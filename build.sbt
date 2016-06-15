@@ -63,9 +63,9 @@ libraryDependencies ++= {
     "org.apache.derby"         % "derbyclient"                    % derbyVersion, //          % "test",
     "org.apache.derby"         % "derbynet"                       % derbyVersion, //          % "test",
     "junit" % "junit" % "4.12" % "test",
-    "org.eclipse.jetty"        % "jetty-server"                   % jettyVersion          % "container;compile;test",
-    "org.eclipse.jetty"        % "jetty-servlets"                 % jettyVersion          % "container;compile;test",
-    "org.eclipse.jetty"        % "jetty-webapp"                   % jettyVersion          % "container;compile;test",
+    "org.eclipse.jetty"        % "jetty-server"                   % jettyVersion          % "compile;test",
+    "org.eclipse.jetty"        % "jetty-servlets"                 % jettyVersion          % "compile;test",
+    "org.eclipse.jetty"        % "jetty-webapp"                   % jettyVersion          % "compile;test",
     "org.eclipse.persistence"  % "eclipselink"                    % eclipselinkVersion,
     "org.json4s"              %% "json4s-jackson"                  % "3.3.0",
     "org.scalatest"           %% "scalatest"                      % scalaTestVersion      % "test",
@@ -84,11 +84,16 @@ libraryDependencies ++= {
 resolvers in ThisBuild ++= Seq(Resolver.mavenLocal,
     "hohonuuli-bintray" at "http://dl.bintray.com/hohonuuli/maven")
 
-//publishMavenStyle := true
-
-//publishTo := Some(Resolver.file("file",  new File(Path.userHome.absolutePath+"/.m2/repository")))
 
 // OTHER SETTINGS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+// -- sbt-native-packager
+enablePlugins(JavaServerAppPackaging)
+
+// -- xsbt-web-plugin
+enablePlugins(JettyPlugin)
+
+mainClass in assembly := Some("JettyMain")
 
 // -- PROMPT
 // set the prompt (for this build) to include the project id.
@@ -141,7 +146,7 @@ resourceGenerators in Compile <+= makeVersionProperties
 packAutoSettings
 
 // For sbt-pack
-val apps = Seq("main")
+val apps = Seq("jetty-main")
 
 packAutoSettings ++ Seq(packExtraClasspath := apps.map(_ -> Seq("${PROG_HOME}/conf")).toMap,
   packJvmOpts := apps.map(_ -> Seq("-Duser.timezone=UTC", "-Xmx4g")).toMap,
