@@ -5,12 +5,12 @@ import java.util.UUID
 import scala.concurrent.{ ExecutionContext, Future }
 
 /**
-  * All DAOs should implement this trait as it defines the minimum CRUD methods needed.
-  *
-  * @author Brian Schlining
-  * @since 2016-05-05T12:44:00
-  * @tparam A The type of the entity
-  */
+ * All DAOs should implement this trait as it defines the minimum CRUD methods needed.
+ *
+ * @author Brian Schlining
+ * @since 2016-05-05T12:44:00
+ * @tparam A The type of the entity
+ */
 trait DAO[A <: PersistentObject] {
 
   def create(entity: A): Unit

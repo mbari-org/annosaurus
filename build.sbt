@@ -21,8 +21,6 @@ scalacOptions in ThisBuild ++= Seq(
   "-Xfatal-warnings",
   "-Xlint",
   "-Yno-adapted-args",
-  "-Ywarn-numeric-widen",
-  "-Ywarn-value-discard",
   "-Xfuture")
 
 javacOptions in ThisBuild ++= Seq("-target", "1.8", "-source","1.8")
@@ -50,6 +48,7 @@ libraryDependencies ++= {
   val scalaTestVersion = "2.2.6"
   val scalatraVersion = "2.4.1"
   val slf4jVersion = "1.7.21"
+  val vcr4jVersion = "3.0.0"
   Seq(
     "ch.qos.logback" % "logback-classic" % logbackVersion,
     "ch.qos.logback" % "logback-core" % logbackVersion,
@@ -67,7 +66,8 @@ libraryDependencies ++= {
     "org.eclipse.jetty"        % "jetty-servlets"                 % jettyVersion          % "compile;test",
     "org.eclipse.jetty"        % "jetty-webapp"                   % jettyVersion          % "compile;test",
     "org.eclipse.persistence"  % "eclipselink"                    % eclipselinkVersion,
-    "org.json4s"              %% "json4s-jackson"                  % "3.3.0",
+    "org.json4s"              %% "json4s-jackson"                 % "3.3.0",
+    "org.mbari.vcr4j"          % "vcr4j-core"                     % vcr4jVersion,
     "org.scalatest"           %% "scalatest"                      % scalaTestVersion      % "test",
     "org.scalatra"            %% "scalatra"                       % scalatraVersion,
     "org.scalatra"            %% "scalatra-json"                  % scalatraVersion,

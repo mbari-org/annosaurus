@@ -7,11 +7,11 @@ import org.slf4j.LoggerFactory
 import scala.concurrent.ExecutionContext
 
 /**
-  *
-  *
-  * @author Brian Schlining
-  * @since 2016-05-20T14:41:00
-  */
+ *
+ *
+ * @author Brian Schlining
+ * @since 2016-05-20T14:41:00
+ */
 class ScalatraBootstrap extends LifeCycle {
 
   private[this] val log = LoggerFactory.getLogger(getClass)
@@ -22,7 +22,8 @@ class ScalatraBootstrap extends LifeCycle {
     """http://localhost:8080/api-docs""",
     """brian@mbari.org""",
     """MIT""",
-    """http://opensource.org/licenses/MIT""")
+    """http://opensource.org/licenses/MIT"""
+  )
 
   implicit val swagger = new Swagger("1.2", "1.0.0", apiInfo)
 
