@@ -8,7 +8,7 @@ MBARI is updating its [Video Annotation and Reference System](https://hohonuuli.
 
 - Create a web-accessible API for creating, updating and deleting video annotations.
 - Use lessons learned from MBARI's video annotation system to create flexible, but searchable video annotations
-- This service should stand on it's own and _not require_ and of the other VARS services to function. This is to provide flexibility in how organizations use this service.
+- This service should stand on it's own and _not require_ any of the other VARS services to function. This is to provide flexibility in how organizations use this service.
 - Simplify installation and deployment for organizations. We recognize that many science institutions would benefit from simply installation. 
 
 __Related Projects__:
