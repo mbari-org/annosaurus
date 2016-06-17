@@ -31,6 +31,6 @@ trait ImageReference {
   var height: Int
   var url: URL
   var description: String
-  def lastUpdated: Instant
+  def lastUpdated: Option[Instant]
 
 }

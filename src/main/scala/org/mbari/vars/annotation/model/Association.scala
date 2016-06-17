@@ -19,3 +19,19 @@ trait Association {
   def lastUpdated: Option[Instant]
 
 }
+
+object Association {
+
+  val LINK_VALUE_NIL = "nil"
+
+  val TO_CONCEPT_SELF = "self"
+
+  val SEPARATOR = " | "
+
+  def asString(association: Association): String = {
+    association.linkName + SEPARATOR +
+      Option(association.toConcept).getOrElse(TO_CONCEPT_SELF) + SEPARATOR +
+      Option(association.linkValue).getOrElse(LINK_VALUE_NIL)
+  }
+
+}

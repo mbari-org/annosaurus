@@ -12,6 +12,7 @@
         <class>org.mbari.vars.annotation.dao.jpa.InstantConverter</class>
         <class>org.mbari.vars.annotation.dao.jpa.URIConverter</class>
         <class>org.mbari.vars.annotation.dao.jpa.UUIDConverter</class>
+        <class>org.mbari.vars.annotation.dao.jpa.TimecodeConverter</class>
 
         <!-- Entities -->
         <!--<class>org.mbari.vars.vam.dao.jpa.VideoSequence</class>-->
