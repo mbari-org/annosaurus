@@ -3,7 +3,7 @@ package org.mbari.vars.annotation.dao.jpa
 import java.util.UUID
 import javax.persistence._
 
-import org.mbari.vars.annotation.dao.PersistentObject
+import org.mbari.vars.annotation.PersistentObject
 
 /**
  * Mixin that supports the UUID fields

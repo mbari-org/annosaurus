@@ -3,13 +3,15 @@ package org.mbari.vars.annotation.model
 import java.time.{ Duration, Instant }
 import java.util.UUID
 
+import org.mbari.vars.annotation.PersistentObject
+
 /**
  *
  *
  * @author Brian Schlining
  * @since 2016-06-15T16:53:00
  */
-trait Observation {
+trait Observation extends PersistentObject {
 
   var uuid: UUID
   var imagedMoment: ImagedMoment

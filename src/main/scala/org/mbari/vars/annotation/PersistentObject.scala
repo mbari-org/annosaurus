@@ -1,4 +1,4 @@
-package org.mbari.vars.annotation.dao
+package org.mbari.vars.annotation
 
 import java.util.UUID
 

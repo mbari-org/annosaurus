@@ -3,6 +3,7 @@ package org.mbari.vars.annotation.model
 import java.time.{ Duration, Instant }
 import java.util.UUID
 
+import org.mbari.vars.annotation.PersistentObject
 import org.mbari.vcr4j.time.Timecode
 
 /**
@@ -11,7 +12,7 @@ import org.mbari.vcr4j.time.Timecode
  * @author Brian Schlining
  * @since 2016-06-15T16:54:00
  */
-trait ImagedMoment {
+trait ImagedMoment extends PersistentObject {
 
   var uuid: UUID
   var videoReferenceUUID: UUID

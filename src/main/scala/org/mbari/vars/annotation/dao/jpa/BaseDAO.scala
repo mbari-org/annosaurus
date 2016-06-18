@@ -3,7 +3,8 @@ package org.mbari.vars.annotation.dao.jpa
 import java.util.UUID
 import javax.persistence.EntityManager
 
-import org.mbari.vars.annotation.dao.{ DAO, PersistentObject }
+import org.mbari.vars.annotation.PersistentObject
+import org.mbari.vars.annotation.dao.DAO
 import org.slf4j.LoggerFactory
 
 import scala.collection.JavaConverters._
