@@ -19,5 +19,4 @@ class AssociationDAOImpl(entityManager: EntityManager)
 
   override def findAll(): Iterable[AssociationImpl] = ???
 
-  override def deleteByUUID(primaryKey: UUID): Unit = ???
 }

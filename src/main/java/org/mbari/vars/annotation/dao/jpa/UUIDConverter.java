@@ -12,11 +12,19 @@ public class UUIDConverter implements AttributeConverter<UUID, String> {
 
     @Override
     public String convertToDatabaseColumn(UUID uuid) {
-        return uuid == null ? null : uuid.toString().toUpperCase();
+        return uuidToString(uuid);
     }
 
     @Override
     public UUID convertToEntityAttribute(String s) {
+        return stringToUUID(s);
+    }
+
+    public static String uuidToString(UUID uuid) {
+        return uuid == null ? null : uuid.toString().toUpperCase();
+    }
+
+    public static UUID stringToUUID(String s) {
         return s == null ? null : UUID.fromString(s.toUpperCase());
     }
 }

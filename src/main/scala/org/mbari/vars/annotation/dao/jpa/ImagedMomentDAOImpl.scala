@@ -16,23 +16,16 @@ import scala.concurrent.{ ExecutionContext, Future }
 class ImagedMomentDAOImpl(entityManager: EntityManager)
     extends BaseDAO[ImagedMomentImpl](entityManager)
     with ImagedMomentDAO[ImagedMomentImpl] {
-  override def findByVideoReferenceUUID(uuid: UUID): Iterable[ImagedMomentImpl] = ???
+  override def findByVideoReferenceUUID(uuid: UUID): Iterable[ImagedMomentImpl] =
+    findByNamedQuery("ImagedMoment.findByVideoReferenceUUID", Map("uuid" -> uuid))
 
-  override def findWithImageReferences(videoReferenceUUID: UUID): Iterable[ImagedMomentImpl] = ???
+  override def findWithImageReferences(videoReferenceUUID: UUID): Iterable[ImagedMomentImpl] =
+    findByNamedQuery("ImagedMoment.findWithImageReferences", Map("uuid" -> videoReferenceUUID))
 
-  override def findByUUID(primaryKey: UUID): Option[ImagedMomentImpl] = ???
+  override def findByUUID(primaryKey: UUID): Option[ImagedMomentImpl] =
+    findByNamedQuery("ImagedMoment.findByUUID", Map("uuid" -> primaryKey)).headOption
 
-  override def update(entity: ImagedMomentImpl): ImagedMomentImpl = ???
+  override def findAll(): Iterable[ImagedMomentImpl] =
+    findByNamedQuery("ImagedMoment.findAll")
 
-  override def findAll(): Iterable[ImagedMomentImpl] = ???
-
-  override def delete(entity: ImagedMomentImpl): Unit = ???
-
-  override def close(): Unit = ???
-
-  override def create(entity: ImagedMomentImpl): Unit = ???
-
-  override def deleteByUUID(primaryKey: UUID): Unit = ???
-
-  override def runTransaction[R](fn: (ImagedMomentDAOImpl.this.type) => R)(implicit ec: ExecutionContext): Future[R] = ???
 }

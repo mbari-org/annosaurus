@@ -14,6 +14,10 @@ import org.mbari.vars.annotation.model.{ ImageReference, ImagedMoment }
 @Entity(name = "ImageReference")
 @Table(name = "image_references")
 @EntityListeners(value = Array(classOf[TransactionLogger]))
+@NamedQueries(Array(
+  new NamedQuery(
+    name = "ImageReference.findAll",
+    query = "SELECT r FROM ImageReference r")))
 class ImageReferenceImpl extends ImageReference with JPAPersistentObject {
 
   @Column(

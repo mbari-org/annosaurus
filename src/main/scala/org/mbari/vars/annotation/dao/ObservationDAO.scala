@@ -1,5 +1,7 @@
 package org.mbari.vars.annotation.dao
 
+import java.util.UUID
+
 import org.mbari.vars.annotation.model.Observation
 
 /**
@@ -15,5 +17,7 @@ trait ObservationDAO[T <: Observation] extends DAO[T] {
    * @return Order sequence of all concept names used
    */
   def findAllNames(): Seq[String]
+
+  def findAllNamesByVideoReferenceUUID(uuid: UUID): Seq[String]
 
 }

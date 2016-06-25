@@ -19,6 +19,19 @@ import scala.collection.JavaConverters._
 @Entity(name = "ImagedMoment")
 @Table(name = "imaged_moments")
 @EntityListeners(value = Array(classOf[TransactionLogger]))
+@NamedQueries(Array(
+  new NamedQuery(
+    name = "ImagedMoment.findAll",
+    query = "SELECT i FROM ImagedMoment i"),
+  new NamedQuery(
+    name = "ImagedMoment.findByVideoReferenceUUID",
+    query = "SELECT i FROM ImagedMoment i WHERE i.videoReferenceUUID = :uuid"),
+  new NamedQuery(
+    name = "ImagedMoment.findWithImageReferences",
+    query = "SELECT i FROM ImagedMoment i LEFT JOIN i.javaImageReferences r WHERE i.videoReferenceUUID = :uuid AND r.url NOT NULL"),
+  new NamedQuery(
+    name = "ImagedMoment.findByUUID",
+    query = "SELECT i FROM ImagedMoment i WHERE i.uuid = :uuid")))
 class ImagedMomentImpl extends ImagedMoment with JPAPersistentObject {
 
   @Column(
@@ -93,7 +106,7 @@ class ImagedMomentImpl extends ImagedMoment with JPAPersistentObject {
     imageReference.imagedMoment = null
   }
 
-  @ManyToOne(
+  @OneToOne(
     cascade = Array(CascadeType.ALL),
     optional = true
   )

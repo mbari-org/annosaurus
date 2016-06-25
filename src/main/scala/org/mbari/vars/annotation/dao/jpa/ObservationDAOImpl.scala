@@ -5,6 +5,8 @@ import javax.persistence.EntityManager
 
 import org.mbari.vars.annotation.dao.ObservationDAO
 
+import scala.collection.JavaConverters._
+
 /**
  *
  *
@@ -18,9 +20,19 @@ class ObservationDAOImpl(entityManager: EntityManager)
    *
    * @return Order sequence of all concept names used
    */
-  override def findAllNames(): Seq[String] = ???
+  override def findAllNames(): Seq[String] = entityManager.createNamedQuery("Observation.findAllNames")
+      .getResultList
+      .asScala
+      .map(_.toString)
 
-  override def findAll(): Iterable[ObservationImpl] = ???
+  override def findAll(): Iterable[ObservationImpl] =
+    findByNamedQuery("Observation.findAll")
 
-  override def deleteByUUID(primaryKey: UUID): Unit = ???
+  override def findAllNamesByVideoReferenceUUID(uuid: UUID): Seq[String] = {
+    val query = entityManager.createNamedQuery("Observation.findAllNamesByVideoReferenceUUID")
+    query.setParameter(1, UUIDConverter.uuidToString(uuid))
+    query.getResultList
+          .asScala
+              .map(_.toString)
+  }
 }

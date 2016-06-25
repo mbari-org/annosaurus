@@ -14,7 +14,7 @@ import org.mbari.vars.annotation.dao.ImageReferenceDAO
 class ImageReferenceDAOImpl(entityManager: EntityManager)
     extends BaseDAO[ImageReferenceImpl](entityManager)
     with ImageReferenceDAO[ImageReferenceImpl] {
-  override def deleteByUUID(primaryKey: UUID): Unit = ???
 
-  override def findAll(): Iterable[ImageReferenceImpl] = ???
+  override def findAll(): Iterable[ImageReferenceImpl] =
+    findByNamedQuery("ImageReference.findAll")
 }
