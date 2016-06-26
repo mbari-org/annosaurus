@@ -1,11 +1,11 @@
 package org.mbari.vars.annotation.dao.jpa
 
+import java.time.{ Duration, Instant }
 import java.util.UUID
 import javax.persistence.EntityManager
 
 import org.mbari.vars.annotation.dao.ImagedMomentDAO
-
-import scala.concurrent.{ ExecutionContext, Future }
+import org.mbari.vcr4j.time.Timecode
 
 /**
  *
@@ -16,6 +16,9 @@ import scala.concurrent.{ ExecutionContext, Future }
 class ImagedMomentDAOImpl(entityManager: EntityManager)
     extends BaseDAO[ImagedMomentImpl](entityManager)
     with ImagedMomentDAO[ImagedMomentImpl] {
+
+  override def newPersistentObject(): ImagedMomentImpl = new ImagedMomentImpl
+
   override def findByVideoReferenceUUID(uuid: UUID): Iterable[ImagedMomentImpl] =
     findByNamedQuery("ImagedMoment.findByVideoReferenceUUID", Map("uuid" -> uuid))
 
@@ -27,5 +30,15 @@ class ImagedMomentDAOImpl(entityManager: EntityManager)
 
   override def findAll(): Iterable[ImagedMomentImpl] =
     findByNamedQuery("ImagedMoment.findAll")
+
+  override def findByVideoReferenceUUIDAndElapsedTime(uuid: UUID, elapsedTime: Duration): Option[ImagedMomentImpl] =
+    findByNamedQuery("ImagedMoment.findByVideoReferenceUUIDAndElapsedTime", Map("elapsedTime" -> elapsedTime)).headOption
+
+  override def findByVideoReferenceUUIDAndTimecode(uuid: UUID, timecode: Timecode): Option[ImagedMomentImpl] =
+    findByNamedQuery("ImagedMoment.findByVideoReferenceUUIDAndTimecode", Map("timecode" -> timecode)).headOption
+
+  override def findByVideoReferenceUUIDAndRecordedDate(uuid: UUID, recordedDate: Instant): Option[ImagedMomentImpl] =
+    findByNamedQuery("ImagedMoment.findByVideoReferenceUUIDAndRecordedDate", Map("recordedDate" -> recordedDate)).headOption
+
 
 }

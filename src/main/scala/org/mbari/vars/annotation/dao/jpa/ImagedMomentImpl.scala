@@ -22,16 +22,33 @@ import scala.collection.JavaConverters._
 @NamedQueries(Array(
   new NamedQuery(
     name = "ImagedMoment.findAll",
-    query = "SELECT i FROM ImagedMoment i"),
+    query = "SELECT i FROM ImagedMoment i"
+  ),
   new NamedQuery(
     name = "ImagedMoment.findByVideoReferenceUUID",
-    query = "SELECT i FROM ImagedMoment i WHERE i.videoReferenceUUID = :uuid"),
+    query = "SELECT i FROM ImagedMoment i WHERE i.videoReferenceUUID = :uuid"
+  ),
   new NamedQuery(
     name = "ImagedMoment.findWithImageReferences",
-    query = "SELECT i FROM ImagedMoment i LEFT JOIN i.javaImageReferences r WHERE i.videoReferenceUUID = :uuid AND r.url NOT NULL"),
+    query = "SELECT i FROM ImagedMoment i LEFT JOIN i.javaImageReferences r WHERE i.videoReferenceUUID = :uuid AND r.url NOT NULL"
+  ),
   new NamedQuery(
     name = "ImagedMoment.findByUUID",
-    query = "SELECT i FROM ImagedMoment i WHERE i.uuid = :uuid")))
+    query = "SELECT i FROM ImagedMoment i WHERE i.uuid = :uuid"
+  ),
+  new NamedQuery(
+    name = "ImagedMoment.findByVideoReferenceUUIDAndTimecode",
+    query = "SELECT i FROM ImagedMoment i WHERE i.timecode = :timecode"
+  ),
+  new NamedQuery(
+    name = "ImagedMoment.findByVideoReferenceUUIDAndElapsedTime",
+    query = "SELECT i FROM ImagedMoment i WHERE i.elapsedTime = :elapsedTime"
+  ),
+  new NamedQuery(
+    name = "ImagedMoment.findByVideoReferenceUUIDAndRecordedDate",
+    query = "SELECT i FROM ImagedMoment i WHERE i.recordedDate = :recordedDate"
+  )
+))
 class ImagedMomentImpl extends ImagedMoment with JPAPersistentObject {
 
   @Column(

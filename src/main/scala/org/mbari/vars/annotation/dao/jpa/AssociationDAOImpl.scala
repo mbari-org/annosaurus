@@ -15,8 +15,12 @@ class AssociationDAOImpl(entityManager: EntityManager)
     extends BaseDAO[AssociationImpl](entityManager)
     with AssociationDAO[AssociationImpl] {
 
-  override def findByLinkName(linkName: String): Iterable[AssociationImpl] = ???
+  override def newPersistentObject(): AssociationImpl = new AssociationImpl
 
-  override def findAll(): Iterable[AssociationImpl] = ???
+  override def findByLinkName(linkName: String): Iterable[AssociationImpl] =
+    findByNamedQuery("Association.findByLinkName")
+
+  override def findAll(): Iterable[AssociationImpl] =
+    findByNamedQuery("Association.findAll")
 
 }

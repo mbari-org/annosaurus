@@ -15,6 +15,7 @@ import scala.concurrent.{ ExecutionContext, Future }
  */
 trait DAO[A <: PersistentObject] {
 
+  def newPersistentObject(): A
   def create(entity: A): Unit
   def update(entity: A): A
   def delete(entity: A): Unit

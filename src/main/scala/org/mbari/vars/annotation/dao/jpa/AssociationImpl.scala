@@ -1,6 +1,6 @@
 package org.mbari.vars.annotation.dao.jpa
 
-import javax.persistence._
+import javax.persistence.{ NamedQuery, _ }
 
 import org.mbari.vars.annotation.model.{ Association, Observation }
 
@@ -13,6 +13,16 @@ import org.mbari.vars.annotation.model.{ Association, Observation }
 @Entity(name = "Association")
 @Table(name = "associations")
 @EntityListeners(value = Array(classOf[TransactionLogger]))
+@NamedQueries(Array(
+  new NamedQuery(
+    name = "Association.findAll",
+    query = "SELECT a FROM Association a"
+  ),
+  new NamedQuery(
+    name = "Association.findByLinkName",
+    query = "SELECT a FROM Association a WHERE a.linkName = :linkName"
+  )
+))
 class AssociationImpl extends Association with JPAPersistentObject {
 
   @Index(name = "idx_link_name", columnList = "link_name")

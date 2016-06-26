@@ -15,6 +15,8 @@ class ImageReferenceDAOImpl(entityManager: EntityManager)
     extends BaseDAO[ImageReferenceImpl](entityManager)
     with ImageReferenceDAO[ImageReferenceImpl] {
 
+  override def newPersistentObject(): ImageReferenceImpl = new ImageReferenceImpl
+
   override def findAll(): Iterable[ImageReferenceImpl] =
     findByNamedQuery("ImageReference.findAll")
 }

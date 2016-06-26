@@ -19,14 +19,19 @@ import org.mbari.vars.annotation.model.{ Association, ImagedMoment, Observation 
 @NamedNativeQueries(Array(
   new NamedNativeQuery(
     name = "Observation.findAllNames",
-    query = "SELECT DISTINCT concept FROM observations ORDER BY concept"),
+    query = "SELECT DISTINCT concept FROM observations ORDER BY concept"
+  ),
   new NamedNativeQuery(
     name = "Observation.findAllNamesByVideoReferenceUUID",
-    query = "SELECT DISTINCT concept FROM observations RIGHT JOIN imaged_moments WHERE imaged_moments.video_reference_uuid = ?1 ORDER BY concept")))
+    query = "SELECT DISTINCT concept FROM observations RIGHT JOIN imaged_moments WHERE imaged_moments.video_reference_uuid = ?1 ORDER BY concept"
+  )
+))
 @NamedQueries(Array(
   new NamedQuery(
     name = "Observation.findAll",
-    query = "SELECT o FROM Observation o")))
+    query = "SELECT o FROM Observation o"
+  )
+))
 class ObservationImpl extends Observation with JPAPersistentObject {
 
   @Index(name = "idx_concept", columnList = "concept")

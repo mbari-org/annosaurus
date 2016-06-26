@@ -15,7 +15,7 @@ class CachedAncillaryDatumDAOImpl(entityManager: EntityManager)
     extends BaseDAO[CachedAncillaryDatumImpl](entityManager)
     with CachedAncillaryDatumDAO[CachedAncillaryDatumImpl] {
 
-  override def deleteByUUID(primaryKey: UUID): Unit = ???
+  override def newPersistentObject(): CachedAncillaryDatumImpl = new CachedAncillaryDatumImpl
 
   override def findAll(): Iterable[CachedAncillaryDatumImpl] = ???
 }

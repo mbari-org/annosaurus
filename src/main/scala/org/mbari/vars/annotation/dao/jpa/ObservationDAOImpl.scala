@@ -16,14 +16,17 @@ import scala.collection.JavaConverters._
 class ObservationDAOImpl(entityManager: EntityManager)
     extends BaseDAO[ObservationImpl](entityManager)
     with ObservationDAO[ObservationImpl] {
+
+  override def newPersistentObject(): ObservationImpl = new ObservationImpl
+
   /**
    *
    * @return Order sequence of all concept names used
    */
   override def findAllNames(): Seq[String] = entityManager.createNamedQuery("Observation.findAllNames")
-      .getResultList
-      .asScala
-      .map(_.toString)
+    .getResultList
+    .asScala
+    .map(_.toString)
 
   override def findAll(): Iterable[ObservationImpl] =
     findByNamedQuery("Observation.findAll")
@@ -32,7 +35,7 @@ class ObservationDAOImpl(entityManager: EntityManager)
     val query = entityManager.createNamedQuery("Observation.findAllNamesByVideoReferenceUUID")
     query.setParameter(1, UUIDConverter.uuidToString(uuid))
     query.getResultList
-          .asScala
-              .map(_.toString)
+      .asScala
+      .map(_.toString)
   }
 }
