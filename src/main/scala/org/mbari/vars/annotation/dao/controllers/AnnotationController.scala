@@ -3,7 +3,8 @@ package org.mbari.vars.annotation.dao.controllers
 import java.time.{Duration, Instant}
 import java.util.UUID
 
-import org.mbari.vars.annotation.model.Observation
+import org.mbari.vars.annotation.dao.{ImagedMomentDAO, ObservationDAO}
+import org.mbari.vars.annotation.model.{ImagedMoment, Observation}
 import org.mbari.vcr4j.time.Timecode
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -27,6 +28,8 @@ class AnnotationController(imagedMomentController: ImagedMomentController,
                     duration: Option[Duration] = None
                     )(implicit ec: ExecutionContext): Future[Observation] = {
 
+
+    // TODO make this ACID. Right now it's done in 2 transactions
     imagedMomentController.create(videoReferenceUUID, timecode, recordedDate, elapsedTime)
         .map(imagedMoment => {
           val obsDAO = observationController.daoFactory.newObservationDAO()
@@ -35,6 +38,9 @@ class AnnotationController(imagedMomentController: ImagedMomentController,
           observation.observer = observer
           observation.observationDate = observationDate
           duration.foreach(observation.duration = _)
+          obsDAO.create(observation)
+          imagedMoment.addObservation(observation)
+          obsDAO.close()
           observation
         })
 

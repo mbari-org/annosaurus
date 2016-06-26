@@ -11,11 +11,17 @@
         <class>org.mbari.vars.annotation.dao.jpa.DurationConverter</class>
         <class>org.mbari.vars.annotation.dao.jpa.InstantConverter</class>
         <class>org.mbari.vars.annotation.dao.jpa.URIConverter</class>
+        <class>org.mbari.vars.annotation.dao.jpa.URLConverter</class>
         <class>org.mbari.vars.annotation.dao.jpa.UUIDConverter</class>
         <class>org.mbari.vars.annotation.dao.jpa.TimecodeConverter</class>
 
         <!-- Entities -->
-        <!--<class>org.mbari.vars.vam.dao.jpa.VideoSequence</class>-->
+        <class>org.mbari.vars.annotation.dao.jpa.ImagedMomentImpl</class>
+        <class>org.mbari.vars.annotation.dao.jpa.ObservationImpl</class>
+        <class>org.mbari.vars.annotation.dao.jpa.AssociationImpl</class>
+        <class>org.mbari.vars.annotation.dao.jpa.ImageReferenceImpl</class>
+        <class>org.mbari.vars.annotation.dao.jpa.CachedAncillaryDatumImpl</class>
+        <class>org.mbari.vars.annotation.dao.jpa.CachedVideoReferenceInfoImpl</class>
 
         <properties>
             <property name="eclipselink.logging.level" value="INFO"/>
