@@ -1,4 +1,4 @@
-package org.mbari.vars.annotation.dao.api
+package org.mbari.vars.annotation.api
 
 import java.net.{ URI, URL }
 import java.time.{ Duration, Instant }
