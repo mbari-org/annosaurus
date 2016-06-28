@@ -52,6 +52,7 @@ libraryDependencies ++= {
   Seq(
     "ch.qos.logback" % "logback-classic" % logbackVersion,
     "ch.qos.logback" % "logback-core" % logbackVersion,
+    "com.h2database"           % "h2"                             % h2Version             % "test",
     "com.typesafe" % "config" % "1.3.0",
     "commons-codec"            % "commons-codec"                  % "1.10",
     "javax.servlet"            % "javax.servlet-api"              % "3.1.0",

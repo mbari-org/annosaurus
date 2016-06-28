@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.persistence.AttributeConverter;
+import javax.persistence.Converter;
 import java.net.MalformedURLException;
 import java.net.URL;
 
@@ -11,6 +12,7 @@ import java.net.URL;
  * @author Brian Schlining
  * @since 2016-06-17T13:17:00
  */
+@Converter(autoApply = true)
 public class URLConverter implements AttributeConverter<URL, String> {
 
     private final Logger log = LoggerFactory.getLogger(getClass());

@@ -48,7 +48,11 @@ class CachedAncillaryDatumImpl extends CachedAncillaryDatum with JPAPersistentOb
   )
   override var latitude: Double = _
 
-  @ManyToOne(cascade = Array(CascadeType.PERSIST, CascadeType.DETACH), optional = false)
+  @OneToOne(
+    cascade = Array(CascadeType.PERSIST, CascadeType.DETACH),
+    optional = false,
+    targetEntity = classOf[ImagedMomentImpl]
+  )
   @JoinColumn(name = "imaged_moment_uuid", nullable = false)
   override var imagedMoment: ImagedMoment = _
 

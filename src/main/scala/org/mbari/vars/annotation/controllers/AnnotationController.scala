@@ -16,7 +16,7 @@ import scala.concurrent.{ ExecutionContext, Future }
  * @since 2016-06-25T20:28:00
  */
 class AnnotationController(
-  imagedMomentController: ImagedMomentController,
+    imagedMomentController: ImagedMomentController,
     observationController: ObservationController
 ) {
 

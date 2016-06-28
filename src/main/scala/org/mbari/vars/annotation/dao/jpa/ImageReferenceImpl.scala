@@ -38,7 +38,11 @@ class ImageReferenceImpl extends ImageReference with JPAPersistentObject {
   @Convert(converter = classOf[URLConverter])
   override var url: URL = _
 
-  @ManyToOne(cascade = Array(CascadeType.PERSIST, CascadeType.DETACH), optional = false)
+  @ManyToOne(
+    cascade = Array(CascadeType.PERSIST, CascadeType.DETACH),
+    optional = false,
+    targetEntity = classOf[ImagedMomentImpl]
+  )
   @JoinColumn(name = "imaged_moment_uuid", nullable = false)
   override var imagedMoment: ImagedMoment = _
 

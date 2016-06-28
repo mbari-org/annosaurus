@@ -20,7 +20,7 @@ import scala.collection.JavaConverters._
 object EntityManagerFactories {
 
   def apply(properties: Map[String, String]): EntityManagerFactory = {
-    val customProps = properties + (PersistenceUnitProperties.SESSION_CUSTOMIZER -> "org.mbari.vars.vam.dao.jpa.UUIDSequence")
+    val customProps = properties + (PersistenceUnitProperties.SESSION_CUSTOMIZER -> "org.mbari.vars.annotation.dao.jpa.UUIDSequence")
     Persistence.createEntityManagerFactory("video-asset-manager", customProps.asJava)
   }
 

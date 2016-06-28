@@ -41,7 +41,11 @@ class AssociationImpl extends Association with JPAPersistentObject {
   )
   override var linkValue: String = _
 
-  @ManyToOne(cascade = Array(CascadeType.PERSIST, CascadeType.DETACH), optional = false)
+  @ManyToOne(
+    cascade = Array(CascadeType.PERSIST, CascadeType.DETACH),
+    optional = false,
+    targetEntity = classOf[ObservationImpl]
+  )
   @JoinColumn(name = "observation_uuid", nullable = false)
   override var observation: Observation = _
 

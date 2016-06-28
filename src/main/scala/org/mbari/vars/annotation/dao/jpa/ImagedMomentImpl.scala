@@ -30,7 +30,7 @@ import scala.collection.JavaConverters._
   ),
   new NamedQuery(
     name = "ImagedMoment.findWithImageReferences",
-    query = "SELECT i FROM ImagedMoment i LEFT JOIN i.javaImageReferences r WHERE i.videoReferenceUUID = :uuid AND r.url NOT NULL"
+    query = "SELECT i FROM ImagedMoment i LEFT JOIN i.javaImageReferences r WHERE i.videoReferenceUUID = :uuid"
   ),
   new NamedQuery(
     name = "ImagedMoment.findByUUID",
@@ -82,7 +82,7 @@ class ImagedMomentImpl extends ImagedMoment with JPAPersistentObject {
   override var videoReferenceUUID: UUID = _
 
   @OneToMany(
-    targetEntity = classOf[Observation],
+    targetEntity = classOf[ObservationImpl],
     cascade = Array(CascadeType.ALL),
     fetch = FetchType.EAGER,
     mappedBy = "imagedMoment",
@@ -103,7 +103,7 @@ class ImagedMomentImpl extends ImagedMoment with JPAPersistentObject {
   override def observations: Iterable[Observation] = javaObservations.asScala
 
   @OneToMany(
-    targetEntity = classOf[ImageReference],
+    targetEntity = classOf[ImageReferenceImpl],
     cascade = Array(CascadeType.ALL),
     fetch = FetchType.EAGER,
     mappedBy = "imagedMoment",
@@ -125,7 +125,8 @@ class ImagedMomentImpl extends ImagedMoment with JPAPersistentObject {
 
   @OneToOne(
     cascade = Array(CascadeType.ALL),
-    optional = true
+    optional = true,
+    targetEntity = classOf[CachedAncillaryDatumImpl]
   )
   @JoinColumn(
     name = "ancillary_datum_uuid",

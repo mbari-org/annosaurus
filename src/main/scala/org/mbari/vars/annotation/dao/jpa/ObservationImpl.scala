@@ -48,7 +48,11 @@ class ObservationImpl extends Observation with JPAPersistentObject {
   @Convert(converter = classOf[DurationConverter])
   override var duration: Duration = _
 
-  @ManyToOne(cascade = Array(CascadeType.PERSIST, CascadeType.DETACH), optional = false)
+  @ManyToOne(
+    cascade = Array(CascadeType.PERSIST, CascadeType.DETACH),
+    optional = false,
+    targetEntity = classOf[ImagedMomentImpl]
+  )
   @JoinColumn(name = "imaged_moment_uuid", nullable = false)
   override var imagedMoment: ImagedMoment = _
 
@@ -68,7 +72,7 @@ class ObservationImpl extends Observation with JPAPersistentObject {
   override var observer: String = _
 
   @OneToMany(
-    targetEntity = classOf[Association],
+    targetEntity = classOf[AssociationImpl],
     cascade = Array(CascadeType.ALL),
     fetch = FetchType.EAGER,
     mappedBy = "observation",
