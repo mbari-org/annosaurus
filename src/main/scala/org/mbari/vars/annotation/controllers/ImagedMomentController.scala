@@ -20,7 +20,7 @@ class ImagedMomentController(val daoFactory: BasicDAOFactory)
 
   protected type IMDAO = ImagedMomentDAO[ImagedMoment]
 
-  override def newDAO(): ImagedMomentDAO[ImagedMoment] = daoFactory.newImagedMomentDAO()
+  override def newDAO(): IMDAO = daoFactory.newImagedMomentDAO()
 
   def findByVideoReferenceUUID(uuid: UUID)(implicit ec: ExecutionContext): Future[Iterable[ImagedMoment]] =
     exec(d => d.findByVideoReferenceUUID(uuid))
@@ -35,20 +35,10 @@ class ImagedMomentController(val daoFactory: BasicDAOFactory)
     elapsedTime: Option[Duration] = None
   )(implicit ec: ExecutionContext): Future[ImagedMoment] = {
 
-    def fn(dao: IMDAO): ImagedMoment = {
-      // -- Return existing or construct a new one if no match is found
-      dao.findByVideoReferenceUUIDAndIndex(videoReferenceUUID, timecode, elapsedTime, recordedDate) match {
-        case Some(imagedMoment) => imagedMoment
-        case None =>
-          val imagedMoment = dao.newPersistentObject()
-          imagedMoment.videoReferenceUUID = videoReferenceUUID
-          timecode.foreach(imagedMoment.timecode = _)
-          elapsedTime.foreach(imagedMoment.elapsedTime = _)
-          recordedDate.foreach(imagedMoment.recordedDate = _)
-          dao.create(imagedMoment)
-          imagedMoment
-      }
-    }
+    def fn(d: IMDAO) = ImagedMomentController.findImagedMoment(
+      d,
+      videoReferenceUUID, timecode, recordedDate, elapsedTime
+    )
     exec(fn)
   }
 
@@ -72,7 +62,29 @@ class ImagedMomentController(val daoFactory: BasicDAOFactory)
           imagedMoment
       }
     }
-
     exec(fn)
+  }
+}
+
+object ImagedMomentController {
+  def findImagedMoment(
+    dao: ImagedMomentDAO[ImagedMoment],
+    videoReferenceUUID: UUID,
+    timecode: Option[Timecode] = None,
+    recordedDate: Option[Instant] = None,
+    elapsedTime: Option[Duration] = None
+  ): ImagedMoment = {
+    // -- Return existing or construct a new one if no match is found
+    dao.findByVideoReferenceUUIDAndIndex(videoReferenceUUID, timecode, elapsedTime, recordedDate) match {
+      case Some(imagedMoment) => imagedMoment
+      case None =>
+        val imagedMoment = dao.newPersistentObject()
+        imagedMoment.videoReferenceUUID = videoReferenceUUID
+        timecode.foreach(imagedMoment.timecode = _)
+        elapsedTime.foreach(imagedMoment.elapsedTime = _)
+        recordedDate.foreach(imagedMoment.recordedDate = _)
+        dao.create(imagedMoment)
+        imagedMoment
+    }
   }
 }
