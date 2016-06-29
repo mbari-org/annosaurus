@@ -26,6 +26,7 @@ class ObservationDAOImpl(entityManager: EntityManager)
   override def findAllNames(): Seq[String] = entityManager.createNamedQuery("Observation.findAllNames")
     .getResultList
     .asScala
+    .filter(_ != null)
     .map(_.toString)
 
   override def findAll(): Iterable[ObservationImpl] =

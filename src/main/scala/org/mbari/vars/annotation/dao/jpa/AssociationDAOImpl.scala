@@ -18,7 +18,7 @@ class AssociationDAOImpl(entityManager: EntityManager)
   override def newPersistentObject(): AssociationImpl = new AssociationImpl
 
   override def findByLinkName(linkName: String): Iterable[AssociationImpl] =
-    findByNamedQuery("Association.findByLinkName")
+    findByNamedQuery("Association.findByLinkName", Map("linkName" -> linkName))
 
   override def findAll(): Iterable[AssociationImpl] =
     findByNamedQuery("Association.findAll")

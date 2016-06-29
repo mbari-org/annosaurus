@@ -17,5 +17,6 @@ class CachedAncillaryDatumDAOImpl(entityManager: EntityManager)
 
   override def newPersistentObject(): CachedAncillaryDatumImpl = new CachedAncillaryDatumImpl
 
-  override def findAll(): Iterable[CachedAncillaryDatumImpl] = ???
+  override def findAll(): Iterable[CachedAncillaryDatumImpl] =
+    findByNamedQuery("AncillaryDatum.findAll")
 }

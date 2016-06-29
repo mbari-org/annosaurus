@@ -30,7 +30,7 @@ trait CachedAncillaryDatum extends PersistentObject {
   // --- CTDO
   var salinity: Float
   var temperatureCelsius: Float
-  var oxygenMgL: Float
+  var oxygenMlL: Float
   var pressureDbar: Float
 
   // -- Camera Pose

@@ -103,6 +103,7 @@ object ObservationImpl {
     observer: Option[String] = None
   ): ObservationImpl = {
     val obs = new ObservationImpl
+    obs.concept = concept
     duration.foreach(obs.duration = _)
     observationDate.foreach(obs.observationDate = _)
     observer.foreach(obs.observer = _)

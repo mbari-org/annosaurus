@@ -10,9 +10,15 @@ import org.mbari.vars.annotation.model.{ CachedAncillaryDatum, ImagedMoment }
  * @author Brian Schlining
  * @since 2016-06-17T15:17:00
  */
-@Entity(name = "AnxillaryDatum")
-@Table(name = "anxillary_data")
+@Entity(name = "AncillaryDatum")
+@Table(name = "ancillary_data")
 @EntityListeners(value = Array(classOf[TransactionLogger]))
+@NamedQueries(Array(
+  new NamedQuery(
+    name = "AncillaryDatum.findAll",
+    query = "SELECT a FROM AncillaryDatum a"
+  )
+))
 class CachedAncillaryDatumImpl extends CachedAncillaryDatum with JPAPersistentObject {
 
   @Column(
@@ -25,7 +31,7 @@ class CachedAncillaryDatumImpl extends CachedAncillaryDatum with JPAPersistentOb
     name = "oxygen_ml_per_l",
     nullable = true
   )
-  override var oxygenMgL: Float = _
+  override var oxygenMlL: Float = _
 
   @Column(name = "depth_meters")
   override var depthMeters: Float = _
@@ -115,4 +121,42 @@ class CachedAncillaryDatumImpl extends CachedAncillaryDatum with JPAPersistentOb
     nullable = true
   )
   override var altitude: Float = _
+}
+
+object CachedAncillaryDatumImpl {
+
+  /**
+   *
+   * @param latitude
+   * @param longitude
+   * @param depthMeters
+   * @return
+   */
+  def apply(latitude: Double, longitude: Double, depthMeters: Float): CachedAncillaryDatumImpl = {
+    val d = new CachedAncillaryDatumImpl
+    d.latitude = latitude
+    d.longitude = longitude
+    d.depthMeters = depthMeters
+    d
+  }
+
+  def apply(
+    latitude: Double,
+    longitude: Double,
+    depthMeters: Float,
+    salinity: Float,
+    temperatureCelsius: Float,
+    pressureDbar: Float,
+    oxygenMlL: Float,
+    crs: String = "CRS:84"
+  ): CachedAncillaryDatumImpl = {
+    val d = apply(latitude, longitude, depthMeters)
+    d.salinity = salinity
+    d.temperatureCelsius = temperatureCelsius
+    d.pressureDbar = pressureDbar
+    d.oxygenMlL = oxygenMlL
+    d.crs = crs
+    d
+  }
+
 }

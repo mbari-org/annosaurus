@@ -49,3 +49,20 @@ class CachedVideoReferenceInfoImpl extends CachedVideoReferenceInfo with JPAPers
   override var missionID: String = _
 
 }
+
+object CachedVideoReferenceInfoImpl {
+  def apply(
+    videoReferenceUUID: UUID,
+    missionID: String,
+    platformName: String,
+    missionContact: Option[String] = None
+  ): CachedVideoReferenceInfoImpl = {
+
+    val d = new CachedVideoReferenceInfoImpl
+    d.videoReferenceUUID = videoReferenceUUID
+    d.missionID = missionID
+    d.platformName = platformName
+    missionContact.foreach(d.missionContact = _)
+    d
+  }
+}

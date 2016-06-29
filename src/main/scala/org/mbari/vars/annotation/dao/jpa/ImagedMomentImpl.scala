@@ -8,6 +8,7 @@ import java.util.{ ArrayList => JArrayList, List => JList }
 import org.mbari.vars.annotation.model.{ CachedAncillaryDatum, ImageReference, ImagedMoment, Observation }
 import org.mbari.vcr4j.time.Timecode
 
+import scala.beans.BeanProperty
 import scala.collection.JavaConverters._
 
 /**
@@ -124,15 +125,20 @@ class ImagedMomentImpl extends ImagedMoment with JPAPersistentObject {
   }
 
   @OneToOne(
+    mappedBy = "imagedMoment",
     cascade = Array(CascadeType.ALL),
     optional = true,
     targetEntity = classOf[CachedAncillaryDatumImpl]
   )
-  @JoinColumn(
-    name = "ancillary_datum_uuid",
-    nullable = true
-  )
-  override var ancillaryDatum: CachedAncillaryDatum = _
+  protected var _ancillaryDatum: CachedAncillaryDatum = _
+
+  def ancillaryDatum = _ancillaryDatum
+  def ancillaryDatum_=(ad: CachedAncillaryDatum): Unit = {
+    if (_ancillaryDatum != null) _ancillaryDatum.imagedMoment = null
+    _ancillaryDatum = ad
+    ad.imagedMoment = this
+  }
+
 }
 
 object ImagedMomentImpl {
