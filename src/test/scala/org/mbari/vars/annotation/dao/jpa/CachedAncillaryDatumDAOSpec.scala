@@ -28,8 +28,8 @@ class CachedAncillaryDatumDAOSpec extends FlatSpec with Matchers {
   private[this] val ancillaryDatum0 = CachedAncillaryDatumImpl(36.234, 122.0011, 666)
   private[this] val newTemp = 3.2F
 
-  private type IRDAO = CachedAncillaryDatumDAO[CachedAncillaryDatumImpl]
-  def run[R](fn: IRDAO => R): R = Await.result(dao.runTransaction(fn), timeout)
+  private type CADAO = CachedAncillaryDatumDAO[CachedAncillaryDatumImpl]
+  def run[R](fn: CADAO => R): R = Await.result(dao.runTransaction(fn), timeout)
 
   "CachedAncillaryDatumDAOImpl" should "create" in {
     imagedMoment0.ancillaryDatum = ancillaryDatum0

@@ -27,7 +27,7 @@ class ImageReferenceDAOSpec extends FlatSpec with Matchers {
   private[this] val now = Instant.now()
   private[this] val imagedMoment0 = ImagedMomentImpl(Some(videoReferenceUUID), Some(now), elapsedTime = Some(Duration.ofMinutes(1)))
   private[this] val imageReference0 = ImageReferenceImpl(new URL("http://www.mbari.org/wp-content/uploads/2015/08/schlining_brian-180.jpg"))
-  private[this] val imageReference1 = ImageReferenceImpl(new URL("http://www.fashiongonerogue.com/wp-content/uploads/2015/07/Emily-Ratajkowski-REVOLVE-Summer-Ads02.jpg"))
+  private[this] val imageReference1 = ImageReferenceImpl(new URL("https://afleetinglance.files.wordpress.com/2012/07/zazen2.jpg"))
   private[this] val newDescription = "A handsome fellow"
 
   private type IRDAO = ImageReferenceDAO[ImageReferenceImpl]
@@ -52,6 +52,23 @@ class ImageReferenceDAOSpec extends FlatSpec with Matchers {
     val ir = run(_.findByUUID(imageReference0.uuid)).head
     ir.description should be(newDescription)
 
+  }
+
+  it should "findAll" in {
+    val irs = run(_.findAll()).filter(_.imagedMoment.uuid == imagedMoment0.uuid)
+    irs.size should be(2)
+  }
+
+  it should "deleteByUUID" in {
+    run(_.deleteByUUID(imageReference1.uuid))
+    val ir1 = run(_.findByUUID(imageReference1.uuid))
+    ir1 shouldBe empty
+  }
+
+  it should "delete" in {
+    run(_.delete(imageReference0))
+    val ir0 = run(_.findByUUID(imageReference0.uuid))
+    ir0 shouldBe empty
   }
 
 }

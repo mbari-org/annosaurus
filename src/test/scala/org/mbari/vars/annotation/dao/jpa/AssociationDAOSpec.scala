@@ -4,6 +4,7 @@ import java.time.{ Duration, Instant }
 import java.util.UUID
 import java.util.concurrent.TimeUnit
 
+import org.mbari.vars.annotation.dao.{ AssociationDAO, CachedAncillaryDatumDAO }
 import org.mbari.vars.annotation.model.Association
 import org.scalatest.{ FlatSpec, Matchers }
 
@@ -31,59 +32,59 @@ class AssociationDAOSpec extends FlatSpec with Matchers {
   private[this] val association0 = AssociationImpl("surface-color", Association.TO_CONCEPT_SELF, "red")
   private[this] val association1 = AssociationImpl("image-quality", Association.TO_CONCEPT_SELF, "mega-awesome!!")
 
-  def run[R](fn: Awaitable[R]): R = Await.result(fn, timeout)
+  private type ADAO = AssociationDAO[AssociationImpl]
+  def run[R](fn: ADAO => R): R = Await.result(dao.runTransaction(fn), timeout)
 
   "AssociationDAOImpl" should "create" in {
     imagedMoment0.addObservation(observation0)
     observation0.addAssociation(association0)
-    run(dao.runTransaction(d => d.create(association0)))
+    run(_.create(association0))
     association0.uuid should not be null
 
     observation0.addAssociation(association1)
-    run(dao.runTransaction(d => d.create(association0)))
+    run(_.create(association0))
   }
 
   it should "update" in {
-    run(dao.runTransaction(d => {
+    run(d => {
       val ass = d.findByUUID(association0.uuid)
       ass shouldBe defined
       ass.get.linkValue = "blue"
-    }))
+    })
 
-    val ass = run(dao.runTransaction(d => d.findByUUID(association0.uuid))).head
+    val ass = run(_.findByUUID(association0.uuid)).head
     ass.linkValue should be("blue")
   }
 
   it should "findByUUID" in {
-    val ass = run(dao.runTransaction(d => d.findByUUID(association0.uuid)))
+    val ass = run(_.findByUUID(association0.uuid))
     ass shouldBe defined
   }
 
   it should "findAll" in {
-    val ass = run(dao.runTransaction(d => d.findAll()))
+    val ass = run(_.findAll())
       .filter(_.observation.uuid == observation0.uuid)
 
     ass.size should be(2)
   }
 
   it should "findByLinkName" in {
-    val ass = run(dao.runTransaction(d => d.findByLinkName("surface-color")))
+    val ass = run(_.findByLinkName("surface-color"))
     ass.size should be(1)
   }
 
   it should "deleteByUUID" in {
-    run(dao.runTransaction(d => d.deleteByUUID(association0.uuid)))
-    val obs = run(dao.runTransaction(d => d.findByUUID(association0.uuid)))
+    run(_.deleteByUUID(association0.uuid))
+    val obs = run(_.findByUUID(association0.uuid))
     obs shouldBe empty
   }
 
   it should "delete" in {
-    val ass = run(dao.runTransaction(d => d.findAll()))
+    val ass = run(_.findAll())
       .filter(_.uuid == association1.uuid)
-    run(dao.runTransaction(d => ass.foreach(d.delete)))
+    run(d => ass.foreach(d.delete))
 
-    val assCheck = run(dao.runTransaction(d => d.findAll()))
-      .filter(_.uuid == association1.uuid)
+    val assCheck = run(_.findAll()).filter(_.uuid == association1.uuid)
     assCheck shouldBe empty
   }
 
