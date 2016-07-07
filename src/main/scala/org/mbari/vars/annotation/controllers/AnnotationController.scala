@@ -21,7 +21,7 @@ class AnnotationController(
     daoFactory: BasicDAOFactory
 ) {
 
-  def newAnnotation(
+  def create(
     videoReferenceUUID: UUID,
     concept: String,
     observer: String,
@@ -32,52 +32,27 @@ class AnnotationController(
     duration: Option[Duration] = None
   )(implicit ec: ExecutionContext): Future[Observation] = {
 
-    // TODO make this ACID. Right now it's done in 2 transactions.
-    imagedMomentController.create(videoReferenceUUID, timecode, recordedDate, elapsedTime)
-      .map(imagedMoment => {
-        val obsDAO = observationController.daoFactory.newObservationDAO()
-        val observation = obsDAO.newPersistentObject()
-        observation.concept = concept
-        observation.observer = observer
-        observation.observationDate = observationDate
-        duration.foreach(observation.duration = _)
-        obsDAO.create(observation)
-        imagedMoment.addObservation(observation)
-        obsDAO.close()
-        observation
-      })
+    val imDao = daoFactory.newImagedMomentDAO()
+    val obsDao = daoFactory.newObservationDAO(imDao)
 
-  }
+    val f = obsDao.runTransaction(d => {
+      val imagedMoment = ImagedMomentController.findImagedMoment(imDao, videoReferenceUUID, timecode,
+        recordedDate, elapsedTime)
+      val observation = obsDao.newPersistentObject()
+      observation.concept = concept
+      observation.observer = observer
+      observation.observationDate = observationDate
+      duration.foreach(observation.duration = _)
+      obsDao.create(observation)
+      imagedMoment.addObservation(observation)
+      observation
+    })
 
-  def updateObservation(
-    uuid: UUID,
-    concept: Option[String] = None,
-    observer: Option[String] = None,
-    observationDate: Instant = Instant.now(),
-    duration: Option[Duration] = None
-  )(implicit ec: ExecutionContext): Future[Option[Observation]] = {
-
-    val obsDao = daoFactory.newObservationDAO()
-
-    val f = Future {
-      // --- 1. Does uuid exist?
-      val observation = obsDao.findByUUID(uuid)
-
-      observation.map(obs => {
-        concept.foreach(obs.concept = _)
-        observer.foreach(obs.observer = _)
-        obs.observationDate = observationDate
-        duration.foreach(obs.duration = _)
-        obs
-      })
-    }
-
-    f.onComplete(t => obsDao.close())
+    f.onComplete(t => imDao.close())
     f
-
   }
 
-  def updateAnnotation(
+  def update(
     uuid: UUID,
     videoReferenceUUID: UUID,
     concept: Option[String] = None,
@@ -92,9 +67,9 @@ class AnnotationController(
     val imDao = daoFactory.newImagedMomentDAO()
     val obsDao = daoFactory.newObservationDAO(imDao)
 
-    val f = Future {
+    // --- 1. Does uuid exist?
 
-      // --- 1. Does uuid exist?
+    val f = obsDao.runTransaction(d => {
       val observation = obsDao.findByUUID(uuid)
 
       observation.map(obs => {
@@ -127,8 +102,7 @@ class AnnotationController(
         obs.observationDate = observationDate
         obs
       })
-    }
-
+    })
     f.onComplete(t => imDao.close())
     f
   }

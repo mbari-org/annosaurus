@@ -7,6 +7,7 @@ import java.util.UUID
 import org.scalatra.{ ContentEncodingSupport, FutureSupport, ScalatraServlet }
 import org.scalatra.swagger.SwaggerSupport
 import org.scalatra.util.conversion.TypeConverter
+import org.slf4j.LoggerFactory
 
 import scala.util.Try
 
@@ -21,6 +22,8 @@ abstract class APIStack extends ScalatraServlet
     with ContentEncodingSupport
     with SwaggerSupport
     with FutureSupport {
+
+  protected[this] val log = LoggerFactory.getLogger(getClass)
 
   implicit val stringToUUID = new TypeConverter[String, UUID] {
     override def apply(s: String): Option[UUID] = Try(UUID.fromString(s)).toOption
