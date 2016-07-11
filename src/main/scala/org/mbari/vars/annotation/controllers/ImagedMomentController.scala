@@ -66,6 +66,16 @@ class ImagedMomentController(val daoFactory: BasicDAOFactory)
 }
 
 object ImagedMomentController {
+
+  /**
+   * This method will find or create (if a matching one is not found in the datastore)
+   * @param dao
+   * @param videoReferenceUUID
+   * @param timecode
+   * @param recordedDate
+   * @param elapsedTime
+   * @return
+   */
   def findImagedMoment(
     dao: ImagedMomentDAO[ImagedMoment],
     videoReferenceUUID: UUID,

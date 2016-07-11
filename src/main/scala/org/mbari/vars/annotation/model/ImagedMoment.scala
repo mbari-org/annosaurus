@@ -42,6 +42,7 @@ trait ImagedMoment extends PersistentObject {
   def removeImageReference(imageReference: ImageReference): Unit
   def imageReferences: Iterable[ImageReference]
   var ancillaryDatum: CachedAncillaryDatum
+  def isEmpty: Boolean = observations.isEmpty && imageReferences.isEmpty
 
 }
 

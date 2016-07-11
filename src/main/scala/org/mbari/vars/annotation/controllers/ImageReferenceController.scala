@@ -83,4 +83,29 @@ class ImageReferenceController(val daoFactory: BasicDAOFactory) extends BaseCont
     exec(fn)
   }
 
+  /**
+   * This controller will also delete the [[org.mbari.vars.annotation.model.ImagedMoment]] if
+   * it is empty (i.e. no observations or other imageReferences)
+   * @param uuid
+   * @param ec
+   * @return
+   */
+  override def delete(uuid: UUID)(implicit ec: ExecutionContext): Future[Boolean] = {
+    def fn(dao: IRDAO): Boolean = {
+      dao.findByUUID(uuid) match {
+        case None => false
+        case Some(imageReference) =>
+          val imagedMoment = imageReference.imagedMoment
+          imagedMoment.removeImageReference(imageReference)
+          dao.delete(imageReference)
+          if (imagedMoment.isEmpty) {
+            val imDao = daoFactory.newImagedMomentDAO(dao)
+            imDao.delete(imagedMoment)
+          }
+          true
+      }
+    }
+    exec(fn)
+  }
+
 }

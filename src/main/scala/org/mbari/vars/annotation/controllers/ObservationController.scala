@@ -95,5 +95,33 @@ class ObservationController(val daoFactory: BasicDAOFactory)
     exec(fn)
   }
 
+  def findAllNamesByVideoReferenceUUID(uuid: UUID)(implicit ec: ExecutionContext): Future[Iterable[String]] = {
+    def fn(dao: ODAO): Iterable[String] = dao.findAllNamesByVideoReferenceUUID(uuid)
+    exec(fn)
+  }
 
+  /**
+   * This controller will also delete the [[org.mbari.vars.annotation.model.ImagedMoment]] if
+   * it is empty (i.e. no observations or other imageReferences)
+   * @param uuid
+   * @param ec
+   * @return
+   */
+  override def delete(uuid: UUID)(implicit ec: ExecutionContext): Future[Boolean] = {
+    def fn(dao: ODAO): Boolean = {
+      dao.findByUUID(uuid) match {
+        case None => false
+        case Some(observation) =>
+          val imagedMoment = observation.imagedMoment
+          imagedMoment.removeObservation(observation)
+          dao.delete(observation)
+          if (imagedMoment.isEmpty) {
+            val imDao = daoFactory.newImagedMomentDAO(dao)
+            imDao.delete(imagedMoment)
+          }
+          true
+      }
+    }
+    exec(fn)
+  }
 }
