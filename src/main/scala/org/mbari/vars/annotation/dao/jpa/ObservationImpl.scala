@@ -71,6 +71,13 @@ class ObservationImpl extends Observation with JPAPersistentObject {
   )
   override var observer: String = _
 
+  @Column(
+    name = "observation_group",
+    nullable = true,
+    length = 128
+  )
+  override var group: String = _
+
   @OneToMany(
     targetEntity = classOf[AssociationImpl],
     cascade = Array(CascadeType.ALL),

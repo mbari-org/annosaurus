@@ -3,8 +3,7 @@ package org.mbari.vars.annotation.controllers
 import java.time.{ Duration, Instant }
 import java.util.UUID
 
-import org.mbari.vars.annotation.dao.{ ImagedMomentDAO, ObservationDAO }
-import org.mbari.vars.annotation.model.{ ImagedMoment, Observation }
+import org.mbari.vars.annotation.model.{ Observation }
 import org.mbari.vcr4j.time.Timecode
 
 import scala.concurrent.{ ExecutionContext, Future }
@@ -15,11 +14,7 @@ import scala.concurrent.{ ExecutionContext, Future }
  * @author Brian Schlining
  * @since 2016-06-25T20:28:00
  */
-class AnnotationController(
-    imagedMomentController: ImagedMomentController,
-    observationController: ObservationController,
-    daoFactory: BasicDAOFactory
-) {
+class AnnotationController(daoFactory: BasicDAOFactory) {
 
   def create(
     videoReferenceUUID: UUID,

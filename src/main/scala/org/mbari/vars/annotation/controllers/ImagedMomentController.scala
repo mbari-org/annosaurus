@@ -36,8 +36,7 @@ class ImagedMomentController(val daoFactory: BasicDAOFactory)
   )(implicit ec: ExecutionContext): Future[ImagedMoment] = {
 
     def fn(d: IMDAO) = ImagedMomentController.findImagedMoment(
-      d,
-      videoReferenceUUID, timecode, recordedDate, elapsedTime
+      d, videoReferenceUUID, timecode, recordedDate, elapsedTime
     )
     exec(fn)
   }
