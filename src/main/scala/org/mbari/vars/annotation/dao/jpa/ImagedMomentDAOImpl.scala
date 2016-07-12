@@ -40,4 +40,6 @@ class ImagedMomentDAOImpl(entityManager: EntityManager)
   override def findByVideoReferenceUUIDAndRecordedDate(uuid: UUID, recordedDate: Instant): Option[ImagedMomentImpl] =
     findByNamedQuery("ImagedMoment.findByVideoReferenceUUIDAndRecordedDate", Map("recordedDate" -> recordedDate)).headOption
 
+  override def findByObservationUUID(uuid: UUID): Option[ImagedMomentImpl] =
+    findByNamedQuery("ImagedMoment.findByObservationUUID", Map("uuid" -> uuid)).headOption
 }

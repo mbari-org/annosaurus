@@ -45,4 +45,6 @@ trait ImagedMomentDAO[T <: ImagedMoment] extends DAO[T] {
     imagedMoment = if (imagedMoment.isDefined) imagedMoment else elapsedTime.flatMap(findByVideoReferenceUUIDAndElapsedTime(uuid, _))
     if (imagedMoment.isDefined) imagedMoment else recordedDate.flatMap(findByVideoReferenceUUIDAndRecordedDate(uuid, _))
   }
+
+  def findByObservationUUID(uuid: UUID): Option[T]
 }

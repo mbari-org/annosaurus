@@ -2,6 +2,7 @@ package org.mbari.vars.annotation.dao.jpa
 
 import javax.persistence.{ NamedQuery, _ }
 
+import com.google.gson.annotations.Expose
 import org.mbari.vars.annotation.model.{ Association, Observation }
 
 /**
@@ -25,6 +26,7 @@ import org.mbari.vars.annotation.model.{ Association, Observation }
 ))
 class AssociationImpl extends Association with JPAPersistentObject {
 
+  @Expose(serialize = true)
   @Index(name = "idx_link_name", columnList = "link_name")
   @Column(
     name = "link_name",
@@ -33,6 +35,7 @@ class AssociationImpl extends Association with JPAPersistentObject {
   )
   override var linkName: String = _
 
+  @Expose(serialize = true)
   @Index(name = "idx_link_value", columnList = "link_value")
   @Column(
     name = "link_value",
@@ -41,6 +44,7 @@ class AssociationImpl extends Association with JPAPersistentObject {
   )
   override var linkValue: String = _
 
+  @Expose(serialize = false)
   @ManyToOne(
     cascade = Array(CascadeType.PERSIST, CascadeType.DETACH),
     optional = false,
@@ -49,6 +53,7 @@ class AssociationImpl extends Association with JPAPersistentObject {
   @JoinColumn(name = "observation_uuid", nullable = false)
   override var observation: Observation = _
 
+  @Expose(serialize = true)
   @Index(name = "idx_to_concept", columnList = "to_concept")
   @Column(
     name = "to_concept",

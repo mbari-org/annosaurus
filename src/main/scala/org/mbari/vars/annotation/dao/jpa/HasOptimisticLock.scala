@@ -4,6 +4,8 @@ import java.sql.Timestamp
 import java.time.Instant
 import javax.persistence.{ Column, Version }
 
+import com.google.gson.annotations.Expose
+
 /**
  * OUr Entities should use optimixtic locks. This trait allows you to mixin the lock.
  *
@@ -13,8 +15,9 @@ import javax.persistence.{ Column, Version }
 trait HasOptimisticLock {
 
   /** Optimistic lock to prevent concurrent overwrites */
+  @Expose(serialize = true)
   @Version
-  @Column(name = "last_updated_time")
+  @Column(name = "last_updated_timestamp")
   protected var lastUpdatedTime: Timestamp = _
 
   def lastUpdated: Option[Instant] = Option(lastUpdatedTime).map(_.toInstant)

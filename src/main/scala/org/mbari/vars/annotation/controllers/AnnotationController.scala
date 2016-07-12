@@ -3,7 +3,7 @@ package org.mbari.vars.annotation.controllers
 import java.time.{ Duration, Instant }
 import java.util.UUID
 
-import org.mbari.vars.annotation.model.{ Observation }
+import org.mbari.vars.annotation.model.Observation
 import org.mbari.vcr4j.time.Timecode
 
 import scala.concurrent.{ ExecutionContext, Future }
@@ -49,7 +49,7 @@ class AnnotationController(daoFactory: BasicDAOFactory) {
 
   def update(
     uuid: UUID,
-    videoReferenceUUID: UUID,
+    videoReferenceUUID: Option[UUID] = None,
     concept: Option[String] = None,
     observer: Option[String] = None,
     observationDate: Instant = Instant.now(),
@@ -72,22 +72,23 @@ class AnnotationController(daoFactory: BasicDAOFactory) {
         // --- 2. Move annotation
         if (timecode.isDefined || elapsedTime.isDefined || recordedDate.isDefined) {
           // Find existing
-          imDao.findByVideoReferenceUUIDAndIndex(videoReferenceUUID, timecode, elapsedTime, recordedDate) match {
-            case Some(im) => // Do nothing
-            case None =>
-              val newIm = imDao.newPersistentObject()
-              newIm.videoReferenceUUID = videoReferenceUUID
-              timecode.foreach(newIm.timecode = _)
-              elapsedTime.foreach(newIm.elapsedTime = _)
-              recordedDate.foreach(newIm.recordedDate = _)
-              val oldIm = obs.imagedMoment
-              oldIm.removeObservation(obs)
-              newIm.addObservation(obs)
+          for {
+            vrUUID <- videoReferenceUUID
+            im <- imDao.findByVideoReferenceUUIDAndIndex(vrUUID, timecode, elapsedTime, recordedDate)
+          } {
+            val newIm = imDao.newPersistentObject()
+            newIm.videoReferenceUUID = vrUUID
+            timecode.foreach(newIm.timecode = _)
+            elapsedTime.foreach(newIm.elapsedTime = _)
+            recordedDate.foreach(newIm.recordedDate = _)
+            val oldIm = obs.imagedMoment
+            oldIm.removeObservation(obs)
+            newIm.addObservation(obs)
 
-              // Delete imagedMoment if no observations or imageReferences are attached
-              if (oldIm.imageReferences.isEmpty && oldIm.observations.isEmpty) {
-                imDao.delete(oldIm)
-              }
+            // Delete imagedMoment if no observations or imageReferences are attached
+            if (oldIm.imageReferences.isEmpty && oldIm.observations.isEmpty) {
+              imDao.delete(oldIm)
+            }
           }
         }
 

@@ -69,18 +69,14 @@ class ObservationController(val daoFactory: BasicDAOFactory)
         obs.observationDate = observationDate
         duration.foreach(obs.duration = _)
         group.foreach(obs.group = _)
-
-        imagedMomentUUID.foreach(imUUID => {
-          val imDao = daoFactory.newImagedMomentDAO(dao)
-          val newIm = imDao.findByUUID(imUUID)
-          newIm match {
-            case None =>
-              throw new NotFoundInDatastoreException(s"ImagedMoment with UUID of $imUUID no found")
-            case Some(imagedMoment) =>
-              obs.imagedMoment.removeObservation(obs)
-              imagedMoment.addObservation(obs)
-          }
-        })
+        for {
+          imUUID <- imagedMomentUUID
+          imDao = daoFactory.newImagedMomentDAO(dao)
+          newIm <- imDao.findByUUID(imUUID)
+        } {
+          obs.imagedMoment.removeObservation(obs)
+          newIm.addObservation(obs)
+        }
 
         obs
       })

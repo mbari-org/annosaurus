@@ -4,6 +4,12 @@ import java.net.{ URI, URL }
 import java.time.{ Duration, Instant }
 import java.util.UUID
 
+import org.mbari.vars.annotation.Constants
+
+//import org.json4s.ext.JavaTypesSerializers
+//import org.json4s.{ DefaultFormats, Formats }
+import org.mbari.vcr4j.time.Timecode
+import org.scalatra.json.JacksonJsonSupport
 import org.scalatra.{ ContentEncodingSupport, FutureSupport, ScalatraServlet }
 import org.scalatra.swagger.SwaggerSupport
 import org.scalatra.util.conversion.TypeConverter
@@ -25,24 +31,33 @@ abstract class APIStack extends ScalatraServlet
 
   protected[this] val log = LoggerFactory.getLogger(getClass)
 
-  implicit val stringToUUID = new TypeConverter[String, UUID] {
+  //protected[this] implicit val jsonFormats: Formats = DefaultFormats ++ JavaTypesSerializers.all
+
+  protected implicit val stringToUUID = new TypeConverter[String, UUID] {
     override def apply(s: String): Option[UUID] = Try(UUID.fromString(s)).toOption
   }
 
-  implicit val stringToInstant = new TypeConverter[String, Instant] {
+  protected implicit val stringToInstant = new TypeConverter[String, Instant] {
     override def apply(s: String): Option[Instant] = Try(Instant.parse(s)).toOption
   }
 
-  implicit val stringToDuration = new TypeConverter[String, Duration] {
+  protected implicit val stringToDuration = new TypeConverter[String, Duration] {
     override def apply(s: String): Option[Duration] = Try(Duration.ofMillis(s.toLong)).toOption
   }
 
-  implicit val stringToURI = new TypeConverter[String, URI] {
+  protected implicit val stringToURI = new TypeConverter[String, URI] {
     override def apply(s: String): Option[URI] = Try(URI.create(s)).toOption
   }
 
-  implicit val stringToURL = new TypeConverter[String, URL] {
+  protected implicit val stringToURL = new TypeConverter[String, URL] {
     override def apply(s: String): Option[URL] = Try(new URL(s)).toOption
   }
+
+  protected implicit val stringToTimecode = new TypeConverter[String, Timecode] {
+    override def apply(s: String): Option[Timecode] = Try(new Timecode(s)).toOption
+  }
+
+  def toJson(obj: Any): String = Constants.GSON.toJson(obj)
+  def fromJson[T](json: String, classOfT: Class[T]) = Constants.GSON.fromJson(json, classOfT)
 
 }

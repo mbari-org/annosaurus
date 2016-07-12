@@ -22,6 +22,8 @@ class ImagedMomentController(val daoFactory: BasicDAOFactory)
 
   override def newDAO(): IMDAO = daoFactory.newImagedMomentDAO()
 
+  def findBy
+
   def findByVideoReferenceUUID(uuid: UUID)(implicit ec: ExecutionContext): Future[Iterable[ImagedMoment]] =
     exec(d => d.findByVideoReferenceUUID(uuid))
 

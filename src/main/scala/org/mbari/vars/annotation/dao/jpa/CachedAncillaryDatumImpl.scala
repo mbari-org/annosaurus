@@ -2,6 +2,7 @@ package org.mbari.vars.annotation.dao.jpa
 
 import javax.persistence.{ CascadeType, JoinColumn, _ }
 
+import com.google.gson.annotations.Expose
 import org.mbari.vars.annotation.model.{ CachedAncillaryDatum, ImagedMoment }
 
 /**
@@ -21,39 +22,46 @@ import org.mbari.vars.annotation.model.{ CachedAncillaryDatum, ImagedMoment }
 ))
 class CachedAncillaryDatumImpl extends CachedAncillaryDatum with JPAPersistentObject {
 
+  @Expose(serialize = true)
   @Column(
     name = "coordinate_reference_system",
     length = 32
   )
   override var crs: String = _
 
+  @Expose(serialize = true)
   @Column(
     name = "oxygen_ml_per_l",
     nullable = true
   )
   override var oxygenMlL: Float = _
 
+  @Expose(serialize = true)
   @Column(name = "depth_meters")
   override var depthMeters: Float = _
 
+  @Expose(serialize = true)
   @Column(
     name = "z",
     nullable = true
   )
   override var z: Double = _
 
+  @Expose(serialize = true)
   @Column(
     name = "xyz_position_units",
     nullable = true
   )
   override var posePositionUnits: String = _
 
+  @Expose(serialize = true)
   @Column(
     name = "latitude",
     nullable = true
   )
   override var latitude: Double = _
 
+  @Expose(serialize = false)
   @OneToOne(
     cascade = Array(CascadeType.PERSIST, CascadeType.DETACH),
     optional = false,
@@ -62,60 +70,70 @@ class CachedAncillaryDatumImpl extends CachedAncillaryDatum with JPAPersistentOb
   @JoinColumn(name = "imaged_moment_uuid", nullable = false)
   override var imagedMoment: ImagedMoment = _
 
+  @Expose(serialize = true)
   @Column(
     name = "y",
     nullable = true
   )
   override var y: Double = _
 
+  @Expose(serialize = true)
   @Column(
     name = "temperature_celsius",
     nullable = true
   )
   override var temperatureCelsius: Float = _
 
+  @Expose(serialize = true)
   @Column(
     name = "x",
     nullable = true
   )
   override var x: Double = _
 
+  @Expose(serialize = true)
   @Column(
     name = "theta",
     nullable = true
   )
   override var theta: Double = _
 
+  @Expose(serialize = true)
   @Column(
     name = "longitude",
     nullable = true
   )
   override var longitude: Double = _
 
+  @Expose(serialize = true)
   @Column(
     name = "phi",
     nullable = true
   )
   override var phi: Double = _
 
+  @Expose(serialize = true)
   @Column(
     name = "psi",
     nullable = true
   )
   override var psi: Double = _
 
+  @Expose(serialize = true)
   @Column(
     name = "pressure_dbar",
     nullable = true
   )
   override var pressureDbar: Float = _
 
+  @Expose(serialize = true)
   @Column(
     name = "salinity",
     nullable = true
   )
   override var salinity: Float = _
 
+  @Expose(serialize = true)
   @Column(
     name = "altitude",
     nullable = true

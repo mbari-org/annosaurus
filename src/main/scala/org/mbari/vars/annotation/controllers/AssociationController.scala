@@ -55,7 +55,7 @@ class AssociationController(val daoFactory: BasicDAOFactory)
         linkName.foreach(association.linkName = _)
         toConcept.foreach(association.toConcept = _)
         linkValue.foreach(association.linkValue = _)
-        // TODO move to new observation if it exists
+        // Move to new observation if it exists
         for {
           obsUUID <- observationUUID
           obsDao = daoFactory.newObservationDAO(dao)

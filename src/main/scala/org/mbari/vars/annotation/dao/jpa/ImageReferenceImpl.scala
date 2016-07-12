@@ -3,6 +3,7 @@ package org.mbari.vars.annotation.dao.jpa
 import java.net.URL
 import javax.persistence._
 
+import com.google.gson.annotations.{ Expose, SerializedName }
 import org.mbari.vars.annotation.model.{ ImageReference, ImagedMoment }
 
 /**
@@ -22,6 +23,7 @@ import org.mbari.vars.annotation.model.{ ImageReference, ImagedMoment }
 ))
 class ImageReferenceImpl extends ImageReference with JPAPersistentObject {
 
+  @Expose(serialize = true)
   @Column(
     name = "description",
     length = 256,
@@ -29,6 +31,7 @@ class ImageReferenceImpl extends ImageReference with JPAPersistentObject {
   )
   override var description: String = _
 
+  @Expose(serialize = true)
   @Column(
     name = "url",
     unique = true,
@@ -46,18 +49,23 @@ class ImageReferenceImpl extends ImageReference with JPAPersistentObject {
   @JoinColumn(name = "imaged_moment_uuid", nullable = false)
   override var imagedMoment: ImagedMoment = _
 
+  @Expose(serialize = true)
+  @SerializedName(value = "height_pixels")
   @Column(
     name = "height_pixels",
     nullable = true
   )
   override var height: Int = _
 
+  @Expose(serialize = true)
+  @SerializedName(value = "width_pixels")
   @Column(
     name = "width_pixels",
     nullable = true
   )
   override var width: Int = _
 
+  @Expose(serialize = true)
   @Column(
     name = "format",
     length = 64,

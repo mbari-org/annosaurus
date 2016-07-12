@@ -3,6 +3,7 @@ package org.mbari.vars.annotation.dao.jpa
 import java.util.UUID
 import javax.persistence._
 
+import com.google.gson.annotations.{ Expose, SerializedName }
 import org.mbari.vars.annotation.model.CachedVideoReferenceInfo
 
 /**
@@ -19,6 +20,7 @@ class CachedVideoReferenceInfoImpl extends CachedVideoReferenceInfo with JPAPers
   /**
    * typically this will be the chief scientist
    */
+  @Expose(serialize = true)
   @Column(
     name = "mission_contact",
     nullable = true,
@@ -26,6 +28,7 @@ class CachedVideoReferenceInfoImpl extends CachedVideoReferenceInfo with JPAPers
   )
   override var missionContact: String = _
 
+  @Expose(serialize = true)
   @Column(
     name = "platform_name",
     nullable = false,
@@ -33,6 +36,8 @@ class CachedVideoReferenceInfoImpl extends CachedVideoReferenceInfo with JPAPers
   )
   override var platformName: String = _
 
+  @Expose(serialize = true)
+  @SerializedName(value = "video_reference_uuid")
   @Column(
     name = "video_reference_uuid",
     nullable = false,
@@ -41,6 +46,7 @@ class CachedVideoReferenceInfoImpl extends CachedVideoReferenceInfo with JPAPers
   @Convert(converter = classOf[UUIDConverter])
   override var videoReferenceUUID: UUID = _
 
+  @Expose(serialize = true)
   @Column(
     name = "mission_id",
     nullable = false,

@@ -1,5 +1,8 @@
 import javax.servlet.ServletContext
 
+import org.mbari.vars.annotation.api.{ AnnotationSwagger, AnnotationV1Api }
+import org.mbari.vars.annotation.controllers._
+import org.mbari.vars.annotation.dao.jpa.DevelopmentDAOFactory
 import org.scalatra.LifeCycle
 import org.scalatra.swagger.{ ApiInfo, Swagger }
 import org.slf4j.LoggerFactory
@@ -17,8 +20,8 @@ class ScalatraBootstrap extends LifeCycle {
   private[this] val log = LoggerFactory.getLogger(getClass)
 
   val apiInfo = ApiInfo(
-    """video-asset-manager""",
-    """Video Asset Manager - Server""",
+    """video-annotation-service""",
+    """Video Annotations - Server""",
     """http://localhost:8080/api-docs""",
     """brian@mbari.org""",
     """MIT""",
@@ -32,6 +35,17 @@ class ScalatraBootstrap extends LifeCycle {
     println("STARTING UP NOW")
 
     implicit val executionContext = ExecutionContext.global
+
+    val daoFactory: BasicDAOFactory = DevelopmentDAOFactory.asInstanceOf[BasicDAOFactory]
+    val annotationController = new AnnotationController(daoFactory)
+    val associationController = new AssociationController(daoFactory)
+    val imagedMomentController = new ImagedMomentController(daoFactory)
+    val imageReferenceController = new ImageReferenceController(daoFactory)
+    val observationController = new ObservationController(daoFactory)
+
+    val annotationV1Api = new AnnotationV1Api(annotationController)
+    context.mount(annotationV1Api, "/v1/annotation")
+    context.mount(new AnnotationSwagger, "/api-docs")
 
   }
 

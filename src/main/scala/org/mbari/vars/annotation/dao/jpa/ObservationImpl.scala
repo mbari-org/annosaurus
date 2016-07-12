@@ -3,8 +3,10 @@ package org.mbari.vars.annotation.dao.jpa
 import java.time.{ Duration, Instant }
 import javax.persistence._
 import java.util.{ ArrayList => JArrayList, List => JList }
-import scala.collection.JavaConverters._
 
+import com.google.gson.annotations.{ Expose, SerializedName }
+
+import scala.collection.JavaConverters._
 import org.mbari.vars.annotation.model.{ Association, ImagedMoment, Observation }
 
 /**
@@ -34,6 +36,7 @@ import org.mbari.vars.annotation.model.{ Association, ImagedMoment, Observation 
 ))
 class ObservationImpl extends Observation with JPAPersistentObject {
 
+  @Expose(serialize = true)
   @Index(name = "idx_concept", columnList = "concept")
   @Column(
     name = "concept",
@@ -41,6 +44,8 @@ class ObservationImpl extends Observation with JPAPersistentObject {
   )
   override var concept: String = _
 
+  @Expose(serialize = true)
+  @SerializedName(value = "duration_millis")
   @Column(
     name = "duration_millis",
     nullable = true
@@ -56,6 +61,8 @@ class ObservationImpl extends Observation with JPAPersistentObject {
   @JoinColumn(name = "imaged_moment_uuid", nullable = false)
   override var imagedMoment: ImagedMoment = _
 
+  @Expose(serialize = true)
+  @SerializedName(value = "observation_timestamp")
   @Column(
     name = "observation_timestamp",
     nullable = true
@@ -64,6 +71,7 @@ class ObservationImpl extends Observation with JPAPersistentObject {
   @Convert(converter = classOf[InstantConverter])
   override var observationDate: Instant = _
 
+  @Expose(serialize = true)
   @Column(
     name = "observer",
     length = 128,
@@ -71,6 +79,7 @@ class ObservationImpl extends Observation with JPAPersistentObject {
   )
   override var observer: String = _
 
+  @Expose(serialize = true)
   @Column(
     name = "observation_group",
     nullable = true,
@@ -78,6 +87,8 @@ class ObservationImpl extends Observation with JPAPersistentObject {
   )
   override var group: String = _
 
+  @Expose(serialize = true)
+  @SerializedName(value = "associations")
   @OneToMany(
     targetEntity = classOf[AssociationImpl],
     cascade = Array(CascadeType.ALL),

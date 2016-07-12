@@ -36,3 +36,4 @@ trait ImageReference extends PersistentObject {
   def lastUpdated: Option[Instant]
 
 }
+

@@ -5,6 +5,7 @@ import java.util.UUID
 import javax.persistence.{ Convert, _ }
 import java.util.{ ArrayList => JArrayList, List => JList }
 
+import com.google.gson.annotations.{ Expose, SerializedName }
 import org.mbari.vars.annotation.model.{ CachedAncillaryDatum, ImageReference, ImagedMoment, Observation }
 import org.mbari.vcr4j.time.Timecode
 
@@ -34,6 +35,10 @@ import scala.collection.JavaConverters._
     query = "SELECT i FROM ImagedMoment i LEFT JOIN i.javaImageReferences r WHERE i.videoReferenceUUID = :uuid"
   ),
   new NamedQuery(
+    name = "ImagedMoment.findByObservationUUID",
+    query = "SELECT i FROM ImagedMoment i LEFT JOIN i.javaObservations o WHERE o.uuid = :uuid"
+  ),
+  new NamedQuery(
     name = "ImagedMoment.findByUUID",
     query = "SELECT i FROM ImagedMoment i WHERE i.uuid = :uuid"
   ),
@@ -52,6 +57,7 @@ import scala.collection.JavaConverters._
 ))
 class ImagedMomentImpl extends ImagedMoment with JPAPersistentObject {
 
+  @Expose(serialize = true)
   @Column(
     name = "elapsed_time_millis",
     nullable = true
@@ -59,6 +65,7 @@ class ImagedMomentImpl extends ImagedMoment with JPAPersistentObject {
   @Convert(converter = classOf[DurationConverter])
   override var elapsedTime: Duration = _
 
+  @Expose(serialize = true)
   @Index(name = "idx_recorded_timestamp", columnList = "recorded_timestamp")
   @Column(
     name = "recorded_timestamp",
@@ -68,6 +75,7 @@ class ImagedMomentImpl extends ImagedMoment with JPAPersistentObject {
   @Convert(converter = classOf[InstantConverter])
   override var recordedDate: Instant = _
 
+  @Expose(serialize = true)
   @Column(
     name = "timecode",
     nullable = true
@@ -75,6 +83,8 @@ class ImagedMomentImpl extends ImagedMoment with JPAPersistentObject {
   @Convert(converter = classOf[TimecodeConverter])
   override var timecode: Timecode = _
 
+  @Expose(serialize = true)
+  @SerializedName(value = "video_reference_uuid")
   @Column(
     name = "video_reference_uuid",
     nullable = true
@@ -82,6 +92,8 @@ class ImagedMomentImpl extends ImagedMoment with JPAPersistentObject {
   @Convert(converter = classOf[UUIDConverter])
   override var videoReferenceUUID: UUID = _
 
+  @Expose(serialize = true)
+  @SerializedName(value = "imaged_moments")
   @OneToMany(
     targetEntity = classOf[ObservationImpl],
     cascade = Array(CascadeType.ALL),
@@ -103,6 +115,8 @@ class ImagedMomentImpl extends ImagedMoment with JPAPersistentObject {
 
   override def observations: Iterable[Observation] = javaObservations.asScala
 
+  @Expose(serialize = true)
+  @SerializedName(value = "image_references")
   @OneToMany(
     targetEntity = classOf[ImageReferenceImpl],
     cascade = Array(CascadeType.ALL),
@@ -124,6 +138,7 @@ class ImagedMomentImpl extends ImagedMoment with JPAPersistentObject {
     imageReference.imagedMoment = null
   }
 
+  @Expose(serialize = true)
   @OneToOne(
     mappedBy = "imagedMoment",
     cascade = Array(CascadeType.ALL),
