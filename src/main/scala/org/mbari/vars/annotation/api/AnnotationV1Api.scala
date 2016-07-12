@@ -33,7 +33,7 @@ class AnnotationV1Api(controller: AnnotationController)(implicit val swagger: Sw
     val uuid = params.getAs[UUID]("uuid").getOrElse(halt(BadRequest(
       body = "{}",
       reason = "A Video Reference UUID parameter is required")))
-    
+    // TODO
   }
 
   post("/") {
@@ -59,6 +59,7 @@ class AnnotationV1Api(controller: AnnotationController)(implicit val swagger: Sw
     controller.create(videoReferenceUUID, concept, observer, observationDate, timecode,
       elapsedTime, recordedDate).map(toJson)
 
+    // TODO convert an annotation object (combined ImagedMoment and Observation)
   }
 
   put("/:uuid") {
@@ -76,6 +77,8 @@ class AnnotationV1Api(controller: AnnotationController)(implicit val swagger: Sw
 
     controller.update(uuid, videoReferenceUUID, concept, observer, observationDate,
       timecode, elapsedTime, recordedDate, duration).map(toJson)
+
+    // TODO convert an annotation object (combined ImagedMoment and Observation)
 
   }
 
