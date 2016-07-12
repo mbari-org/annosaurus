@@ -28,5 +28,7 @@ class CachedVideoReferenceInfoDAOImpl(entityManager: EntityManager)
 
   override def findAll(): Iterable[CachedVideoReferenceInfoImpl] = ???
 
+  override def findAll(limit: Int, offset: Int): Iterable[CachedVideoReferenceInfoImpl] = ???
+
   override def deleteByUUID(primaryKey: UUID): Unit = ???
 }

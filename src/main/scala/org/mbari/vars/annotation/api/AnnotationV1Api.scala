@@ -7,9 +7,9 @@ import org.mbari.vars.annotation.controllers.AnnotationController
 import org.mbari.vcr4j.time.Timecode
 import org.scalatra.BadRequest
 import org.scalatra.swagger.Swagger
-import org.mbari.vars.annotation.model.simple.Implicits._
 
 import scala.concurrent.ExecutionContext
+import scala.collection.JavaConverters._
 
 /**
  *
@@ -32,8 +32,21 @@ class AnnotationV1Api(controller: AnnotationController)(implicit val swagger: Sw
   get("/:uuid") {
     val uuid = params.getAs[UUID]("uuid").getOrElse(halt(BadRequest(
       body = "{}",
-      reason = "A Video Reference UUID parameter is required")))
-    // TODO
+      reason = "A 'uuid' parameter is required"
+    )))
+    controller.findByUUID(uuid).map(toJson)
+  }
+
+  get("/videoreference/:uuid") {
+    val uuid = params.getAs[UUID]("uuid").getOrElse(halt(BadRequest(
+      body = "{}",
+      reason = "A video reference 'uuid' parameter is required"
+    )))
+    val limit = params.getAs[Int]("limit")
+    val offset = params.getAs[Int]("offset")
+    controller.findByVideoReferenceUUID(uuid, limit, offset)
+      .map(_.asJava)
+      .map(toJson)
   }
 
   post("/") {
@@ -51,21 +64,23 @@ class AnnotationV1Api(controller: AnnotationController)(implicit val swagger: Sw
     val timecode = params.getAs[Timecode]("timecode")
     val elapsedTime = params.getAs[Duration]("elapsed_time_millis")
     val recordedDate = params.getAs[Instant]("recorded_timestamp")
+    val duration = params.getAs[Duration]("duration_millis")
 
     if (timecode.isEmpty && elapsedTime.isEmpty && recordedDate.isEmpty) {
       halt(BadRequest("One or more of the following indicies into the video are required: timecode, elapsed_time_millis, recorded_date"))
     }
 
     controller.create(videoReferenceUUID, concept, observer, observationDate, timecode,
-      elapsedTime, recordedDate).map(toJson)
+      elapsedTime, recordedDate, duration)
+      .map(toJson) // Convert to JSON
 
-    // TODO convert an annotation object (combined ImagedMoment and Observation)
   }
 
   put("/:uuid") {
     val uuid = params.getAs[UUID]("uuid").getOrElse(halt(BadRequest(
       body = "{}",
-      reason = "A 'uuid' parameter is required")))
+      reason = "A 'uuid' parameter is required"
+    )))
     val videoReferenceUUID = params.getAs[UUID]("video_reference_uuid")
     val concept = params.get("concept")
     val observer = params.get("observer")
@@ -76,9 +91,8 @@ class AnnotationV1Api(controller: AnnotationController)(implicit val swagger: Sw
     val duration = params.getAs[Duration]("duration_millis")
 
     controller.update(uuid, videoReferenceUUID, concept, observer, observationDate,
-      timecode, elapsedTime, recordedDate, duration).map(toJson)
-
-    // TODO convert an annotation object (combined ImagedMoment and Observation)
+      timecode, elapsedTime, recordedDate, duration)
+      .map(toJson) // Convert to JSON
 
   }
 

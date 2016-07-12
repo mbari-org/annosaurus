@@ -2,20 +2,19 @@ package org.mbari.vars.annotation.api
 
 import java.util.UUID
 
-import org.mbari.vars.annotation.controllers.{AnnotationController, ImagedMomentController}
+import org.mbari.vars.annotation.controllers.{ AnnotationController, ImagedMomentController }
 import org.mbari.vcr4j.time.Timecode
-import org.scalatra.{BadRequest, NotFound}
+import org.scalatra.{ BadRequest, NotFound }
 import org.scalatra.swagger.Swagger
 
 import scala.concurrent.ExecutionContext
-import scala.util.Try
-
+import scala.collection.JavaConverters._
 /**
-  *
-  *
-  * @author Brian Schlining
-  * @since 2016-07-11T16:58:00
-  */
+ *
+ *
+ * @author Brian Schlining
+ * @since 2016-07-11T16:58:00
+ */
 class ImagedMomentV1Api(controller: ImagedMomentController)(implicit val swagger: Swagger, val executor: ExecutionContext)
     extends APIStack {
 
@@ -33,24 +32,27 @@ class ImagedMomentV1Api(controller: ImagedMomentController)(implicit val swagger
     controller.findByUUID(uuid).map({
       case None => halt(NotFound(
         body = "{}",
-        reason = s"An ImagedMoment with a UUID of $uuid was not found"))
+        reason = s"An ImagedMoment with a UUID of $uuid was not found"
+      ))
       case Some(v) => toJson(v)
     })
   }
 
+  get("/videoreference") {
+    val limit = params.getAs[Int]("limit")
+    val offset = params.getAs[Int]("offset")
+    controller.findAllVideoReferenceUUIDs(limit, offset)
+      .map(_.asJava)
+      .map(toJson)
+  }
+
   get("/videoreference/:uuid") {
     val uuid = params.getAs[UUID]("uuid").getOrElse(halt(BadRequest("Please provide a Video Reference UUID")))
-    controller.findByVideoReferenceUUID(uuid).map(toJson)
+    val limit = params.getAs[Int]("limit")
+    val offset = params.getAs[Int]("offset")
+    controller.findByVideoReferenceUUID(uuid, limit, offset).map(toJson)
   }
 
-  get("/videoreference/:uuid/:index") {
-    val uuid = params.getAs[UUID]("uuid").getOrElse(halt(BadRequest("Please provide a Video Reference UUID")))
-    val index = params.get("index").getOrElse(halt(BadRequest("Please provide an index into the video reference")))
-
-    val timecode = new Timecode(index)
-    if (timecode.isValid) {
-      controller.
-    }
-  }
+  put("/:uuid") {}
 
 }

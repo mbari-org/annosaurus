@@ -14,7 +14,8 @@ import org.mbari.vcr4j.time.Timecode
  */
 trait ImagedMomentDAO[T <: ImagedMoment] extends DAO[T] {
 
-  def findByVideoReferenceUUID(uuid: UUID): Iterable[T]
+  def findAllVideoReferenceUUIDs(limit: Option[Int], offset: Option[Int]): Iterable[UUID]
+  def findByVideoReferenceUUID(uuid: UUID, limit: Option[Int] = None, offset: Option[Int] = None): Iterable[T]
 
   def findWithImageReferences(videoReferenceUUID: UUID): Iterable[T]
 

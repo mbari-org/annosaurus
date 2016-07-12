@@ -4,6 +4,7 @@ import java.time.{ Duration, Instant }
 import java.util.UUID
 
 import org.mbari.vars.annotation.model.Observation
+import org.mbari.vars.annotation.model.simple.Annotation
 import org.mbari.vcr4j.time.Timecode
 
 import scala.concurrent.{ ExecutionContext, Future }
@@ -16,6 +17,28 @@ import scala.concurrent.{ ExecutionContext, Future }
  */
 class AnnotationController(daoFactory: BasicDAOFactory) {
 
+  def findByUUID(uuid: UUID)(implicit ec: ExecutionContext): Future[Option[Annotation]] = {
+    val obsDao = daoFactory.newObservationDAO()
+    val f = obsDao.runTransaction(d => obsDao.findByUUID(uuid))
+    f.onComplete(t => obsDao.close())
+    f.map(_.map(Annotation(_)))
+  }
+
+  def findByVideoReferenceUUID(
+    videoReferenceUUID: UUID,
+    limit: Option[Int] = None,
+    offset: Option[Int] = None
+  )(implicit ec: ExecutionContext): Future[Seq[Annotation]] = {
+
+    println(s"!!!!!!! $limit $offset")
+    val imDao = daoFactory.newImagedMomentDAO()
+    val f = imDao.runTransaction(d => imDao.findByVideoReferenceUUID(videoReferenceUUID, limit, offset))
+    f.onComplete(t => imDao.close())
+    f.map(ims => ims.flatMap(_.observations)) // Convert to Iterable[Observation]
+      .map(obss => obss.toSeq.map(Annotation(_))) // Convert to Iterable[Annotation]
+
+  }
+
   def create(
     videoReferenceUUID: UUID,
     concept: String,
@@ -24,8 +47,9 @@ class AnnotationController(daoFactory: BasicDAOFactory) {
     timecode: Option[Timecode] = None,
     elapsedTime: Option[Duration] = None,
     recordedDate: Option[Instant] = None,
-    duration: Option[Duration] = None
-  )(implicit ec: ExecutionContext): Future[Observation] = {
+    duration: Option[Duration] = None,
+    group: Option[String] = None
+  )(implicit ec: ExecutionContext): Future[Annotation] = {
 
     val imDao = daoFactory.newImagedMomentDAO()
     val obsDao = daoFactory.newObservationDAO(imDao)
@@ -38,13 +62,14 @@ class AnnotationController(daoFactory: BasicDAOFactory) {
       observation.observer = observer
       observation.observationDate = observationDate
       duration.foreach(observation.duration = _)
+      group.foreach(observation.group = _)
       obsDao.create(observation)
       imagedMoment.addObservation(observation)
       observation
     })
 
     f.onComplete(t => imDao.close())
-    f
+    f.map(Annotation(_))
   }
 
   def update(
@@ -56,8 +81,9 @@ class AnnotationController(daoFactory: BasicDAOFactory) {
     timecode: Option[Timecode] = None,
     elapsedTime: Option[Duration] = None,
     recordedDate: Option[Instant] = None,
-    duration: Option[Duration] = None
-  )(implicit ec: ExecutionContext): Future[Option[Observation]] = {
+    duration: Option[Duration] = None,
+    group: Option[String] = None
+  )(implicit ec: ExecutionContext): Future[Option[Annotation]] = {
 
     val imDao = daoFactory.newImagedMomentDAO()
     val obsDao = daoFactory.newObservationDAO(imDao)
@@ -95,12 +121,13 @@ class AnnotationController(daoFactory: BasicDAOFactory) {
         concept.foreach(obs.concept = _)
         observer.foreach(obs.observer = _)
         duration.foreach(obs.duration = _)
+        group.foreach(obs.group = _)
         obs.observationDate = observationDate
         obs
       })
     })
     f.onComplete(t => imDao.close())
-    f
+    f.map(opt => opt.map(Annotation(_)))
   }
 
 }

@@ -22,10 +22,11 @@ class ImagedMomentController(val daoFactory: BasicDAOFactory)
 
   override def newDAO(): IMDAO = daoFactory.newImagedMomentDAO()
 
-  def findBy
+  def findAllVideoReferenceUUIDs(limit: Option[Int] = None, offset: Option[Int] = None)(implicit ec: ExecutionContext): Future[Iterable[UUID]] =
+    exec(d => d.findAllVideoReferenceUUIDs(limit, offset))
 
-  def findByVideoReferenceUUID(uuid: UUID)(implicit ec: ExecutionContext): Future[Iterable[ImagedMoment]] =
-    exec(d => d.findByVideoReferenceUUID(uuid))
+  def findByVideoReferenceUUID(uuid: UUID, limit: Option[Int] = None, offset: Option[Int] = None)(implicit ec: ExecutionContext): Future[Iterable[ImagedMoment]] =
+    exec(d => d.findByVideoReferenceUUID(uuid, limit, offset))
 
   def findWithImageReferences(videoReferenceUUID: UUID)(implicit ec: ExecutionContext): Future[Iterable[ImagedMoment]] =
     exec(d => d.findWithImageReferences(videoReferenceUUID))

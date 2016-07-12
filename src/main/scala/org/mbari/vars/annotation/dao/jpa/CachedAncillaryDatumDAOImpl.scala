@@ -19,4 +19,7 @@ class CachedAncillaryDatumDAOImpl(entityManager: EntityManager)
 
   override def findAll(): Iterable[CachedAncillaryDatumImpl] =
     findByNamedQuery("AncillaryDatum.findAll")
+
+  override def findAll(limit: Int, offset: Int): Iterable[CachedAncillaryDatumImpl] =
+    findByNamedQuery("AncillaryDatum.findAll", limit = Some(limit), offset = Some(offset))
 }

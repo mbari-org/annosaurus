@@ -23,4 +23,6 @@ class AssociationDAOImpl(entityManager: EntityManager)
   override def findAll(): Iterable[AssociationImpl] =
     findByNamedQuery("Association.findAll")
 
+  override def findAll(limit: Int, offset: Int): Iterable[AssociationImpl] =
+    findByNamedQuery("Association.findAll", limit = Some(limit), offset = Some(offset))
 }
