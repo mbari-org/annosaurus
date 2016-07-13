@@ -53,6 +53,15 @@ class ImagedMomentV1Api(controller: ImagedMomentController)(implicit val swagger
     controller.findByVideoReferenceUUID(uuid, limit, offset).map(toJson)
   }
 
-  put("/:uuid") {}
+  put("/:uuid") {
+    val uuid = params.getAs[UUID]("uuid").getOrElse(halt(BadRequest("Please provide a UUID")))
+    val timecode = params.getAs[Timecode]("timecode")
+    val elapsedTime = params.getAs[Duration]("elapsed_time_millis")
+    val recordedDate = params.getAs[Instant]("recorded_timestamp")
+    val videoReferenceUUID = params.getAs[UUID]("video_reference_uuid")
+    controller.update(uuid, videoReferenceUUID, timecode, recordedDate, elapsedTime).map(toJson)
+  }
+
+  delete("/:uuid") {}
 
 }

@@ -20,6 +20,10 @@ class AssociationDAOImpl(entityManager: EntityManager)
   override def findByLinkName(linkName: String): Iterable[AssociationImpl] =
     findByNamedQuery("Association.findByLinkName", Map("linkName" -> linkName))
 
+  override def findByLinkNameAndVideoReferenceUUID(linkName: String, videoReferenceUUID: UUID): Iterable[AssociationImpl] =
+    findByNamedQuery("Association.findByLinkName",
+      Map("linkName" -> linkName, "videoReferenceUUID" -> videoReferenceUUID))
+
   override def findAll(): Iterable[AssociationImpl] =
     findByNamedQuery("Association.findAll")
 

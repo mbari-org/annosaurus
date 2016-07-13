@@ -19,6 +19,9 @@ class ObservationDAOImpl(entityManager: EntityManager)
 
   override def newPersistentObject(): ObservationImpl = new ObservationImpl
 
+  override def findByVideoReferenceUUID(uuid: UUID, limit: Option[Int] = None, offset: Option[Int] = None): Iterable[ObservationImpl] =
+    findByNamedQuery("Observation.findByVideoReferenceUUID", Map("uuid" -> uuid))
+
   /**
    *
    * @return Order sequence of all concept names used

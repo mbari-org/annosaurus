@@ -1,5 +1,7 @@
 package org.mbari.vars.annotation.dao
 
+import java.util.UUID
+
 import org.mbari.vars.annotation.model.Association
 
 /**
@@ -11,5 +13,7 @@ import org.mbari.vars.annotation.model.Association
 trait AssociationDAO[T <: Association] extends DAO[T] {
 
   def findByLinkName(linkName: String): Iterable[T]
+
+  def findByLinkNameAndVideoReferenceUUID(linkName: String, videoReferenceUUID: UUID): Iterable[T]
 
 }

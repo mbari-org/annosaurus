@@ -12,12 +12,17 @@ import org.mbari.vars.annotation.model.Observation
  */
 trait ObservationDAO[T <: Observation] extends DAO[T] {
 
+
+  def findByVideoReferenceUUID(uuid: UUID, limit: Option[Int] = None, offset: Option[Int] = None): Iterable[T]
+
   /**
    *
    * @return Order sequence of all concept names used
    */
   def findAllNames(): Seq[String]
 
+
   def findAllNamesByVideoReferenceUUID(uuid: UUID): Seq[String]
+
 
 }

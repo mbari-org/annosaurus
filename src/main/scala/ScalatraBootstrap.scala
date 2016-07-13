@@ -1,6 +1,6 @@
 import javax.servlet.ServletContext
 
-import org.mbari.vars.annotation.api.{ AnnotationSwagger, AnnotationV1Api, ImagedMomentV1Api }
+import org.mbari.vars.annotation.api.{ AnnotationSwagger, AnnotationV1Api, AssociationV1Api, ImagedMomentV1Api }
 import org.mbari.vars.annotation.controllers._
 import org.mbari.vars.annotation.dao.jpa.DevelopmentDAOFactory
 import org.scalatra.LifeCycle
@@ -44,9 +44,11 @@ class ScalatraBootstrap extends LifeCycle {
     val observationController = new ObservationController(daoFactory)
 
     val annotationV1Api = new AnnotationV1Api(annotationController)
+    val associationV1Api = new AssociationV1Api(associationController)
     val imagedMomentV1Api = new ImagedMomentV1Api(imagedMomentController)
 
     context.mount(annotationV1Api, "/v1/annotations")
+    context.mount(associationV1Api, "/v1/associations")
     context.mount(imagedMomentV1Api, "/v1/imagedmoments")
     context.mount(new AnnotationSwagger, "/api-docs")
 

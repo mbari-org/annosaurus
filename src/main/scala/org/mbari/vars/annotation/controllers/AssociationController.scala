@@ -77,4 +77,8 @@ class AssociationController(val daoFactory: BasicDAOFactory)
     exec(fn)
   }
 
+  def findByLinkNameAndVideoReferenceUUID(linkName: String, videoReferenceUUID: UUID): Future[Iterable[Association]] = {
+
+  }
+
 }

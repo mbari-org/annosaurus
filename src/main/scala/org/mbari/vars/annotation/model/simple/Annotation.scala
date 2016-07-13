@@ -4,7 +4,7 @@ import java.time.{ Duration, Instant }
 import java.util.UUID
 
 import com.google.gson.annotations.{ Expose, SerializedName }
-import org.mbari.vars.annotation.model.{ Association, Observation }
+import org.mbari.vars.annotation.model.{ Association, ImageReference, Observation }
 import org.mbari.vcr4j.time.Timecode
 import java.util.{ ArrayList => JArrayList, List => JList }
 
@@ -16,7 +16,6 @@ import scala.collection.JavaConverters._
  * @author Brian Schlining
  * @since 2016-07-12T10:00:00
  */
-
 class Annotation {
   @Expose(serialize = true)
   var observationUuid: UUID = _
@@ -52,17 +51,17 @@ class Annotation {
 
   @Expose(serialize = true)
   @SerializedName(value = "associations")
-  protected var javaAssociations: JList[SimpleAssociation] = new JArrayList[SimpleAssociation]()
-  def associations: Seq[SimpleAssociation] = javaAssociations.asScala
-  def associations_=(as: Seq[SimpleAssociation]): Unit = {
+  protected var javaAssociations: JList[Association] = new JArrayList[Association]()
+  def associations: Seq[Association] = javaAssociations.asScala
+  def associations_=(as: Seq[Association]): Unit = {
     javaAssociations = as.asJava
   }
 
   @Expose(serialize = true)
   @SerializedName(value = "image_references")
-  var javaImageReferences: JList[SimpleImageReference] = new JArrayList[SimpleImageReference]()
-  def imageReferences: Seq[SimpleImageReference] = javaImageReferences.asScala
-  def imageReferences_=(irs: Seq[SimpleImageReference]): Unit = {
+  var javaImageReferences: JList[ImageReference] = new JArrayList[ImageReference]()
+  def imageReferences: Seq[ImageReference] = javaImageReferences.asScala
+  def imageReferences_=(irs: Seq[ImageReference]): Unit = {
     javaImageReferences = irs.asJava
   }
 
@@ -82,8 +81,8 @@ object Annotation {
     a.recordedTimestamp = observation.imagedMoment.recordedDate
     a.duration = observation.duration
     a.group = observation.group
-    a.associations = observation.associations.map(SimpleAssociation(_)).toSeq
-    a.imageReferences = observation.imagedMoment.imageReferences.map(SimpleImageReference(_)).toSeq
+    a.associations = observation.associations.toSeq
+    a.imageReferences = observation.imagedMoment.imageReferences.toSeq
     a
   }
 

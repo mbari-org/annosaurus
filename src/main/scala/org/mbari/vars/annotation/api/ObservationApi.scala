@@ -2,11 +2,12 @@ package org.mbari.vars.annotation.api
 
 import java.util.UUID
 
-import org.mbari.vars.annotation.controllers.{ AnnotationController, ObservationController }
-import org.scalatra.BadRequest
+import org.mbari.vars.annotation.controllers.{AnnotationController, ObservationController}
+import org.scalatra.{BadRequest, NotFound}
 import org.scalatra.swagger.Swagger
 
 import scala.concurrent.ExecutionContext
+import scala.collection.JavaConverters._
 
 /**
  *
@@ -20,17 +21,38 @@ class ObservationApi(controller: ObservationController)(implicit val swagger: Sw
 
   override protected val applicationName: Option[String] = Some("ObservationAPI")
 
-  get("/:uuid") {}
+  get("/:uuid") {
+    val uuid = params.getAs[UUID]("uuid").getOrElse(halt(BadRequest("Please provide a UUID")))
+    controller.findByUUID(uuid).map({
+      case None => halt(NotFound(
+        body = "{}",
+        reason = s"An ImagedMoment with a UUID of $uuid was not found"
+      ))
+      case Some(v) => toJson(v)
+    })
+  }
 
   get("/videoreference/:uuid") {
     val uuid = params.getAs[UUID]("uuid").getOrElse(halt(BadRequest("Please provide a Video Reference UUID")))
     val limit = params.getAs[Int]("limit")
     val offset = params.getAs[Int]("offset")
+    controller.findByVideoReferenceUUID(uuid)
+        .map(_.asJava)
+        .map(toJson)
   }
 
-  get("/names") {}
+  get("/names") {
+    controller.findAllNames
+        .map(_.asJava)
+        .map(toJson)
+  }
 
-  get("/names/:uuid") {}
+  get("/names/:uuid") {
+    val uuid = params.getAs[UUID]("uuid").getOrElse(halt(BadRequest("Please provide a video-reference 'uuid'")))
+    controller.findAllNamesByVideoReferenceUUID(uuid)
+          .map(_.asJava)
+              .map(toJson)
+  }
 
   put("/:uuid") {}
 
