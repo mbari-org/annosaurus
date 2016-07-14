@@ -63,6 +63,9 @@ class AssociationV1Api(controller: AssociationController)(implicit val swagger: 
     controller.update(uuid, observationUUID, linkName, toConcept, linkValue).map(toJson)
   }
 
-  delete("/:uuid") {}
+  delete("/:uuid") {
+    val uuid = params.getAs[UUID]("uuid").getOrElse(halt(BadRequest("Please provide the 'uuid' of the association")))
+    controller.delete(uuid)
+  }
 
 }

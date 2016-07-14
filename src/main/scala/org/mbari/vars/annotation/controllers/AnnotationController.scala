@@ -3,7 +3,8 @@ package org.mbari.vars.annotation.controllers
 import java.time.{ Duration, Instant }
 import java.util.UUID
 
-import org.mbari.vars.annotation.model.Observation
+import org.mbari.vars.annotation.dao.{ ImagedMomentDAO, ObservationDAO }
+import org.mbari.vars.annotation.model.{ ImageReference, ImagedMoment, Observation }
 import org.mbari.vars.annotation.model.simple.Annotation
 import org.mbari.vcr4j.time.Timecode
 
@@ -24,15 +25,21 @@ class AnnotationController(daoFactory: BasicDAOFactory) {
     f.map(_.map(Annotation(_)))
   }
 
+  /*
+      This searches for the ImagedMoments but returns an Annotation view. Keep in mind
+      that each ImagedMoment may contain more than one observations. The limit and
+      offset are for the ImagedMoments, and each may contain more than one Observation
+      (i.e. Annotation). So this call will appear to return more rows than limit and offest
+      specify.
+   */
   def findByVideoReferenceUUID(
     videoReferenceUUID: UUID,
     limit: Option[Int] = None,
     offset: Option[Int] = None
   )(implicit ec: ExecutionContext): Future[Seq[Annotation]] = {
 
-    println(s"!!!!!!! $limit $offset")
     val imDao = daoFactory.newImagedMomentDAO()
-    val f = imDao.runTransaction(d => imDao.findByVideoReferenceUUID(videoReferenceUUID, limit, offset))
+    val f = imDao.runTransaction(d => d.findByVideoReferenceUUID(videoReferenceUUID, limit, offset))
     f.onComplete(t => imDao.close())
     f.map(ims => ims.flatMap(_.observations)) // Convert to Iterable[Observation]
       .map(obss => obss.toSeq.map(Annotation(_))) // Convert to Iterable[Annotation]
@@ -94,28 +101,19 @@ class AnnotationController(daoFactory: BasicDAOFactory) {
       val observation = obsDao.findByUUID(uuid)
 
       observation.map(obs => {
-
+        val vrUUID = videoReferenceUUID.getOrElse(obs.imagedMoment.videoReferenceUUID)
         // --- 2. Move annotation
         if (timecode.isDefined || elapsedTime.isDefined || recordedDate.isDefined) {
           // Find existing
-          for {
-            vrUUID <- videoReferenceUUID
-            im <- imDao.findByVideoReferenceUUIDAndIndex(vrUUID, timecode, elapsedTime, recordedDate)
-          } {
-            val newIm = imDao.newPersistentObject()
-            newIm.videoReferenceUUID = vrUUID
-            timecode.foreach(newIm.timecode = _)
-            elapsedTime.foreach(newIm.elapsedTime = _)
-            recordedDate.foreach(newIm.recordedDate = _)
-            val oldIm = obs.imagedMoment
-            oldIm.removeObservation(obs)
-            newIm.addObservation(obs)
-
-            // Delete imagedMoment if no observations or imageReferences are attached
-            if (oldIm.imageReferences.isEmpty && oldIm.observations.isEmpty) {
-              imDao.delete(oldIm)
-            }
-          }
+          val newIm = ImagedMomentController.findImagedMoment(imDao, vrUUID, timecode, recordedDate, elapsedTime)
+          move(imDao, newIm, obs)
+        } else if (videoReferenceUUID.isDefined) {
+          // move to new video-reference/imaged-moment using the existing images
+          val tc = Option(obs.imagedMoment.timecode)
+          val rd = Option(obs.imagedMoment.recordedDate)
+          val et = Option(obs.imagedMoment.elapsedTime)
+          val newIm = ImagedMomentController.findImagedMoment(imDao, vrUUID, tc, rd, et)
+          move(imDao, newIm, obs)
         }
 
         concept.foreach(obs.concept = _)
@@ -128,6 +126,13 @@ class AnnotationController(daoFactory: BasicDAOFactory) {
     })
     f.onComplete(t => imDao.close())
     f.map(opt => opt.map(Annotation(_)))
+  }
+
+  private def move(dao: ImagedMomentDAO[ImagedMoment], newIm: ImagedMoment, observation: Observation): Unit = {
+    val oldIm = observation.imagedMoment
+    oldIm.removeObservation(observation)
+    newIm.addObservation(observation)
+    dao.deleteIfEmpty(oldIm)
   }
 
 }

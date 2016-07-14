@@ -1,5 +1,6 @@
 package org.mbari.vars.annotation.dao.jpa
 
+import java.net.URL
 import java.util.UUID
 import javax.persistence.EntityManager
 
@@ -16,6 +17,22 @@ class ImageReferenceDAOImpl(entityManager: EntityManager)
     with ImageReferenceDAO[ImageReferenceImpl] {
 
   override def newPersistentObject(): ImageReferenceImpl = new ImageReferenceImpl
+
+  override def newPersistentObject(
+    url: URL,
+    description: Option[String] = None,
+    heightPixels: Option[Int] = None,
+    widthPixels: Option[Int] = None,
+    format: Option[String] = None
+  ): ImageReferenceImpl = {
+    val imageReference = newPersistentObject()
+    imageReference.url = url
+    description.foreach(imageReference.description = _)
+    heightPixels.foreach(imageReference.height = _)
+    widthPixels.foreach(imageReference.width = _)
+    format.foreach(imageReference.format = _)
+    imageReference
+  }
 
   override def findAll(): Iterable[ImageReferenceImpl] =
     findByNamedQuery("ImageReference.findAll")

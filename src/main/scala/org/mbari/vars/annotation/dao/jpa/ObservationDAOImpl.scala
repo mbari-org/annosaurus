@@ -1,5 +1,6 @@
 package org.mbari.vars.annotation.dao.jpa
 
+import java.time.{ Duration, Instant }
 import java.util.UUID
 import javax.persistence.EntityManager
 
@@ -18,6 +19,23 @@ class ObservationDAOImpl(entityManager: EntityManager)
     with ObservationDAO[ObservationImpl] {
 
   override def newPersistentObject(): ObservationImpl = new ObservationImpl
+
+  override def newPersistentObject(
+    concept: String,
+    observer: String,
+    observationDate: Instant = Instant.now(),
+    group: Option[String] = None,
+    duration: Option[Duration] = None
+  ): ObservationImpl = {
+
+    val observation = newPersistentObject()
+    observation.concept = concept
+    observation.observer = observer
+    observation.observationDate = observationDate
+    group.foreach(observation.group = _)
+    duration.foreach(observation.duration = _)
+    observation
+  }
 
   override def findByVideoReferenceUUID(uuid: UUID, limit: Option[Int] = None, offset: Option[Int] = None): Iterable[ObservationImpl] =
     findByNamedQuery("Observation.findByVideoReferenceUUID", Map("uuid" -> uuid))

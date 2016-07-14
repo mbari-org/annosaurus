@@ -1,9 +1,10 @@
 package org.mbari.vars.annotation.api
 
+import java.time.{ Duration, Instant }
 import java.util.UUID
 
-import org.mbari.vars.annotation.controllers.{AnnotationController, ObservationController}
-import org.scalatra.{BadRequest, NotFound}
+import org.mbari.vars.annotation.controllers.{ AnnotationController, ObservationController }
+import org.scalatra.{ BadRequest, NotFound }
 import org.scalatra.swagger.Swagger
 
 import scala.concurrent.ExecutionContext
@@ -37,24 +38,38 @@ class ObservationApi(controller: ObservationController)(implicit val swagger: Sw
     val limit = params.getAs[Int]("limit")
     val offset = params.getAs[Int]("offset")
     controller.findByVideoReferenceUUID(uuid)
-        .map(_.asJava)
-        .map(toJson)
+      .map(_.asJava)
+      .map(toJson)
   }
 
   get("/names") {
     controller.findAllNames
-        .map(_.asJava)
-        .map(toJson)
+      .map(_.asJava)
+      .map(toJson)
   }
 
   get("/names/:uuid") {
     val uuid = params.getAs[UUID]("uuid").getOrElse(halt(BadRequest("Please provide a video-reference 'uuid'")))
     controller.findAllNamesByVideoReferenceUUID(uuid)
-          .map(_.asJava)
-              .map(toJson)
+      .map(_.asJava)
+      .map(toJson)
   }
 
-  put("/:uuid") {}
+  put("/:uuid") {
+    val uuid = params.getAs[UUID]("uuid").getOrElse(halt(BadRequest("Please provide a UUID")))
+    val imagedMomentUUID = params.getAs[UUID]("imaged_moment_uuid")
+    val duration = params.getAs[Duration]("duration_millis")
+    val group = params.get("group")
+    val concept = params.get("concept")
+    val observer = params.get("observer")
+    val observationDate = params.getAs[Instant]("observation_timestamp").getOrElse(Instant.now())
 
-  delete("/:uuid") {}
+    controller.update(uuid, concept, observer, observationDate, duration, group, imagedMomentUUID)
+
+  }
+
+  delete("/:uuid") {
+    val uuid = params.getAs[UUID]("uuid").getOrElse(halt(BadRequest("Please provide a UUID")))
+    controller.delete(uuid)
+  }
 }

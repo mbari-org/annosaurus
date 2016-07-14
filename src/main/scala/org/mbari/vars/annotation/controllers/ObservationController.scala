@@ -24,7 +24,7 @@ class ObservationController(val daoFactory: BasicDAOFactory)
   def create(
     imagedMomentUUID: UUID,
     concept: String,
-    observer: Option[String] = None,
+    observer: String,
     observationDate: Instant = Instant.now(),
     duration: Option[Duration] = None,
     group: Option[String] = None
@@ -35,12 +35,7 @@ class ObservationController(val daoFactory: BasicDAOFactory)
       imDao.findByUUID(imagedMomentUUID) match {
         case None => throw new NotFoundInDatastoreException(s"ImagedMoment with UUID of $imagedMomentUUID not found")
         case Some(imagedMoment) =>
-          val observation = dao.newPersistentObject()
-          observation.concept = concept
-          observer.foreach(observation.observer = _)
-          observation.observationDate = observationDate
-          duration.foreach(observation.duration = _)
-          group.foreach(observation.group = _)
+          val observation = dao.newPersistentObject(concept, observer, observationDate, group, duration)
           observation.imagedMoment = imagedMoment
           observation
       }
@@ -96,7 +91,7 @@ class ObservationController(val daoFactory: BasicDAOFactory)
     exec(fn)
   }
 
-  def findByVideoReferenceUUID(uuid: UUID,  limit: Option[Int] = None, offset: Option[Int] = None)(implicit ec: ExecutionContext): Future[Iterable[Observation]] = {
+  def findByVideoReferenceUUID(uuid: UUID, limit: Option[Int] = None, offset: Option[Int] = None)(implicit ec: ExecutionContext): Future[Iterable[Observation]] = {
     def fn(dao: ODAO): Iterable[Observation] = dao.findByVideoReferenceUUID(uuid)
     exec(fn)
   }

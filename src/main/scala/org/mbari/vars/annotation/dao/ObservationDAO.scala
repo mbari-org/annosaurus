@@ -1,5 +1,6 @@
 package org.mbari.vars.annotation.dao
 
+import java.time.{ Duration, Instant }
 import java.util.UUID
 
 import org.mbari.vars.annotation.model.Observation
@@ -12,6 +13,13 @@ import org.mbari.vars.annotation.model.Observation
  */
 trait ObservationDAO[T <: Observation] extends DAO[T] {
 
+  def newPersistentObject(
+    concept: String,
+    observer: String,
+    observationDate: Instant = Instant.now(),
+    group: Option[String] = None,
+    duration: Option[Duration] = None
+  ): T
 
   def findByVideoReferenceUUID(uuid: UUID, limit: Option[Int] = None, offset: Option[Int] = None): Iterable[T]
 
@@ -21,8 +29,6 @@ trait ObservationDAO[T <: Observation] extends DAO[T] {
    */
   def findAllNames(): Seq[String]
 
-
   def findAllNamesByVideoReferenceUUID(uuid: UUID): Seq[String]
-
 
 }

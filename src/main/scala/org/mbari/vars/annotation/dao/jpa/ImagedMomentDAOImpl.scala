@@ -20,6 +20,20 @@ class ImagedMomentDAOImpl(entityManager: EntityManager)
 
   override def newPersistentObject(): ImagedMomentImpl = new ImagedMomentImpl
 
+  def newPersistentObject(
+    videoReferenceUUID: UUID,
+    timecode: Option[Timecode] = None,
+    elapsedTime: Option[Duration] = None,
+    recordedDate: Option[Instant] = None
+  ): ImagedMomentImpl = {
+    val imagedMoment = new ImagedMomentImpl
+    imagedMoment.videoReferenceUUID = videoReferenceUUID
+    timecode.foreach(imagedMoment.timecode = _)
+    elapsedTime.foreach(imagedMoment.elapsedTime = _)
+    recordedDate.foreach(imagedMoment.recordedDate = _)
+    imagedMoment
+  }
+
   override def findAllVideoReferenceUUIDs(limit: Option[Int] = None, offset: Option[Int] = None): Iterable[UUID] = {
     val query = entityManager.createNamedQuery("ImagedMoment.findAllVideoReferenceUUIDs")
     limit.foreach(query.setMaxResults)

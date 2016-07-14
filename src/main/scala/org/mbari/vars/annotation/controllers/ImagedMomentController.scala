@@ -90,11 +90,7 @@ object ImagedMomentController {
     dao.findByVideoReferenceUUIDAndIndex(videoReferenceUUID, timecode, elapsedTime, recordedDate) match {
       case Some(imagedMoment) => imagedMoment
       case None =>
-        val imagedMoment = dao.newPersistentObject()
-        imagedMoment.videoReferenceUUID = videoReferenceUUID
-        timecode.foreach(imagedMoment.timecode = _)
-        elapsedTime.foreach(imagedMoment.elapsedTime = _)
-        recordedDate.foreach(imagedMoment.recordedDate = _)
+        val imagedMoment = dao.newPersistentObject(videoReferenceUUID, timecode, elapsedTime, recordedDate)
         dao.create(imagedMoment)
         imagedMoment
     }
