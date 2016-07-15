@@ -2,9 +2,9 @@ package org.mbari.vars.annotation.api
 
 import java.util.UUID
 
-import org.mbari.vars.annotation.controllers.{ AssociationController, ImagedMomentController }
+import org.mbari.vars.annotation.controllers.{AssociationController, ImagedMomentController}
 import org.mbari.vars.annotation.model.Association
-import org.scalatra.{ BadRequest, NotFound }
+import org.scalatra.{BadRequest, NoContent, NotFound}
 import org.scalatra.swagger.Swagger
 
 import scala.concurrent.ExecutionContext
@@ -63,6 +63,12 @@ class AssociationV1Api(controller: AssociationController)(implicit val swagger: 
     controller.update(uuid, observationUUID, linkName, toConcept, linkValue).map(toJson)
   }
 
-  delete("/:uuid") {}
+  delete("/:uuid") {
+    val uuid = params.getAs[UUID]("uuid").getOrElse(halt(BadRequest("Please provide the 'uuid' of the association")))
+    controller.delete(uuid).map({
+      case true => halt(NoContent(reason = s"Success! Deleted association with UUID of $uuid"))
+      case false => halt(NotFound(reason = s"Failed. No association with UUID of $uuid was found."))
+    })
+  }
 
 }

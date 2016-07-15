@@ -5,7 +5,7 @@ import java.util.UUID
 
 import org.mbari.vars.annotation.controllers.{AnnotationController, ImagedMomentController}
 import org.mbari.vcr4j.time.Timecode
-import org.scalatra.{BadRequest, NotFound}
+import org.scalatra.{BadRequest, NoContent, NotFound}
 import org.scalatra.swagger.Swagger
 
 import scala.concurrent.ExecutionContext
@@ -63,6 +63,12 @@ class ImagedMomentV1Api(controller: ImagedMomentController)(implicit val swagger
     controller.update(uuid, videoReferenceUUID, timecode, recordedDate, elapsedTime).map(toJson)
   }
 
-  delete("/:uuid") {}
+  delete("/:uuid") {
+    val uuid = params.getAs[UUID]("uuid").getOrElse(halt(BadRequest("Please provide the 'uuid' of the association")))
+    controller.delete(uuid).map({
+      case true => halt(NoContent(reason = s"Success! Deleted ImagedMoment with UUID of $uuid"))
+      case false => halt(NotFound(reason = s"Failed. No ImagedMoment with UUID of $uuid was found."))
+    })
+  }
 
 }
