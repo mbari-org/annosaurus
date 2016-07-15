@@ -12,6 +12,12 @@ import org.mbari.vars.annotation.model.Association
  */
 trait AssociationDAO[T <: Association] extends DAO[T] {
 
+  def newPersistentObject(
+    linkName: String,
+    toConcept: Option[String] = Some(Association.TO_CONCEPT_SELF),
+    linkValue: Option[String] = Some(Association.LINK_VALUE_NIL)
+  ): T
+
   def findByLinkName(linkName: String): Iterable[T]
 
   def findByLinkNameAndVideoReferenceUUID(linkName: String, videoReferenceUUID: UUID): Iterable[T]

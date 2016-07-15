@@ -16,7 +16,7 @@ import scala.collection.JavaConverters._
  * @author Brian Schlining
  * @since 2016-07-04T21:56:00
  */
-class ObservationApi(controller: ObservationController)(implicit val swagger: Swagger, val executor: ExecutionContext)
+class ObservationV1Api(controller: ObservationController)(implicit val swagger: Swagger, val executor: ExecutionContext)
     extends APIStack {
   override protected def applicationDescription: String = "Observation API (v1)"
 
@@ -38,21 +38,21 @@ class ObservationApi(controller: ObservationController)(implicit val swagger: Sw
     val limit = params.getAs[Int]("limit")
     val offset = params.getAs[Int]("offset")
     controller.findByVideoReferenceUUID(uuid)
-        .map(_.asJava)
-        .map(toJson)
+      .map(_.asJava)
+      .map(toJson)
   }
 
   get("/names") {
     controller.findAllNames
-        .map(_.asJava)
-        .map(toJson)
+      .map(_.asJava)
+      .map(toJson)
   }
 
   get("/names/:uuid") {
     val uuid = params.getAs[UUID]("uuid").getOrElse(halt(BadRequest("Please provide a video-reference 'uuid'")))
     controller.findAllNamesByVideoReferenceUUID(uuid)
-          .map(_.asJava)
-          .map(toJson)
+      .map(_.asJava)
+      .map(toJson)
   }
 
   put("/:uuid") {

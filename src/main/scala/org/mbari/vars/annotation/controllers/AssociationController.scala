@@ -31,10 +31,7 @@ class AssociationController(val daoFactory: BasicDAOFactory)
       obsDao.findByUUID(observationUUID) match {
         case None => throw new NotFoundInDatastoreException(s"Observation with UUID of $observationUUID not found")
         case Some(observation) =>
-          val association = dao.newPersistentObject()
-          association.linkName = linkName
-          association.toConcept = toConcept
-          association.linkValue = linkValue
+          val association = dao.newPersistentObject(linkName, Some(toConcept), Some(linkValue))
           observation.addAssociation(association)
           association
       }
@@ -77,7 +74,7 @@ class AssociationController(val daoFactory: BasicDAOFactory)
     exec(fn)
   }
 
-  def findByLinkNameAndVideoReferenceUUID(linkName: String, videoReferenceUUID: UUID): Future[Iterable[Association]] = {
+  def findByLinkNameAndVideoReferenceUUID(linkName: String, videoReferenceUUID: UUID)(implicit ec: ExecutionContext): Future[Iterable[Association]] = {
     def fn(dao: ADAO): Iterable[Association] = dao.findByLinkNameAndVideoReferenceUUID(linkName, videoReferenceUUID)
     exec(fn)
   }

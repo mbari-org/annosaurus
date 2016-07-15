@@ -17,6 +17,7 @@ import scala.collection.JavaConverters._
  * @since 2016-07-12T10:00:00
  */
 class Annotation {
+
   @Expose(serialize = true)
   var observationUuid: UUID = _
 

@@ -34,12 +34,7 @@ class ImageReferenceController(val daoFactory: BasicDAOFactory) extends BaseCont
       imDao.findByUUID(imagedMomentUUID) match {
         case None => throw new NotFoundInDatastoreException(s"No ImagedMoment with UUID of $imagedMomentUUID was found")
         case Some(imagedMoment) =>
-          val imageReference = dao.newPersistentObject()
-          imageReference.url = url
-          description.foreach(imageReference.description = _)
-          heightPixels.foreach(imageReference.height = _)
-          widthPixels.foreach(imageReference.width = _)
-          format.foreach(imageReference.format = _)
+          val imageReference = dao.newPersistentObject(url, description, heightPixels, widthPixels, format)
           imagedMoment.addImageReference(imageReference)
           imageReference
       }
