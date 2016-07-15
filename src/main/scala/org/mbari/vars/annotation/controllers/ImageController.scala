@@ -120,6 +120,23 @@ class ImageController(daoFactory: BasicDAOFactory) {
     f.map(_.map(Image(_)))
   }
 
+  def delete(uuid: UUID)(implicit ec: ExecutionContext): Future[Boolean] = {
+    val imDao = daoFactory.newImagedMomentDAO()
+    val irDao = daoFactory.newImageReferenceDAO(imDao)
+    val f = irDao.runTransaction(d => {
+      d.findByUUID(uuid) match {
+        case None => false
+        case Some(v) =>
+          val imagedMoment = v.imagedMoment
+          imagedMoment.removeImageReference(v)
+          d.delete(v)
+          imDao.deleteIfEmpty(imagedMoment)
+      }
+    })
+    f.onComplete(t => irDao.close())
+    f
+  }
+
   private def move(dao: ImagedMomentDAO[ImagedMoment], newIm: ImagedMoment, imageReference: ImageReference): Unit = {
     val oldIm = imageReference.imagedMoment
     oldIm.removeImageReference(imageReference)

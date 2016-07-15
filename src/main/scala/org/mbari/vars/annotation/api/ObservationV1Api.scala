@@ -16,7 +16,7 @@ import scala.collection.JavaConverters._
  * @author Brian Schlining
  * @since 2016-07-04T21:56:00
  */
-class ObservationApi(controller: ObservationController)(implicit val swagger: Swagger, val executor: ExecutionContext)
+class ObservationV1Api(controller: ObservationController)(implicit val swagger: Swagger, val executor: ExecutionContext)
     extends APIStack {
   override protected def applicationDescription: String = "Observation API (v1)"
 

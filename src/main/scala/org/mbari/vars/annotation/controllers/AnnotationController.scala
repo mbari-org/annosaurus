@@ -128,6 +128,23 @@ class AnnotationController(daoFactory: BasicDAOFactory) {
     f.map(opt => opt.map(Annotation(_)))
   }
 
+  def delete(uuid: UUID)(implicit ec: ExecutionContext): Future[Boolean] = {
+    val imDao = daoFactory.newImagedMomentDAO()
+    val obsDao = daoFactory.newObservationDAO(imDao)
+    val f = obsDao.runTransaction(d => {
+      d.findByUUID(uuid) match {
+        case None => false
+        case Some(v) =>
+          val imagedMoment = v.imagedMoment
+          imagedMoment.removeObservation(v)
+          d.delete(v)
+          imDao.deleteIfEmpty(imagedMoment)
+      }
+    })
+    f.onComplete(t => obsDao.close())
+    f
+  }
+
   private def move(dao: ImagedMomentDAO[ImagedMoment], newIm: ImagedMoment, observation: Observation): Unit = {
     val oldIm = observation.imagedMoment
     oldIm.removeObservation(observation)
