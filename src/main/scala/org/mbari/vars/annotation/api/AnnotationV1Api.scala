@@ -21,8 +21,8 @@ class AnnotationV1Api(controller: AnnotationController)(implicit val swagger: Sw
     extends APIStack {
 
   override protected def applicationDescription: String = "Annotation API (v1)"
-
   override protected val applicationName: Option[String] = Some("AnnotationAPI")
+
 
   before() {
     contentType = "application/json"
