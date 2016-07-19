@@ -23,7 +23,6 @@ class AnnotationV1Api(controller: AnnotationController)(implicit val swagger: Sw
   override protected def applicationDescription: String = "Annotation API (v1)"
   override protected val applicationName: Option[String] = Some("AnnotationAPI")
 
-
   before() {
     contentType = "application/json"
     response.headers += ("Access-Control-Allow-Origin" -> "*")

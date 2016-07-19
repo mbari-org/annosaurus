@@ -1,7 +1,7 @@
 package org.mbari.vars.annotation.api
 
 import java.net.URL
-import java.time.{Duration, Instant}
+import java.time.{ Duration, Instant }
 import java.util.UUID
 
 import org.mbari.vars.annotation.controllers.ImageController
@@ -26,7 +26,6 @@ class ImageV1Api(controller: ImageController)(implicit val swagger: Swagger, val
     response.headers += ("Access-Control-Allow-Origin" -> "*")
   }
 
-
   get("/:uuid") {
     val uuid = params.getAs[UUID]("uuid").getOrElse(halt(BadRequest(
       body = "{}",
@@ -43,8 +42,8 @@ class ImageV1Api(controller: ImageController)(implicit val swagger: Swagger, val
     val limit = params.getAs[Int]("limit")
     val offset = params.getAs[Int]("offset")
     controller.findByVideoReferenceUUID(uuid, limit, offset)
-        .map(_.asJava)
-        .map(toJson)
+      .map(_.asJava)
+      .map(toJson)
   }
 
   post("/") {
@@ -65,7 +64,7 @@ class ImageV1Api(controller: ImageController)(implicit val swagger: Swagger, val
     val description = params.get("description")
     controller.create(videoReferenceUUID, url, timecode, elapsedTime, recordedDate,
       format, width, height, description)
-        .map(toJson)
+      .map(toJson)
   }
 
   put("/:uuid") {
@@ -82,11 +81,8 @@ class ImageV1Api(controller: ImageController)(implicit val swagger: Swagger, val
     val width = params.getAs[Int]("width_pixels")
     val height = params.getAs[Int]("height_pixels")
     val description = params.get("description")
-    controller.update(uuid, videoReferenceUUID, timecode, elaspedTime, recordedDate,
+    controller.update(uuid, videoReferenceUUID, timecode, elapsedTime, recordedDate,
       format, width, height, description).map(toJson)
   }
-
-
-
 
 }

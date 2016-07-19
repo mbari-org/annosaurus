@@ -1,10 +1,10 @@
 package org.mbari.vars.annotation.api
 
-import java.time.{Duration, Instant}
+import java.time.{ Duration, Instant }
 import java.util.UUID
 
-import org.mbari.vars.annotation.controllers.{AnnotationController, ObservationController}
-import org.scalatra.{BadRequest, NoContent, NotFound}
+import org.mbari.vars.annotation.controllers.{ AnnotationController, ObservationController }
+import org.scalatra.{ BadRequest, NoContent, NotFound }
 import org.scalatra.swagger.Swagger
 
 import scala.concurrent.ExecutionContext
@@ -67,7 +67,7 @@ class ObservationV1Api(controller: ObservationController)(implicit val swagger: 
     val group = params.get("group")
     val imagedMomentUUID = params.getAs[UUID]("imaged_moment_uuid")
     controller.update(uuid, concept, observer, observationDate, duration, group, imagedMomentUUID)
-        .map(toJson)
+      .map(toJson)
   }
 
   delete("/:uuid") {

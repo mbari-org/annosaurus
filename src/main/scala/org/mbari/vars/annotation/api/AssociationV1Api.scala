@@ -2,9 +2,9 @@ package org.mbari.vars.annotation.api
 
 import java.util.UUID
 
-import org.mbari.vars.annotation.controllers.{AssociationController, ImagedMomentController}
+import org.mbari.vars.annotation.controllers.{ AssociationController, ImagedMomentController }
 import org.mbari.vars.annotation.model.Association
-import org.scalatra.{BadRequest, NoContent, NotFound}
+import org.scalatra.{ BadRequest, NoContent, NotFound }
 import org.scalatra.swagger.Swagger
 
 import scala.concurrent.ExecutionContext

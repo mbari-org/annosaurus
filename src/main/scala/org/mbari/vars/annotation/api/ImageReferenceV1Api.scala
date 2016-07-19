@@ -1,11 +1,11 @@
 package org.mbari.vars.annotation.api
 
 import java.net.URL
-import java.time.{Duration, Instant}
+import java.time.{ Duration, Instant }
 import java.util.UUID
 
 import org.mbari.vars.annotation.controllers.ImageReferenceController
-import org.scalatra.{BadRequest, NoContent, NotFound}
+import org.scalatra.{ BadRequest, NoContent, NotFound }
 import org.scalatra.swagger.Swagger
 
 import scala.concurrent.ExecutionContext
@@ -43,7 +43,7 @@ class ImageReferenceV1Api(controller: ImageReferenceController)(implicit val swa
     val description = params.get("description")
     val imagedMomentUUID = params.getAs[UUID]("imaged_moment_uuid")
     controller.update(uuid, url, description, height, width, format, imagedMomentUUID)
-          .map(toJson)
+      .map(toJson)
   }
 
   delete("/:uuid") {
