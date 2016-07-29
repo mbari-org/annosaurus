@@ -111,10 +111,8 @@ class ObservationController(val daoFactory: BasicDAOFactory)
           val imagedMoment = observation.imagedMoment
           imagedMoment.removeObservation(observation)
           dao.delete(observation)
-          if (imagedMoment.isEmpty) {
-            val imDao = daoFactory.newImagedMomentDAO(dao)
-            imDao.delete(imagedMoment)
-          }
+          val imDao = daoFactory.newImagedMomentDAO(dao)
+          imDao.deleteIfEmpty(imagedMoment)
           true
       }
     }
