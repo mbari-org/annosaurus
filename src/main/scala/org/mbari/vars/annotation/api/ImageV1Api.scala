@@ -58,6 +58,11 @@ class ImageV1Api(controller: ImageController)(implicit val swagger: Swagger, val
     val timecode = params.getAs[Timecode]("timecode")
     val elapsedTime = params.getAs[Duration]("elapsed_time_millis")
     val recordedDate = params.getAs[Instant]("recorded_timestamp")
+
+    if (timecode.isEmpty && elapsedTime.isEmpty && recordedDate.isEmpty) {
+      halt(BadRequest("An valid index of timecode, elapsed_time_millis, or recorded_timestamp is required"))
+    }
+
     val format = params.get("format")
     val width = params.getAs[Int]("width_pixels")
     val height = params.getAs[Int]("height_pixels")

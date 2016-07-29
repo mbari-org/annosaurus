@@ -26,6 +26,11 @@ post(anno_url,
 post(image_url,
      data = {"video_reference_uuid": video_reference_uuid,
              "url": "http://foobar.com/someimage.png",
+             "elapsed_time_millis": 12345,
              "width_pixels": 1920,
              "height_pixels": 1080,
              "format": "image/png"})
+
+print("Dump for all annotations for video-reference of " + video_reference_uuid)
+query_url = anno_url + "/videoreference/" + video_reference_uuid
+print(get(query_url))
