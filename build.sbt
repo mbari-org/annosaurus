@@ -1,7 +1,7 @@
 // PROJECT PROPERTIES ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 organization in ThisBuild := "org.mbari.vars"
 
-name := "video-annotation-service"
+name := "annosaurus"
 
 version in ThisBuild := "0.1.0-SNAPSHOT"
 
