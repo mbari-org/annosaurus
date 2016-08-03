@@ -1,8 +1,8 @@
-![MBARI logo](https://raw.githubusercontent.com/underwatervideo/video-annotation-service/master/src/site/images/logo-mbari-3b.png)
+![MBARI logo](https://raw.githubusercontent.com/underwatervideo/annosaurus/master/src/site/images/logo-mbari-3b.png)
 
-# video-annotation-service
+# annosaurus
 
-MBARI is updating its [Video Annotation and Reference System](https://hohonuuli.github.io/vars/) for modern video workflows. The service in this repository is one component of our next generation system. The _video-annotation-service_ is the component that stores and retrieves annotations for a video or images. It is being designed to work as a programming-language agnostic API that can be accessed from any programming language. The goal of this project is to provide a data service that allows developers and scientists to easily build their own tools for annotating video and images collections.
+MBARI is updating its [Video Annotation and Reference System](https://hohonuuli.github.io/vars/) for modern video workflows. The service in this repository is one component of our next generation system. _annosaurus_ is the component that stores and retrieves annotations for a video or images. It is being designed to work as a programming-language agnostic API that can be accessed from any programming language. The goal of this project is to provide a data service that allows developers and scientists to easily build their own tools for annotating video and images collections.
 
 ## Design Goals
 
@@ -15,7 +15,7 @@ MBARI is updating its [Video Annotation and Reference System](https://hohonuuli.
 
 This model _might_ not be directly exposed to end users. It's the current internal notional data model.
 
-![Data Model](https://raw.githubusercontent.com/underwatervideo/video-annotation-service/master/src/site/images/annotation_data_model.png)
+![Data Model](https://raw.githubusercontent.com/underwatervideo/annosaurus/master/src/site/images/annotation_data_model.png)
 
 ```
 +--------------+               +----------------+
@@ -45,7 +45,7 @@ This model _might_ not be directly exposed to end users. It's the current intern
 
 __Related Projects__:
 
-- [video-asset-manager](https://github.com/underwatervideo/video-asset-manager): A service for registering and locating video files.
+- [vampire-squid](https://github.com/underwatervideo/vampire-squid): A service for registering and locating video files.
 
 ## Building
 
