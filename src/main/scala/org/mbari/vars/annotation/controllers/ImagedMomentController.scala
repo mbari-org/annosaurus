@@ -61,6 +61,7 @@ class ImagedMomentController(val daoFactory: BasicDAOFactory)
           timecode.foreach(imagedMoment.timecode = _)
           recordedDate.foreach(imagedMoment.recordedDate = _)
           elapsedTime.foreach(imagedMoment.elapsedTime = _)
+          //dao.update(imagedMoment)
           imagedMoment
       }
     }

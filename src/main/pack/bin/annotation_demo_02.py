@@ -3,7 +3,9 @@
 import requests
 import json
 
-def post(url, data = {}):
+def post(url, data=None):
+    if data is None:
+        data = {}
     r = requests.post(url, data)
     return json.loads(r.text)
 

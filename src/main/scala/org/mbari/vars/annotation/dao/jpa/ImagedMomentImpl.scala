@@ -99,7 +99,7 @@ class ImagedMomentImpl extends ImagedMoment with JPAPersistentObject {
   override var videoReferenceUUID: UUID = _
 
   @Expose(serialize = true)
-  @SerializedName(value = "imaged_moments")
+  @SerializedName(value = "observations")
   @OneToMany(
     targetEntity = classOf[ObservationImpl],
     cascade = Array(CascadeType.ALL),
