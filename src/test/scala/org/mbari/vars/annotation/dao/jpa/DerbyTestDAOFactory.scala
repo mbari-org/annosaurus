@@ -1,9 +1,15 @@
 package org.mbari.vars.annotation.dao.jpa
 
+import java.util.concurrent.TimeUnit
 import javax.persistence.EntityManagerFactory
 
 import com.typesafe.config.ConfigFactory
 import org.eclipse.persistence.config.TargetDatabase
+
+import scala.concurrent.Await
+import scala.concurrent.duration.Duration
+
+import org.mbari.vars.annotation.dao.jpa.Implicits.RichEntityManager
 
 /**
  *
@@ -38,6 +44,20 @@ object DerbyTestDAOFactory extends JPADAOFactory {
     val user = config.getString("org.mbari.vars.annotation.database.derby.user")
     val password = config.getString("org.mbari.vars.annotation.database.derby.password")
     EntityManagerFactories(url, user, password, driver, testProps)
+  }
+
+  def cleanup(): Unit = {
+
+    import scala.concurrent.ExecutionContext.Implicits.global
+    val dao = newImagedMomentDAO()
+
+    val f = dao.runTransaction(d => {
+      val all = dao.findAll()
+      all.foreach(dao.delete)
+    })
+    f.onComplete(t => dao.close())
+    Await.result(f, Duration(4, TimeUnit.SECONDS))
+
   }
 
 }

@@ -107,10 +107,10 @@ class ImagedMomentImpl extends ImagedMoment with JPAPersistentObject {
     mappedBy = "imagedMoment",
     orphanRemoval = true
   )
-  protected var javaObservations: JList[Observation] = new JArrayList[Observation]
+  protected var javaObservations: JList[ObservationImpl] = new JArrayList[ObservationImpl]
 
   override def addObservation(observation: Observation): Unit = {
-    javaObservations.add(observation)
+    javaObservations.add(observation.asInstanceOf[ObservationImpl])
     observation.imagedMoment = this
   }
 
@@ -130,10 +130,10 @@ class ImagedMomentImpl extends ImagedMoment with JPAPersistentObject {
     mappedBy = "imagedMoment",
     orphanRemoval = true
   )
-  protected var javaImageReferences: JList[ImageReference] = new JArrayList[ImageReference]
+  protected var javaImageReferences: JList[ImageReferenceImpl] = new JArrayList[ImageReferenceImpl]
 
   override def addImageReference(imageReference: ImageReference): Unit = {
-    javaImageReferences.add(imageReference)
+    javaImageReferences.add(imageReference.asInstanceOf[ImageReferenceImpl])
     imageReference.imagedMoment = this
   }
 

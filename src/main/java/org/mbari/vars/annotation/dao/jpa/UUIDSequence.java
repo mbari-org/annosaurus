@@ -24,7 +24,7 @@ public class UUIDSequence extends Sequence implements SessionCustomizer {
     @Override
     public Object getGeneratedValue(Accessor accessor,
             AbstractSession writeSession, String seqName) {
-        return UUID.randomUUID().toString().toUpperCase();
+        return UUID.randomUUID().toString().toLowerCase();
     }
 
     @Override

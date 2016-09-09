@@ -5,7 +5,7 @@ import java.util.UUID
 import java.util.concurrent.TimeUnit
 
 import org.mbari.vars.annotation.dao.{ CachedAncillaryDatumDAO, ImageReferenceDAO }
-import org.scalatest.{ FlatSpec, Matchers }
+import org.scalatest.{ FlatSpec, Matchers, BeforeAndAfterAll }
 
 import scala.concurrent.{ Await, Awaitable }
 import scala.concurrent.duration.{ Duration => SDuration }
@@ -17,7 +17,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
  * @author Brian Schlining
  * @since 2016-06-28T15:39:00
  */
-class CachedAncillaryDatumDAOSpec extends FlatSpec with Matchers {
+class CachedAncillaryDatumDAOSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
 
   private[this] val timeout = SDuration(2, TimeUnit.SECONDS)
   private[this] val imDao = H2TestDAOFactory.newImagedMomentDAO()
@@ -61,6 +61,10 @@ class CachedAncillaryDatumDAOSpec extends FlatSpec with Matchers {
 
     val datCheck = run(_.findByUUID(ancillaryDatum0.uuid))
     datCheck shouldBe empty
+  }
+
+  protected override def afterAll(): Unit = {
+    H2TestDAOFactory.cleanup()
   }
 
 }

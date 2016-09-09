@@ -34,6 +34,9 @@ class Annotation {
   var videoReferenceUuid: UUID = _
 
   @Expose(serialize = true)
+  var imagedMomentUuid: UUID = _
+
+  @Expose(serialize = true)
   var timecode: Timecode = _
 
   @Expose(serialize = true)
@@ -77,6 +80,7 @@ object Annotation {
     a.observer = observation.observer
     a.observationTimestamp = observation.observationDate
     a.videoReferenceUuid = observation.imagedMoment.videoReferenceUUID
+    a.imagedMomentUuid = observation.imagedMoment.uuid
     a.timecode = observation.imagedMoment.timecode
     a.elapsedTime = observation.imagedMoment.elapsedTime
     a.recordedTimestamp = observation.imagedMoment.recordedDate

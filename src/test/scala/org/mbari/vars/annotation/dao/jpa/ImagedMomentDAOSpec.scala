@@ -6,7 +6,7 @@ import java.util.concurrent.TimeUnit
 
 import org.mbari.vars.annotation.dao.{ AssociationDAO, ImagedMomentDAO }
 import org.mbari.vcr4j.time.Timecode
-import org.scalatest.{ FlatSpec, Matchers }
+import org.scalatest.{ FlatSpec, Matchers, BeforeAndAfterAll }
 
 import scala.concurrent.{ Await, Awaitable, Future }
 import scala.concurrent.duration.{ Duration => SDuration }
@@ -18,7 +18,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
  * @author Brian Schlining
  * @since 2016-06-27T15:12:00
  */
-class ImagedMomentDAOSpec extends FlatSpec with Matchers {
+class ImagedMomentDAOSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
 
   private[this] val timeout = SDuration(2, TimeUnit.SECONDS)
   private[this] val dao = H2TestDAOFactory.newImagedMomentDAO()
@@ -91,6 +91,10 @@ class ImagedMomentDAOSpec extends FlatSpec with Matchers {
     run(d => im.foreach(d.delete))
     val imCheck = run(_.findAll()).filter(_.uuid == imagedMoment1.uuid)
     imCheck shouldBe empty
+  }
+
+  protected override def afterAll(): Unit = {
+    H2TestDAOFactory.cleanup()
   }
 
 }

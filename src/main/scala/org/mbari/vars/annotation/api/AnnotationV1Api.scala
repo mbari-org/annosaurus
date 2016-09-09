@@ -5,7 +5,7 @@ import java.util.UUID
 
 import org.mbari.vars.annotation.controllers.AnnotationController
 import org.mbari.vcr4j.time.Timecode
-import org.scalatra.BadRequest
+import org.scalatra.{ BadRequest, NotFound }
 import org.scalatra.swagger.Swagger
 
 import scala.concurrent.ExecutionContext
@@ -33,7 +33,11 @@ class AnnotationV1Api(controller: AnnotationController)(implicit val swagger: Sw
       body = "{}",
       reason = "A 'uuid' parameter is required"
     )))
-    controller.findByUUID(uuid).map(toJson)
+    controller.findByUUID(uuid)
+      .map({
+        case None => halt(NotFound(body = "{}", reason = s"An observation with uuid of $uuid was not found"))
+        case Some(obs) => toJson(obs)
+      })
   }
 
   get("/videoreference/:uuid") {
@@ -91,7 +95,11 @@ class AnnotationV1Api(controller: AnnotationController)(implicit val swagger: Sw
 
     controller.update(uuid, videoReferenceUUID, concept, observer, observationDate,
       timecode, elapsedTime, recordedDate, duration)
-      .map(toJson) // Convert to JSON
+      .map({
+        case None =>
+          halt(NotFound(body = "{}", reason = s"An annotaiton with observation_uuid of $uuid was not found"))
+        case Some(ann) => toJson(ann)
+      }) // Convert to JSON
 
   }
 

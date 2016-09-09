@@ -1,7 +1,5 @@
 package org.mbari.vars.annotation.dao
 
-import javax.persistence.EntityManagerFactory
-
 import org.mbari.vars.annotation.model._
 
 /**

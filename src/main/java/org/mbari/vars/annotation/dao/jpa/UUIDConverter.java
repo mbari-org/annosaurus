@@ -21,10 +21,10 @@ public class UUIDConverter implements AttributeConverter<UUID, String> {
     }
 
     public static String uuidToString(UUID uuid) {
-        return uuid == null ? null : uuid.toString().toUpperCase();
+        return uuid == null ? null : uuid.toString().toLowerCase();
     }
 
     public static UUID stringToUUID(String s) {
-        return s == null ? null : UUID.fromString(s.toUpperCase());
+        return s == null ? null : UUID.fromString(s.toLowerCase());
     }
 }

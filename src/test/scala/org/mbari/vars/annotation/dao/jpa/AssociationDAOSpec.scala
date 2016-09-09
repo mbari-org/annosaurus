@@ -6,7 +6,7 @@ import java.util.concurrent.TimeUnit
 
 import org.mbari.vars.annotation.dao.{ AssociationDAO, CachedAncillaryDatumDAO }
 import org.mbari.vars.annotation.model.Association
-import org.scalatest.{ FlatSpec, Matchers }
+import org.scalatest.{ FlatSpec, Matchers, BeforeAndAfterAll }
 
 import scala.concurrent.{ Await, Awaitable }
 import scala.concurrent.duration.{ Duration => SDuration }
@@ -18,7 +18,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
  * @author Brian Schlining
  * @since 2016-06-28T09:49:00
  */
-class AssociationDAOSpec extends FlatSpec with Matchers {
+class AssociationDAOSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
 
   private[this] val timeout = SDuration(2, TimeUnit.SECONDS)
   private[this] val imDao = H2TestDAOFactory.newImagedMomentDAO()
@@ -86,6 +86,10 @@ class AssociationDAOSpec extends FlatSpec with Matchers {
 
     val assCheck = run(_.findAll()).filter(_.uuid == association1.uuid)
     assCheck shouldBe empty
+  }
+
+  protected override def afterAll(): Unit = {
+    H2TestDAOFactory.cleanup()
   }
 
 }

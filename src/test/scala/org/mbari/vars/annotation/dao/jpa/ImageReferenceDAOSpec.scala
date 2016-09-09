@@ -6,7 +6,7 @@ import java.util.UUID
 import java.util.concurrent.TimeUnit
 
 import org.mbari.vars.annotation.dao.ImageReferenceDAO
-import org.scalatest.{ FlatSpec, Matchers }
+import org.scalatest.{ FlatSpec, Matchers, BeforeAndAfterAll }
 
 import scala.concurrent.{ Await, Awaitable }
 import scala.concurrent.duration.{ Duration => SDuration }
@@ -18,7 +18,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
  * @author Brian Schlining
  * @since 2016-06-28T17:04:00
  */
-class ImageReferenceDAOSpec extends FlatSpec with Matchers {
+class ImageReferenceDAOSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
 
   private[this] val timeout = SDuration(2, TimeUnit.SECONDS)
   private[this] val imDao = H2TestDAOFactory.newImagedMomentDAO()
@@ -69,6 +69,10 @@ class ImageReferenceDAOSpec extends FlatSpec with Matchers {
     run(_.delete(imageReference0))
     val ir0 = run(_.findByUUID(imageReference0.uuid))
     ir0 shouldBe empty
+  }
+
+  protected override def afterAll(): Unit = {
+    H2TestDAOFactory.cleanup()
   }
 
 }

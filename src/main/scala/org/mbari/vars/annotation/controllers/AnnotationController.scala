@@ -3,6 +3,7 @@ package org.mbari.vars.annotation.controllers
 import java.time.{ Duration, Instant }
 import java.util.UUID
 
+import org.mbari.vars.annotation.Constants
 import org.mbari.vars.annotation.dao.{ ImagedMomentDAO, ObservationDAO }
 import org.mbari.vars.annotation.model.{ ImageReference, ImagedMoment, Observation }
 import org.mbari.vars.annotation.model.simple.Annotation

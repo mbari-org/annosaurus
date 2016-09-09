@@ -28,6 +28,14 @@ class ImagedMomentV1Api(controller: ImagedMomentController)(implicit val swagger
     response.headers += ("Access-Control-Allow-Origin" -> "*")
   }
 
+  get("/") {
+    val limit = params.getAs[Int]("limit").getOrElse(1000)
+    val offset = params.getAs[Int]("offset").getOrElse(0)
+    controller.findAll(limit, offset)
+      .map(_.asJava)
+      .map(toJson)
+  }
+
   get("/:uuid") {
     val uuid = params.getAs[UUID]("uuid").getOrElse(halt(BadRequest("Please provide a UUID")))
     controller.findByUUID(uuid).map({
@@ -55,6 +63,18 @@ class ImagedMomentV1Api(controller: ImagedMomentController)(implicit val swagger
       .map(_.asJava)
       .map(toJson)
   }
+
+  //  post("/") {
+  //    val videoReferenceUUID = params.getAs[UUID]("video_reference_uuid")
+  //        .getOrElse(halt(BadRequest("A video_reference_uuid is required")))
+  //    val timecode = params.getAs[Timecode]("timecode")
+  //    val elapsedTime = params.getAs[Duration]("elapsed_time_millis")
+  //    val recordedDate = params.getAs[Instant]("recorded_timestamp")
+  //    if (timecode.isEmpty && elapsedTime.isEmpty && recordedDate.isEmpty) {
+  //      halt(BadRequest("At least one of: timecode, elapsed_time_millis, or recorded_timestamp is required"))
+  //    }
+  //
+  //  }
 
   put("/:uuid") {
     val uuid = params.getAs[UUID]("uuid").getOrElse(halt(BadRequest("Please provide a UUID")))
