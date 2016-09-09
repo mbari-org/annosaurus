@@ -2,11 +2,14 @@ package org.mbari.vars.annotation.controllers
 
 import java.net.URL
 import java.util.UUID
+import java.util.concurrent.TimeUnit
 
 import org.mbari.vars.annotation.dao.{ ImageReferenceDAO, NotFoundInDatastoreException }
 import org.mbari.vars.annotation.model.ImageReference
 
-import scala.concurrent.{ ExecutionContext, Future }
+import scala.concurrent.duration.Duration
+import scala.concurrent.{ Await, ExecutionContext, Future }
+import scala.util.{ Failure, Success }
 
 /**
  *
@@ -91,11 +94,12 @@ class ImageReferenceController(val daoFactory: BasicDAOFactory) extends BaseCont
         case None => false
         case Some(imageReference) =>
           val imagedMoment = imageReference.imagedMoment
-          imagedMoment.removeImageReference(imageReference)
-          dao.delete(imageReference)
-          if (imagedMoment.isEmpty) {
+          // If this is the only imageref and there are no observations, delete the imagemoment
+          if (imagedMoment.imageReferences.size == 1 && imagedMoment.observations.isEmpty) {
             val imDao = daoFactory.newImagedMomentDAO(dao)
             imDao.delete(imagedMoment)
+          } else {
+            dao.delete(imageReference)
           }
           true
       }

@@ -62,10 +62,17 @@ trait ImagedMomentDAO[T <: ImagedMoment] extends DAO[T] {
    * @param imagedMoment The object to delete
    * @return true if deleted, false if not deleted.
    */
-  def deleteIfEmpty(imagedMoment: T): Boolean = {
-    if (imagedMoment.imageReferences.isEmpty && imagedMoment.observations.isEmpty) {
-      delete(imagedMoment)
-      true
-    } else false
+  def deleteIfEmpty(imagedMoment: T): Boolean = deleteIfEmptyByUUID(imagedMoment.uuid)
+
+  def deleteIfEmptyByUUID(uuid: UUID): Boolean = {
+    println("!!!DeleteifEmptyByUUID")
+    findByUUID(uuid).map(imagedMoment => {
+
+      if (imagedMoment.imageReferences.isEmpty && imagedMoment.observations.isEmpty) {
+
+        delete(imagedMoment)
+        true
+      } else false
+    }).getOrElse(false)
   }
 }

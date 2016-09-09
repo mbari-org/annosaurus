@@ -43,7 +43,10 @@ class ImageReferenceV1Api(controller: ImageReferenceController)(implicit val swa
     val description = params.get("description")
     val imagedMomentUUID = params.getAs[UUID]("imaged_moment_uuid")
     controller.update(uuid, url, description, height, width, format, imagedMomentUUID)
-      .map(toJson)
+      .map({
+        case None => halt(NotFound(reason = s"An ImageReference with uuid of $uuid was not found"))
+        case Some(ir) => toJson(ir)
+      })
   }
 
   delete("/:uuid") {

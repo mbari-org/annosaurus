@@ -64,6 +64,15 @@ class ImagedMomentV1Api(controller: ImagedMomentController)(implicit val swagger
       .map(toJson)
   }
 
+  get("/imagereference/:uuid") {
+    val uuid = params.getAs[UUID]("uuid").getOrElse(halt(BadRequest("Please provide a Video Reference UUID")))
+    controller.findByImageReferenceUUID(uuid)
+      .map({
+        case None => halt(NotFound(reason = s"No imagereference with a uuid of $uuid was found"))
+        case Some(im) => toJson(im)
+      })
+  }
+
   //  post("/") {
   //    val videoReferenceUUID = params.getAs[UUID]("video_reference_uuid")
   //        .getOrElse(halt(BadRequest("A video_reference_uuid is required")))

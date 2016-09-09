@@ -8,6 +8,7 @@ import org.scalatra.{ BadRequest, NoContent, NotFound }
 import org.scalatra.swagger.Swagger
 
 import scala.concurrent.ExecutionContext
+import scala.collection.JavaConverters._
 
 /**
  *
@@ -43,7 +44,8 @@ class AssociationV1Api(controller: AssociationController)(implicit val swagger: 
   get("/:video_reference_uuid/:link_name") {
     val videoReferenceUUID = params.getAs[UUID]("video_reference_uuid").getOrElse(halt(BadRequest("Please provide a video-reference 'uuid'")))
     val linkName = params.get("link_name").getOrElse(halt(BadRequest("A 'link_name' parameter is required")))
-    controller.findByLinkNameAndVideoReferenceUUID(linkName, videoReferenceUUID).map(toJson)
+    controller.findByLinkNameAndVideoReferenceUUID(linkName, videoReferenceUUID)
+      .map(as => toJson(as.asJava))
   }
 
   post("/") {
@@ -60,7 +62,10 @@ class AssociationV1Api(controller: AssociationController)(implicit val swagger: 
     val linkName = params.get("link_name")
     val toConcept = params.get("to_concept")
     val linkValue = params.get("link_value")
-    controller.update(uuid, observationUUID, linkName, toConcept, linkValue).map(toJson)
+    controller.update(uuid, observationUUID, linkName, toConcept, linkValue).map({
+      case None => halt(NotFound(body = "{}", reason = s"No association with uuid of $uuid was found"))
+      case Some(a) => toJson(a)
+    })
   }
 
   delete("/:uuid") {

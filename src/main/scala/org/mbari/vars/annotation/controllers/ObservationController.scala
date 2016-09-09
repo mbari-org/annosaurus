@@ -96,6 +96,14 @@ class ObservationController(val daoFactory: BasicDAOFactory)
     exec(fn)
   }
 
+  def findByAssociationUUID(uuid: UUID)(implicit ec: ExecutionContext): Future[Option[Observation]] = {
+    def fn(dao: ODAO): Option[Observation] = {
+      val adao = daoFactory.newAssociationDAO(dao)
+      adao.findByUUID(uuid).map(_.observation)
+    }
+    exec(fn)
+  }
+
   /**
    * This controller will also delete the [[org.mbari.vars.annotation.model.ImagedMoment]] if
    * it is empty (i.e. no observations or other imageReferences)
@@ -109,13 +117,17 @@ class ObservationController(val daoFactory: BasicDAOFactory)
         case None => false
         case Some(observation) =>
           val imagedMoment = observation.imagedMoment
-          imagedMoment.removeObservation(observation)
-          dao.delete(observation)
-          val imDao = daoFactory.newImagedMomentDAO(dao)
-          imDao.deleteIfEmpty(imagedMoment)
+          // If this is the only observation and there are no imagerefs, delete the imagemoment
+          if (imagedMoment.observations.size == 1 && imagedMoment.imageReferences.isEmpty) {
+            val imDao = daoFactory.newImagedMomentDAO(dao)
+            imDao.delete(imagedMoment)
+          } else {
+            dao.delete(observation)
+          }
           true
       }
     }
     exec(fn)
   }
+
 }

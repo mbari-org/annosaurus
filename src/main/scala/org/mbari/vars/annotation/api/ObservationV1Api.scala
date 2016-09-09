@@ -42,6 +42,15 @@ class ObservationV1Api(controller: ObservationController)(implicit val swagger: 
       .map(toJson)
   }
 
+  get("/association/:uuid") {
+    val uuid = params.getAs[UUID]("uuid").getOrElse(halt(BadRequest("Please provide an Association UUID")))
+    controller.findByAssociationUUID(uuid)
+      .map({
+        case None => halt(NotFound(s"No observation for association with uuid of ${uuid} was found"))
+        case Some(obs) => toJson(obs)
+      })
+  }
+
   get("/names") {
     controller.findAllNames
       .map(_.asJava)

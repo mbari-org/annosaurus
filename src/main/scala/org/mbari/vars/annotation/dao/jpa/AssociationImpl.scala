@@ -25,7 +25,7 @@ import org.mbari.vars.annotation.model.{ Association, Observation }
   ),
   new NamedQuery(
     name = "Association.findByLinkNameAndVideoReferenceUUID",
-    query = "SELECT a FROM Association a JOIN a.observation o JOIN o.imagedMoment im WHERE a.linkName = :linkName AND im.uuid = :videoReferenceUuid"
+    query = "SELECT a FROM Association a INNER JOIN FETCH a.observation o INNER JOIN FETCH o.imagedMoment im WHERE im.videoReferenceUUID = :videoReferenceUuid AND a.linkName = :linkName"
   )
 ))
 class AssociationImpl extends Association with JPAPersistentObject {
