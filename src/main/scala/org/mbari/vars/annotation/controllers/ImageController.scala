@@ -79,6 +79,7 @@ class ImageController(daoFactory: BasicDAOFactory) {
    */
   def update(
     uuid: UUID,
+    url: Option[URL] = None,
     videoReferenceUUID: Option[UUID] = None,
     timecode: Option[Timecode] = None,
     elapsedTime: Option[Duration] = None,
@@ -109,6 +110,7 @@ class ImageController(daoFactory: BasicDAOFactory) {
           move(imDao, newIm, ir)
         }
 
+        url.foreach(ir.url = _)
         format.foreach(ir.format = _)
         width.foreach(ir.width = _)
         height.foreach(ir.height = _)
@@ -126,11 +128,15 @@ class ImageController(daoFactory: BasicDAOFactory) {
     val f = irDao.runTransaction(d => {
       d.findByUUID(uuid) match {
         case None => false
-        case Some(v) =>
-          val imagedMoment = v.imagedMoment
-          imagedMoment.removeImageReference(v)
-          d.delete(v)
-          imDao.deleteIfEmpty(imagedMoment)
+        case Some(imageReference) =>
+          val imagedMoment = imageReference.imagedMoment
+          if (imagedMoment.imageReferences.size == 1 && imagedMoment.observations.isEmpty) {
+            val imDao = daoFactory.newImagedMomentDAO(d)
+            imDao.delete(imagedMoment)
+          } else {
+            d.delete(imageReference)
+          }
+          true
       }
     })
     f.onComplete(t => irDao.close())
@@ -139,9 +145,14 @@ class ImageController(daoFactory: BasicDAOFactory) {
 
   private def move(dao: ImagedMomentDAO[ImagedMoment], newIm: ImagedMoment, imageReference: ImageReference): Unit = {
     val oldIm = imageReference.imagedMoment
-    oldIm.removeImageReference(imageReference)
-    newIm.addImageReference(imageReference)
-    dao.deleteIfEmpty(oldIm)
+    if (!oldIm.uuid.equals(newIm.uuid)) {
+      val shouldDelete = oldIm.imageReferences.size == 1 && oldIm.observations.isEmpty
+      oldIm.removeImageReference(imageReference)
+      newIm.addImageReference(imageReference)
+      if (shouldDelete) {
+        dao.delete(oldIm)
+      }
+    }
   }
 
 }

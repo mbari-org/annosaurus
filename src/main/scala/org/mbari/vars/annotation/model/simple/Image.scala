@@ -35,6 +35,9 @@ class Image {
   var videoReferenceUuid: UUID = _
 
   @Expose(serialize = true)
+  var imagedMomentUuid: UUID = _
+
+  @Expose(serialize = true)
   var timecode: Timecode = _
 
   @Expose(serialize = true)
@@ -57,6 +60,7 @@ object Image {
     i.url = imageReference.url
     i.description = imageReference.description
     i.videoReferenceUuid = imageReference.imagedMoment.videoReferenceUUID
+    i.imagedMomentUuid = imageReference.imagedMoment.uuid
     i.timecode = imageReference.imagedMoment.timecode
     i.elapsedTime = imageReference.imagedMoment.elapsedTime
     i.recordedTimestamp = imageReference.imagedMoment.recordedDate

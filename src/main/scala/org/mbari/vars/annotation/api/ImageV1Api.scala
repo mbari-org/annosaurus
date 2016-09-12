@@ -6,7 +6,7 @@ import java.util.UUID
 
 import org.mbari.vars.annotation.controllers.ImageController
 import org.mbari.vcr4j.time.Timecode
-import org.scalatra.BadRequest
+import org.scalatra.{ BadRequest, NotFound }
 import org.scalatra.swagger.Swagger
 
 import scala.concurrent.ExecutionContext
@@ -31,7 +31,10 @@ class ImageV1Api(controller: ImageController)(implicit val swagger: Swagger, val
       body = "{}",
       reason = "A 'uuid' parameter is required"
     )))
-    controller.findByUUID(uuid).map(toJson)
+    controller.findByUUID(uuid).map({
+      case None => halt(NotFound(reason = s"an Image with an image_reference_uuid of $uuid was not found"))
+      case Some(v) => toJson(v)
+    })
   }
 
   get("/videoreference/:uuid") {
@@ -86,8 +89,12 @@ class ImageV1Api(controller: ImageController)(implicit val swagger: Swagger, val
     val width = params.getAs[Int]("width_pixels")
     val height = params.getAs[Int]("height_pixels")
     val description = params.get("description")
-    controller.update(uuid, videoReferenceUUID, timecode, elapsedTime, recordedDate,
-      format, width, height, description).map(toJson)
+    controller.update(uuid, url, videoReferenceUUID, timecode, elapsedTime, recordedDate,
+      format, width, height, description)
+      .map({
+        case None => halt(NotFound(reason = s"an Image with an image_reference_uuid of $uuid was not found"))
+        case Some(v) => toJson(v)
+      })
   }
 
 }

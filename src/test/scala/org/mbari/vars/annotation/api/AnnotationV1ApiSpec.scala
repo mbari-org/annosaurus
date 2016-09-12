@@ -27,7 +27,7 @@ class AnnotationV1ApiSpec extends WebApiStack {
 
   var annotation: Annotation = _
 
-  "AnnotationV1API" should "create" in {
+  "AnnotationV1Api" should "create" in {
     post(
       "/v1/annotations",
       "video_reference_uuid" -> UUID.randomUUID().toString,
