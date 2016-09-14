@@ -3,8 +3,8 @@ package org.mbari.vars.annotation.api
 import java.time.{ Duration, Instant }
 import java.util.UUID
 
-import org.mbari.vars.annotation.controllers.{ AnnotationController, ObservationController }
-import org.mbari.vars.annotation.model.simple.{ Concepts }
+import org.mbari.vars.annotation.controllers.ObservationController
+import org.mbari.vars.annotation.model.ValueArray
 import org.scalatra.{ BadRequest, NoContent, NotFound }
 import org.scalatra.swagger.Swagger
 
@@ -38,7 +38,7 @@ class ObservationV1Api(controller: ObservationController)(implicit val swagger: 
     val uuid = params.getAs[UUID]("uuid").getOrElse(halt(BadRequest("Please provide a Video Reference UUID")))
     val limit = params.getAs[Int]("limit")
     val offset = params.getAs[Int]("offset")
-    controller.findByVideoReferenceUUID(uuid)
+    controller.findByVideoReferenceUUID(uuid, limit, offset)
       .map(_.asJava)
       .map(toJson)
   }
@@ -54,14 +54,14 @@ class ObservationV1Api(controller: ObservationController)(implicit val swagger: 
 
   get("/concepts") {
     controller.findAllConcepts
-      .map(s => Concepts(s.toArray))
+      .map(s => ValueArray(s.toArray))
       .map(toJson)
   }
 
   get("/concepts/:uuid") {
     val uuid = params.getAs[UUID]("uuid").getOrElse(halt(BadRequest("Please provide a video-reference 'uuid'")))
     controller.findAllConceptsByVideoReferenceUUID(uuid)
-      .map(s => Concepts(s.toArray))
+      .map(s => ValueArray(s.toArray))
       .map(toJson)
   }
 

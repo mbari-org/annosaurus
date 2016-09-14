@@ -7,8 +7,7 @@ import java.util.concurrent.TimeUnit
 import org.mbari.vars.annotation.Constants
 import org.mbari.vars.annotation.controllers.ObservationController
 import org.mbari.vars.annotation.dao.jpa.{ AssociationImpl, ImagedMomentImpl, ObservationImpl }
-import org.mbari.vars.annotation.model.Observation
-import org.mbari.vars.annotation.model.simple.Concepts
+import org.mbari.vars.annotation.model.{ Observation, StringArray, ValueArray }
 
 import scala.concurrent.Await
 import scala.concurrent.duration.{ Duration => SDuration }
@@ -112,17 +111,18 @@ class ObservationV1ApiSpec extends WebApiStack {
     // --- find all names
     get(s"$path/concepts") {
       status should be(200)
-      val concepts = gson.fromJson(body, classOf[Concepts])
-      concepts.names should contain theSameElementsAs List("squid", "submarine", "rocketship")
+      val concepts = gson.fromJson(body, classOf[StringArray])
+      concepts.values should contain theSameElementsAs Array("squid", "submarine", "rocketship")
     }
   }
 
   it should "find all names for a video reference" in {
     get(s"$path/concepts/${observation.imagedMoment.videoReferenceUUID}") {
       status should be(200)
+      val concepts = gson.fromJson(body, classOf[StringArray])
       println(body)
-      val concepts = gson.fromJson(body, classOf[Concepts])
-      concepts.names should contain theSameElementsAs List("submarine", "rocketship")
+      println(concepts.values.getClass)
+      concepts.values should contain theSameElementsAs Array("submarine", "rocketship")
     }
   }
 

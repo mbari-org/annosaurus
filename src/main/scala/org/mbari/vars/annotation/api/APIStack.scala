@@ -6,10 +6,7 @@ import java.util.UUID
 
 import org.mbari.vars.annotation.Constants
 
-//import org.json4s.ext.JavaTypesSerializers
-//import org.json4s.{ DefaultFormats, Formats }
 import org.mbari.vcr4j.time.Timecode
-import org.scalatra.json.JacksonJsonSupport
 import org.scalatra.{ ContentEncodingSupport, FutureSupport, ScalatraServlet }
 import org.scalatra.swagger.SwaggerSupport
 import org.scalatra.util.conversion.TypeConverter

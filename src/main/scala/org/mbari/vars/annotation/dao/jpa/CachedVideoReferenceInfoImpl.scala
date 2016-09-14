@@ -12,9 +12,49 @@ import org.mbari.vars.annotation.model.CachedVideoReferenceInfo
  * @author Brian Schlining
  * @since 2016-06-17T15:33:00
  */
-@Entity(name = "VideoReferenceInfo")
+@Entity(name = "CachedVideoReferenceInfo")
 @Table(name = "video_reference_information")
 @EntityListeners(value = Array(classOf[TransactionLogger]))
+@NamedNativeQueries(Array(
+  new NamedNativeQuery(
+    name = "VideoReferenceInfo.findAllVideoReferenceUUIDs",
+    query = "SELECT DISTINCT video_reference_uuid FROM video_reference_information ORDER BY video_reference_uuid ASC"
+  ),
+  new NamedNativeQuery(
+    name = "VideoReferenceInfo.findAllMissionContacts",
+    query = "SELECT DISTINCT mission_contact FROM video_reference_information ORDER BY mission_contact ASC"
+  ),
+  new NamedNativeQuery(
+    name = "VideoReferenceInfo.findAllPlatformNames",
+    query = "SELECT DISTINCT platform_name FROM video_reference_information ORDER BY platform_name ASC"
+  ),
+  new NamedNativeQuery(
+    name = "VideoReferenceInfo.findAllMissionIDs",
+    query = "SELECT DISTINCT mission_id FROM video_reference_information ORDER BY mission_id ASC"
+  )
+))
+@NamedQueries(Array(
+  new NamedQuery(
+    name = "VideoReferenceInfo.findAll",
+    query = "SELECT v FROM CachedVideoReferenceInfo v"
+  ),
+  new NamedQuery(
+    name = "VideoReferenceInfo.findByVideoReferenceUUID",
+    query = "SELECT v FROM CachedVideoReferenceInfo v WHERE v.videoReferenceUUID = :uuid"
+  ),
+  new NamedQuery(
+    name = "VideoReferenceInfo.findByPlatformName",
+    query = "SELECT v FROM CachedVideoReferenceInfo v WHERE v.platformName = :name"
+  ),
+  new NamedQuery(
+    name = "VideoReferenceInfo.findByMissionID",
+    query = "SELECT v FROM CachedVideoReferenceInfo v WHERE v.missionID = :id"
+  ),
+  new NamedQuery(
+    name = "VideoReferenceInfo.findByMissionContact",
+    query = "SELECT v FROM CachedVideoReferenceInfo v WHERE v.missionContact = :contact "
+  )
+))
 class CachedVideoReferenceInfoImpl extends CachedVideoReferenceInfo with JPAPersistentObject {
 
   /**

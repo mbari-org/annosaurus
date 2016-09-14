@@ -16,5 +16,9 @@ trait CachedVideoReferenceInfoDAO[T <: CachedVideoReferenceInfo] extends DAO[T] 
   def findByPlatformName(platformName: String): Iterable[CachedVideoReferenceInfo]
   def findByMissionID(missionID: String): Iterable[CachedVideoReferenceInfo]
   def findByMissionContact(missionContact: String): Iterable[CachedVideoReferenceInfo]
+  def findAllVideoReferenceUUIDs(): Iterable[UUID]
+  def findAllMissionContacts(): Iterable[String]
+  def findAllPlatformNames(): Iterable[String]
+  def findAllMissionIDs(): Iterable[String]
 
 }

@@ -141,9 +141,12 @@ class AnnotationController(daoFactory: BasicDAOFactory) {
         case None => false
         case Some(v) =>
           val imagedMoment = v.imagedMoment
-          imagedMoment.removeObservation(v)
-          d.delete(v)
-          imDao.deleteIfEmpty(imagedMoment)
+          if (imagedMoment.observations.size == 1 && imagedMoment.imageReferences.isEmpty) {
+            imDao.delete(imagedMoment)
+          } else {
+            d.delete(v)
+          }
+          true
       }
     })
     f.onComplete(t => obsDao.close())
