@@ -15,28 +15,13 @@ MBARI is updating its [Video Annotation and Reference System](https://hohonuuli.
 
 This model _might_ not be directly exposed to end users. It's the current internal notional data model.
 
-![Data Model](https://raw.githubusercontent.com/underwatervideo/annosaurus/master/src/site/images/annotation_data_model.png)
+![Data Model](src/site/images/annosaurus_classes.png)
 
-```
-+--------------+               +----------------+
-| ImagedMoment |-[1]--[0..*]->| ImageReference |
-+--------------+               +----------------+
-       |      \
-      [1]      \    +---------------------+
-       |        --- | CachedAnxillaryData |
-       |            +---------------------+
-      [0..*]
-       |
-       v
-+-------------+               +-------------+
-| Observation |-[1]--[0..*]-> | Association |
-+-------------+               +-------------+
-```
-
-
-
-- `ImagedMoment`: Reference to some index in a particular video. The other model pieces are joined to this.
-- `Observation`: Represents an `annotation`. Includes annotation term, an optional duration, and tracks who made the observation.
+- `ImagedMoment`: Reference to some index in a particular video. It can contain zero or more _Observations_ and zero or more _ImageReferences_. It can use any or all of the following as indices, but at least one _must_ be present:
+     - _recordedDate_: The moment in time when the frame or image was recorded
+     - _timecode_: Typically this is a tape timecode, but it could be pulled from a timecode track in a video too.
+     - _elapsedTime_: This is the time since the start of the video clip. This is the most commonly used index for video files.
+- `Observation`: Represents an `annotation`. Includes the annotation term (i.e. concept), an optional duration, and tracks who made the observation. The group and activity fields can be used to further categorize annotations for example at MBARI we might use groups like: _images_, _ROV_, and _AUV_ and activities like: _descent_, _ascent_, _transect_, and _cruising_. 
 - `Association`: Information that augments an observation. Very flexible, the format is `linkName | toConcept | linkValue`. Some examples; `eating | Aegina | nil`, `surface-color | self | red`, `audio-comment | nil | first sighting on this mission`. 
 - `ImageReference`: Images, such as framegrabs, linked to the moment. It will also be possible to load image references for image annotation projects.
 - `CachedAnxillaryData`: For performance reason, we may want to cache some time indexed information, such as position, CTD, etc, in side the same database as the annotations.
