@@ -68,13 +68,15 @@ class AnnotationV1Api(controller: AnnotationController)(implicit val swagger: Sw
     val elapsedTime = params.getAs[Duration]("elapsed_time_millis")
     val recordedDate = params.getAs[Instant]("recorded_timestamp")
     val duration = params.getAs[Duration]("duration_millis")
+    val group = params.get("group")
+    val activity = params.get("activity")
 
     if (timecode.isEmpty && elapsedTime.isEmpty && recordedDate.isEmpty) {
       halt(BadRequest("One or more of the following indicies into the video are required: timecode, elapsed_time_millis, recorded_date"))
     }
 
     controller.create(videoReferenceUUID, concept, observer, observationDate, timecode,
-      elapsedTime, recordedDate, duration)
+      elapsedTime, recordedDate, duration, group, activity)
       .map(toJson) // Convert to JSON
 
   }
@@ -92,9 +94,11 @@ class AnnotationV1Api(controller: AnnotationController)(implicit val swagger: Sw
     val elapsedTime = params.getAs[Duration]("elapsed_time_millis")
     val recordedDate = params.getAs[Instant]("recorded_timestamp")
     val duration = params.getAs[Duration]("duration_millis")
+    val group = params.get("group")
+    val activity = params.get("activity")
 
     controller.update(uuid, videoReferenceUUID, concept, observer, observationDate,
-      timecode, elapsedTime, recordedDate, duration)
+      timecode, elapsedTime, recordedDate, duration, group, activity)
       .map({
         case None =>
           halt(NotFound(body = "{}", reason = s"An annotaiton with observation_uuid of $uuid was not found"))

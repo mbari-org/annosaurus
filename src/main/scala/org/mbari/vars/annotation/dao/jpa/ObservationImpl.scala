@@ -25,7 +25,7 @@ import org.mbari.vars.annotation.model.{ Association, ImagedMoment, Observation 
   ),
   new NamedNativeQuery(
     name = "Observation.findAllNamesByVideoReferenceUUID",
-    query = "SELECT DISTINCT concept FROM observations RIGHT JOIN imaged_moments WHERE imaged_moments.video_reference_uuid = ?1 ORDER BY concept"
+    query = "SELECT DISTINCT concept FROM imaged_moments LEFT JOIN observations ON observations.imaged_moment_uuid = imaged_moments.uuid WHERE imaged_moments.video_reference_uuid = ?1 ORDER BY concept"
   )
 ))
 @NamedQueries(Array(
@@ -35,7 +35,7 @@ import org.mbari.vars.annotation.model.{ Association, ImagedMoment, Observation 
   ),
   new NamedQuery(
     name = "Observation.findByVideoReferenceUUID",
-    query = "SELECT o FROM Observation o WHERE o.imagedMoment.uuid = :uuid"
+    query = "SELECT o FROM Observation o JOIN o.imagedMoment i WHERE i.videoReferenceUUID = :uuid"
   )
 ))
 class ObservationImpl extends Observation with JPAPersistentObject {
@@ -92,6 +92,14 @@ class ObservationImpl extends Observation with JPAPersistentObject {
   override var group: String = _
 
   @Expose(serialize = true)
+  @Column(
+    name = "activity",
+    nullable = true,
+    length = 128
+  )
+  override var activity: String = _
+
+  @Expose(serialize = true)
   @SerializedName(value = "associations")
   @OneToMany(
     targetEntity = classOf[AssociationImpl],
@@ -100,10 +108,10 @@ class ObservationImpl extends Observation with JPAPersistentObject {
     mappedBy = "observation",
     orphanRemoval = true
   )
-  protected var javaAssociations: JList[Association] = new JArrayList[Association]
+  protected var javaAssociations: JList[AssociationImpl] = new JArrayList[AssociationImpl]
 
   override def addAssociation(association: Association): Unit = {
-    javaAssociations.add(association)
+    javaAssociations.add(association.asInstanceOf[AssociationImpl])
     association.observation = this
   }
 
@@ -122,13 +130,17 @@ object ObservationImpl {
     concept: String,
     duration: Option[Duration] = None,
     observationDate: Option[Instant] = None,
-    observer: Option[String] = None
+    observer: Option[String] = None,
+    group: Option[String] = None,
+    activity: Option[String] = None
   ): ObservationImpl = {
     val obs = new ObservationImpl
     obs.concept = concept
     duration.foreach(obs.duration = _)
     observationDate.foreach(obs.observationDate = _)
     observer.foreach(obs.observer = _)
+    group.foreach(obs.group = _)
+    activity.foreach(obs.activity = _)
     obs
   }
 

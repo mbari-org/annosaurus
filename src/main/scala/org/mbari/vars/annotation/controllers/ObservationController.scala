@@ -51,6 +51,7 @@ class ObservationController(val daoFactory: BasicDAOFactory)
     observationDate: Instant = Instant.now(),
     duration: Option[Duration] = None,
     group: Option[String] = None,
+    activity: Option[String] = None,
     imagedMomentUUID: Option[UUID] = None
   )(implicit ec: ExecutionContext): Future[Option[Observation]] = {
 
@@ -64,6 +65,7 @@ class ObservationController(val daoFactory: BasicDAOFactory)
         obs.observationDate = observationDate
         duration.foreach(obs.duration = _)
         group.foreach(obs.group = _)
+        activity.foreach(obs.activity = _)
         for {
           imUUID <- imagedMomentUUID
           imDao = daoFactory.newImagedMomentDAO(dao)
@@ -81,13 +83,13 @@ class ObservationController(val daoFactory: BasicDAOFactory)
 
   }
 
-  def findAllNames(implicit ec: ExecutionContext): Future[Iterable[String]] = {
+  def findAllConcepts(implicit ec: ExecutionContext): Future[Iterable[String]] = {
     def fn(dao: ODAO): Iterable[String] = dao.findAllNames()
     exec(fn)
   }
 
-  def findAllNamesByVideoReferenceUUID(uuid: UUID)(implicit ec: ExecutionContext): Future[Iterable[String]] = {
-    def fn(dao: ODAO): Iterable[String] = dao.findAllNamesByVideoReferenceUUID(uuid)
+  def findAllConceptsByVideoReferenceUUID(uuid: UUID)(implicit ec: ExecutionContext): Future[Iterable[String]] = {
+    def fn(dao: ODAO): Iterable[String] = dao.findAllConceptsByVideoReferenceUUID(uuid)
     exec(fn)
   }
 

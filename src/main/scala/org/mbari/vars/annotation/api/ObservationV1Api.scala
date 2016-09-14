@@ -4,6 +4,7 @@ import java.time.{ Duration, Instant }
 import java.util.UUID
 
 import org.mbari.vars.annotation.controllers.{ AnnotationController, ObservationController }
+import org.mbari.vars.annotation.model.simple.{ Concepts }
 import org.scalatra.{ BadRequest, NoContent, NotFound }
 import org.scalatra.swagger.Swagger
 
@@ -51,16 +52,16 @@ class ObservationV1Api(controller: ObservationController)(implicit val swagger: 
       })
   }
 
-  get("/names") {
-    controller.findAllNames
-      .map(_.asJava)
+  get("/concepts") {
+    controller.findAllConcepts
+      .map(s => Concepts(s.toArray))
       .map(toJson)
   }
 
-  get("/names/:uuid") {
+  get("/concepts/:uuid") {
     val uuid = params.getAs[UUID]("uuid").getOrElse(halt(BadRequest("Please provide a video-reference 'uuid'")))
-    controller.findAllNamesByVideoReferenceUUID(uuid)
-      .map(_.asJava)
+    controller.findAllConceptsByVideoReferenceUUID(uuid)
+      .map(s => Concepts(s.toArray))
       .map(toJson)
   }
 
@@ -74,9 +75,13 @@ class ObservationV1Api(controller: ObservationController)(implicit val swagger: 
     val observationDate = params.getAs[Instant]("observation_timestamp").getOrElse(Instant.now())
     val duration = params.getAs[Duration]("duration_millis")
     val group = params.get("group")
+    val activity = params.get("activity")
     val imagedMomentUUID = params.getAs[UUID]("imaged_moment_uuid")
-    controller.update(uuid, concept, observer, observationDate, duration, group, imagedMomentUUID)
-      .map(toJson)
+    controller.update(uuid, concept, observer, observationDate, duration, group, activity, imagedMomentUUID)
+      .map({
+        case None => halt(NotFound(reason = s"Failed. No observation with UUID of $uuid was found."))
+        case Some(obs) => toJson(obs)
+      })
   }
 
   delete("/:uuid") {

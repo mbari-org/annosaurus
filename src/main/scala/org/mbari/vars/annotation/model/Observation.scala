@@ -36,6 +36,12 @@ trait Observation extends PersistentObject {
   var group: String
 
   /**
+   * At MBARI, we track what the camera is doing when the observation is made. For example,
+   * transect, descent, ascent, etc.
+   */
+  var activity: String
+
+  /**
    * An ID for the person or software that made the observation
    */
   var observer: String

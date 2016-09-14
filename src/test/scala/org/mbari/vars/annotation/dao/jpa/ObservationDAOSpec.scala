@@ -75,7 +75,7 @@ class ObservationDAOSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
   }
 
   it should "findAllNamesByVideoReferenceUUID" in {
-    val names = run(_.findAllNamesByVideoReferenceUUID(imagedMoment0.videoReferenceUUID))
+    val names = run(_.findAllConceptsByVideoReferenceUUID(imagedMoment0.videoReferenceUUID))
     names should contain allOf (concept, newConcept)
   }
 

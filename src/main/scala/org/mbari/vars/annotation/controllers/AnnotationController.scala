@@ -56,7 +56,8 @@ class AnnotationController(daoFactory: BasicDAOFactory) {
     elapsedTime: Option[Duration] = None,
     recordedDate: Option[Instant] = None,
     duration: Option[Duration] = None,
-    group: Option[String] = None
+    group: Option[String] = None,
+    activity: Option[String] = None
   )(implicit ec: ExecutionContext): Future[Annotation] = {
 
     val imDao = daoFactory.newImagedMomentDAO()
@@ -71,6 +72,7 @@ class AnnotationController(daoFactory: BasicDAOFactory) {
       observation.observationDate = observationDate
       duration.foreach(observation.duration = _)
       group.foreach(observation.group = _)
+      activity.foreach(observation.activity = _)
       obsDao.create(observation)
       imagedMoment.addObservation(observation)
       observation
@@ -90,7 +92,8 @@ class AnnotationController(daoFactory: BasicDAOFactory) {
     elapsedTime: Option[Duration] = None,
     recordedDate: Option[Instant] = None,
     duration: Option[Duration] = None,
-    group: Option[String] = None
+    group: Option[String] = None,
+    activity: Option[String] = None
   )(implicit ec: ExecutionContext): Future[Option[Annotation]] = {
 
     val imDao = daoFactory.newImagedMomentDAO()
@@ -121,6 +124,7 @@ class AnnotationController(daoFactory: BasicDAOFactory) {
         observer.foreach(obs.observer = _)
         duration.foreach(obs.duration = _)
         group.foreach(obs.group = _)
+        activity.foreach(obs.activity = _)
         obs.observationDate = observationDate
         obs
       })

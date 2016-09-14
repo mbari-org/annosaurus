@@ -29,6 +29,6 @@ trait ObservationDAO[T <: Observation] extends DAO[T] {
    */
   def findAllNames(): Seq[String]
 
-  def findAllNamesByVideoReferenceUUID(uuid: UUID): Seq[String]
+  def findAllConceptsByVideoReferenceUUID(uuid: UUID): Seq[String]
 
 }

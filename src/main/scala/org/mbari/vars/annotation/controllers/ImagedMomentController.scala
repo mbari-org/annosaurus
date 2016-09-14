@@ -39,6 +39,14 @@ class ImagedMomentController(val daoFactory: BasicDAOFactory)
     exec(fn)
   }
 
+  def findByObservationUUID(uuid: UUID)(implicit ec: ExecutionContext): Future[Option[ImagedMoment]] = {
+    def fn(dao: IMDAO): Option[ImagedMoment] = {
+      val obsDao = daoFactory.newObservationDAO(dao)
+      obsDao.findByUUID(uuid).map(_.imagedMoment)
+    }
+    exec(fn)
+  }
+
   def findWithImageReferences(videoReferenceUUID: UUID)(implicit ec: ExecutionContext): Future[Iterable[ImagedMoment]] =
     exec(d => d.findWithImageReferences(videoReferenceUUID))
 
