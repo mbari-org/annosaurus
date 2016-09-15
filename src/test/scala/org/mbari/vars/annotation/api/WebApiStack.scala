@@ -4,7 +4,7 @@ import java.util.concurrent.TimeUnit
 
 import org.mbari.vars.annotation.Constants
 import org.mbari.vars.annotation.controllers._
-import org.mbari.vars.annotation.dao.jpa.H2TestDAOFactory
+import org.mbari.vars.annotation.dao.jpa.{ DerbyTestDAOFactory, H2TestDAOFactory }
 import org.scalatest.BeforeAndAfterAll
 import org.scalatra.swagger.{ ApiInfo, Swagger }
 import org.scalatra.test.scalatest.ScalatraFlatSpec

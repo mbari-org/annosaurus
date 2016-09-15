@@ -33,9 +33,11 @@ class CachedVideoReferenceInfoV1ApiSpec extends WebApiStack {
 
   var videoinfos = new mutable.ArrayBuffer[CachedVideoReferenceInfo]
 
+  val n = 10
+
   "CachedVideoReferenceInfoApi" should "create" in {
 
-    for (i <- 0 until 10) {
+    for (i <- 0 until n) {
       post(
         s"$path",
         "video_reference_uuid" -> UUID.randomUUID().toString,
@@ -59,11 +61,44 @@ class CachedVideoReferenceInfoV1ApiSpec extends WebApiStack {
     get(path + "/") {
       status should be(200)
       val vis = gson.fromJson(body, classOf[Array[CachedVideoReferenceInfoImpl]])
-      vis.size should be(10)
+      vis.size should be(n)
       vis.map(_.platformName) should contain theSameElementsAs videoinfos.map(_.platformName)
       vis.map(_.missionID) should contain theSameElementsAs videoinfos.map(_.missionID)
       vis.map(_.videoReferenceUUID) should contain theSameElementsAs videoinfos.map(_.videoReferenceUUID)
       vis.map(_.missionContact) should contain theSameElementsAs videoinfos.map(_.missionContact)
     }
   }
+
+  it should "update" in {
+    var vis: Array[CachedVideoReferenceInfoImpl] = Array.empty
+    get(path + "/") {
+      status should be(200)
+      vis = gson.fromJson(body, classOf[Array[CachedVideoReferenceInfoImpl]])
+      vis.size should be(n)
+    }
+
+    for (i <- 0 until n) {
+      val v = vis(i)
+      post(
+        s"$path/${v.uuid}",
+        "mission_contact" -> "schlin", "mission_id" -> ("xxx" + i), "platform_name" -> "Doc Ricketts"
+      ) {
+          status should be(200)
+          val v2 = gson.fromJson(body, classOf[CachedVideoReferenceInfoImpl])
+          v2.videoReferenceUUID should be(v.videoReferenceUUID)
+          v2.missionContact should be("schlin")
+          v2.missionID should be(s"xxx$i")
+          v2.platformName should be("Doc Ricketts")
+        }
+    }
+  }
+
+  it should "delete" in {
+    for (v <- videoinfos) {
+      delete(s"$path/${v.uuid}") {
+        status should be(204)
+      }
+    }
+  }
+
 }
