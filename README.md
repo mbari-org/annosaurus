@@ -27,11 +27,21 @@ This model _might_ not be directly exposed to end users. It's the current intern
 - `CachedAnxillaryData`: For performance reason, we may want to cache some time indexed information, such as position, CTD, etc, in side the same database as the annotations.
 - `CachedMissionInfo`: This may contain information describing a camera deployment.
 
-
-__Related Projects__:
-
-- [vampire-squid](https://github.com/underwatervideo/vampire-squid): A service for registering and locating video files.
-
 ## Building
 
 This project is built using [SBT](http://www.scala-sbt.org/). To create the distribution, run `sbt pack`
+
+## Testing
+
+To take it for a quick spin using an in-memory (i.e. temporary) database run the following:
+
+`docker run --name=annosaurus -p 8080:8080  hohonuuli/annosaurus`
+
+## Deployment
+
+Refer to [DEPLOYMENT.md](DEPLOYMENT.md) for production deployment instructions.
+
+## Related Projects
+
+- [vampire-squid](https://github.com/underwatervideo/vampire-squid): A service for registering and locating video files.
+

@@ -122,6 +122,7 @@ lazy val root = (project in file("."))
               "org.scalatra"            %% "scalatra-swagger-ext"           % scalatraVersion,
               "org.scalatra"            %% "scalatra-scalatest"            % scalatraVersion)
                 .map(_.excludeAll(ExclusionRule("org.slf4j", "slf4j-jdk14"),
+                  ExclusionRule("org.slf4j", "slf4j-log4j12"),
                   ExclusionRule("javax.servlet", "servlet-api")))
           },
           mainClass in assembly := Some("JettyMain")
