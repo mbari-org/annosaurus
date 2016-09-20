@@ -98,5 +98,5 @@ class ImageV1ApiSpec extends WebApiStack {
         im.videoReferenceUuid should not be (image.videoReferenceUuid)
       }
   }
-
+  
 }
