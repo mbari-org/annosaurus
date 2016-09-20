@@ -37,6 +37,13 @@ To take it for a quick spin using an in-memory (i.e. temporary) database run the
 
 `docker run --name=annosaurus -p 8080:8080  hohonuuli/annosaurus`
 
+You can shut it down using:
+
+```
+docker stop annosaurus
+docker rm annosaurus
+```
+
 ## Deployment
 
 Refer to [DEPLOYMENT.md](DEPLOYMENT.md) for production deployment instructions.
