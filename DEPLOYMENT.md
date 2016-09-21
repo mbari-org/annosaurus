@@ -5,8 +5,8 @@
 These are the deployment instructions for MBARI. To deploy on your own network and database you will need to do the following:
 
 1. Run `sbt pack`
-2. Find the JDBC driver for your database. For example, you can get the PostgreSQL driver at [https://jdbc.postgresql.org/download.html](https://jdbc.postgresql.org/download.html). Download the _.jar_ file for your database and copy it into `target\lib`.
-3. Customize configuration file at `target\conf\application.conf`. You will need to change the `production` section to use your databases parameters. 
+2. Find the JDBC driver for your database. For example, you can get the PostgreSQL driver at [https://jdbc.postgresql.org/download.html](https://jdbc.postgresql.org/download.html). Download the _.jar_ file for your database and copy it into `target\pack\lib`.
+3. Customize configuration file at `target\pack\conf\application.conf`. You will need to change the `production` section to use your databases parameters. 
     - Refer to your databases JDBC documentation for the format of the URL and the drivers _class_ name. 
     - Your database administrator can provide you with a username (with write access) and password for your database
     - Annosaurus will generate the database schema automatically when it's first run. Make sure that the user account has permissions to create schemas.
