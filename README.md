@@ -50,7 +50,7 @@ Refer to [DEPLOYMENT.md](DEPLOYMENT.md) for production deployment instructions.
 
 ## Usage
 
-We are in the process of putting together an API doc and tutorial on usage. That's ust been start but you can see some python examples in [src/main/pack/bin](src/main/pack/bin)
+We are in the process of putting together an API doc and tutorial on usage. That's just been started but you can see some python examples in [src/main/pack/bin](tree/master/src/main/pack/bin)
 
 
 ## Related Projects
