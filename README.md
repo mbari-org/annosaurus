@@ -48,6 +48,11 @@ docker rm annosaurus
 
 Refer to [DEPLOYMENT.md](DEPLOYMENT.md) for production deployment instructions.
 
+## Usage
+
+We are in the process of putting together an API doc and tutorial on usage. That's ust been start but you can see some python examples in [src/main/pack/bin](src/main/pack/bin)
+
+
 ## Related Projects
 
 - [vampire-squid](https://github.com/underwatervideo/vampire-squid): A service for registering and locating video files.
