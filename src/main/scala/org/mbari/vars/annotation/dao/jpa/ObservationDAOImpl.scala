@@ -44,7 +44,7 @@ class ObservationDAOImpl(entityManager: EntityManager)
    *
    * @return Order sequence of all concept names used
    */
-  override def findAllNames(): Seq[String] = entityManager.createNamedQuery("Observation.findAllNames")
+  override def findAllConcepts(): Seq[String] = entityManager.createNamedQuery("Observation.findAllNames")
     .getResultList
     .asScala
     .filter(_ != null)

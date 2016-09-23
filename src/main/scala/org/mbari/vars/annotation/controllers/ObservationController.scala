@@ -84,7 +84,7 @@ class ObservationController(val daoFactory: BasicDAOFactory)
   }
 
   def findAllConcepts(implicit ec: ExecutionContext): Future[Iterable[String]] = {
-    def fn(dao: ODAO): Iterable[String] = dao.findAllNames()
+    def fn(dao: ODAO): Iterable[String] = dao.findAllConcepts()
     exec(fn)
   }
 

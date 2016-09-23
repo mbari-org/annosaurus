@@ -69,8 +69,8 @@ class ObservationDAOSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     all.size should be >= 2
   }
 
-  it should "findAllNames" in {
-    val names = run(_.findAllNames())
+  it should "findAllConcepts" in {
+    val names = run(_.findAllConcepts())
     names should contain allOf (concept, newConcept)
   }
 

@@ -19,6 +19,10 @@ import org.mbari.vars.annotation.model.{ ImageReference, ImagedMoment }
   new NamedQuery(
     name = "ImageReference.findAll",
     query = "SELECT r FROM ImageReference r"
+  ),
+  new NamedQuery(
+    name = "ImageReference.findByURL",
+    query = "SELECT r FROM ImageReference WHERE url = :url"
   )
 ))
 class ImageReferenceImpl extends ImageReference with JPAPersistentObject {

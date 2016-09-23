@@ -27,7 +27,7 @@ trait ObservationDAO[T <: Observation] extends DAO[T] {
    *
    * @return Order sequence of all concept names used
    */
-  def findAllNames(): Seq[String]
+  def findAllConcepts(): Seq[String]
 
   def findAllConceptsByVideoReferenceUUID(uuid: UUID): Seq[String]
 

@@ -35,6 +35,13 @@ class ImageController(daoFactory: BasicDAOFactory) {
       .map(irs => irs.toSeq.map(Image(_)))
   }
 
+  def findByURL(url: URL)(implicit ec: ExecutionContext): Future[Option[Image]] = {
+    val dao = daoFactory.newImageReferenceDAO()
+    val f = dao.runTransaction(d => d.findByURL(url))
+    f.onComplete(t => dao.close())
+    f.map(_.map(Image(_)))
+  }
+
   def create(
     videoReferenceUUID: UUID,
     url: URL,

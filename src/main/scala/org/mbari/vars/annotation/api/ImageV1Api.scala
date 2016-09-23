@@ -49,6 +49,17 @@ class ImageV1Api(controller: ImageController)(implicit val swagger: Swagger, val
       .map(toJson)
   }
 
+  get("/find/:url") {
+    val url = params.getAs[URL]("url").getOrElse(halt(BadRequest(
+      body = "{}",
+      reason = "A 'url' parameter is required"
+    )))
+    controller.findByURL(url).map({
+      case None => halt(NotFound(reason = s"an Image with a URL of $url was not found"))
+      case Some(i) => toJson(i)
+    })
+  }
+
   post("/") {
     val videoReferenceUUID = params.getAs[UUID]("video_reference_uuid").getOrElse(halt(BadRequest(
       body = "{}",

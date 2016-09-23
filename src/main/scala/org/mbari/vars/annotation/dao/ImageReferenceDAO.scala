@@ -20,4 +20,6 @@ trait ImageReferenceDAO[T <: ImageReference] extends DAO[T] {
     format: Option[String] = None
   ): T
 
+  def findByURL(url: URL): Option[T]
+
 }
