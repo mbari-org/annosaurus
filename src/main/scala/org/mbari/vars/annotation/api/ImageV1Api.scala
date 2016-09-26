@@ -1,6 +1,6 @@
 package org.mbari.vars.annotation.api
 
-import java.net.URL
+import java.net.{ URL, URLDecoder }
 import java.time.{ Duration, Instant }
 import java.util.UUID
 
@@ -49,11 +49,15 @@ class ImageV1Api(controller: ImageController)(implicit val swagger: Swagger, val
       .map(toJson)
   }
 
-  get("/find/:url") {
-    val url = params.getAs[URL]("url").getOrElse(halt(BadRequest(
-      body = "{}",
-      reason = "A 'url' parameter is required"
-    )))
+  // URL should be encoded e.g. URLEncoder.encode(...)
+  get("/url/:url") {
+    val url = params.get("url")
+      .map(URLDecoder.decode(_, "UTF-8"))
+      .map(new URL(_))
+      .getOrElse(halt(BadRequest(
+        body = "{}",
+        reason = "A 'url' parameter is required"
+      )))
     controller.findByURL(url).map({
       case None => halt(NotFound(reason = s"an Image with a URL of $url was not found"))
       case Some(i) => toJson(i)
