@@ -53,6 +53,8 @@ def put(url, data = {}):
 endpoint = "http://localhost:8080"
 
 # 2. Build APIs from endpoint.
+# The annotation and image url are what most users will primarily usefor creating annotations
+annotation_url = "%s/v1/annotations" % (endpoint)
 
 # The annotation and image url are what most users will primarily use
 #    for creating annotations and registering images
@@ -70,8 +72,7 @@ association_url = "%s/v1/associations" % (endpoint)
 # It provides a simple search if you know you're video_reference_uuid. It does not allow you
 # to delete. You use a different API (Observation API) for that
 
-# The annotation and image url are what most users will primarily usefor creating annotations
-annotation_url = "%s/v1/annotations" % (endpoint)
+
 
 # 1. We need a UUID that is a reference to a video file or image set. The UUID is used to logically
 #    group a set of annotations. Here we just create one

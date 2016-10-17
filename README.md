@@ -57,3 +57,6 @@ We are in the process of putting together an API doc and tutorial on usage. That
 
 - [vampire-squid](https://github.com/underwatervideo/vampire-squid): A service for registering and locating video files.
 
+## Acknowledgements
+
+-[![JWT Auth for open source projectcs](http://cdn.auth0.com/oss/badges/a0-badge-dark.png)](https://auth0.com/?utm_source=oss&utm_medium=gp&utm_campaign=oss)
