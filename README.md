@@ -59,4 +59,6 @@ We are in the process of putting together an API doc and tutorial on usage. That
 
 ## Acknowledgements
 
--[![JWT Auth for open source projectcs](http://cdn.auth0.com/oss/badges/a0-badge-dark.png)](https://auth0.com/?utm_source=oss&utm_medium=gp&utm_campaign=oss)
+We'd like to thank the following companies for kindly donating software for the development of this project:
+
+[![JWT Auth for open source projects](http://cdn.auth0.com/oss/badges/a0-badge-dark.png)](https://auth0.com/?utm_source=oss&utm_medium=gp&utm_campaign=oss)
