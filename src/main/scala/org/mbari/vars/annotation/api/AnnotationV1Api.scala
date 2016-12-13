@@ -101,7 +101,7 @@ class AnnotationV1Api(controller: AnnotationController)(implicit val swagger: Sw
       timecode, elapsedTime, recordedDate, duration, group, activity)
       .map({
         case None =>
-          halt(NotFound(body = "{}", reason = s"An annotaiton with observation_uuid of $uuid was not found"))
+          halt(NotFound(body = "{}", reason = s"An annotation with observation_uuid of $uuid was not found"))
         case Some(ann) => toJson(ann)
       }) // Convert to JSON
 
