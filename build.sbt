@@ -6,7 +6,7 @@ lazy val makeVersionProperties = taskKey[Seq[File]]("make-version-props")
 lazy val commonSettings = Seq(
   organization := "org.mbari.vars",
   version := "0.1.0-SNAPSHOT",
-  scalaVersion := "2.11.8",
+  scalaVersion := "2.12.1",
   libraryDependencies ++= {
     val slf4jVersion = "1.7.21"
     val logbackVersion = "1.1.7"
@@ -83,17 +83,17 @@ lazy val root = (project in file("."))
           name := "annosaurus",
           libraryDependencies ++= {
             val akkaVersion = "2.4.7"
-            val derbyVersion = "10.12.1.1"
+            val derbyVersion = "10.13.1.1"
             val eclipselinkVersion = "2.6.3"
             val gsonJavatimeVersion = "1.1.1"
             val gsonVersion = "2.7"
             val h2Version = "1.4.192"
-            val jettyVersion = "9.3.11.v20160721"
+            val jettyVersion = "9.3.14.v20161028"
             val jtaVersion = "1.1"
             val jtdsVersion = "1.3.1"
             val logbackVersion = "1.1.7"
             val scalaTestVersion = "3.0.0"
-            val scalatraVersion = "2.4.1"
+            val scalatraVersion = "2.5.0-RC1"
             val slf4jVersion = "1.7.21"
             val vcr4jVersion = "3.0.0"
             Seq(
@@ -103,7 +103,7 @@ lazy val root = (project in file("."))
               "commons-codec"            % "commons-codec"                  % "1.10",
               "javax.servlet"            % "javax.servlet-api"              % "3.1.0",
               "javax.transaction"        % "jta"                            % jtaVersion,
-              "net.databinder.dispatch" %% "dispatch-core"                  % "0.11.3",
+              //"net.databinder.dispatch" %% "dispatch-core"                  % "0.11.3",
               "org.apache.derby"         % "derby"                          % derbyVersion, //          % "test",
               "org.apache.derby"         % "derbyclient"                    % derbyVersion, //          % "test",
               "org.apache.derby"         % "derbynet"                       % derbyVersion, //          % "test",
@@ -111,7 +111,7 @@ lazy val root = (project in file("."))
               "org.eclipse.jetty"        % "jetty-servlets"                 % jettyVersion          % "compile;test",
               "org.eclipse.jetty"        % "jetty-webapp"                   % jettyVersion          % "compile;test",
               "org.eclipse.persistence"  % "eclipselink"                    % eclipselinkVersion,
-              "org.json4s"              %% "json4s-jackson"                 % "3.4.0",
+              "org.json4s"              %% "json4s-jackson"                 % "3.5.0",
               "org.mbari.vcr4j"          % "vcr4j-core"                     % vcr4jVersion,
               "org.scalatest"           %% "scalatest"                      % scalaTestVersion      % "test",
               "org.scalatra"            %% "scalatra"                       % scalatraVersion,

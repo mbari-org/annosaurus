@@ -79,7 +79,7 @@ class CachedVideoReferenceInfoV1ApiSpec extends WebApiStack {
 
     for (i <- 0 until n) {
       val v = vis(i)
-      post(
+      put(
         s"$path/${v.uuid}",
         "mission_contact" -> "schlin", "mission_id" -> ("xxx" + i), "platform_name" -> "Doc Ricketts"
       ) {
