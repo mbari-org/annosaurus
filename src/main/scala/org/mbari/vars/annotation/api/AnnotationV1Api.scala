@@ -53,6 +53,7 @@ class AnnotationV1Api(controller: AnnotationController)(implicit val swagger: Sw
   }
 
   post("/") {
+    validateRequest() // Apply API security
     val videoReferenceUUID = params.getAs[UUID]("video_reference_uuid").getOrElse(halt(BadRequest(
       body = "{}",
       reason = "A 'video_reference_uuid' parameter is required"
@@ -82,6 +83,7 @@ class AnnotationV1Api(controller: AnnotationController)(implicit val swagger: Sw
   }
 
   put("/:uuid") {
+    validateRequest() // Apply API security
     val uuid = params.getAs[UUID]("uuid").getOrElse(halt(BadRequest(
       body = "{}",
       reason = "A 'uuid' parameter is required"

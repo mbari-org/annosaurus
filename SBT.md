@@ -23,7 +23,7 @@
 - `publish-local` or `~publish-local` (continous): Publish to the local ivy repo
 - `publishM2`: Publish to the local maven repo
 - `reload`: Reloads the build. Useful if you edit build.sbt.
-_ `scalastyleGenerateConfig`: Generates a scalastyle config file. Run before using `scalastyle`
+- `scalastyleGenerateConfig`: Generates a scalastyle config file. Run before using `scalastyle`
 - `scalastyle`: Checks code style. Results go into target/scalastyle-result.xml. Also `test:scalastyle`
 - `show ivy-report`: Show the location of the dependency report
 - `show update`: Show dependencies and indicate which were evicted

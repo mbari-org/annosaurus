@@ -1,6 +1,5 @@
 package org.mbari.vars.annotation.dao.jpa
 
-import java.util
 import javax.persistence.{ EntityManagerFactory, Persistence }
 
 import org.eclipse.persistence.config.PersistenceUnitProperties

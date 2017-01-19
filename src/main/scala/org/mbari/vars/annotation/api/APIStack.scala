@@ -22,6 +22,7 @@ import scala.util.Try
  * @since 2016-05-23T13:32:00
  */
 abstract class APIStack extends ScalatraServlet
+    with ApiAuthenticationSupport
     with ContentEncodingSupport
     with SwaggerSupport
     with FutureSupport {

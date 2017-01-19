@@ -49,6 +49,7 @@ class AssociationV1Api(controller: AssociationController)(implicit val swagger: 
   }
 
   post("/") {
+    validateRequest() // Apply API security
     val uuid = params.getAs[UUID]("observation_uuid").getOrElse(halt(BadRequest("Please provide an 'observation_uuid'")))
     val linkName = params.get("link_name").getOrElse(halt(BadRequest("A 'link_name' parameter is required")))
     val toConcept = params.get("to_concept").getOrElse(Association.TO_CONCEPT_SELF)
@@ -57,6 +58,7 @@ class AssociationV1Api(controller: AssociationController)(implicit val swagger: 
   }
 
   put("/:uuid") {
+    validateRequest() // Apply API security
     val uuid = params.getAs[UUID]("uuid").getOrElse(halt(BadRequest("Please provide the 'uuid' of the association")))
     val observationUUID = params.getAs[UUID]("observation_uuid")
     val linkName = params.get("link_name")
@@ -69,6 +71,7 @@ class AssociationV1Api(controller: AssociationController)(implicit val swagger: 
   }
 
   delete("/:uuid") {
+    validateRequest() // Apply API security
     val uuid = params.getAs[UUID]("uuid").getOrElse(halt(BadRequest("Please provide the 'uuid' of the association")))
     controller.delete(uuid).map({
       case true => halt(NoContent(reason = s"Success! Deleted association with UUID of $uuid"))

@@ -32,6 +32,7 @@ class ImageReferenceV1Api(controller: ImageReferenceController)(implicit val swa
   }
 
   put("/:uuid") {
+    validateRequest() // Apply API security
     val uuid = params.getAs[UUID]("uuid").getOrElse(halt(BadRequest(
       body = "{}",
       reason = "A 'uuid' parameter is required"
@@ -50,6 +51,7 @@ class ImageReferenceV1Api(controller: ImageReferenceController)(implicit val swa
   }
 
   delete("/:uuid") {
+    validateRequest() // Apply API security
     val uuid = params.getAs[UUID]("uuid").getOrElse(halt(BadRequest(
       body = "{}",
       reason = "A 'uuid' parameter is required"
