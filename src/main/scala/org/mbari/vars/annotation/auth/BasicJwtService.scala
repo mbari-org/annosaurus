@@ -1,56 +1,71 @@
 package org.mbari.vars.annotation.auth
 
-import java.lang.{Long => JLong}
+import java.lang.{ Long => JLong }
 import java.time.Instant
 import javax.servlet.http.HttpServletRequest
 
-import com.auth0.jwt.{JWTSigner, JWTVerifier}
+import com.auth0.jwt.{ JWTSigner, JWTVerifier }
+import com.google.gson.{ FieldNamingPolicy, GsonBuilder }
 import com.typesafe.config.ConfigFactory
+import org.mbari.vars.annotation.Constants
+
+import scala.util.control.NonFatal
 
 /**
-  * To use this authentication. The client and server should both have a shared
-  * secret (aka client secret). The client sends this to the server in a
-  * authorization header. If the secret is correct, the server will send back
-  * a JWT token that can be used to validate subsequent requests.
-  *
-  * {{{
-  *   Client                                                                Server
-  *     |-------> POST /authorize: Authorization: APIKEY <client_secret> ----->|
-  *     |                                                                      |
-  *     |<------- {'access_token': <token>, 'token_type': 'Bearer'}     <------|
-  *     |                                                                      |
-  *     |                                                                      |
-  *     |-------> POST /somemethod: Authorization: Bearer <token>       ------>|
-  *     |                                                                      |
-  *     |<------- 200                                                   <------|
-  * }}}
-  * @author Brian Schlining
-  * @since 2017-01-18T16:42:00
-  */
-class BasicJwtService extends  AuthorizationService {
+ * To use this authentication. The client and server should both have a shared
+ * secret (aka client secret). The client sends this to the server in a
+ * authorization header. If the secret is correct, the server will send back
+ * a JWT token that can be used to validate subsequent requests.
+ *
+ * {{{
+ *   Client                                                                Server
+ *     |-------> POST /auth: Authorization: APIKEY <client_secret>      ----->|
+ *     |                                                                      |
+ *     |<------- {'access_token': <token>, 'token_type': 'Bearer'}     <------|
+ *     |                                                                      |
+ *     |                                                                      |
+ *     |-------> POST /somemethod: Authorization: Bearer <token>       ------>|
+ *     |                                                                      |
+ *     |<------- 200                                                   <------|
+ * }}}
+ * @author Brian Schlining
+ * @since 2017-01-18T16:42:00
+ */
+class BasicJwtService extends AuthorizationService {
 
   private[this] val config = ConfigFactory.load()
   private[this] val issuer = config.getString("basicjwt.issuer")
   private[this] val apiKey = config.getString("basicjwt.client.secret")
   private[this] val signingSecret = config.getString("basicjwt.signing.secret")
   private[this] val verifier = new JWTVerifier(signingSecret)
+  val gson = new GsonBuilder()
+    .setPrettyPrinting()
+    .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
+    .create()
 
   private def authorize(request: HttpServletRequest): Option[Authorization] = {
     Option(request.getHeader("Authorization"))
       .map(parseAuthHeader)
   }
 
-  private def isValid(auth: Option[Authorization]): Boolean = auth match {
-    case None => false
-    case Some(a) =>
-      if (a.tokenType.equalsIgnoreCase("BEARER")) {
-        val claims = verifier.verify(a.accessToken)
-        val exp = claims.getOrDefault("exp", 0L).asInstanceOf[Long]
-        val expiration = Instant.ofEpochSecond(exp)
-        val now = Instant.now()
-        expiration.isAfter(now)
+  private def isValid(auth: Option[Authorization]): Boolean = {
+    println("RUNNING JWT with auth = " + auth.getOrElse("NONE"))
+    try {
+      auth match {
+        case None => false
+        case Some(a) =>
+          if (a.tokenType.equalsIgnoreCase("BEARER")) {
+            val claims = verifier.verify(a.accessToken)
+            val exp = claims.getOrDefault("exp", Integer.valueOf(0))
+              .asInstanceOf[Integer]
+            val expiration = Instant.ofEpochSecond(exp.toLong)
+            val now = Instant.now()
+            expiration.isAfter(now)
+          } else false
       }
-      else false
+    } catch {
+      case NonFatal(e) => false
+    }
   }
 
   private def parseAuthHeader(header: String): Authorization = {
@@ -64,20 +79,22 @@ class BasicJwtService extends  AuthorizationService {
 
   override def requestAuthorization(request: HttpServletRequest): Option[String] = {
     Option(request.getHeader("Authorization"))
-        .map(parseAuthHeader)
-        .filter(_.tokenType.equalsIgnoreCase("APIKEY"))
-        .filter(_.accessToken == apiKey)
-        .map(a => {
-          val iat: JLong = System.currentTimeMillis() / 1000L // issued at claim
-          val exp: JLong = iat + 86400L // expires claim. In this case the token expires in 24 hours
+      .map(parseAuthHeader)
+      .filter(_.tokenType.equalsIgnoreCase("APIKEY"))
+      .filter(_.accessToken == apiKey)
+      .map(a => {
+        val iat: JLong = System.currentTimeMillis() / 1000L // issued at claim
+        val exp: JLong = iat + 86400L // expires claim. In this case the token expires in 24 hours
 
-          val signer = new JWTSigner(signingSecret)
-          val claims = new java.util.HashMap[String, Object]()
-          claims.put("iss", issuer)
-          claims.put("exp", exp)
-          claims.put("iat", iat)
+        val signer = new JWTSigner(signingSecret)
+        val claims = new java.util.HashMap[String, Object]()
+        claims.put("iss", issuer)
+        claims.put("exp", exp)
+        claims.put("iat", iat)
 
-          signer.sign(claims)
-        })
+        signer.sign(claims)
+      })
+      .map(Authorization("Bearer", _))
+      .map(gson.toJson)
   }
 }

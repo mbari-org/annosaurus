@@ -2,18 +2,19 @@ package org.mbari.vars.annotation.api
 
 import com.typesafe.config.ConfigFactory
 import org.mbari.vars.annotation.auth.AuthorizationService
-import org.scalatra.{ScalatraBase, Unauthorized}
+import org.scalatra.{ ScalatraBase, Unauthorized }
 
 /**
-  * @author Brian Schlining
-  * @since 2017-01-18T16:27:00
-  */
+ * @author Brian Schlining
+ * @since 2017-01-18T16:27:00
+ */
 trait ApiAuthenticationSupport { self: ScalatraBase =>
 
   def authorizationService: AuthorizationService = ApiAuthenticationSupport.authorizationService
 
   protected def validateRequest(): Unit = {
-    if (authorizationService.validateAuthorization(request)) {
+    println("VALIDATING: " + request)
+    if (!authorizationService.validateAuthorization(request)) {
       halt(Unauthorized("The request did not include valid authorization credentials"))
     }
   }
