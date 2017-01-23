@@ -13,7 +13,7 @@ trait ApiAuthenticationSupport { self: ScalatraBase =>
   def authorizationService: AuthorizationService = ApiAuthenticationSupport.authorizationService
 
   protected def validateRequest(): Unit = {
-    println("VALIDATING: " + request)
+    //println("VALIDATING: " + request)
     if (!authorizationService.validateAuthorization(request)) {
       halt(Unauthorized("The request did not include valid authorization credentials"))
     }

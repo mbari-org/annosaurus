@@ -49,7 +49,7 @@ class BasicJwtService extends AuthorizationService {
   }
 
   private def isValid(auth: Option[Authorization]): Boolean = {
-    println("RUNNING JWT with auth = " + auth.getOrElse("NONE"))
+    //println("RUNNING JWT with auth = " + auth.getOrElse("NONE"))
     try {
       auth match {
         case None => false

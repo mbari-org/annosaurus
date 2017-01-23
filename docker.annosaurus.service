@@ -4,6 +4,7 @@ After=docker.service
 Requires=docker.service
 
 [Service]
+User=docker_user
 TimeoutStartSec=2
 Restart=always
 ExecStartPre=-/usr/bin/docker stop annosaurus

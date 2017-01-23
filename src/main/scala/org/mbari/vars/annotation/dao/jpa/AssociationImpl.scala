@@ -1,9 +1,9 @@
 package org.mbari.vars.annotation.dao.jpa
 
-import javax.persistence.{Index, NamedQuery, _}
+import javax.persistence.{ Index, NamedQuery, _ }
 
 import com.google.gson.annotations.Expose
-import org.mbari.vars.annotation.model.{Association, Observation}
+import org.mbari.vars.annotation.model.{ Association, Observation }
 
 /**
  *
