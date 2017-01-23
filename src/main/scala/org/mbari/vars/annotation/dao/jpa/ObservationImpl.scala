@@ -16,7 +16,11 @@ import org.mbari.vars.annotation.model.{ Association, ImagedMoment, Observation 
  * @since 2016-06-16T14:12:00
  */
 @Entity(name = "Observation")
-@Table(name = "observations")
+@Table(name = "observations", indexes = Array(
+  new Index(name = "idx_concept", columnList = "concept"),
+  new Index(name = "idx_observation_group", columnList = "observation_group"),
+  new Index(name = "idx_activity", columnList = "activity")
+))
 @EntityListeners(value = Array(classOf[TransactionLogger]))
 @NamedNativeQueries(Array(
   new NamedNativeQuery(
@@ -41,7 +45,6 @@ import org.mbari.vars.annotation.model.{ Association, ImagedMoment, Observation 
 class ObservationImpl extends Observation with JPAPersistentObject {
 
   @Expose(serialize = true)
-  @Index(name = "idx_concept", columnList = "concept")
   @Column(
     name = "concept",
     length = 256

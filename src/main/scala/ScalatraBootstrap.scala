@@ -2,7 +2,7 @@ import javax.servlet.ServletContext
 
 import org.mbari.vars.annotation.api._
 import org.mbari.vars.annotation.controllers._
-import org.mbari.vars.annotation.dao.jpa.DevelopmentDAOFactory
+import org.mbari.vars.annotation.dao.jpa.JPADAOFactory
 import org.scalatra.LifeCycle
 import org.scalatra.swagger.{ ApiInfo, Swagger }
 import org.slf4j.LoggerFactory
@@ -36,7 +36,7 @@ class ScalatraBootstrap extends LifeCycle {
 
     implicit val executionContext = ExecutionContext.global
 
-    val daoFactory: BasicDAOFactory = DevelopmentDAOFactory.asInstanceOf[BasicDAOFactory]
+    val daoFactory: BasicDAOFactory = JPADAOFactory.asInstanceOf[BasicDAOFactory]
     val annotationController = new AnnotationController(daoFactory)
     val associationController = new AssociationController(daoFactory)
     val imageController = new ImageController(daoFactory)

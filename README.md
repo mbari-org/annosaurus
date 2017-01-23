@@ -44,6 +44,12 @@ docker stop annosaurus
 docker rm annosaurus
 ```
 
+Alternatively, you can start it with:
+
+```
+export PORT=9090; export CLIENT_SECRET="foo";export SIGNING_SECRET="bar";jetty-main
+```
+
 ## Deployment
 
 Refer to [DEPLOYMENT.md](DEPLOYMENT.md) for production deployment instructions.

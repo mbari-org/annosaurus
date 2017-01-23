@@ -90,6 +90,7 @@ lazy val root = (project in file("."))
       "javax.servlet"            % "javax.servlet-api"              % servletVersion,
       "javax.transaction"        % "jta"                            % jtaVersion,
       "junit"                    % "junit"                          % junitVersion          % "test",
+      "net.sourceforge.jtds"     % "jtds"                           % jtdsVersion,
       "org.apache.derby"         % "derby"                          % derbyVersion, //          % "test",
       "org.apache.derby"         % "derbyclient"                    % derbyVersion, //          % "test",
       "org.apache.derby"         % "derbynet"                       % derbyVersion, //          % "test",

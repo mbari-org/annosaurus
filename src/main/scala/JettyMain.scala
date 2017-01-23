@@ -26,29 +26,29 @@ object JettyMain {
   def main(args: Array[String]) = {
     System.setProperty("user.timezone", "UTC")
     val server: Server = new Server
-    println("starting jetty")
+    println("Starting Annosaurus on " + conf.port)
 
-    server setStopTimeout conf.stopTimeout
+    server.setStopTimeout(conf.stopTimeout)
     //server setDumpAfterStart true
-    server setStopAtShutdown true
+    server.setStopAtShutdown(true)
 
     val httpConfig = new HttpConfiguration()
-    httpConfig setSendDateHeader true
-    httpConfig setSendServerVersion false
+    httpConfig.setSendDateHeader(true)
+    httpConfig.setSendServerVersion(false)
 
     val connector = new NetworkTrafficServerConnector(server, new HttpConnectionFactory(httpConfig))
-    connector setPort conf.port
-    connector setSoLingerTime 0
-    connector setIdleTimeout conf.connectorIdleTimeout
-    server addConnector connector
+    connector.setPort(conf.port)
+    connector.setSoLingerTime(0)
+    connector.setIdleTimeout(conf.connectorIdleTimeout)
+    server.addConnector(connector)
 
     val webapp = conf.webapp
     val webApp = new WebAppContext
-    webApp setContextPath conf.contextPath
-    webApp setResourceBase conf.webapp
-    webApp setEventListeners Array(new ScalatraListener)
+    webApp.setContextPath(conf.contextPath)
+    webApp.setResourceBase(conf.webapp)
+    webApp.setEventListeners(Array(new ScalatraListener))
 
-    server setHandler webApp
+    server.setHandler(webApp)
 
     server.start()
   }

@@ -2,6 +2,7 @@ package org.mbari.vars.annotation.dao.jpa
 
 import javax.persistence.{ EntityManager, EntityManagerFactory }
 
+import com.typesafe.config.ConfigFactory
 import org.mbari.vars.annotation.dao.{ DAO, ImagedMomentDAO, ObservationDAO, _ }
 
 /**
@@ -54,4 +55,18 @@ trait JPADAOFactory
   override def newImagedMomentDAO(dao: DAO[_]): ImagedMomentDAO[ImagedMomentImpl] =
     new ImagedMomentDAOImpl(extractEntityManager(dao))
 
+}
+
+class JPADAOFactoryImpl(val entityManagerFactory: EntityManagerFactory) extends JPADAOFactory
+
+object JPADAOFactory extends JPADAOFactory {
+
+  lazy val entityManagerFactory = {
+    val config = ConfigFactory.load()
+    val environment = config.getString("database.environment")
+    val nodeName = if (environment.equalsIgnoreCase("production")) "org.mbari.vars.annotation.database.production"
+    else "org.mbari.vars.annotation.database.development"
+
+    EntityManagerFactories(nodeName)
+  }
 }

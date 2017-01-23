@@ -1,12 +1,12 @@
 package org.mbari.vars.annotation.dao.jpa
 
-import java.time.{ Duration, Instant }
+import java.time.{Duration, Instant}
 import java.util.UUID
-import javax.persistence.{ Convert, _ }
-import java.util.{ ArrayList => JArrayList, List => JList }
+import javax.persistence.{Convert, Index, _}
+import java.util.{ArrayList => JArrayList, List => JList}
 
-import com.google.gson.annotations.{ Expose, SerializedName }
-import org.mbari.vars.annotation.model.{ CachedAncillaryDatum, ImageReference, ImagedMoment, Observation }
+import com.google.gson.annotations.{Expose, SerializedName}
+import org.mbari.vars.annotation.model.{CachedAncillaryDatum, ImageReference, ImagedMoment, Observation}
 import org.mbari.vcr4j.time.Timecode
 
 import scala.beans.BeanProperty
@@ -19,7 +19,11 @@ import scala.collection.JavaConverters._
  * @since 2016-06-16T14:12:00
  */
 @Entity(name = "ImagedMoment")
-@Table(name = "imaged_moments")
+@Table(name = "imaged_moments", indexes = Array(
+  new Index(name = "idx_recorded_timestamp", columnList = "recorded_timestamp"),
+  new Index(name = "idx_elapsed_time", columnList = "elapsed_time_millis"),
+  new Index(name = "idx_timecode", columnList = "timecode")
+))
 @EntityListeners(value = Array(classOf[TransactionLogger]))
 @NamedNativeQueries(Array(
   new NamedNativeQuery(
@@ -72,7 +76,6 @@ class ImagedMomentImpl extends ImagedMoment with JPAPersistentObject {
   override var elapsedTime: Duration = _
 
   @Expose(serialize = true)
-  @Index(name = "idx_recorded_timestamp", columnList = "recorded_timestamp")
   @Column(
     name = "recorded_timestamp",
     nullable = true
