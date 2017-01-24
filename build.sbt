@@ -13,6 +13,7 @@ val jtaVersion = "1.1"
 val jtdsVersion = "1.3.1"
 val junitVersion = "4.12"
 val logbackVersion = "1.1.8"
+val mssqlVersion = "6.1.0.jre8"
 val scalatestVersion = "3.0.1"
 val scalatraVersion = "2.5.0"
 val servletVersion = "3.1.0"
@@ -90,6 +91,7 @@ lazy val root = (project in file("."))
       "javax.servlet"            % "javax.servlet-api"              % servletVersion,
       "javax.transaction"        % "jta"                            % jtaVersion,
       "junit"                    % "junit"                          % junitVersion          % "test",
+      "com.microsoft.sqlserver"  % "mssql-jdbc"                     % mssqlVersion,
       "net.sourceforge.jtds"     % "jtds"                           % jtdsVersion,
       "org.apache.derby"         % "derby"                          % derbyVersion, //          % "test",
       "org.apache.derby"         % "derbyclient"                    % derbyVersion, //          % "test",

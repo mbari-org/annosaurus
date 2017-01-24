@@ -1,11 +1,11 @@
 package org.mbari.vars.annotation.api
 
-import java.time.Duration
+import java.time.{ Duration, Instant }
 import java.util
 import java.util.{ UUID, List => JList }
 
 import org.mbari.vars.annotation.Constants
-import org.mbari.vars.annotation.controllers.{ AnnotationController, ImagedMomentController }
+import org.mbari.vars.annotation.controllers.{ AnnotationController, BasicDAOFactory, ImagedMomentController }
 import org.mbari.vars.annotation.model.simple.Annotation
 
 /**
@@ -27,7 +27,7 @@ class AnnotationV1ApiSpec extends WebApiStack {
 
   var annotation: Annotation = _
 
-  "AnnotationV1Api" should "create" in {
+  "AnnotationV1Api" should "create with timecode" in {
     post(
       "/v1/annotations",
       "video_reference_uuid" -> UUID.randomUUID().toString,
@@ -40,6 +40,38 @@ class AnnotationV1ApiSpec extends WebApiStack {
         annotation.concept should be("Nanomia bijuga")
         annotation.observer should be("brian")
         annotation.elapsedTime should be(Duration.ofMillis(12345))
+      }
+  }
+
+  it should "create with recorded timestamp" in {
+    post(
+      "/v1/annotations",
+      "video_reference_uuid" -> UUID.randomUUID().toString,
+      "concept" -> "Squid",
+      "observer" -> "brian",
+      "recorded_timestamp" -> "2017-01-18T22:01:03.41Z"
+    ) {
+        status should be(200)
+        val a = gson.fromJson(body, classOf[Annotation])
+        a.concept should be("Squid")
+        a.observer should be("brian")
+        a.recordedTimestamp should be(Instant.parse("2017-01-18T22:01:03.41Z"))
+      }
+  }
+
+  it should "create with existing recorded timestamp" in {
+    post(
+      "/v1/annotations",
+      "video_reference_uuid" -> UUID.randomUUID().toString,
+      "concept" -> "Shark",
+      "observer" -> "brian",
+      "recorded_timestamp" -> "2017-01-18T22:01:03.41Z"
+    ) {
+        status should be(200)
+        val a = gson.fromJson(body, classOf[Annotation])
+        a.concept should be("Shark")
+        a.observer should be("brian")
+        a.recordedTimestamp should be(Instant.parse("2017-01-18T22:01:03.41Z"))
       }
   }
 
