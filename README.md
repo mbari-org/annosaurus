@@ -52,11 +52,11 @@ docker stop annosaurus && docker rm annosaurus
 
 ## Deployment
 
-Refer to [DEPLOYMENT.md] for production deployment instructions.
+Refer to [DEPLOYMENT.md](DEPLOYMENT.md) for production deployment instructions.
 
 ## Usage
 
-We are putting together an API doc and tutorial on usage. That's just been started but you can see some python examples in [src/pack/bin]
+We are putting together an API doc and tutorial on usage. That's just been started but you can see some python examples in [src/pack/bin](src/pack/bin)
 
 ## Related Projects
 
