@@ -50,8 +50,9 @@ class ImagedMomentDAOSpec extends FlatSpec with Matchers with BeforeAndAfterAll 
 
     val imagedMoment = run(_.findByVideoReferenceUUID(videoReferenceUUID))
       .filter(_.uuid == imagedMoment0.uuid)
-      .head
-    imagedMoment.timecode.toString should be(timecode.toString)
+      .headOption
+    imagedMoment should not be (empty)
+    imagedMoment.get.timecode.toString should be(timecode.toString)
   }
 
   it should "findByUUID" in {

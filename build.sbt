@@ -1,5 +1,5 @@
 val akkaVersion = "2.4.7"
-val auth0Version = "2.2.1"
+val auth0Version = "3.1.0"
 val codecVersion = "1.10"
 val configVersion = "1.3.1"
 val derbyVersion = "10.13.1.1"
@@ -7,12 +7,12 @@ val eclipselinkVersion = "2.6.4"
 val gsonJavatimeVersion = "1.1.1"
 val gsonVersion = "2.8.0"
 val h2Version = "1.4.193"
-val jettyVersion = "9.4.0.v20161208"
+val jettyVersion = "9.4.1.v20170120"
 val jsonVersion = "3.5.0"
 val jtaVersion = "1.1"
 val jtdsVersion = "1.3.1"
 val junitVersion = "4.12"
-val logbackVersion = "1.1.8"
+val logbackVersion = "1.1.9"
 val mssqlVersion = "6.1.0.jre8"
 val scalatestVersion = "3.0.1"
 val scalatraVersion = "2.5.0"
@@ -92,7 +92,7 @@ lazy val root = (project in file("."))
       "javax.transaction"        % "jta"                            % jtaVersion,
       "junit"                    % "junit"                          % junitVersion          % "test",
       "com.microsoft.sqlserver"  % "mssql-jdbc"                     % mssqlVersion,
-      "net.sourceforge.jtds"     % "jtds"                           % jtdsVersion,
+      //"net.sourceforge.jtds"     % "jtds"                           % jtdsVersion,
       "org.apache.derby"         % "derby"                          % derbyVersion, //          % "test",
       "org.apache.derby"         % "derbyclient"                    % derbyVersion, //          % "test",
       "org.apache.derby"         % "derbynet"                       % derbyVersion, //          % "test",

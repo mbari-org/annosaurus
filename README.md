@@ -13,6 +13,8 @@ MBARI is updating its [Video Annotation and Reference System](https://hohonuuli.
 
 ## Underlying Data Model
 
+### Class Diagram
+
 This model _might_ not be directly exposed to end users. It's the current internal notional data model.
 
 ![Data Model](src/site/images/annosaurus_classes.png)
@@ -26,6 +28,10 @@ This model _might_ not be directly exposed to end users. It's the current intern
 - `ImageReference`: Images, such as framegrabs, linked to the moment. It will also be possible to load image references for image annotation projects.
 - `CachedAnxillaryData`: For performance reason, we may want to cache some time indexed information, such as position, CTD, etc, in side the same database as the annotations.
 - `CachedMissionInfo`: This may contain information describing a camera deployment.
+
+### ER Diagram
+
+![ER Model](src/site/images/sqlserver-er-diagram.png)
 
 ## Building
 

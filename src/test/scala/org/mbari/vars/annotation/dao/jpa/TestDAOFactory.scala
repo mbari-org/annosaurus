@@ -22,9 +22,10 @@ object TestDAOFactory {
     "javax.persistence.schema-generation.scripts.drop-target" -> "target/test-database-drop.ddl"
   )
 
-  val Instance: SpecDAOFactory = DerbyTestDAOFactory.asInstanceOf[SpecDAOFactory]
+  //val Instance: SpecDAOFactory = DerbyTestDAOFactory.asInstanceOf[SpecDAOFactory]
+  val Instance: SpecDAOFactory = DevelopmentTestDAOFactory.asInstanceOf[SpecDAOFactory]
 
-  def cleanup(): Unit = DerbyTestDAOFactory.cleanup()
+  def cleanup(): Unit = Instance.cleanup()
 
 }
 

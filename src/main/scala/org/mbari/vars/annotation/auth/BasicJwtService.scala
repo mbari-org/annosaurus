@@ -2,12 +2,14 @@ package org.mbari.vars.annotation.auth
 
 import java.lang.{ Long => JLong }
 import java.time.Instant
+import java.time.temporal.{ ChronoUnit, TemporalUnit }
+import java.util.Date
 import javax.servlet.http.HttpServletRequest
 
-import com.auth0.jwt.{ JWTSigner, JWTVerifier }
+import com.auth0.jwt.JWT
+import com.auth0.jwt.algorithms.Algorithm
 import com.google.gson.{ FieldNamingPolicy, GsonBuilder }
 import com.typesafe.config.ConfigFactory
-import org.mbari.vars.annotation.Constants
 
 import scala.util.control.NonFatal
 
@@ -37,7 +39,12 @@ class BasicJwtService extends AuthorizationService {
   private[this] val issuer = config.getString("basicjwt.issuer")
   private[this] val apiKey = config.getString("basicjwt.client.secret")
   private[this] val signingSecret = config.getString("basicjwt.signing.secret")
-  private[this] val verifier = new JWTVerifier(signingSecret)
+  private[this] val algorithm = Algorithm.HMAC512(signingSecret)
+
+  private[this] val verifier = JWT.require(algorithm)
+    .withIssuer(issuer)
+    .build()
+
   val gson = new GsonBuilder()
     .setPrettyPrinting()
     .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
@@ -55,12 +62,8 @@ class BasicJwtService extends AuthorizationService {
         case None => false
         case Some(a) =>
           if (a.tokenType.equalsIgnoreCase("BEARER")) {
-            val claims = verifier.verify(a.accessToken)
-            val exp = claims.getOrDefault("exp", Integer.valueOf(0))
-              .asInstanceOf[Integer]
-            val expiration = Instant.ofEpochSecond(exp.toLong)
-            val now = Instant.now()
-            expiration.isAfter(now)
+            val jwt = verifier.verify(a.accessToken)
+            true
           } else false
       }
     } catch {
@@ -83,16 +86,17 @@ class BasicJwtService extends AuthorizationService {
       .filter(_.tokenType.equalsIgnoreCase("APIKEY"))
       .filter(_.accessToken == apiKey)
       .map(a => {
-        val iat: JLong = System.currentTimeMillis() / 1000L // issued at claim
-        val exp: JLong = iat + 86400L // expires claim. In this case the token expires in 24 hours
+        val now = Instant.now()
+        val tomorrow = now.plus(1, ChronoUnit.DAYS)
+        val iat = Date.from(now)
+        val exp = Date.from(tomorrow)
 
-        val signer = new JWTSigner(signingSecret)
-        val claims = new java.util.HashMap[String, Object]()
-        claims.put("iss", issuer)
-        claims.put("exp", exp)
-        claims.put("iat", iat)
+        JWT.create()
+          .withIssuer(issuer)
+          .withIssuedAt(iat)
+          .withExpiresAt(exp)
+          .sign(algorithm)
 
-        signer.sign(claims)
       })
       .map(Authorization("Bearer", _))
       .map(gson.toJson)
