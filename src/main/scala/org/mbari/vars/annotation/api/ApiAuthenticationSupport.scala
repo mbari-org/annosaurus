@@ -10,7 +10,7 @@ import org.scalatra.{ ScalatraBase, Unauthorized }
  */
 trait ApiAuthenticationSupport { self: ScalatraBase =>
 
-  def authorizationService: AuthorizationService = ApiAuthenticationSupport.authorizationService
+  val authorizationService: AuthorizationService = ApiAuthenticationSupport.authorizationService
 
   protected def validateRequest(): Unit = {
     //println("VALIDATING: " + request)
