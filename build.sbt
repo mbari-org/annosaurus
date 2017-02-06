@@ -75,7 +75,7 @@ lazy val appSettings = buildSettings ++
 
 lazy val apps = Seq("jetty-main")  // for sbt-pack
 
-lazy val root = (project in file("."))
+lazy val annosaurus = (project in file("."))
   .enablePlugins(JettyPlugin)
   .settings(appSettings)
   .settings(

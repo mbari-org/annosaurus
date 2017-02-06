@@ -17,11 +17,17 @@ class AssociationDAOImpl(entityManager: EntityManager)
 
   override def newPersistentObject(): AssociationImpl = new AssociationImpl
 
-  override def newPersistentObject(linkName: String, toConcept: Option[String], linkValue: Option[String]): AssociationImpl = {
+  override def newPersistentObject(
+    linkName: String,
+    toConcept: Option[String],
+    linkValue: Option[String],
+    mimeType: Option[String]
+  ): AssociationImpl = {
     val a = new AssociationImpl
     a.linkName = linkName
     toConcept.foreach(a.toConcept = _)
     linkValue.foreach(a.linkValue = _)
+    mimeType.foreach(a.mimeType = _)
     a
   }
 

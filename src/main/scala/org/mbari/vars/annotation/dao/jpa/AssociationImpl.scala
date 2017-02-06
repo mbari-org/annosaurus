@@ -67,6 +67,17 @@ class AssociationImpl extends Association with JPAPersistentObject {
   )
   override var toConcept: String = _
 
+  /**
+   * The mime-type of the linkValue
+   */
+  @Expose(serialize = true)
+  @Column(
+    name = "mime_type",
+    length = 64,
+    nullable = false
+  )
+  override var mimeType: String = "text/plain"
+
   override def toString: String = Association.asString(this)
 
 }

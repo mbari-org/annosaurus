@@ -54,7 +54,8 @@ class AssociationV1Api(controller: AssociationController)(implicit val swagger: 
     val linkName = params.get("link_name").getOrElse(halt(BadRequest("A 'link_name' parameter is required")))
     val toConcept = params.get("to_concept").getOrElse(Association.TO_CONCEPT_SELF)
     val linkValue = params.get("link_value").getOrElse(Association.LINK_VALUE_NIL)
-    controller.create(uuid, linkName, toConcept, linkValue).map(toJson)
+    val mimeType = params.get("mime_type").getOrElse("text/plain")
+    controller.create(uuid, linkName, toConcept, linkValue, mimeType).map(toJson)
   }
 
   put("/:uuid") {
@@ -64,7 +65,8 @@ class AssociationV1Api(controller: AssociationController)(implicit val swagger: 
     val linkName = params.get("link_name")
     val toConcept = params.get("to_concept")
     val linkValue = params.get("link_value")
-    controller.update(uuid, observationUUID, linkName, toConcept, linkValue).map({
+    val mimeType = params.get("mime_type")
+    controller.update(uuid, observationUUID, linkName, toConcept, linkValue, mimeType).map({
       case None => halt(NotFound(body = "{}", reason = s"No association with uuid of $uuid was found"))
       case Some(a) => toJson(a)
     })

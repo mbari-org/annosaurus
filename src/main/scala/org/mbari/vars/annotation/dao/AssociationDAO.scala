@@ -15,7 +15,8 @@ trait AssociationDAO[T <: Association] extends DAO[T] {
   def newPersistentObject(
     linkName: String,
     toConcept: Option[String] = Some(Association.TO_CONCEPT_SELF),
-    linkValue: Option[String] = Some(Association.LINK_VALUE_NIL)
+    linkValue: Option[String] = Some(Association.LINK_VALUE_NIL),
+    mimeType: Option[String] = Some("text/plain")
   ): T
 
   def findByLinkName(linkName: String): Iterable[T]

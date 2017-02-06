@@ -4,11 +4,11 @@ import java.util.UUID
 import java.util.concurrent.TimeUnit
 
 import org.mbari.vars.annotation.Constants
-import org.mbari.vars.annotation.controllers.{BasicDAOFactory, CachedVideoReferenceInfoController}
+import org.mbari.vars.annotation.controllers.{ BasicDAOFactory, CachedVideoReferenceInfoController }
 import org.mbari.vars.annotation.dao.jpa.CachedVideoReferenceInfoImpl
 import org.mbari.vars.annotation.model.CachedVideoReferenceInfo
 
-import scala.concurrent.duration.{Duration => SDuration}
+import scala.concurrent.duration.{ Duration => SDuration }
 import scala.collection.mutable
 import scala.concurrent.Await
 

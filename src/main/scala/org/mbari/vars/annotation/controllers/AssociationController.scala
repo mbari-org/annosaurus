@@ -24,14 +24,15 @@ class AssociationController(val daoFactory: BasicDAOFactory)
     observationUUID: UUID,
     linkName: String,
     toConcept: String,
-    linkValue: String
+    linkValue: String,
+    mimeType: String
   )(implicit ec: ExecutionContext): Future[Association] = {
     def fn(dao: ADAO): Association = {
       val obsDao = daoFactory.newObservationDAO(dao)
       obsDao.findByUUID(observationUUID) match {
         case None => throw new NotFoundInDatastoreException(s"Observation with UUID of $observationUUID not found")
         case Some(observation) =>
-          val association = dao.newPersistentObject(linkName, Some(toConcept), Some(linkValue))
+          val association = dao.newPersistentObject(linkName, Some(toConcept), Some(linkValue), Some(mimeType))
           observation.addAssociation(association)
           association
       }
@@ -44,7 +45,8 @@ class AssociationController(val daoFactory: BasicDAOFactory)
     observationUUID: Option[UUID] = None,
     linkName: Option[String] = None,
     toConcept: Option[String] = None,
-    linkValue: Option[String] = None
+    linkValue: Option[String] = None,
+    mimeType: Option[String] = None
   )(implicit ec: ExecutionContext): Future[Option[Association]] = {
 
     def fn(dao: ADAO): Option[Association] = {
@@ -52,6 +54,7 @@ class AssociationController(val daoFactory: BasicDAOFactory)
         linkName.foreach(association.linkName = _)
         toConcept.foreach(association.toConcept = _)
         linkValue.foreach(association.linkValue = _)
+        mimeType.foreach(association.mimeType = _)
         // Move to new observation if it exists
         for {
           obsUUID <- observationUUID
