@@ -1,4 +1,4 @@
-![MBARI logo](https://raw.githubusercontent.com/underwatervideo/annosaurus/master/src/site/images/logo-mbari-3b.png)
+![MBARI logo](src/site/images/logo-mbari-3b.png)
 
 # annosaurus
 
