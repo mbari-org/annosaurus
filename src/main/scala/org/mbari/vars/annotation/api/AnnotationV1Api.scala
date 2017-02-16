@@ -21,7 +21,7 @@ class AnnotationV1Api(controller: AnnotationController)(implicit val swagger: Sw
     extends APIStack {
 
   override protected def applicationDescription: String = "Annotation API (v1)"
-  override protected val applicationName: Option[String] = Some("AnnotationAPI")
+  override protected val applicationName: Option[String] = Some.apply("AnnotationAPI")
 
   before() {
     contentType = "application/json"
@@ -73,7 +73,7 @@ class AnnotationV1Api(controller: AnnotationController)(implicit val swagger: Sw
     val activity = params.get("activity")
 
     if (timecode.isEmpty && elapsedTime.isEmpty && recordedDate.isEmpty) {
-      halt(BadRequest("One or more of the following indicies into the video are required: timecode, elapsed_time_millis, recorded_date"))
+      halt(BadRequest.apply("One or more of the following indicies into the video are required: timecode, elapsed_time_millis, recorded_date"))
     }
 
     controller.create(videoReferenceUUID, concept, observer, observationDate, timecode,

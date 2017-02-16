@@ -54,15 +54,15 @@ import scala.collection.JavaConverters._
   ),
   new NamedQuery(
     name = "ImagedMoment.findByVideoReferenceUUIDAndTimecode",
-    query = "SELECT i FROM ImagedMoment i WHERE i.timecode = :timecode"
+    query = "SELECT i FROM ImagedMoment i WHERE i.timecode = :timecode AND i.videoReferenceUUID = :uuid"
   ),
   new NamedQuery(
     name = "ImagedMoment.findByVideoReferenceUUIDAndElapsedTime",
-    query = "SELECT i FROM ImagedMoment i WHERE i.elapsedTime = :elapsedTime"
+    query = "SELECT i FROM ImagedMoment i WHERE i.elapsedTime = :elapsedTime AND i.videoReferenceUUID = :uuid"
   ),
   new NamedQuery(
     name = "ImagedMoment.findByVideoReferenceUUIDAndRecordedDate",
-    query = "SELECT i FROM ImagedMoment i WHERE i.recordedDate = :recordedDate"
+    query = "SELECT i FROM ImagedMoment i WHERE i.recordedDate = :recordedDate AND i.videoReferenceUUID = :uuid"
   )
 ))
 class ImagedMomentImpl extends ImagedMoment with JPAPersistentObject {
