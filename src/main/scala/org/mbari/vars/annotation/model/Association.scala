@@ -18,6 +18,11 @@ trait Association extends PersistentObject {
   var linkName: String
   var toConcept: String
   var linkValue: String
+
+  /**
+   * The mime-type of the linkValue
+   */
+  var mimeType: String
   def lastUpdated: Option[Instant]
 
 }

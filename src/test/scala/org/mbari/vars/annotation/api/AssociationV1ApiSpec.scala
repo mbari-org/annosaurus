@@ -4,7 +4,7 @@ import java.time.Duration
 import java.util.UUID
 import java.util.concurrent.TimeUnit
 
-import org.mbari.vars.annotation.controllers.{ AnnotationController, AssociationController, ObservationController }
+import org.mbari.vars.annotation.controllers.{ AnnotationController, AssociationController, BasicDAOFactory, ObservationController }
 import org.mbari.vars.annotation.dao.jpa.AssociationImpl
 import org.mbari.vars.annotation.model.Association
 import org.mbari.vars.annotation.model.simple.Annotation
@@ -102,7 +102,7 @@ class AssociationV1ApiSpec extends WebApiStack {
 
   it should "update (move to new observation)" in {
     val newAnno = {
-      val controller = new AnnotationController(daoFactory)
+      val controller = new AnnotationController(daoFactory.asInstanceOf[BasicDAOFactory])
       Await.result(controller.create(UUID.randomUUID(), "Bar", "schlin",
         elapsedTime = Some(Duration.ofMillis(3000))), timeout)
     }
@@ -112,7 +112,7 @@ class AssociationV1ApiSpec extends WebApiStack {
       val a = gson.fromJson(body, classOf[AssociationImpl])
       a.uuid should be(association.uuid)
 
-      val observationController = new ObservationController(daoFactory)
+      val observationController = new ObservationController(daoFactory.asInstanceOf[BasicDAOFactory])
       val f = observationController.findByAssociationUUID(a.uuid)
       val obsOpt = Await.result(f, timeout)
       obsOpt should not be empty

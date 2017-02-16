@@ -21,7 +21,7 @@ class AnnotationV1Api(controller: AnnotationController)(implicit val swagger: Sw
     extends APIStack {
 
   override protected def applicationDescription: String = "Annotation API (v1)"
-  override protected val applicationName: Option[String] = Some("AnnotationAPI")
+  override protected val applicationName: Option[String] = Some.apply("AnnotationAPI")
 
   before() {
     contentType = "application/json"
@@ -53,6 +53,7 @@ class AnnotationV1Api(controller: AnnotationController)(implicit val swagger: Sw
   }
 
   post("/") {
+    validateRequest() // Apply API security
     val videoReferenceUUID = params.getAs[UUID]("video_reference_uuid").getOrElse(halt(BadRequest(
       body = "{}",
       reason = "A 'video_reference_uuid' parameter is required"
@@ -72,7 +73,7 @@ class AnnotationV1Api(controller: AnnotationController)(implicit val swagger: Sw
     val activity = params.get("activity")
 
     if (timecode.isEmpty && elapsedTime.isEmpty && recordedDate.isEmpty) {
-      halt(BadRequest("One or more of the following indicies into the video are required: timecode, elapsed_time_millis, recorded_date"))
+      halt(BadRequest.apply("One or more of the following indicies into the video are required: timecode, elapsed_time_millis, recorded_date"))
     }
 
     controller.create(videoReferenceUUID, concept, observer, observationDate, timecode,
@@ -82,6 +83,7 @@ class AnnotationV1Api(controller: AnnotationController)(implicit val swagger: Sw
   }
 
   put("/:uuid") {
+    validateRequest() // Apply API security
     val uuid = params.getAs[UUID]("uuid").getOrElse(halt(BadRequest(
       body = "{}",
       reason = "A 'uuid' parameter is required"
@@ -101,7 +103,7 @@ class AnnotationV1Api(controller: AnnotationController)(implicit val swagger: Sw
       timecode, elapsedTime, recordedDate, duration, group, activity)
       .map({
         case None =>
-          halt(NotFound(body = "{}", reason = s"An annotaiton with observation_uuid of $uuid was not found"))
+          halt(NotFound(body = "{}", reason = s"An annotation with observation_uuid of $uuid was not found"))
         case Some(ann) => toJson(ann)
       }) // Convert to JSON
 

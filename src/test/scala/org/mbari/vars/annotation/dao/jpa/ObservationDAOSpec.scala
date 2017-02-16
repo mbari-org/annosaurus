@@ -19,9 +19,11 @@ import scala.concurrent.ExecutionContext.Implicits.global
  */
 class ObservationDAOSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
 
+  private[this] val daoFactory = TestDAOFactory.Instance
+
   private[this] val timeout = SDuration(2, TimeUnit.SECONDS)
-  private[this] val imDao = H2TestDAOFactory.newImagedMomentDAO()
-  private[this] val dao = H2TestDAOFactory.newObservationDAO(imDao)
+  private[this] val imDao = TestDAOFactory.Instance.newImagedMomentDAO()
+  private[this] val dao = TestDAOFactory.Instance.newObservationDAO(imDao)
   private[this] val videoReferenceUUID = UUID.randomUUID()
   private[this] val now = Instant.now()
   private[this] val imagedMoment0 = ImagedMomentImpl(Some(videoReferenceUUID), Some(now), elapsedTime = Some(Duration.ofMinutes(1)))
@@ -93,7 +95,7 @@ class ObservationDAOSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
   }
 
   protected override def afterAll(): Unit = {
-    H2TestDAOFactory.cleanup()
+    daoFactory.cleanup()
   }
 
 }

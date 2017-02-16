@@ -4,7 +4,7 @@ import java.util.concurrent.TimeUnit
 
 import org.mbari.vars.annotation.Constants
 import org.mbari.vars.annotation.controllers._
-import org.mbari.vars.annotation.dao.jpa.{ DerbyTestDAOFactory, H2TestDAOFactory }
+import org.mbari.vars.annotation.dao.jpa.TestDAOFactory
 import org.scalatest.BeforeAndAfterAll
 import org.scalatra.swagger.{ ApiInfo, Swagger }
 import org.scalatra.test.scalatest.ScalatraFlatSpec
@@ -22,7 +22,7 @@ import scala.util.Try
 trait WebApiStack extends ScalatraFlatSpec with BeforeAndAfterAll {
 
   protected[this] val gson = Constants.GSON
-  protected[this] val daoFactory = H2TestDAOFactory.asInstanceOf[BasicDAOFactory]
+  protected[this] val daoFactory = TestDAOFactory.Instance.asInstanceOf[BasicDAOFactory]
   protected[this] implicit val executionContext = ExecutionContext.global
 
   protected[this] val apiInfo = ApiInfo(

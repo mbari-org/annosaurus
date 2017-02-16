@@ -13,7 +13,9 @@ import org.mbari.vars.annotation.model.{ ImageReference, ImagedMoment }
  * @since 2016-06-17T13:10:00
  */
 @Entity(name = "ImageReference")
-@Table(name = "image_references")
+@Table(name = "image_references", indexes = Array(
+  new Index(name = "idx_url", columnList = "url")
+))
 @EntityListeners(value = Array(classOf[TransactionLogger]))
 @NamedQueries(Array(
   new NamedQuery(

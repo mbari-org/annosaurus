@@ -4,12 +4,13 @@ import java.util.UUID
 import java.util.concurrent.TimeUnit
 
 import org.mbari.vars.annotation.Constants
-import org.mbari.vars.annotation.controllers.CachedVideoReferenceInfoController
+import org.mbari.vars.annotation.controllers.{ BasicDAOFactory, CachedVideoReferenceInfoController }
 import org.mbari.vars.annotation.dao.jpa.CachedVideoReferenceInfoImpl
 import org.mbari.vars.annotation.model.CachedVideoReferenceInfo
 
 import scala.concurrent.duration.{ Duration => SDuration }
 import scala.collection.mutable
+import scala.concurrent.Await
 
 /**
  *
@@ -79,7 +80,7 @@ class CachedVideoReferenceInfoV1ApiSpec extends WebApiStack {
 
     for (i <- 0 until n) {
       val v = vis(i)
-      post(
+      put(
         s"$path/${v.uuid}",
         "mission_contact" -> "schlin", "mission_id" -> ("xxx" + i), "platform_name" -> "Doc Ricketts"
       ) {
@@ -99,6 +100,20 @@ class CachedVideoReferenceInfoV1ApiSpec extends WebApiStack {
         status should be(204)
       }
     }
+  }
+
+  protected override def afterAll(): Unit = {
+    super.afterAll()
+    val dao = daoFactory.newCachedVideoReferenceInfoDAO()
+
+    val f = dao.runTransaction(d => {
+      val all = dao.findAll()
+      all.foreach(dao.delete)
+    })
+    f.onComplete(t => dao.close())
+    Await.result(f, SDuration(4, TimeUnit.SECONDS))
+
+    super.afterAll()
   }
 
 }

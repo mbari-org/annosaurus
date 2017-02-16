@@ -1,6 +1,6 @@
 package org.mbari.vars.annotation.dao.jpa
 
-import javax.persistence.{ NamedQuery, _ }
+import javax.persistence.{ Index, NamedQuery, _ }
 
 import com.google.gson.annotations.Expose
 import org.mbari.vars.annotation.model.{ Association, Observation }
@@ -12,7 +12,11 @@ import org.mbari.vars.annotation.model.{ Association, Observation }
  * @since 2016-06-17T11:36:00
  */
 @Entity(name = "Association")
-@Table(name = "associations")
+@Table(name = "associations", indexes = Array(
+  new Index(name = "idx_link_name", columnList = "link_name"),
+  new Index(name = "idx_link_value", columnList = "link_value"),
+  new Index(name = "idx_to_concept", columnList = "to_concept")
+))
 @EntityListeners(value = Array(classOf[TransactionLogger]))
 @NamedNativeQueries(Array(
   new NamedNativeQuery(
@@ -45,7 +49,6 @@ import org.mbari.vars.annotation.model.{ Association, Observation }
 class AssociationImpl extends Association with JPAPersistentObject {
 
   @Expose(serialize = true)
-  @Index(name = "idx_link_name", columnList = "link_name")
   @Column(
     name = "link_name",
     length = 128,
@@ -54,7 +57,6 @@ class AssociationImpl extends Association with JPAPersistentObject {
   override var linkName: String = _
 
   @Expose(serialize = true)
-  @Index(name = "idx_link_value", columnList = "link_value")
   @Column(
     name = "link_value",
     length = 1024,
@@ -72,13 +74,23 @@ class AssociationImpl extends Association with JPAPersistentObject {
   override var observation: Observation = _
 
   @Expose(serialize = true)
-  @Index(name = "idx_to_concept", columnList = "to_concept")
   @Column(
     name = "to_concept",
     length = 128,
     nullable = true
   )
   override var toConcept: String = _
+
+  /**
+   * The mime-type of the linkValue
+   */
+  @Expose(serialize = true)
+  @Column(
+    name = "mime_type",
+    length = 64,
+    nullable = false
+  )
+  override var mimeType: String = "text/plain"
 
   override def toString: String = Association.asString(this)
 

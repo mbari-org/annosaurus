@@ -69,7 +69,7 @@ association_url = "%s/v1/associations" % (endpoint)
 # ~~~ Annotation API ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # The annotation API is an abstraction to make it very simple to create and modify annotations.
-# It provides a simple search if you know you're video_reference_uuid. It does not allow you
+# It provides a simple search if you know your video_reference_uuid. It does not allow you
 # to delete. You use a different API (Observation API) for that
 
 
@@ -147,6 +147,32 @@ get_url = "%s/videoreference/%s" % (annotation_url, annotation["video_reference_
 annotations = get(get_url)
 show("Search results for " + get_url, annotations)
 
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# ~~~ Image API ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# The image API is for registering images that can be annotated. Each image needs to be indexed
+# either to a video using elpased_time_millis or timecode or to actual reality with recorded_timestamp
+
+# 1. Create
+
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# ~~~ Association API ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Associations store additional descriptive information about an annotation.
+
+# 1. Create an Association with minimum fields
+association = post(association_url, data = {"observation_uuid": observation_uuid, "link_name": "swimming"})
+show("Created using " + association_url, association)
+
+# 2. Create using all possible fields
+association = post(association_url,
+                   data = {
+                       "observation_uuid": observation_uuid,
+                       "link_name": "distance measurement",
+                       "to_concept": "self",
+                       "link_value": '{"x0": 100, "y0: 89", "x1'
+                   })
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # ~~~ Observation API ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -156,6 +182,17 @@ show("Search results for " + get_url, annotations)
 # An ImagedMoment, one or more Observations, one or more ImageReferences and zero or one
 # CachedAncillaryDatum.
 
+# 1. Find an observation by it's uuid
+get_url = "%s/%s" % (observation_url, observation_uuid)
+observation = get(get_url)
+show("Search results for " + get_url, observation)
+
+# 2. Find all observations in a video
+get_url = "%s/videoreference/%s" % (observation_url, annotation['video_reference_uuid'])
+observation = get(get_url)
+show("Search results for " + get_url, observation)
+
+# 3.
 
 
 

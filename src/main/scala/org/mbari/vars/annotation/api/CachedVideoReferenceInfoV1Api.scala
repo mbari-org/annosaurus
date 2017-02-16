@@ -89,6 +89,7 @@ class CachedVideoReferenceInfoV1Api(controller: CachedVideoReferenceInfoControll
   }
 
   post("/") {
+    validateRequest() // Apply API security
     val videoReferenceUUID = params.getAs[UUID]("video_reference_uuid").getOrElse(halt(BadRequest(
       body = "{}",
       reason = "A 'video_reference_uuid' parameter is required"
@@ -101,6 +102,7 @@ class CachedVideoReferenceInfoV1Api(controller: CachedVideoReferenceInfoControll
   }
 
   put("/:uuid") {
+    validateRequest() // Apply API security
     val uuid = params.getAs[UUID]("uuid").getOrElse(halt(BadRequest(
       body = "{}",
       reason = "A 'uuid' parameter is required"
@@ -117,6 +119,7 @@ class CachedVideoReferenceInfoV1Api(controller: CachedVideoReferenceInfoControll
   }
 
   delete("/:uuid") {
+    validateRequest() // Apply API security
     val uuid = params.getAs[UUID]("uuid").getOrElse(halt(BadRequest(
       body = "{}",
       reason = "A 'uuid' parameter is required"

@@ -2,7 +2,7 @@ package org.mbari.vars.annotation.dao.jpa
 
 import java.time.{ Duration, Instant }
 import java.util.UUID
-import javax.persistence.{ Convert, _ }
+import javax.persistence.{ Convert, Index, _ }
 import java.util.{ ArrayList => JArrayList, List => JList }
 
 import com.google.gson.annotations.{ Expose, SerializedName }
@@ -19,7 +19,11 @@ import scala.collection.JavaConverters._
  * @since 2016-06-16T14:12:00
  */
 @Entity(name = "ImagedMoment")
-@Table(name = "imaged_moments")
+@Table(name = "imaged_moments", indexes = Array(
+  new Index(name = "idx_recorded_timestamp", columnList = "recorded_timestamp"),
+  new Index(name = "idx_elapsed_time", columnList = "elapsed_time_millis"),
+  new Index(name = "idx_timecode", columnList = "timecode")
+))
 @EntityListeners(value = Array(classOf[TransactionLogger]))
 @NamedNativeQueries(Array(
   new NamedNativeQuery(
@@ -50,15 +54,15 @@ import scala.collection.JavaConverters._
   ),
   new NamedQuery(
     name = "ImagedMoment.findByVideoReferenceUUIDAndTimecode",
-    query = "SELECT i FROM ImagedMoment i WHERE i.timecode = :timecode"
+    query = "SELECT i FROM ImagedMoment i WHERE i.timecode = :timecode AND i.videoReferenceUUID = :uuid"
   ),
   new NamedQuery(
     name = "ImagedMoment.findByVideoReferenceUUIDAndElapsedTime",
-    query = "SELECT i FROM ImagedMoment i WHERE i.elapsedTime = :elapsedTime"
+    query = "SELECT i FROM ImagedMoment i WHERE i.elapsedTime = :elapsedTime AND i.videoReferenceUUID = :uuid"
   ),
   new NamedQuery(
     name = "ImagedMoment.findByVideoReferenceUUIDAndRecordedDate",
-    query = "SELECT i FROM ImagedMoment i WHERE i.recordedDate = :recordedDate"
+    query = "SELECT i FROM ImagedMoment i WHERE i.recordedDate = :recordedDate AND i.videoReferenceUUID = :uuid"
   )
 ))
 class ImagedMomentImpl extends ImagedMoment with JPAPersistentObject {
@@ -72,7 +76,6 @@ class ImagedMomentImpl extends ImagedMoment with JPAPersistentObject {
   override var elapsedTime: Duration = _
 
   @Expose(serialize = true)
-  @Index(name = "idx_recorded_timestamp", columnList = "recorded_timestamp")
   @Column(
     name = "recorded_timestamp",
     nullable = true

@@ -4,11 +4,11 @@ import java.time.{ Duration, Instant }
 import java.util.UUID
 import java.util.concurrent.TimeUnit
 
-import org.mbari.vars.annotation.dao.{ AssociationDAO, CachedAncillaryDatumDAO }
+import org.mbari.vars.annotation.dao.{ AssociationDAO }
 import org.mbari.vars.annotation.model.Association
 import org.scalatest.{ FlatSpec, Matchers, BeforeAndAfterAll }
 
-import scala.concurrent.{ Await, Awaitable }
+import scala.concurrent.{ Await }
 import scala.concurrent.duration.{ Duration => SDuration }
 import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -20,10 +20,12 @@ import scala.concurrent.ExecutionContext.Implicits.global
  */
 class AssociationDAOSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
 
+  private[this] val daoFactory = TestDAOFactory.Instance
+
   private[this] val timeout = SDuration(2, TimeUnit.SECONDS)
-  private[this] val imDao = H2TestDAOFactory.newImagedMomentDAO()
-  private[this] val obsDao = H2TestDAOFactory.newObservationDAO(imDao)
-  private[this] val dao = H2TestDAOFactory.newAssociationDAO(imDao)
+  private[this] val imDao = daoFactory.newImagedMomentDAO()
+  private[this] val obsDao = daoFactory.newObservationDAO(imDao)
+  private[this] val dao = daoFactory.newAssociationDAO(imDao)
   private[this] val videoReferenceUUID = UUID.randomUUID()
   private[this] val now = Instant.now()
   private[this] val imagedMoment0 = ImagedMomentImpl(Some(videoReferenceUUID), Some(now), elapsedTime = Some(Duration.ofMinutes(1)))
@@ -89,7 +91,7 @@ class AssociationDAOSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
   }
 
   protected override def afterAll(): Unit = {
-    H2TestDAOFactory.cleanup()
+    daoFactory.cleanup()
   }
 
 }

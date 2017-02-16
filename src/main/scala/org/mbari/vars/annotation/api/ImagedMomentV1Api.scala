@@ -95,6 +95,7 @@ class ImagedMomentV1Api(controller: ImagedMomentController)(implicit val swagger
   //  }
 
   put("/:uuid") {
+    validateRequest() // Apply API security
     val uuid = params.getAs[UUID]("uuid").getOrElse(halt(BadRequest("Please provide a UUID")))
     val timecode = params.getAs[Timecode]("timecode")
     val elapsedTime = params.getAs[Duration]("elapsed_time_millis")
@@ -104,6 +105,7 @@ class ImagedMomentV1Api(controller: ImagedMomentController)(implicit val swagger
   }
 
   delete("/:uuid") {
+    validateRequest() // Apply API security
     val uuid = params.getAs[UUID]("uuid").getOrElse(halt(BadRequest("Please provide the 'uuid' of the association")))
     controller.delete(uuid).map({
       case true => halt(NoContent(reason = s"Success! Deleted ImagedMoment with UUID of $uuid"))

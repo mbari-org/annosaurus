@@ -20,8 +20,10 @@ import scala.concurrent.ExecutionContext.Implicits.global
  */
 class ImagedMomentDAOSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
 
+  private[this] val daoFactory = TestDAOFactory.Instance
+
   private[this] val timeout = SDuration(2, TimeUnit.SECONDS)
-  private[this] val dao = H2TestDAOFactory.newImagedMomentDAO()
+  private[this] val dao = daoFactory.newImagedMomentDAO()
   private[this] val videoReferenceUUID = UUID.randomUUID()
   private[this] val now = Instant.now()
   private[this] val imagedMoment0 = ImagedMomentImpl(Some(videoReferenceUUID), Some(now), elapsedTime = Some(Duration.ofMinutes(1)))
@@ -48,8 +50,9 @@ class ImagedMomentDAOSpec extends FlatSpec with Matchers with BeforeAndAfterAll 
 
     val imagedMoment = run(_.findByVideoReferenceUUID(videoReferenceUUID))
       .filter(_.uuid == imagedMoment0.uuid)
-      .head
-    imagedMoment.timecode.toString should be(timecode.toString)
+      .headOption
+    imagedMoment should not be (empty)
+    imagedMoment.get.timecode.toString should be(timecode.toString)
   }
 
   it should "findByUUID" in {
@@ -94,7 +97,7 @@ class ImagedMomentDAOSpec extends FlatSpec with Matchers with BeforeAndAfterAll 
   }
 
   protected override def afterAll(): Unit = {
-    H2TestDAOFactory.cleanup()
+    daoFactory.cleanup()
   }
 
 }
