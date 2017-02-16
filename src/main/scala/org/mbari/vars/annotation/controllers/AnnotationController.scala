@@ -163,6 +163,4 @@ class AnnotationController(daoFactory: BasicDAOFactory) {
     }
   }
 
-
-
 }

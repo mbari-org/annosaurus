@@ -59,16 +59,22 @@ class ImagedMomentDAOImpl(entityManager: EntityManager)
     findByNamedQuery("ImagedMoment.findAll", limit = Some(limit), offset = Some(offset))
 
   override def findByVideoReferenceUUIDAndElapsedTime(uuid: UUID, elapsedTime: Duration): Option[ImagedMomentImpl] =
-    findByNamedQuery("ImagedMoment.findByVideoReferenceUUIDAndElapsedTime",
-      Map("elapsedTime" -> elapsedTime, "uuid" -> uuid)).headOption
+    findByNamedQuery(
+      "ImagedMoment.findByVideoReferenceUUIDAndElapsedTime",
+      Map("elapsedTime" -> elapsedTime, "uuid" -> uuid)
+    ).headOption
 
   override def findByVideoReferenceUUIDAndTimecode(uuid: UUID, timecode: Timecode): Option[ImagedMomentImpl] =
-    findByNamedQuery("ImagedMoment.findByVideoReferenceUUIDAndTimecode",
-      Map("timecode" -> timecode, "uuid" -> uuid)).headOption
+    findByNamedQuery(
+      "ImagedMoment.findByVideoReferenceUUIDAndTimecode",
+      Map("timecode" -> timecode, "uuid" -> uuid)
+    ).headOption
 
   override def findByVideoReferenceUUIDAndRecordedDate(uuid: UUID, recordedDate: Instant): Option[ImagedMomentImpl] =
-    findByNamedQuery("ImagedMoment.findByVideoReferenceUUIDAndRecordedDate",
-      Map("recordedDate" -> recordedDate, "uuid" -> uuid)).headOption
+    findByNamedQuery(
+      "ImagedMoment.findByVideoReferenceUUIDAndRecordedDate",
+      Map("recordedDate" -> recordedDate, "uuid" -> uuid)
+    ).headOption
 
   override def findByObservationUUID(uuid: UUID): Option[ImagedMomentImpl] =
     findByNamedQuery("ImagedMoment.findByObservationUUID", Map("uuid" -> uuid)).headOption

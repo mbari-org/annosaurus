@@ -68,9 +68,9 @@ class ObservationDAOImpl(entityManager: EntityManager)
     val query = entityManager.createNamedQuery("Observation.countByConcept")
     query.setParameter(1, name)
     query.getResultList
-          .asScala
-            .map(_.asInstanceOf[Int])
-              .head
+      .asScala
+      .map(_.asInstanceOf[Int])
+      .head
   }
 
   override def updateConcept(oldConcept: String, newConcept: String): Int = {

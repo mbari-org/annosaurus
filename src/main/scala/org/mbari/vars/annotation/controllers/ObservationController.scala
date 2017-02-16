@@ -132,12 +132,12 @@ class ObservationController(val daoFactory: BasicDAOFactory)
     exec(fn)
   }
 
-  def countByConcept(concept: String): Future[Int] = {
+  def countByConcept(concept: String)(implicit ec: ExecutionContext): Future[Int] = {
     def fn(dao: ODAO): Int = dao.countByConcept(concept)
     exec(fn)
   }
 
-  def updateConcept(oldConcept: String, newConcept: String): Future[Int] = {
+  def updateConcept(oldConcept: String, newConcept: String)(implicit ec: ExecutionContext): Future[Int] = {
     def fn(dao: ODAO): Int = dao.updateConcept(oldConcept, newConcept)
     exec(fn)
   }

@@ -52,14 +52,15 @@ class AssociationDAOImpl(entityManager: EntityManager)
     val query = entityManager.createNativeQuery("Association.countByToConcept")
     query.setParameter(1, toConcept)
     query.getResultList
-          .asScala
-          .map(_.asInstanceOf[Int])
-        .head
+      .asScala
+      .map(_.asInstanceOf[Int])
+      .head
   }
 
   override def updateToConcept(oldToConcept: String, newToConcept: String): Int = {
     val query = entityManager.createNativeQuery("Association.updateToConcept")
     query.setParameter(1, newToConcept)
     query.setParameter(2, oldToConcept)
+    query.getFirstResult
   }
 }

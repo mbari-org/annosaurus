@@ -113,5 +113,4 @@ class ImagedMomentV1Api(controller: ImagedMomentController)(implicit val swagger
     })
   }
 
-
 }

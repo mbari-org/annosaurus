@@ -84,14 +84,14 @@ class AssociationV1Api(controller: AssociationController)(implicit val swagger: 
   get("/count/:concept") {
     val concept = params.get("concept").getOrElse(halt(BadRequest("Please provide a concept to search for")))
     controller.countByToConcept(concept)
-        .map(n => s"""{"concept":"$concept", "count":"$n"}""")
+      .map(n => s"""{"concept":"$concept", "count":"$n"}""")
   }
 
   put("/rename/:old/:new") {
     val oldConcept = params.get("old").getOrElse(halt(BadRequest("Please provide the concept being replaced")))
     val newConcept = params.get("new").getOrElse(halt(BadRequest("Please provide the replacement concept")))
     controller.updateToConcept(oldConcept, newConcept)
-        .map(n => s"""{"old_concept":"$oldConcept", "new_concept":"$newConcept", "number_updated":"$n"}""")
+      .map(n => s"""{"old_concept":"$oldConcept", "new_concept":"$newConcept", "number_updated":"$n"}""")
   }
 
 }
