@@ -65,13 +65,13 @@ class ObservationV1Api(controller: ObservationController)(implicit val swagger: 
       .map(toJson)
   }
 
-  get("/count/:concept") {
+  get("/concept/count/:concept") {
     val concept = params.get("concept").getOrElse(halt(BadRequest("Please provide a concept to search for")))
     controller.countByConcept(concept)
       .map(n => s"""{"concept":"$concept", "count":"$n"}""")
   }
 
-  put("/rename/:old/:new") {
+  put("/concept/rename") {
     val oldConcept = params.get("old").getOrElse(halt(BadRequest("Please provide the concept being replaced")))
     val newConcept = params.get("new").getOrElse(halt(BadRequest("Please provide the replacement concept")))
     controller.updateConcept(oldConcept, newConcept)

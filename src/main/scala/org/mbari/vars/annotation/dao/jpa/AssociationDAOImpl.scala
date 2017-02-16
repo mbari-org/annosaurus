@@ -49,18 +49,20 @@ class AssociationDAOImpl(entityManager: EntityManager)
     findByNamedQuery("Association.findAll", limit = Some(limit), offset = Some(offset))
 
   override def countByToConcept(toConcept: String): Int = {
-    val query = entityManager.createNativeQuery("Association.countByToConcept")
+    //val query = entityManager.createNativeQuery("Association.countByToConcept")
+    val query = entityManager.createNamedQuery("Association.countByToConcept")
     query.setParameter(1, toConcept)
     query.getResultList
       .asScala
       .map(_.asInstanceOf[Int])
       .head
+
   }
 
   override def updateToConcept(oldToConcept: String, newToConcept: String): Int = {
-    val query = entityManager.createNativeQuery("Association.updateToConcept")
-    query.setParameter(1, newToConcept)
-    query.setParameter(2, oldToConcept)
+    val query = entityManager.createNamedQuery("Association.updateToConcept")
+    query.setParameter(1, oldToConcept)
+    query.setParameter(2, newToConcept)
     query.getFirstResult
   }
 }

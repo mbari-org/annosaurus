@@ -4,6 +4,7 @@ import java.time.{ Duration, Instant }
 import java.util.UUID
 
 import org.mbari.vars.annotation.controllers.{ AnnotationController, ImagedMomentController }
+import org.mbari.vars.annotation.model.{ UUIDArray, ValueArray }
 import org.mbari.vcr4j.time.Timecode
 import org.scalatra.{ BadRequest, NoContent, NotFound }
 import org.scalatra.swagger.Swagger
@@ -51,7 +52,8 @@ class ImagedMomentV1Api(controller: ImagedMomentController)(implicit val swagger
     val limit = params.getAs[Int]("limit")
     val offset = params.getAs[Int]("offset")
     controller.findAllVideoReferenceUUIDs(limit, offset)
-      .map(_.asJava)
+      .map(_.toArray)
+      .map(a => ValueArray(a))
       .map(toJson)
   }
 
