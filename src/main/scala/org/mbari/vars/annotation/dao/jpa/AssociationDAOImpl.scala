@@ -5,6 +5,8 @@ import javax.persistence.EntityManager
 
 import org.mbari.vars.annotation.dao.AssociationDAO
 
+import scala.collection.JavaConverters._
+
 /**
  *
  *
@@ -39,4 +41,19 @@ class AssociationDAOImpl(entityManager: EntityManager)
 
   override def findAll(limit: Int, offset: Int): Iterable[AssociationImpl] =
     findByNamedQuery("Association.findAll", limit = Some(limit), offset = Some(offset))
+
+  override def countByToConcept(toConcept: String): Int = {
+    val query = entityManager.createNativeQuery("Association.countByToConcept")
+    query.setParameter(1, toConcept)
+    query.getResultList
+          .asScala
+          .map(_.asInstanceOf[Int])
+        .head
+  }
+
+  override def updateToConcept(oldToConcept: String, newToConcept: String): Int = {
+    val query = entityManager.createNativeQuery("Association.updateToConcept")
+    query.setParameter(1, newToConcept)
+    query.setParameter(2, oldToConcept)
+  }
 }

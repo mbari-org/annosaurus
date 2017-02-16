@@ -31,4 +31,8 @@ trait ObservationDAO[T <: Observation] extends DAO[T] {
 
   def findAllConceptsByVideoReferenceUUID(uuid: UUID): Seq[String]
 
+  def countByConcept(name: String): Int
+
+  def updateConcept(oldName: String, newName: String): Int
+
 }

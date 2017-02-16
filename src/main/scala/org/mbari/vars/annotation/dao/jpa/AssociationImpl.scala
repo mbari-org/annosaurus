@@ -14,6 +14,20 @@ import org.mbari.vars.annotation.model.{ Association, Observation }
 @Entity(name = "Association")
 @Table(name = "associations")
 @EntityListeners(value = Array(classOf[TransactionLogger]))
+@NamedNativeQueries(Array(
+  new NamedNativeQuery(
+    name = "Association.findAllToConcepts",
+    query = "SELECT DISTINCT to_concept FROM associations ORDER BY to_concept"
+  ),
+  new NamedNativeQuery(
+    name = "Association.countByToConcept",
+    query = "SELECT COUNT(*) FROM associations WHERE to_concept = ?"
+  ),
+  new NamedNativeQuery(
+    name = "Association.updateToConcept",
+    query = "UPDATE associations SET to_concept = ? WHERE to_concept = ?"
+  )
+))
 @NamedQueries(Array(
   new NamedQuery(
     name = "Association.findAll",

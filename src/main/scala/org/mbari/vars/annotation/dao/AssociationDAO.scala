@@ -22,4 +22,8 @@ trait AssociationDAO[T <: Association] extends DAO[T] {
 
   def findByLinkNameAndVideoReferenceUUID(linkName: String, videoReferenceUUID: UUID): Iterable[T]
 
+  def countByToConcept(toConcept: String): Int
+
+  def updateToConcept(oldToConcept: String, newToConcept: String): Int
+
 }

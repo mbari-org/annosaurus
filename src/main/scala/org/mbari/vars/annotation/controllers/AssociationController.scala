@@ -79,4 +79,14 @@ class AssociationController(val daoFactory: BasicDAOFactory)
     exec(fn)
   }
 
+  def countByToConcept(concept: String): Future[Int] = {
+    def fn(dao: ADAO): Int = dao.countByToConcept(concept)
+    exec(fn)
+  }
+
+  def updateToConcept(oldToConcept: String, newToConcept: String): Future[Int] = {
+    def fn(dao: ADAO): Int = dao.updateToConcept(oldToConcept, newToConcept)
+    exec(fn)
+  }
+
 }

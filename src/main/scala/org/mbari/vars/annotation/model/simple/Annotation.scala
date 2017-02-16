@@ -54,6 +54,9 @@ class Annotation {
   var group: String = _
 
   @Expose(serialize = true)
+  var activity: String = _
+
+  @Expose(serialize = true)
   @SerializedName(value = "associations")
   protected var javaAssociations: JList[Association] = new JArrayList[Association]()
   def associations: Seq[Association] = javaAssociations.asScala
@@ -86,6 +89,7 @@ object Annotation {
     a.recordedTimestamp = observation.imagedMoment.recordedDate
     a.duration = observation.duration
     a.group = observation.group
+    a.activity = observation.activity
     a.associations = observation.associations.toSeq
     a.imageReferences = observation.imagedMoment.imageReferences.toSeq
     a
