@@ -61,8 +61,8 @@ class AssociationDAOImpl(entityManager: EntityManager)
 
   override def updateToConcept(oldToConcept: String, newToConcept: String): Int = {
     val query = entityManager.createNamedQuery("Association.updateToConcept")
-    query.setParameter(1, oldToConcept)
-    query.setParameter(2, newToConcept)
-    query.getFirstResult
+    query.setParameter(1, newToConcept)
+    query.setParameter(2, oldToConcept)
+    query.executeUpdate()
   }
 }

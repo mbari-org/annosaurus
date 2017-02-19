@@ -53,7 +53,6 @@ class ImagedMomentV1Api(controller: ImagedMomentController)(implicit val swagger
     val offset = params.getAs[Int]("offset")
     controller.findAllVideoReferenceUUIDs(limit, offset)
       .map(_.toArray)
-      .map(a => ValueArray(a))
       .map(toJson)
   }
 

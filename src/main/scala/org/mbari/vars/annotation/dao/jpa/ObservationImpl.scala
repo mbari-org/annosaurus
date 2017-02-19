@@ -33,11 +33,11 @@ import org.mbari.vars.annotation.model.{ Association, ImagedMoment, Observation 
   ),
   new NamedNativeQuery(
     name = "Observation.countByConcept",
-    query = "SELECT COUNT(*) FROM observations WHERE concept = ?"
+    query = "SELECT COUNT(*) FROM observations WHERE concept = ?1"
   ),
   new NamedNativeQuery(
     name = "Observation.updateConcept",
-    query = "UPDATE observations SET concept = ? WHERE concept = ?"
+    query = "UPDATE observations SET concept = ?1 WHERE concept = ?2"
   )
 ))
 @NamedQueries(Array(

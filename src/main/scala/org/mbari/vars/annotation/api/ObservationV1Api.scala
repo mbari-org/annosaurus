@@ -54,14 +54,14 @@ class ObservationV1Api(controller: ObservationController)(implicit val swagger: 
 
   get("/concepts") {
     controller.findAllConcepts
-      .map(s => ValueArray(s.toArray))
+      .map(_.toArray)
       .map(toJson)
   }
 
   get("/concepts/:uuid") {
     val uuid = params.getAs[UUID]("uuid").getOrElse(halt(BadRequest("Please provide a video-reference 'uuid'")))
     controller.findAllConceptsByVideoReferenceUUID(uuid)
-      .map(s => ValueArray(s.toArray))
+      .map(_.toArray)
       .map(toJson)
   }
 
