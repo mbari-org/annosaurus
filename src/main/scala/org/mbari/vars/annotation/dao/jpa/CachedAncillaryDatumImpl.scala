@@ -25,7 +25,7 @@ import org.mbari.vars.annotation.model.{ CachedAncillaryDatum, ImagedMoment }
   ),
   new NamedQuery(
     name = "Association.findByObservationUUID",
-    query = "SELECT a FROM AncillaryDatum a INNER JOIN FETCH a.imagedMoment im INNER JOIN FETCH im.observations o WHERE o.uuid = :uuid"
+    query = "SELECT a FROM AncillaryDatum a INNER JOIN FETCH a.imagedMoment im INNER JOIN FETCH im.javaObservations o WHERE o.uuid = :uuid"
   )
 ))
 class CachedAncillaryDatumImpl extends CachedAncillaryDatum with JPAPersistentObject {

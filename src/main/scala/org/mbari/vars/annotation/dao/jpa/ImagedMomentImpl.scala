@@ -66,7 +66,7 @@ import scala.collection.JavaConverters._
   ),
   new NamedQuery(
     name = "ImagedMoment.deleteByVideoReferenceUUID",
-    query = "DELETE r FROM ImagedMoment i WHERE i.videoReferenceUUID = :uuid"
+    query = "DELETE FROM ImagedMoment i WHERE i.videoReferenceUUID = :uuid"
   )
 ))
 class ImagedMomentImpl extends ImagedMoment with JPAPersistentObject {
@@ -152,6 +152,7 @@ class ImagedMomentImpl extends ImagedMoment with JPAPersistentObject {
   }
 
   @Expose(serialize = true)
+  @SerializedName(value = "ancillary_data")
   @OneToOne(
     mappedBy = "imagedMoment",
     cascade = Array(CascadeType.ALL),
