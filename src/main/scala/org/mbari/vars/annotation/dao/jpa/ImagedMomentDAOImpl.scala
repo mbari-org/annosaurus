@@ -78,4 +78,14 @@ class ImagedMomentDAOImpl(entityManager: EntityManager)
 
   override def findByObservationUUID(uuid: UUID): Option[ImagedMomentImpl] =
     findByNamedQuery("ImagedMoment.findByObservationUUID", Map("uuid" -> uuid)).headOption
+
+  /**
+   * A bulk delete operation. This will delete all annotation related data for a single video.
+   * (which is identified via its uuid (e.g. videoReferenceUUID)
+   *
+   * @param uuid The UUID of the VideoReference. WARNING!! All annotation data associated to
+   *             this videoReference will be deleted.
+   */
+  override def deleteByVideoReferenceUUUID(uuid: UUID): Int =
+    executeNamedQuery("ImagedMoment.deleteByVideoReferenceUUID", Map("uuid" -> uuid))
 }

@@ -42,4 +42,5 @@ class ImageReferenceDAOImpl(entityManager: EntityManager)
 
   override def findByURL(url: URL): Option[ImageReferenceImpl] =
     findByNamedQuery("ImageReference.findByURL", Map("url" -> url)).headOption
+
 }

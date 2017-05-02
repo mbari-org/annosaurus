@@ -58,6 +58,16 @@ trait ImagedMomentDAO[T <: ImagedMoment] extends DAO[T] {
   def findByObservationUUID(uuid: UUID): Option[T]
 
   /**
+   * A bulk delete operation. This will delete all annotation related data for a single video.
+   * (which is identified via its uuid (e.g. videoReferenceUUID))
+   *
+   * @param uuid The UUID of the VideoReference. WARNING!! All annotation data associated to
+   *             this videoReference will be deleted.
+   * @return The number of records deleted
+   */
+  def deleteByVideoReferenceUUUID(uuid: UUID): Int
+
+  /**
    * Deletes an imagedMoment if it does not contain any observations or imageReferences
    * @param imagedMoment The object to delete
    * @return true if deleted, false if not deleted.
@@ -65,13 +75,12 @@ trait ImagedMomentDAO[T <: ImagedMoment] extends DAO[T] {
   def deleteIfEmpty(imagedMoment: T): Boolean = deleteIfEmptyByUUID(imagedMoment.uuid)
 
   def deleteIfEmptyByUUID(uuid: UUID): Boolean = {
-    findByUUID(uuid).map(imagedMoment => {
+    findByUUID(uuid).exists(imagedMoment => {
 
       if (imagedMoment.imageReferences.isEmpty && imagedMoment.observations.isEmpty) {
-
         delete(imagedMoment)
         true
       } else false
-    }).getOrElse(false)
+    })
   }
 }

@@ -50,6 +50,9 @@ class ImagedMomentController(val daoFactory: BasicDAOFactory)
   def findWithImageReferences(videoReferenceUUID: UUID)(implicit ec: ExecutionContext): Future[Iterable[ImagedMoment]] =
     exec(d => d.findWithImageReferences(videoReferenceUUID))
 
+  def deleteByVideoReferenceUUID(videoReferenceUUID: UUID)(implicit ec: ExecutionContext): Future[Int] =
+    exec(d => d.deleteByVideoReferenceUUUID(videoReferenceUUID))
+
   def create(
     videoReferenceUUID: UUID,
     timecode: Option[Timecode] = None,

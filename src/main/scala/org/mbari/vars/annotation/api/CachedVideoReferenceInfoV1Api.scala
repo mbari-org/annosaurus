@@ -95,7 +95,7 @@ class CachedVideoReferenceInfoV1Api(controller: CachedVideoReferenceInfoControll
       reason = "A 'video_reference_uuid' parameter is required"
     )))
     val missionContact = params.get("mission_contact")
-    val missionID = params.get("mission_id").getOrElse(halt(BadRequest("A 'misison_id' parameter is required")))
+    val missionID = params.get("mission_id").getOrElse(halt(BadRequest("A 'mission_id' parameter is required")))
     val platformName = params.get("platform_name").getOrElse(halt(BadRequest("A 'platform_name' parameter is required")))
     controller.create(videoReferenceUUID, platformName, missionID, missionContact)
       .map(toJson)

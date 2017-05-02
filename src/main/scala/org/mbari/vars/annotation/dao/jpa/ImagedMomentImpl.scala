@@ -63,6 +63,10 @@ import scala.collection.JavaConverters._
   new NamedQuery(
     name = "ImagedMoment.findByVideoReferenceUUIDAndRecordedDate",
     query = "SELECT i FROM ImagedMoment i WHERE i.recordedDate = :recordedDate AND i.videoReferenceUUID = :uuid"
+  ),
+  new NamedQuery(
+    name = "ImagedMoment.deleteByVideoReferenceUUID",
+    query = "DELETE r FROM ImagedMoment i WHERE i.videoReferenceUUID = :uuid"
   )
 ))
 class ImagedMomentImpl extends ImagedMoment with JPAPersistentObject {

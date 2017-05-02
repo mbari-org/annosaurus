@@ -65,6 +65,13 @@ class ImagedMomentV1Api(controller: ImagedMomentController)(implicit val swagger
       .map(toJson)
   }
 
+  delete("/videoreference/:uuid") {
+    validateRequest() // Apply API security
+    val uuid = params.getAs[UUID]("uuid").getOrElse(halt(BadRequest("Please provide a Video Reference UUID")))
+    controller.deleteByVideoReferenceUUID(uuid)
+      .map(toJson)
+  }
+
   get("/imagereference/:uuid") {
     val uuid = params.getAs[UUID]("uuid").getOrElse(halt(BadRequest("Please provide an ImageReference UUID")))
     controller.findByImageReferenceUUID(uuid)

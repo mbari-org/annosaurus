@@ -18,6 +18,14 @@ import org.mbari.vars.annotation.model.{ CachedAncillaryDatum, ImagedMoment }
   new NamedQuery(
     name = "AncillaryDatum.findAll",
     query = "SELECT a FROM AncillaryDatum a"
+  ),
+  new NamedQuery(
+    name = "AncillaryDatum.findByImagedMomentUUID",
+    query = "SELECT a FROM AncillaryDatum a JOIN a.imagedMoment i WHERE i.uuid = :uuid"
+  ),
+  new NamedQuery(
+    name = "Association.findByObservationUUID",
+    query = "SELECT a FROM AncillaryDatum a INNER JOIN FETCH a.imagedMoment im INNER JOIN FETCH im.observations o WHERE o.uuid = :uuid"
   )
 ))
 class CachedAncillaryDatumImpl extends CachedAncillaryDatum with JPAPersistentObject {
@@ -139,6 +147,13 @@ class CachedAncillaryDatumImpl extends CachedAncillaryDatum with JPAPersistentOb
     nullable = true
   )
   override var altitude: Float = _
+
+  @Expose(serialize = true)
+  @Column(
+    name = "light_transmission",
+    nullable = true
+  )
+  override var lightTransmission: Float = _
 }
 
 object CachedAncillaryDatumImpl {

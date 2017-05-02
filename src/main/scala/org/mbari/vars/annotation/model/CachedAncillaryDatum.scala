@@ -33,6 +33,9 @@ trait CachedAncillaryDatum extends PersistentObject {
   var oxygenMlL: Float
   var pressureDbar: Float
 
+  // --- Transmissometer
+  var lightTransmission: Float
+
   // -- Camera Pose
   // Camera coordinate system
   var x: Double

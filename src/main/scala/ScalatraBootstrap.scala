@@ -37,6 +37,7 @@ class ScalatraBootstrap extends LifeCycle {
     implicit val executionContext = ExecutionContext.global
 
     val daoFactory: BasicDAOFactory = JPADAOFactory.asInstanceOf[BasicDAOFactory]
+    val ancillaryDatumController = new CachedAncillaryDatumController(daoFactory)
     val annotationController = new AnnotationController(daoFactory)
     val associationController = new AssociationController(daoFactory)
     val imageController = new ImageController(daoFactory)
@@ -45,6 +46,7 @@ class ScalatraBootstrap extends LifeCycle {
     val observationController = new ObservationController(daoFactory)
     val videoReferenceController = new CachedVideoReferenceInfoController(daoFactory)
 
+    val ancillaryDatumV1Api = new CachedAncillaryDatumV1Api(ancillaryDatumController)
     val annotationV1Api = new AnnotationV1Api(annotationController)
     val associationV1Api = new AssociationV1Api(associationController)
     val authorizationV1Api = new AuthorizationV1Api
@@ -54,6 +56,7 @@ class ScalatraBootstrap extends LifeCycle {
     val observationV1Api = new ObservationV1Api(observationController)
     val videoReferenceV1Api = new CachedVideoReferenceInfoV1Api(videoReferenceController)
 
+    context.mount(ancillaryDatumV1Api, "/v1/ancillarydata")
     context.mount(annotationV1Api, "/v1/annotations")
     context.mount(associationV1Api, "/v1/associations")
     context.mount(authorizationV1Api, "/v1/auth")
