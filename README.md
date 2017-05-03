@@ -42,7 +42,7 @@ This project is built using [SBT](http://www.scala-sbt.org/). To build a distrib
 
 To take it for a quick spin using an in-memory (i.e. temporary) database, you do _not_ need to clone or build the project. Instead, install [Docker](https://www.docker.com/) and run the following:
 
-`docker run --name=annosaurus -p 8080:8080 hohonuuli/annosaurus`
+`docker run --name=annosaurus -p 8080:8080 mbari/annosaurus`
 
 You can shut it down using:
 

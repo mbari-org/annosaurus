@@ -9,7 +9,7 @@ TimeoutStartSec=2
 Restart=always
 ExecStartPre=-/usr/bin/docker stop annosaurus
 ExecStartPre=-/usr/bin/docker rm annosaurus
-ExecStart=/usr/bin/docker run --name=annosaurus -p 8100:8080  hohonuuli/annosaurus
+ExecStart=/usr/bin/docker run --name=annosaurus -p 8100:8080  mbari/annosaurus
 ExecStop=-/usr/bin/docker stop annosaurus
 
 [Install]

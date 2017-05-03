@@ -19,15 +19,15 @@ Build and deploy an new docker image. __Substitute your docker username for _hoh
 
 ```
 sbt pack
-docker build -t hohonuuli/annosaurus .
+docker build -t mbari/annosaurus .
 docker login --username=hohonuuli
-docker push hohonuuli/annosaurus
+docker push mbari/annosaurus
 ```
 
 ## On Deployment Machine
 
 ```
-docker pull hohonuuli/annosaurus
+docker pull mbari/annosaurus
 sudo /usr/bin/systemctl restart docker.annosaurus
 ```
 
