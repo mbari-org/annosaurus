@@ -33,6 +33,8 @@ trait ObservationDAO[T <: Observation] extends DAO[T] {
 
   def countByConcept(name: String): Int
 
+  def countByVideoReferenceUUID(uuid: UUID): Int
+
   def updateConcept(oldName: String, newName: String): Int
 
 }

@@ -32,6 +32,10 @@ import org.mbari.vars.annotation.model.{ Association, ImagedMoment, Observation 
     query = "SELECT DISTINCT concept FROM imaged_moments LEFT JOIN observations ON observations.imaged_moment_uuid = imaged_moments.uuid WHERE imaged_moments.video_reference_uuid = ?1 ORDER BY concept"
   ),
   new NamedNativeQuery(
+    name = "Observation.countByVideoReferenceUUID",
+    query = "SELECT COUNT(*) FROM imaged_moments LEFT JOIN observations ON observations.imaged_moment_uuid = imaged_moments.uuid WHERE imaged_moments.video_reference_uuid = ?1"
+  ),
+  new NamedNativeQuery(
     name = "Observation.countByConcept",
     query = "SELECT COUNT(*) FROM observations WHERE concept = ?1"
   ),

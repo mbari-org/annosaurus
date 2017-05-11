@@ -71,6 +71,12 @@ class ObservationV1Api(controller: ObservationController)(implicit val swagger: 
       .map(n => s"""{"concept":"$concept", "count":"$n"}""")
   }
 
+  get("/videoreference/count/:uuid") {
+    val uuid = params.getAs[UUID]("uuid").getOrElse(halt(BadRequest("Please provide a video-reference 'uuid'")))
+    controller.countByVideoReferenceUUID(uuid)
+      .map(n => s"""{"video_reference_uuid": "count":"$n"}""")
+  }
+
   put("/concept/rename") {
     val oldConcept = params.get("old").getOrElse(halt(BadRequest("Please provide the concept being replaced")))
     val newConcept = params.get("new").getOrElse(halt(BadRequest("Please provide the replacement concept")))
