@@ -74,7 +74,7 @@ class ObservationV1Api(controller: ObservationController)(implicit val swagger: 
   get("/videoreference/count/:uuid") {
     val uuid = params.getAs[UUID]("uuid").getOrElse(halt(BadRequest("Please provide a video-reference 'uuid'")))
     controller.countByVideoReferenceUUID(uuid)
-      .map(n => s"""{"video_reference_uuid": "count":"$n"}""")
+      .map(n => s"""{"video_reference_uuid": "${uuid}", "count":"$n"}""")
   }
 
   put("/concept/rename") {
