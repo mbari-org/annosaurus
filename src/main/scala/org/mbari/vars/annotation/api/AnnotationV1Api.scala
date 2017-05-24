@@ -86,7 +86,7 @@ class AnnotationV1Api(controller: AnnotationController)(implicit val swagger: Sw
     validateRequest() // Apply API security
     val uuid = params.getAs[UUID]("uuid").getOrElse(halt(BadRequest(
       body = "{}",
-      reason = "A 'uuid' parameter is required"
+      reason = "An observation 'uuid' parameter is required"
     )))
     val videoReferenceUUID = params.getAs[UUID]("video_reference_uuid")
     val concept = params.get("concept")
