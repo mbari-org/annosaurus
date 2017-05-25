@@ -52,6 +52,17 @@ class AnnotationV1Api(controller: AnnotationController)(implicit val swagger: Sw
       .map(toJson)
   }
 
+  get("/imagereference/:uuid") {
+    val uuid = params.getAs[UUID]("uuid").getOrElse(halt(BadRequest(
+      body = "{}",
+      reason = "A image reference 'uuid' parameter is required"
+    )))
+    controller.findByImageReferenceUUID(uuid)
+      .map(_.asJava)
+      .map(toJson)
+
+  }
+
   post("/") {
     validateRequest() // Apply API security
     val videoReferenceUUID = params.getAs[UUID]("video_reference_uuid").getOrElse(halt(BadRequest(

@@ -26,6 +26,7 @@ trait ImagedMomentDAO[T <: ImagedMoment] extends DAO[T] {
   def findByVideoReferenceUUID(uuid: UUID, limit: Option[Int] = None, offset: Option[Int] = None): Iterable[T]
 
   def findWithImageReferences(videoReferenceUUID: UUID): Iterable[T]
+  def findByImageReferenceUUID(imageReferenceUUID: UUID): Option[T]
 
   def findByVideoReferenceUUIDAndTimecode(uuid: UUID, timecode: Timecode): Option[T]
   def findByVideoReferenceUUIDAndRecordedDate(uuid: UUID, recordedDate: Instant): Option[T]

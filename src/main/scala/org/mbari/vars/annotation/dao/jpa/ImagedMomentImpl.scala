@@ -67,6 +67,10 @@ import scala.collection.JavaConverters._
   new NamedQuery(
     name = "ImagedMoment.deleteByVideoReferenceUUID",
     query = "DELETE FROM ImagedMoment i WHERE i.videoReferenceUUID = :uuid"
+  ),
+  new NamedQuery(
+    name = "ImagedMoment.findByImageReferenceUUID",
+    query = "SELECT i FROM ImagedMoment i LEFT JOIN i.javaImageReferences r WHERE r.uuid = :uuid"
   )
 ))
 class ImagedMomentImpl extends ImagedMoment with JPAPersistentObject {

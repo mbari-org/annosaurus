@@ -49,6 +49,9 @@ class ImagedMomentDAOImpl(entityManager: EntityManager)
   override def findWithImageReferences(videoReferenceUUID: UUID): Iterable[ImagedMomentImpl] =
     findByNamedQuery("ImagedMoment.findWithImageReferences", Map("uuid" -> videoReferenceUUID))
 
+  override def findByImageReferenceUUID(imageReferenceUUID: UUID): Option[ImagedMomentImpl] =
+    findByNamedQuery("ImagedMoment.findByImageReferenceUUID", Map("uuid" -> imageReferenceUUID)).headOption
+
   override def findByUUID(primaryKey: UUID): Option[ImagedMomentImpl] =
     findByNamedQuery("ImagedMoment.findByUUID", Map("uuid" -> primaryKey)).headOption
 

@@ -47,6 +47,18 @@ class AnnotationController(daoFactory: BasicDAOFactory) {
 
   }
 
+  def findByImageReferenceUUID(imageReferenceUUID: UUID)(implicit ec: ExecutionContext): Future[Iterable[Annotation]] = {
+
+    val imDao = daoFactory.newImagedMomentDAO()
+    val f = imDao.runTransaction(d => d.findByImageReferenceUUID(imageReferenceUUID))
+    f.onComplete(t => imDao.close())
+    f.map({
+      case None => Nil
+      case Some(im) => im.observations
+    })
+      .map(obs => obs.map(Annotation(_)))
+  }
+
   def create(
     videoReferenceUUID: UUID,
     concept: String,
