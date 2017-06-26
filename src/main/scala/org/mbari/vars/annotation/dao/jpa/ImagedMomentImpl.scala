@@ -1,13 +1,13 @@
 package org.mbari.vars.annotation.dao.jpa
 
-import java.time.{Duration, Instant}
+import java.time.{ Duration, Instant }
 import java.util.UUID
-import javax.persistence.{Convert, Index, _}
-import java.util.{ArrayList => JArrayList, List => JList}
+import javax.persistence.{ Convert, Index, _ }
+import java.util.{ ArrayList => JArrayList, List => JList }
 
-import com.google.gson.annotations.{Expose, SerializedName}
+import com.google.gson.annotations.{ Expose, SerializedName }
 import org.mbari.vars.annotation.Constants
-import org.mbari.vars.annotation.model.{CachedAncillaryDatum, ImageReference, ImagedMoment, Observation}
+import org.mbari.vars.annotation.model.{ CachedAncillaryDatum, ImageReference, ImagedMoment, Observation }
 import org.mbari.vcr4j.time.Timecode
 
 import scala.beans.BeanProperty
