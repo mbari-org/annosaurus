@@ -32,7 +32,7 @@ class ImageV1Api(controller: ImageController)(implicit val swagger: Swagger, val
       reason = "A 'uuid' parameter is required"
     )))
     controller.findByUUID(uuid).map({
-      case None => halt(NotFound(reason = s"an Image with an image_reference_uuid of $uuid was not found"))
+      case None => halt(NotFound(body = "{}", reason = s"an Image with an image_reference_uuid of $uuid was not found"))
       case Some(v) => toJson(v)
     })
   }

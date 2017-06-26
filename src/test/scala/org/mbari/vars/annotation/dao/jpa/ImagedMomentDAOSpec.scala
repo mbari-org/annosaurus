@@ -61,12 +61,12 @@ class ImagedMomentDAOSpec extends FlatSpec with Matchers with BeforeAndAfterAll 
   }
 
   it should "findByVideoReferenceUUIDAndElapsedTime" in {
-    val im = run(_.findByVideoReferenceUUIDAndElapsedTime(imagedMoment0.uuid, imagedMoment0.elapsedTime))
+    val im = run(_.findByVideoReferenceUUIDAndElapsedTime(imagedMoment0.videoReferenceUUID, imagedMoment0.elapsedTime))
     im shouldBe defined
   }
 
   it should "findByVideoReferenceUUIDAndRecordedDate" in {
-    val im = run(_.findByVideoReferenceUUIDAndRecordedDate(imagedMoment0.uuid, imagedMoment0.recordedDate))
+    val im = run(_.findByVideoReferenceUUIDAndRecordedDate(imagedMoment0.videoReferenceUUID, imagedMoment0.recordedDate))
     im shouldBe defined
   }
 
@@ -80,6 +80,7 @@ class ImagedMomentDAOSpec extends FlatSpec with Matchers with BeforeAndAfterAll 
   it should "findAll" in {
     run(_.create(imagedMoment1))
     val all = run(_.findAll())
+    println(all)
     all.size should be >= 2
   }
 

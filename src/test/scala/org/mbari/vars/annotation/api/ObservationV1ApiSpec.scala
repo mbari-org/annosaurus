@@ -111,18 +111,18 @@ class ObservationV1ApiSpec extends WebApiStack {
     // --- find all names
     get(s"$path/concepts") {
       status should be(200)
-      val concepts = gson.fromJson(body, classOf[StringArray])
-      concepts.values should contain theSameElementsAs Array("squid", "submarine", "rocketship")
+      println(body)
+      val concepts = gson.fromJson(body, classOf[Array[String]])
+      concepts should contain theSameElementsAs Array("squid", "submarine", "rocketship")
     }
   }
 
   it should "find all names for a video reference" in {
     get(s"$path/concepts/${observation.imagedMoment.videoReferenceUUID}") {
       status should be(200)
-      val concepts = gson.fromJson(body, classOf[StringArray])
+      val concepts = gson.fromJson(body, classOf[Array[String]])
       println(body)
-      println(concepts.values.getClass)
-      concepts.values should contain theSameElementsAs Array("submarine", "rocketship")
+      concepts should contain theSameElementsAs Array("submarine", "rocketship")
     }
   }
 
