@@ -72,6 +72,18 @@ class AssociationV1Api(controller: AssociationController)(implicit val swagger: 
     })
   }
 
+  put("/bulk") {
+    validateRequest()
+    request.getHeader("Content-Type") match {
+      case "application/json" =>
+        val associations = fromJson(request.body, classOf[Array[Association]])
+        controller.bulkUpdate(associations)
+            .map(assos => toJson(assos.asJava))
+      case _ =>
+        halt(BadRequest("Puts to /bulk only accept JSON body (i.e. Content-Type: application/json"))
+    }
+  }
+
   post("/delete") {
     validateRequest()
     request.getHeader("Content-Type") match {
