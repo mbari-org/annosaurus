@@ -127,4 +127,8 @@ class AssociationV1ApiSpec extends WebApiStack {
     }
   }
 
+  it should "bulk delete" in {
+    // TODO implement bulk delete spec
+  }
+
 }

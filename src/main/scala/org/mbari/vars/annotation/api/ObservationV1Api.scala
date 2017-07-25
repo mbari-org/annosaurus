@@ -122,7 +122,6 @@ class ObservationV1Api(controller: ObservationController)(implicit val swagger: 
     request.getHeader("Content-Type") match {
       case "application/json" =>
         val uuids = fromJson(request.body, classOf[Array[UUID]])
-        println(uuids)
         if (uuids == null || uuids.isEmpty) halt(BadRequest("No observation UUIDs were provided as JSON"))
         controller.bulkDelete(uuids)
       case _ =>

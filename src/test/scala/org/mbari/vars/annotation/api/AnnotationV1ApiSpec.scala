@@ -163,11 +163,11 @@ class AnnotationV1ApiSpec extends WebApiStack {
           .fromJson(body, classOf[Array[Annotation]])
           .toSeq
       updatedAnnotations.size should be (5)
+      //println(body)
       for (a <- updatedAnnotations) {
         a.videoReferenceUuid should be (uuid2)
         a.observer should be ("carolina")
       }
-      println(body)
     }
   }
 

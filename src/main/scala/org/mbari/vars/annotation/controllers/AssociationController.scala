@@ -72,6 +72,25 @@ class AssociationController(val daoFactory: BasicDAOFactory)
     exec(fn)
   }
 
+  def bulkUpdate(associations: Iterable[Association])(implicit ec: ExecutionContext): Future[Iterable[Association]] = {
+    def fn(dao: ADAO): Iterable[Association] = associations.flatMap(a0 => {
+        dao.findByUUID(a0.uuid)
+          .map(a1 => {
+            a1.linkName = a0.linkName
+            a1.toConcept = a0.toConcept
+            a1.linkValue = a0.linkValue
+            a1.mimeType = a0.mimeType
+            a1
+          })
+      })
+    exec(fn)
+  }
+
+  def bulkDelete(uuids: Iterable[UUID])(implicit ec: ExecutionContext): Future[Unit] = {
+    def fn(dao: ADAO): Unit = uuids.foreach(uuid => dao.deleteByUUID(uuid))
+    exec(fn)
+  }
+
   def findByLinkName(linkName: String)(implicit ec: ExecutionContext): Future[Iterable[Association]] = {
     def fn(dao: ADAO): Iterable[Association] = dao.findByLinkName(linkName)
     exec(fn)

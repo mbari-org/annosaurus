@@ -1,12 +1,12 @@
 package org.mbari.vars.annotation.api
 
-import java.time.{Duration, Instant}
+import java.time.{ Duration, Instant }
 import java.util.UUID
 
 import org.mbari.vars.annotation.controllers.AnnotationController
 import org.mbari.vars.annotation.model.simple.Annotation
 import org.mbari.vcr4j.time.Timecode
-import org.scalatra.{BadRequest, NotFound}
+import org.scalatra.{ BadRequest, NotFound }
 import org.scalatra.swagger.Swagger
 
 import scala.concurrent.ExecutionContext
@@ -93,7 +93,6 @@ class AnnotationV1Api(controller: AnnotationController)(implicit val swagger: Sw
       .map(toJson) // Convert to JSON
 
   }
-
 
   post("/bulk") {
     validateRequest()

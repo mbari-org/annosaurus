@@ -1,15 +1,15 @@
 package org.mbari.vars.annotation.controllers
 
-import java.time.{Duration, Instant}
+import java.time.{ Duration, Instant }
 import java.util.UUID
 
 import org.mbari.vars.annotation.Constants
-import org.mbari.vars.annotation.dao.{DAO, ImagedMomentDAO, ObservationDAO}
-import org.mbari.vars.annotation.model.{ImageReference, ImagedMoment, Observation}
+import org.mbari.vars.annotation.dao.{ DAO, ImagedMomentDAO, ObservationDAO }
+import org.mbari.vars.annotation.model.{ ImageReference, ImagedMoment, Observation }
 import org.mbari.vars.annotation.model.simple.Annotation
 import org.mbari.vcr4j.time.Timecode
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.{ ExecutionContext, Future }
 
 /**
  *
@@ -79,8 +79,7 @@ class AnnotationController(daoFactory: BasicDAOFactory) {
     f.map(Annotation(_))
   }
 
-  def bulkCreate(annotations: Iterable[Annotation])
-                (implicit ec: ExecutionContext): Future[Seq[Annotation]] = {
+  def bulkCreate(annotations: Iterable[Annotation])(implicit ec: ExecutionContext): Future[Seq[Annotation]] = {
     val obsDao = daoFactory.newObservationDAO()
     val f = obsDao.runTransaction(d => annotations.map(a => create(d, a)))
     f.onComplete(_ => obsDao.close())
@@ -90,11 +89,13 @@ class AnnotationController(daoFactory: BasicDAOFactory) {
   private def create(dao: DAO[_], annotation: Annotation): Observation = {
     val imDao = daoFactory.newImagedMomentDAO(dao)
     val obsDao = daoFactory.newObservationDAO(dao)
-    val imagedMoment = ImagedMomentController.findImagedMoment(imDao,
+    val imagedMoment = ImagedMomentController.findImagedMoment(
+      imDao,
       annotation.videoReferenceUuid,
       Option(annotation.timecode),
       Option(annotation.recordedTimestamp),
-      Option(annotation.elapsedTime))
+      Option(annotation.elapsedTime)
+    )
     val observation = obsDao.newPersistentObject()
     observation.concept = annotation.concept
     observation.observer = annotation.observer
@@ -129,12 +130,12 @@ class AnnotationController(daoFactory: BasicDAOFactory) {
     f
   }
 
-  def bulkUpdate(annotations: Iterable[Annotation])
-                (implicit ec: ExecutionContext): Future[Iterable[Annotation]] = {
+  def bulkUpdate(annotations: Iterable[Annotation])(implicit ec: ExecutionContext): Future[Iterable[Annotation]] = {
     val dao = daoFactory.newObservationDAO()
     val f = dao.runTransaction(d => {
       annotations.flatMap(a => {
-        _update(d,
+        _update(
+          d,
           a.observationUuid,
           Some(a.videoReferenceUuid),
           Some(a.concept),
@@ -154,34 +155,36 @@ class AnnotationController(daoFactory: BasicDAOFactory) {
   }
 
   /**
-    * This private method is meant to be wrapped in a transaction, either for a
-    * single update or for bulk updates
-    * @param dao
-    * @param uuid
-    * @param videoReferenceUUID
-    * @param concept
-    * @param observer
-    * @param observationDate
-    * @param timecode
-    * @param elapsedTime
-    * @param recordedDate
-    * @param duration
-    * @param group
-    * @param activity
-    * @return
-    */
-  private def _update(dao: DAO[_],
-                     uuid: UUID,
-                     videoReferenceUUID: Option[UUID] = None,
-                     concept: Option[String] = None,
-                     observer: Option[String] = None,
-                     observationDate: Instant = Instant.now(),
-                     timecode: Option[Timecode] = None,
-                     elapsedTime: Option[Duration] = None,
-                     recordedDate: Option[Instant] = None,
-                     duration: Option[Duration] = None,
-                     group: Option[String] = None,
-                     activity: Option[String] = None): Option[Annotation] = {
+   * This private method is meant to be wrapped in a transaction, either for a
+   * single update or for bulk updates
+   * @param dao
+   * @param uuid
+   * @param videoReferenceUUID
+   * @param concept
+   * @param observer
+   * @param observationDate
+   * @param timecode
+   * @param elapsedTime
+   * @param recordedDate
+   * @param duration
+   * @param group
+   * @param activity
+   * @return
+   */
+  private def _update(
+    dao: DAO[_],
+    uuid: UUID,
+    videoReferenceUUID: Option[UUID] = None,
+    concept: Option[String] = None,
+    observer: Option[String] = None,
+    observationDate: Instant = Instant.now(),
+    timecode: Option[Timecode] = None,
+    elapsedTime: Option[Duration] = None,
+    recordedDate: Option[Instant] = None,
+    duration: Option[Duration] = None,
+    group: Option[String] = None,
+    activity: Option[String] = None
+  ): Option[Annotation] = {
     val obsDao = daoFactory.newObservationDAO(dao)
     val imDao = daoFactory.newImagedMomentDAO()
     val observation = obsDao.findByUUID(uuid)
@@ -210,7 +213,6 @@ class AnnotationController(daoFactory: BasicDAOFactory) {
       Annotation(obs)
     })
   }
-
 
   def delete(uuid: UUID)(implicit ec: ExecutionContext): Future[Boolean] = {
     val imDao = daoFactory.newImagedMomentDAO()

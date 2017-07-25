@@ -72,6 +72,18 @@ class AssociationV1Api(controller: AssociationController)(implicit val swagger: 
     })
   }
 
+  post("/delete") {
+    validateRequest()
+    request.getHeader("Content-Type") match {
+      case "application/json" =>
+        val uuids = fromJson(request.body, classOf[Array[UUID]])
+        if (uuids == null || uuids.isEmpty) halt(BadRequest("No observation UUIDs were provided as JSON"))
+          controller.bulkDelete(uuids)
+        case _ =>
+          halt(BadRequest("bulk delete only accepts JSON (Content-Type: application/json)"))
+      }
+  }
+
   delete("/:uuid") {
     validateRequest() // Apply API security
     val uuid = params.getAs[UUID]("uuid").getOrElse(halt(BadRequest("Please provide the 'uuid' of the association")))
