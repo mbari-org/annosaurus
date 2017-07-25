@@ -105,10 +105,28 @@ class ObservationV1Api(controller: ObservationController)(implicit val swagger: 
   }
 
   delete("/:uuid") {
+    validateRequest() // Apply API security
     val uuid = params.getAs[UUID]("uuid").getOrElse(halt(BadRequest("Please provide a UUID")))
     controller.delete(uuid).map({
       case true => halt(NoContent(reason = s"Success! Deleted observation with UUID of $uuid"))
       case false => halt(NotFound(reason = s"Failed. No observation with UUID of $uuid was found."))
     })
+  }
+
+  /*
+     DELETE spec says ignore the request body. So to where the body contains an
+     array of UUID's, we'll use a post methods instead.
+   */
+  post("/delete") {
+    validateRequest() // Apply API security
+    request.getHeader("Content-Type") match {
+      case "application/json" =>
+        val uuids = fromJson(request.body, classOf[Array[UUID]])
+        println(uuids)
+        if (uuids == null || uuids.isEmpty) halt(BadRequest("No observation UUIDs were provided as JSON"))
+        controller.bulkDelete(uuids)
+      case _ =>
+        halt(BadRequest("bulk delete only accepts JSON (Content-Type: application/json)"))
+    }
   }
 }

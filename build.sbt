@@ -24,8 +24,8 @@ val vcr4jVersion = "3.0.1"
 lazy val buildSettings = Seq(
   organization := "org.mbari.vars",
   version := "0.1.0-SNAPSHOT",
-  scalaVersion := "2.12.1",
-  crossScalaVersions := Seq("2.12.1")
+  scalaVersion := "2.12.2",
+  crossScalaVersions := Seq("2.12.2")
 )
 
 lazy val consoleSettings = Seq(
@@ -56,7 +56,6 @@ lazy val optionSettings = Seq(
     "-language:higherKinds",
     "-language:implicitConversions",
     "-unchecked",
-    "-Xfatal-warnings",
     "-Xlint",
     "-Yno-adapted-args",
     "-Xfuture"),

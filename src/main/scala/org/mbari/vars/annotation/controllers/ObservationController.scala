@@ -114,21 +114,13 @@ class ObservationController(val daoFactory: BasicDAOFactory)
    * @return
    */
   override def delete(uuid: UUID)(implicit ec: ExecutionContext): Future[Boolean] = {
-    def fn(dao: ODAO): Boolean = {
-      dao.findByUUID(uuid) match {
-        case None => false
-        case Some(observation) =>
-          val imagedMoment = observation.imagedMoment
-          // If this is the only observation and there are no imagerefs, delete the imagemoment
-          if (imagedMoment.observations.size == 1 && imagedMoment.imageReferences.isEmpty) {
-            val imDao = daoFactory.newImagedMomentDAO(dao)
-            imDao.delete(imagedMoment)
-          } else {
-            dao.delete(observation)
-          }
-          true
-      }
-    }
+    def fn(dao: ODAO) = deleteFunction(dao, uuid)
+    exec(fn)
+  }
+
+  def bulkDelete(uuids: Iterable[UUID])(implicit ec: ExecutionContext): Future[Boolean] = {
+    def fn(dao: ODAO): Boolean =
+      uuids.map(deleteFunction(dao, _)).toSeq.forall(b => b)
     exec(fn)
   }
 
@@ -145,6 +137,22 @@ class ObservationController(val daoFactory: BasicDAOFactory)
   def updateConcept(oldConcept: String, newConcept: String)(implicit ec: ExecutionContext): Future[Int] = {
     def fn(dao: ODAO): Int = dao.updateConcept(oldConcept, newConcept)
     exec(fn)
+  }
+
+  private def deleteFunction(dao: ODAO, uuid: UUID): Boolean = {
+    dao.findByUUID(uuid) match {
+      case None => false
+      case Some(observation) =>
+        val imagedMoment = observation.imagedMoment
+        // If this is the only observation and there are no imagerefs, delete the imagemoment
+        if (imagedMoment.observations.size == 1 && imagedMoment.imageReferences.isEmpty) {
+          val imDao = daoFactory.newImagedMomentDAO(dao)
+          imDao.delete(imagedMoment)
+        } else {
+          dao.delete(observation)
+        }
+        true
+    }
   }
 
 }

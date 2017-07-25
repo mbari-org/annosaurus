@@ -1,11 +1,12 @@
 package org.mbari.vars.annotation.api
 
-import java.time.{ Duration, Instant }
+import java.time.{Duration, Instant}
 import java.util.UUID
 
 import org.mbari.vars.annotation.controllers.AnnotationController
+import org.mbari.vars.annotation.model.simple.Annotation
 import org.mbari.vcr4j.time.Timecode
-import org.scalatra.{ BadRequest, NotFound }
+import org.scalatra.{BadRequest, NotFound}
 import org.scalatra.swagger.Swagger
 
 import scala.concurrent.ExecutionContext
@@ -84,13 +85,25 @@ class AnnotationV1Api(controller: AnnotationController)(implicit val swagger: Sw
     val activity = params.get("activity")
 
     if (timecode.isEmpty && elapsedTime.isEmpty && recordedDate.isEmpty) {
-      halt(BadRequest.apply("One or more of the following indicies into the video are required: timecode, elapsed_time_millis, recorded_date"))
+      halt(BadRequest.apply("One or more of the following indices into the video are required: timecode, elapsed_time_millis, recorded_date"))
     }
 
     controller.create(videoReferenceUUID, concept, observer, observationDate, timecode,
       elapsedTime, recordedDate, duration, group, activity)
       .map(toJson) // Convert to JSON
 
+  }
+
+
+  post("/bulk") {
+    validateRequest()
+    request.getHeader("Content-Type") match {
+      case "application/json" =>
+        val annotations = fromJson(request.body, classOf[Array[Annotation]])
+        controller.bulkCreate(annotations)
+      case _ =>
+        halt(BadRequest("Posts to /bulk only accept JSON body (i.e. Content-Type: application/json)"))
+    }
   }
 
   put("/:uuid") {
@@ -118,6 +131,17 @@ class AnnotationV1Api(controller: AnnotationController)(implicit val swagger: Sw
         case Some(ann) => toJson(ann)
       }) // Convert to JSON
 
+  }
+
+  put("/bulk") {
+    validateRequest()
+    request.getHeader("Content-Type") match {
+      case "application/json" =>
+        val annotations = fromJson(request.body, classOf[Array[Annotation]])
+        controller.bulkUpdate(annotations)
+      case _ =>
+        halt(BadRequest("Puts to /bulk only accept JSON body (i.e. Content-Type: application/json)"))
+    }
   }
 
 }

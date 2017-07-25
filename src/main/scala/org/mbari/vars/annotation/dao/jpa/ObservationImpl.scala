@@ -84,11 +84,11 @@ class ObservationImpl extends Observation with JPAPersistentObject {
   @SerializedName(value = "observation_timestamp")
   @Column(
     name = "observation_timestamp",
-    nullable = true
+    nullable = false
   )
   @Temporal(value = TemporalType.TIMESTAMP)
   @Convert(converter = classOf[InstantConverter])
-  override var observationDate: Instant = _
+  override var observationDate: Instant = Instant.now()
 
   @Expose(serialize = true)
   @Column(

@@ -88,4 +88,5 @@ class ObservationDAOImpl(entityManager: EntityManager)
     query.setParameter(2, oldConcept)
     query.executeUpdate()
   }
+
 }

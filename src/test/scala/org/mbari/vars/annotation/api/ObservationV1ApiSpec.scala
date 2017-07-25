@@ -1,16 +1,19 @@
 package org.mbari.vars.annotation.api
 
-import java.time.{ Duration, Instant }
+import java.nio.charset.{Charset, StandardCharsets}
+import java.time.{Duration, Instant}
 import java.util.UUID
 import java.util.concurrent.TimeUnit
 
 import org.mbari.vars.annotation.Constants
 import org.mbari.vars.annotation.controllers.ObservationController
-import org.mbari.vars.annotation.dao.jpa.{ AssociationImpl, ImagedMomentImpl, ObservationImpl }
-import org.mbari.vars.annotation.model.{ Observation, StringArray, ValueArray }
+import org.mbari.vars.annotation.dao.jpa.{AssociationImpl, ImagedMomentImpl, ObservationImpl}
+import org.mbari.vars.annotation.model.simple.Annotation
+import org.mbari.vars.annotation.model.Observation
 
+import scala.collection.JavaConverters._
 import scala.concurrent.Await
-import scala.concurrent.duration.{ Duration => SDuration }
+import scala.concurrent.duration.{Duration => SDuration}
 
 /**
  *
@@ -54,6 +57,9 @@ class ObservationV1ApiSpec extends WebApiStack {
       obs.observer should be("brian")
       obs.group should be("ROV")
       obs.activity should be("transect")
+      obs.lastUpdated should not be empty
+      //obs.observationDate should not be (null)
+
     }
   }
 
@@ -145,6 +151,35 @@ class ObservationV1ApiSpec extends WebApiStack {
   it should "delete" in {
     delete(s"$path/${observation.uuid}") {
       status should be(204)
+    }
+  }
+
+  it should "bulk delete" in {
+    val dao = daoFactory.newObservationDAO()
+    val imagedMoment = ImagedMomentImpl(Some(UUID.randomUUID()), Some(Instant.now()))
+    val obs0 = ObservationImpl("rocketship", observer = Some("brian"), group = Some("ROV"),
+      activity = Some("transect"))
+    val obs1 = ObservationImpl("giant dragon", observer = Some("brian"), group = Some("AUV"),
+      activity = Some("transect"))
+    imagedMoment.addObservation(obs0)
+    imagedMoment.addObservation(obs1)
+    val f = dao.runTransaction(d => {
+      d.create(obs0)
+      d.create(obs1)
+    })
+    f.onComplete(t => dao.close())
+    Await.result(f, timeout)
+
+    val annos = Seq(obs0, obs1).map(Annotation(_))
+        .map(_.observationUuid)
+        .asJava
+    val json = Constants.GSON_FOR_ANNOTATION
+      .toJson(annos)
+      .getBytes(StandardCharsets.UTF_8)
+    post(s"$path/delete",
+      body = json,
+      headers = Map("Content-Type" -> "application/json")) {
+      status should be (200)
     }
   }
 

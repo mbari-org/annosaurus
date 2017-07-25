@@ -32,7 +32,7 @@ class ScalatraBootstrap extends LifeCycle {
 
   override def init(context: ServletContext): Unit = {
 
-    println("STARTING UP NOW")
+    log.info("STARTING UP NOW")
 
     implicit val executionContext = ExecutionContext.global
 

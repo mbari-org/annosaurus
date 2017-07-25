@@ -95,5 +95,30 @@ object Annotation {
     a
   }
 
+  def apply(videoReferenceUUID: UUID,
+            concept: String,
+            observer: String,
+            observationDate: Instant = Instant.now(),
+            timecode: Option[Timecode] = None,
+            elapsedTime: Option[Duration] = None,
+            recordedDate: Option[Instant] = None,
+            duration: Option[Duration] = None,
+            group: Option[String] = None,
+            activity: Option[String] = None): Annotation = {
+
+    val annotation = new Annotation
+    annotation.videoReferenceUuid = videoReferenceUUID
+    annotation.concept = concept
+    annotation.observer = observer
+    annotation.observationTimestamp = observationDate
+    timecode.foreach(annotation.timecode = _)
+    elapsedTime.foreach(annotation.elapsedTime = _)
+    recordedDate.foreach(annotation.recordedTimestamp = _)
+    duration.foreach(annotation.duration = _)
+    group.foreach(annotation.group = _)
+    activity.foreach(annotation.activity = _)
+    annotation
+  }
+
 }
 

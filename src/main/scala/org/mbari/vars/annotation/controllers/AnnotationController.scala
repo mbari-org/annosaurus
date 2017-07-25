@@ -1,15 +1,15 @@
 package org.mbari.vars.annotation.controllers
 
-import java.time.{ Duration, Instant }
+import java.time.{Duration, Instant}
 import java.util.UUID
 
 import org.mbari.vars.annotation.Constants
-import org.mbari.vars.annotation.dao.{ ImagedMomentDAO, ObservationDAO }
-import org.mbari.vars.annotation.model.{ ImageReference, ImagedMoment, Observation }
+import org.mbari.vars.annotation.dao.{DAO, ImagedMomentDAO, ObservationDAO}
+import org.mbari.vars.annotation.model.{ImageReference, ImagedMoment, Observation}
 import org.mbari.vars.annotation.model.simple.Annotation
 import org.mbari.vcr4j.time.Timecode
 
-import scala.concurrent.{ ExecutionContext, Future }
+import scala.concurrent.{ExecutionContext, Future}
 
 /**
  *
@@ -22,7 +22,7 @@ class AnnotationController(daoFactory: BasicDAOFactory) {
   def findByUUID(uuid: UUID)(implicit ec: ExecutionContext): Future[Option[Annotation]] = {
     val obsDao = daoFactory.newObservationDAO()
     val f = obsDao.runTransaction(d => obsDao.findByUUID(uuid))
-    f.onComplete(t => obsDao.close())
+    f.onComplete(_ => obsDao.close())
     f.map(_.map(Annotation(_)))
   }
 
@@ -71,27 +71,40 @@ class AnnotationController(daoFactory: BasicDAOFactory) {
     group: Option[String] = None,
     activity: Option[String] = None
   )(implicit ec: ExecutionContext): Future[Annotation] = {
-
-    val imDao = daoFactory.newImagedMomentDAO()
-    val obsDao = daoFactory.newObservationDAO(imDao)
-
-    val f = obsDao.runTransaction(d => {
-      val imagedMoment = ImagedMomentController.findImagedMoment(imDao, videoReferenceUUID, timecode,
-        recordedDate, elapsedTime)
-      val observation = obsDao.newPersistentObject()
-      observation.concept = concept
-      observation.observer = observer
-      observation.observationDate = observationDate
-      duration.foreach(observation.duration = _)
-      group.foreach(observation.group = _)
-      activity.foreach(observation.activity = _)
-      obsDao.create(observation)
-      imagedMoment.addObservation(observation)
-      observation
-    })
-
-    f.onComplete(t => imDao.close())
+    val obsDao = daoFactory.newObservationDAO()
+    val annotation = Annotation(videoReferenceUUID, concept, observer,
+      observationDate, timecode, elapsedTime, recordedDate, duration, group, activity)
+    val f = obsDao.runTransaction(d => create(d, annotation))
+    f.onComplete(_ => obsDao.close())
     f.map(Annotation(_))
+  }
+
+  def bulkCreate(annotations: Iterable[Annotation])
+                (implicit ec: ExecutionContext): Future[Seq[Annotation]] = {
+    val obsDao = daoFactory.newObservationDAO()
+    val f = obsDao.runTransaction(d => annotations.map(a => create(d, a)))
+    f.onComplete(_ => obsDao.close())
+    f.map(obsList => obsList.map(Annotation(_)).toSeq)
+  }
+
+  private def create(dao: DAO[_], annotation: Annotation): Observation = {
+    val imDao = daoFactory.newImagedMomentDAO(dao)
+    val obsDao = daoFactory.newObservationDAO(dao)
+    val imagedMoment = ImagedMomentController.findImagedMoment(imDao,
+      annotation.videoReferenceUuid,
+      Option(annotation.timecode),
+      Option(annotation.recordedTimestamp),
+      Option(annotation.elapsedTime))
+    val observation = obsDao.newPersistentObject()
+    observation.concept = annotation.concept
+    observation.observer = annotation.observer
+    observation.observationDate = annotation.observationTimestamp
+    Option(annotation.duration).foreach(observation.duration = _)
+    Option(annotation.group).foreach(observation.group = _)
+    Option(annotation.activity).foreach(observation.activity = _)
+    obsDao.create(observation)
+    imagedMoment.addObservation(observation)
+    observation
   }
 
   def update(
@@ -108,42 +121,96 @@ class AnnotationController(daoFactory: BasicDAOFactory) {
     activity: Option[String] = None
   )(implicit ec: ExecutionContext): Future[Option[Annotation]] = {
 
-    val imDao = daoFactory.newImagedMomentDAO()
-    val obsDao = daoFactory.newObservationDAO(imDao)
+    val dao = daoFactory.newObservationDAO()
+    val f = dao.runTransaction(d => _update(dao, uuid, videoReferenceUUID, concept,
+      observer, observationDate, timecode, elapsedTime, recordedDate, duration,
+      group, activity))
+    f.onComplete(_ => dao.close())
+    f
+  }
 
-    // --- 1. Does uuid exist?
-
-    val f = obsDao.runTransaction(d => {
-      val observation = obsDao.findByUUID(uuid)
-
-      observation.map(obs => {
-        val vrUUID = videoReferenceUUID.getOrElse(obs.imagedMoment.videoReferenceUUID)
-        // --- 2. Move annotation
-        if (timecode.isDefined || elapsedTime.isDefined || recordedDate.isDefined) {
-          // Find existing
-          val newIm = ImagedMomentController.findImagedMoment(imDao, vrUUID, timecode, recordedDate, elapsedTime)
-          move(imDao, newIm, obs)
-        } else if (videoReferenceUUID.isDefined) {
-          // move to new video-reference/imaged-moment using the existing images
-          val tc = Option(obs.imagedMoment.timecode)
-          val rd = Option(obs.imagedMoment.recordedDate)
-          val et = Option(obs.imagedMoment.elapsedTime)
-          val newIm = ImagedMomentController.findImagedMoment(imDao, vrUUID, tc, rd, et)
-          move(imDao, newIm, obs)
-        }
-
-        concept.foreach(obs.concept = _)
-        observer.foreach(obs.observer = _)
-        duration.foreach(obs.duration = _)
-        group.foreach(obs.group = _)
-        activity.foreach(obs.activity = _)
-        obs.observationDate = observationDate
-        obs
+  def bulkUpdate(annotations: Iterable[Annotation])
+                (implicit ec: ExecutionContext): Future[Iterable[Annotation]] = {
+    val dao = daoFactory.newObservationDAO()
+    val f = dao.runTransaction(d => {
+      annotations.flatMap(a => {
+        _update(d,
+          a.observationUuid,
+          Some(a.videoReferenceUuid),
+          Some(a.concept),
+          Some(a.observer),
+          a.observationTimestamp,
+          Option(a.timecode),
+          Option(a.elapsedTime),
+          Option(a.recordedTimestamp),
+          Option(a.duration),
+          Option(a.group),
+          Option(a.activity)
+        )
       })
     })
-    f.onComplete(t => imDao.close())
-    f.map(opt => opt.map(Annotation(_)))
+    f.onComplete(_ => dao.close())
+    f
   }
+
+  /**
+    * This private method is meant to be wrapped in a transaction, either for a
+    * single update or for bulk updates
+    * @param dao
+    * @param uuid
+    * @param videoReferenceUUID
+    * @param concept
+    * @param observer
+    * @param observationDate
+    * @param timecode
+    * @param elapsedTime
+    * @param recordedDate
+    * @param duration
+    * @param group
+    * @param activity
+    * @return
+    */
+  private def _update(dao: DAO[_],
+                     uuid: UUID,
+                     videoReferenceUUID: Option[UUID] = None,
+                     concept: Option[String] = None,
+                     observer: Option[String] = None,
+                     observationDate: Instant = Instant.now(),
+                     timecode: Option[Timecode] = None,
+                     elapsedTime: Option[Duration] = None,
+                     recordedDate: Option[Instant] = None,
+                     duration: Option[Duration] = None,
+                     group: Option[String] = None,
+                     activity: Option[String] = None): Option[Annotation] = {
+    val obsDao = daoFactory.newObservationDAO(dao)
+    val imDao = daoFactory.newImagedMomentDAO()
+    val observation = obsDao.findByUUID(uuid)
+    observation.map(obs => {
+      val vrUUID = videoReferenceUUID.getOrElse(obs.imagedMoment.videoReferenceUUID)
+      // --- 2. Move annotation
+      if (timecode.isDefined || elapsedTime.isDefined || recordedDate.isDefined) {
+        // Find existing
+        val newIm = ImagedMomentController.findImagedMoment(imDao, vrUUID, timecode, recordedDate, elapsedTime)
+        move(imDao, newIm, obs)
+      } else if (videoReferenceUUID.isDefined) {
+        // move to new video-reference/imaged-moment using the existing images
+        val tc = Option(obs.imagedMoment.timecode)
+        val rd = Option(obs.imagedMoment.recordedDate)
+        val et = Option(obs.imagedMoment.elapsedTime)
+        val newIm = ImagedMomentController.findImagedMoment(imDao, vrUUID, tc, rd, et)
+        move(imDao, newIm, obs)
+      }
+
+      concept.foreach(obs.concept = _)
+      observer.foreach(obs.observer = _)
+      duration.foreach(obs.duration = _)
+      group.foreach(obs.group = _)
+      activity.foreach(obs.activity = _)
+      obs.observationDate = observationDate
+      Annotation(obs)
+    })
+  }
+
 
   def delete(uuid: UUID)(implicit ec: ExecutionContext): Future[Boolean] = {
     val imDao = daoFactory.newImagedMomentDAO()
@@ -161,7 +228,7 @@ class AnnotationController(daoFactory: BasicDAOFactory) {
           true
       }
     })
-    f.onComplete(t => obsDao.close())
+    f.onComplete(_ => obsDao.close())
     f
   }
 
