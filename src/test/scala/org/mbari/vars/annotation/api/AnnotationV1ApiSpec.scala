@@ -1,12 +1,16 @@
 package org.mbari.vars.annotation.api
 
-import java.time.{ Duration, Instant }
+import java.nio.charset.StandardCharsets
+import java.time.{Duration, Instant}
 import java.util
-import java.util.{ UUID, List => JList }
+import java.util.{UUID, List => JList}
 
 import org.mbari.vars.annotation.Constants
-import org.mbari.vars.annotation.controllers.{ AnnotationController, BasicDAOFactory, ImagedMomentController }
+import org.mbari.vars.annotation.controllers.{AnnotationController, BasicDAOFactory, ImagedMomentController}
 import org.mbari.vars.annotation.model.simple.Annotation
+import org.mbari.vcr4j.time.Timecode
+
+import scala.collection.JavaConverters._
 
 /**
  *
@@ -115,6 +119,56 @@ class AnnotationV1ApiSpec extends WebApiStack {
         a.timecode should be(null)
         a.duration should be(Duration.ofMillis(2500))
       }
+  }
+
+  // Set up for bulk methods
+  val uuid0 = UUID.randomUUID()
+  val uuid1 = UUID.randomUUID()
+  val recordedDate = Some(Instant.now())
+  val elapsedTime = Some(Duration.ofSeconds(123))
+  val annotations = Seq(
+    Annotation(uuid0, "Nanomia bijuga", "brian", recordedDate = recordedDate),
+    Annotation(uuid0, "bony-eared assfish", "brian", recordedDate = recordedDate),
+    Annotation(uuid1, "Pandalus platyceros", "schlin", elapsedTime = elapsedTime),
+    Annotation(uuid1, "Peobius", "stephalopod", elapsedTime = elapsedTime, timecode = Some(new Timecode("00:02:34:29", 29.97))),
+    Annotation(uuid1, "Peobius", "stephalopod", timecode = Some(new Timecode("00:02:34:29", 29.97)))
+  )
+  var persistedAnnotations: Seq[Annotation] = _
+
+  it should "bulk create" in {
+    val json = Constants.GSON_FOR_ANNOTATION.toJson(annotations.asJava)
+    post("/v1/annotations/bulk",
+      headers = Map("Content-Type" -> "application/json"),
+      body = json.getBytes(StandardCharsets.UTF_8)) {
+      status should be (200)
+      persistedAnnotations = Constants.GSON_FOR_ANNOTATION
+        .fromJson(body, classOf[Array[Annotation]])
+        .toSeq
+      persistedAnnotations.size should be (5)
+    }
+  }
+
+  it should "bulk update" in {
+    val uuid2 = UUID.randomUUID()
+    persistedAnnotations.foreach(a => {
+      a.videoReferenceUuid = uuid2
+      a.observer = "carolina"
+    })
+    val json = Constants.GSON_FOR_ANNOTATION.toJson(persistedAnnotations.asJava)
+    put("/v1/annotations/bulk",
+      headers = Map("Content-Type" -> "application/json"),
+      body = json.getBytes(StandardCharsets.UTF_8)) {
+        status should be (200)
+      val updatedAnnotations = Constants.GSON_FOR_ANNOTATION
+          .fromJson(body, classOf[Array[Annotation]])
+          .toSeq
+      updatedAnnotations.size should be (5)
+      for (a <- updatedAnnotations) {
+        a.videoReferenceUuid should be (uuid2)
+        a.observer should be ("carolina")
+      }
+      println(body)
+    }
   }
 
 }

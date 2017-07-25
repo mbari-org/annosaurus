@@ -101,6 +101,7 @@ class AnnotationV1Api(controller: AnnotationController)(implicit val swagger: Sw
       case "application/json" =>
         val annotations = fromJson(request.body, classOf[Array[Annotation]])
         controller.bulkCreate(annotations)
+          .map(annos => toJson(annos.asJava))
       case _ =>
         halt(BadRequest("Posts to /bulk only accept JSON body (i.e. Content-Type: application/json)"))
     }
@@ -139,6 +140,7 @@ class AnnotationV1Api(controller: AnnotationController)(implicit val swagger: Sw
       case "application/json" =>
         val annotations = fromJson(request.body, classOf[Array[Annotation]])
         controller.bulkUpdate(annotations)
+          .map(annos => toJson(annos.asJava))
       case _ =>
         halt(BadRequest("Puts to /bulk only accept JSON body (i.e. Content-Type: application/json)"))
     }

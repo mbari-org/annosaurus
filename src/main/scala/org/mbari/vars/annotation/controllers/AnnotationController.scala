@@ -234,12 +234,9 @@ class AnnotationController(daoFactory: BasicDAOFactory) {
 
   private def move(dao: ImagedMomentDAO[ImagedMoment], newIm: ImagedMoment, observation: Observation): Unit = {
     val oldIm = observation.imagedMoment
-    val shouldDelete =
-      oldIm.removeObservation(observation)
     newIm.addObservation(observation)
     if (oldIm.isEmpty) {
       dao.delete(oldIm)
     }
   }
-
 }
