@@ -78,7 +78,7 @@ class AssociationV1Api(controller: AssociationController)(implicit val swagger: 
       case "application/json" =>
         val associations = fromJson(request.body, classOf[Array[Association]])
         controller.bulkUpdate(associations)
-            .map(assos => toJson(assos.asJava))
+          .map(assos => toJson(assos.asJava))
       case _ =>
         halt(BadRequest("Puts to /bulk only accept JSON body (i.e. Content-Type: application/json"))
     }
@@ -90,10 +90,10 @@ class AssociationV1Api(controller: AssociationController)(implicit val swagger: 
       case "application/json" =>
         val uuids = fromJson(request.body, classOf[Array[UUID]])
         if (uuids == null || uuids.isEmpty) halt(BadRequest("No observation UUIDs were provided as JSON"))
-          controller.bulkDelete(uuids)
-        case _ =>
-          halt(BadRequest("bulk delete only accepts JSON (Content-Type: application/json)"))
-      }
+        controller.bulkDelete(uuids)
+      case _ =>
+        halt(BadRequest("bulk delete only accepts JSON (Content-Type: application/json)"))
+    }
   }
 
   delete("/:uuid") {

@@ -74,15 +74,15 @@ class AssociationController(val daoFactory: BasicDAOFactory)
 
   def bulkUpdate(associations: Iterable[Association])(implicit ec: ExecutionContext): Future[Iterable[Association]] = {
     def fn(dao: ADAO): Iterable[Association] = associations.flatMap(a0 => {
-        dao.findByUUID(a0.uuid)
-          .map(a1 => {
-            a1.linkName = a0.linkName
-            a1.toConcept = a0.toConcept
-            a1.linkValue = a0.linkValue
-            a1.mimeType = a0.mimeType
-            a1
-          })
-      })
+      dao.findByUUID(a0.uuid)
+        .map(a1 => {
+          a1.linkName = a0.linkName
+          a1.toConcept = a0.toConcept
+          a1.linkValue = a0.linkValue
+          a1.mimeType = a0.mimeType
+          a1
+        })
+    })
     exec(fn)
   }
 
