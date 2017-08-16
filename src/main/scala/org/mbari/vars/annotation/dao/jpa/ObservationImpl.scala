@@ -42,6 +42,10 @@ import org.mbari.vars.annotation.model.{ Association, ImagedMoment, Observation 
   new NamedNativeQuery(
     name = "Observation.updateConcept",
     query = "UPDATE observations SET concept = ?1 WHERE concept = ?2"
+  ),
+  new NamedNativeQuery(
+    name = "Observation.updateImagedMomentUUID",
+    query = "UPDATE observations SET imaged_moment_uuid = ?1 WHERE uuid = ?2"
   )
 ))
 @NamedQueries(Array(

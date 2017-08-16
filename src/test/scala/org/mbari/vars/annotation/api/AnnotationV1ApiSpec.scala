@@ -121,6 +121,23 @@ class AnnotationV1ApiSpec extends WebApiStack {
       }
   }
 
+  it should "update with same VideoReferenceUuid" in {
+    put(
+      s"/v1/annotations/${annotation.observationUuid}",
+      "concept" -> "Aegina",
+      "duration_millis" -> "2500",
+      "video_reference_uuid" -> s"${annotation.videoReferenceUuid}"
+    ) {
+      status should be(200)
+      val a = gson.fromJson(body, classOf[Annotation])
+      a.concept should be("Aegina")
+      a.observer should be(annotation.observer)
+      a.elapsedTime should be(annotation.elapsedTime)
+      a.timecode should be(null)
+      a.duration should be(Duration.ofMillis(2500))
+    }
+  }
+
   // Set up for bulk methods
   val uuid0 = UUID.randomUUID()
   val uuid1 = UUID.randomUUID()

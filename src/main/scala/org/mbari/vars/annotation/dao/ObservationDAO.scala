@@ -37,4 +37,6 @@ trait ObservationDAO[T <: Observation] extends DAO[T] {
 
   def updateConcept(oldName: String, newName: String): Int
 
+  def changeImageMoment(imagedMomentUuid: UUID, observationUuid: UUID): Int
+
 }

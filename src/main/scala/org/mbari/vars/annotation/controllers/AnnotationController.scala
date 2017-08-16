@@ -189,18 +189,29 @@ class AnnotationController(daoFactory: BasicDAOFactory) {
     val imDao = daoFactory.newImagedMomentDAO()
     val observation = obsDao.findByUUID(uuid)
     observation.map(obs => {
-      val vrUUID = videoReferenceUUID.getOrElse(obs.imagedMoment.videoReferenceUUID)
-      // --- 2. Move annotation
-      if (timecode.isDefined || elapsedTime.isDefined || recordedDate.isDefined) {
-        // Find existing
-        val newIm = ImagedMomentController.findImagedMoment(imDao, vrUUID, timecode, recordedDate, elapsedTime)
-        move(imDao, newIm, obs)
-      } else if (videoReferenceUUID.isDefined) {
-        // move to new video-reference/imaged-moment using the existing images
+      val vrUUID = obs.imagedMoment.videoReferenceUUID
+
+      val tcChanged = timecode.isDefined &&
+        obs.imagedMoment.timecode != null &&
+        timecode.get != obs.imagedMoment.timecode
+
+      val etChanged = elapsedTime.isDefined &&
+        obs.imagedMoment.elapsedTime != null &&
+        elapsedTime.get != obs.imagedMoment.elapsedTime
+
+      val rdChanged = recordedDate.isDefined &&
+        obs.imagedMoment.recordedDate != null &&
+        recordedDate.get != obs.imagedMoment.recordedDate
+
+      if (videoReferenceUUID.isDefined && videoReferenceUUID.get != vrUUID) {
         val tc = Option(obs.imagedMoment.timecode)
         val rd = Option(obs.imagedMoment.recordedDate)
         val et = Option(obs.imagedMoment.elapsedTime)
         val newIm = ImagedMomentController.findImagedMoment(imDao, vrUUID, tc, rd, et)
+        move(imDao, newIm, obs)
+      }
+      else if (tcChanged || etChanged || rdChanged) {
+        val newIm = ImagedMomentController.findImagedMoment(imDao, vrUUID, timecode, recordedDate, elapsedTime)
         move(imDao, newIm, obs)
       }
 
@@ -236,9 +247,11 @@ class AnnotationController(daoFactory: BasicDAOFactory) {
 
   private def move(dao: ImagedMomentDAO[ImagedMoment], newIm: ImagedMoment, observation: Observation): Unit = {
     val oldIm = observation.imagedMoment
-    newIm.addObservation(observation)
+    // TODO use observationDao.changeImageMoment to change where teh observation is attached.
     if (oldIm.isEmpty) {
-      dao.delete(oldIm)
+      // May need to look up oldIm again and check to see if it's empty before deleting it
+      dao.findByUUID(oldIm.uuid)
+          .foreach(dao.delete)
     }
   }
 }

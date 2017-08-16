@@ -1,13 +1,14 @@
 package org.mbari.vars.annotation.controllers
 
-import java.time.{ Duration, Instant }
+import java.time.{Duration, Instant}
 import java.util.UUID
 
-import org.mbari.vars.annotation.dao.{ ImagedMomentDAO, NotFoundInDatastoreException }
+import org.mbari.vars.annotation.dao.{ImagedMomentDAO, NotFoundInDatastoreException}
 import org.mbari.vars.annotation.model.ImagedMoment
 import org.mbari.vcr4j.time.Timecode
+import org.slf4j.LoggerFactory
 
-import scala.concurrent.{ ExecutionContext, Future }
+import scala.concurrent.{ExecutionContext, Future}
 
 /**
  *
@@ -93,6 +94,8 @@ class ImagedMomentController(val daoFactory: BasicDAOFactory)
 
 object ImagedMomentController {
 
+  private[this] val log = LoggerFactory.getLogger(getClass)
+
   /**
    * This method will find or create (if a matching one is not found in the datastore)
    * @param dao
@@ -113,6 +116,7 @@ object ImagedMomentController {
     dao.findByVideoReferenceUUIDAndIndex(videoReferenceUUID, timecode, elapsedTime, recordedDate) match {
       case Some(imagedMoment) => imagedMoment
       case None =>
+        log.info(s"Creating new imaged moment at timecode = ${timecode.getOrElse("")}, recordedDate = ${recordedDate.getOrElse("")}, elapsedTime = ${elapsedTime.getOrElse("")}")
         val imagedMoment = dao.newPersistentObject(videoReferenceUUID, timecode, elapsedTime, recordedDate)
         dao.create(imagedMoment)
         imagedMoment

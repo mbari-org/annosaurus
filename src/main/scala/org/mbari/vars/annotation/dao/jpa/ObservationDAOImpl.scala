@@ -89,4 +89,11 @@ class ObservationDAOImpl(entityManager: EntityManager)
     query.executeUpdate()
   }
 
+  def changeImageMoment(imagedMomentUuid: UUID, observationUuid: UUID): Int = {
+    val query = entityManager.createNamedQuery("Observation.updateImagedMomentUUID")
+    query.setParameter(1, imagedMomentUuid)
+    query.setParameter(2, observationUuid)
+    query.executeUpdate()
+  }
+
 }
