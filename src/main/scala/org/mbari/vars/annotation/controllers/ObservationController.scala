@@ -88,6 +88,17 @@ class ObservationController(val daoFactory: BasicDAOFactory)
     exec(fn)
   }
 
+  def findAllGroups(implicit ec: ExecutionContext): Future[Iterable[String]] = {
+    def fn(dao: ODAO): Iterable[String] = dao.findAllGroups()
+    exec(fn)
+  }
+
+  def findAllActivities(implicit ec: ExecutionContext): Future[Iterable[String]] = {
+    def fn(dao: ODAO): Iterable[String] = dao.findAllActivities()
+    exec(fn)
+  }
+
+
   def findAllConceptsByVideoReferenceUUID(uuid: UUID)(implicit ec: ExecutionContext): Future[Iterable[String]] = {
     def fn(dao: ODAO): Iterable[String] = dao.findAllConceptsByVideoReferenceUUID(uuid)
     exec(fn)

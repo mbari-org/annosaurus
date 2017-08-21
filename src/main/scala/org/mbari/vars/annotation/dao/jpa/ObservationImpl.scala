@@ -28,8 +28,16 @@ import org.mbari.vars.annotation.model.{ Association, ImagedMoment, Observation 
     query = "SELECT DISTINCT concept FROM observations ORDER BY concept"
   ),
   new NamedNativeQuery(
+    name = "Observation.findAllGroups",
+    query = "SELECT DISTINCT observation_group FROM observations ORDER BY observation_group"
+  ),
+  new NamedNativeQuery(
     name = "Observation.findAllNamesByVideoReferenceUUID",
     query = "SELECT DISTINCT concept FROM imaged_moments LEFT JOIN observations ON observations.imaged_moment_uuid = imaged_moments.uuid WHERE imaged_moments.video_reference_uuid = ?1 ORDER BY concept"
+  ),
+  new NamedNativeQuery(
+    name = "Observation.findAllActivities",
+    query = "SELECT DISTINCT activity FROM observations ORDER BY activity"
   ),
   new NamedNativeQuery(
     name = "Observation.countByVideoReferenceUUID",

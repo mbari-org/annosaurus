@@ -43,6 +43,12 @@ class ObservationV1Api(controller: ObservationController)(implicit val swagger: 
       .map(toJson)
   }
 
+  get("/activities") {
+    controller.findAllActivities
+      .map(_.toArray)
+      .map(toJson)
+  }
+
   get("/association/:uuid") {
     val uuid = params.getAs[UUID]("uuid").getOrElse(halt(BadRequest("Please provide an Association UUID")))
     controller.findByAssociationUUID(uuid)
@@ -69,6 +75,12 @@ class ObservationV1Api(controller: ObservationController)(implicit val swagger: 
     val concept = params.get("concept").getOrElse(halt(BadRequest("Please provide a concept to search for")))
     controller.countByConcept(concept)
       .map(n => s"""{"concept":"$concept", "count":"$n"}""")
+  }
+
+  get("/groups") {
+    controller.findAllGroups
+        .map(_.toArray)
+        .map(toJson)
   }
 
   get("/videoreference/count/:uuid") {

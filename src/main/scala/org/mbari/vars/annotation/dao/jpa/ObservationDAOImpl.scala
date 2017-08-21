@@ -50,6 +50,18 @@ class ObservationDAOImpl(entityManager: EntityManager)
     .filter(_ != null)
     .map(_.toString)
 
+  override def findAllGroups(): Seq[String] = entityManager.createNamedQuery("Observation.findAllGroups")
+    .getResultList
+    .asScala
+    .filter(_ != null)
+    .map(_.toString)
+
+  override def findAllActivities(): Seq[String] = entityManager.createNamedQuery("Observation.findAllActivities")
+    .getResultList
+    .asScala
+    .filter(_ != null)
+    .map(_.toString)
+
   override def findAll(): Iterable[ObservationImpl] =
     findByNamedQuery("Observation.findAll")
 
@@ -89,10 +101,10 @@ class ObservationDAOImpl(entityManager: EntityManager)
     query.executeUpdate()
   }
 
-  def changeImageMoment(imagedMomentUuid: UUID, observationUuid: UUID): Int = {
+  override def changeImageMoment(imagedMomentUuid: UUID, observationUuid: UUID): Int = {
     val query = entityManager.createNamedQuery("Observation.updateImagedMomentUUID")
-    query.setParameter(1, imagedMomentUuid)
-    query.setParameter(2, observationUuid)
+    query.setParameter(1, imagedMomentUuid.toString)
+    query.setParameter(2, observationUuid.toString)
     query.executeUpdate()
   }
 

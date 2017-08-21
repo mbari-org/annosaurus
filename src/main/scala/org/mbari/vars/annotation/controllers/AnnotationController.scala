@@ -1,15 +1,16 @@
 package org.mbari.vars.annotation.controllers
 
-import java.time.{ Duration, Instant }
+import java.time.{Duration, Instant}
 import java.util.UUID
 
 import org.mbari.vars.annotation.Constants
-import org.mbari.vars.annotation.dao.{ DAO, ImagedMomentDAO, ObservationDAO }
-import org.mbari.vars.annotation.model.{ ImageReference, ImagedMoment, Observation }
+import org.mbari.vars.annotation.dao.{DAO, ImagedMomentDAO, ObservationDAO}
+import org.mbari.vars.annotation.model.{ImageReference, ImagedMoment, Observation}
 import org.mbari.vars.annotation.model.simple.Annotation
 import org.mbari.vcr4j.time.Timecode
 
-import scala.concurrent.{ ExecutionContext, Future }
+import scala.concurrent.{ExecutionContext, Future}
+import scala.util.{Failure, Success}
 
 /**
  *
@@ -122,16 +123,32 @@ class AnnotationController(daoFactory: BasicDAOFactory) {
     activity: Option[String] = None
   )(implicit ec: ExecutionContext): Future[Option[Annotation]] = {
 
+    // We have to do this in 2 transactions. The first makes all the changes. The second to
+    // retrieve them. We have to do this because we may make a SQL call to move an observaton
+    // to a new imagedmoment. The enitymanage doesn't see this change and so returns the cached
+    // value which may have the wrong time index or videoreference.
     val dao = daoFactory.newObservationDAO()
-    val f = dao.runTransaction(d => _update(dao, uuid, videoReferenceUUID, concept,
+    val f = dao.runTransaction(d => _update(d, uuid, videoReferenceUUID, concept,
       observer, observationDate, timecode, elapsedTime, recordedDate, duration,
       group, activity))
     f.onComplete(_ => dao.close())
-    f
+
+    val g = f.flatMap(opt => {
+      val dao1 = daoFactory.newObservationDAO()
+      val ff = dao1.runTransaction(d => d.findByUUID(uuid).map(Annotation(_)))
+      ff.onComplete(_ => dao1.close())
+      ff
+    })
+
+    g
   }
 
   def bulkUpdate(annotations: Iterable[Annotation])(implicit ec: ExecutionContext): Future[Iterable[Annotation]] = {
     val dao = daoFactory.newObservationDAO()
+    // We have to do this in 2 transactions. The first makes all the changes. The second to
+    // retrieve them. We have to do this because we may make a SQL call to move an observaton
+    // to a new imagedmoment. The enitymanage doesn't see this change and so returns the cached
+    // value which may have the wrong time index or videoreference.
     val f = dao.runTransaction(d => {
       annotations.flatMap(a => {
         _update(
@@ -151,7 +168,14 @@ class AnnotationController(daoFactory: BasicDAOFactory) {
       })
     })
     f.onComplete(_ => dao.close())
-    f
+    // --- After update find all the changes
+    val g = f.flatMap(obs => {
+      val dao1 = daoFactory.newObservationDAO()
+      val ff = dao1.runTransaction(d => obs.flatMap(o => d.findByUUID(o.uuid).map(Annotation(_))))
+      ff.onComplete(_ => dao1.close())
+      ff
+    })
+    g
   }
 
   /**
@@ -184,9 +208,9 @@ class AnnotationController(daoFactory: BasicDAOFactory) {
     duration: Option[Duration] = None,
     group: Option[String] = None,
     activity: Option[String] = None
-  ): Option[Annotation] = {
+  ): Option[Observation] = {
     val obsDao = daoFactory.newObservationDAO(dao)
-    val imDao = daoFactory.newImagedMomentDAO()
+    val imDao = daoFactory.newImagedMomentDAO(dao)
     val observation = obsDao.findByUUID(uuid)
     observation.map(obs => {
       val vrUUID = obs.imagedMoment.videoReferenceUUID
@@ -208,11 +232,11 @@ class AnnotationController(daoFactory: BasicDAOFactory) {
         val rd = Option(obs.imagedMoment.recordedDate)
         val et = Option(obs.imagedMoment.elapsedTime)
         val newIm = ImagedMomentController.findImagedMoment(imDao, vrUUID, tc, rd, et)
-        move(imDao, newIm, obs)
+        obsDao.changeImageMoment(newIm.uuid, obs.uuid)
       }
       else if (tcChanged || etChanged || rdChanged) {
         val newIm = ImagedMomentController.findImagedMoment(imDao, vrUUID, timecode, recordedDate, elapsedTime)
-        move(imDao, newIm, obs)
+        obsDao.changeImageMoment(newIm.uuid, obs.uuid)
       }
 
       concept.foreach(obs.concept = _)
@@ -221,7 +245,7 @@ class AnnotationController(daoFactory: BasicDAOFactory) {
       group.foreach(obs.group = _)
       activity.foreach(obs.activity = _)
       obs.observationDate = observationDate
-      Annotation(obs)
+      obs
     })
   }
 
@@ -245,13 +269,4 @@ class AnnotationController(daoFactory: BasicDAOFactory) {
     f
   }
 
-  private def move(dao: ImagedMomentDAO[ImagedMoment], newIm: ImagedMoment, observation: Observation): Unit = {
-    val oldIm = observation.imagedMoment
-    // TODO use observationDao.changeImageMoment to change where teh observation is attached.
-    if (oldIm.isEmpty) {
-      // May need to look up oldIm again and check to see if it's empty before deleting it
-      dao.findByUUID(oldIm.uuid)
-          .foreach(dao.delete)
-    }
-  }
 }

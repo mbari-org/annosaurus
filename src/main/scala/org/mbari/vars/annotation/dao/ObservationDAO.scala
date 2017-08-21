@@ -29,6 +29,17 @@ trait ObservationDAO[T <: Observation] extends DAO[T] {
    */
   def findAllConcepts(): Seq[String]
 
+  /**
+    * @return Ordered sequence of all activities used.
+    */
+  def findAllActivities(): Seq[String]
+
+  /**
+    * @return Ordered sequence of all groups used.
+    */
+  def findAllGroups(): Seq[String]
+
+
   def findAllConceptsByVideoReferenceUUID(uuid: UUID): Seq[String]
 
   def countByConcept(name: String): Int
@@ -37,6 +48,12 @@ trait ObservationDAO[T <: Observation] extends DAO[T] {
 
   def updateConcept(oldName: String, newName: String): Int
 
+  /**
+   * Move an observation to a different imaged moment efficeintly
+   * @param imagedMomentUuid The image moment we want to move to
+   * @param observationUuid The observation to move
+   * @return The number of records affected. Should be 1
+   */
   def changeImageMoment(imagedMomentUuid: UUID, observationUuid: UUID): Int
 
 }

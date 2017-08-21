@@ -1,14 +1,14 @@
 package org.mbari.vars.annotation.controllers
 
-import java.time.{Duration, Instant}
+import java.time.{ Duration, Instant }
 import java.util.UUID
 
-import org.mbari.vars.annotation.dao.{ImagedMomentDAO, NotFoundInDatastoreException}
+import org.mbari.vars.annotation.dao.{ ImagedMomentDAO, NotFoundInDatastoreException }
 import org.mbari.vars.annotation.model.ImagedMoment
 import org.mbari.vcr4j.time.Timecode
 import org.slf4j.LoggerFactory
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.{ ExecutionContext, Future }
 
 /**
  *
