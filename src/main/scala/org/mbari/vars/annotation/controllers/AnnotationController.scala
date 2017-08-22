@@ -1,16 +1,16 @@
 package org.mbari.vars.annotation.controllers
 
-import java.time.{Duration, Instant}
+import java.time.{ Duration, Instant }
 import java.util.UUID
 
 import org.mbari.vars.annotation.Constants
-import org.mbari.vars.annotation.dao.{DAO, ImagedMomentDAO, ObservationDAO}
-import org.mbari.vars.annotation.model.{ImageReference, ImagedMoment, Observation}
+import org.mbari.vars.annotation.dao.{ DAO, ImagedMomentDAO, ObservationDAO }
+import org.mbari.vars.annotation.model.{ ImageReference, ImagedMoment, Observation }
 import org.mbari.vars.annotation.model.simple.Annotation
 import org.mbari.vcr4j.time.Timecode
 
-import scala.concurrent.{ExecutionContext, Future}
-import scala.util.{Failure, Success}
+import scala.concurrent.{ ExecutionContext, Future }
+import scala.util.{ Failure, Success }
 
 /**
  *
@@ -233,8 +233,7 @@ class AnnotationController(daoFactory: BasicDAOFactory) {
         val et = Option(obs.imagedMoment.elapsedTime)
         val newIm = ImagedMomentController.findImagedMoment(imDao, vrUUID, tc, rd, et)
         obsDao.changeImageMoment(newIm.uuid, obs.uuid)
-      }
-      else if (tcChanged || etChanged || rdChanged) {
+      } else if (tcChanged || etChanged || rdChanged) {
         val newIm = ImagedMomentController.findImagedMoment(imDao, vrUUID, timecode, recordedDate, elapsedTime)
         obsDao.changeImageMoment(newIm.uuid, obs.uuid)
       }

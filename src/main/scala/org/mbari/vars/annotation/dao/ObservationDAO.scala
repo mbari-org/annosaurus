@@ -30,15 +30,14 @@ trait ObservationDAO[T <: Observation] extends DAO[T] {
   def findAllConcepts(): Seq[String]
 
   /**
-    * @return Ordered sequence of all activities used.
-    */
+   * @return Ordered sequence of all activities used.
+   */
   def findAllActivities(): Seq[String]
 
   /**
-    * @return Ordered sequence of all groups used.
-    */
+   * @return Ordered sequence of all groups used.
+   */
   def findAllGroups(): Seq[String]
-
 
   def findAllConceptsByVideoReferenceUUID(uuid: UUID): Seq[String]
 

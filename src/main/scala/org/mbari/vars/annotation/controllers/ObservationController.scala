@@ -98,7 +98,6 @@ class ObservationController(val daoFactory: BasicDAOFactory)
     exec(fn)
   }
 
-
   def findAllConceptsByVideoReferenceUUID(uuid: UUID)(implicit ec: ExecutionContext): Future[Iterable[String]] = {
     def fn(dao: ODAO): Iterable[String] = dao.findAllConceptsByVideoReferenceUUID(uuid)
     exec(fn)

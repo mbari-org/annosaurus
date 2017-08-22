@@ -79,8 +79,8 @@ class ObservationV1Api(controller: ObservationController)(implicit val swagger: 
 
   get("/groups") {
     controller.findAllGroups
-        .map(_.toArray)
-        .map(toJson)
+      .map(_.toArray)
+      .map(toJson)
   }
 
   get("/videoreference/count/:uuid") {
