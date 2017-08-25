@@ -24,7 +24,7 @@ import org.mbari.vars.annotation.model.{ CachedAncillaryDatum, ImagedMoment }
     query = "SELECT a FROM AncillaryDatum a JOIN a.imagedMoment i WHERE i.uuid = :uuid"
   ),
   new NamedQuery(
-    name = "Association.findByObservationUUID",
+    name = "AncillaryDatum.findByObservationUUID",
     query = "SELECT a FROM AncillaryDatum a INNER JOIN FETCH a.imagedMoment im INNER JOIN FETCH im.javaObservations o WHERE o.uuid = :uuid"
   )
 ))
