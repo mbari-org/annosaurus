@@ -1,6 +1,6 @@
 package org.mbari.vars.annotation.api
 
-import java.net.URL
+import java.net.{ URL, URLEncoder }
 import java.time.{ Duration, Instant }
 import java.util.UUID
 
@@ -75,6 +75,15 @@ class ImageV1ApiSpec extends WebApiStack {
       val im = gson.fromJson(body, classOf[Image])
       im.imagedMomentUuid should be(image.imagedMomentUuid)
       im.url should be(image.url)
+    }
+  }
+
+  it should "find by url" in {
+    val url = URLEncoder.encode(image.url.toExternalForm, "UTF-8")
+    get(s"$path/url/${url}") {
+      status should be(200)
+      val im = gson.fromJson(body, classOf[Image])
+      im.url should be(new URL("http://www.mbari.org/foo.jpg"))
     }
   }
 

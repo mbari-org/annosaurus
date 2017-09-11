@@ -51,13 +51,14 @@ class ImageV1Api(controller: ImageController)(implicit val swagger: Swagger, val
 
   // URL should be encoded e.g. URLEncoder.encode(...)
   get("/url/:url") {
-    val url = params.get("url")
-      .map(URLDecoder.decode(_, "UTF-8"))
-      .map(new URL(_))
-      .getOrElse(halt(BadRequest(
-        body = "{}",
-        reason = "A 'url' parameter is required"
-      )))
+    // val url = params.get("url")
+    //   .map(URLDecoder.decode(_, "UTF-8"))
+    //   .map(new URL(_))
+    //   .getOrElse(halt(BadRequest(
+    //     body = "{}",
+    //     reason = "A 'url' parameter is required"
+    //   )))
+    val url = params.getAs[URL]("url").getOrElse(halt(BadRequest("Please provide a URL")))
     controller.findByURL(url).map({
       case None => halt(NotFound(reason = s"an Image with a URL of $url was not found"))
       case Some(i) => toJson(i)

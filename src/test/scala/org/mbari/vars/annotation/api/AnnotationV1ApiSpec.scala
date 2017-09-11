@@ -1,12 +1,12 @@
 package org.mbari.vars.annotation.api
 
 import java.nio.charset.StandardCharsets
-import java.time.{Duration, Instant}
+import java.time.{ Duration, Instant }
 import java.util
-import java.util.{UUID, List => JList}
+import java.util.{ UUID, List => JList }
 
 import org.mbari.vars.annotation.Constants
-import org.mbari.vars.annotation.controllers.{AnnotationController, BasicDAOFactory, ImagedMomentController}
+import org.mbari.vars.annotation.controllers.{ AnnotationController, BasicDAOFactory, ImagedMomentController }
 import org.mbari.vars.annotation.model.simple.Annotation
 import org.mbari.vcr4j.time.Timecode
 
@@ -128,14 +128,14 @@ class AnnotationV1ApiSpec extends WebApiStack {
       "duration_millis" -> "2500",
       "video_reference_uuid" -> s"${annotation.videoReferenceUuid}"
     ) {
-      status should be(200)
-      val a = gson.fromJson(body, classOf[Annotation])
-      a.concept should be("Aegina")
-      a.observer should be(annotation.observer)
-      a.elapsedTime should be(annotation.elapsedTime)
-      a.timecode should be(null)
-      a.duration should be(Duration.ofMillis(2500))
-    }
+        status should be(200)
+        val a = gson.fromJson(body, classOf[Annotation])
+        a.concept should be("Aegina")
+        a.observer should be(annotation.observer)
+        a.elapsedTime should be(annotation.elapsedTime)
+        a.timecode should be(null)
+        a.duration should be(Duration.ofMillis(2500))
+      }
   }
 
   // Set up for bulk methods
@@ -154,15 +154,17 @@ class AnnotationV1ApiSpec extends WebApiStack {
 
   it should "bulk create" in {
     val json = Constants.GSON_FOR_ANNOTATION.toJson(annotations.asJava)
-    post("/v1/annotations/bulk",
+    post(
+      "/v1/annotations/bulk",
       headers = Map("Content-Type" -> "application/json"),
-      body = json.getBytes(StandardCharsets.UTF_8)) {
-      status should be (200)
-      persistedAnnotations = Constants.GSON_FOR_ANNOTATION
-        .fromJson(body, classOf[Array[Annotation]])
-        .toSeq
-      persistedAnnotations.size should be (5)
-    }
+      body = json.getBytes(StandardCharsets.UTF_8)
+    ) {
+        status should be(200)
+        persistedAnnotations = Constants.GSON_FOR_ANNOTATION
+          .fromJson(body, classOf[Array[Annotation]])
+          .toSeq
+        persistedAnnotations.size should be(5)
+      }
   }
 
   it should "bulk update" in {
@@ -172,20 +174,22 @@ class AnnotationV1ApiSpec extends WebApiStack {
       a.observer = "carolina"
     })
     val json = Constants.GSON_FOR_ANNOTATION.toJson(persistedAnnotations.asJava)
-    put("/v1/annotations/bulk",
+    put(
+      "/v1/annotations/bulk",
       headers = Map("Content-Type" -> "application/json"),
-      body = json.getBytes(StandardCharsets.UTF_8)) {
-        status should be (200)
-      val updatedAnnotations = Constants.GSON_FOR_ANNOTATION
+      body = json.getBytes(StandardCharsets.UTF_8)
+    ) {
+        status should be(200)
+        val updatedAnnotations = Constants.GSON_FOR_ANNOTATION
           .fromJson(body, classOf[Array[Annotation]])
           .toSeq
-      updatedAnnotations.size should be (5)
-      //println(body)
-      for (a <- updatedAnnotations) {
-        a.videoReferenceUuid should be (uuid2)
-        a.observer should be ("carolina")
+        updatedAnnotations.size should be(5)
+        //println(body)
+        for (a <- updatedAnnotations) {
+          a.videoReferenceUuid should be(uuid2)
+          a.observer should be("carolina")
+        }
       }
-    }
   }
 
 }

@@ -1,14 +1,14 @@
 package org.mbari.vars.annotation.controllers
 
-import java.time.{Duration, Instant}
+import java.time.{ Duration, Instant }
 import java.util.UUID
 import java.util.concurrent.TimeUnit
 
 import org.mbari.vars.annotation.dao.jpa.TestDAOFactory
-import org.scalatest.{BeforeAndAfterAll, FlatSpec, Matchers}
+import org.scalatest.{ BeforeAndAfterAll, FlatSpec, Matchers }
 
-import scala.concurrent.{Await, Future}
-import scala.concurrent.duration.{Duration => SDuration}
+import scala.concurrent.{ Await, Future }
+import scala.concurrent.duration.{ Duration => SDuration }
 import scala.concurrent.ExecutionContext.Implicits.global
 
 /**
@@ -62,7 +62,7 @@ class AnnotationControllerSpec extends FlatSpec with Matchers with BeforeAndAfte
     val b = exec(() => controller.update(a.observationUuid, Some(a.videoReferenceUuid),
       concept = Some("Nanomia bijuga")))
     b should not be (empty)
-    b.get.concept should be ("Nanomia bijuga")
+    b.get.concept should be("Nanomia bijuga")
   }
 
   it should "create and update with different elapsed times" in {
@@ -76,20 +76,24 @@ class AnnotationControllerSpec extends FlatSpec with Matchers with BeforeAndAfte
     ))
     a.concept should be("Grimpoteuthis")
     a.observer should be("brian")
-    a.elapsedTime should be (et0)
+    a.elapsedTime should be(et0)
 
-    val b = exec(() => controller.update(a.observationUuid,
+    val b = exec(() => controller.update(
+      a.observationUuid,
       Some(a.videoReferenceUuid),
       concept = Some("Nanomia bijuga"),
-      elapsedTime = Some(et1)))
+      elapsedTime = Some(et1)
+    ))
     b should not be (empty)
-    b.get.concept should be ("Nanomia bijuga")
-    b.get.elapsedTime should be (et1)
+    b.get.concept should be("Nanomia bijuga")
+    b.get.elapsedTime should be(et1)
 
-    val c = exec(() => controller.update(a.observationUuid,
-      elapsedTime = Some(et0)))
+    val c = exec(() => controller.update(
+      a.observationUuid,
+      elapsedTime = Some(et0)
+    ))
     c should not be (empty)
-    c.get.elapsedTime should be (et0)
+    c.get.elapsedTime should be(et0)
   }
 
   protected override def afterAll(): Unit = {

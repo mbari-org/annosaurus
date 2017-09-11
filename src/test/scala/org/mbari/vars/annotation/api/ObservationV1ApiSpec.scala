@@ -1,19 +1,19 @@
 package org.mbari.vars.annotation.api
 
-import java.nio.charset.{Charset, StandardCharsets}
-import java.time.{Duration, Instant}
+import java.nio.charset.{ Charset, StandardCharsets }
+import java.time.{ Duration, Instant }
 import java.util.UUID
 import java.util.concurrent.TimeUnit
 
 import org.mbari.vars.annotation.Constants
 import org.mbari.vars.annotation.controllers.ObservationController
-import org.mbari.vars.annotation.dao.jpa.{AssociationImpl, ImagedMomentImpl, ObservationImpl}
+import org.mbari.vars.annotation.dao.jpa.{ AssociationImpl, ImagedMomentImpl, ObservationImpl }
 import org.mbari.vars.annotation.model.simple.Annotation
 import org.mbari.vars.annotation.model.Observation
 
 import scala.collection.JavaConverters._
 import scala.concurrent.Await
-import scala.concurrent.duration.{Duration => SDuration}
+import scala.concurrent.duration.{ Duration => SDuration }
 
 /**
  *
@@ -171,16 +171,18 @@ class ObservationV1ApiSpec extends WebApiStack {
     Await.result(f, timeout)
 
     val annos = Seq(obs0, obs1).map(Annotation(_))
-        .map(_.observationUuid)
-        .asJava
+      .map(_.observationUuid)
+      .asJava
     val json = Constants.GSON_FOR_ANNOTATION
       .toJson(annos)
       .getBytes(StandardCharsets.UTF_8)
-    post(s"$path/delete",
+    post(
+      s"$path/delete",
       body = json,
-      headers = Map("Content-Type" -> "application/json")) {
-      status should be (200)
-    }
+      headers = Map("Content-Type" -> "application/json")
+    ) {
+        status should be(200)
+      }
   }
 
 }
