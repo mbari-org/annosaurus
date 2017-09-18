@@ -228,10 +228,12 @@ class AnnotationController(daoFactory: BasicDAOFactory) {
         recordedDate.get != obs.imagedMoment.recordedDate
 
       if (videoReferenceUUID.isDefined && videoReferenceUUID.get != vrUUID) {
+        val newVr = videoReferenceUUID.get
+        // TODO use paramsif defined otherwise use existing values
         val tc = Option(obs.imagedMoment.timecode)
         val rd = Option(obs.imagedMoment.recordedDate)
         val et = Option(obs.imagedMoment.elapsedTime)
-        val newIm = ImagedMomentController.findImagedMoment(imDao, vrUUID, tc, rd, et)
+        val newIm = ImagedMomentController.findImagedMoment(imDao, newVr, tc, rd, et)
         obsDao.changeImageMoment(newIm.uuid, obs.uuid)
       } else if (tcChanged || etChanged || rdChanged) {
         val newIm = ImagedMomentController.findImagedMoment(imDao, vrUUID, timecode, recordedDate, elapsedTime)
