@@ -213,30 +213,25 @@ class AnnotationController(daoFactory: BasicDAOFactory) {
     val imDao = daoFactory.newImagedMomentDAO(dao)
     val observation = obsDao.findByUUID(uuid)
     observation.map(obs => {
-      val vrUUID = obs.imagedMoment.videoReferenceUUID
+
+      val vrChanged = videoReferenceUUID.isDefined &&
+        videoReferenceUUID.get != obs.imagedMoment.videoReferenceUUID
 
       val tcChanged = timecode.isDefined &&
-        obs.imagedMoment.timecode != null &&
         timecode.get != obs.imagedMoment.timecode
 
       val etChanged = elapsedTime.isDefined &&
-        obs.imagedMoment.elapsedTime != null &&
         elapsedTime.get != obs.imagedMoment.elapsedTime
 
       val rdChanged = recordedDate.isDefined &&
-        obs.imagedMoment.recordedDate != null &&
         recordedDate.get != obs.imagedMoment.recordedDate
 
-      if (videoReferenceUUID.isDefined && videoReferenceUUID.get != vrUUID) {
-        val newVr = videoReferenceUUID.get
-        // TODO use paramsif defined otherwise use existing values
-        val tc = Option(obs.imagedMoment.timecode)
-        val rd = Option(obs.imagedMoment.recordedDate)
-        val et = Option(obs.imagedMoment.elapsedTime)
-        val newIm = ImagedMomentController.findImagedMoment(imDao, newVr, tc, rd, et)
-        obsDao.changeImageMoment(newIm.uuid, obs.uuid)
-      } else if (tcChanged || etChanged || rdChanged) {
-        val newIm = ImagedMomentController.findImagedMoment(imDao, vrUUID, timecode, recordedDate, elapsedTime)
+      if (vrChanged || tcChanged || etChanged || rdChanged) {
+        val vrUUID = videoReferenceUUID.getOrElse(obs.imagedMoment.videoReferenceUUID)
+        val tc = Option(timecode.getOrElse(obs.imagedMoment.timecode))
+        val rd = Option(recordedDate.getOrElse(obs.imagedMoment.recordedDate))
+        val et = Option(elapsedTime.getOrElse(obs.imagedMoment.elapsedTime))
+        val newIm = ImagedMomentController.findImagedMoment(imDao, vrUUID, tc, rd, et)
         obsDao.changeImageMoment(newIm.uuid, obs.uuid)
       }
 
