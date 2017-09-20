@@ -119,7 +119,7 @@ class AnnotationController(daoFactory: BasicDAOFactory) {
       observation.addAssociation(newA)
     })
 
-    // TODO add imagereferences
+    // Add imagereferences
     annotation.imageReferences.foreach(i => {
       irDao.findByURL(i.url) match {
         case Some(v) => // Do nothing. It should already be attached to the imagedmoment
