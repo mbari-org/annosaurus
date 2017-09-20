@@ -1,10 +1,11 @@
 package org.mbari.vars.annotation.dao.jpa
 
 import java.net.URL
+import java.sql.Timestamp
 import javax.persistence._
 
-import com.google.gson.annotations.{ Expose, SerializedName }
-import org.mbari.vars.annotation.model.{ ImageReference, ImagedMoment }
+import com.google.gson.annotations.{Expose, SerializedName}
+import org.mbari.vars.annotation.model.{ImageReference, ImagedMoment}
 
 /**
  *
@@ -96,5 +97,20 @@ object ImageReferenceImpl {
     format.foreach(i.format = _)
     description.foreach(i.description = _)
     i
+  }
+
+  def apply(ir: ImageReference): ImageReferenceImpl = ir match {
+    case v: ImageReferenceImpl => v
+    case v: _ =>
+      val i = new ImageReferenceImpl
+      i.description = v.description
+      i.format = v.format
+      i.height = v.height
+      i.url = v.url
+      i.width = v.width
+      i.imagedMoment = ImagedMomentImpl(v.imagedMoment)
+      i.uuid = v.uuid
+      v.lastUpdated.foreach(t => i.lastUpdatedTime = new Timestamp(t.getEpochSecond))
+      i
   }
 }

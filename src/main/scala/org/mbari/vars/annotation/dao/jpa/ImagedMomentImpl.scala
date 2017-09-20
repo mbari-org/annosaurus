@@ -1,16 +1,16 @@
 package org.mbari.vars.annotation.dao.jpa
 
-import java.time.{ Duration, Instant }
+import java.sql.Timestamp
+import java.time.{Duration, Instant}
 import java.util.UUID
-import javax.persistence.{ Convert, Index, _ }
-import java.util.{ ArrayList => JArrayList, List => JList }
+import javax.persistence.{Convert, Index, _}
+import java.util.{ArrayList => JArrayList, List => JList}
 
-import com.google.gson.annotations.{ Expose, SerializedName }
+import com.google.gson.annotations.{Expose, SerializedName}
 import org.mbari.vars.annotation.Constants
-import org.mbari.vars.annotation.model.{ CachedAncillaryDatum, ImageReference, ImagedMoment, Observation }
+import org.mbari.vars.annotation.model.{CachedAncillaryDatum, ImageReference, ImagedMoment, Observation}
 import org.mbari.vcr4j.time.Timecode
 
-import scala.beans.BeanProperty
 import scala.collection.JavaConverters._
 
 /**
@@ -191,6 +191,24 @@ object ImagedMomentImpl {
     timecode.foreach(im.timecode = _)
     elapsedTime.foreach(im.elapsedTime = _)
     im
+  }
+
+  def apply(im: ImagedMoment): ImagedMomentImpl = im match {
+    case v: ImagedMomentImpl => v
+    case v: _ =>
+      val i = new ImagedMomentImpl
+      i.elapsedTime = v.elapsedTime
+      i.recordedDate = v.recordedDate
+      i.timecode = v.timecode
+      v.observations.map(o => ObservationImpl(o))
+          .foreach(o => i.addObservation(o))
+      v.imageReferences.map(ir => ImageReferenceImpl(ir))
+          .foreach(ir => i.addImageReference(ir))
+      i.ancillaryDatum = CachedAncillaryDatumImpl(v.ancillaryDatum)
+      i.videoReferenceUUID = v.videoReferenceUUID
+      i.uuid = v.uuid
+      v.lastUpdated.foreach(t => i.lastUpdatedTime = new Timestamp(t.getEpochSecond))
+      i
   }
 
 }

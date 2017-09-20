@@ -1,12 +1,12 @@
 package org.mbari.vars.annotation.api
 
-import java.time.{ Duration, Instant }
+import java.time.{Duration, Instant}
 import java.util.UUID
 
 import org.mbari.vars.annotation.controllers.AnnotationController
-import org.mbari.vars.annotation.model.simple.Annotation
+import org.mbari.vars.annotation.dao.jpa.AnnotationImpl
 import org.mbari.vcr4j.time.Timecode
-import org.scalatra.{ BadRequest, NotFound }
+import org.scalatra.{BadRequest, NotFound}
 import org.scalatra.swagger.Swagger
 
 import scala.concurrent.ExecutionContext
@@ -98,7 +98,7 @@ class AnnotationV1Api(controller: AnnotationController)(implicit val swagger: Sw
     validateRequest()
     request.getHeader("Content-Type") match {
       case "application/json" =>
-        val annotations = fromJson(request.body, classOf[Array[Annotation]])
+        val annotations = fromJson(request.body, classOf[Array[AnnotationImpl]])
         controller.bulkCreate(annotations)
           .map(annos => toJson(annos.asJava))
       case _ =>
@@ -137,7 +137,7 @@ class AnnotationV1Api(controller: AnnotationController)(implicit val swagger: Sw
     validateRequest()
     request.getHeader("Content-Type") match {
       case "application/json" =>
-        val annotations = fromJson(request.body, classOf[Array[Annotation]])
+        val annotations = fromJson(request.body, classOf[Array[AnnotationImpl]])
         controller.bulkUpdate(annotations)
           .map(annos => toJson(annos.asJava))
       case _ =>

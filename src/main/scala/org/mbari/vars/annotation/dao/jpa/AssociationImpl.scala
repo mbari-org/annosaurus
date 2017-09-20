@@ -1,9 +1,10 @@
 package org.mbari.vars.annotation.dao.jpa
 
-import javax.persistence.{ Index, NamedQuery, _ }
+import java.sql.Timestamp
+import javax.persistence.{Index, NamedQuery, _}
 
 import com.google.gson.annotations.Expose
-import org.mbari.vars.annotation.model.{ Association, Observation }
+import org.mbari.vars.annotation.model.{Association, Observation}
 
 /**
  *
@@ -106,6 +107,15 @@ object AssociationImpl {
     a
   }
 
+  def apply(linkName: String, toConcept: String, linkValue: String, mimetype: String): AssociationImpl = {
+    val a = new AssociationImpl
+    a.linkName = linkName
+    a.toConcept = toConcept
+    a.linkValue = linkValue
+    a.mimeType = mimetype
+    a
+  }
+
   def apply(
     linkName: String,
     toConcept: Option[String] = None,
@@ -115,6 +125,15 @@ object AssociationImpl {
     a.linkName = linkName
     toConcept.foreach(a.toConcept = _)
     linkValue.foreach(a.linkValue = _)
+  }
+
+  def apply(a: Association): AssociationImpl = a match {
+    case v: AssociationImpl => v
+    case v:_ =>
+      val ass = apply(v.linkName, v.toConcept, v.linkValue, v.mimeType)
+      ass.uuid = v.uuid
+      v.lastUpdated.foreach(t => ass.lastUpdatedTime = new Timestamp(t.getEpochSecond))
+      ass
   }
 
 }

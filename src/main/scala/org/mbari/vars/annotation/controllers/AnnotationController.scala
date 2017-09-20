@@ -1,16 +1,16 @@
 package org.mbari.vars.annotation.controllers
 
-import java.time.{ Duration, Instant }
+import java.time.{Duration, Instant}
 import java.util.UUID
 
 import org.mbari.vars.annotation.Constants
-import org.mbari.vars.annotation.dao.{ DAO, ImagedMomentDAO, ObservationDAO }
-import org.mbari.vars.annotation.model.{ ImageReference, ImagedMoment, Observation }
-import org.mbari.vars.annotation.model.simple.Annotation
+import org.mbari.vars.annotation.dao.jpa.AnnotationImpl
+import org.mbari.vars.annotation.dao.{DAO, ImagedMomentDAO, ObservationDAO}
+import org.mbari.vars.annotation.model.{ImageReference, ImagedMoment, Observation}
 import org.mbari.vcr4j.time.Timecode
 
-import scala.concurrent.{ ExecutionContext, Future }
-import scala.util.{ Failure, Success }
+import scala.concurrent.{ExecutionContext, Future}
+import scala.util.{Failure, Success}
 
 /**
  *
@@ -20,11 +20,11 @@ import scala.util.{ Failure, Success }
  */
 class AnnotationController(daoFactory: BasicDAOFactory) {
 
-  def findByUUID(uuid: UUID)(implicit ec: ExecutionContext): Future[Option[Annotation]] = {
+  def findByUUID(uuid: UUID)(implicit ec: ExecutionContext): Future[Option[AnnotationImpl]] = {
     val obsDao = daoFactory.newObservationDAO()
     val f = obsDao.runTransaction(d => obsDao.findByUUID(uuid))
     f.onComplete(_ => obsDao.close())
-    f.map(_.map(Annotation(_)))
+    f.map(_.map(AnnotationImpl(_)))
   }
 
   /*
@@ -38,17 +38,17 @@ class AnnotationController(daoFactory: BasicDAOFactory) {
     videoReferenceUUID: UUID,
     limit: Option[Int] = None,
     offset: Option[Int] = None
-  )(implicit ec: ExecutionContext): Future[Seq[Annotation]] = {
+  )(implicit ec: ExecutionContext): Future[Seq[AnnotationImpl]] = {
 
     val imDao = daoFactory.newImagedMomentDAO()
     val f = imDao.runTransaction(d => d.findByVideoReferenceUUID(videoReferenceUUID, limit, offset))
     f.onComplete(t => imDao.close())
     f.map(ims => ims.flatMap(_.observations)) // Convert to Iterable[Observation]
-      .map(obss => obss.toSeq.map(Annotation(_))) // Convert to Iterable[Annotation]
+      .map(obss => obss.toSeq.map(AnnotationImpl(_))) // Convert to Iterable[Annotation]
 
   }
 
-  def findByImageReferenceUUID(imageReferenceUUID: UUID)(implicit ec: ExecutionContext): Future[Iterable[Annotation]] = {
+  def findByImageReferenceUUID(imageReferenceUUID: UUID)(implicit ec: ExecutionContext): Future[Iterable[AnnotationImpl]] = {
 
     val imDao = daoFactory.newImagedMomentDAO()
     val f = imDao.runTransaction(d => d.findByImageReferenceUUID(imageReferenceUUID))
@@ -57,7 +57,7 @@ class AnnotationController(daoFactory: BasicDAOFactory) {
       case None => Nil
       case Some(im) => im.observations
     })
-      .map(obs => obs.map(Annotation(_)))
+      .map(obs => obs.map(AnnotationImpl(_)))
   }
 
   def create(
@@ -71,23 +71,23 @@ class AnnotationController(daoFactory: BasicDAOFactory) {
     duration: Option[Duration] = None,
     group: Option[String] = None,
     activity: Option[String] = None
-  )(implicit ec: ExecutionContext): Future[Annotation] = {
+  )(implicit ec: ExecutionContext): Future[AnnotationImpl] = {
     val obsDao = daoFactory.newObservationDAO()
-    val annotation = Annotation(videoReferenceUUID, concept, observer,
+    val annotation = AnnotationImpl(videoReferenceUUID, concept, observer,
       observationDate, timecode, elapsedTime, recordedDate, duration, group, activity)
     val f = obsDao.runTransaction(d => create(d, annotation))
     f.onComplete(_ => obsDao.close())
-    f.map(Annotation(_))
+    f.map(AnnotationImpl(_))
   }
 
-  def bulkCreate(annotations: Iterable[Annotation])(implicit ec: ExecutionContext): Future[Seq[Annotation]] = {
+  def bulkCreate(annotations: Iterable[AnnotationImpl])(implicit ec: ExecutionContext): Future[Seq[AnnotationImpl]] = {
     val obsDao = daoFactory.newObservationDAO()
     val f = obsDao.runTransaction(d => annotations.map(a => create(d, a)))
     f.onComplete(_ => obsDao.close())
-    f.map(obsList => obsList.map(Annotation(_)).toSeq)
+    f.map(obsList => obsList.map(AnnotationImpl(_)).toSeq)
   }
 
-  private def create(dao: DAO[_], annotation: Annotation): Observation = {
+  private def create(dao: DAO[_], annotation: AnnotationImpl): Observation = {
     val imDao = daoFactory.newImagedMomentDAO(dao)
     val obsDao = daoFactory.newObservationDAO(dao)
     val imagedMoment = ImagedMomentController.findImagedMoment(
@@ -121,7 +121,7 @@ class AnnotationController(daoFactory: BasicDAOFactory) {
     duration: Option[Duration] = None,
     group: Option[String] = None,
     activity: Option[String] = None
-  )(implicit ec: ExecutionContext): Future[Option[Annotation]] = {
+  )(implicit ec: ExecutionContext): Future[Option[AnnotationImpl]] = {
 
     // We have to do this in 2 transactions. The first makes all the changes. The second to
     // retrieve them. We have to do this because we may make a SQL call to move an observaton
@@ -135,7 +135,7 @@ class AnnotationController(daoFactory: BasicDAOFactory) {
 
     val g = f.flatMap(opt => {
       val dao1 = daoFactory.newObservationDAO()
-      val ff = dao1.runTransaction(d => d.findByUUID(uuid).map(Annotation(_)))
+      val ff = dao1.runTransaction(d => d.findByUUID(uuid).map(AnnotationImpl(_)))
       ff.onComplete(_ => dao1.close())
       ff
     })
@@ -143,7 +143,7 @@ class AnnotationController(daoFactory: BasicDAOFactory) {
     g
   }
 
-  def bulkUpdate(annotations: Iterable[Annotation])(implicit ec: ExecutionContext): Future[Iterable[Annotation]] = {
+  def bulkUpdate(annotations: Iterable[AnnotationImpl])(implicit ec: ExecutionContext): Future[Iterable[AnnotationImpl]] = {
     val dao = daoFactory.newObservationDAO()
     // We have to do this in 2 transactions. The first makes all the changes. The second to
     // retrieve them. We have to do this because we may make a SQL call to move an observaton
@@ -171,7 +171,7 @@ class AnnotationController(daoFactory: BasicDAOFactory) {
     // --- After update find all the changes
     val g = f.flatMap(obs => {
       val dao1 = daoFactory.newObservationDAO()
-      val ff = dao1.runTransaction(d => obs.flatMap(o => d.findByUUID(o.uuid).map(Annotation(_))))
+      val ff = dao1.runTransaction(d => obs.flatMap(o => d.findByUUID(o.uuid).map(AnnotationImpl(_))))
       ff.onComplete(_ => dao1.close())
       ff
     })

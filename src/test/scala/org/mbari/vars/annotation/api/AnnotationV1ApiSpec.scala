@@ -1,13 +1,14 @@
 package org.mbari.vars.annotation.api
 
 import java.nio.charset.StandardCharsets
-import java.time.{ Duration, Instant }
+import java.time.{Duration, Instant}
 import java.util
-import java.util.{ UUID, List => JList }
+import java.util.{UUID, List => JList}
 
 import org.mbari.vars.annotation.Constants
-import org.mbari.vars.annotation.controllers.{ AnnotationController, BasicDAOFactory, ImagedMomentController }
-import org.mbari.vars.annotation.model.simple.Annotation
+import org.mbari.vars.annotation.controllers.{AnnotationController, BasicDAOFactory, ImagedMomentController}
+import org.mbari.vars.annotation.dao.jpa.AnnotationImpl
+import org.mbari.vars.annotation.model.Annotation
 import org.mbari.vcr4j.time.Timecode
 
 import scala.collection.JavaConverters._
@@ -40,7 +41,7 @@ class AnnotationV1ApiSpec extends WebApiStack {
       "elapsed_time_millis" -> "12345"
     ) {
         status should be(200)
-        annotation = gson.fromJson(body, classOf[Annotation])
+        annotation = gson.fromJson(body, classOf[AnnotationImpl])
         annotation.concept should be("Nanomia bijuga")
         annotation.observer should be("brian")
         annotation.elapsedTime should be(Duration.ofMillis(12345))
@@ -56,7 +57,7 @@ class AnnotationV1ApiSpec extends WebApiStack {
       "recorded_timestamp" -> "2017-01-18T22:01:03.41Z"
     ) {
         status should be(200)
-        val a = gson.fromJson(body, classOf[Annotation])
+        val a = gson.fromJson(body, classOf[AnnotationImpl])
         a.concept should be("Squid")
         a.observer should be("brian")
         a.recordedTimestamp should be(Instant.parse("2017-01-18T22:01:03.41Z"))
@@ -72,7 +73,7 @@ class AnnotationV1ApiSpec extends WebApiStack {
       "recorded_timestamp" -> "2017-01-18T22:01:03.41Z"
     ) {
         status should be(200)
-        val a = gson.fromJson(body, classOf[Annotation])
+        val a = gson.fromJson(body, classOf[AnnotationImpl])
         a.concept should be("Shark")
         a.observer should be("brian")
         a.recordedTimestamp should be(Instant.parse("2017-01-18T22:01:03.41Z"))
@@ -82,7 +83,7 @@ class AnnotationV1ApiSpec extends WebApiStack {
   it should "get by observation uuid" in {
     get(s"/v1/annotations/${annotation.observationUuid}") {
       status should be(200)
-      val a = gson.fromJson(body, classOf[Annotation])
+      val a = gson.fromJson(body, classOf[AnnotationImpl])
       a.concept should be(annotation.concept)
       a.observer should be(annotation.observer)
       a.elapsedTime should be(annotation.elapsedTime)
@@ -95,7 +96,7 @@ class AnnotationV1ApiSpec extends WebApiStack {
   it should "get by videoreference uuid" in {
     get(s"/v1/annotations/videoreference/${annotation.videoReferenceUuid}") {
       status should be(200)
-      val as = gson.fromJson(body, classOf[Array[Annotation]])
+      val as = gson.fromJson(body, classOf[Array[AnnotationImpl]])
       as.size should be(1)
       val a = as(0)
       a.concept should be(annotation.concept)
@@ -112,7 +113,7 @@ class AnnotationV1ApiSpec extends WebApiStack {
       "duration_millis" -> "2500"
     ) {
         status should be(200)
-        val a = gson.fromJson(body, classOf[Annotation])
+        val a = gson.fromJson(body, classOf[AnnotationImpl])
         a.concept should be("Aegina")
         a.observer should be(annotation.observer)
         a.elapsedTime should be(annotation.elapsedTime)
@@ -129,7 +130,7 @@ class AnnotationV1ApiSpec extends WebApiStack {
       "video_reference_uuid" -> s"${annotation.videoReferenceUuid}"
     ) {
         status should be(200)
-        val a = gson.fromJson(body, classOf[Annotation])
+        val a = gson.fromJson(body, classOf[AnnotationImpl])
         a.concept should be("Aegina")
         a.observer should be(annotation.observer)
         a.elapsedTime should be(annotation.elapsedTime)
@@ -144,13 +145,13 @@ class AnnotationV1ApiSpec extends WebApiStack {
   val recordedDate = Some(Instant.now())
   val elapsedTime = Some(Duration.ofSeconds(123))
   val annotations = Seq(
-    Annotation(uuid0, "Nanomia bijuga", "brian", recordedDate = recordedDate),
-    Annotation(uuid0, "bony-eared assfish", "brian", recordedDate = recordedDate),
-    Annotation(uuid1, "Pandalus platyceros", "schlin", elapsedTime = elapsedTime),
-    Annotation(uuid1, "Peobius", "stephalopod", elapsedTime = elapsedTime, timecode = Some(new Timecode("00:02:34:29", 29.97))),
-    Annotation(uuid1, "Peobius", "stephalopod", timecode = Some(new Timecode("00:02:34:29", 29.97)))
+    AnnotationImpl(uuid0, "Nanomia bijuga", "brian", recordedDate = recordedDate),
+    AnnotationImpl(uuid0, "bony-eared assfish", "brian", recordedDate = recordedDate),
+    AnnotationImpl(uuid1, "Pandalus platyceros", "schlin", elapsedTime = elapsedTime),
+    AnnotationImpl(uuid1, "Peobius", "stephalopod", elapsedTime = elapsedTime, timecode = Some(new Timecode("00:02:34:29", 29.97))),
+    AnnotationImpl(uuid1, "Peobius", "stephalopod", timecode = Some(new Timecode("00:02:34:29", 29.97)))
   )
-  var persistedAnnotations: Seq[Annotation] = _
+  var persistedAnnotations: Seq[AnnotationImpl] = _
 
   it should "bulk create" in {
     val json = Constants.GSON_FOR_ANNOTATION.toJson(annotations.asJava)
@@ -161,7 +162,7 @@ class AnnotationV1ApiSpec extends WebApiStack {
     ) {
         status should be(200)
         persistedAnnotations = Constants.GSON_FOR_ANNOTATION
-          .fromJson(body, classOf[Array[Annotation]])
+          .fromJson(body, classOf[Array[AnnotationImpl]])
           .toSeq
         persistedAnnotations.size should be(5)
       }
@@ -181,7 +182,7 @@ class AnnotationV1ApiSpec extends WebApiStack {
     ) {
         status should be(200)
         val updatedAnnotations = Constants.GSON_FOR_ANNOTATION
-          .fromJson(body, classOf[Array[Annotation]])
+          .fromJson(body, classOf[Array[AnnotationImpl]])
           .toSeq
         updatedAnnotations.size should be(5)
         //println(body)

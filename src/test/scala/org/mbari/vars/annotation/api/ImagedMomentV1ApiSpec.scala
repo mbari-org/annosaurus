@@ -4,14 +4,13 @@ import java.time.Duration
 import java.util.UUID
 import java.util.concurrent.TimeUnit
 
-import org.mbari.vars.annotation.controllers.{ AnnotationController, ImagedMomentController }
-import org.mbari.vars.annotation.dao.jpa.{ ImagedMomentImpl }
+import org.mbari.vars.annotation.controllers.{AnnotationController, ImagedMomentController}
+import org.mbari.vars.annotation.dao.jpa.{AnnotationImpl, ImagedMomentImpl}
 import org.mbari.vars.annotation.model.ImagedMoment
-import org.mbari.vars.annotation.model.simple.Annotation
 import org.mbari.vcr4j.time.Timecode
 
 import scala.concurrent.Await
-import scala.concurrent.duration.{ Duration => SDuration }
+import scala.concurrent.duration.{Duration => SDuration}
 
 /**
  *
@@ -35,7 +34,7 @@ class ImagedMomentV1ApiSpec extends WebApiStack {
     }
   }
 
-  var annotation: Annotation = _
+  var annotation: AnnotationImpl = _
 
   it should "find by uuid" in {
 
