@@ -7,8 +7,7 @@ import java.util.concurrent.TimeUnit
 
 import org.mbari.vars.annotation.Constants
 import org.mbari.vars.annotation.controllers.ObservationController
-import org.mbari.vars.annotation.dao.jpa.{ AssociationImpl, ImagedMomentImpl, ObservationImpl }
-import org.mbari.vars.annotation.model.simple.Annotation
+import org.mbari.vars.annotation.dao.jpa.{ AnnotationImpl, AssociationImpl, ImagedMomentImpl, ObservationImpl }
 import org.mbari.vars.annotation.model.Observation
 
 import scala.collection.JavaConverters._
@@ -170,7 +169,7 @@ class ObservationV1ApiSpec extends WebApiStack {
     f.onComplete(t => dao.close())
     Await.result(f, timeout)
 
-    val annos = Seq(obs0, obs1).map(Annotation(_))
+    val annos = Seq(obs0, obs1).map(AnnotationImpl(_))
       .map(_.observationUuid)
       .asJava
     val json = Constants.GSON_FOR_ANNOTATION

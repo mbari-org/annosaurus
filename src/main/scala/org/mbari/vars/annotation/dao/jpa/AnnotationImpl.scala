@@ -1,12 +1,11 @@
-package org.mbari.vars.annotation.model.simple
+package org.mbari.vars.annotation.dao.jpa
 
 import java.time.{ Duration, Instant }
-import java.util.UUID
+import java.util.{ UUID, ArrayList => JArrayList, List => JList }
 
 import com.google.gson.annotations.{ Expose, SerializedName }
-import org.mbari.vars.annotation.model.{ Association, ImageReference, Observation }
+import org.mbari.vars.annotation.model.{ Annotation, Association, ImageReference, Observation }
 import org.mbari.vcr4j.time.Timecode
-import java.util.{ ArrayList => JArrayList, List => JList }
 
 import scala.collection.JavaConverters._
 
@@ -16,7 +15,7 @@ import scala.collection.JavaConverters._
  * @author Brian Schlining
  * @since 2016-07-12T10:00:00
  */
-class Annotation {
+class AnnotationImpl extends Annotation {
 
   @Expose(serialize = true)
   var observationUuid: UUID = _
@@ -58,26 +57,32 @@ class Annotation {
 
   @Expose(serialize = true)
   @SerializedName(value = "associations")
-  protected var javaAssociations: JList[Association] = new JArrayList[Association]()
+  protected var javaAssociations: JList[AssociationImpl] = new JArrayList[AssociationImpl]()
   def associations: Seq[Association] = javaAssociations.asScala
   def associations_=(as: Seq[Association]): Unit = {
-    javaAssociations = as.asJava
+    javaAssociations = as.map({
+      case a: AssociationImpl => a
+      case v: Association => AssociationImpl(v)
+    }).asJava
   }
 
   @Expose(serialize = true)
   @SerializedName(value = "image_references")
-  var javaImageReferences: JList[ImageReference] = new JArrayList[ImageReference]()
+  var javaImageReferences: JList[ImageReferenceImpl] = new JArrayList[ImageReferenceImpl]()
   def imageReferences: Seq[ImageReference] = javaImageReferences.asScala
   def imageReferences_=(irs: Seq[ImageReference]): Unit = {
-    javaImageReferences = irs.asJava
+    javaImageReferences = irs.map({
+      case i: ImageReferenceImpl => i
+      case v: ImageReference => ImageReferenceImpl(v)
+    }).asJava
   }
 
 }
 
-object Annotation {
+object AnnotationImpl {
 
-  def apply(observation: Observation): Annotation = {
-    val a = new Annotation
+  def apply(observation: Observation): AnnotationImpl = {
+    val a = new AnnotationImpl
     a.observationUuid = observation.uuid
     a.concept = observation.concept
     a.observer = observation.observer
@@ -106,9 +111,9 @@ object Annotation {
     duration: Option[Duration] = None,
     group: Option[String] = None,
     activity: Option[String] = None
-  ): Annotation = {
+  ): AnnotationImpl = {
 
-    val annotation = new Annotation
+    val annotation = new AnnotationImpl
     annotation.videoReferenceUuid = videoReferenceUUID
     annotation.concept = concept
     annotation.observer = observer

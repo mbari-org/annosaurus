@@ -117,4 +117,14 @@ object AssociationImpl {
     linkValue.foreach(a.linkValue = _)
   }
 
+  def apply(v: Association): AssociationImpl = {
+    val a = new AssociationImpl
+    a.linkName = v.linkName
+    a.toConcept = v.toConcept
+    a.linkValue = v.linkValue
+    a.mimeType = v.mimeType
+    a.uuid = v.uuid
+    a
+  }
+
 }

@@ -97,4 +97,15 @@ object ImageReferenceImpl {
     description.foreach(i.description = _)
     i
   }
+
+  def apply(v: ImageReference): ImageReferenceImpl = {
+    val i = new ImageReferenceImpl
+    i.url = v.url
+    i.description = v.description
+    i.width = v.width
+    i.height = v.height
+    i.format = v.format
+    i.uuid = v.uuid
+    i
+  }
 }
