@@ -12,13 +12,13 @@ import org.mbari.vars.annotation.model.CachedAncillaryDatum
  */
 case class SimpleAncillaryDatum(
   uuid: UUID,
-  latitude: Double,
-  longitude: Double,
-  depthMeters: Float,
-  salinity: Float,
-  temperatureCelsius: Float,
-  oxygenMlL: Float,
-  pressureDbar: Float
+  latitude: Option[Double],
+  longitude: Option[Double],
+  depthMeters: Option[Float],
+  salinity: Option[Float],
+  temperatureCelsius: Option[Float],
+  oxygenMlL: Option[Float],
+  pressureDbar: Option[Float]
 )
 
 object SimpleAncillaryDatum {

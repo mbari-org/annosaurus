@@ -10,6 +10,9 @@
         <!-- Converters -->
         <class>org.mbari.vars.annotation.dao.jpa.DurationConverter</class>
         <class>org.mbari.vars.annotation.dao.jpa.InstantConverter</class>
+        <class>org.mbari.vars.annotation.dao.jpa.OptionConverter</class>
+        <class>org.mbari.vars.annotation.dao.jpa.FloatOptionConverter</class>
+        <class>org.mbari.vars.annotation.dao.jpa.DoubleOptionConverter</class>
         <class>org.mbari.vars.annotation.dao.jpa.URIConverter</class>
         <class>org.mbari.vars.annotation.dao.jpa.URLConverter</class>
         <class>org.mbari.vars.annotation.dao.jpa.UUIDConverter</class>

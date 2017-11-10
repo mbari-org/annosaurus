@@ -3,6 +3,7 @@ package org.mbari.vars.annotation.dao
 import java.util.UUID
 
 import org.mbari.vars.annotation.model.CachedAncillaryDatum
+import org.mbari.vars.annotation.model.simple.CachedAncillaryDatumBean
 
 /**
  *
@@ -35,5 +36,7 @@ trait CachedAncillaryDatumDAO[T <: CachedAncillaryDatum] extends DAO[T] {
   def findByObservationUUID(observationUuid: UUID): Option[CachedAncillaryDatum]
 
   def findByImagedMomentUUID(imagedMomentUuid: UUID): Option[CachedAncillaryDatum]
+
+  def asPersistentObject(bean: CachedAncillaryDatum): CachedAncillaryDatum
 
 }

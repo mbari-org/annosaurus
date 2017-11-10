@@ -43,11 +43,12 @@ class CachedAncillaryDatumDAOSpec extends FlatSpec with Matchers with BeforeAndA
     run(d => {
       val ad = d.findByUUID(ancillaryDatum0.uuid)
       ad shouldBe defined
-      ad.get.temperatureCelsius = newTemp
+      ad.get.temperatureCelsius = Some(newTemp)
     })
 
     val datum = run(d => d.findByUUID(ancillaryDatum0.uuid)).head
-    datum.temperatureCelsius should be(newTemp +- 0.000001F)
+    datum.temperatureCelsius should not be (None)
+    datum.temperatureCelsius.get should be(newTemp +- 0.000001F)
   }
 
   it should "findAll" in {

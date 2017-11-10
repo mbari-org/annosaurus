@@ -1,5 +1,6 @@
 package org.mbari.vars.annotation.dao.jpa
 
+import java.lang.{ Double => JDouble, Float => JFloat }
 import javax.persistence.{ CascadeType, JoinColumn, _ }
 
 import com.google.gson.annotations.Expose
@@ -41,19 +42,28 @@ class CachedAncillaryDatumImpl extends CachedAncillaryDatum with JPAPersistentOb
   @Column(
     name = "oxygen_ml_per_l",
     nullable = true
-  )
-  override var oxygenMlL: Float = _
+  ) //@Access(AccessType.PROPERTY)
+  @Convert(converter = classOf[FloatOptionConverter])
+  override var oxygenMlL: Option[Float] = None
+  private def getOxygenMlL = oxygenMlL.getOrElse(null)
+  private def setOxygenMlL(v: Float): Unit = oxygenMlL = Option(v)
 
   @Expose(serialize = true)
-  @Column(name = "depth_meters")
-  override var depthMeters: Float = _
+  @Column(name = "depth_meters") //@Access(AccessType.PROPERTY)
+  @Convert(converter = classOf[FloatOptionConverter])
+  override var depthMeters: Option[Float] = None
+  private def getDepthMeters = depthMeters.getOrElse(null)
+  private def setDepthMeters(v: Float): Unit = depthMeters = Option(v)
 
   @Expose(serialize = true)
   @Column(
     name = "z",
     nullable = true
-  )
-  override var z: Double = _
+  ) //@Access(AccessType.PROPERTY)
+  @Convert(converter = classOf[DoubleOptionConverter])
+  override var z: Option[Double] = None
+  private def getZ = z.getOrElse(null)
+  private def setZ(v: Double): Unit = z = Option(v)
 
   @Expose(serialize = true)
   @Column(
@@ -66,8 +76,11 @@ class CachedAncillaryDatumImpl extends CachedAncillaryDatum with JPAPersistentOb
   @Column(
     name = "latitude",
     nullable = true
-  )
-  override var latitude: Double = _
+  ) //@Access(AccessType.PROPERTY)
+  @Convert(converter = classOf[DoubleOptionConverter])
+  override var latitude: Option[Double] = None
+  private def getLatitude = latitude.getOrElse(null)
+  private def setLatitude(v: Double): Unit = latitude = Option(v)
 
   @Expose(serialize = false)
   @OneToOne(
@@ -82,81 +95,142 @@ class CachedAncillaryDatumImpl extends CachedAncillaryDatum with JPAPersistentOb
   @Column(
     name = "y",
     nullable = true
-  )
-  override var y: Double = _
+  ) //@Access(AccessType.PROPERTY)
+  @Convert(converter = classOf[DoubleOptionConverter])
+  override var y: Option[Double] = None
+  private def getY() = y.getOrElse(null)
+  private def setY(v: Double): Unit = y = Option(v)
 
   @Expose(serialize = true)
   @Column(
     name = "temperature_celsius",
     nullable = true
-  )
-  override var temperatureCelsius: Float = _
+  ) //@Access(AccessType.PROPERTY)
+  @Convert(converter = classOf[FloatOptionConverter])
+  override var temperatureCelsius: Option[Float] = None
+  private def getTemperatureCelsius() = temperatureCelsius.getOrElse(null)
+  private def setTemperatureCelsius(v: Float): Unit = temperatureCelsius = Option(v)
 
   @Expose(serialize = true)
   @Column(
     name = "x",
     nullable = true
-  )
-  override var x: Double = _
+  ) //@Access(AccessType.PROPERTY)
+  @Convert(converter = classOf[DoubleOptionConverter])
+  override var x: Option[Double] = None
+  private def getX() = x.getOrElse(null)
+  private def setX(v: Double): Unit = x = Option(v)
 
   @Expose(serialize = true)
   @Column(
     name = "theta",
     nullable = true
-  )
-  override var theta: Double = _
+  ) //@Access(AccessType.PROPERTY)
+  @Convert(converter = classOf[DoubleOptionConverter])
+  override var theta: Option[Double] = None
+  private def getTheta() = theta.getOrElse(null)
+  private def setTheta(v: Double): Unit = theta = Option(v)
 
   @Expose(serialize = true)
   @Column(
     name = "longitude",
     nullable = true
-  )
-  override var longitude: Double = _
+  ) //@Access(AccessType.PROPERTY)
+  @Convert(converter = classOf[DoubleOptionConverter])
+  override var longitude: Option[Double] = None
+  private def getLongitude = longitude.getOrElse(null)
+  private def setLongitude(v: Double): Unit = longitude = Option(v)
 
   @Expose(serialize = true)
   @Column(
     name = "phi",
     nullable = true
-  )
-  override var phi: Double = _
+  ) //@Access(AccessType.PROPERTY)
+  @Convert(converter = classOf[DoubleOptionConverter])
+  override var phi: Option[Double] = None
+  private def getPhi = phi.getOrElse(null)
+  private def setPhi(v: Double): Unit = phi = Option(v)
 
   @Expose(serialize = true)
   @Column(
     name = "psi",
     nullable = true
-  )
-  override var psi: Double = _
+  ) //@Access(AccessType.PROPERTY)
+  @Convert(converter = classOf[DoubleOptionConverter])
+  override var psi: Option[Double] = None
+  private def getPsi = psi.getOrElse(null)
+  private def setPsi(v: Double): Unit = psi = Option(v)
 
   @Expose(serialize = true)
   @Column(
     name = "pressure_dbar",
     nullable = true
-  )
-  override var pressureDbar: Float = _
+  ) //@Access(AccessType.PROPERTY)
+  @Convert(converter = classOf[FloatOptionConverter])
+  override var pressureDbar: Option[Float] = None
+  private def getPressureDbar = pressureDbar.getOrElse(null)
+  private def setPressureDbar(v: Float): Unit = pressureDbar = Option(v)
 
   @Expose(serialize = true)
   @Column(
     name = "salinity",
     nullable = true
-  )
-  override var salinity: Float = _
+  ) //@Access(AccessType.PROPERTY)
+  @Convert(converter = classOf[FloatOptionConverter])
+  override var salinity: Option[Float] = None
+  private def getSalinity = salinity.getOrElse(null)
+  private def setSalinity(v: Float): Unit = salinity = Option(v)
 
   @Expose(serialize = true)
   @Column(
     name = "altitude",
     nullable = true
-  )
-  override var altitude: Float = _
+  ) //@Access(AccessType.PROPERTY)
+  @Convert(converter = classOf[FloatOptionConverter])
+  override var altitude: Option[Float] = None
+  private def getAltitude() = altitude.getOrElse(null)
+  private def setAltitude(v: Float): Unit = altitude = Option(v)
 
   @Expose(serialize = true)
   @Column(
     name = "light_transmission",
     nullable = true
-  )
-  override var lightTransmission: Float = _
+  ) //@Access(AccessType.PROPERTY)
+  @Convert(converter = classOf[FloatOptionConverter])
+  override var lightTransmission: Option[Float] = None
+  private def getLightTransmission() = lightTransmission.getOrElse(null)
+  private def setLightTransmission(v: Float): Unit = lightTransmission = Option(v)
 }
 
 object CachedAncillaryDatumImpl {
+
+  def apply(datum: CachedAncillaryDatum): CachedAncillaryDatumImpl = {
+    datum match {
+      case c: CachedAncillaryDatumImpl => c
+      case c =>
+        val d = new CachedAncillaryDatumImpl
+        d.uuid = c.uuid
+        d.imagedMoment = c.imagedMoment
+        d.latitude = c.latitude
+        d.longitude = c.longitude
+        d.depthMeters = c.depthMeters
+        d.altitude = c.altitude
+        d.crs = c.crs
+        d.salinity = c.salinity
+        d.temperatureCelsius = c.temperatureCelsius
+        d.oxygenMlL = c.oxygenMlL
+        d.pressureDbar = c.pressureDbar
+        d.lightTransmission = c.lightTransmission
+        d.x = c.x
+        d.y = c.y
+        d.z = c.z
+        d.posePositionUnits = c.posePositionUnits
+        d.phi = c.phi
+        d.theta = c.theta
+        d.psi = c.psi
+        d
+    }
+  }
 
   /**
    *
@@ -167,9 +241,9 @@ object CachedAncillaryDatumImpl {
    */
   def apply(latitude: Double, longitude: Double, depthMeters: Float): CachedAncillaryDatumImpl = {
     val d = new CachedAncillaryDatumImpl
-    d.latitude = latitude
-    d.longitude = longitude
-    d.depthMeters = depthMeters
+    d.latitude = Option(latitude)
+    d.longitude = Option(longitude)
+    d.depthMeters = Option(depthMeters)
     d
   }
 
@@ -184,10 +258,10 @@ object CachedAncillaryDatumImpl {
     crs: String = "CRS:84"
   ): CachedAncillaryDatumImpl = {
     val d = apply(latitude, longitude, depthMeters)
-    d.salinity = salinity
-    d.temperatureCelsius = temperatureCelsius
-    d.pressureDbar = pressureDbar
-    d.oxygenMlL = oxygenMlL
+    d.salinity = Option(salinity)
+    d.temperatureCelsius = Option(temperatureCelsius)
+    d.pressureDbar = Option(pressureDbar)
+    d.oxygenMlL = Option(oxygenMlL)
     d.crs = crs
     d
   }

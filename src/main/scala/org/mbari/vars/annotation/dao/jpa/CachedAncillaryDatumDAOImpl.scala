@@ -5,6 +5,7 @@ import javax.persistence.EntityManager
 
 import org.mbari.vars.annotation.dao.CachedAncillaryDatumDAO
 import org.mbari.vars.annotation.model.CachedAncillaryDatum
+import org.mbari.vars.annotation.model.simple.CachedAncillaryDatumBean
 
 /**
  *
@@ -39,24 +40,27 @@ class CachedAncillaryDatumDAOImpl(entityManager: EntityManager)
   ): CachedAncillaryDatum = {
 
     val cad = new CachedAncillaryDatumImpl()
-    cad.latitude = latitude
-    cad.longitude = longitude
-    cad.depthMeters = depthMeters
-    altitude.foreach(cad.altitude = _)
+    cad.latitude = Some(latitude)
+    cad.longitude = Some(longitude)
+    cad.depthMeters = Some(depthMeters)
+    cad.altitude = altitude
     crs.foreach(cad.crs = _)
-    salinity.foreach(cad.salinity = _)
-    temperatureCelsius.foreach(cad.temperatureCelsius = _)
-    oxygenMlL.foreach(cad.oxygenMlL = _)
-    pressureDbar.foreach(cad.pressureDbar = _)
-    x.foreach(cad.x = _)
-    y.foreach(cad.y = _)
-    z.foreach(cad.z = _)
+    cad.salinity = salinity
+    cad.temperatureCelsius = temperatureCelsius
+    cad.oxygenMlL = oxygenMlL
+    cad.pressureDbar = pressureDbar
+    cad.x = x
+    cad.y = y
+    cad.z = z
     posePositionUnits.foreach(cad.posePositionUnits = _)
-    phi.foreach(cad.phi = _)
-    theta.foreach(cad.theta = _)
-    psi.foreach(cad.psi = _)
+    cad.phi = phi
+    cad.theta = theta
+    cad.psi = psi
     cad
   }
+
+  override def asPersistentObject(datum: CachedAncillaryDatum): CachedAncillaryDatum =
+    CachedAncillaryDatumImpl(datum)
 
   override def findAll(): Iterable[CachedAncillaryDatumImpl] =
     findByNamedQuery("AncillaryDatum.findAll")

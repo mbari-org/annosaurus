@@ -37,11 +37,17 @@ abstract class BaseDAO[B <: PersistentObject: ClassTag](val entityManager: Entit
     limit: Option[Int] = None,
     offset: Option[Int] = None
   ): List[B] = {
+    if (log.isDebugEnabled()) {
+      log.debug(s"JPA Query => $name using $namedParameters")
+    }
     val query = entityManager.createNamedQuery(name)
     limit.foreach(query.setMaxResults)
     offset.foreach(query.setFirstResult)
     namedParameters.foreach({ case (a, b) => query.setParameter(a, b) })
-    query.getResultList.asScala.toList.map(_.asInstanceOf[B])
+    query.getResultList
+      .asScala
+      .toList
+      .map(_.asInstanceOf[B])
   }
 
   def executeNamedQuery(name: String, namedParameters: Map[String, Any] = Map.empty): Int = {

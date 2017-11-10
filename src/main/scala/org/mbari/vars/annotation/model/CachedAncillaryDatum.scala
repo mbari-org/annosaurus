@@ -17,10 +17,10 @@ trait CachedAncillaryDatum extends PersistentObject {
   var imagedMoment: ImagedMoment
 
   // --- Position
-  var latitude: Double
-  var longitude: Double
-  var depthMeters: Float
-  var altitude: Float
+  var latitude: Option[Double]
+  var longitude: Option[Double]
+  var depthMeters: Option[Float]
+  var altitude: Option[Float]
 
   /**
    * Coordinate Reference System for latitude and longitude
@@ -28,23 +28,23 @@ trait CachedAncillaryDatum extends PersistentObject {
   var crs: String
 
   // --- CTDO
-  var salinity: Float
-  var temperatureCelsius: Float
-  var oxygenMlL: Float
-  var pressureDbar: Float
+  var salinity: Option[Float]
+  var temperatureCelsius: Option[Float]
+  var oxygenMlL: Option[Float]
+  var pressureDbar: Option[Float]
 
   // --- Transmissometer
-  var lightTransmission: Float
+  var lightTransmission: Option[Float]
 
   // -- Camera Pose
   // Camera coordinate system
-  var x: Double
-  var y: Double
-  var z: Double
+  var x: Option[Double]
+  var y: Option[Double]
+  var z: Option[Double]
   var posePositionUnits: String
-  var phi: Double
-  var theta: Double
-  var psi: Double
+  var phi: Option[Double]
+  var theta: Option[Double]
+  var psi: Option[Double]
 
   def lastUpdated: Option[Instant]
 
