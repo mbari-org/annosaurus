@@ -145,25 +145,40 @@ class CachedAncillaryDatumController(val daoFactory: BasicDAOFactory)
         datum <- data
         if datum.imagedMomentUuid != null
       } yield {
-        val c = dao.asPersistentObject(datum)
-        imDao.findByUUID(datum.imagedMomentUuid)
-          .flatMap(im => if (im.ancillaryDatum != null) {
-            log.info(s"ImagedMoment with UUID of ${datum.imagedMomentUuid} already has ancillary data")
-            None
+        val maybeMoment = imDao.findByUUID(datum.imagedMomentUuid)
+        maybeMoment.flatMap(im => {
+          if (im.ancillaryDatum != null) {
+            updateValues(im.ancillaryDatum, datum)
+            Some(im.ancillaryDatum)
           } else {
-            if (im.ancillaryDatum != null) {
-              datum.uuid = im.ancillaryDatum.uuid
-              im.ancillaryDatum = datum
-              Some(dao.update(datum))
-
-            } else {
-              im.ancillaryDatum = datum
-              Some(datum)
-            }
-          })
+            val c = dao.asPersistentObject(datum)
+            im.ancillaryDatum = c
+            Some(c)
+          }
+        })
       }
       cads.flatten.toSeq
     }
     exec(fn)
+  }
+
+  private def updateValues(a: CachedAncillaryDatum, b: CachedAncillaryDatum): Unit = {
+    a.altitude = b.altitude
+    a.depthMeters = b.depthMeters
+    a.crs = b.crs
+    a.latitude = b.latitude
+    a.longitude = b.longitude
+    a.salinity = b.salinity
+    a.temperatureCelsius = b.temperatureCelsius
+    a.oxygenMlL = b.oxygenMlL
+    a.pressureDbar = b.pressureDbar
+    a.x = b.x
+    a.y = b.y
+    a.z = b.z
+    a.posePositionUnits = b.posePositionUnits
+    a.phi = b.phi
+    a.theta = b.theta
+    a.psi = b.psi
+    a.lightTransmission = b.lightTransmission
   }
 }

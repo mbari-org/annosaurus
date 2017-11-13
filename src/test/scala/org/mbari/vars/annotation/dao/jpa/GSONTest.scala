@@ -56,4 +56,8 @@ class GSONTest extends FlatSpec with Matchers {
     im0.imageReferences.head.url should be(imageReference.url)
   }
 
+  it should "round trip an ancillary datum to/from json" in {
+    val datum = CachedAncillaryDatumImpl(36, -122, 1000, 35.234, 13, 1003, 3.4)
+  }
+
 }

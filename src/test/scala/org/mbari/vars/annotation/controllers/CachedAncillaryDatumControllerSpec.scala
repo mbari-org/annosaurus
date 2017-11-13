@@ -45,6 +45,8 @@ class CachedAncillaryDatumControllerSpec extends FlatSpec with Matchers with Bef
     cad should not be (null)
     cad.uuid should not be (null)
     cad.imagedMoment.uuid should be(im.uuid)
+    cad.depthMeters should not be None
+    cad.depthMeters.get should be (1078)
   }
 
   it should "bulk create datums" in {
@@ -54,12 +56,19 @@ class CachedAncillaryDatumControllerSpec extends FlatSpec with Matchers with Bef
       c.latitude = Some(math.random() * 90)
       c.longitude = Some(math.random() * 180)
       c.depthMeters = Some(1000)
-      c.uuid = UUID.randomUUID()
+      //c.uuid = UUID.randomUUID()
       c
     })
 
     exec(() => controller.bulkCreateOrUpdate(cads))
 
+    imagedMoments.foreach(im => {
+      val maybeMoment = exec(() => imagedMomentController.findByUUID(im.uuid))
+      maybeMoment should not be None
+      val i = maybeMoment.get
+      i.ancillaryDatum.depthMeters should not be None
+      i.ancillaryDatum.depthMeters.get should be (1000)
+    })
   }
 
 }

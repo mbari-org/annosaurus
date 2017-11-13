@@ -34,7 +34,8 @@ class CachedAncillaryDatumImpl extends CachedAncillaryDatum with JPAPersistentOb
   @Expose(serialize = true)
   @Column(
     name = "coordinate_reference_system",
-    length = 32
+    length = 32,
+    nullable = true
   )
   override var crs: String = _
 
@@ -47,7 +48,10 @@ class CachedAncillaryDatumImpl extends CachedAncillaryDatum with JPAPersistentOb
   override var oxygenMlL: Option[Float] = None
 
   @Expose(serialize = true)
-  @Column(name = "depth_meters")
+  @Column(
+    name = "depth_meters",
+    nullable = true
+  )
   @Convert(converter = classOf[FloatOptionConverter])
   override var depthMeters: Option[Float] = None
 
