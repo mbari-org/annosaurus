@@ -1,4 +1,4 @@
-package org.mbari.vars.annotation.json;
+package org.mbari.vars.annotation.gson;
 
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;

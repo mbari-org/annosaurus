@@ -1,4 +1,4 @@
-package org.mbari.vars.annotation.json;
+package org.mbari.vars.annotation.gson;
 
 import com.google.gson.InstanceCreator;
 import org.mbari.vars.annotation.dao.jpa.ImageReferenceImpl;

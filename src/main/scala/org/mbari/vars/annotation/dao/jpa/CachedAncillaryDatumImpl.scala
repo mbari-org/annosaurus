@@ -1,10 +1,11 @@
 package org.mbari.vars.annotation.dao.jpa
 
-import java.lang.{ Double => JDouble, Float => JFloat }
-import javax.persistence.{ CascadeType, JoinColumn, _ }
+import java.lang.{Double => JDouble, Float => JFloat}
+import javax.persistence.{CascadeType, JoinColumn, _}
 
-import com.google.gson.annotations.Expose
-import org.mbari.vars.annotation.model.{ CachedAncillaryDatum, ImagedMoment }
+import com.google.gson.annotations.{Expose, JsonAdapter}
+import org.mbari.vars.annotation.gson.{DoubleOptionDeserializer, FloatOptionDeserializer}
+import org.mbari.vars.annotation.model.{CachedAncillaryDatum, ImagedMoment}
 
 /**
  *
@@ -40,6 +41,7 @@ class CachedAncillaryDatumImpl extends CachedAncillaryDatum with JPAPersistentOb
   override var crs: String = _
 
   @Expose(serialize = true)
+  @JsonAdapter(value = classOf[FloatOptionDeserializer])
   @Column(
     name = "oxygen_ml_per_l",
     nullable = true
@@ -48,6 +50,7 @@ class CachedAncillaryDatumImpl extends CachedAncillaryDatum with JPAPersistentOb
   override var oxygenMlL: Option[Float] = None
 
   @Expose(serialize = true)
+  @JsonAdapter(value = classOf[FloatOptionDeserializer])
   @Column(
     name = "depth_meters",
     nullable = true
@@ -56,6 +59,7 @@ class CachedAncillaryDatumImpl extends CachedAncillaryDatum with JPAPersistentOb
   override var depthMeters: Option[Float] = None
 
   @Expose(serialize = true)
+  @JsonAdapter(value = classOf[DoubleOptionDeserializer])
   @Column(
     name = "z",
     nullable = true
@@ -71,6 +75,7 @@ class CachedAncillaryDatumImpl extends CachedAncillaryDatum with JPAPersistentOb
   override var posePositionUnits: String = _
 
   @Expose(serialize = true)
+  @JsonAdapter(value = classOf[FloatOptionDeserializer])
   @Column(
     name = "latitude",
     nullable = true
@@ -88,6 +93,7 @@ class CachedAncillaryDatumImpl extends CachedAncillaryDatum with JPAPersistentOb
   override var imagedMoment: ImagedMoment = _
 
   @Expose(serialize = true)
+  @JsonAdapter(value = classOf[FloatOptionDeserializer])
   @Column(
     name = "y",
     nullable = true
@@ -96,6 +102,7 @@ class CachedAncillaryDatumImpl extends CachedAncillaryDatum with JPAPersistentOb
   override var y: Option[Double] = None
 
   @Expose(serialize = true)
+  @JsonAdapter(value = classOf[FloatOptionDeserializer])
   @Column(
     name = "temperature_celsius",
     nullable = true
@@ -104,6 +111,7 @@ class CachedAncillaryDatumImpl extends CachedAncillaryDatum with JPAPersistentOb
   override var temperatureCelsius: Option[Float] = None
 
   @Expose(serialize = true)
+  @JsonAdapter(value = classOf[FloatOptionDeserializer])
   @Column(
     name = "x",
     nullable = true
@@ -112,6 +120,7 @@ class CachedAncillaryDatumImpl extends CachedAncillaryDatum with JPAPersistentOb
   override var x: Option[Double] = None
 
   @Expose(serialize = true)
+  @JsonAdapter(value = classOf[FloatOptionDeserializer])
   @Column(
     name = "theta",
     nullable = true
@@ -120,6 +129,7 @@ class CachedAncillaryDatumImpl extends CachedAncillaryDatum with JPAPersistentOb
   override var theta: Option[Double] = None
 
   @Expose(serialize = true)
+  @JsonAdapter(value = classOf[FloatOptionDeserializer])
   @Column(
     name = "longitude",
     nullable = true
@@ -128,6 +138,7 @@ class CachedAncillaryDatumImpl extends CachedAncillaryDatum with JPAPersistentOb
   override var longitude: Option[Double] = None
 
   @Expose(serialize = true)
+  @JsonAdapter(value = classOf[FloatOptionDeserializer])
   @Column(
     name = "phi",
     nullable = true
@@ -136,6 +147,7 @@ class CachedAncillaryDatumImpl extends CachedAncillaryDatum with JPAPersistentOb
   override var phi: Option[Double] = None
 
   @Expose(serialize = true)
+  @JsonAdapter(value = classOf[FloatOptionDeserializer])
   @Column(
     name = "psi",
     nullable = true
@@ -144,6 +156,7 @@ class CachedAncillaryDatumImpl extends CachedAncillaryDatum with JPAPersistentOb
   override var psi: Option[Double] = None
 
   @Expose(serialize = true)
+  @JsonAdapter(value = classOf[FloatOptionDeserializer])
   @Column(
     name = "pressure_dbar",
     nullable = true
@@ -152,6 +165,7 @@ class CachedAncillaryDatumImpl extends CachedAncillaryDatum with JPAPersistentOb
   override var pressureDbar: Option[Float] = None
 
   @Expose(serialize = true)
+  @JsonAdapter(value = classOf[FloatOptionDeserializer])
   @Column(
     name = "salinity",
     nullable = true
@@ -160,6 +174,7 @@ class CachedAncillaryDatumImpl extends CachedAncillaryDatum with JPAPersistentOb
   override var salinity: Option[Float] = None
 
   @Expose(serialize = true)
+  @JsonAdapter(value = classOf[FloatOptionDeserializer])
   @Column(
     name = "altitude",
     nullable = true
@@ -168,6 +183,7 @@ class CachedAncillaryDatumImpl extends CachedAncillaryDatum with JPAPersistentOb
   override var altitude: Option[Float] = None
 
   @Expose(serialize = true)
+  @JsonAdapter(value = classOf[FloatOptionDeserializer])
   @Column(
     name = "light_transmission",
     nullable = true

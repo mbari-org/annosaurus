@@ -6,7 +6,7 @@ import java.time.Duration
 import com.fatboyindustrial.gsonjavatime.Converters
 import com.google.gson.reflect.TypeToken
 import com.google.gson.{ FieldNamingPolicy, Gson, GsonBuilder }
-import org.mbari.vars.annotation.json._
+import org.mbari.vars.annotation.gson._
 import org.mbari.vars.annotation.model.{ Association, ImageReference }
 import org.mbari.vcr4j.time.Timecode
 
@@ -35,9 +35,6 @@ object Constants {
 
     val timecodeType: Type = new TypeToken[Timecode]() {}.getType
     gsonBuilder.registerTypeAdapter(timecodeType, new TimecodeConverter)
-
-    val optionType: Type = new TypeToken[Option[_]]() {}.getType
-    gsonBuilder.registerTypeAdapter(optionType, new OptionConverter)
 
     val associationType: Type = new TypeToken[Association]() {}.getType
     gsonBuilder.registerTypeAdapter(associationType, new AssociationCreator)
