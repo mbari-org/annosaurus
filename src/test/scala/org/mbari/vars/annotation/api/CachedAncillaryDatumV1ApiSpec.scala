@@ -41,7 +41,7 @@ class CachedAncillaryDatumV1ApiSpec extends WebApiStack {
     ims
   }
 
-  "cachedAncillaryDatumV1Api" should "create" in {
+  "cachedAncillaryDatumV1Api" should "create, then update" in {
     val data = imagedMoments.map( im =>
         {
           val i: Float = (math.random() * 10F).floatValue()
@@ -55,7 +55,8 @@ class CachedAncillaryDatumV1ApiSpec extends WebApiStack {
           d
         })
     val json = Constants.GSON.toJson(data.asJava)
-    println(json)
+
+    // --- Create
     post(s"$path/bulk",
       headers = Map("Content-Type" -> "application/json"),
       body = json.getBytes(StandardCharsets.UTF_8)
@@ -77,8 +78,39 @@ class CachedAncillaryDatumV1ApiSpec extends WebApiStack {
         b.salinity.get should be (a.salinity.get)
         b.temperatureCelsius should be (None)
       })
-
     }
+
+    // --- Update
+    data.foreach(d => {
+      d.oxygenMlL = None
+      d.salinity = Some(14)
+    })
+
+    val json2 = Constants.GSON.toJson(data.asJava)
+    post(s"$path/bulk",
+      headers = Map("Content-Type" -> "application/json"),
+      body = json2.getBytes(StandardCharsets.UTF_8)
+    ) {
+      status should be (200)
+      val persistedData = Constants.GSON
+        .fromJson(body, classOf[Array[CachedAncillaryDatumImpl]])
+        .toSeq
+      persistedData.size should be (imagedMoments.size)
+      persistedData.indices.foreach(i => {
+        val a = data(i)
+        val b = persistedData(i)
+
+        b.uuid should not be (null)
+        b.latitude.get should be (a.latitude.get)
+        b.longitude.get should be (a.longitude.get)
+        b.depthMeters.get should be (a.depthMeters.get)
+        b.oxygenMlL should be (None)
+        b.salinity.get should be (14)
+        b.temperatureCelsius should be (None)
+      })
+    }
+
+
   }
 
 }
