@@ -3,9 +3,9 @@ package org.mbari.vars.annotation.model.simple
 import java.time.Instant
 import java.util.UUID
 
-import com.google.gson.annotations.{Expose, JsonAdapter}
-import org.mbari.vars.annotation.gson.{DoubleOptionDeserializer, FloatOptionDeserializer}
-import org.mbari.vars.annotation.model.{CachedAncillaryDatum, ImagedMoment}
+import com.google.gson.annotations.{ Expose, JsonAdapter }
+import org.mbari.vars.annotation.gson.{ DoubleOptionDeserializer, FloatOptionDeserializer }
+import org.mbari.vars.annotation.model.{ CachedAncillaryDatum, ImagedMoment }
 
 /**
  * @author Brian Schlining

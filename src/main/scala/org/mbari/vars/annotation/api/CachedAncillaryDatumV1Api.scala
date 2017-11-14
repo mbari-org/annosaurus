@@ -4,7 +4,7 @@ import java.util.UUID
 
 import org.mbari.vars.annotation.controllers.CachedAncillaryDatumController
 import org.mbari.vars.annotation.model.simple.CachedAncillaryDatumBean
-import org.scalatra.{BadRequest, NotFound}
+import org.scalatra.{ BadRequest, NotFound }
 import org.scalatra.swagger.Swagger
 
 import scala.concurrent.ExecutionContext
@@ -90,7 +90,7 @@ class CachedAncillaryDatumV1Api(controller: CachedAncillaryDatumController)(impl
       case "application/json" =>
         val data = fromJson(request.body, classOf[Array[CachedAncillaryDatumBean]])
         controller.bulkCreateOrUpdate(data)
-              .map(ds => toJson(ds.asJava))
+          .map(ds => toJson(ds.asJava))
       case _ =>
         halt(BadRequest("Posts to /bulk only accept a JSON body (i.e. Content-Type: application/json)"))
     }
