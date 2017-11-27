@@ -79,6 +79,7 @@ lazy val apps = Seq("jetty-main")  // for sbt-pack
 
 lazy val annosaurus = (project in file("."))
   .enablePlugins(JettyPlugin)
+  .enablePlugins(AutomateHeaderPlugin)
   .settings(appSettings)
   .settings(
     libraryDependencies ++= Seq(
