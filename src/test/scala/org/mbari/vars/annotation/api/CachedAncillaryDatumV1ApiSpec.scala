@@ -95,6 +95,7 @@ class CachedAncillaryDatumV1ApiSpec extends WebApiStack {
       val persistedData = Constants.GSON
         .fromJson(body, classOf[Array[CachedAncillaryDatumImpl]])
         .toSeq
+      println(body)
       persistedData.size should be (imagedMoments.size)
       persistedData.indices.foreach(i => {
         val a = data(i)
