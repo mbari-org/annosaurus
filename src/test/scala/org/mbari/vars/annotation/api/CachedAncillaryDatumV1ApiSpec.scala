@@ -32,7 +32,7 @@ class CachedAncillaryDatumV1ApiSpec extends WebApiStack {
           d
         })
     post(s"$path/bulk",
-      
+
     )
   }
 
