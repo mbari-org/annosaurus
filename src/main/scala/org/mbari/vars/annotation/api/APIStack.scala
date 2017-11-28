@@ -16,14 +16,14 @@
 
 package org.mbari.vars.annotation.api
 
-import java.net.{URI, URL}
+import java.net.{ URI, URL }
 import java.time.format.DateTimeFormatter
-import java.time.{Duration, Instant}
+import java.time.{ Duration, Instant }
 import java.util.UUID
 
 import org.mbari.vars.annotation.Constants
 import org.mbari.vcr4j.time.Timecode
-import org.scalatra.{ContentEncodingSupport, FutureSupport, ScalatraServlet}
+import org.scalatra.{ ContentEncodingSupport, FutureSupport, ScalatraServlet }
 import org.scalatra.swagger.SwaggerSupport
 import org.scalatra.util.conversion.TypeConverter
 import org.slf4j.LoggerFactory
