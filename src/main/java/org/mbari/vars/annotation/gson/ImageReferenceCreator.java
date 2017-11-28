@@ -14,31 +14,21 @@
  * limitations under the License.
  */
 
-package org.mbari.vars.annotation.api
+package org.mbari.vars.annotation.gson;
 
-import org.scalatra.Unauthorized
-import org.scalatra.swagger.Swagger
+import com.google.gson.InstanceCreator;
+import org.mbari.vars.annotation.dao.jpa.ImageReferenceImpl;
+import org.mbari.vars.annotation.model.ImageReference;
 
-import scala.concurrent.ExecutionContext
+import java.lang.reflect.Type;
 
 /**
  * @author Brian Schlining
- * @since 2017-01-19T11:07:00
+ * @since 2017-09-20T14:14:00
  */
-class AuthorizationV1Api(implicit val swagger: Swagger, val executor: ExecutionContext)
-    extends APIStack {
-
-  override protected def applicationDescription: String = "Authorization API (v1)"
-
-  before() {
-    contentType = "application/json"
-  }
-
-  post("/") {
-    authorizationService.requestAuthorization(request) match {
-      case None => halt(Unauthorized())
-      case Some(s) => s
+public class ImageReferenceCreator implements InstanceCreator<ImageReference> {
+    @Override
+    public ImageReference createInstance(Type type) {
+        return new ImageReferenceImpl();
     }
-  }
-
 }

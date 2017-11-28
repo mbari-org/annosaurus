@@ -1,10 +1,26 @@
+/*
+ * Copyright 2017 Monterey Bay Aquarium Research Institute
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.mbari.vars.annotation.api
 
 import java.util.UUID
 
 import org.mbari.vars.annotation.controllers.CachedAncillaryDatumController
 import org.mbari.vars.annotation.model.simple.CachedAncillaryDatumBean
-import org.scalatra.{BadRequest, NotFound}
+import org.scalatra.{ BadRequest, NotFound }
 import org.scalatra.swagger.Swagger
 
 import scala.concurrent.ExecutionContext
@@ -90,7 +106,7 @@ class CachedAncillaryDatumV1Api(controller: CachedAncillaryDatumController)(impl
       case "application/json" =>
         val data = fromJson(request.body, classOf[Array[CachedAncillaryDatumBean]])
         controller.bulkCreateOrUpdate(data)
-              .map(ds => toJson(ds.asJava))
+          .map(ds => toJson(ds.asJava))
       case _ =>
         halt(BadRequest("Posts to /bulk only accept a JSON body (i.e. Content-Type: application/json)"))
     }

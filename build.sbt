@@ -25,7 +25,10 @@ lazy val buildSettings = Seq(
   organization := "org.mbari.vars",
   version := "0.1.0-SNAPSHOT",
   scalaVersion := "2.12.2",
-  crossScalaVersions := Seq("2.12.2")
+  crossScalaVersions := Seq("2.12.2"),
+  organizationName := "Monterey Bay Aquarium Research Institute",
+  startYear := Some(2017),
+  licenses += ("Apache-2.0", new URL("https://www.apache.org/licenses/LICENSE-2.0.txt"))
 )
 
 lazy val consoleSettings = Seq(
@@ -76,6 +79,7 @@ lazy val apps = Seq("jetty-main")  // for sbt-pack
 
 lazy val annosaurus = (project in file("."))
   .enablePlugins(JettyPlugin)
+  .enablePlugins(AutomateHeaderPlugin)
   .settings(appSettings)
   .settings(
     libraryDependencies ++= Seq(

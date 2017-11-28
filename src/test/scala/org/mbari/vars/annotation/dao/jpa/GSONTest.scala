@@ -57,7 +57,14 @@ class GSONTest extends FlatSpec with Matchers {
   }
 
   it should "round trip an ancillary datum to/from json" in {
-    val datum = CachedAncillaryDatumImpl(36, -122, 1000, 35.234, 13, 1003, 3.4)
+    val datum = CachedAncillaryDatumImpl(36, -122, 1000, 35.234F, 13F, 1003F, 3.4F)
+    val json = Constants.GSON.toJson(datum)
+    val datum0 = Constants.GSON.fromJson(json, classOf[CachedAncillaryDatumImpl])
+    datum0.latitude should not be None
+    datum0.latitude.get should be (datum.latitude.get)
+    datum0.longitude.get should be (datum.longitude.get)
+    datum0.depthMeters.get should be (datum.depthMeters.get)
+    datum0.salinity.get should be (datum.salinity.get +- 0.0001F)
   }
 
 }

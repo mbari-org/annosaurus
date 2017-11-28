@@ -28,4 +28,10 @@ addSbtPlugin("org.scalastyle" %% "scalastyle-sbt-plugin" % "0.8.0")
 // https://github.com/fedragon/sbt-todolist
 addSbtPlugin("com.github.fedragon" % "sbt-todolist" % "0.6")
 
+// https://github.com/sbt/sbt-license-report
+addSbtPlugin("com.typesafe.sbt" % "sbt-license-report" % "1.2.0")
+
+// https://github.com/sbt/sbt-header
+addSbtPlugin("de.heikoseeberger" % "sbt-header" % "4.0.0")
+
 resolvers += Resolver.sonatypeRepo("releases")
