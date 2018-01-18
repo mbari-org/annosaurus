@@ -2,6 +2,8 @@
 
 # annosaurus
 
+[![Build Status](https://travis-ci.org/mbari-media-management/annosaurus.svg?branch=master)](https://travis-ci.org/mbari-media-management/annosaurus)
+
 ## tl;dr
 
 A web-service for creating image and video annotations.
