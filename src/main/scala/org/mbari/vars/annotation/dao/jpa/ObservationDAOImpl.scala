@@ -97,7 +97,8 @@ class ObservationDAOImpl(entityManager: EntityManager)
     query.setParameter(1, name)
     query.getResultList
       .asScala
-      .map(_.asInstanceOf[Int])
+      .map(_.asInstanceOf[Number])
+      .map(_.intValue())
       .head
   }
 
@@ -106,7 +107,8 @@ class ObservationDAOImpl(entityManager: EntityManager)
     query.setParameter(1, UUIDConverter.uuidToString(uuid))
     query.getResultList
       .asScala
-      .map(_.asInstanceOf[Int])
+      .map(_.asInstanceOf[Number])
+      .map(_.intValue())
       .head
   }
 
