@@ -6,7 +6,9 @@
 
 ## tl;dr
 
-A web-service for creating image and video annotations.
+A web-service for creating image and video annotations. 
+
+We're working on API documentation. You can view the them on [swaggerhub](https://app.swaggerhub.com/apis/mbari/annosaurus/1.0.0-oas3)
 
 ## Overview
 
