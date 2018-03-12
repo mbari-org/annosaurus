@@ -8,7 +8,7 @@
 
 A web-service for creating image and video annotations. 
 
-We're working on API documentation. You can view the them on [swaggerhub](https://app.swaggerhub.com/apis/mbari/annosaurus/1.0.0-oas3)
+We're working on API documentation; [it's still incomplete](https://i.pinimg.com/originals/10/a0/cc/10a0cc1e941644f78ef777a946898148.jpg). You can view them in their _in-progress_ state on [swaggerhub](https://app.swaggerhub.com/apis/mbari/annosaurus/1.0.0-oas3)
 
 ## Overview
 
