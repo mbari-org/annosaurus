@@ -112,7 +112,7 @@ class ImageV1Api(controller: ImageController)(implicit val swagger: Swagger, val
     validateRequest() // Apply API security
     val uuid = params.getAs[UUID]("uuid").getOrElse(halt(BadRequest(
       body = "{}",
-      reason = "A video reference 'uuid' parameter is required"
+      reason = "A image reference 'uuid' parameter is required"
     )))
     val videoReferenceUUID = params.getAs[UUID]("video_reference_uuid")
     val url = params.getAs[URL]("url")

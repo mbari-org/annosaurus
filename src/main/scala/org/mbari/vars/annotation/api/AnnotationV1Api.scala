@@ -27,6 +27,7 @@ import org.scalatra.swagger.Swagger
 
 import scala.concurrent.ExecutionContext
 import scala.collection.JavaConverters._
+import scala.util.control.NonFatal
 
 /**
  *
@@ -57,6 +58,19 @@ class AnnotationV1Api(controller: AnnotationController)(implicit val swagger: Sw
       })
   }
 
+  get("/updated/:start/:end") {
+    val start = params.getAs[Instant]("start").getOrElse(halt(BadRequest(
+      body = "{}",
+      reason = "A start timestamp parameter is required"
+    )))
+    val end = params.getAs[Instant]("end").getOrElse(Instant.now())
+    val limit = params.getAs[Int]("limit")
+    val offset = params.getAs[Int]("offset")
+    controller.findBetweenUpdatedDates(start, end, limit, offset)
+      .map(_.asJava)
+      .map(toJson)
+  }
+
   get("/videoreference/:uuid") {
     val uuid = params.getAs[UUID]("uuid").getOrElse(halt(BadRequest(
       body = "{}",
@@ -67,6 +81,7 @@ class AnnotationV1Api(controller: AnnotationController)(implicit val swagger: Sw
     controller.findByVideoReferenceUUID(uuid, limit, offset)
       .map(_.asJava)
       .map(toJson)
+
   }
 
   get("/imagereference/:uuid") {

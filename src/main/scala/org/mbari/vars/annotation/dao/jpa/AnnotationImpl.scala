@@ -20,7 +20,7 @@ import java.time.{ Duration, Instant }
 import java.util.{ UUID, ArrayList => JArrayList, List => JList }
 
 import com.google.gson.annotations.{ Expose, SerializedName }
-import org.mbari.vars.annotation.model.{ Annotation, Association, ImageReference, Observation }
+import org.mbari.vars.annotation.model._
 import org.mbari.vcr4j.time.Timecode
 
 import scala.collection.JavaConverters._
@@ -114,6 +114,11 @@ object AnnotationImpl {
     a.associations = observation.associations.toSeq
     a.imageReferences = observation.imagedMoment.imageReferences.toSeq
     a
+  }
+
+  def apply(imagedMoment: ImagedMoment): Iterable[AnnotationImpl] = {
+    imagedMoment.observations
+      .map(apply)
   }
 
   def apply(

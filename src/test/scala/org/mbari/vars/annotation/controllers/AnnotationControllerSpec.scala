@@ -1,3 +1,19 @@
+/*
+ * Copyright 2017 Monterey Bay Aquarium Research Institute
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.mbari.vars.annotation.controllers
 
 import java.time.{ Duration, Instant }
@@ -46,6 +62,20 @@ class AnnotationControllerSpec extends FlatSpec with Matchers with BeforeAndAfte
     a.concept should be("Grimpoteuthis")
     a.observer should be("brian")
     a.recordedTimestamp should be(recordedDate)
+  }
+
+  it should "find by videoReferenceUuid" in {
+    val a = exec(() => controller.create(
+      UUID.randomUUID(),
+      concept = "Slime mold",
+      observer = "brian",
+      recordedDate = Some(recordedDate)
+    ))
+
+    val b = exec(() => controller.findByVideoReferenceUUID(a.videoReferenceUuid))
+    b should not be empty
+    b.size should be(1)
+    b.head.concept should be("Slime mold")
   }
 
   it should "create and update" in {

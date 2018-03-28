@@ -54,6 +54,12 @@ import scala.collection.JavaConverters._
     query = "SELECT i FROM ImagedMoment i"
   ),
   new NamedQuery(
+    name = "ImagedMoment.findBetweenUpdatedDates",
+    query = "SELECT i FROM ImagedMoment i LEFT JOIN i.javaObservations o WHERE " +
+    "i.lastUpdatedTime BETWEEN :start AND :end OR " +
+    "o.lastUpdatedTime BETWEEN :start AND :end"
+  ),
+  new NamedQuery(
     name = "ImagedMoment.findByVideoReferenceUUID",
     query = "SELECT i FROM ImagedMoment i WHERE i.videoReferenceUUID = :uuid"
   ),

@@ -16,13 +16,17 @@
 
 package org.mbari.vars.annotation.dao.jpa
 
+import java.sql.Timestamp
 import java.time.{ Duration, Instant }
 import java.util.UUID
-import javax.persistence.EntityManager
 
+import javax.persistence.EntityManager
 import org.mbari.vars.annotation.dao.ImagedMomentDAO
+import org.mbari.vars.annotation.model.Annotation
 import org.mbari.vcr4j.time.Timecode
+
 import scala.collection.JavaConverters._
+import scala.concurrent.Future
 
 /**
  *
@@ -48,6 +52,24 @@ class ImagedMomentDAOImpl(entityManager: EntityManager)
     elapsedTime.foreach(imagedMoment.elapsedTime = _)
     recordedDate.foreach(imagedMoment.recordedDate = _)
     imagedMoment
+  }
+
+  override def findBetweenUpdatedDates(
+    start: Instant,
+    end: Instant,
+    limit: Option[Int] = None,
+    offset: Option[Int] = None
+  ): Iterable[ImagedMomentImpl] = {
+
+    val startTimestamp = Timestamp.from(start)
+    val endTimestamp = Timestamp.from(end)
+
+    findByNamedQuery(
+      "ImagedMoment.findBetweenUpdatedDates",
+      Map("start" -> startTimestamp, "end" -> endTimestamp),
+      limit,
+      offset
+    )
   }
 
   override def findAllVideoReferenceUUIDs(limit: Option[Int] = None, offset: Option[Int] = None): Iterable[UUID] = {

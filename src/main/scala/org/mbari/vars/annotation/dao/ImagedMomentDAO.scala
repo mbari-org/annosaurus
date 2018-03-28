@@ -20,8 +20,10 @@ import java.time.{ Duration, Instant }
 import java.util.UUID
 
 import org.mbari.vars.annotation.dao.jpa.ImagedMomentImpl
-import org.mbari.vars.annotation.model.ImagedMoment
+import org.mbari.vars.annotation.model.{ Annotation, ImagedMoment }
 import org.mbari.vcr4j.time.Timecode
+
+import scala.concurrent.Future
 
 /**
  *
@@ -37,6 +39,22 @@ trait ImagedMomentDAO[T <: ImagedMoment] extends DAO[T] {
     elapsedTime: Option[Duration] = None,
     recordedDate: Option[Instant] = None
   ): T
+
+  /**
+   * Find ImagedMoments where the imagedmoment OR observation has been updated
+   * between the requested dates.
+   * @param start The starting date
+   * @param end The ending date
+   * @param limit The number of results to return. Default is all of them
+   * @param offset The starting index of the results to return. Default is 0.
+   * @return ImagedMoments between the given dates
+   */
+  def findBetweenUpdatedDates(
+    start: Instant,
+    end: Instant,
+    limit: Option[Int] = None,
+    offset: Option[Int] = None
+  ): Iterable[ImagedMomentImpl]
 
   def findAllVideoReferenceUUIDs(limit: Option[Int], offset: Option[Int]): Iterable[UUID]
   def findByVideoReferenceUUID(uuid: UUID, limit: Option[Int] = None, offset: Option[Int] = None): Iterable[T]

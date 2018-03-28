@@ -43,6 +43,18 @@ class AnnotationController(daoFactory: BasicDAOFactory) {
     f.map(_.map(AnnotationImpl(_)))
   }
 
+  def findBetweenUpdatedDates(
+    start: Instant,
+    end: Instant,
+    limit: Option[Int] = None,
+    offset: Option[Int] = None
+  )(implicit ec: ExecutionContext): Future[Seq[Annotation]] = {
+    val imDao = daoFactory.newImagedMomentDAO()
+    val f = imDao.runTransaction(d => d.findBetweenUpdatedDates(start, end, limit, offset))
+    f.onComplete(_ => imDao.close())
+    f.map(_.flatMap(AnnotationImpl(_)).toSeq)
+  }
+
   /*
       This searches for the ImagedMoments but returns an Annotation view. Keep in mind
       that each ImagedMoment may contain more than one observations. The limit and
@@ -59,9 +71,7 @@ class AnnotationController(daoFactory: BasicDAOFactory) {
     val imDao = daoFactory.newImagedMomentDAO()
     val f = imDao.runTransaction(d => d.findByVideoReferenceUUID(videoReferenceUUID, limit, offset))
     f.onComplete(t => imDao.close())
-    f.map(ims => ims.flatMap(_.observations)) // Convert to Iterable[Observation]
-      .map(obss => obss.toSeq.map(AnnotationImpl(_))) // Convert to Iterable[Annotation]
-
+    f.map(_.flatMap(AnnotationImpl(_)).toSeq)
   }
 
   def findByImageReferenceUUID(imageReferenceUUID: UUID)(implicit ec: ExecutionContext): Future[Iterable[Annotation]] = {
