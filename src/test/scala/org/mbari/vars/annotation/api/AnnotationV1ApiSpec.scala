@@ -38,8 +38,6 @@ import scala.collection.JavaConverters._
  */
 class AnnotationV1ApiSpec extends WebApiStack {
 
-  private[this] val startTimestamp = Instant.now()
-
   private[this] val annotationV1Api = {
     val controller = new AnnotationController(daoFactory)
     new AnnotationV1Api(controller)
@@ -122,12 +120,6 @@ class AnnotationV1ApiSpec extends WebApiStack {
       a.observer should be(annotation.observer)
       a.elapsedTime should be(annotation.elapsedTime)
       a.timecode should be(null)
-    }
-  }
-
-  it should "find last updated annotations between timestamps" in {
-    get(s"/v1/annotations/updated/$startTimestamp/${Instant.now()}") {
-      status should be(200)
     }
   }
 

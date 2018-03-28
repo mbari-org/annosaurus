@@ -24,7 +24,6 @@ import java.util.UUID
 import org.mbari.vars.annotation.Constants
 import org.mbari.vcr4j.time.Timecode
 import org.scalatra.{ ContentEncodingSupport, FutureSupport, ScalatraServlet }
-import org.scalatra.swagger.SwaggerSupport
 import org.scalatra.util.conversion.TypeConverter
 import org.slf4j.LoggerFactory
 
@@ -40,7 +39,6 @@ import scala.util.Try
 abstract class APIStack extends ScalatraServlet
     with ApiAuthenticationSupport
     with ContentEncodingSupport
-    with SwaggerSupport
     with FutureSupport {
 
   protected[this] val log = LoggerFactory.getLogger(getClass)

@@ -20,7 +20,6 @@ import org.mbari.vars.annotation.api._
 import org.mbari.vars.annotation.controllers._
 import org.mbari.vars.annotation.dao.jpa.JPADAOFactory
 import org.scalatra.LifeCycle
-import org.scalatra.swagger.{ ApiInfo, Swagger }
 import org.slf4j.LoggerFactory
 
 import scala.concurrent.ExecutionContext
@@ -34,17 +33,6 @@ import scala.concurrent.ExecutionContext
 class ScalatraBootstrap extends LifeCycle {
 
   private[this] val log = LoggerFactory.getLogger(getClass)
-
-  val apiInfo = ApiInfo(
-    """video-annotation-service""",
-    """Video Annotations - Server""",
-    """http://localhost:8080/api-docs""",
-    """brian@mbari.org""",
-    """MIT""",
-    """http://opensource.org/licenses/MIT"""
-  )
-
-  implicit val swagger = new Swagger("1.2", "1.0.0", apiInfo)
 
   override def init(context: ServletContext): Unit = {
 
@@ -81,8 +69,6 @@ class ScalatraBootstrap extends LifeCycle {
     context.mount(imageV1Api, "/v1/images")
     context.mount(observationV1Api, "/v1/observations")
     context.mount(videoReferenceV1Api, "/v1/videoreferences")
-
-    context.mount(new AnnotationSwagger, "/api-docs")
 
   }
 

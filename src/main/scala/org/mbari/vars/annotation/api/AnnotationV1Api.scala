@@ -23,11 +23,9 @@ import org.mbari.vars.annotation.controllers.AnnotationController
 import org.mbari.vars.annotation.dao.jpa.AnnotationImpl
 import org.mbari.vcr4j.time.Timecode
 import org.scalatra.{ BadRequest, NotFound }
-import org.scalatra.swagger.Swagger
 
 import scala.concurrent.ExecutionContext
 import scala.collection.JavaConverters._
-import scala.util.control.NonFatal
 
 /**
  *
@@ -35,11 +33,8 @@ import scala.util.control.NonFatal
  * @author Brian Schlining
  * @since 2016-06-30T10:08:00
  */
-class AnnotationV1Api(controller: AnnotationController)(implicit val swagger: Swagger, val executor: ExecutionContext)
+class AnnotationV1Api(controller: AnnotationController)(implicit val executor: ExecutionContext)
     extends APIStack {
-
-  override protected def applicationDescription: String = "Annotation API (v1)"
-  override protected val applicationName: Option[String] = Some.apply("AnnotationAPI")
 
   before() {
     contentType = "application/json"
@@ -48,46 +43,36 @@ class AnnotationV1Api(controller: AnnotationController)(implicit val swagger: Sw
 
   get("/:uuid") {
     val uuid = params.getAs[UUID]("uuid").getOrElse(halt(BadRequest(
-      body = "{}",
-      reason = "A 'uuid' parameter is required"
+      body = "A 'uuid' parameter is required"
     )))
     controller.findByUUID(uuid)
       .map({
-        case None => halt(NotFound(body = "{}", reason = s"An observation with uuid of $uuid was not found"))
+        case None => halt(NotFound(body = s"An observation with uuid of $uuid was not found"))
         case Some(obs) => toJson(obs)
       })
   }
 
-  get("/updated/:start/:end") {
-    val start = params.getAs[Instant]("start").getOrElse(halt(BadRequest(
-      body = "{}",
-      reason = "A start timestamp parameter is required"
-    )))
-    val end = params.getAs[Instant]("end").getOrElse(Instant.now())
-    val limit = params.getAs[Int]("limit")
-    val offset = params.getAs[Int]("offset")
-    controller.findBetweenUpdatedDates(start, end, limit, offset)
-      .map(_.asJava)
-      .map(toJson)
-  }
-
   get("/videoreference/:uuid") {
     val uuid = params.getAs[UUID]("uuid").getOrElse(halt(BadRequest(
-      body = "{}",
-      reason = "A video reference 'uuid' parameter is required"
+      body = "A video reference 'uuid' parameter is required"
     )))
     val limit = params.getAs[Int]("limit")
     val offset = params.getAs[Int]("offset")
     controller.findByVideoReferenceUUID(uuid, limit, offset)
       .map(_.asJava)
       .map(toJson)
+  }
+
+  get("/videoreference/count/:uuid") {
+    val uuid = params.getAs[UUID]("uuid").getOrElse(halt(BadRequest(
+      body = "A video reference 'uuid' parameter is required"
+    )))
 
   }
 
   get("/imagereference/:uuid") {
     val uuid = params.getAs[UUID]("uuid").getOrElse(halt(BadRequest(
-      body = "{}",
-      reason = "A image reference 'uuid' parameter is required"
+      body = "A image reference 'uuid' parameter is required"
     )))
     controller.findByImageReferenceUUID(uuid)
       .map(_.asJava)
@@ -98,8 +83,7 @@ class AnnotationV1Api(controller: AnnotationController)(implicit val swagger: Sw
   post("/") {
     validateRequest() // Apply API security
     val videoReferenceUUID = params.getAs[UUID]("video_reference_uuid").getOrElse(halt(BadRequest(
-      body = "{}",
-      reason = "A 'video_reference_uuid' parameter is required"
+      body = "A 'video_reference_uuid' parameter is required"
     )))
     val concept = params.get("concept").getOrElse(halt(BadRequest(
       "A 'concept' parameter is required"
@@ -140,8 +124,7 @@ class AnnotationV1Api(controller: AnnotationController)(implicit val swagger: Sw
   put("/:uuid") {
     validateRequest() // Apply API security
     val uuid = params.getAs[UUID]("uuid").getOrElse(halt(BadRequest(
-      body = "{}",
-      reason = "An observation 'uuid' parameter is required"
+      body = "An observation 'uuid' parameter is required"
     )))
     val videoReferenceUUID = params.getAs[UUID]("video_reference_uuid")
     val concept = params.get("concept")
@@ -158,7 +141,7 @@ class AnnotationV1Api(controller: AnnotationController)(implicit val swagger: Sw
       timecode, elapsedTime, recordedDate, duration, group, activity)
       .map({
         case None =>
-          halt(NotFound(body = "{}", reason = s"An annotation with observation_uuid of $uuid was not found"))
+          halt(NotFound(body = s"An annotation with observation_uuid of $uuid was not found"))
         case Some(ann) => toJson(ann)
       }) // Convert to JSON
 

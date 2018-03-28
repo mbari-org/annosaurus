@@ -22,11 +22,9 @@ import java.util.UUID
 
 import javax.persistence.EntityManager
 import org.mbari.vars.annotation.dao.ImagedMomentDAO
-import org.mbari.vars.annotation.model.Annotation
 import org.mbari.vcr4j.time.Timecode
 
 import scala.collection.JavaConverters._
-import scala.concurrent.Future
 
 /**
  *
@@ -72,6 +70,18 @@ class ImagedMomentDAOImpl(entityManager: EntityManager)
     )
   }
 
+  override def countBetweenUpdatedDates(start: Instant, end: Instant): Int = {
+    val query = entityManager.createNamedQuery("ImagedMoment.countBetweenUpdatedDates")
+    val startTimestamp = Timestamp.from(start)
+    val endTimestamp = Timestamp.from(end)
+    query.setParameter(1, startTimestamp)
+    query.setParameter(2, endTimestamp)
+    query.getResultList
+      .asScala
+      .map(_.asInstanceOf[Int])
+      .head
+  }
+
   override def findAllVideoReferenceUUIDs(limit: Option[Int] = None, offset: Option[Int] = None): Iterable[UUID] = {
     val query = entityManager.createNamedQuery("ImagedMoment.findAllVideoReferenceUUIDs")
     limit.foreach(query.setMaxResults)
@@ -79,6 +89,15 @@ class ImagedMomentDAOImpl(entityManager: EntityManager)
     query.getResultList
       .asScala
       .map(s => UUID.fromString(s.toString))
+  }
+
+  override def countByVideoReferenceUUID(uuid: UUID): Int = {
+    val query = entityManager.createNamedQuery("ImagedMoment.countBetweenUpdatedDates")
+    query.setParameter(1, uuid)
+    query.getResultList
+      .asScala
+      .map(_.asInstanceOf[Int])
+      .head
   }
 
   override def findByVideoReferenceUUID(uuid: UUID, limit: Option[Int], offset: Option[Int]): Iterable[ImagedMomentImpl] =

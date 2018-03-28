@@ -16,14 +16,13 @@
 
 package org.mbari.vars.annotation.api
 
-import java.time.Duration
+import java.time.{ Duration, Instant }
 import java.util.UUID
 import java.util.concurrent.TimeUnit
 
 import org.mbari.vars.annotation.controllers.{ AnnotationController, ImagedMomentController }
-import org.mbari.vars.annotation.dao.jpa.{ AnnotationImpl, ImagedMomentImpl }
-import org.mbari.vars.annotation.model.{ Annotation, ImagedMoment }
-import org.mbari.vcr4j.time.Timecode
+import org.mbari.vars.annotation.dao.jpa.ImagedMomentImpl
+import org.mbari.vars.annotation.model.Annotation
 
 import scala.concurrent.Await
 import scala.concurrent.duration.{ Duration => SDuration }
@@ -35,6 +34,8 @@ import scala.concurrent.duration.{ Duration => SDuration }
  * @since 2016-09-08T14:24:00
  */
 class ImagedMomentV1ApiSpec extends WebApiStack {
+
+  private[this] val startTimestamp = Instant.now()
 
   private[this] val imagedMomentV1Api = {
     val controller = new ImagedMomentController(daoFactory)
@@ -89,6 +90,21 @@ class ImagedMomentV1ApiSpec extends WebApiStack {
       val i = im.head
       i.videoReferenceUUID should be(annotation.videoReferenceUuid)
       i.uuid should be(annotation.imagedMomentUuid)
+    }
+  }
+
+  it should "find last updated imagedmoments between timestamps" in {
+    get(s"/v1/imagedmoments/modified/$startTimestamp/${Instant.now()}") {
+      status should be(200)
+      val im = gson.fromJson(body, classOf[Array[ImagedMomentImpl]]).toList
+      im.size should be > 0
+    }
+  }
+
+  it should "count last updated imagedmoments between timestamps" in {
+    get(s"/v1/imagedmoments/modified/count/$startTimestamp/${Instant.now()}") {
+      status should be(200)
+      println(body)
     }
   }
 

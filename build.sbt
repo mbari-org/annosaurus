@@ -1,31 +1,31 @@
 val akkaVersion = "2.4.7"
-val auth0Version = "3.1.0"
+val auth0Version = "3.3.0"
 val codecVersion = "1.10"
 val configVersion = "1.3.1"
-val derbyVersion = "10.13.1.1"
-val eclipselinkVersion = "2.6.4"
+val derbyVersion = "10.14.1.0"
+val eclipselinkVersion = "2.6.5"
 val gsonJavatimeVersion = "1.1.1"
-val gsonVersion = "2.8.0"
-val h2Version = "1.4.193"
-val jettyVersion = "9.4.1.v20170120"
-val jsonVersion = "3.5.0"
+val gsonVersion = "2.8.2"
+val h2Version = "1.4.197"
+val jettyVersion = "9.4.9.v20180320"
+val jsonVersion = "3.5.3"
 val jtaVersion = "1.1"
 val jtdsVersion = "1.3.1"
 val junitVersion = "4.12"
-val logbackVersion = "1.1.9"
+val logbackVersion = "1.2.3"
 val mssqlVersion = "6.1.0.jre8"
-val scalatestVersion = "3.0.1"
-val scalatraVersion = "2.5.0"
+val scalatestVersion = "3.0.5"
+val scalatraVersion = "2.6.3"
 val servletVersion = "3.1.0"
-val slf4jVersion = "1.7.22"
-val vcr4jVersion = "3.0.1"
+val slf4jVersion = "1.7.25"
+val vcr4jVersion = "4.0.1"
 
 
 lazy val buildSettings = Seq(
   organization := "org.mbari.vars",
   version := "0.1.0-SNAPSHOT",
-  scalaVersion := "2.12.2",
-  crossScalaVersions := Seq("2.12.2"),
+  scalaVersion := "2.12.5",
+  crossScalaVersions := Seq("2.12.5"),
   organizationName := "Monterey Bay Aquarium Research Institute",
   startYear := Some(2017),
   licenses += ("Apache-2.0", new URL("https://www.apache.org/licenses/LICENSE-2.0.txt"))
@@ -110,9 +110,6 @@ lazy val annosaurus = (project in file("."))
       "org.scalatra"            %% "scalatra-json"                  % scalatraVersion,
       "org.scalatra"            %% "scalatra-scalate"               % scalatraVersion,
       "org.scalatra"            %% "scalatra-scalatest"             % scalatraVersion,
-      "org.scalatra"            %% "scalatra-slf4j"                 % scalatraVersion,
-      "org.scalatra"            %% "scalatra-swagger"               % scalatraVersion,
-      "org.scalatra"            %% "scalatra-swagger-ext"           % scalatraVersion,
       "org.slf4j"                % "log4j-over-slf4j"               % slf4jVersion,
       "org.slf4j"                % "slf4j-api"                      % slf4jVersion
     ).map(_.excludeAll(ExclusionRule("org.slf4j", "slf4j-jdk14"),

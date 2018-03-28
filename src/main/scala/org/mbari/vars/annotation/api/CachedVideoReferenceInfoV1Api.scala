@@ -21,7 +21,6 @@ import java.util.UUID
 import org.mbari.vars.annotation.controllers.CachedVideoReferenceInfoController
 import org.mbari.vars.annotation.model.{ StringArray, UUIDArray, ValueArray }
 import org.scalatra.{ BadRequest, NoContent, NotFound }
-import org.scalatra.swagger.Swagger
 
 import scala.collection.JavaConverters._
 import scala.concurrent.ExecutionContext
@@ -32,12 +31,8 @@ import scala.concurrent.ExecutionContext
  * @author Brian Schlining
  * @since 2016-09-14T10:50:00
  */
-class CachedVideoReferenceInfoV1Api(controller: CachedVideoReferenceInfoController)(implicit val swagger: Swagger, val executor: ExecutionContext)
+class CachedVideoReferenceInfoV1Api(controller: CachedVideoReferenceInfoController)(implicit val executor: ExecutionContext)
     extends APIStack {
-
-  override protected def applicationDescription: String = "CachedVideoReferenceInfo API (v1)"
-
-  override protected val applicationName: Option[String] = Some("CachedVideoReferenceInfoAPI")
 
   get("/?") {
     val limit = params.getAs[Int]("limit")
@@ -53,8 +48,7 @@ class CachedVideoReferenceInfoV1Api(controller: CachedVideoReferenceInfoControll
     val offset = params.getAs[Int]("offset")
     controller.findByUUID(uuid).map({
       case None => halt(NotFound(
-        body = "{}",
-        reason = s"A CachedVideoReferenceInfo with a UUID of $uuid was not found"
+        body = s"A CachedVideoReferenceInfo with a UUID of $uuid was not found"
       ))
       case Some(v) => toJson(v)
     })
@@ -72,7 +66,7 @@ class CachedVideoReferenceInfoV1Api(controller: CachedVideoReferenceInfoControll
 
     controller.findByVideoReferenceUUID(uuid)
       .map({
-        case None => halt(NotFound(reason = s"A CachedVideoReferenceInfo with a videoreference uuid of $uuid was not found"))
+        case None => halt(NotFound(s"A CachedVideoReferenceInfo with a videoreference uuid of $uuid was not found"))
         case Some(v) => toJson(v)
       })
   }
@@ -107,8 +101,7 @@ class CachedVideoReferenceInfoV1Api(controller: CachedVideoReferenceInfoControll
   post("/") {
     validateRequest() // Apply API security
     val videoReferenceUUID = params.getAs[UUID]("video_reference_uuid").getOrElse(halt(BadRequest(
-      body = "{}",
-      reason = "A 'video_reference_uuid' parameter is required"
+      body = "A 'video_reference_uuid' parameter is required"
     )))
     val missionContact = params.get("mission_contact")
     val missionID = params.get("mission_id").getOrElse(halt(BadRequest("A 'mission_id' parameter is required")))
@@ -120,8 +113,7 @@ class CachedVideoReferenceInfoV1Api(controller: CachedVideoReferenceInfoControll
   put("/:uuid") {
     validateRequest() // Apply API security
     val uuid = params.getAs[UUID]("uuid").getOrElse(halt(BadRequest(
-      body = "{}",
-      reason = "A 'uuid' parameter is required"
+      body = "A 'uuid' parameter is required"
     )))
     val videoReferenceUUID = params.getAs[UUID]("video_reference_uuid")
     val missionContact = params.get("mission_contact")
@@ -129,7 +121,7 @@ class CachedVideoReferenceInfoV1Api(controller: CachedVideoReferenceInfoControll
     val platformName = params.get("platform_name")
     controller.update(uuid, videoReferenceUUID, platformName, missionID, missionContact)
       .map({
-        case None => halt(NotFound(reason = s"Failed. No VideoReferenceInfo with UUID of $uuid was found."))
+        case None => halt(NotFound(s"Failed. No VideoReferenceInfo with UUID of $uuid was found."))
         case Some(v) => toJson(v)
       })
   }
@@ -137,12 +129,11 @@ class CachedVideoReferenceInfoV1Api(controller: CachedVideoReferenceInfoControll
   delete("/:uuid") {
     validateRequest() // Apply API security
     val uuid = params.getAs[UUID]("uuid").getOrElse(halt(BadRequest(
-      body = "{}",
-      reason = "A 'uuid' parameter is required"
+      body = "A 'uuid' parameter is required"
     )))
     controller.delete(uuid).map({
-      case true => halt(NoContent(reason = s"Success! Deleted observation with UUID of $uuid"))
-      case false => halt(NotFound(reason = s"Failed. No observation with UUID of $uuid was found."))
+      case true => halt(NoContent()) // Success
+      case false => halt(NotFound(s"Failed. No observation with UUID of $uuid was found."))
     })
   }
 

@@ -19,8 +19,9 @@ package org.mbari.vars.annotation.controllers
 import java.time.{ Duration, Instant }
 import java.util.UUID
 
+import org.mbari.vars.annotation.dao.jpa.AnnotationImpl
 import org.mbari.vars.annotation.dao.{ ImagedMomentDAO, NotFoundInDatastoreException }
-import org.mbari.vars.annotation.model.ImagedMoment
+import org.mbari.vars.annotation.model.{ Annotation, ImagedMoment }
 import org.mbari.vcr4j.time.Timecode
 import org.slf4j.LoggerFactory
 
@@ -66,6 +67,28 @@ class ImagedMomentController(val daoFactory: BasicDAOFactory)
 
   def findWithImageReferences(videoReferenceUUID: UUID)(implicit ec: ExecutionContext): Future[Iterable[ImagedMoment]] =
     exec(d => d.findWithImageReferences(videoReferenceUUID))
+
+  def findBetweenUpdatedDates(
+    start: Instant,
+    end: Instant,
+    limit: Option[Int] = None,
+    offset: Option[Int] = None
+  )(implicit ec: ExecutionContext): Future[Seq[ImagedMoment]] = {
+    val imDao = daoFactory.newImagedMomentDAO()
+    val f = imDao.runTransaction(d => d.findBetweenUpdatedDates(start, end, limit, offset))
+    f.onComplete(_ => imDao.close())
+    f.map(_.toSeq)
+  }
+
+  def countBetweenUpdatedDates(
+    start: Instant,
+    end: Instant
+  )(implicit ec: ExecutionContext): Future[Int] = {
+    val imDao = daoFactory.newImagedMomentDAO()
+    val f = imDao.runTransaction(d => d.countBetweenUpdatedDates(start, end))
+    f.onComplete(_ => imDao.close())
+    f
+  }
 
   def deleteByVideoReferenceUUID(videoReferenceUUID: UUID)(implicit ec: ExecutionContext): Future[Int] =
     exec(d => d.deleteByVideoReferenceUUUID(videoReferenceUUID))

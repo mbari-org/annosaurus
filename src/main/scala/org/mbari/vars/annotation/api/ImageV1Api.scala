@@ -23,7 +23,6 @@ import java.util.UUID
 import org.mbari.vars.annotation.controllers.ImageController
 import org.mbari.vcr4j.time.Timecode
 import org.scalatra.{ BadRequest, NotFound }
-import org.scalatra.swagger.Swagger
 
 import scala.concurrent.ExecutionContext
 import scala.collection.JavaConverters._
@@ -31,11 +30,8 @@ import scala.collection.JavaConverters._
 /**
  * Created by brian on 7/14/16.
  */
-class ImageV1Api(controller: ImageController)(implicit val swagger: Swagger, val executor: ExecutionContext)
+class ImageV1Api(controller: ImageController)(implicit val executor: ExecutionContext)
     extends APIStack {
-
-  override protected def applicationDescription: String = "Image API (v1)"
-  override protected val applicationName: Option[String] = Some("ImageAPI")
 
   before() {
     contentType = "application/json"
@@ -44,19 +40,17 @@ class ImageV1Api(controller: ImageController)(implicit val swagger: Swagger, val
 
   get("/:uuid") {
     val uuid = params.getAs[UUID]("uuid").getOrElse(halt(BadRequest(
-      body = "{}",
-      reason = "A 'uuid' parameter is required"
+      body = "A 'uuid' parameter is required"
     )))
     controller.findByUUID(uuid).map({
-      case None => halt(NotFound(body = "{}", reason = s"an Image with an image_reference_uuid of $uuid was not found"))
+      case None => halt(NotFound(body = s"an Image with an image_reference_uuid of $uuid was not found"))
       case Some(v) => toJson(v)
     })
   }
 
   get("/videoreference/:uuid") {
     val uuid = params.getAs[UUID]("uuid").getOrElse(halt(BadRequest(
-      body = "{}",
-      reason = "A video reference 'uuid' parameter is required"
+      body = "A video reference 'uuid' parameter is required"
     )))
     val limit = params.getAs[Int]("limit")
     val offset = params.getAs[Int]("offset")
@@ -76,7 +70,7 @@ class ImageV1Api(controller: ImageController)(implicit val swagger: Swagger, val
     //   )))
     val url = params.getAs[URL]("url").getOrElse(halt(BadRequest("Please provide a URL")))
     controller.findByURL(url).map({
-      case None => halt(NotFound(reason = s"an Image with a URL of $url was not found"))
+      case None => halt(NotFound(body = s"an Image with a URL of $url was not found"))
       case Some(i) => toJson(i)
     })
   }
@@ -84,12 +78,10 @@ class ImageV1Api(controller: ImageController)(implicit val swagger: Swagger, val
   post("/") {
     validateRequest() // Apply API security
     val videoReferenceUUID = params.getAs[UUID]("video_reference_uuid").getOrElse(halt(BadRequest(
-      body = "{}",
-      reason = "A 'video_reference_uuid' parameter is required"
+      body = "A 'video_reference_uuid' parameter is required"
     )))
     val url = params.getAs[URL]("url").getOrElse(halt(BadRequest(
-      body = "{}",
-      reason = "A 'url' parameter is required"
+      body = "A 'url' parameter is required"
     )))
     val timecode = params.getAs[Timecode]("timecode")
     val elapsedTime = params.getAs[Duration]("elapsed_time_millis")
@@ -111,8 +103,7 @@ class ImageV1Api(controller: ImageController)(implicit val swagger: Swagger, val
   put("/:uuid") {
     validateRequest() // Apply API security
     val uuid = params.getAs[UUID]("uuid").getOrElse(halt(BadRequest(
-      body = "{}",
-      reason = "A image reference 'uuid' parameter is required"
+      body = "A image reference 'uuid' parameter is required"
     )))
     val videoReferenceUUID = params.getAs[UUID]("video_reference_uuid")
     val url = params.getAs[URL]("url")
@@ -126,7 +117,7 @@ class ImageV1Api(controller: ImageController)(implicit val swagger: Swagger, val
     controller.update(uuid, url, videoReferenceUUID, timecode, elapsedTime, recordedDate,
       format, width, height, description)
       .map({
-        case None => halt(NotFound(reason = s"an Image with an image_reference_uuid of $uuid was not found"))
+        case None => halt(NotFound(body = s"an Image with an image_reference_uuid of $uuid was not found"))
         case Some(v) => toJson(v)
       })
   }

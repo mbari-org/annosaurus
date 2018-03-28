@@ -21,7 +21,6 @@ import java.util.UUID
 import org.mbari.vars.annotation.controllers.{ AssociationController, ImagedMomentController }
 import org.mbari.vars.annotation.model.Association
 import org.scalatra.{ BadRequest, NoContent, NotFound }
-import org.scalatra.swagger.Swagger
 
 import scala.concurrent.ExecutionContext
 import scala.collection.JavaConverters._
@@ -32,12 +31,8 @@ import scala.collection.JavaConverters._
  * @author Brian Schlining
  * @since 2016-07-13T11:21:00
  */
-class AssociationV1Api(controller: AssociationController)(implicit val swagger: Swagger, val executor: ExecutionContext)
+class AssociationV1Api(controller: AssociationController)(implicit val executor: ExecutionContext)
     extends APIStack {
-
-  override protected def applicationDescription: String = "Association API (v1)"
-
-  override protected val applicationName: Option[String] = Some("AssociationAPI")
 
   before() {
     contentType = "application/json"
@@ -49,8 +44,7 @@ class AssociationV1Api(controller: AssociationController)(implicit val swagger: 
     val uuid = params.getAs[UUID]("uuid").getOrElse(halt(BadRequest("Please provide a 'uuid' parameter")))
     controller.findByUUID(uuid).map({
       case None => halt(NotFound(
-        body = "{}",
-        reason = s"An Association with a UUID of $uuid was not found"
+        body = s"An Association with a UUID of $uuid was not found"
       ))
       case Some(v) => toJson(v)
     })
@@ -83,7 +77,7 @@ class AssociationV1Api(controller: AssociationController)(implicit val swagger: 
     val linkValue = params.get("link_value")
     val mimeType = params.get("mime_type")
     controller.update(uuid, observationUUID, linkName, toConcept, linkValue, mimeType).map({
-      case None => halt(NotFound(body = "{}", reason = s"No association with uuid of $uuid was found"))
+      case None => halt(NotFound(body = s"No association with uuid of $uuid was found"))
       case Some(a) => toJson(a)
     })
   }
@@ -116,8 +110,8 @@ class AssociationV1Api(controller: AssociationController)(implicit val swagger: 
     validateRequest() // Apply API security
     val uuid = params.getAs[UUID]("uuid").getOrElse(halt(BadRequest("Please provide the 'uuid' of the association")))
     controller.delete(uuid).map({
-      case true => halt(NoContent(reason = s"Success! Deleted association with UUID of $uuid"))
-      case false => halt(NotFound(reason = s"Failed. No association with UUID of $uuid was found."))
+      case true => halt(NoContent()) // Success!
+      case false => halt(NotFound(s"Failed. No association with UUID of $uuid was found."))
     })
   }
 
