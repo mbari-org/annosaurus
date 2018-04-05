@@ -63,13 +63,6 @@ class AnnotationV1Api(controller: AnnotationController)(implicit val executor: E
       .map(toJson)
   }
 
-  get("/videoreference/count/:uuid") {
-    val uuid = params.getAs[UUID]("uuid").getOrElse(halt(BadRequest(
-      body = "A video reference 'uuid' parameter is required"
-    )))
-
-  }
-
   get("/imagereference/:uuid") {
     val uuid = params.getAs[UUID]("uuid").getOrElse(halt(BadRequest(
       body = "A image reference 'uuid' parameter is required"
