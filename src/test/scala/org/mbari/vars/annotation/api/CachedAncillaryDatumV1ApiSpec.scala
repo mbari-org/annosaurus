@@ -49,8 +49,7 @@ class CachedAncillaryDatumV1ApiSpec extends WebApiStack {
     val dao = daoFactory.newImagedMomentDAO()
     val ims = (0 until 10).map(i => dao.newPersistentObject(
       videoReferenceUuid,
-      elapsedTime = Some(Duration.ofMillis(math.round(math.random() * 10000L)))
-    ))
+      elapsedTime = Some(Duration.ofMillis(math.round(math.random() * 10000L)))))
     dao.runTransaction(d => {
       ims.foreach(dao.create)
     })
@@ -76,8 +75,7 @@ class CachedAncillaryDatumV1ApiSpec extends WebApiStack {
     post(
       s"$path/bulk",
       headers = Map("Content-Type" -> "application/json"),
-      body = json.getBytes(StandardCharsets.UTF_8)
-    ) {
+      body = json.getBytes(StandardCharsets.UTF_8)) {
         status should be(200)
         val persistedData = Constants.GSON
           .fromJson(body, classOf[Array[CachedAncillaryDatumImpl]])
@@ -107,8 +105,7 @@ class CachedAncillaryDatumV1ApiSpec extends WebApiStack {
     post(
       s"$path/bulk",
       headers = Map("Content-Type" -> "application/json"),
-      body = json2.getBytes(StandardCharsets.UTF_8)
-    ) {
+      body = json2.getBytes(StandardCharsets.UTF_8)) {
         status should be(200)
         val persistedData = Constants.GSON
           .fromJson(body, classOf[Array[CachedAncillaryDatumImpl]])

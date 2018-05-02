@@ -37,8 +37,7 @@ trait ImagedMomentDAO[T <: ImagedMoment] extends DAO[T] {
     videoReferenceUUID: UUID,
     timecode: Option[Timecode] = None,
     elapsedTime: Option[Duration] = None,
-    recordedDate: Option[Instant] = None
-  ): T
+    recordedDate: Option[Instant] = None): T
 
   /**
    * Find ImagedMoments where the imagedmoment OR observation has been updated
@@ -53,8 +52,7 @@ trait ImagedMomentDAO[T <: ImagedMoment] extends DAO[T] {
     start: Instant,
     end: Instant,
     limit: Option[Int] = None,
-    offset: Option[Int] = None
-  ): Iterable[ImagedMomentImpl]
+    offset: Option[Int] = None): Iterable[ImagedMomentImpl]
 
   def countBetweenUpdatedDates(start: Instant, end: Instant): Int
 
@@ -86,8 +84,7 @@ trait ImagedMomentDAO[T <: ImagedMoment] extends DAO[T] {
     uuid: UUID,
     timecode: Option[Timecode] = None,
     elapsedTime: Option[Duration] = None,
-    recordedDate: Option[Instant] = None
-  ): Option[T] = {
+    recordedDate: Option[Instant] = None): Option[T] = {
     var imagedMoment = timecode.flatMap(findByVideoReferenceUUIDAndTimecode(uuid, _))
     imagedMoment = if (imagedMoment.isDefined) imagedMoment else elapsedTime.flatMap(findByVideoReferenceUUIDAndElapsedTime(uuid, _))
     if (imagedMoment.isDefined) imagedMoment else recordedDate.flatMap(findByVideoReferenceUUIDAndRecordedDate(uuid, _))

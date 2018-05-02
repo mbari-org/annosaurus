@@ -55,8 +55,7 @@ class AnnotationV1ApiSpec extends WebApiStack {
       "video_reference_uuid" -> UUID.randomUUID().toString,
       "concept" -> "Nanomia bijuga",
       "observer" -> "brian",
-      "elapsed_time_millis" -> "12345"
-    ) {
+      "elapsed_time_millis" -> "12345") {
         status should be(200)
         annotation = gson.fromJson(body, classOf[AnnotationImpl])
         annotation.concept should be("Nanomia bijuga")
@@ -71,8 +70,7 @@ class AnnotationV1ApiSpec extends WebApiStack {
       "video_reference_uuid" -> UUID.randomUUID().toString,
       "concept" -> "Squid",
       "observer" -> "brian",
-      "recorded_timestamp" -> "2017-01-18T22:01:03.41Z"
-    ) {
+      "recorded_timestamp" -> "2017-01-18T22:01:03.41Z") {
         status should be(200)
         val a = gson.fromJson(body, classOf[AnnotationImpl])
         a.concept should be("Squid")
@@ -87,8 +85,7 @@ class AnnotationV1ApiSpec extends WebApiStack {
       "video_reference_uuid" -> UUID.randomUUID().toString,
       "concept" -> "Shark",
       "observer" -> "brian",
-      "recorded_timestamp" -> "2017-01-18T22:01:03.41Z"
-    ) {
+      "recorded_timestamp" -> "2017-01-18T22:01:03.41Z") {
         status should be(200)
         val a = gson.fromJson(body, classOf[AnnotationImpl])
         a.concept should be("Shark")
@@ -127,8 +124,7 @@ class AnnotationV1ApiSpec extends WebApiStack {
     put(
       s"/v1/annotations/${annotation.observationUuid}",
       "concept" -> "Aegina",
-      "duration_millis" -> "2500"
-    ) {
+      "duration_millis" -> "2500") {
         status should be(200)
         val a = gson.fromJson(body, classOf[AnnotationImpl])
         a.concept should be("Aegina")
@@ -144,8 +140,7 @@ class AnnotationV1ApiSpec extends WebApiStack {
       s"/v1/annotations/${annotation.observationUuid}",
       "concept" -> "Aegina",
       "duration_millis" -> "2500",
-      "video_reference_uuid" -> s"${annotation.videoReferenceUuid}"
-    ) {
+      "video_reference_uuid" -> s"${annotation.videoReferenceUuid}") {
         status should be(200)
         val a = gson.fromJson(body, classOf[AnnotationImpl])
         a.concept should be("Aegina")
@@ -166,8 +161,7 @@ class AnnotationV1ApiSpec extends WebApiStack {
     AnnotationImpl(uuid0, "bony-eared assfish", "brian", recordedDate = recordedDate),
     AnnotationImpl(uuid1, "Pandalus platyceros", "schlin", elapsedTime = elapsedTime),
     AnnotationImpl(uuid1, "Peobius", "stephalopod", elapsedTime = elapsedTime, timecode = Some(new Timecode("00:02:34:29", 29.97))),
-    AnnotationImpl(uuid1, "Peobius", "stephalopod", timecode = Some(new Timecode("00:02:34:29", 29.97)))
-  )
+    AnnotationImpl(uuid1, "Peobius", "stephalopod", timecode = Some(new Timecode("00:02:34:29", 29.97))))
   var persistedAnnotations: Seq[AnnotationImpl] = _
 
   it should "bulk create" in {
@@ -175,8 +169,7 @@ class AnnotationV1ApiSpec extends WebApiStack {
     post(
       "/v1/annotations/bulk",
       headers = Map("Content-Type" -> "application/json"),
-      body = json.getBytes(StandardCharsets.UTF_8)
-    ) {
+      body = json.getBytes(StandardCharsets.UTF_8)) {
         status should be(200)
         persistedAnnotations = Constants.GSON_FOR_ANNOTATION
           .fromJson(body, classOf[Array[AnnotationImpl]])
@@ -198,8 +191,7 @@ class AnnotationV1ApiSpec extends WebApiStack {
     post(
       "/v1/annotations/bulk",
       headers = Map("Content-Type" -> "application/json"),
-      body = json.getBytes(StandardCharsets.UTF_8)
-    ) {
+      body = json.getBytes(StandardCharsets.UTF_8)) {
         status should be(200)
         var pas0 = Constants.GSON_FOR_ANNOTATION
           .fromJson(body, classOf[Array[AnnotationImpl]])
@@ -219,8 +211,7 @@ class AnnotationV1ApiSpec extends WebApiStack {
     put(
       "/v1/annotations/bulk",
       headers = Map("Content-Type" -> "application/json"),
-      body = json.getBytes(StandardCharsets.UTF_8)
-    ) {
+      body = json.getBytes(StandardCharsets.UTF_8)) {
         status should be(200)
         val updatedAnnotations = Constants.GSON_FOR_ANNOTATION
           .fromJson(body, classOf[Array[AnnotationImpl]])

@@ -75,8 +75,7 @@ class ImageReferenceV1ApiSpec extends WebApiStack {
       "format" -> "image/jpg",
       "width_pixels" -> "1920",
       "height_pixels" -> "1080",
-      "description" -> "updated"
-    ) {
+      "description" -> "updated") {
         status should be(200)
         val ir = gson.fromJson(body, classOf[ImageReferenceImpl])
         ir.uuid should be(imageReference.uuid)

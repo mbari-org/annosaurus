@@ -34,8 +34,7 @@ trait ImageReferenceDAO[T <: ImageReference] extends DAO[T] {
     description: Option[String] = None,
     heightPixels: Option[Int] = None,
     widthPixels: Option[Int] = None,
-    format: Option[String] = None
-  ): T
+    format: Option[String] = None): T
 
   def findByURL(url: URL): Option[T]
 

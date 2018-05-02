@@ -32,7 +32,7 @@ import scala.collection.JavaConverters._
  * @since 2016-07-11T16:58:00
  */
 class ImagedMomentV1Api(controller: ImagedMomentController)(implicit val executor: ExecutionContext)
-    extends APIStack {
+  extends APIStack {
 
   before() {
     contentType = "application/json"
@@ -51,8 +51,7 @@ class ImagedMomentV1Api(controller: ImagedMomentController)(implicit val executo
     val uuid = params.getAs[UUID]("uuid").getOrElse(halt(BadRequest("Please provide a UUID")))
     controller.findByUUID(uuid).map({
       case None => halt(NotFound(
-        body = s"An ImagedMoment with a UUID of $uuid was not found"
-      ))
+        body = s"An ImagedMoment with a UUID of $uuid was not found"))
       case Some(v) => toJson(v)
     })
   }

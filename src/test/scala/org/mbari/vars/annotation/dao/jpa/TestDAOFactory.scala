@@ -35,8 +35,7 @@ object TestDAOFactory {
     "eclipselink.logging.level" -> "FINE",
     "javax.persistence.schema-generation.scripts.action" -> "drop-and-create",
     "javax.persistence.schema-generation.scripts.create-target" -> "target/test-database-create.ddl",
-    "javax.persistence.schema-generation.scripts.drop-target" -> "target/test-database-drop.ddl"
-  )
+    "javax.persistence.schema-generation.scripts.drop-target" -> "target/test-database-drop.ddl")
 
   //val Instance: SpecDAOFactory = DerbyTestDAOFactory.asInstanceOf[SpecDAOFactory]
   val Instance: SpecDAOFactory = DevelopmentTestDAOFactory.asInstanceOf[SpecDAOFactory]
@@ -71,8 +70,7 @@ object DerbyTestDAOFactory extends SpecDAOFactory {
   override def testProps(): Map[String, String] = TestDAOFactory.TestProperties ++
     Map(
       "eclipselink.target-database" -> TargetDatabase.Derby,
-      "javax.persistence.database-product-name" -> TargetDatabase.Derby
-    )
+      "javax.persistence.database-product-name" -> TargetDatabase.Derby)
 
   lazy val entityManagerFactory: EntityManagerFactory = {
     val driver = config.getString("org.mbari.vars.annotation.database.derby.driver")
@@ -89,8 +87,7 @@ object H2TestDAOFactory extends SpecDAOFactory {
   override def testProps(): Map[String, String] = TestDAOFactory.TestProperties ++
     Map(
       "eclipselink.target-database" -> TargetDatabase.Derby,
-      "javax.persistence.database-product-name" -> TargetDatabase.Derby
-    )
+      "javax.persistence.database-product-name" -> TargetDatabase.Derby)
 
   lazy val entityManagerFactory: EntityManagerFactory = {
     val driver = config.getString("org.mbari.vars.annotation.database.h2.driver")
@@ -109,8 +106,7 @@ object DevelopmentTestDAOFactory extends SpecDAOFactory {
   override def testProps(): Map[String, String] = TestDAOFactory.TestProperties ++
     Map(
       "eclipselink.target-database" -> productName,
-      "javax.persistence.database-product-name" -> productName
-    )
+      "javax.persistence.database-product-name" -> productName)
 
   lazy val entityManagerFactory: EntityManagerFactory = {
     val driver = config.getString("org.mbari.vars.annotation.database.development.driver")

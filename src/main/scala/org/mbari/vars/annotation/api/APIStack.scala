@@ -37,9 +37,9 @@ import scala.util.Try
  * @since 2016-05-23T13:32:00
  */
 abstract class APIStack extends ScalatraServlet
-    with ApiAuthenticationSupport
-    with ContentEncodingSupport
-    with FutureSupport {
+  with ApiAuthenticationSupport
+  with ContentEncodingSupport
+  with FutureSupport {
 
   protected[this] val log = LoggerFactory.getLogger(getClass)
   protected[this] val timeFormatter = DateTimeFormatter.ISO_DATE_TIME

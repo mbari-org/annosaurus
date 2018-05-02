@@ -30,7 +30,7 @@ import scala.concurrent.{ ExecutionContext, Future }
  * @since 2016-09-14T10:50:00
  */
 class CachedVideoReferenceInfoController(val daoFactory: BasicDAOFactory)
-    extends BaseController[CachedVideoReferenceInfo, CachedVideoReferenceInfoDAO[CachedVideoReferenceInfo]] {
+  extends BaseController[CachedVideoReferenceInfo, CachedVideoReferenceInfoDAO[CachedVideoReferenceInfo]] {
 
   protected type VRDAO = CachedVideoReferenceInfoDAO[CachedVideoReferenceInfo]
 
@@ -83,8 +83,7 @@ class CachedVideoReferenceInfoController(val daoFactory: BasicDAOFactory)
     videoReferenceUUID: UUID,
     platformName: String,
     missionID: String,
-    missionContact: Option[String] = None
-  )(implicit ec: ExecutionContext): Future[CachedVideoReferenceInfo] = {
+    missionContact: Option[String] = None)(implicit ec: ExecutionContext): Future[CachedVideoReferenceInfo] = {
 
     def fn(dao: VRDAO): CachedVideoReferenceInfo = {
       val v = dao.newPersistentObject()
@@ -103,8 +102,7 @@ class CachedVideoReferenceInfoController(val daoFactory: BasicDAOFactory)
     videoReferenceUUID: Option[UUID] = None,
     platformName: Option[String] = None,
     missionID: Option[String] = None,
-    missionContact: Option[String] = None
-  )(implicit ec: ExecutionContext): Future[Option[CachedVideoReferenceInfo]] = {
+    missionContact: Option[String] = None)(implicit ec: ExecutionContext): Future[Option[CachedVideoReferenceInfo]] = {
 
     def fn(dao: VRDAO): Option[CachedVideoReferenceInfo] = dao.findByUUID(uuid) match {
       case None => None

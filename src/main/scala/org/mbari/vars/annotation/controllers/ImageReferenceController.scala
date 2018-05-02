@@ -45,8 +45,7 @@ class ImageReferenceController(val daoFactory: BasicDAOFactory) extends BaseCont
     description: Option[String],
     heightPixels: Option[Int],
     widthPixels: Option[Int],
-    format: Option[String]
-  )(implicit ec: ExecutionContext): Future[ImageReference] = {
+    format: Option[String])(implicit ec: ExecutionContext): Future[ImageReference] = {
 
     def fn(dao: IRDAO): ImageReference = {
       val imDao = daoFactory.newImagedMomentDAO()
@@ -69,8 +68,7 @@ class ImageReferenceController(val daoFactory: BasicDAOFactory) extends BaseCont
     heightPixels: Option[Int] = None,
     widthPixels: Option[Int] = None,
     format: Option[String] = None,
-    imagedMomentUUID: Option[UUID] = None
-  )(implicit ec: ExecutionContext): Future[Option[ImageReference]] = {
+    imagedMomentUUID: Option[UUID] = None)(implicit ec: ExecutionContext): Future[Option[ImageReference]] = {
 
     def fn(dao: IRDAO): Option[ImageReference] = {
       dao.findByUUID(uuid).map(imageReference => {

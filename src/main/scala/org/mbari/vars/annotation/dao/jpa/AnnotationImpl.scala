@@ -131,8 +131,7 @@ object AnnotationImpl {
     recordedDate: Option[Instant] = None,
     duration: Option[Duration] = None,
     group: Option[String] = None,
-    activity: Option[String] = None
-  ): AnnotationImpl = {
+    activity: Option[String] = None): AnnotationImpl = {
 
     val annotation = new AnnotationImpl
     annotation.videoReferenceUuid = videoReferenceUUID

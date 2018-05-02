@@ -30,8 +30,8 @@ import scala.collection.JavaConverters._
  * @since 2016-06-17T17:11:00
  */
 class AssociationDAOImpl(entityManager: EntityManager)
-    extends BaseDAO[AssociationImpl](entityManager)
-    with AssociationDAO[AssociationImpl] {
+  extends BaseDAO[AssociationImpl](entityManager)
+  with AssociationDAO[AssociationImpl] {
 
   override def newPersistentObject(): AssociationImpl = new AssociationImpl
 
@@ -39,8 +39,7 @@ class AssociationDAOImpl(entityManager: EntityManager)
     linkName: String,
     toConcept: Option[String],
     linkValue: Option[String],
-    mimeType: Option[String]
-  ): AssociationImpl = {
+    mimeType: Option[String]): AssociationImpl = {
     val a = new AssociationImpl
     a.linkName = linkName
     toConcept.foreach(a.toConcept = _)
@@ -55,8 +54,7 @@ class AssociationDAOImpl(entityManager: EntityManager)
   override def findByLinkNameAndVideoReferenceUUID(linkName: String, videoReferenceUUID: UUID): Iterable[AssociationImpl] =
     findByNamedQuery(
       "Association.findByLinkNameAndVideoReferenceUUID",
-      Map("linkName" -> linkName, "videoReferenceUuid" -> videoReferenceUUID)
-    )
+      Map("linkName" -> linkName, "videoReferenceUuid" -> videoReferenceUUID))
 
   override def findAll(): Iterable[AssociationImpl] =
     findByNamedQuery("Association.findAll")

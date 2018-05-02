@@ -28,8 +28,8 @@ import org.mbari.vars.annotation.model.Observation
  * @since 2016-07-11T15:06:00
  */
 case class SimpleObservation(uuid: UUID, concept: String, duration: Duration, group: String,
-  activity: String, observer: String, observationDate: Instant,
-  assocations: Iterable[SimpleAssociation])
+    activity: String, observer: String, observationDate: Instant,
+    assocations: Iterable[SimpleAssociation])
 
 object SimpleObservation {
 

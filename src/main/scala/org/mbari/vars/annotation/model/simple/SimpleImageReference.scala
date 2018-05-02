@@ -28,7 +28,7 @@ import org.mbari.vars.annotation.model.ImageReference
  * @since 2016-07-11T14:59:00
  */
 case class SimpleImageReference(uuid: UUID, url: URL, description: String,
-  format: String, width: Int, height: Int)
+    format: String, width: Int, height: Int)
 
 object SimpleImageReference {
 

@@ -31,8 +31,8 @@ import scala.collection.JavaConverters._
  * @since 2016-06-17T17:10:00
  */
 class ObservationDAOImpl(entityManager: EntityManager)
-    extends BaseDAO[ObservationImpl](entityManager)
-    with ObservationDAO[ObservationImpl] {
+  extends BaseDAO[ObservationImpl](entityManager)
+  with ObservationDAO[ObservationImpl] {
 
   override def newPersistentObject(): ObservationImpl = new ObservationImpl
 
@@ -41,8 +41,7 @@ class ObservationDAOImpl(entityManager: EntityManager)
     observer: String,
     observationDate: Instant = Instant.now(),
     group: Option[String] = None,
-    duration: Option[Duration] = None
-  ): ObservationImpl = {
+    duration: Option[Duration] = None): ObservationImpl = {
 
     val observation = newPersistentObject()
     observation.concept = concept

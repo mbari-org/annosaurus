@@ -29,8 +29,8 @@ import scala.collection.JavaConverters._
  * @since 2016-06-17T17:15:00
  */
 class CachedVideoReferenceInfoDAOImpl(entityManager: EntityManager)
-    extends BaseDAO[CachedVideoReferenceInfoImpl](entityManager)
-    with CachedVideoReferenceInfoDAO[CachedVideoReferenceInfoImpl] {
+  extends BaseDAO[CachedVideoReferenceInfoImpl](entityManager)
+  with CachedVideoReferenceInfoDAO[CachedVideoReferenceInfoImpl] {
 
   override def newPersistentObject(): CachedVideoReferenceInfoImpl = new CachedVideoReferenceInfoImpl
 

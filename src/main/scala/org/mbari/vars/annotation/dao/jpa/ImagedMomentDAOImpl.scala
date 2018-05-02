@@ -33,8 +33,8 @@ import scala.collection.JavaConverters._
  * @since 2016-06-17T16:34:00
  */
 class ImagedMomentDAOImpl(entityManager: EntityManager)
-    extends BaseDAO[ImagedMomentImpl](entityManager)
-    with ImagedMomentDAO[ImagedMomentImpl] {
+  extends BaseDAO[ImagedMomentImpl](entityManager)
+  with ImagedMomentDAO[ImagedMomentImpl] {
 
   override def newPersistentObject(): ImagedMomentImpl = new ImagedMomentImpl
 
@@ -42,8 +42,7 @@ class ImagedMomentDAOImpl(entityManager: EntityManager)
     videoReferenceUUID: UUID,
     timecode: Option[Timecode] = None,
     elapsedTime: Option[Duration] = None,
-    recordedDate: Option[Instant] = None
-  ): ImagedMomentImpl = {
+    recordedDate: Option[Instant] = None): ImagedMomentImpl = {
     val imagedMoment = new ImagedMomentImpl
     imagedMoment.videoReferenceUUID = videoReferenceUUID
     timecode.foreach(imagedMoment.timecode = _)
@@ -56,8 +55,7 @@ class ImagedMomentDAOImpl(entityManager: EntityManager)
     start: Instant,
     end: Instant,
     limit: Option[Int] = None,
-    offset: Option[Int] = None
-  ): Iterable[ImagedMomentImpl] = {
+    offset: Option[Int] = None): Iterable[ImagedMomentImpl] = {
 
     val startTimestamp = Timestamp.from(start)
     val endTimestamp = Timestamp.from(end)
@@ -66,8 +64,7 @@ class ImagedMomentDAOImpl(entityManager: EntityManager)
       "ImagedMoment.findBetweenUpdatedDates",
       Map("start" -> startTimestamp, "end" -> endTimestamp),
       limit,
-      offset
-    )
+      offset)
   }
 
   override def countBetweenUpdatedDates(start: Instant, end: Instant): Int = {
@@ -121,20 +118,17 @@ class ImagedMomentDAOImpl(entityManager: EntityManager)
   override def findByVideoReferenceUUIDAndElapsedTime(uuid: UUID, elapsedTime: Duration): Option[ImagedMomentImpl] =
     findByNamedQuery(
       "ImagedMoment.findByVideoReferenceUUIDAndElapsedTime",
-      Map("elapsedTime" -> elapsedTime, "uuid" -> uuid)
-    ).headOption
+      Map("elapsedTime" -> elapsedTime, "uuid" -> uuid)).headOption
 
   override def findByVideoReferenceUUIDAndTimecode(uuid: UUID, timecode: Timecode): Option[ImagedMomentImpl] =
     findByNamedQuery(
       "ImagedMoment.findByVideoReferenceUUIDAndTimecode",
-      Map("timecode" -> timecode, "uuid" -> uuid)
-    ).headOption
+      Map("timecode" -> timecode, "uuid" -> uuid)).headOption
 
   override def findByVideoReferenceUUIDAndRecordedDate(uuid: UUID, recordedDate: Instant): Option[ImagedMomentImpl] =
     findByNamedQuery(
       "ImagedMoment.findByVideoReferenceUUIDAndRecordedDate",
-      Map("recordedDate" -> recordedDate, "uuid" -> uuid)
-    ).headOption
+      Map("recordedDate" -> recordedDate, "uuid" -> uuid)).headOption
 
   override def findByObservationUUID(uuid: UUID): Option[ImagedMomentImpl] =
     findByNamedQuery("ImagedMoment.findByObservationUUID", Map("uuid" -> uuid)).headOption

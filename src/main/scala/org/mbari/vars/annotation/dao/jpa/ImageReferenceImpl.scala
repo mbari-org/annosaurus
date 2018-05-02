@@ -30,27 +30,22 @@ import org.mbari.vars.annotation.model.{ ImageReference, ImagedMoment }
  */
 @Entity(name = "ImageReference")
 @Table(name = "image_references", indexes = Array(
-  new Index(name = "idx_url", columnList = "url")
-))
+  new Index(name = "idx_url", columnList = "url")))
 @EntityListeners(value = Array(classOf[TransactionLogger]))
 @NamedQueries(Array(
   new NamedQuery(
     name = "ImageReference.findAll",
-    query = "SELECT r FROM ImageReference r"
-  ),
+    query = "SELECT r FROM ImageReference r"),
   new NamedQuery(
     name = "ImageReference.findByURL",
-    query = "SELECT r FROM ImageReference r WHERE r.url = :url"
-  )
-))
+    query = "SELECT r FROM ImageReference r WHERE r.url = :url")))
 class ImageReferenceImpl extends ImageReference with JPAPersistentObject {
 
   @Expose(serialize = true)
   @Column(
     name = "description",
     length = 256,
-    nullable = true
-  )
+    nullable = true)
   override var description: String = _
 
   @Expose(serialize = true)
@@ -58,16 +53,14 @@ class ImageReferenceImpl extends ImageReference with JPAPersistentObject {
     name = "url",
     unique = true,
     length = 1024,
-    nullable = false
-  )
+    nullable = false)
   @Convert(converter = classOf[URLConverter])
   override var url: URL = _
 
   @ManyToOne(
     cascade = Array(CascadeType.PERSIST, CascadeType.DETACH),
     optional = false,
-    targetEntity = classOf[ImagedMomentImpl]
-  )
+    targetEntity = classOf[ImagedMomentImpl])
   @JoinColumn(name = "imaged_moment_uuid", nullable = false)
   override var imagedMoment: ImagedMoment = _
 
@@ -75,24 +68,21 @@ class ImageReferenceImpl extends ImageReference with JPAPersistentObject {
   @SerializedName(value = "height_pixels")
   @Column(
     name = "height_pixels",
-    nullable = true
-  )
+    nullable = true)
   override var height: Int = _
 
   @Expose(serialize = true)
   @SerializedName(value = "width_pixels")
   @Column(
     name = "width_pixels",
-    nullable = true
-  )
+    nullable = true)
   override var width: Int = _
 
   @Expose(serialize = true)
   @Column(
     name = "format",
     length = 64,
-    nullable = true
-  )
+    nullable = true)
   override var format: String = _
 }
 
@@ -103,8 +93,7 @@ object ImageReferenceImpl {
     width: Option[Int] = None,
     height: Option[Int] = None,
     format: Option[String] = None,
-    description: Option[String] = None
-  ): ImageReferenceImpl = {
+    description: Option[String] = None): ImageReferenceImpl = {
     val i = new ImageReferenceImpl()
     i.url = url
     width.foreach(i.width = _)

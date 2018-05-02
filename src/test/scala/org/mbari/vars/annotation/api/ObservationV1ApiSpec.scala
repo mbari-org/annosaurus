@@ -152,8 +152,7 @@ class ObservationV1ApiSpec extends WebApiStack {
       s"$path/${observation.uuid}",
       "concept" -> "shoe",
       "duration_millis" -> "3200",
-      "activity" -> "ascent"
-    ) {
+      "activity" -> "ascent") {
         status should be(200)
         val obs = gson.fromJson(body, classOf[ObservationImpl])
         obs.concept should be("shoe")
@@ -194,8 +193,7 @@ class ObservationV1ApiSpec extends WebApiStack {
     post(
       s"$path/delete",
       body = json,
-      headers = Map("Content-Type" -> "application/json")
-    ) {
+      headers = Map("Content-Type" -> "application/json")) {
         status should be(200)
       }
   }

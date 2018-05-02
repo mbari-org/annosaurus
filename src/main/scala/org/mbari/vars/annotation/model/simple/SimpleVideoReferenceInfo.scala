@@ -27,12 +27,11 @@ import org.mbari.vars.annotation.model.CachedVideoReferenceInfo
  * @since 2016-07-11T14:57:00
  */
 case class SimpleVideoReferenceInfo(
-  uuid: UUID,
-  videoReferenceUuid: UUID,
-  platformName: String,
-  missionId: String,
-  missionContact: String
-)
+    uuid: UUID,
+    videoReferenceUuid: UUID,
+    platformName: String,
+    missionId: String,
+    missionContact: String)
 
 object SimpleVideoReferenceInfo {
 

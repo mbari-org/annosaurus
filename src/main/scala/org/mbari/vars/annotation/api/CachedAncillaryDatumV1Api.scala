@@ -30,7 +30,7 @@ import scala.collection.JavaConverters._
  * @since 2017-05-01T13:24:00
  */
 class CachedAncillaryDatumV1Api(controller: CachedAncillaryDatumController)(implicit val executor: ExecutionContext)
-    extends APIStack {
+  extends APIStack {
 
   before() {
     contentType = "application/json"
@@ -41,8 +41,7 @@ class CachedAncillaryDatumV1Api(controller: CachedAncillaryDatumController)(impl
     val uuid = params.getAs[UUID]("uuid").getOrElse(halt(BadRequest("Please provide a UUID")))
     controller.findByUUID(uuid).map({
       case None => halt(NotFound(
-        body = s"An ImagedMoment with a UUID of $uuid was not found"
-      ))
+        body = s"An ImagedMoment with a UUID of $uuid was not found"))
       case Some(v) => toJson(v)
     })
   }
@@ -111,8 +110,7 @@ class CachedAncillaryDatumV1Api(controller: CachedAncillaryDatumController)(impl
   put("/:uuid") {
     validateRequest() // Apply API security
     val uuid = params.getAs[UUID]("uuid").getOrElse(halt(BadRequest(
-      body = "A video reference 'uuid' parameter is required"
-    )))
+      body = "A video reference 'uuid' parameter is required")))
     val latitude = params.getAs[Double]("latitude")
     val longitude = params.getAs[Double]("longitude")
     val depthMeters = params.getAs[Float]("depth_meters")

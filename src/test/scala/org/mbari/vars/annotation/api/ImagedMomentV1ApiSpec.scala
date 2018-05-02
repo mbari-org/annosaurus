@@ -60,8 +60,7 @@ class ImagedMomentV1ApiSpec extends WebApiStack {
       Await.result(
         controller.create(UUID.randomUUID(), "Foo", "brian",
           elapsedTime = Some(Duration.ofMillis(2000))),
-        SDuration(3000, TimeUnit.MILLISECONDS)
-      )
+        SDuration(3000, TimeUnit.MILLISECONDS))
     }
 
     get(s"/v1/imagedmoments/${annotation.imagedMomentUuid}") {
@@ -112,8 +111,7 @@ class ImagedMomentV1ApiSpec extends WebApiStack {
     put(
       s"/v1/imagedmoments/${annotation.imagedMomentUuid}",
       "timecode" -> "01:23:45:12",
-      "elapsed_time_millis" -> "22222"
-    ) {
+      "elapsed_time_millis" -> "22222") {
         status should be(200)
         val im = gson.fromJson(body, classOf[ImagedMomentImpl])
         im.elapsedTime should be(Duration.ofMillis(22222))

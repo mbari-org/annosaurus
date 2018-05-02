@@ -45,8 +45,7 @@ class AnnotationControllerSpec extends FlatSpec with Matchers with BeforeAndAfte
       UUID.randomUUID(),
       "Nanomia bijuga",
       "brian",
-      recordedDate = Some(recordedDate)
-    ))
+      recordedDate = Some(recordedDate)))
     a.concept should be("Nanomia bijuga")
     a.observer should be("brian")
     a.recordedTimestamp should be(recordedDate)
@@ -57,8 +56,7 @@ class AnnotationControllerSpec extends FlatSpec with Matchers with BeforeAndAfte
       UUID.randomUUID(),
       "Grimpoteuthis",
       "brian",
-      recordedDate = Some(recordedDate)
-    ))
+      recordedDate = Some(recordedDate)))
     a.concept should be("Grimpoteuthis")
     a.observer should be("brian")
     a.recordedTimestamp should be(recordedDate)
@@ -69,8 +67,7 @@ class AnnotationControllerSpec extends FlatSpec with Matchers with BeforeAndAfte
       UUID.randomUUID(),
       concept = "Slime mold",
       observer = "brian",
-      recordedDate = Some(recordedDate)
-    ))
+      recordedDate = Some(recordedDate)))
 
     val b = exec(() => controller.findByVideoReferenceUUID(a.videoReferenceUuid))
     b should not be empty
@@ -83,8 +80,7 @@ class AnnotationControllerSpec extends FlatSpec with Matchers with BeforeAndAfte
       UUID.randomUUID(),
       "Grimpoteuthis",
       "brian",
-      recordedDate = Some(recordedDate)
-    ))
+      recordedDate = Some(recordedDate)))
     a.concept should be("Grimpoteuthis")
     a.observer should be("brian")
     a.recordedTimestamp should be(recordedDate)
@@ -102,8 +98,7 @@ class AnnotationControllerSpec extends FlatSpec with Matchers with BeforeAndAfte
       UUID.randomUUID(),
       "Grimpoteuthis",
       "brian",
-      elapsedTime = Some(et0)
-    ))
+      elapsedTime = Some(et0)))
     a.concept should be("Grimpoteuthis")
     a.observer should be("brian")
     a.elapsedTime should be(et0)
@@ -112,16 +107,14 @@ class AnnotationControllerSpec extends FlatSpec with Matchers with BeforeAndAfte
       a.observationUuid,
       Some(a.videoReferenceUuid),
       concept = Some("Nanomia bijuga"),
-      elapsedTime = Some(et1)
-    ))
+      elapsedTime = Some(et1)))
     b should not be (empty)
     b.get.concept should be("Nanomia bijuga")
     b.get.elapsedTime should be(et1)
 
     val c = exec(() => controller.update(
       a.observationUuid,
-      elapsedTime = Some(et0)
-    ))
+      elapsedTime = Some(et0)))
     c should not be (empty)
     c.get.elapsedTime should be(et0)
   }

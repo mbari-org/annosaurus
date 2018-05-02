@@ -34,7 +34,7 @@ import scala.concurrent.{ ExecutionContext, Future }
  * @since 2016-06-17T16:06:00
  */
 class ImagedMomentController(val daoFactory: BasicDAOFactory)
-    extends BaseController[ImagedMoment, ImagedMomentDAO[ImagedMoment]] {
+  extends BaseController[ImagedMoment, ImagedMomentDAO[ImagedMoment]] {
 
   protected type IMDAO = ImagedMomentDAO[ImagedMoment]
 
@@ -72,8 +72,7 @@ class ImagedMomentController(val daoFactory: BasicDAOFactory)
     start: Instant,
     end: Instant,
     limit: Option[Int] = None,
-    offset: Option[Int] = None
-  )(implicit ec: ExecutionContext): Future[Seq[ImagedMoment]] = {
+    offset: Option[Int] = None)(implicit ec: ExecutionContext): Future[Seq[ImagedMoment]] = {
     val imDao = daoFactory.newImagedMomentDAO()
     val f = imDao.runTransaction(d => d.findBetweenUpdatedDates(start, end, limit, offset))
     f.onComplete(_ => imDao.close())
@@ -82,8 +81,7 @@ class ImagedMomentController(val daoFactory: BasicDAOFactory)
 
   def countBetweenUpdatedDates(
     start: Instant,
-    end: Instant
-  )(implicit ec: ExecutionContext): Future[Int] = {
+    end: Instant)(implicit ec: ExecutionContext): Future[Int] = {
     val imDao = daoFactory.newImagedMomentDAO()
     val f = imDao.runTransaction(d => d.countBetweenUpdatedDates(start, end))
     f.onComplete(_ => imDao.close())
@@ -97,12 +95,10 @@ class ImagedMomentController(val daoFactory: BasicDAOFactory)
     videoReferenceUUID: UUID,
     timecode: Option[Timecode] = None,
     recordedDate: Option[Instant] = None,
-    elapsedTime: Option[Duration] = None
-  )(implicit ec: ExecutionContext): Future[ImagedMoment] = {
+    elapsedTime: Option[Duration] = None)(implicit ec: ExecutionContext): Future[ImagedMoment] = {
 
     def fn(d: IMDAO) = ImagedMomentController.findImagedMoment(
-      d, videoReferenceUUID, timecode, recordedDate, elapsedTime
-    )
+      d, videoReferenceUUID, timecode, recordedDate, elapsedTime)
     exec(fn)
   }
 
@@ -111,8 +107,7 @@ class ImagedMomentController(val daoFactory: BasicDAOFactory)
     videoReferenceUUID: Option[UUID] = None,
     timecode: Option[Timecode] = None,
     recordedDate: Option[Instant] = None,
-    elapsedTime: Option[Duration] = None
-  )(implicit ec: ExecutionContext) = {
+    elapsedTime: Option[Duration] = None)(implicit ec: ExecutionContext) = {
 
     def fn(dao: IMDAO): ImagedMoment = {
       dao.findByUUID(uuid) match {
@@ -149,8 +144,7 @@ object ImagedMomentController {
     videoReferenceUUID: UUID,
     timecode: Option[Timecode] = None,
     recordedDate: Option[Instant] = None,
-    elapsedTime: Option[Duration] = None
-  ): ImagedMoment = {
+    elapsedTime: Option[Duration] = None): ImagedMoment = {
     // -- Return existing or construct a new one if no match is found
     dao.findByVideoReferenceUUIDAndIndex(videoReferenceUUID, timecode, elapsedTime, recordedDate) match {
       case Some(imagedMoment) => imagedMoment

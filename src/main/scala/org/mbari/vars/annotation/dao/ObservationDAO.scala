@@ -34,8 +34,7 @@ trait ObservationDAO[T <: Observation] extends DAO[T] {
     observer: String,
     observationDate: Instant = Instant.now(),
     group: Option[String] = None,
-    duration: Option[Duration] = None
-  ): T
+    duration: Option[Duration] = None): T
 
   def findByVideoReferenceUUID(uuid: UUID, limit: Option[Int] = None, offset: Option[Int] = None): Iterable[T]
 

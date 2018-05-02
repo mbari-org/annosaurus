@@ -34,7 +34,7 @@ import scala.collection.JavaConverters._
  * @since 2016-06-30T10:08:00
  */
 class AnnotationV1Api(controller: AnnotationController)(implicit val executor: ExecutionContext)
-    extends APIStack {
+  extends APIStack {
 
   before() {
     contentType = "application/json"
@@ -43,8 +43,7 @@ class AnnotationV1Api(controller: AnnotationController)(implicit val executor: E
 
   get("/:uuid") {
     val uuid = params.getAs[UUID]("uuid").getOrElse(halt(BadRequest(
-      body = "A 'uuid' parameter is required"
-    )))
+      body = "A 'uuid' parameter is required")))
     controller.findByUUID(uuid)
       .map({
         case None => halt(NotFound(body = s"An observation with uuid of $uuid was not found"))
@@ -54,8 +53,7 @@ class AnnotationV1Api(controller: AnnotationController)(implicit val executor: E
 
   get("/videoreference/:uuid") {
     val uuid = params.getAs[UUID]("uuid").getOrElse(halt(BadRequest(
-      body = "A video reference 'uuid' parameter is required"
-    )))
+      body = "A video reference 'uuid' parameter is required")))
     val limit = params.getAs[Int]("limit")
     val offset = params.getAs[Int]("offset")
     controller.findByVideoReferenceUUID(uuid, limit, offset)
@@ -65,8 +63,7 @@ class AnnotationV1Api(controller: AnnotationController)(implicit val executor: E
 
   get("/imagereference/:uuid") {
     val uuid = params.getAs[UUID]("uuid").getOrElse(halt(BadRequest(
-      body = "A image reference 'uuid' parameter is required"
-    )))
+      body = "A image reference 'uuid' parameter is required")))
     controller.findByImageReferenceUUID(uuid)
       .map(_.asJava)
       .map(toJson)
@@ -76,14 +73,11 @@ class AnnotationV1Api(controller: AnnotationController)(implicit val executor: E
   post("/") {
     validateRequest() // Apply API security
     val videoReferenceUUID = params.getAs[UUID]("video_reference_uuid").getOrElse(halt(BadRequest(
-      body = "A 'video_reference_uuid' parameter is required"
-    )))
+      body = "A 'video_reference_uuid' parameter is required")))
     val concept = params.get("concept").getOrElse(halt(BadRequest(
-      "A 'concept' parameter is required"
-    )))
+      "A 'concept' parameter is required")))
     val observer = params.get("observer").getOrElse(halt(BadRequest(
-      "An 'observer' parameter is required"
-    )))
+      "An 'observer' parameter is required")))
     val observationDate = params.getAs[Instant]("observation_timestamp").getOrElse(Instant.now())
     val timecode = params.getAs[Timecode]("timecode")
     val elapsedTime = params.getAs[Duration]("elapsed_time_millis")
@@ -117,8 +111,7 @@ class AnnotationV1Api(controller: AnnotationController)(implicit val executor: E
   put("/:uuid") {
     validateRequest() // Apply API security
     val uuid = params.getAs[UUID]("uuid").getOrElse(halt(BadRequest(
-      body = "An observation 'uuid' parameter is required"
-    )))
+      body = "An observation 'uuid' parameter is required")))
     val videoReferenceUUID = params.getAs[UUID]("video_reference_uuid")
     val concept = params.get("concept")
     val observer = params.get("observer")

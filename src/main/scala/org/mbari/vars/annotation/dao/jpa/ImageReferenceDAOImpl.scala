@@ -29,8 +29,8 @@ import org.mbari.vars.annotation.dao.ImageReferenceDAO
  * @since 2016-06-17T17:17:00
  */
 class ImageReferenceDAOImpl(entityManager: EntityManager)
-    extends BaseDAO[ImageReferenceImpl](entityManager)
-    with ImageReferenceDAO[ImageReferenceImpl] {
+  extends BaseDAO[ImageReferenceImpl](entityManager)
+  with ImageReferenceDAO[ImageReferenceImpl] {
 
   override def newPersistentObject(): ImageReferenceImpl = new ImageReferenceImpl
 
@@ -39,8 +39,7 @@ class ImageReferenceDAOImpl(entityManager: EntityManager)
     description: Option[String] = None,
     heightPixels: Option[Int] = None,
     widthPixels: Option[Int] = None,
-    format: Option[String] = None
-  ): ImageReferenceImpl = {
+    format: Option[String] = None): ImageReferenceImpl = {
     val imageReference = newPersistentObject()
     imageReference.url = url
     description.foreach(imageReference.description = _)

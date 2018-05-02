@@ -53,8 +53,7 @@ class AnnotationController(daoFactory: BasicDAOFactory) {
   def findByVideoReferenceUUID(
     videoReferenceUUID: UUID,
     limit: Option[Int] = None,
-    offset: Option[Int] = None
-  )(implicit ec: ExecutionContext): Future[Seq[Annotation]] = {
+    offset: Option[Int] = None)(implicit ec: ExecutionContext): Future[Seq[Annotation]] = {
 
     val imDao = daoFactory.newImagedMomentDAO()
     val f = imDao.runTransaction(d => d.findByVideoReferenceUUID(videoReferenceUUID, limit, offset))
@@ -84,8 +83,7 @@ class AnnotationController(daoFactory: BasicDAOFactory) {
     recordedDate: Option[Instant] = None,
     duration: Option[Duration] = None,
     group: Option[String] = None,
-    activity: Option[String] = None
-  )(implicit ec: ExecutionContext): Future[Annotation] = {
+    activity: Option[String] = None)(implicit ec: ExecutionContext): Future[Annotation] = {
     val obsDao = daoFactory.newObservationDAO()
     val annotation = AnnotationImpl(videoReferenceUUID, concept, observer,
       observationDate, timecode, elapsedTime, recordedDate, duration, group, activity)
@@ -111,8 +109,7 @@ class AnnotationController(daoFactory: BasicDAOFactory) {
       annotation.videoReferenceUuid,
       Option(annotation.timecode),
       Option(annotation.recordedTimestamp),
-      Option(annotation.elapsedTime)
-    )
+      Option(annotation.elapsedTime))
     val observation = obsDao.newPersistentObject()
     observation.concept = annotation.concept
     observation.observer = annotation.observer
@@ -127,8 +124,7 @@ class AnnotationController(daoFactory: BasicDAOFactory) {
     annotation.associations.foreach(a => {
       val newA = assDao.newPersistentObject(
         a.linkName,
-        Option(a.toConcept), Option(a.linkValue), Option(a.mimeType)
-      )
+        Option(a.toConcept), Option(a.linkValue), Option(a.mimeType))
       newA.uuid = a.uuid
       observation.addAssociation(newA)
     })
@@ -160,8 +156,7 @@ class AnnotationController(daoFactory: BasicDAOFactory) {
     recordedDate: Option[Instant] = None,
     duration: Option[Duration] = None,
     group: Option[String] = None,
-    activity: Option[String] = None
-  )(implicit ec: ExecutionContext): Future[Option[Annotation]] = {
+    activity: Option[String] = None)(implicit ec: ExecutionContext): Future[Option[Annotation]] = {
 
     // We have to do this in 2 transactions. The first makes all the changes. The second to
     // retrieve them. We have to do this because we may make a SQL call to move an observaton
@@ -203,8 +198,7 @@ class AnnotationController(daoFactory: BasicDAOFactory) {
           Option(a.recordedTimestamp),
           Option(a.duration),
           Option(a.group),
-          Option(a.activity)
-        )
+          Option(a.activity))
       })
     })
     f.onComplete(_ => dao.close())
@@ -247,8 +241,7 @@ class AnnotationController(daoFactory: BasicDAOFactory) {
     recordedDate: Option[Instant] = None,
     duration: Option[Duration] = None,
     group: Option[String] = None,
-    activity: Option[String] = None
-  ): Option[Observation] = {
+    activity: Option[String] = None): Option[Observation] = {
     val obsDao = daoFactory.newObservationDAO(dao)
     val imDao = daoFactory.newImagedMomentDAO(dao)
     val observation = obsDao.findByUUID(uuid)

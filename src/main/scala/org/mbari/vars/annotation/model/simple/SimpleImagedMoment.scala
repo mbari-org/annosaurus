@@ -29,15 +29,14 @@ import org.mbari.vcr4j.time.Timecode
  * @since 2016-07-11T14:58:00
  */
 case class SimpleImagedMoment(
-  uuid: UUID,
-  videoReferenceUuid: UUID,
-  timecode: Timecode,
-  elapsedTime: Duration,
-  recordedDate: Instant,
-  observations: Iterable[SimpleObservation],
-  imageReferences: Iterable[SimpleImageReference],
-  ancillaryDatum: SimpleAncillaryDatum
-)
+    uuid: UUID,
+    videoReferenceUuid: UUID,
+    timecode: Timecode,
+    elapsedTime: Duration,
+    recordedDate: Instant,
+    observations: Iterable[SimpleObservation],
+    imageReferences: Iterable[SimpleImageReference],
+    ancillaryDatum: SimpleAncillaryDatum)
 
 object SimpleImagedMoment {
 

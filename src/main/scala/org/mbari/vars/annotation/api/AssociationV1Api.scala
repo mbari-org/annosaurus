@@ -32,7 +32,7 @@ import scala.collection.JavaConverters._
  * @since 2016-07-13T11:21:00
  */
 class AssociationV1Api(controller: AssociationController)(implicit val executor: ExecutionContext)
-    extends APIStack {
+  extends APIStack {
 
   before() {
     contentType = "application/json"
@@ -44,8 +44,7 @@ class AssociationV1Api(controller: AssociationController)(implicit val executor:
     val uuid = params.getAs[UUID]("uuid").getOrElse(halt(BadRequest("Please provide a 'uuid' parameter")))
     controller.findByUUID(uuid).map({
       case None => halt(NotFound(
-        body = s"An Association with a UUID of $uuid was not found"
-      ))
+        body = s"An Association with a UUID of $uuid was not found"))
       case Some(v) => toJson(v)
     })
   }

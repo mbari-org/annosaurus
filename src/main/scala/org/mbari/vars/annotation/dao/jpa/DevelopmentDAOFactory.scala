@@ -42,8 +42,7 @@ object DevelopmentDAOFactory extends JPADAOFactory {
     "eclipselink.logging.timestamp" -> "false",
     "eclipselink.target-database" -> productName,
     "javax.persistence.database-product-name" -> productName,
-    "javax.persistence.schema-generation.database.action" -> "create"
-  )
+    "javax.persistence.schema-generation.database.action" -> "create")
 
   lazy val entityManagerFactory: EntityManagerFactory = {
     val driver = config.getString("org.mbari.vars.annotation.database.development.driver")

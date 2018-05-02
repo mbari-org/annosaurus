@@ -51,8 +51,7 @@ abstract class BaseDAO[B <: PersistentObject: ClassTag](val entityManager: Entit
     name: String,
     namedParameters: Map[String, Any] = Map.empty,
     limit: Option[Int] = None,
-    offset: Option[Int] = None
-  ): List[B] = {
+    offset: Option[Int] = None): List[B] = {
     if (log.isDebugEnabled()) {
       log.debug(s"JPA Query => $name using $namedParameters")
     }

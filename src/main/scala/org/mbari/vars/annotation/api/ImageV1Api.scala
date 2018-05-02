@@ -31,7 +31,7 @@ import scala.collection.JavaConverters._
  * Created by brian on 7/14/16.
  */
 class ImageV1Api(controller: ImageController)(implicit val executor: ExecutionContext)
-    extends APIStack {
+  extends APIStack {
 
   before() {
     contentType = "application/json"
@@ -40,8 +40,7 @@ class ImageV1Api(controller: ImageController)(implicit val executor: ExecutionCo
 
   get("/:uuid") {
     val uuid = params.getAs[UUID]("uuid").getOrElse(halt(BadRequest(
-      body = "A 'uuid' parameter is required"
-    )))
+      body = "A 'uuid' parameter is required")))
     controller.findByUUID(uuid).map({
       case None => halt(NotFound(body = s"an Image with an image_reference_uuid of $uuid was not found"))
       case Some(v) => toJson(v)
@@ -50,8 +49,7 @@ class ImageV1Api(controller: ImageController)(implicit val executor: ExecutionCo
 
   get("/videoreference/:uuid") {
     val uuid = params.getAs[UUID]("uuid").getOrElse(halt(BadRequest(
-      body = "A video reference 'uuid' parameter is required"
-    )))
+      body = "A video reference 'uuid' parameter is required")))
     val limit = params.getAs[Int]("limit")
     val offset = params.getAs[Int]("offset")
     controller.findByVideoReferenceUUID(uuid, limit, offset)
@@ -78,11 +76,9 @@ class ImageV1Api(controller: ImageController)(implicit val executor: ExecutionCo
   post("/") {
     validateRequest() // Apply API security
     val videoReferenceUUID = params.getAs[UUID]("video_reference_uuid").getOrElse(halt(BadRequest(
-      body = "A 'video_reference_uuid' parameter is required"
-    )))
+      body = "A 'video_reference_uuid' parameter is required")))
     val url = params.getAs[URL]("url").getOrElse(halt(BadRequest(
-      body = "A 'url' parameter is required"
-    )))
+      body = "A 'url' parameter is required")))
     val timecode = params.getAs[Timecode]("timecode")
     val elapsedTime = params.getAs[Duration]("elapsed_time_millis")
     val recordedDate = params.getAs[Instant]("recorded_timestamp")
@@ -103,8 +99,7 @@ class ImageV1Api(controller: ImageController)(implicit val executor: ExecutionCo
   put("/:uuid") {
     validateRequest() // Apply API security
     val uuid = params.getAs[UUID]("uuid").getOrElse(halt(BadRequest(
-      body = "A image reference 'uuid' parameter is required"
-    )))
+      body = "A image reference 'uuid' parameter is required")))
     val videoReferenceUUID = params.getAs[UUID]("video_reference_uuid")
     val url = params.getAs[URL]("url")
     val timecode = params.getAs[Timecode]("timecode")

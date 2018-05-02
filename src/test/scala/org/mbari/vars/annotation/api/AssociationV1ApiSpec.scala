@@ -53,16 +53,14 @@ class AssociationV1ApiSpec extends WebApiStack {
       val controller = new AnnotationController(daoFactory)
       Await.result(
         controller.create(UUID.randomUUID(), "Foo", "brian",
-          elapsedTime = Some(Duration.ofMillis(2000))), timeout
-      )
+          elapsedTime = Some(Duration.ofMillis(2000))), timeout)
     }
 
     post(
       s"/v1/associations/",
       "observation_uuid" -> annotation.observationUuid.toString,
       "link_name" -> "color",
-      "link_value" -> "red"
-    ) {
+      "link_value" -> "red") {
         status should be(200)
         association = gson.fromJson(body, classOf[AssociationImpl])
         association.linkName should be("color")
@@ -86,16 +84,14 @@ class AssociationV1ApiSpec extends WebApiStack {
       s"/v1/associations/",
       "observation_uuid" -> annotation.observationUuid.toString,
       "link_name" -> "eating",
-      "to_concept" -> "crab"
-    ) {
+      "to_concept" -> "crab") {
         status should be(200)
       }
     post(
       s"/v1/associations/",
       "observation_uuid" -> annotation.observationUuid.toString,
       "link_name" -> "eating",
-      "to_concept" -> "filet-o-fish"
-    ) {
+      "to_concept" -> "filet-o-fish") {
         status should be(200)
       }
     get(s"/v1/associations/${annotation.videoReferenceUuid}/eating") {

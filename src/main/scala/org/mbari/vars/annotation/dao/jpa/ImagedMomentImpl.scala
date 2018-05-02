@@ -38,91 +38,72 @@ import scala.collection.JavaConverters._
 @Table(name = "imaged_moments", indexes = Array(
   new Index(name = "idx_recorded_timestamp", columnList = "recorded_timestamp"),
   new Index(name = "idx_elapsed_time", columnList = "elapsed_time_millis"),
-  new Index(name = "idx_timecode", columnList = "timecode")
-))
+  new Index(name = "idx_timecode", columnList = "timecode")))
 @EntityListeners(value = Array(classOf[TransactionLogger]))
 @NamedNativeQueries(Array(
   new NamedNativeQuery(
     name = "ImagedMoment.findAllVideoReferenceUUIDs",
-    query = "SELECT DISTINCT video_reference_uuid FROM imaged_moments ORDER BY video_reference_uuid ASC"
-  ),
+    query = "SELECT DISTINCT video_reference_uuid FROM imaged_moments ORDER BY video_reference_uuid ASC"),
   new NamedNativeQuery(
     name = "ImagedMoment.countBetweenUpdatedDates",
     query = "SELECT COUNT(*) FROM imaged_moments im LEFT JOIN " +
-    "observations obs ON obs.imaged_moment_uuid = im.uuid WHERE " +
-    "im.last_updated_timestamp BETWEEN ?1 AND ?2 OR " +
-    "obs.last_updated_timestamp BETWEEN ?1 AND ?2"
-  ),
+      "observations obs ON obs.imaged_moment_uuid = im.uuid WHERE " +
+      "im.last_updated_timestamp BETWEEN ?1 AND ?2 OR " +
+      "obs.last_updated_timestamp BETWEEN ?1 AND ?2"),
   new NamedNativeQuery(
     name = "ImagedMoment.countByVideoReferenceUUID",
     query = "SELECT COUNT(*) imaged_moments im LEFT JOIN " +
-    "observations obs ON obs.imaged_moment_uuid = im.uuid WHERE " +
-    "im.video_reference_uuid = ?1"
-  )
-))
+      "observations obs ON obs.imaged_moment_uuid = im.uuid WHERE " +
+      "im.video_reference_uuid = ?1")))
 @NamedQueries(Array(
   new NamedQuery(
     name = "ImagedMoment.findAll",
-    query = "SELECT i FROM ImagedMoment i"
-  ),
+    query = "SELECT i FROM ImagedMoment i"),
   new NamedQuery(
     name = "ImagedMoment.findBetweenUpdatedDates",
     query = "SELECT i FROM ImagedMoment i LEFT JOIN i.javaObservations o WHERE " +
-    "i.lastUpdatedTime BETWEEN :start AND :end OR " +
-    "o.lastUpdatedTime BETWEEN :start AND :end"
-  ),
+      "i.lastUpdatedTime BETWEEN :start AND :end OR " +
+      "o.lastUpdatedTime BETWEEN :start AND :end"),
   new NamedQuery(
     name = "ImagedMoment.findByVideoReferenceUUID",
-    query = "SELECT i FROM ImagedMoment i WHERE i.videoReferenceUUID = :uuid"
-  ),
+    query = "SELECT i FROM ImagedMoment i WHERE i.videoReferenceUUID = :uuid"),
   new NamedQuery(
     name = "ImagedMoment.findWithImageReferences",
-    query = "SELECT i FROM ImagedMoment i LEFT JOIN i.javaImageReferences r WHERE i.videoReferenceUUID = :uuid"
-  ),
+    query = "SELECT i FROM ImagedMoment i LEFT JOIN i.javaImageReferences r WHERE i.videoReferenceUUID = :uuid"),
   new NamedQuery(
     name = "ImagedMoment.findByObservationUUID",
-    query = "SELECT i FROM ImagedMoment i LEFT JOIN i.javaObservations o WHERE o.uuid = :uuid"
-  ),
+    query = "SELECT i FROM ImagedMoment i LEFT JOIN i.javaObservations o WHERE o.uuid = :uuid"),
   new NamedQuery(
     name = "ImagedMoment.findByUUID",
-    query = "SELECT i FROM ImagedMoment i WHERE i.uuid = :uuid"
-  ),
+    query = "SELECT i FROM ImagedMoment i WHERE i.uuid = :uuid"),
   new NamedQuery(
     name = "ImagedMoment.findByVideoReferenceUUIDAndTimecode",
-    query = "SELECT i FROM ImagedMoment i WHERE i.timecode = :timecode AND i.videoReferenceUUID = :uuid"
-  ),
+    query = "SELECT i FROM ImagedMoment i WHERE i.timecode = :timecode AND i.videoReferenceUUID = :uuid"),
   new NamedQuery(
     name = "ImagedMoment.findByVideoReferenceUUIDAndElapsedTime",
-    query = "SELECT i FROM ImagedMoment i WHERE i.elapsedTime = :elapsedTime AND i.videoReferenceUUID = :uuid"
-  ),
+    query = "SELECT i FROM ImagedMoment i WHERE i.elapsedTime = :elapsedTime AND i.videoReferenceUUID = :uuid"),
   new NamedQuery(
     name = "ImagedMoment.findByVideoReferenceUUIDAndRecordedDate",
-    query = "SELECT i FROM ImagedMoment i WHERE i.recordedDate = :recordedDate AND i.videoReferenceUUID = :uuid"
-  ),
+    query = "SELECT i FROM ImagedMoment i WHERE i.recordedDate = :recordedDate AND i.videoReferenceUUID = :uuid"),
   new NamedQuery(
     name = "ImagedMoment.deleteByVideoReferenceUUID",
-    query = "DELETE FROM ImagedMoment i WHERE i.videoReferenceUUID = :uuid"
-  ),
+    query = "DELETE FROM ImagedMoment i WHERE i.videoReferenceUUID = :uuid"),
   new NamedQuery(
     name = "ImagedMoment.findByImageReferenceUUID",
-    query = "SELECT i FROM ImagedMoment i LEFT JOIN i.javaImageReferences r WHERE r.uuid = :uuid"
-  )
-))
+    query = "SELECT i FROM ImagedMoment i LEFT JOIN i.javaImageReferences r WHERE r.uuid = :uuid")))
 class ImagedMomentImpl extends ImagedMoment with JPAPersistentObject {
 
   @Expose(serialize = true)
   @Column(
     name = "elapsed_time_millis",
-    nullable = true
-  )
+    nullable = true)
   @Convert(converter = classOf[DurationConverter])
   override var elapsedTime: Duration = _
 
   @Expose(serialize = true)
   @Column(
     name = "recorded_timestamp",
-    nullable = true
-  )
+    nullable = true)
   @Temporal(value = TemporalType.TIMESTAMP)
   @Convert(converter = classOf[InstantConverter])
   override var recordedDate: Instant = _
@@ -130,8 +111,7 @@ class ImagedMomentImpl extends ImagedMoment with JPAPersistentObject {
   @Expose(serialize = true)
   @Column(
     name = "timecode",
-    nullable = true
-  )
+    nullable = true)
   @Convert(converter = classOf[TimecodeConverter])
   override var timecode: Timecode = _
 
@@ -139,8 +119,7 @@ class ImagedMomentImpl extends ImagedMoment with JPAPersistentObject {
   @SerializedName(value = "video_reference_uuid")
   @Column(
     name = "video_reference_uuid",
-    nullable = true
-  )
+    nullable = true)
   @Convert(converter = classOf[UUIDConverter])
   override var videoReferenceUUID: UUID = _
 
@@ -151,8 +130,7 @@ class ImagedMomentImpl extends ImagedMoment with JPAPersistentObject {
     cascade = Array(CascadeType.ALL),
     fetch = FetchType.EAGER,
     mappedBy = "imagedMoment",
-    orphanRemoval = true
-  )
+    orphanRemoval = true)
   protected var javaObservations: JList[ObservationImpl] = new JArrayList[ObservationImpl]
 
   override def addObservation(observation: Observation): Unit = {
@@ -174,8 +152,7 @@ class ImagedMomentImpl extends ImagedMoment with JPAPersistentObject {
     cascade = Array(CascadeType.ALL),
     fetch = FetchType.EAGER,
     mappedBy = "imagedMoment",
-    orphanRemoval = true
-  )
+    orphanRemoval = true)
   protected var javaImageReferences: JList[ImageReferenceImpl] = new JArrayList[ImageReferenceImpl]
 
   override def addImageReference(imageReference: ImageReference): Unit = {
@@ -196,8 +173,7 @@ class ImagedMomentImpl extends ImagedMoment with JPAPersistentObject {
     mappedBy = "imagedMoment",
     cascade = Array(CascadeType.ALL),
     optional = true,
-    targetEntity = classOf[CachedAncillaryDatumImpl]
-  )
+    targetEntity = classOf[CachedAncillaryDatumImpl])
   protected var _ancillaryDatum: CachedAncillaryDatum = _
 
   def ancillaryDatum = _ancillaryDatum
@@ -216,8 +192,7 @@ object ImagedMomentImpl {
     videoReferenceUUID: Option[UUID] = None,
     recordedDate: Option[Instant] = None,
     timecode: Option[Timecode] = None,
-    elapsedTime: Option[Duration] = None
-  ): ImagedMomentImpl = {
+    elapsedTime: Option[Duration] = None): ImagedMomentImpl = {
 
     val im = new ImagedMomentImpl
     videoReferenceUUID.foreach(im.videoReferenceUUID = _)

@@ -30,8 +30,8 @@ import org.mbari.vars.annotation.model.simple.CachedAncillaryDatumBean
  * @since 2016-06-17T17:12:00
  */
 class CachedAncillaryDatumDAOImpl(entityManager: EntityManager)
-    extends BaseDAO[CachedAncillaryDatumImpl](entityManager)
-    with CachedAncillaryDatumDAO[CachedAncillaryDatumImpl] {
+  extends BaseDAO[CachedAncillaryDatumImpl](entityManager)
+  with CachedAncillaryDatumDAO[CachedAncillaryDatumImpl] {
 
   override def newPersistentObject(): CachedAncillaryDatumImpl = new CachedAncillaryDatumImpl
 
@@ -52,8 +52,7 @@ class CachedAncillaryDatumDAOImpl(entityManager: EntityManager)
     posePositionUnits: Option[String] = None,
     phi: Option[Double] = None,
     theta: Option[Double] = None,
-    psi: Option[Double] = None
-  ): CachedAncillaryDatum = {
+    psi: Option[Double] = None): CachedAncillaryDatum = {
 
     val cad = new CachedAncillaryDatumImpl()
     cad.latitude = Some(latitude)
@@ -87,14 +86,12 @@ class CachedAncillaryDatumDAOImpl(entityManager: EntityManager)
   override def findByObservationUUID(observationUuid: UUID): Option[CachedAncillaryDatum] =
     findByNamedQuery(
       "AncillaryDatum.findByObservationUUID",
-      Map("uuid" -> observationUuid)
-    )
+      Map("uuid" -> observationUuid))
       .headOption
 
   override def findByImagedMomentUUID(imagedMomentUuid: UUID): Option[CachedAncillaryDatum] =
     findByNamedQuery(
       "AncillaryDatum.findByImagedMomentUUID",
-      Map("uuid" -> imagedMomentUuid)
-    )
+      Map("uuid" -> imagedMomentUuid))
       .headOption
 }

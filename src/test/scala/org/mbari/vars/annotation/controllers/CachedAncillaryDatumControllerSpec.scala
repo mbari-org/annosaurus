@@ -45,8 +45,7 @@ class CachedAncillaryDatumControllerSpec extends FlatSpec with Matchers with Bef
     val dao = daoFactory.newImagedMomentDAO()
     val ims = (0 until 10).map(i => dao.newPersistentObject(
       videoReferenceUuid,
-      elapsedTime = Some(Duration.ofMillis(math.round(math.random() * 10000L)))
-    ))
+      elapsedTime = Some(Duration.ofMillis(math.round(math.random() * 10000L)))))
     dao.runTransaction(d => {
       ims.foreach(dao.create)
     })

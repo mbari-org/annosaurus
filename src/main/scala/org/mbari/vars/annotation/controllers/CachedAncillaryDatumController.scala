@@ -30,7 +30,7 @@ import scala.concurrent.{ ExecutionContext, Future }
  * @since 2017-05-01T10:53:00
  */
 class CachedAncillaryDatumController(val daoFactory: BasicDAOFactory)
-    extends BaseController[CachedAncillaryDatum, CachedAncillaryDatumDAO[CachedAncillaryDatum]] {
+  extends BaseController[CachedAncillaryDatum, CachedAncillaryDatumDAO[CachedAncillaryDatum]] {
 
   protected type ADDAO = CachedAncillaryDatumDAO[CachedAncillaryDatum]
   private[this] val log = LoggerFactory.getLogger(getClass)
@@ -55,8 +55,7 @@ class CachedAncillaryDatumController(val daoFactory: BasicDAOFactory)
     posePositionUnits: Option[String] = None,
     phi: Option[Double] = None,
     theta: Option[Double] = None,
-    psi: Option[Double] = None
-  )(implicit ec: ExecutionContext): Future[CachedAncillaryDatum] = {
+    psi: Option[Double] = None)(implicit ec: ExecutionContext): Future[CachedAncillaryDatum] = {
 
     def fn(dao: ADDAO): CachedAncillaryDatum = {
       val imDao = daoFactory.newImagedMomentDAO(dao)
@@ -117,8 +116,7 @@ class CachedAncillaryDatumController(val daoFactory: BasicDAOFactory)
     posePositionUnits: Option[String] = None,
     phi: Option[Double] = None,
     theta: Option[Double] = None,
-    psi: Option[Double] = None
-  )(implicit ec: ExecutionContext): Future[Option[CachedAncillaryDatum]] = {
+    psi: Option[Double] = None)(implicit ec: ExecutionContext): Future[Option[CachedAncillaryDatum]] = {
 
     def fn(dao: ADDAO): Option[CachedAncillaryDatum] = {
       dao.findByUUID(uuid).map(cad => {

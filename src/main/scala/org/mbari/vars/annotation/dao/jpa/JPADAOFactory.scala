@@ -28,7 +28,7 @@ import org.mbari.vars.annotation.dao.{ DAO, ImagedMomentDAO, ObservationDAO, _ }
  * @since 2016-06-25T17:27:00
  */
 trait JPADAOFactory
-    extends DAOFactory[ImagedMomentImpl, ObservationImpl, AssociationImpl, ImageReferenceImpl, CachedAncillaryDatumImpl, CachedVideoReferenceInfoImpl] {
+  extends DAOFactory[ImagedMomentImpl, ObservationImpl, AssociationImpl, ImageReferenceImpl, CachedAncillaryDatumImpl, CachedVideoReferenceInfoImpl] {
 
   def entityManagerFactory: EntityManagerFactory
 

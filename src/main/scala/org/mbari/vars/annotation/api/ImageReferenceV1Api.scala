@@ -28,14 +28,13 @@ import scala.concurrent.ExecutionContext
  * Created by brian on 7/14/16.
  */
 class ImageReferenceV1Api(controller: ImageReferenceController)(implicit val executor: ExecutionContext)
-    extends APIStack {
+  extends APIStack {
 
   get("/:uuid") {
     val uuid = params.getAs[UUID]("uuid").getOrElse(halt(BadRequest("Please provide a UUID")))
     controller.findByUUID(uuid).map({
       case None => halt(NotFound(
-        body = s"An ImagedMoment with a UUID of $uuid was not found"
-      ))
+        body = s"An ImagedMoment with a UUID of $uuid was not found"))
       case Some(v) => toJson(v)
     })
   }
@@ -43,8 +42,7 @@ class ImageReferenceV1Api(controller: ImageReferenceController)(implicit val exe
   put("/:uuid") {
     validateRequest() // Apply API security
     val uuid = params.getAs[UUID]("uuid").getOrElse(halt(BadRequest(
-      body = "A 'uuid' parameter is required"
-    )))
+      body = "A 'uuid' parameter is required")))
     val url = params.getAs[URL]("url")
     val format = params.get("format")
     val width = params.getAs[Int]("width_pixels")
@@ -61,8 +59,7 @@ class ImageReferenceV1Api(controller: ImageReferenceController)(implicit val exe
   delete("/:uuid") {
     validateRequest() // Apply API security
     val uuid = params.getAs[UUID]("uuid").getOrElse(halt(BadRequest(
-      body = "A 'uuid' parameter is required"
-    )))
+      body = "A 'uuid' parameter is required")))
     controller.delete(uuid).map({
       case true => halt(NoContent()) // Success
       case false => halt(NotFound(s"Failed. No observation with UUID of $uuid was found."))

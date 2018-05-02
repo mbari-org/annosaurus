@@ -60,8 +60,7 @@ class CachedVideoReferenceInfoV1ApiSpec extends WebApiStack {
         "video_reference_uuid" -> UUID.randomUUID().toString,
         "mission_contact" -> "brian",
         "mission_id" -> i.toString,
-        "platform_name" -> s"Ventana_$i"
-      ) {
+        "platform_name" -> s"Ventana_$i") {
 
           status should be(200)
           val vi = gson.fromJson(body, classOf[CachedVideoReferenceInfoImpl])
@@ -98,8 +97,7 @@ class CachedVideoReferenceInfoV1ApiSpec extends WebApiStack {
       val v = vis(i)
       put(
         s"$path/${v.uuid}",
-        "mission_contact" -> "schlin", "mission_id" -> ("xxx" + i), "platform_name" -> "Doc Ricketts"
-      ) {
+        "mission_contact" -> "schlin", "mission_id" -> ("xxx" + i), "platform_name" -> "Doc Ricketts") {
           status should be(200)
           val v2 = gson.fromJson(body, classOf[CachedVideoReferenceInfoImpl])
           v2.videoReferenceUUID should be(v.videoReferenceUUID)

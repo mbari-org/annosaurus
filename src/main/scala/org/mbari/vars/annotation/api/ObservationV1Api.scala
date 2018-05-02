@@ -33,14 +33,13 @@ import scala.collection.JavaConverters._
  * @since 2016-07-04T21:56:00
  */
 class ObservationV1Api(controller: ObservationController)(implicit val executor: ExecutionContext)
-    extends APIStack {
+  extends APIStack {
 
   get("/:uuid") {
     val uuid = params.getAs[UUID]("uuid").getOrElse(halt(BadRequest("Please provide a UUID")))
     controller.findByUUID(uuid).map({
       case None => halt(NotFound(
-        body = s"{reason: 'An ImagedMoment with a UUID of $uuid was not found'}"
-      ))
+        body = s"{reason: 'An ImagedMoment with a UUID of $uuid was not found'}"))
       case Some(v) => toJson(v)
     })
   }
@@ -110,8 +109,7 @@ class ObservationV1Api(controller: ObservationController)(implicit val executor:
   put("/:uuid") {
     validateRequest() // Apply API security
     val uuid = params.getAs[UUID]("uuid").getOrElse(halt(BadRequest(
-      body = "{reason: 'A uuid parameter is required'}"
-    )))
+      body = "{reason: 'A uuid parameter is required'}")))
     val concept = params.get("concept")
     val observer = params.get("observer")
     val observationDate = params.getAs[Instant]("observation_timestamp").getOrElse(Instant.now())

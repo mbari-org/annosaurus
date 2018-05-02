@@ -42,8 +42,7 @@ class ImageController(daoFactory: BasicDAOFactory) {
   def findByVideoReferenceUUID(
     videoReferenceUUID: UUID,
     limit: Option[Int] = None,
-    offset: Option[Int] = None
-  )(implicit ec: ExecutionContext): Future[Seq[Image]] = {
+    offset: Option[Int] = None)(implicit ec: ExecutionContext): Future[Seq[Image]] = {
     val dao = daoFactory.newImagedMomentDAO()
     val f = dao.runTransaction(d => d.findByVideoReferenceUUID(videoReferenceUUID, limit, offset))
     f.onComplete(t => dao.close())
@@ -67,8 +66,7 @@ class ImageController(daoFactory: BasicDAOFactory) {
     format: Option[String],
     width: Option[Int],
     height: Option[Int],
-    description: Option[String]
-  )(implicit ec: ExecutionContext): Future[Image] = {
+    description: Option[String])(implicit ec: ExecutionContext): Future[Image] = {
 
     val imDao = daoFactory.newImagedMomentDAO()
     val irDao = daoFactory.newImageReferenceDAO(imDao)
@@ -110,8 +108,7 @@ class ImageController(daoFactory: BasicDAOFactory) {
     format: Option[String],
     width: Option[Int],
     height: Option[Int],
-    description: Option[String]
-  )(implicit ec: ExecutionContext): Future[Option[Image]] = {
+    description: Option[String])(implicit ec: ExecutionContext): Future[Option[Image]] = {
 
     val imDao = daoFactory.newImagedMomentDAO()
     val irDao = daoFactory.newImageReferenceDAO(imDao)

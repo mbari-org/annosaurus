@@ -30,7 +30,7 @@ import scala.concurrent.{ ExecutionContext, Future }
  * @since 2016-07-09T15:51:00
  */
 class AssociationController(val daoFactory: BasicDAOFactory)
-    extends BaseController[Association, AssociationDAO[Association]] {
+  extends BaseController[Association, AssociationDAO[Association]] {
 
   type ADAO = AssociationDAO[Association]
 
@@ -41,8 +41,7 @@ class AssociationController(val daoFactory: BasicDAOFactory)
     linkName: String,
     toConcept: String,
     linkValue: String,
-    mimeType: String
-  )(implicit ec: ExecutionContext): Future[Association] = {
+    mimeType: String)(implicit ec: ExecutionContext): Future[Association] = {
     def fn(dao: ADAO): Association = {
       val obsDao = daoFactory.newObservationDAO(dao)
       obsDao.findByUUID(observationUUID) match {
@@ -62,8 +61,7 @@ class AssociationController(val daoFactory: BasicDAOFactory)
     linkName: Option[String] = None,
     toConcept: Option[String] = None,
     linkValue: Option[String] = None,
-    mimeType: Option[String] = None
-  )(implicit ec: ExecutionContext): Future[Option[Association]] = {
+    mimeType: Option[String] = None)(implicit ec: ExecutionContext): Future[Option[Association]] = {
 
     def fn(dao: ADAO): Option[Association] = {
       dao.findByUUID(uuid).map(association => {

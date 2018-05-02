@@ -46,8 +46,7 @@ trait CachedAncillaryDatumDAO[T <: CachedAncillaryDatum] extends DAO[T] {
     posePositionUnits: Option[String] = None,
     phi: Option[Double] = None,
     theta: Option[Double] = None,
-    psi: Option[Double] = None
-  ): CachedAncillaryDatum
+    psi: Option[Double] = None): CachedAncillaryDatum
 
   def findByObservationUUID(observationUuid: UUID): Option[CachedAncillaryDatum]
 

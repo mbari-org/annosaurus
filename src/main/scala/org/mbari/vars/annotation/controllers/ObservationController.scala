@@ -31,7 +31,7 @@ import scala.concurrent.{ ExecutionContext, Future }
  * @since 2016-06-25T20:33:00
  */
 class ObservationController(val daoFactory: BasicDAOFactory)
-    extends BaseController[Observation, ObservationDAO[Observation]] {
+  extends BaseController[Observation, ObservationDAO[Observation]] {
 
   type ODAO = ObservationDAO[Observation]
 
@@ -43,8 +43,7 @@ class ObservationController(val daoFactory: BasicDAOFactory)
     observer: String,
     observationDate: Instant = Instant.now(),
     duration: Option[Duration] = None,
-    group: Option[String] = None
-  )(implicit ec: ExecutionContext): Future[Observation] = {
+    group: Option[String] = None)(implicit ec: ExecutionContext): Future[Observation] = {
 
     def fn(dao: ODAO): Observation = {
       val imDao = daoFactory.newImagedMomentDAO(dao)
@@ -68,8 +67,7 @@ class ObservationController(val daoFactory: BasicDAOFactory)
     duration: Option[Duration] = None,
     group: Option[String] = None,
     activity: Option[String] = None,
-    imagedMomentUUID: Option[UUID] = None
-  )(implicit ec: ExecutionContext): Future[Option[Observation]] = {
+    imagedMomentUUID: Option[UUID] = None)(implicit ec: ExecutionContext): Future[Option[Observation]] = {
 
     def fn(dao: ODAO): Option[Observation] = {
       // --- 1. Does uuid exist?
