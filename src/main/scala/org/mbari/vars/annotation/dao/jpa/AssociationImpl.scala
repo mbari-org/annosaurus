@@ -46,13 +46,13 @@ import org.mbari.vars.annotation.model.{ Association, Observation }
 @NamedQueries(Array(
   new NamedQuery(
     name = "Association.findAll",
-    query = "SELECT a FROM Association a"),
+    query = "SELECT a FROM Association a ORDER BY a.uuid"),
   new NamedQuery(
     name = "Association.findByLinkName",
-    query = "SELECT a FROM Association a WHERE a.linkName = :linkName"),
+    query = "SELECT a FROM Association a WHERE a.linkName = :linkName ORDER BY a.uuid"),
   new NamedQuery(
     name = "Association.findByLinkNameAndVideoReferenceUUID",
-    query = "SELECT a FROM Association a INNER JOIN FETCH a.observation o INNER JOIN FETCH o.imagedMoment im WHERE im.videoReferenceUUID = :videoReferenceUuid AND a.linkName = :linkName")))
+    query = "SELECT a FROM Association a INNER JOIN FETCH a.observation o INNER JOIN FETCH o.imagedMoment im WHERE im.videoReferenceUUID = :videoReferenceUuid AND a.linkName = :linkName ORDER BY a.uuid")))
 class AssociationImpl extends Association with JPAPersistentObject {
 
   @Expose(serialize = true)

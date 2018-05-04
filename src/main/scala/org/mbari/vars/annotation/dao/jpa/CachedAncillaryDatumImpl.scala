@@ -35,13 +35,13 @@ import org.mbari.vars.annotation.model.{ CachedAncillaryDatum, ImagedMoment }
 @NamedQueries(Array(
   new NamedQuery(
     name = "AncillaryDatum.findAll",
-    query = "SELECT a FROM AncillaryDatum a"),
+    query = "SELECT a FROM AncillaryDatum a ORDER BY a.uuid"),
   new NamedQuery(
     name = "AncillaryDatum.findByImagedMomentUUID",
-    query = "SELECT a FROM AncillaryDatum a JOIN a.imagedMoment i WHERE i.uuid = :uuid"),
+    query = "SELECT a FROM AncillaryDatum a JOIN a.imagedMoment i WHERE i.uuid = :uuid ORDER BY a.uuid"),
   new NamedQuery(
     name = "AncillaryDatum.findByObservationUUID",
-    query = "SELECT a FROM AncillaryDatum a INNER JOIN FETCH a.imagedMoment im INNER JOIN FETCH im.javaObservations o WHERE o.uuid = :uuid")))
+    query = "SELECT a FROM AncillaryDatum a INNER JOIN FETCH a.imagedMoment im INNER JOIN FETCH im.javaObservations o WHERE o.uuid = :uuid ORDER BY a.uuid")))
 class CachedAncillaryDatumImpl extends CachedAncillaryDatum with JPAPersistentObject {
 
   @Expose(serialize = true)

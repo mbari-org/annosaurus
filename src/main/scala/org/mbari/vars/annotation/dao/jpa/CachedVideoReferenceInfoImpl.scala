@@ -47,19 +47,19 @@ import org.mbari.vars.annotation.model.CachedVideoReferenceInfo
 @NamedQueries(Array(
   new NamedQuery(
     name = "VideoReferenceInfo.findAll",
-    query = "SELECT v FROM CachedVideoReferenceInfo v"),
+    query = "SELECT v FROM CachedVideoReferenceInfo v ORDER BY v.uuid"),
   new NamedQuery(
     name = "VideoReferenceInfo.findByVideoReferenceUUID",
-    query = "SELECT v FROM CachedVideoReferenceInfo v WHERE v.videoReferenceUUID = :uuid"),
+    query = "SELECT v FROM CachedVideoReferenceInfo v WHERE v.videoReferenceUUID = :uuid ORDER BY v.uuid"),
   new NamedQuery(
     name = "VideoReferenceInfo.findByPlatformName",
-    query = "SELECT v FROM CachedVideoReferenceInfo v WHERE v.platformName = :name"),
+    query = "SELECT v FROM CachedVideoReferenceInfo v WHERE v.platformName = :name ORDER BY v.uuid"),
   new NamedQuery(
     name = "VideoReferenceInfo.findByMissionID",
-    query = "SELECT v FROM CachedVideoReferenceInfo v WHERE v.missionID = :id"),
+    query = "SELECT v FROM CachedVideoReferenceInfo v WHERE v.missionID = :id ORDER BY v.uuid"),
   new NamedQuery(
     name = "VideoReferenceInfo.findByMissionContact",
-    query = "SELECT v FROM CachedVideoReferenceInfo v WHERE v.missionContact = :contact ")))
+    query = "SELECT v FROM CachedVideoReferenceInfo v WHERE v.missionContact = :contact ORDER BY v.uuid")))
 class CachedVideoReferenceInfoImpl extends CachedVideoReferenceInfo with JPAPersistentObject {
 
   /**

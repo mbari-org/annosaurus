@@ -58,39 +58,39 @@ import scala.collection.JavaConverters._
 @NamedQueries(Array(
   new NamedQuery(
     name = "ImagedMoment.findAll",
-    query = "SELECT i FROM ImagedMoment i"),
+    query = "SELECT i FROM ImagedMoment i ORDER BY i.uuid"),
   new NamedQuery(
     name = "ImagedMoment.findBetweenUpdatedDates",
     query = "SELECT i FROM ImagedMoment i LEFT JOIN i.javaObservations o WHERE " +
       "i.lastUpdatedTime BETWEEN :start AND :end OR " +
-      "o.lastUpdatedTime BETWEEN :start AND :end"),
+      "o.lastUpdatedTime BETWEEN :start AND :end ORDER BY i.uuid"),
   new NamedQuery(
     name = "ImagedMoment.findByVideoReferenceUUID",
-    query = "SELECT i FROM ImagedMoment i WHERE i.videoReferenceUUID = :uuid"),
+    query = "SELECT i FROM ImagedMoment i WHERE i.videoReferenceUUID = :uuid ORDER BY i.uuid"),
   new NamedQuery(
     name = "ImagedMoment.findWithImageReferences",
-    query = "SELECT i FROM ImagedMoment i LEFT JOIN i.javaImageReferences r WHERE i.videoReferenceUUID = :uuid"),
+    query = "SELECT i FROM ImagedMoment i LEFT JOIN i.javaImageReferences r WHERE i.videoReferenceUUID = :uuid ORDER BY i.uuid"),
   new NamedQuery(
     name = "ImagedMoment.findByObservationUUID",
-    query = "SELECT i FROM ImagedMoment i LEFT JOIN i.javaObservations o WHERE o.uuid = :uuid"),
+    query = "SELECT i FROM ImagedMoment i LEFT JOIN i.javaObservations o WHERE o.uuid = :uuid ORDER BY i.uuid"),
   new NamedQuery(
     name = "ImagedMoment.findByUUID",
-    query = "SELECT i FROM ImagedMoment i WHERE i.uuid = :uuid"),
+    query = "SELECT i FROM ImagedMoment i WHERE i.uuid = :uuid ORDER BY i.uuid"),
   new NamedQuery(
     name = "ImagedMoment.findByVideoReferenceUUIDAndTimecode",
-    query = "SELECT i FROM ImagedMoment i WHERE i.timecode = :timecode AND i.videoReferenceUUID = :uuid"),
+    query = "SELECT i FROM ImagedMoment i WHERE i.timecode = :timecode AND i.videoReferenceUUID = :uuid ORDER BY i.uuid"),
   new NamedQuery(
     name = "ImagedMoment.findByVideoReferenceUUIDAndElapsedTime",
-    query = "SELECT i FROM ImagedMoment i WHERE i.elapsedTime = :elapsedTime AND i.videoReferenceUUID = :uuid"),
+    query = "SELECT i FROM ImagedMoment i WHERE i.elapsedTime = :elapsedTime AND i.videoReferenceUUID = :uuid ORDER BY i.uuid"),
   new NamedQuery(
     name = "ImagedMoment.findByVideoReferenceUUIDAndRecordedDate",
-    query = "SELECT i FROM ImagedMoment i WHERE i.recordedDate = :recordedDate AND i.videoReferenceUUID = :uuid"),
+    query = "SELECT i FROM ImagedMoment i WHERE i.recordedDate = :recordedDate AND i.videoReferenceUUID = :uuid ORDER BY i.uuid"),
   new NamedQuery(
     name = "ImagedMoment.deleteByVideoReferenceUUID",
     query = "DELETE FROM ImagedMoment i WHERE i.videoReferenceUUID = :uuid"),
   new NamedQuery(
     name = "ImagedMoment.findByImageReferenceUUID",
-    query = "SELECT i FROM ImagedMoment i LEFT JOIN i.javaImageReferences r WHERE r.uuid = :uuid")))
+    query = "SELECT i FROM ImagedMoment i LEFT JOIN i.javaImageReferences r WHERE r.uuid = :uuid ORDER BY i.uuid")))
 class ImagedMomentImpl extends ImagedMoment with JPAPersistentObject {
 
   @Expose(serialize = true)

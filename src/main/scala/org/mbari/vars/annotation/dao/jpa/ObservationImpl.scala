@@ -65,10 +65,10 @@ import org.mbari.vars.annotation.model.{ Association, ImagedMoment, Observation 
 @NamedQueries(Array(
   new NamedQuery(
     name = "Observation.findAll",
-    query = "SELECT o FROM Observation o"),
+    query = "SELECT o FROM Observation o ORDER BY o.uuid"),
   new NamedQuery(
     name = "Observation.findByVideoReferenceUUID",
-    query = "SELECT o FROM Observation o JOIN o.imagedMoment i WHERE i.videoReferenceUUID = :uuid")))
+    query = "SELECT o FROM Observation o JOIN o.imagedMoment i WHERE i.videoReferenceUUID = :uuid ORDER BY o.uuid")))
 class ObservationImpl extends Observation with JPAPersistentObject {
 
   @Expose(serialize = true)
