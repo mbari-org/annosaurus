@@ -88,6 +88,21 @@ class ImagedMomentDAOImpl(entityManager: EntityManager)
       .map(s => UUID.fromString(s.toString))
   }
 
+  override def countByConcept(concept: String): Int = {
+    val query = entityManager.createNamedQuery("ImagedMoment.countByConcept")
+    query.setParameter(1, concept)
+    query.getResultList
+      .asScala
+      .map(_.asInstanceOf[Int])
+      .head
+  }
+
+  override def findByConcept(
+    concept: String,
+    limit: Option[Int],
+    offset: Option[Int]): Iterable[ImagedMomentImpl] =
+    findByNamedQuery("ImagedMoment.findByConcept", Map("concept" -> concept), limit, offset)
+
   override def countByVideoReferenceUUID(uuid: UUID): Int = {
     val query = entityManager.createNamedQuery("ImagedMoment.countBetweenUpdatedDates")
     query.setParameter(1, uuid)

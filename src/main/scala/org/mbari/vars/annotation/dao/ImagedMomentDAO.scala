@@ -52,7 +52,10 @@ trait ImagedMomentDAO[T <: ImagedMoment] extends DAO[T] {
     start: Instant,
     end: Instant,
     limit: Option[Int] = None,
-    offset: Option[Int] = None): Iterable[ImagedMomentImpl]
+    offset: Option[Int] = None): Iterable[T]
+
+  def countByConcept(concept: String): Int
+  def findByConcept(concept: String, limit: Option[Int], offset: Option[Int]): Iterable[T]
 
   def countBetweenUpdatedDates(start: Instant, end: Instant): Int
 

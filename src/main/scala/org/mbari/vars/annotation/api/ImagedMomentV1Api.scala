@@ -56,6 +56,23 @@ class ImagedMomentV1Api(controller: ImagedMomentController)(implicit val executo
     })
   }
 
+  get("/concept/:name") {
+    val name = params.get("name")
+      .getOrElse(halt(BadRequest("""{"reason": "Please provide a concept name"}""")))
+    val limit = params.getAs[Int]("limit")
+    val offset = params.getAs[Int]("offset")
+    controller.findByConcept(name, limit, offset)
+      .map(_.asJava)
+      .map(toJson)
+  }
+
+  get("/concept/count/:name") {
+    val name = params.get("name")
+      .getOrElse(halt(BadRequest("""{"reason": "Please provide a concept name"}""")))
+    controller.countByConcept(name)
+      .map(c => s"""{"concept": "$name", "count": $c}""")
+  }
+
   get("/modified/:start/:end") {
     val start = params.getAs[Instant]("start").getOrElse(halt(BadRequest("Please provide a start date (yyyy-mm-ddThh:mm:ssZ)")))
     val end = params.getAs[Instant]("end").getOrElse(halt(BadRequest("Please provide an end date (yyyy-mm-ddThh:mm:ssZ)")))
