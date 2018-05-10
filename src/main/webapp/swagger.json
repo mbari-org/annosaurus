@@ -1684,6 +1684,10 @@
             "description" : "pitch in radians, airplne coordinate system",
             "type" : "number"
           },
+          "psi" : {
+            "description" : "tilt in radians, airplane coordinate system",
+            "type" : "number"
+          },
           "last_upated_time" : {
             "description" : "The time of last modification",
             "type" : "string",
