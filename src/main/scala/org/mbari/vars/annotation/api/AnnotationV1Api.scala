@@ -19,7 +19,7 @@ package org.mbari.vars.annotation.api
 import java.time.{ Duration, Instant }
 import java.util.UUID
 
-import org.mbari.vars.annotation.controllers.AnnotationController
+import org.mbari.vars.annotation.controllers.{ AnnotationController, ObservationController }
 import org.mbari.vars.annotation.dao.jpa.AnnotationImpl
 import org.mbari.vcr4j.time.Timecode
 import org.scalatra.{ BadRequest, NotFound }

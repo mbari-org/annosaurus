@@ -16,13 +16,13 @@
 
 package org.mbari.vars.annotation.api
 
-import java.time.{Duration, Instant}
+import java.time.{ Duration, Instant }
 import java.util.UUID
 
 import org.mbari.vars.annotation.controllers.ImagedMomentController
 import org.mbari.vars.annotation.dao.jpa.ObservationDAOImpl
 import org.mbari.vcr4j.time.Timecode
-import org.scalatra.{BadRequest, NoContent, NotFound}
+import org.scalatra.{ BadRequest, NoContent, NotFound }
 
 import scala.concurrent.ExecutionContext
 import scala.collection.JavaConverters._
@@ -57,43 +57,43 @@ class ImagedMomentV1Api(controller: ImagedMomentController)(implicit val executo
     })
   }
 
-//  get("/concept/:name") {
-//    val name = params.get("name")
-//      .getOrElse(halt(BadRequest("""{"reason": "Please provide a concept name"}""")))
-//    val limit = params.getAs[Int]("limit")
-//    val offset = params.getAs[Int]("offset")
-//    controller.findByConcept(name, limit, offset)
-//      .map(_.asJava)
-//      .map(toJson)
-//  }
-
   get("/concept/:name") {
     val name = params.get("name")
       .getOrElse(halt(BadRequest("""{"reason": "Please provide a concept name"}""")))
-    val imDao = controller.daoFactory.newImagedMomentDAO()
-    imDao match {
-      case dao: ObservationDAOImpl =>
-        // HACK: Working around controller!!
-        response.setHeader("Transfer-Encoding", "chunked")
-        response.setStatus(200)
-        val out = response.getWriter
-        out.write("[")
-        val moments = dao.findByConcept(name, None, None).toList
-        val n = moments.size - 1
-        for (i <- moments.indices) {
-          out.write(toJson(moments(i)))
-          if (i < n) out.write(",")
-        }
-        out.write("]")
-        out.flush()
-      case _ =>
-        val limit = params.getAs[Int]("limit")
-        val offset = params.getAs[Int]("offset")
-        controller.findByConcept(name, limit, offset)
-          .map(_.asJava)
-          .map(toJson)
-    }
+    val limit = params.getAs[Int]("limit")
+    val offset = params.getAs[Int]("offset")
+    controller.findByConcept(name, limit, offset)
+      .map(_.asJava)
+      .map(toJson)
   }
+
+  // get("/concept/:name") {
+  //   val name = params.get("name")
+  //     .getOrElse(halt(BadRequest("""{"reason": "Please provide a concept name"}""")))
+  //   val imDao = controller.daoFactory.newImagedMomentDAO()
+  //   imDao match {
+  //     case dao: ObservationDAOImpl =>
+  //       // HACK: Working around controller!!
+  //       response.setHeader("Transfer-Encoding", "chunked")
+  //       response.setStatus(200)
+  //       val out = response.getWriter
+  //       out.write("[")
+  //       val moments = dao.findByConcept(name, None, None).toList
+  //       val n = moments.size - 1
+  //       for (i <- moments.indices) {
+  //         out.write(toJson(moments(i)))
+  //         if (i < n) out.write(",")
+  //       }
+  //       out.write("]")
+  //       out.flush()
+  //     case _ =>
+  //       val limit = params.getAs[Int]("limit")
+  //       val offset = params.getAs[Int]("offset")
+  //       controller.findByConcept(name, limit, offset)
+  //         .map(_.asJava)
+  //         .map(toJson)
+  //   }
+  // }
 
   get("/concept/count/:name") {
     val name = params.get("name")

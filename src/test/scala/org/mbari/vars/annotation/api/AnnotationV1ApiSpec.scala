@@ -23,8 +23,8 @@ import java.util
 import java.util.{ UUID, List => JList }
 
 import org.mbari.vars.annotation.Constants
-import org.mbari.vars.annotation.controllers.{ AnnotationController, BasicDAOFactory, ImagedMomentController }
-import org.mbari.vars.annotation.dao.jpa.{ AnnotationImpl, ImageReferenceImpl }
+import org.mbari.vars.annotation.controllers.{ AnnotationController, BasicDAOFactory, ImagedMomentController, ObservationController }
+import org.mbari.vars.annotation.dao.jpa.{ AnnotationImpl, AssociationImpl, ImageReferenceImpl }
 import org.mbari.vars.annotation.model.Annotation
 import org.mbari.vcr4j.time.Timecode
 
@@ -198,6 +198,33 @@ class AnnotationV1ApiSpec extends WebApiStack {
           .toSeq
         pas0.size should be(1)
         pas0.head.imageReferences.size should be(1)
+      }
+  }
+
+  val uuid2 = UUID.randomUUID()
+  val anno1 = {
+    val a0 = AnnotationImpl(uuid2, "Nanomia bijuga", "brian", recordedDate = recordedDate)
+    val as = AssociationImpl("linkname", "toconcept", "linkvalue")
+    val ir = ImageReferenceImpl(new URL("http://www.foo.bar/wootty.png"), Option(1920), Option(1080))
+    a0.imageReferences = Seq(ir)
+    a0.associations = Seq(as)
+    a0
+  }
+
+  it should "bulk create with an imagereference AND association" in {
+    val annos = Seq(anno1)
+    val json = Constants.GSON_FOR_ANNOTATION.toJson(annos.asJava)
+    post(
+      "/v1/annotations/bulk",
+      headers = Map("Content-Type" -> "application/json"),
+      body = json.getBytes(StandardCharsets.UTF_8)) {
+        status should be(200)
+        var pas0 = Constants.GSON_FOR_ANNOTATION
+          .fromJson(body, classOf[Array[AnnotationImpl]])
+          .toSeq
+        pas0.size should be(1)
+        pas0.head.imageReferences.size should be(1)
+        pas0.head.associations.size should be(1)
       }
   }
 
