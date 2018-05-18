@@ -87,6 +87,8 @@ class ObservationV1Api(controller: ObservationController)(implicit val executor:
       .map(n => s"""{"concept":"$concept", "count":"$n"}""")
   }
 
+  // TODO add method that returns all concepts and their count
+
   get("/groups") {
     controller.findAllGroups
       .map(_.toArray)
