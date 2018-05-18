@@ -1624,6 +1624,12 @@
             "format" : "uuid",
             "example" : "d290f1ee-6c54-4b01-90e6-d701748f0851"
           },
+          "imaged_moment_uuid" : {
+            "description" : "UUID to the imagedmoment. This is used when uploading data to the bulk create or update API.",
+            "type" : "string",
+            "format" : "uuid",
+            "example" : "d290f1ee-6c54-4b01-90e6-d701748f0851"
+          },
           "latitude" : {
             "description" : "Latitude of video sample",
             "type" : "number"
@@ -1682,6 +1688,10 @@
           },
           "theta" : {
             "description" : "pitch in radians, airplne coordinate system",
+            "type" : "number"
+          },
+          "psi" : {
+            "description" : "tilt in radians, airplane coordinate system",
             "type" : "number"
           },
           "last_upated_time" : {
