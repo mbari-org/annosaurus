@@ -38,6 +38,9 @@ class CachedAncillaryDatumBean extends CachedAncillaryDatum {
   var imagedMomentUuid: UUID = _
 
   @Expose(serialize = true)
+  var recordedTimestamp: Option[Instant] = _
+
+  @Expose(serialize = true)
   @JsonAdapter(value = classOf[DoubleOptionDeserializer])
   override var latitude: Option[Double] = _
 
