@@ -1178,7 +1178,7 @@
       "get" : {
         "tags" : [ "Observation" ],
         "summary" : "Retrieve the number of usages of a concept",
-        "operationId" : "findObservationByUuid",
+        "operationId" : "countObservationsByConcept",
         "description" : "Retrieve a count of the number of usages of a concept in the entire data store",
         "parameters" : [ {
           "in" : "path",
