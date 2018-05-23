@@ -90,7 +90,7 @@ class CachedAncillaryDatumV1Api(controller: CachedAncillaryDatumController)(impl
     val psi = params.getAs[Double]("psi")
 
     controller.create(imagedMomentUuid, latitude, longitude, depthMeters, altitude, crs, salinity,
-      oxygenMlL, temperature, pressureDbar, lightTransmission, x, y, z, posePositionUnits, phi, theta, psi)
+      temperature, oxygenMlL, pressureDbar, lightTransmission, x, y, z, posePositionUnits, phi, theta, psi)
       .map(toJson)
 
   }
