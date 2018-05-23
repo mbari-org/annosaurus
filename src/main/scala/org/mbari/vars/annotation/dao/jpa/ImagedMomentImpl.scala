@@ -53,7 +53,7 @@ import scala.collection.JavaConverters._
     name = "ImagedMoment.countByConceptWithImages",
     query = "SELECT COUNT(*) FROM imaged_moments im LEFT JOIN " +
       "observations obs ON obs.imaged_moment_uuid = im.uuid RIGHT JOIN " +
-      "image_references ir ON ir.imaged_moment_uuid = im.uuid" +
+      "image_references ir ON ir.imaged_moment_uuid = im.uuid " +
       "WHERE obs.concept = ?1 AND ir.url IS NOT NULL"),
   new NamedNativeQuery(
     name = "ImagedMoment.countBetweenUpdatedDates",
