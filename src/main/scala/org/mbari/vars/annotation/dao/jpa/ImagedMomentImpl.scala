@@ -185,7 +185,7 @@ class ImagedMomentImpl extends ImagedMoment with JPAPersistentObject {
     targetEntity = classOf[CachedAncillaryDatumImpl])
   protected var _ancillaryDatum: CachedAncillaryDatum = _
 
-  def ancillaryDatum = _ancillaryDatum
+  def ancillaryDatum: CachedAncillaryDatum = _ancillaryDatum
   def ancillaryDatum_=(ad: CachedAncillaryDatum): Unit = {
     if (_ancillaryDatum != null) _ancillaryDatum.imagedMoment = null
     _ancillaryDatum = ad

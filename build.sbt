@@ -2,23 +2,24 @@ val akkaVersion = "2.4.7"
 val auth0Version = "3.3.0"
 val codecVersion = "1.11"
 val configVersion = "1.3.3"
-val derbyVersion = "10.14.1.0"
+val derbyVersion = "10.14.2.0"
 val eclipselinkVersion = "2.7.1"
 val gsonJavatimeVersion = "1.1.1"
-val gsonVersion = "2.8.4"
+val gsonVersion = "2.8.5"
 val h2Version = "1.4.197"
-val jettyVersion = "9.4.9.v20180320"
-val jsonVersion = "3.5.3"
+val jettyVersion = "9.4.10.v20180503"
+val jsonVersion = "3.5.4"
 val jtaVersion = "1.1"
 val jtdsVersion = "1.3.1"
 val junitVersion = "4.12"
 val logbackVersion = "1.2.3"
 val mssqlVersion = "6.4.0.jre8"
+val scilubeVersion = "2.0.4"
 val scalatestVersion = "3.0.5"
 val scalatraVersion = "2.6.3"
 val servletVersion = "4.0.1"
 val slf4jVersion = "1.7.25"
-val vcr4jVersion = "4.0.1"
+val vcr4jVersion = "4.0.2"
 
 
 lazy val buildSettings = Seq(
@@ -95,6 +96,7 @@ lazy val annosaurus = (project in file("."))
       "junit"                    % "junit"                          % junitVersion          % "test",
       "com.microsoft.sqlserver"  % "mssql-jdbc"                     % mssqlVersion,
       //"net.sourceforge.jtds"     % "jtds"                           % jtdsVersion,
+      "scilube"                 %% "scilube-core"                   % scilubeVersion,
       "org.apache.derby"         % "derby"                          % derbyVersion, //          % "test",
       "org.apache.derby"         % "derbyclient"                    % derbyVersion, //          % "test",
       "org.apache.derby"         % "derbynet"                       % derbyVersion, //          % "test",

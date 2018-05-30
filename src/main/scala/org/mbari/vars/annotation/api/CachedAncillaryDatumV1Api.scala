@@ -16,6 +16,7 @@
 
 package org.mbari.vars.annotation.api
 
+import java.time.Duration
 import java.util.UUID
 
 import org.mbari.vars.annotation.controllers.CachedAncillaryDatumController
@@ -104,6 +105,21 @@ class CachedAncillaryDatumV1Api(controller: CachedAncillaryDatumController)(impl
           .map(ds => toJson(ds.asJava))
       case _ =>
         halt(BadRequest("Posts to /bulk only accept a JSON body (i.e. Content-Type: application/json)"))
+    }
+  }
+
+  put("/merge/:uuid") {
+    validateRequest()
+    val uuid = params.getAs[UUID]("uuid").getOrElse(halt(BadRequest(
+      body = "A video reference 'uuid' parameter is required")))
+    val windowMillis = params.getAs[Int]("window").getOrElse(7500)
+    request.getHeader("Content-Type") match {
+      case "application/json" =>
+        val data = fromJson(request.body, classOf[Array[CachedAncillaryDatumBean]])
+        controller.merge(data, uuid, Duration.ofMillis(windowMillis))
+          .map(ds => toJson(ds.asJava))
+      case _ =>
+        halt(BadRequest("Posts to /merge only accept a JSON body (i.e. Content-Type: application/json)"))
     }
   }
 

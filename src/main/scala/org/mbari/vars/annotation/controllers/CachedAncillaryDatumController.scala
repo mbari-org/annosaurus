@@ -16,10 +16,12 @@
 
 package org.mbari.vars.annotation.controllers
 
+import java.time.Duration
 import java.util.UUID
 
 import org.mbari.vars.annotation.dao.{ CachedAncillaryDatumDAO, NotFoundInDatastoreException }
-import org.mbari.vars.annotation.model.CachedAncillaryDatum
+import org.mbari.vars.annotation.math.FastCollator
+import org.mbari.vars.annotation.model.{ CachedAncillaryDatum, ImagedMoment }
 import org.mbari.vars.annotation.model.simple.CachedAncillaryDatumBean
 import org.slf4j.LoggerFactory
 
@@ -160,20 +162,59 @@ class CachedAncillaryDatumController(val daoFactory: BasicDAOFactory)
         if datum.imagedMomentUuid != null
       } yield {
         val maybeMoment = imDao.findByUUID(datum.imagedMomentUuid)
-        maybeMoment.flatMap(im => {
-          if (im.ancillaryDatum != null) {
-            updateValues(im.ancillaryDatum, datum)
-            Some(im.ancillaryDatum)
-          } else {
-            val c = dao.asPersistentObject(datum)
-            im.ancillaryDatum = c
-            Some(c)
-          }
-        })
+        maybeMoment.flatMap(im => Option(createOrUpdate(datum, im)))
       }
       cads.flatten.toSeq
     }
     exec(fn)
+  }
+
+  def merge(
+    data: Iterable[CachedAncillaryDatumBean],
+    videoReferenceUuid: UUID,
+    tolerance: Duration = Duration.ofMillis(7500))(implicit ec: ExecutionContext): Future[Seq[CachedAncillaryDatum]] = {
+
+    def fn(dao: ADDAO): Seq[CachedAncillaryDatum] = {
+      val imDao = daoFactory.newImagedMomentDAO(dao)
+      val imagedMoments = imDao.findByVideoReferenceUUID(videoReferenceUuid)
+        .filter(ir => ir.recordedDate != null)
+
+      val usefulData = data.filter(_.recordedTimestamp.isDefined)
+
+      def imagedMomentToMillis(im: ImagedMoment) = im.recordedDate.toEpochMilli
+      def datumToMillis(cd: CachedAncillaryDatumBean) = cd.recordedTimestamp.map(_.toEpochMilli).getOrElse(-1L)
+      val mergedData = FastCollator(
+        imagedMoments,
+        imagedMomentToMillis,
+        usefulData,
+        datumToMillis,
+        tolerance.toMillis)
+
+      for {
+        (im, opt) <- mergedData
+        cad <- opt
+      } yield {
+        val d = dao.asPersistentObject(cad)
+        createOrUpdate(d, im)
+      }
+    }
+    exec(fn)
+  }
+
+  /**
+   * This method should be called within a transaction!
+   * @param d
+   * @param im
+   * @return
+   */
+  private def createOrUpdate(d: CachedAncillaryDatum, im: ImagedMoment): CachedAncillaryDatum = {
+    if (im.ancillaryDatum != null) {
+      updateValues(im.ancillaryDatum, d)
+      im.ancillaryDatum
+    } else {
+      im.ancillaryDatum = d
+      d
+    }
   }
 
   private def updateValues(a: CachedAncillaryDatum, b: CachedAncillaryDatum): Unit = {
