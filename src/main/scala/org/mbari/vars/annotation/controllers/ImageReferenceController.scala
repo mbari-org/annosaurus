@@ -18,14 +18,11 @@ package org.mbari.vars.annotation.controllers
 
 import java.net.URL
 import java.util.UUID
-import java.util.concurrent.TimeUnit
 
 import org.mbari.vars.annotation.dao.{ ImageReferenceDAO, NotFoundInDatastoreException }
 import org.mbari.vars.annotation.model.ImageReference
 
-import scala.concurrent.duration.Duration
-import scala.concurrent.{ Await, ExecutionContext, Future }
-import scala.util.{ Failure, Success }
+import scala.concurrent.{ ExecutionContext, Future }
 
 /**
  *

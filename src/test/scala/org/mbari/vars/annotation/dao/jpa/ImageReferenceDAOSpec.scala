@@ -24,7 +24,7 @@ import java.util.concurrent.TimeUnit
 import org.mbari.vars.annotation.dao.ImageReferenceDAO
 import org.scalatest.{ FlatSpec, Matchers, BeforeAndAfterAll }
 
-import scala.concurrent.{ Await, Awaitable }
+import scala.concurrent.Await
 import scala.concurrent.duration.{ Duration => SDuration }
 import scala.concurrent.ExecutionContext.Implicits.global
 

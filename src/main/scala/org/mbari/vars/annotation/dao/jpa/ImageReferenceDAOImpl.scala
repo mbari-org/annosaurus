@@ -17,7 +17,6 @@
 package org.mbari.vars.annotation.dao.jpa
 
 import java.net.URL
-import java.util.UUID
 import javax.persistence.EntityManager
 
 import org.mbari.vars.annotation.dao.ImageReferenceDAO

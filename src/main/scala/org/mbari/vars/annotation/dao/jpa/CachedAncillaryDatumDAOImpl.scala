@@ -21,7 +21,6 @@ import javax.persistence.EntityManager
 
 import org.mbari.vars.annotation.dao.CachedAncillaryDatumDAO
 import org.mbari.vars.annotation.model.CachedAncillaryDatum
-import org.mbari.vars.annotation.model.simple.CachedAncillaryDatumBean
 
 /**
  *

@@ -19,14 +19,12 @@ package org.mbari.vars.annotation.controllers
 import java.time.{ Duration, Instant }
 import java.util.UUID
 
-import org.mbari.vars.annotation.Constants
 import org.mbari.vars.annotation.dao.jpa.AnnotationImpl
-import org.mbari.vars.annotation.dao.{ DAO, ImagedMomentDAO, ObservationDAO }
-import org.mbari.vars.annotation.model.{ Annotation, ImageReference, ImagedMoment, Observation }
+import org.mbari.vars.annotation.dao.DAO
+import org.mbari.vars.annotation.model.{ Annotation, Observation }
 import org.mbari.vcr4j.time.Timecode
 
 import scala.concurrent.{ ExecutionContext, Future }
-import scala.util.{ Failure, Success }
 
 /**
  *

@@ -162,7 +162,8 @@ class CachedAncillaryDatumController(val daoFactory: BasicDAOFactory)
         imagedMomentUuid <- Option(datum.imagedMomentUuid)
       } yield {
         val maybeMoment = imDao.findByUUID(imagedMomentUuid)
-        maybeMoment.flatMap(im => Option(createOrUpdate(datum, im)))
+        val cad = dao.asPersistentObject(datum)
+        maybeMoment.flatMap(im => Option(createOrUpdate(cad, im)))
       }
       cads.flatten.toSeq
     }

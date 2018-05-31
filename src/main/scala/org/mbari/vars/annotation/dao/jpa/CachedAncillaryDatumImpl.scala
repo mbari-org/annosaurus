@@ -16,7 +16,6 @@
 
 package org.mbari.vars.annotation.dao.jpa
 
-import java.lang.{ Double => JDouble, Float => JFloat }
 import javax.persistence.{ CascadeType, JoinColumn, _ }
 
 import com.google.gson.annotations.{ Expose, JsonAdapter }

@@ -26,7 +26,6 @@ import org.scalatra.test.scalatest.ScalatraFlatSpec
 
 import scala.concurrent.duration.Duration
 import scala.concurrent.{ Await, ExecutionContext }
-import scala.util.Try
 
 /**
  *

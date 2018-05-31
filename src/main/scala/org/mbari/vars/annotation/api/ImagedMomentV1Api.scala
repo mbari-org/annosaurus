@@ -20,7 +20,6 @@ import java.time.{ Duration, Instant }
 import java.util.UUID
 
 import org.mbari.vars.annotation.controllers.ImagedMomentController
-import org.mbari.vars.annotation.dao.jpa.ObservationDAOImpl
 import org.mbari.vcr4j.time.Timecode
 import org.scalatra.{ BadRequest, NoContent, NotFound }
 

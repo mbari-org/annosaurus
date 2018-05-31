@@ -16,7 +16,7 @@
 
 package org.mbari.vars.annotation.api
 
-import java.nio.charset.{ Charset, StandardCharsets }
+import java.nio.charset.StandardCharsets
 import java.time.{ Duration, Instant }
 import java.util.UUID
 import java.util.concurrent.TimeUnit

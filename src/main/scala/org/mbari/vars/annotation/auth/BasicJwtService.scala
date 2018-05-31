@@ -16,9 +16,8 @@
 
 package org.mbari.vars.annotation.auth
 
-import java.lang.{ Long => JLong }
 import java.time.Instant
-import java.time.temporal.{ ChronoUnit, TemporalUnit }
+import java.time.temporal.ChronoUnit
 import java.util.Date
 import javax.servlet.http.HttpServletRequest
 

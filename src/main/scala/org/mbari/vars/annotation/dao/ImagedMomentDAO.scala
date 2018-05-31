@@ -19,11 +19,8 @@ package org.mbari.vars.annotation.dao
 import java.time.{ Duration, Instant }
 import java.util.UUID
 
-import org.mbari.vars.annotation.dao.jpa.ImagedMomentImpl
-import org.mbari.vars.annotation.model.{ Annotation, ImagedMoment }
+import org.mbari.vars.annotation.model.ImagedMoment
 import org.mbari.vcr4j.time.Timecode
-
-import scala.concurrent.Future
 
 /**
  *

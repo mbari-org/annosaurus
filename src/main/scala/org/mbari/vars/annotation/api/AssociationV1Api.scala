@@ -18,7 +18,7 @@ package org.mbari.vars.annotation.api
 
 import java.util.UUID
 
-import org.mbari.vars.annotation.controllers.{ AssociationController, ImagedMomentController }
+import org.mbari.vars.annotation.controllers.AssociationController
 import org.mbari.vars.annotation.model.Association
 import org.scalatra.{ BadRequest, NoContent, NotFound }
 

@@ -19,7 +19,6 @@ package org.mbari.vars.annotation.controllers
 import java.time.{ Duration, Instant }
 import java.util.UUID
 
-import org.mbari.vars.annotation.dao.jpa.{ BaseDAO, ObservationDAOImpl }
 import org.mbari.vars.annotation.dao.{ ImagedMomentDAO, NotFoundInDatastoreException }
 import org.mbari.vars.annotation.model.ImagedMoment
 import org.mbari.vcr4j.time.Timecode

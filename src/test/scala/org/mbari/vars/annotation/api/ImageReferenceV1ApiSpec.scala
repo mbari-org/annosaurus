@@ -21,7 +21,7 @@ import java.time.Instant
 import java.util.UUID
 import java.util.concurrent.TimeUnit
 
-import org.mbari.vars.annotation.controllers.{ BasicDAOFactory, ImageReferenceController, ImagedMomentController }
+import org.mbari.vars.annotation.controllers.{ ImageReferenceController, ImagedMomentController }
 import org.mbari.vars.annotation.dao.jpa.{ ImageReferenceImpl, ImagedMomentImpl }
 
 import scala.concurrent.Await

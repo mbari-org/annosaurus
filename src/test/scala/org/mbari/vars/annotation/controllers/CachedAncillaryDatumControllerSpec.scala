@@ -20,7 +20,7 @@ import java.time.{ Duration, Instant }
 import java.util.UUID
 import java.util.concurrent.TimeUnit
 
-import org.mbari.vars.annotation.dao.jpa.{ ImagedMomentImpl, TestDAOFactory }
+import org.mbari.vars.annotation.dao.jpa.TestDAOFactory
 import org.mbari.vars.annotation.model.simple.CachedAncillaryDatumBean
 import org.scalatest.{ BeforeAndAfterAll, FlatSpec, Matchers }
 
@@ -43,7 +43,7 @@ class CachedAncillaryDatumControllerSpec extends FlatSpec with Matchers with Bef
   private[this] val imagedMoments = {
     val videoReferenceUuid = UUID.randomUUID()
     val dao = daoFactory.newImagedMomentDAO()
-    val ims = (0 until 10).map(i => dao.newPersistentObject(
+    val ims = (0 until 2).map(i => dao.newPersistentObject(
       videoReferenceUuid,
       elapsedTime = Some(Duration.ofMillis(math.round(math.random() * 10000L)))))
     dao.runTransaction(d => {

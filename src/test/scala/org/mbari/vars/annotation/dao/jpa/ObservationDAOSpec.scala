@@ -20,10 +20,10 @@ import java.time.{ Duration, Instant }
 import java.util.UUID
 import java.util.concurrent.TimeUnit
 
-import org.mbari.vars.annotation.dao.{ ImagedMomentDAO, ObservationDAO }
+import org.mbari.vars.annotation.dao.ObservationDAO
 import org.scalatest.{ FlatSpec, Matchers, BeforeAndAfterAll }
 
-import scala.concurrent.{ Await, Awaitable }
+import scala.concurrent.Await
 import scala.concurrent.duration.{ Duration => SDuration }
 import scala.concurrent.ExecutionContext.Implicits.global
 

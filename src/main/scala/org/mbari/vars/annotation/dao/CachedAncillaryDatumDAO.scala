@@ -19,7 +19,6 @@ package org.mbari.vars.annotation.dao
 import java.util.UUID
 
 import org.mbari.vars.annotation.model.CachedAncillaryDatum
-import org.mbari.vars.annotation.model.simple.CachedAncillaryDatumBean
 
 /**
  *

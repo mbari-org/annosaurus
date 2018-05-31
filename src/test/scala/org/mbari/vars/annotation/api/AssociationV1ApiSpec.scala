@@ -21,7 +21,7 @@ import java.util.UUID
 import java.util.concurrent.TimeUnit
 
 import org.mbari.vars.annotation.controllers.{ AnnotationController, AssociationController, BasicDAOFactory, ObservationController }
-import org.mbari.vars.annotation.dao.jpa.{ AnnotationImpl, AssociationImpl }
+import org.mbari.vars.annotation.dao.jpa.AssociationImpl
 import org.mbari.vars.annotation.model.{ Annotation, Association }
 
 import scala.concurrent.Await

@@ -19,7 +19,7 @@ package org.mbari.vars.annotation.api
 import java.util.UUID
 
 import org.mbari.vars.annotation.controllers.CachedVideoReferenceInfoController
-import org.mbari.vars.annotation.model.{ StringArray, UUIDArray, ValueArray }
+import org.mbari.vars.annotation.model.{ StringArray, UUIDArray }
 import org.scalatra.{ BadRequest, NoContent, NotFound }
 
 import scala.collection.JavaConverters._

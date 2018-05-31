@@ -20,7 +20,6 @@ import java.time.{ Duration, Instant }
 import java.util.UUID
 
 import org.mbari.vars.annotation.controllers.ObservationController
-import org.mbari.vars.annotation.model.ValueArray
 import org.scalatra.{ BadRequest, NoContent, NotFound }
 
 import scala.concurrent.ExecutionContext
