@@ -159,9 +159,9 @@ class CachedAncillaryDatumController(val daoFactory: BasicDAOFactory)
       val imDao = daoFactory.newImagedMomentDAO(dao)
       val cads = for {
         datum <- data
-        if datum.imagedMomentUuid != null
+        imagedMomentUuid <- Option(datum.imagedMomentUuid)
       } yield {
-        val maybeMoment = imDao.findByUUID(datum.imagedMomentUuid)
+        val maybeMoment = imDao.findByUUID(imagedMomentUuid)
         maybeMoment.flatMap(im => Option(createOrUpdate(datum, im)))
       }
       cads.flatten.toSeq
@@ -208,6 +208,9 @@ class CachedAncillaryDatumController(val daoFactory: BasicDAOFactory)
    * @return
    */
   private def createOrUpdate(d: CachedAncillaryDatum, im: ImagedMoment): CachedAncillaryDatum = {
+    require(d != null, "A null CachedAncillaryDatum argument is not allowed")
+    require(im != null, "A null ImagedMoment argument is not allowed")
+    require(im.uuid != null, "The ImagedMoment should already be present in the database. (Null UUID was found")
     if (im.ancillaryDatum != null) {
       updateValues(im.ancillaryDatum, d)
       im.ancillaryDatum

@@ -116,7 +116,7 @@ class CachedAncillaryDatumV1ApiSpec extends WebApiStack {
           val a = data(i)
           val b = persistedData(i)
 
-          b.uuid should not be (null)
+          b.uuid should not be null
           b.latitude.get should be(a.latitude.get)
           b.longitude.get should be(a.longitude.get)
           b.depthMeters.get should be(a.depthMeters.get)
