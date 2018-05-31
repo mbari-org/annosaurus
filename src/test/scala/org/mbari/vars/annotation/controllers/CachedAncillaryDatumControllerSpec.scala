@@ -39,13 +39,15 @@ class CachedAncillaryDatumControllerSpec extends FlatSpec with Matchers with Bef
   private[this] val imagedMomentController = new ImagedMomentController(daoFactory.asInstanceOf[BasicDAOFactory])
   private[this] val timeout = SDuration(200, TimeUnit.SECONDS)
   private[this] val recordedDate = Instant.now()
+  private[this] val videoReferenceUuid = UUID.randomUUID()
 
   private[this] val imagedMoments = {
-    val videoReferenceUuid = UUID.randomUUID()
+
     val dao = daoFactory.newImagedMomentDAO()
-    val ims = (0 until 2).map(i => dao.newPersistentObject(
+    val ims = (0 until 4).map(i => dao.newPersistentObject(
       videoReferenceUuid,
-      elapsedTime = Some(Duration.ofMillis(math.round(math.random() * 10000L)))))
+      elapsedTime = Some(Duration.ofMillis(1000 + i * 10 * 1000)),
+      recordedDate = Some(recordedDate.plusSeconds(10 * i))))
     dao.runTransaction(d => {
       ims.foreach(dao.create)
     })
@@ -71,7 +73,6 @@ class CachedAncillaryDatumControllerSpec extends FlatSpec with Matchers with Bef
       c.latitude = Some(math.random() * 90)
       c.longitude = Some(math.random() * 180)
       c.depthMeters = Some(1000)
-      //c.uuid = UUID.randomUUID()
       c
     })
 
@@ -84,6 +85,46 @@ class CachedAncillaryDatumControllerSpec extends FlatSpec with Matchers with Bef
       i.ancillaryDatum.depthMeters should not be None
       i.ancillaryDatum.depthMeters.get should be(1000)
     })
+  }
+
+  it should "merge" in {
+
+    // --- Remove
+    val minEpochMillis = imagedMoments.map(_.recordedDate.toEpochMilli).min
+
+    val cads = imagedMoments.zipWithIndex
+      .map({
+        case (im, idx) =>
+          val ts = Instant.ofEpochMilli(minEpochMillis + idx * 10 * 1000 + 1000)
+          val c = new CachedAncillaryDatumBean
+          c.recordedTimestamp = Some(ts)
+          c.latitude = Some(90)
+          c.longitude = Some(180)
+          c.depthMeters = Some(2000)
+          c.imagedMomentUuid = im.uuid
+          c.lightTransmission = Some(50)
+          c.temperatureCelsius = Some(4)
+          c.salinity = Some(33.5F)
+          c.crs = "EPSG:4326"
+          c
+      })
+
+    exec(() => controller.merge(cads, videoReferenceUuid, Duration.ofMillis(15000)))
+
+    imagedMoments.foreach(im => {
+      val maybeMoment = exec(() => imagedMomentController.findByUUID(im.uuid))
+      maybeMoment should not be None
+      val i = maybeMoment.get
+      val ad = i.ancillaryDatum
+      println(im.recordedDate)
+      ad.depthMeters should not be None
+      ad.depthMeters.get should be(2000)
+      ad.salinity should not be None
+      ad.salinity.get should be(33.5F)
+      ad.lightTransmission should not be None
+      ad.lightTransmission.get should be(50)
+    })
+
   }
 
 }

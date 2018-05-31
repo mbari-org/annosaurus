@@ -204,14 +204,15 @@ class CachedAncillaryDatumController(val daoFactory: BasicDAOFactory)
 
   /**
    * This method should be called within a transaction!
-   * @param d
-   * @param im
-   * @return
+   * @param d This MUST be a persistable object! (Not a CahcedAncillaryDatumBean)
+   * @param im The moment whose ancillary data is being updated
+   * @return The CachedAncillaryDatum.
    */
   private def createOrUpdate(d: CachedAncillaryDatum, im: ImagedMoment): CachedAncillaryDatum = {
     require(d != null, "A null CachedAncillaryDatum argument is not allowed")
     require(im != null, "A null ImagedMoment argument is not allowed")
     require(im.uuid != null, "The ImagedMoment should already be present in the database. (Null UUID was found")
+    require(!d.isInstanceOf[CachedAncillaryDatumBean], "Can not persist a CachedAncillaryDatumBean")
     if (im.ancillaryDatum != null) {
       updateValues(im.ancillaryDatum, d)
       im.ancillaryDatum
@@ -222,6 +223,7 @@ class CachedAncillaryDatumController(val daoFactory: BasicDAOFactory)
   }
 
   private def updateValues(a: CachedAncillaryDatum, b: CachedAncillaryDatum): Unit = {
+    require(a != null && b != null, "Null arguments are not allowed")
     a.altitude = b.altitude
     a.depthMeters = b.depthMeters
     a.crs = b.crs

@@ -68,6 +68,7 @@ class ImagedMomentDAOSpec extends FlatSpec with Matchers with BeforeAndAfterAll 
       .filter(_.uuid == imagedMoment0.uuid)
       .headOption
     imagedMoment should not be (empty)
+    imagedMoment.get.timecode should not be null
     imagedMoment.get.timecode.toString should be(timecode.toString)
   }
 
