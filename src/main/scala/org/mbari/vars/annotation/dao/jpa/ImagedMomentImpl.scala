@@ -50,6 +50,12 @@ import scala.collection.JavaConverters._
       "observations obs ON obs.imaged_moment_uuid = im.uuid WHERE " +
       "obs.concept = ?1"),
   new NamedNativeQuery(
+    name = "ImagedMoment.countByConceptWithImages",
+    query = "SELECT COUNT(*) FROM imaged_moments im LEFT JOIN " +
+      "observations obs ON obs.imaged_moment_uuid = im.uuid RIGHT JOIN " +
+      "image_references ir ON ir.imaged_moment_uuid = im.uuid " +
+      "WHERE obs.concept = ?1 AND ir.url IS NOT NULL"),
+  new NamedNativeQuery(
     name = "ImagedMoment.countBetweenUpdatedDates",
     query = "SELECT COUNT(*) FROM imaged_moments im LEFT JOIN " +
       "observations obs ON obs.imaged_moment_uuid = im.uuid WHERE " +
@@ -68,6 +74,11 @@ import scala.collection.JavaConverters._
     name = "ImagedMoment.findByConcept",
     query = "SELECT i FROM ImagedMoment i LEFT JOIN i.javaObservations o WHERE " +
       "o.concept = :concept ORDER BY i.uuid"),
+  new NamedQuery(
+    name = "ImagedMoment.findByConceptWithImages",
+    query = "SELECT i FROM ImagedMoment i LEFT JOIN i.javaObservations o " +
+      "LEFT JOIN i.javaImageReferences ir " +
+      "WHERE ir.url IS NOT NULL AND o.concept = :concept ORDER BY i.uuid"),
   new NamedQuery(
     name = "ImagedMoment.findBetweenUpdatedDates",
     query = "SELECT i FROM ImagedMoment i LEFT JOIN i.javaObservations o WHERE " +

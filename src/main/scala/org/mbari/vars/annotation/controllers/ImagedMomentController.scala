@@ -105,6 +105,23 @@ class ImagedMomentController(val daoFactory: BasicDAOFactory)
     f
   }
 
+  def findByConceptWithImages(
+    concept: String,
+    limit: Option[Int] = None,
+    offset: Option[Int] = None)(implicit ec: ExecutionContext): Future[Iterable[ImagedMoment]] = {
+    val imDao = daoFactory.newImagedMomentDAO()
+    val f = imDao.runTransaction(d => d.findByConceptWithImages(concept, limit, offset))
+    f.onComplete(_ => imDao.close())
+    f
+  }
+
+  def countByConceptWithImages(concept: String)(implicit ec: ExecutionContext): Future[Int] = {
+    val imDao = daoFactory.newImagedMomentDAO()
+    val f = imDao.runTransaction(d => d.countByConceptWithImages(concept))
+    f.onComplete(_ => imDao.close())
+    f
+  }
+
   def deleteByVideoReferenceUUID(videoReferenceUUID: UUID)(implicit ec: ExecutionContext): Future[Int] =
     exec(d => d.deleteByVideoReferenceUUUID(videoReferenceUUID))
 
