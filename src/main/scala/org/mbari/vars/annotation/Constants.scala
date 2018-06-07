@@ -58,6 +58,8 @@ object Constants {
     val imageReferenceType: Type = new TypeToken[ImageReference]() {}.getType
     gsonBuilder.registerTypeAdapter(imageReferenceType, new ImageReferenceCreator)
 
+    gsonBuilder.registerTypeAdapter(classOf[Option[Any]], new OptionSerializer)
+
     gsonBuilder.create()
 
   }

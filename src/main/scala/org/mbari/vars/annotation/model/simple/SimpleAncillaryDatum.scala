@@ -30,11 +30,11 @@ case class SimpleAncillaryDatum(
     uuid: UUID,
     latitude: Option[Double],
     longitude: Option[Double],
-    depthMeters: Option[Float],
-    salinity: Option[Float],
-    temperatureCelsius: Option[Float],
-    oxygenMlL: Option[Float],
-    pressureDbar: Option[Float])
+    depthMeters: Option[Double],
+    salinity: Option[Double],
+    temperatureCelsius: Option[Double],
+    oxygenMlL: Option[Double],
+    pressureDbar: Option[Double])
 
 object SimpleAncillaryDatum {
 

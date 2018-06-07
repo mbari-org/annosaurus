@@ -44,7 +44,7 @@ class CachedAncillaryDatumDAOSpec extends FlatSpec with Matchers with BeforeAndA
   private[this] val now = Instant.now()
   private[this] val imagedMoment0 = ImagedMomentImpl(Some(videoReferenceUUID), Some(now), elapsedTime = Some(Duration.ofMinutes(1)))
   private[this] val ancillaryDatum0 = CachedAncillaryDatumImpl(36.234, 122.0011, 666)
-  private[this] val newTemp = 3.2F
+  private[this] val newTemp = 3.2
 
   private type CADAO = CachedAncillaryDatumDAO[CachedAncillaryDatumImpl]
   def run[R](fn: CADAO => R): R = Await.result(dao.runTransaction(fn), timeout)
@@ -64,7 +64,7 @@ class CachedAncillaryDatumDAOSpec extends FlatSpec with Matchers with BeforeAndA
 
     val datum = run(d => d.findByUUID(ancillaryDatum0.uuid)).head
     datum.temperatureCelsius should not be None
-    datum.temperatureCelsius.get should be(newTemp +- 0.000001F)
+    datum.temperatureCelsius.get should be(newTemp +- 0.000001D)
   }
 
   it should "findAll" in {

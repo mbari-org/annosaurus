@@ -30,11 +30,18 @@ public class FloatOptionConverter implements AttributeConverter<Option<Float>, F
 
     @Override
     public Float convertToDatabaseColumn(Option<Float> opt) {
-        return opt == null || opt.isEmpty() ? null : opt.get();
+        try {
+            return opt == null || opt.isEmpty() ? null : opt.get().floatValue();
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+
     }
 
     @Override
     public Option<Float> convertToEntityAttribute(Float a) {
-        return scala.Option.apply(a);
+        return scala.Option.apply(a.floatValue());
     }
 }

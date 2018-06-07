@@ -35,8 +35,8 @@ trait CachedAncillaryDatum extends PersistentObject {
   // --- Position
   var latitude: Option[Double]
   var longitude: Option[Double]
-  var depthMeters: Option[Float]
-  var altitude: Option[Float]
+  var depthMeters: Option[Double]
+  var altitude: Option[Double]
 
   /**
    * Coordinate Reference System for latitude and longitude
@@ -44,13 +44,13 @@ trait CachedAncillaryDatum extends PersistentObject {
   var crs: String
 
   // --- CTDO
-  var salinity: Option[Float]
-  var temperatureCelsius: Option[Float]
-  var oxygenMlL: Option[Float]
-  var pressureDbar: Option[Float]
+  var salinity: Option[Double]
+  var temperatureCelsius: Option[Double]
+  var oxygenMlL: Option[Double]
+  var pressureDbar: Option[Double]
 
   // --- Transmissometer
-  var lightTransmission: Option[Float]
+  var lightTransmission: Option[Double]
 
   // -- Camera Pose
   // Camera coordinate system

@@ -21,6 +21,7 @@ import java.time.Instant
 import java.util.UUID
 
 import org.mbari.vars.annotation.Constants
+import org.mbari.vars.annotation.model.simple.CachedAncillaryDatumBean
 import org.scalatest.{ FlatSpec, Matchers }
 
 import scala.io.Source
@@ -80,7 +81,35 @@ class GSONTest extends FlatSpec with Matchers {
     datum0.latitude.get should be(datum.latitude.get)
     datum0.longitude.get should be(datum.longitude.get)
     datum0.depthMeters.get should be(datum.depthMeters.get)
-    datum0.salinity.get should be(datum.salinity.get +- 0.0001F)
+    //datum0.salinity.get.toDouble should be(datum.salinity.get.toDouble +- 0.001D)
+  }
+
+  it should "round trip a CachedAncillaryDatumBean to/from json" in {
+    val datum = new CachedAncillaryDatumBean()
+    datum.recordedTimestamp = None
+    datum.latitude = None
+    datum.longitude = None
+    datum.depthMeters = None
+    val json = Constants.GSON.toJson(datum)
+    val datum0 = Constants.GSON.fromJson(json, classOf[CachedAncillaryDatumBean])
+    datum0.recordedTimestamp should be(None)
+    datum0.longitude should be(None)
+    datum0.latitude should be(None)
+  }
+
+  it should "round trip a CachedAncillaryDatumBean to/from json with values" in {
+    val datum = new CachedAncillaryDatumBean()
+    datum.recordedTimestamp = Some(Instant.now())
+    datum.latitude = Some(36)
+    datum.longitude = Some(-122)
+    datum.depthMeters = Some(1000)
+    datum.salinity = Some(35.000F)
+    val json = Constants.GSON.toJson(datum)
+    val datum0 = Constants.GSON.fromJson(json, classOf[CachedAncillaryDatumBean])
+    datum0.recordedTimestamp should be(datum.recordedTimestamp)
+    datum0.longitude should be(datum.longitude)
+    datum0.latitude should be(datum.latitude)
+    datum0.salinity should be(datum.salinity)
   }
 
 }

@@ -56,7 +56,7 @@ class CachedAncillaryDatumV1ApiSpec extends WebApiStack {
     ims
   }
 
-  "cachedAncillaryDatumV1Api" should "create, then update" in {
+  "CachedAncillaryDatumV1Api" should "create, then update" in {
     val data = imagedMoments.map(im =>
       {
         val i: Float = (math.random() * 10F).floatValue()

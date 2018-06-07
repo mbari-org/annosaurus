@@ -20,7 +20,6 @@ import java.time.Instant
 import java.util.UUID
 
 import com.google.gson.annotations.{ Expose, JsonAdapter }
-import org.mbari.vars.annotation.gson.{ DoubleOptionDeserializer, FloatOptionDeserializer }
 import org.mbari.vars.annotation.model.{ CachedAncillaryDatum, ImagedMoment }
 
 /**
@@ -38,23 +37,19 @@ class CachedAncillaryDatumBean extends CachedAncillaryDatum {
   var imagedMomentUuid: UUID = _
 
   @Expose(serialize = true)
-  var recordedTimestamp: Option[Instant] = _
+  var recordedTimestamp: Option[Instant] = None
 
   @Expose(serialize = true)
-  @JsonAdapter(value = classOf[DoubleOptionDeserializer])
-  override var latitude: Option[Double] = _
+  override var latitude: Option[Double] = None
 
   @Expose(serialize = true)
-  @JsonAdapter(value = classOf[DoubleOptionDeserializer])
-  override var longitude: Option[Double] = _
+  override var longitude: Option[Double] = None
 
   @Expose(serialize = true)
-  @JsonAdapter(value = classOf[FloatOptionDeserializer])
-  override var depthMeters: Option[Float] = _
+  override var depthMeters: Option[Double] = None
 
   @Expose(serialize = true)
-  @JsonAdapter(value = classOf[FloatOptionDeserializer])
-  override var altitude: Option[Float] = _
+  override var altitude: Option[Double] = None
   /**
    * Coordinate Reference System for latitude and longitude
    */
@@ -62,51 +57,40 @@ class CachedAncillaryDatumBean extends CachedAncillaryDatum {
   override var crs: String = _
 
   @Expose(serialize = true)
-  @JsonAdapter(value = classOf[FloatOptionDeserializer])
-  override var salinity: Option[Float] = _
+  override var salinity: Option[Double] = None
 
   @Expose(serialize = true)
-  @JsonAdapter(value = classOf[FloatOptionDeserializer])
-  override var temperatureCelsius: Option[Float] = _
+  override var temperatureCelsius: Option[Double] = None
 
   @Expose(serialize = true)
-  @JsonAdapter(value = classOf[FloatOptionDeserializer])
-  override var oxygenMlL: Option[Float] = _
+  override var oxygenMlL: Option[Double] = None
 
   @Expose(serialize = true)
-  @JsonAdapter(value = classOf[FloatOptionDeserializer])
-  override var pressureDbar: Option[Float] = _
+  override var pressureDbar: Option[Double] = None
 
   @Expose(serialize = true)
-  @JsonAdapter(value = classOf[FloatOptionDeserializer])
-  override var lightTransmission: Option[Float] = _
+  override var lightTransmission: Option[Double] = None
 
   @Expose(serialize = true)
-  @JsonAdapter(value = classOf[DoubleOptionDeserializer])
-  override var x: Option[Double] = _
+  override var x: Option[Double] = None
 
   @Expose(serialize = true)
-  @JsonAdapter(value = classOf[DoubleOptionDeserializer])
-  override var y: Option[Double] = _
+  override var y: Option[Double] = None
 
   @Expose(serialize = true)
-  @JsonAdapter(value = classOf[DoubleOptionDeserializer])
-  override var z: Option[Double] = _
+  override var z: Option[Double] = None
 
   @Expose(serialize = true)
   override var posePositionUnits: String = _
 
   @Expose(serialize = true)
-  @JsonAdapter(value = classOf[DoubleOptionDeserializer])
-  override var phi: Option[Double] = _
+  override var phi: Option[Double] = None
 
   @Expose(serialize = true)
-  @JsonAdapter(value = classOf[DoubleOptionDeserializer])
-  override var theta: Option[Double] = _
+  override var theta: Option[Double] = None
 
   @Expose(serialize = true)
-  @JsonAdapter(value = classOf[DoubleOptionDeserializer])
-  override var psi: Option[Double] = _
+  override var psi: Option[Double] = None
 
   override val lastUpdated: Option[Instant] = None
 
