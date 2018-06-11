@@ -196,7 +196,19 @@ class ImagedMomentV1Api(controller: ImagedMomentController)(implicit val executo
     val elapsedTime = params.getAs[Duration]("elapsed_time_millis")
     val recordedDate = params.getAs[Instant]("recorded_timestamp")
     val videoReferenceUUID = params.getAs[UUID]("video_reference_uuid")
-    controller.update(uuid, videoReferenceUUID, timecode, recordedDate, elapsedTime).map(toJson)
+    controller.update(uuid, videoReferenceUUID, timecode, recordedDate, elapsedTime)
+      .map(toJson)
+  }
+
+  put("/newtime/:uuid/:time") {
+    validateRequest()
+    val uuid = params.getAs[UUID]("uuid")
+      .getOrElse(halt(BadRequest("{\"error\": \"Please provide a video reference UUID parameter\"}")))
+    val time = params.getAs[Instant]("time")
+      .getOrElse(halt(BadRequest("{\"error\": \"Please provide a new start 'time' parameter\"}")))
+    controller.updateRecordedTimestamps(uuid, time)
+      .map(_.asJava)
+      .map(toJson)
   }
 
   delete("/:uuid") {

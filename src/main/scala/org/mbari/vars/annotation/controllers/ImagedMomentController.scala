@@ -157,6 +157,22 @@ class ImagedMomentController(val daoFactory: BasicDAOFactory)
     }
     exec(fn)
   }
+
+  def updateRecordedTimestamps(videoReferenceUuid: UUID, newStartTimestamp: Instant)(implicit ec: ExecutionContext): Future[Iterable[ImagedMoment]] = {
+    def fn(dao: IMDAO): Iterable[ImagedMoment] = {
+      dao.findByVideoReferenceUUID(videoReferenceUuid)
+        .map(im => {
+          if (im.elapsedTime != null) {
+            val newRecordedDate = newStartTimestamp.plus(im.elapsedTime)
+            if (newRecordedDate != im.recordedDate) {
+              im.recordedDate = newRecordedDate
+            }
+          }
+          im
+        })
+    }
+    exec(fn)
+  }
 }
 
 object ImagedMomentController {

@@ -17,8 +17,10 @@
 package org.mbari.vars.annotation.dao.jpa
 
 import java.net.URL
-import javax.persistence.EntityManager
+import java.time.Instant
+import java.util.UUID
 
+import javax.persistence.EntityManager
 import org.mbari.vars.annotation.dao.ImageReferenceDAO
 
 /**
