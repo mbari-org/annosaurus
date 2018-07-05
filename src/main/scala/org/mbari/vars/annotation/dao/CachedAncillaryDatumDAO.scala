@@ -53,4 +53,12 @@ trait CachedAncillaryDatumDAO[T <: CachedAncillaryDatum] extends DAO[T] {
 
   def asPersistentObject(bean: CachedAncillaryDatum): CachedAncillaryDatum
 
+  /**
+   * Delete all ancillary data associated with annotations for a given
+   * video reference
+   * @param videoReferenceUuid the VideoReference UUID
+   * @return The number of rows deleted
+   */
+  def deleteByVideoReferenceUuid(videoReferenceUuid: UUID): Int
+
 }

@@ -213,6 +213,11 @@ class CachedAncillaryDatumController(val daoFactory: BasicDAOFactory)
     exec(fn)
   }
 
+  def deleteByVideoReferenceUuid(videoReferenceUuid: UUID)(implicit ec: ExecutionContext): Future[Int] = {
+    def fn(dao: ADDAO): Int = dao.deleteByVideoReferenceUuid(videoReferenceUuid)
+    exec(fn)
+  }
+
   /**
    * This method should be called within a transaction!
    * @param d This MUST be a persistable object! (Not a CahcedAncillaryDatumBean)

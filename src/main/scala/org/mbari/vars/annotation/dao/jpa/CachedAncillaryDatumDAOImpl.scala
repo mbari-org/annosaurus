@@ -93,4 +93,10 @@ class CachedAncillaryDatumDAOImpl(entityManager: EntityManager)
       "AncillaryDatum.findByImagedMomentUUID",
       Map("uuid" -> imagedMomentUuid))
       .headOption
+
+  override def deleteByVideoReferenceUuid(videoReferenceUuid: UUID): Int = {
+    val query = entityManager.createNamedQuery("AncillaryDatum.deleteByVideoReferenceUuid")
+    query.setParameter(1, videoReferenceUuid)
+    query.executeUpdate()
+  }
 }

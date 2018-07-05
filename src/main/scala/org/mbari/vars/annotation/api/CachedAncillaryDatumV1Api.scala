@@ -155,9 +155,17 @@ class CachedAncillaryDatumV1Api(controller: CachedAncillaryDatumController)(impl
     controller.update(uuid, latitude, longitude, depthMeters, altitudeMeters, crs, salinity,
       oxygenMlL, temperature, pressureDbar, lightTransmission, x, y, z, posePositionUnits, phi, theta, psi)
       .map({
-        case None => halt(NotFound(body = s"A CachedAncillaryDatm with uuid of $uuid was not found"))
+        case None => halt(NotFound(body = s"A CachedAncillaryDatum with uuid of $uuid was not found"))
         case Some(v) => toJson(v)
       })
+  }
+
+  delete("/videoreference/:uuid") {
+    validateRequest()
+    val uuid = params.getAs[UUID]("uuid").getOrElse(halt(BadRequest(
+      body = "{\"error\": \"A video reference 'uuid' parameter is required\"}")))
+    controller.deleteByVideoReferenceUuid(uuid)
+      .map(n => s"""{"video_reference_uuid": "$uuid", "count": $n}""")
   }
 
 }
