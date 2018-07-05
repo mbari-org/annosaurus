@@ -39,16 +39,23 @@ class CachedAncillaryDatumV1Api(controller: CachedAncillaryDatumController)(impl
   }
 
   get("/:uuid") {
-    val uuid = params.getAs[UUID]("uuid").getOrElse(halt(BadRequest("Please provide a UUID")))
+    val uuid = params.getAs[UUID]("uuid").getOrElse(halt(BadRequest("{\"error\": \"Please provide a ancillary data UUID\"}")))
     controller.findByUUID(uuid).map({
       case None => halt(NotFound(
-        body = s"An ImagedMoment with a UUID of $uuid was not found"))
+        body = s"An AncillaryDatum with a UUID of $uuid was not found"))
       case Some(v) => toJson(v)
     })
   }
 
+  get("/videoreference/:uuid") {
+    val uuid = params.getAs[UUID]("uuid").getOrElse(halt(BadRequest("{\"error\": \"Please provide a video reference UUID\"}")))
+    controller.findByVideoReferenceUUID(uuid)
+      .map(_.asJava)
+      .map(toJson)
+  }
+
   get("/imagedmoment/:uuid") {
-    val uuid = params.getAs[UUID]("uuid").getOrElse(halt(BadRequest("Please provide an ImageReference UUID")))
+    val uuid = params.getAs[UUID]("uuid").getOrElse(halt(BadRequest("{\"error\": \"Please provide an image reference UUID\"}")))
     controller.findByImagedMomentUUID(uuid)
       .map({
         case None => halt(NotFound(body = s"No imagereference with a uuid of $uuid was found"))
@@ -57,7 +64,7 @@ class CachedAncillaryDatumV1Api(controller: CachedAncillaryDatumController)(impl
   }
 
   get("/observation/:uuid") {
-    val uuid = params.getAs[UUID]("uuid").getOrElse(halt(BadRequest("Please provide an Observation UUID")))
+    val uuid = params.getAs[UUID]("uuid").getOrElse(halt(BadRequest("{\"error\": \"Please provide an observation UUID\"}")))
     controller.findByObservationUUID(uuid)
       .map({
         case None => halt(NotFound(body = s"No observation with a uuid of $uuid was found"))

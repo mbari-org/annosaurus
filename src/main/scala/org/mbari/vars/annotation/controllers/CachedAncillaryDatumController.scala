@@ -144,6 +144,17 @@ class CachedAncillaryDatumController(val daoFactory: BasicDAOFactory)
     exec(fn)
   }
 
+  def findByVideoReferenceUUID(uuid: UUID)(implicit ec: ExecutionContext): Future[Seq[CachedAncillaryDatumBean]] = {
+    def fn(dao: ADDAO): Seq[CachedAncillaryDatumBean] = {
+      val imDao = daoFactory.newImagedMomentDAO(dao)
+      val moments = imDao.findByVideoReferenceUUID(uuid)
+      moments.filter(_.ancillaryDatum != null)
+        .map(im => CachedAncillaryDatumBean(im.ancillaryDatum))
+        .toSeq
+    }
+    exec(fn)
+  }
+
   def findByObservationUUID(uuid: UUID)(implicit ec: ExecutionContext): Future[Option[CachedAncillaryDatum]] = {
     def fn(dao: ADDAO): Option[CachedAncillaryDatum] = dao.findByObservationUUID(uuid)
     exec(fn)

@@ -97,3 +97,39 @@ class CachedAncillaryDatumBean extends CachedAncillaryDatum {
   override def primaryKey = Option(uuid)
 
 }
+
+object CachedAncillaryDatumBean {
+
+  def apply(datum: CachedAncillaryDatum): CachedAncillaryDatumBean = {
+    datum match {
+      case c: CachedAncillaryDatumBean => c
+      case c =>
+        val d = new CachedAncillaryDatumBean
+        d.uuid = c.uuid
+        //d.imagedMoment = c.imagedMoment
+        d.latitude = c.latitude
+        d.longitude = c.longitude
+        d.depthMeters = c.depthMeters
+        d.altitude = c.altitude
+        d.crs = c.crs
+        d.salinity = c.salinity
+        d.temperatureCelsius = c.temperatureCelsius
+        d.oxygenMlL = c.oxygenMlL
+        d.pressureDbar = c.pressureDbar
+        d.lightTransmission = c.lightTransmission
+        d.x = c.x
+        d.y = c.y
+        d.z = c.z
+        d.posePositionUnits = c.posePositionUnits
+        d.phi = c.phi
+        d.theta = c.theta
+        d.psi = c.psi
+        if (c.imagedMoment != null) {
+          d.imagedMomentUuid = c.imagedMoment.uuid
+          d.recordedTimestamp = Option(c.imagedMoment.recordedDate)
+        }
+        d
+    }
+  }
+
+}
