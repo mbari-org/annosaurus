@@ -107,7 +107,10 @@ class CachedAncillaryDatumV1Api(controller: CachedAncillaryDatumController)(impl
     validateRequest()
     request.getHeader("Content-Type") match {
       case "application/json" =>
-        val data = fromJson(request.body, classOf[Array[CachedAncillaryDatumBean]])
+        val b = request.body
+        val data = fromJson(b, classOf[Array[CachedAncillaryDatumBean]])
+        //log.info("Recieved >>> " + b)
+        //log.info("Parse    <<< " + toJson(data))
         controller.bulkCreateOrUpdate(data)
           .map(ds => toJson(ds.asJava))
       case _ =>
