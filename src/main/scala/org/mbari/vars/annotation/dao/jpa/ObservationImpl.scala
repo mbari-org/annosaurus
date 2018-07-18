@@ -54,6 +54,9 @@ import org.mbari.vars.annotation.model.{ Association, ImagedMoment, Observation 
     name = "Observation.countByVideoReferenceUUID",
     query = "SELECT COUNT(*) FROM imaged_moments LEFT JOIN observations ON observations.imaged_moment_uuid = imaged_moments.uuid WHERE imaged_moments.video_reference_uuid = ?1"),
   new NamedNativeQuery(
+    name = "Observation.countAllByVideoReferenceUUIDs",
+    query = "SELECT im.video_reference_uuid, COUNT(obs.uuid) as n FROM observations obs RIGHT JOIN imaged_moments im ON im.uuid = obs.imaged_moment_uuid GROUP BY im.video_reference_uuid ORDER BY n"),
+  new NamedNativeQuery(
     name = "Observation.countByConcept",
     query = "SELECT COUNT(*) FROM observations WHERE concept = ?1"),
   new NamedNativeQuery(

@@ -111,6 +111,19 @@ class ObservationDAOImpl(entityManager: EntityManager)
       .head
   }
 
+  override def countAllByVideoReferenceUuids(): Map[UUID, Int] = {
+    val query = entityManager.createNamedQuery("Observation.countAllByVideoReferenceUUIDs")
+    query.getResultList
+      .asScala
+      .map(_.asInstanceOf[Array[Object]])
+      .map(xs => {
+        val uuid = UUID.fromString(xs(0).asInstanceOf[String])
+        val count = xs(1).asInstanceOf[Number].intValue()
+        uuid -> count
+      })
+      .toMap
+  }
+
   override def updateConcept(oldConcept: String, newConcept: String): Int = {
     val query = entityManager.createNamedQuery("Observation.updateConcept")
     query.setParameter(1, newConcept)
