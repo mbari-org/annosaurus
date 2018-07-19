@@ -100,7 +100,7 @@ class ObservationV1Api(controller: ObservationController)(implicit val executor:
     controller.countByVideoReferenceUUID(uuid)
       .map(n => ObservationCount(uuid, n))
       .map(toJson)
-      //.map(n => s"""{"video_reference_uuid": "${uuid}", "count":"$n"}""")
+    //.map(n => s"""{"video_reference_uuid": "${uuid}", "count":"$n"}""")
   }
 
   get("/counts") {
