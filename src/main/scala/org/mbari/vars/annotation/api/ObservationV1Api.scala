@@ -20,6 +20,7 @@ import java.time.{ Duration, Instant }
 import java.util.UUID
 
 import org.mbari.vars.annotation.controllers.ObservationController
+import org.mbari.vars.annotation.model.simple.ObservationCount
 import org.scalatra.{ BadRequest, NoContent, NotFound }
 
 import scala.concurrent.ExecutionContext
@@ -97,7 +98,16 @@ class ObservationV1Api(controller: ObservationController)(implicit val executor:
   get("/videoreference/count/:uuid") {
     val uuid = params.getAs[UUID]("uuid").getOrElse(halt(BadRequest("Please provide a video-reference 'uuid'")))
     controller.countByVideoReferenceUUID(uuid)
-      .map(n => s"""{"video_reference_uuid": "${uuid}", "count":"$n"}""")
+      .map(n => ObservationCount(uuid, n))
+      .map(toJson)
+      //.map(n => s"""{"video_reference_uuid": "${uuid}", "count":"$n"}""")
+  }
+
+  get("/counts") {
+    controller.countAllGroupByVideoReferenceUUID()
+      .map(_.map({ case (uuid, count) => ObservationCount(uuid, count) }))
+      .map(_.asJava)
+      .map(toJson)
   }
 
   put("/concept/rename") {
