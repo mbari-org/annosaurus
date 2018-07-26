@@ -87,6 +87,9 @@ class ImagedMomentController(val daoFactory: BasicDAOFactory)
     f
   }
 
+  def countAllGroupByVideoReferenceUUID()(implicit ec: ExecutionContext): Future[Map[UUID, Int]] =
+    exec(dao => dao.countAllByVideoReferenceUuids())
+
   def findByConcept(
     concept: String,
     limit: Option[Int] = None,

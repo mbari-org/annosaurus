@@ -62,6 +62,9 @@ import scala.collection.JavaConverters._
       "im.last_updated_timestamp BETWEEN ?1 AND ?2 OR " +
       "obs.last_updated_timestamp BETWEEN ?1 AND ?2"),
   new NamedNativeQuery(
+    name = "ImagedMoment.countAllByVideoReferenceUUIDs",
+    query = "SELECT video_reference_uuid, COUNT(uuid) as n FROM imaged_moments GROUP BY video_reference_uuid ORDER BY n"),
+  new NamedNativeQuery(
     name = "ImagedMoment.countByVideoReferenceUUID",
     query = "SELECT COUNT(*) imaged_moments im LEFT JOIN " +
       "observations obs ON obs.imaged_moment_uuid = im.uuid WHERE " +

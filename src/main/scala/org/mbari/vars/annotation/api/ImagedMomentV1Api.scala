@@ -20,6 +20,7 @@ import java.time.{ Duration, Instant }
 import java.util.UUID
 
 import org.mbari.vars.annotation.controllers.ImagedMomentController
+import org.mbari.vars.annotation.model.simple.ObservationCount
 import org.mbari.vcr4j.time.Timecode
 import org.scalatra.{ BadRequest, NoContent, NotFound }
 
@@ -133,6 +134,13 @@ class ImagedMomentV1Api(controller: ImagedMomentController)(implicit val executo
     val end = params.getAs[Instant]("end").getOrElse(halt(BadRequest("Please provide an end date (yyyy-mm-ddThh:mm:ssZ)")))
     controller.countBetweenUpdatedDates(start, end)
       .map(n => s"""{"start_timestamp":"$start", "end_timestamp":"$end", "count": "$n"}""")
+  }
+
+  get("/counts") {
+    controller.countAllGroupByVideoReferenceUUID()
+      .map(_.map({ case (uuid, count) => ObservationCount(uuid, count) }))
+      .map(_.asJava)
+      .map(toJson)
   }
 
   get("/videoreference") {

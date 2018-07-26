@@ -58,6 +58,7 @@ trait ImagedMomentDAO[T <: ImagedMoment] extends DAO[T] {
   def findByConceptWithImages(concept: String, limit: Option[Int], offset: Option[Int]): Iterable[T]
 
   def countBetweenUpdatedDates(start: Instant, end: Instant): Int
+  def countAllByVideoReferenceUuids(): Map[UUID, Int]
 
   def findAllVideoReferenceUUIDs(limit: Option[Int], offset: Option[Int]): Iterable[UUID]
   def findByVideoReferenceUUID(uuid: UUID, limit: Option[Int] = None, offset: Option[Int] = None): Iterable[T]

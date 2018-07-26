@@ -88,6 +88,19 @@ class ImagedMomentDAOImpl(entityManager: EntityManager)
       .map(s => UUID.fromString(s.toString))
   }
 
+  override def countAllByVideoReferenceUuids(): Map[UUID, Int] = {
+    val query = entityManager.createNamedQuery("ImagedMoment.countAllByVideoReferenceUUIDs")
+    query.getResultList
+      .asScala
+      .map(_.asInstanceOf[Array[Object]])
+      .map(xs => {
+        val uuid = UUID.fromString(xs(0).asInstanceOf[String])
+        val count = xs(1).asInstanceOf[Number].intValue()
+        uuid -> count
+      })
+      .toMap
+  }
+
   override def countByConcept(concept: String): Int = {
     val query = entityManager.createNamedQuery("ImagedMoment.countByConcept")
     query.setParameter(1, concept)
