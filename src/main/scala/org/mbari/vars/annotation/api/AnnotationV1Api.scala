@@ -145,4 +145,16 @@ class AnnotationV1Api(controller: AnnotationController)(implicit val executor: E
     }
   }
 
+  put("/bulk/timeupdate") {
+    validateRequest()
+    request.getHeader("Content-Type") match {
+      case "application/json" =>
+        val annotations = fromJson(request.body, classOf[Array[AnnotationImpl]])
+        controller.updateTimeIndices(annotations)
+          .map(annos => toJson(annos.asJava))
+      case _ =>
+        halt(BadRequest("Puts to /bulk/timeupdate only accept JSON body (i.e. Content-Type: application/json)"))
+    }
+  }
+
 }

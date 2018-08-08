@@ -210,6 +210,36 @@ class AnnotationController(daoFactory: BasicDAOFactory) {
     g
   }
 
+  def updateTimeIndices(annotations: Iterable[Annotation])(implicit ec: ExecutionContext): Future[Iterable[AnnotationImpl]] = {
+    val dao = daoFactory.newObservationDAO()
+    val f = dao.runTransaction(d => {
+      annotations.flatMap(a => {
+        _update( //TODO _update won't work. Create method that can adjust the image moments indices
+          d,
+          a.observationUuid,
+          None,
+          None,
+          None,
+          a.observationTimestamp,
+          Option(a.timecode),
+          Option(a.elapsedTime),
+          Option(a.recordedTimestamp),
+          None,
+          None,
+          None)
+      })
+    })
+    f.onComplete(_ => dao.close())
+    // --- After update find all the changes
+    val g = f.flatMap(obs => {
+      val dao1 = daoFactory.newObservationDAO()
+      val ff = dao1.runTransaction(d => obs.flatMap(o => d.findByUUID(o.uuid).map(AnnotationImpl(_))))
+      ff.onComplete(_ => dao1.close())
+      ff
+    })
+    g
+  }
+
   /**
    * This private method is meant to be wrapped in a transaction, either for a
    * single update or for bulk updates
