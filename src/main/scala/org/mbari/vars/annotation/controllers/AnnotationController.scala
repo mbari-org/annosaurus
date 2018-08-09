@@ -210,23 +210,14 @@ class AnnotationController(daoFactory: BasicDAOFactory) {
     g
   }
 
-  def updateTimeIndices(annotations: Iterable[Annotation])(implicit ec: ExecutionContext): Future[Iterable[AnnotationImpl]] = {
+  def bulkUpdateRecordedTimestampOnly(annotations: Iterable[Annotation])(implicit ec: ExecutionContext): Future[Iterable[AnnotationImpl]] = {
     val dao = daoFactory.newObservationDAO()
     val f = dao.runTransaction(d => {
       annotations.flatMap(a => {
-        _update( //TODO _update won't work. Create method that can adjust the image moments indices
+        _updateRecordedTimestamp(
           d,
           a.observationUuid,
-          None,
-          None,
-          None,
-          a.observationTimestamp,
-          Option(a.timecode),
-          Option(a.elapsedTime),
-          Option(a.recordedTimestamp),
-          None,
-          None,
-          None)
+          Option(a.recordedTimestamp))
       })
     })
     f.onComplete(_ => dao.close())
@@ -238,6 +229,44 @@ class AnnotationController(daoFactory: BasicDAOFactory) {
       ff
     })
     g
+  }
+
+  /**
+   * This is a special method to handle the case where an
+   * ImagedMoment's recordedTimestamp needs to be explicity
+   * changed and NOT moved. It is meant for tape annotations where
+   * the timecode is the correct index and the recordedTimestamp
+   * may need to be adjusted in-place
+   * @param dao
+   * @param uuid
+   * @param recordedTimestampOpt
+   * @return Observations that belong to the imagedmoment that was modified
+   */
+  private def _updateRecordedTimestamp(
+    dao: DAO[_],
+    uuid: UUID,
+    recordedTimestampOpt: Option[Instant]): Seq[Observation] = {
+
+    val obsDao = daoFactory.newObservationDAO(dao)
+    val imDao = daoFactory.newImagedMomentDAO(dao)
+    obsDao.findByUUID(uuid)
+      .map(observation => {
+        val imagedMoment = observation.imagedMoment
+        val timecodeOpt = Option(imagedMoment.timecode)
+        val currentTimestampOpt = Option(imagedMoment.recordedDate)
+        // MUST have a timecode!! This method is for tape annotations
+        if (timecodeOpt.isEmpty) Nil
+        else if (recordedTimestampOpt.isEmpty && currentTimestampOpt.isDefined) {
+          imagedMoment.recordedDate = null
+          imagedMoment.observations.toSeq
+        } else if (recordedTimestampOpt.isDefined
+          && (currentTimestampOpt.isEmpty || currentTimestampOpt.get != recordedTimestampOpt.get)) {
+          imagedMoment.recordedDate = recordedTimestampOpt.get
+          imagedMoment.observations.toSeq
+        } else Nil
+      })
+      .getOrElse(Nil)
+
   }
 
   /**
