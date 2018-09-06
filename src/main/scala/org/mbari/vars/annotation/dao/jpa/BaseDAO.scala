@@ -17,14 +17,16 @@
 package org.mbari.vars.annotation.dao.jpa
 
 import java.util.UUID
-import javax.persistence.EntityManager
 
+import io.reactivex.Observable
+import io.reactivex.subjects.PublishSubject
+import javax.persistence.EntityManager
 import org.mbari.vars.annotation.PersistentObject
 import org.mbari.vars.annotation.dao.DAO
 import org.slf4j.LoggerFactory
 
 import scala.collection.JavaConverters._
-import scala.concurrent.{ ExecutionContext, Future }
+import scala.concurrent.{ExecutionContext, Future}
 import scala.reflect.ClassTag
 import scala.reflect.classTag
 
@@ -63,6 +65,35 @@ abstract class BaseDAO[B <: PersistentObject: ClassTag](val entityManager: Entit
       .asScala
       .toList
       .map(_.asInstanceOf[B])
+  }
+
+  /**
+   * Fetches the results as a stream. This better allows for fetching large
+   * sets and returning them as chunked responses.
+   * @param name
+   * @param namedParameters
+   * @param limit
+   * @param offset
+   * @return
+   */
+  def streamByNamedQuery(
+    name: String,
+    namedParameters: Map[String, Any] = Map.empty,
+    limit: Option[Int] = None,
+    offset: Option[Int] = None)(implicit executionContext: ExecutionContext): Observable[B] = {
+
+    val subject: PublishSubject[B] = PublishSubject.create()
+    executionContext.execute(() => {
+      val query = entityManager.createNamedQuery(name)
+      limit.foreach(query.setMaxResults)
+      offset.foreach(query.setFirstResult)
+      namedParameters.foreach({ case (a, b) => query.setParameter(a, b) })
+      query.getResultStream
+          .forEach(b => subject.onNext(b.asInstanceOf[B]))
+      subject.onComplete()
+    })
+
+    subject
   }
 
   def executeNamedQuery(name: String, namedParameters: Map[String, Any] = Map.empty): Int = {

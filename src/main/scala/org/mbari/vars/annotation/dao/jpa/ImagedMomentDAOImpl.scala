@@ -130,6 +130,9 @@ class ImagedMomentDAOImpl(entityManager: EntityManager)
   override def findByVideoReferenceUUID(uuid: UUID, limit: Option[Int], offset: Option[Int]): Iterable[ImagedMomentImpl] =
     findByNamedQuery("ImagedMoment.findByVideoReferenceUUID", Map("uuid" -> uuid), limit, offset)
 
+  override def streamByVideoReferenceUUID(uuid: UUID, limit: Option[Int], offset: Option[Int]): Iterable[ImagedMomentImpl] =
+    streamByNamedQuery("ImagedMoment.findByVideoReferenceUUID", Map("uuid" -> uuid), limit, offset)
+
   override def findWithImageReferences(videoReferenceUUID: UUID): Iterable[ImagedMomentImpl] =
     findByNamedQuery("ImagedMoment.findWithImageReferences", Map("uuid" -> videoReferenceUUID))
 

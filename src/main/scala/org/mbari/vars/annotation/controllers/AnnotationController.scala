@@ -59,6 +59,20 @@ class AnnotationController(daoFactory: BasicDAOFactory) {
     f.map(_.flatMap(AnnotationImpl(_)).toSeq)
   }
 
+  def streamByVideoReferenceUUID(
+    videoReferenceUUID: UUID,
+    limit: Option[Int] = None,
+    offset: Option[Int] = None)(implicit ec: ExecutionContext): Iterable[Annotation] = {
+
+    // TODO run query outside of transaction. Don't return future,just an iterable
+    val imDao = daoFactory.newImagedMomentDAO()
+    imDao.streamByVideoReferenceUUID(videoReferenceUUID, limit, offset)
+
+//    val f = imDao.runTransaction(d => d.streamByVideoReferenceUUID(videoReferenceUUID, limit, offset))
+//    f.onComplete(t => imDao.close())
+//    f.map(_.flatMap(AnnotationImpl(_)).toSeq)
+  }
+
   def findByImageReferenceUUID(imageReferenceUUID: UUID)(implicit ec: ExecutionContext): Future[Iterable[Annotation]] = {
 
     val imDao = daoFactory.newImagedMomentDAO()

@@ -152,6 +152,13 @@ class ImagedMomentV1Api(controller: ImagedMomentController)(implicit val executo
       .map(toJson)
   }
 
+  get("/videoreference/chunked/:uuid") {
+    val uuid = params.getAs[UUID]("uuid").getOrElse(halt(BadRequest("Please provide a Video Reference UUID")))
+    val limit = params.getAs[Int]("limit")
+    val offset = params.getAs[Int]("offset")
+    controller.daoFactory.newImagedMomentDAO()
+  }
+
   delete("/videoreference/:uuid") {
     validateRequest() // Apply API security
     val uuid = params.getAs[UUID]("uuid").getOrElse(halt(BadRequest("Please provide a Video Reference UUID")))
