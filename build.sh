@@ -3,5 +3,5 @@
 echo "--- Building annosaurus (reminder: run docker login first!!)"
 
 sbt pack && \
-    docker build -t mbari/annosaurus . && \
-    docker push mbari/annosaurus
+    docker build -t mbari/annosaurus:java-11 . && \
+    docker push mbari/annosaurus:java-11

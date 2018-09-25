@@ -3,17 +3,17 @@ val auth0Version = "3.4.0"
 val codecVersion = "1.11"
 val configVersion = "1.3.3"
 val derbyVersion = "10.14.2.0"
-val eclipselinkVersion = "2.7.2"
+val eclipselinkVersion = "2.7.3"
 val gsonJavatimeVersion = "1.1.1"
 val gsonVersion = "2.8.5"
 val h2Version = "1.4.197"
-val jettyVersion = "9.4.11.v20180605"
-val jsonVersion = "3.5.4"
+val jettyVersion = "9.4.12.v20180830"
+val jsonVersion = "3.6.1"
 val jtaVersion = "1.1"
 val jtdsVersion = "1.3.1"
 val junitVersion = "4.12"
 val logbackVersion = "1.2.3"
-val mssqlVersion = "6.4.0.jre8"
+val mssqlVersion = "6.4.0.jre9"
 val scilubeVersion = "2.0.4"
 val scalatestVersion = "3.0.5"
 val scalatraVersion = "2.6.3"
@@ -63,7 +63,7 @@ lazy val optionSettings = Seq(
     "-Xlint",
     "-Yno-adapted-args",
     "-Xfuture"),
-  javacOptions ++= Seq("-target", "1.8", "-source", "1.8"),
+  javacOptions ++= Seq("-target", "11", "-source", "11"),
   updateOptions := updateOptions.value.withCachedResolution(true)
 )
 

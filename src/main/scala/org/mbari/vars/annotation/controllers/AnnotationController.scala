@@ -16,7 +16,7 @@
 
 package org.mbari.vars.annotation.controllers
 
-import java.time.{Duration, Instant}
+import java.time.{ Duration, Instant }
 import java.util.UUID
 
 import org.mbari.vars.annotation.dao.jpa.AnnotationImpl

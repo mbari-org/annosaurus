@@ -168,18 +168,4 @@ object ObservationImpl {
     obs
   }
 
-  def apply(obs: Observation): ObservationImpl = obs match {
-    case v: ObservationImpl => v
-    case v: _ =>
-      val o = new ObservationImpl
-      o.observationDate = v.observationDate
-      o.activity = v.activity
-      o.concept = v.concept
-      o.duration = v.duration
-      o.group = v.group
-      o.imagedMoment = ImagedMomentImpl(v.imagedMoment)
-      
-      o
-  }
-
 }

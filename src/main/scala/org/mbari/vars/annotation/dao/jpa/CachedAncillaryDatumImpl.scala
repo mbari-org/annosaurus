@@ -17,7 +17,7 @@
 package org.mbari.vars.annotation.dao.jpa
 
 import java.sql.Timestamp
-import javax.persistence.{CascadeType, JoinColumn, _}
+import javax.persistence.{ CascadeType, JoinColumn, _ }
 
 import com.google.gson.annotations.{ Expose, JsonAdapter }
 import org.mbari.vars.annotation.model.{ CachedAncillaryDatum, ImagedMoment }
@@ -235,33 +235,6 @@ object CachedAncillaryDatumImpl {
     d.oxygenMlL = Option(oxygenMlL)
     d.crs = crs
     d
-  }
-
-  def apply(cad: CachedAncillaryDatum): CachedAncillaryDatumImpl = cad match {
-    case v: CachedAncillaryDatumImpl => v
-    case v: _ =>
-      val c = new CachedAncillaryDatumImpl
-      c.altitude = v.altitude
-      c.crs = v.crs
-      c.depthMeters = v.depthMeters
-      c.imagedMoment = ImagedMomentImpl(v.imagedMoment)
-      c.latitude = v.latitude
-      c.lightTransmission = v.lightTransmission
-      c.longitude = v.longitude
-      c.oxygenMlL = v.oxygenMlL
-      c.phi = v.phi
-      c.posePositionUnits = v.posePositionUnits
-      c.pressureDbar = v.pressureDbar
-      c.psi = v.psi
-      c.salinity = v.salinity
-      c.temperatureCelsius = v.temperatureCelsius
-      c.theta = v.theta
-      c.x = v.x
-      c.y = v.y
-      c.z = v.z
-      c.uuid = v.uuid
-      v.lastUpdated.foreach(t => c.lastUpdatedTime = new Timestamp(t.getEpochSecond))
-      c
   }
 
 }
