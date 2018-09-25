@@ -62,18 +62,18 @@ class AnnotationV1Api(controller: AnnotationController)(implicit val executor: E
       .map(toJson)
   }
 
-  get("/videoreference/chunked/:uuid") {
-    val uuid = params.getAs[UUID]("uuid").getOrElse(halt(BadRequest(
-      body = "A video reference 'uuid' parameter is required")))
-    val limit = params.getAs[Int]("limit")
-    val offset = params.getAs[Int]("offset")
-    controller.streamByVideoReferenceUUID(uuid, limit, offset)
-      .andThen({
-        case Success(annotations) => sendChunkedResponse(response, annotations)
-        case Failure(e) =>
-          s"""{"error": "${e.getCause}"} """
-      })
-  }
+  //  get("/videoreference/chunked/:uuid") {
+  //    val uuid = params.getAs[UUID]("uuid").getOrElse(halt(BadRequest(
+  //      body = "A video reference 'uuid' parameter is required")))
+  //    val limit = params.getAs[Int]("limit")
+  //    val offset = params.getAs[Int]("offset")
+  //    controller.streamByVideoReferenceUUID(uuid, limit, offset)
+  //      .andThen({
+  //        case Success(annotations) => sendChunkedResponse(response, annotations)
+  //        case Failure(e) =>
+  //          s"""{"error": "${e.getCause}"} """
+  //      })
+  //  }
 
   get("/imagereference/:uuid") {
     val uuid = params.getAs[UUID]("uuid").getOrElse(halt(BadRequest(

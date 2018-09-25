@@ -26,7 +26,7 @@ import org.mbari.vars.annotation.dao.DAO
 import org.slf4j.LoggerFactory
 
 import scala.collection.JavaConverters._
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.{ ExecutionContext, Future }
 import scala.reflect.ClassTag
 import scala.reflect.classTag
 
@@ -89,7 +89,7 @@ abstract class BaseDAO[B <: PersistentObject: ClassTag](val entityManager: Entit
       offset.foreach(query.setFirstResult)
       namedParameters.foreach({ case (a, b) => query.setParameter(a, b) })
       query.getResultStream
-          .forEach(b => subject.onNext(b.asInstanceOf[B]))
+        .forEach(b => subject.onNext(b.asInstanceOf[B]))
       subject.onComplete()
     })
 
