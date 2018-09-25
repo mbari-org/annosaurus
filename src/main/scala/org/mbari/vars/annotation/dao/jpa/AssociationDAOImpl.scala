@@ -1,3 +1,19 @@
+/*
+ * Copyright 2017 Monterey Bay Aquarium Research Institute
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.mbari.vars.annotation.dao.jpa
 
 import java.util.UUID
@@ -14,8 +30,8 @@ import scala.collection.JavaConverters._
  * @since 2016-06-17T17:11:00
  */
 class AssociationDAOImpl(entityManager: EntityManager)
-    extends BaseDAO[AssociationImpl](entityManager)
-    with AssociationDAO[AssociationImpl] {
+  extends BaseDAO[AssociationImpl](entityManager)
+  with AssociationDAO[AssociationImpl] {
 
   override def newPersistentObject(): AssociationImpl = new AssociationImpl
 
@@ -23,8 +39,7 @@ class AssociationDAOImpl(entityManager: EntityManager)
     linkName: String,
     toConcept: Option[String],
     linkValue: Option[String],
-    mimeType: Option[String]
-  ): AssociationImpl = {
+    mimeType: Option[String]): AssociationImpl = {
     val a = new AssociationImpl
     a.linkName = linkName
     toConcept.foreach(a.toConcept = _)
@@ -39,8 +54,7 @@ class AssociationDAOImpl(entityManager: EntityManager)
   override def findByLinkNameAndVideoReferenceUUID(linkName: String, videoReferenceUUID: UUID): Iterable[AssociationImpl] =
     findByNamedQuery(
       "Association.findByLinkNameAndVideoReferenceUUID",
-      Map("linkName" -> linkName, "videoReferenceUuid" -> videoReferenceUUID)
-    )
+      Map("linkName" -> linkName, "videoReferenceUuid" -> videoReferenceUUID))
 
   override def findAll(): Iterable[AssociationImpl] =
     findByNamedQuery("Association.findAll")

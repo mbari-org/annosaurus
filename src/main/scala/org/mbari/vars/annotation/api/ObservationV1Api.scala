@@ -1,12 +1,27 @@
+/*
+ * Copyright 2017 Monterey Bay Aquarium Research Institute
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.mbari.vars.annotation.api
 
 import java.time.{ Duration, Instant }
 import java.util.UUID
 
 import org.mbari.vars.annotation.controllers.ObservationController
-import org.mbari.vars.annotation.model.ValueArray
+import org.mbari.vars.annotation.model.simple.ObservationCount
 import org.scalatra.{ BadRequest, NoContent, NotFound }
-import org.scalatra.swagger.Swagger
 
 import scala.concurrent.ExecutionContext
 import scala.collection.JavaConverters._
@@ -17,19 +32,14 @@ import scala.collection.JavaConverters._
  * @author Brian Schlining
  * @since 2016-07-04T21:56:00
  */
-class ObservationV1Api(controller: ObservationController)(implicit val swagger: Swagger, val executor: ExecutionContext)
-    extends APIStack {
-  override protected def applicationDescription: String = "Observation API (v1)"
-
-  override protected val applicationName: Option[String] = Some("ObservationAPI")
+class ObservationV1Api(controller: ObservationController)(implicit val executor: ExecutionContext)
+  extends APIStack {
 
   get("/:uuid") {
     val uuid = params.getAs[UUID]("uuid").getOrElse(halt(BadRequest("Please provide a UUID")))
     controller.findByUUID(uuid).map({
       case None => halt(NotFound(
-        body = "{}",
-        reason = s"An ImagedMoment with a UUID of $uuid was not found"
-      ))
+        body = s"{reason: 'An ImagedMoment with a UUID of $uuid was not found'}"))
       case Some(v) => toJson(v)
     })
   }
@@ -77,6 +87,8 @@ class ObservationV1Api(controller: ObservationController)(implicit val swagger: 
       .map(n => s"""{"concept":"$concept", "count":"$n"}""")
   }
 
+  // TODO add method that returns all concepts and their count
+
   get("/groups") {
     controller.findAllGroups
       .map(_.toArray)
@@ -86,7 +98,16 @@ class ObservationV1Api(controller: ObservationController)(implicit val swagger: 
   get("/videoreference/count/:uuid") {
     val uuid = params.getAs[UUID]("uuid").getOrElse(halt(BadRequest("Please provide a video-reference 'uuid'")))
     controller.countByVideoReferenceUUID(uuid)
-      .map(n => s"""{"video_reference_uuid": "${uuid}", "count":"$n"}""")
+      .map(n => ObservationCount(uuid, n))
+      .map(toJson)
+    //.map(n => s"""{"video_reference_uuid": "${uuid}", "count":"$n"}""")
+  }
+
+  get("/counts") {
+    controller.countAllGroupByVideoReferenceUUID()
+      .map(_.map({ case (uuid, count) => ObservationCount(uuid, count) }))
+      .map(_.asJava)
+      .map(toJson)
   }
 
   put("/concept/rename") {
@@ -99,9 +120,7 @@ class ObservationV1Api(controller: ObservationController)(implicit val swagger: 
   put("/:uuid") {
     validateRequest() // Apply API security
     val uuid = params.getAs[UUID]("uuid").getOrElse(halt(BadRequest(
-      body = "{}",
-      reason = "A 'uuid' parameter is required"
-    )))
+      body = "{reason: 'A uuid parameter is required'}")))
     val concept = params.get("concept")
     val observer = params.get("observer")
     val observationDate = params.getAs[Instant]("observation_timestamp").getOrElse(Instant.now())
@@ -111,7 +130,7 @@ class ObservationV1Api(controller: ObservationController)(implicit val swagger: 
     val imagedMomentUUID = params.getAs[UUID]("imaged_moment_uuid")
     controller.update(uuid, concept, observer, observationDate, duration, group, activity, imagedMomentUUID)
       .map({
-        case None => halt(NotFound(reason = s"Failed. No observation with UUID of $uuid was found."))
+        case None => halt(NotFound(s"Failed. No observation with UUID of $uuid was found."))
         case Some(obs) => toJson(obs)
       })
   }
@@ -120,8 +139,8 @@ class ObservationV1Api(controller: ObservationController)(implicit val swagger: 
     validateRequest() // Apply API security
     val uuid = params.getAs[UUID]("uuid").getOrElse(halt(BadRequest("Please provide a UUID")))
     controller.delete(uuid).map({
-      case true => halt(NoContent(reason = s"Success! Deleted observation with UUID of $uuid"))
-      case false => halt(NotFound(reason = s"Failed. No observation with UUID of $uuid was found."))
+      case true => halt(NoContent()) // Success!!
+      case false => halt(NotFound(s"Failed. No observation with UUID of $uuid was found."))
     })
   }
 

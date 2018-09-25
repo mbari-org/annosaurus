@@ -1,13 +1,28 @@
+/*
+ * Copyright 2017 Monterey Bay Aquarium Research Institute
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.mbari.vars.annotation.api
 
-import java.time.{Duration, Instant}
+import java.time.{ Duration, Instant }
 import java.util.UUID
 
 import org.mbari.vars.annotation.controllers.AnnotationController
 import org.mbari.vars.annotation.dao.jpa.AnnotationImpl
 import org.mbari.vcr4j.time.Timecode
-import org.scalatra.{BadRequest, NotFound}
-import org.scalatra.swagger.Swagger
+import org.scalatra.{ BadRequest, NotFound }
 
 import scala.concurrent.ExecutionContext
 import scala.collection.JavaConverters._
@@ -18,11 +33,8 @@ import scala.collection.JavaConverters._
  * @author Brian Schlining
  * @since 2016-06-30T10:08:00
  */
-class AnnotationV1Api(controller: AnnotationController)(implicit val swagger: Swagger, val executor: ExecutionContext)
-    extends APIStack {
-
-  override protected def applicationDescription: String = "Annotation API (v1)"
-  override protected val applicationName: Option[String] = Some.apply("AnnotationAPI")
+class AnnotationV1Api(controller: AnnotationController)(implicit val executor: ExecutionContext)
+  extends APIStack {
 
   before() {
     contentType = "application/json"
@@ -31,21 +43,17 @@ class AnnotationV1Api(controller: AnnotationController)(implicit val swagger: Sw
 
   get("/:uuid") {
     val uuid = params.getAs[UUID]("uuid").getOrElse(halt(BadRequest(
-      body = "{}",
-      reason = "A 'uuid' parameter is required"
-    )))
+      body = "A 'uuid' parameter is required")))
     controller.findByUUID(uuid)
       .map({
-        case None => halt(NotFound(body = "{}", reason = s"An observation with uuid of $uuid was not found"))
+        case None => halt(NotFound(body = s"An observation with uuid of $uuid was not found"))
         case Some(obs) => toJson(obs)
       })
   }
 
   get("/videoreference/:uuid") {
     val uuid = params.getAs[UUID]("uuid").getOrElse(halt(BadRequest(
-      body = "{}",
-      reason = "A video reference 'uuid' parameter is required"
-    )))
+      body = "A video reference 'uuid' parameter is required")))
     val limit = params.getAs[Int]("limit")
     val offset = params.getAs[Int]("offset")
     controller.findByVideoReferenceUUID(uuid, limit, offset)
@@ -55,9 +63,7 @@ class AnnotationV1Api(controller: AnnotationController)(implicit val swagger: Sw
 
   get("/imagereference/:uuid") {
     val uuid = params.getAs[UUID]("uuid").getOrElse(halt(BadRequest(
-      body = "{}",
-      reason = "A image reference 'uuid' parameter is required"
-    )))
+      body = "A image reference 'uuid' parameter is required")))
     controller.findByImageReferenceUUID(uuid)
       .map(_.asJava)
       .map(toJson)
@@ -67,15 +73,11 @@ class AnnotationV1Api(controller: AnnotationController)(implicit val swagger: Sw
   post("/") {
     validateRequest() // Apply API security
     val videoReferenceUUID = params.getAs[UUID]("video_reference_uuid").getOrElse(halt(BadRequest(
-      body = "{}",
-      reason = "A 'video_reference_uuid' parameter is required"
-    )))
+      body = "A 'video_reference_uuid' parameter is required")))
     val concept = params.get("concept").getOrElse(halt(BadRequest(
-      "A 'concept' parameter is required"
-    )))
+      "A 'concept' parameter is required")))
     val observer = params.get("observer").getOrElse(halt(BadRequest(
-      "An 'observer' parameter is required"
-    )))
+      "An 'observer' parameter is required")))
     val observationDate = params.getAs[Instant]("observation_timestamp").getOrElse(Instant.now())
     val timecode = params.getAs[Timecode]("timecode")
     val elapsedTime = params.getAs[Duration]("elapsed_time_millis")
@@ -109,9 +111,7 @@ class AnnotationV1Api(controller: AnnotationController)(implicit val swagger: Sw
   put("/:uuid") {
     validateRequest() // Apply API security
     val uuid = params.getAs[UUID]("uuid").getOrElse(halt(BadRequest(
-      body = "{}",
-      reason = "An observation 'uuid' parameter is required"
-    )))
+      body = "An observation 'uuid' parameter is required")))
     val videoReferenceUUID = params.getAs[UUID]("video_reference_uuid")
     val concept = params.get("concept")
     val observer = params.get("observer")
@@ -127,7 +127,7 @@ class AnnotationV1Api(controller: AnnotationController)(implicit val swagger: Sw
       timecode, elapsedTime, recordedDate, duration, group, activity)
       .map({
         case None =>
-          halt(NotFound(body = "{}", reason = s"An annotation with observation_uuid of $uuid was not found"))
+          halt(NotFound(body = s"An annotation with observation_uuid of $uuid was not found"))
         case Some(ann) => toJson(ann)
       }) // Convert to JSON
 
@@ -142,6 +142,18 @@ class AnnotationV1Api(controller: AnnotationController)(implicit val swagger: Sw
           .map(annos => toJson(annos.asJava))
       case _ =>
         halt(BadRequest("Puts to /bulk only accept JSON body (i.e. Content-Type: application/json)"))
+    }
+  }
+
+  put("/tapetime") {
+    validateRequest()
+    request.getHeader("Content-Type") match {
+      case "application/json" =>
+        val annotations = fromJson(request.body, classOf[Array[AnnotationImpl]])
+        controller.bulkUpdateRecordedTimestampOnly(annotations)
+          .map(annos => toJson(annos.asJava))
+      case _ =>
+        halt(BadRequest("Puts to tapetime only accept JSON body (i.e. Content-Type: application/json)"))
     }
   }
 

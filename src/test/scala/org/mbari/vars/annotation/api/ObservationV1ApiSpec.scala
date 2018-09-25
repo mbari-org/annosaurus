@@ -1,18 +1,34 @@
+/*
+ * Copyright 2017 Monterey Bay Aquarium Research Institute
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.mbari.vars.annotation.api
 
-import java.nio.charset.{Charset, StandardCharsets}
-import java.time.{Duration, Instant}
+import java.nio.charset.StandardCharsets
+import java.time.{ Duration, Instant }
 import java.util.UUID
 import java.util.concurrent.TimeUnit
 
 import org.mbari.vars.annotation.Constants
 import org.mbari.vars.annotation.controllers.ObservationController
-import org.mbari.vars.annotation.dao.jpa.{AnnotationImpl, AssociationImpl, ImagedMomentImpl, ObservationImpl}
+import org.mbari.vars.annotation.dao.jpa.{ AnnotationImpl, AssociationImpl, ImagedMomentImpl, ObservationImpl }
 import org.mbari.vars.annotation.model.Observation
 
 import scala.collection.JavaConverters._
 import scala.concurrent.Await
-import scala.concurrent.duration.{Duration => SDuration}
+import scala.concurrent.duration.{ Duration => SDuration }
 
 /**
  *
@@ -136,8 +152,7 @@ class ObservationV1ApiSpec extends WebApiStack {
       s"$path/${observation.uuid}",
       "concept" -> "shoe",
       "duration_millis" -> "3200",
-      "activity" -> "ascent"
-    ) {
+      "activity" -> "ascent") {
         status should be(200)
         val obs = gson.fromJson(body, classOf[ObservationImpl])
         obs.concept should be("shoe")
@@ -178,8 +193,7 @@ class ObservationV1ApiSpec extends WebApiStack {
     post(
       s"$path/delete",
       body = json,
-      headers = Map("Content-Type" -> "application/json")
-    ) {
+      headers = Map("Content-Type" -> "application/json")) {
         status should be(200)
       }
   }

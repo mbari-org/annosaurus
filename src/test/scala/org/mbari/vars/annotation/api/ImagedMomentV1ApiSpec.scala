@@ -1,16 +1,31 @@
+/*
+ * Copyright 2017 Monterey Bay Aquarium Research Institute
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.mbari.vars.annotation.api
 
-import java.time.Duration
+import java.time.{ Duration, Instant }
 import java.util.UUID
 import java.util.concurrent.TimeUnit
 
-import org.mbari.vars.annotation.controllers.{AnnotationController, ImagedMomentController}
-import org.mbari.vars.annotation.dao.jpa.{AnnotationImpl, ImagedMomentImpl}
-import org.mbari.vars.annotation.model.ImagedMoment
-import org.mbari.vcr4j.time.Timecode
+import org.mbari.vars.annotation.controllers.{ AnnotationController, ImagedMomentController }
+import org.mbari.vars.annotation.dao.jpa.ImagedMomentImpl
+import org.mbari.vars.annotation.model.Annotation
 
 import scala.concurrent.Await
-import scala.concurrent.duration.{Duration => SDuration}
+import scala.concurrent.duration.{ Duration => SDuration }
 
 /**
  *
@@ -19,6 +34,8 @@ import scala.concurrent.duration.{Duration => SDuration}
  * @since 2016-09-08T14:24:00
  */
 class ImagedMomentV1ApiSpec extends WebApiStack {
+
+  private[this] val startTimestamp = Instant.now()
 
   private[this] val imagedMomentV1Api = {
     val controller = new ImagedMomentController(daoFactory)
@@ -34,7 +51,7 @@ class ImagedMomentV1ApiSpec extends WebApiStack {
     }
   }
 
-  var annotation: AnnotationImpl = _
+  var annotation: Annotation = _
 
   it should "find by uuid" in {
 
@@ -43,8 +60,7 @@ class ImagedMomentV1ApiSpec extends WebApiStack {
       Await.result(
         controller.create(UUID.randomUUID(), "Foo", "brian",
           elapsedTime = Some(Duration.ofMillis(2000))),
-        SDuration(3000, TimeUnit.MILLISECONDS)
-      )
+        SDuration(3000, TimeUnit.MILLISECONDS))
     }
 
     get(s"/v1/imagedmoments/${annotation.imagedMomentUuid}") {
@@ -76,12 +92,26 @@ class ImagedMomentV1ApiSpec extends WebApiStack {
     }
   }
 
+  it should "find last updated imagedmoments between timestamps" in {
+    get(s"/v1/imagedmoments/modified/$startTimestamp/${Instant.now()}") {
+      status should be(200)
+      val im = gson.fromJson(body, classOf[Array[ImagedMomentImpl]]).toList
+      im.size should be > 0
+    }
+  }
+
+  it should "count last updated imagedmoments between timestamps" in {
+    get(s"/v1/imagedmoments/modified/count/$startTimestamp/${Instant.now()}") {
+      status should be(200)
+      println(body)
+    }
+  }
+
   it should "update" in {
     put(
       s"/v1/imagedmoments/${annotation.imagedMomentUuid}",
       "timecode" -> "01:23:45:12",
-      "elapsed_time_millis" -> "22222"
-    ) {
+      "elapsed_time_millis" -> "22222") {
         status should be(200)
         val im = gson.fromJson(body, classOf[ImagedMomentImpl])
         im.elapsedTime should be(Duration.ofMillis(22222))

@@ -1,32 +1,40 @@
+/*
+ * Copyright 2017 Monterey Bay Aquarium Research Institute
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.mbari.vars.annotation.api
 
 import java.net.URL
-import java.time.{ Duration, Instant }
 import java.util.UUID
 
 import org.mbari.vars.annotation.controllers.ImageReferenceController
 import org.scalatra.{ BadRequest, NoContent, NotFound }
-import org.scalatra.swagger.Swagger
 
 import scala.concurrent.ExecutionContext
 
 /**
  * Created by brian on 7/14/16.
  */
-class ImageReferenceV1Api(controller: ImageReferenceController)(implicit val swagger: Swagger, val executor: ExecutionContext)
-    extends APIStack {
-
-  override protected def applicationDescription: String = "ImageReference API (v1)"
-
-  override protected val applicationName: Option[String] = Some("ImageReferenceAPI")
+class ImageReferenceV1Api(controller: ImageReferenceController)(implicit val executor: ExecutionContext)
+  extends APIStack {
 
   get("/:uuid") {
     val uuid = params.getAs[UUID]("uuid").getOrElse(halt(BadRequest("Please provide a UUID")))
     controller.findByUUID(uuid).map({
       case None => halt(NotFound(
-        body = "{}",
-        reason = s"An ImagedMoment with a UUID of $uuid was not found"
-      ))
+        body = s"An ImagedMoment with a UUID of $uuid was not found"))
       case Some(v) => toJson(v)
     })
   }
@@ -34,9 +42,7 @@ class ImageReferenceV1Api(controller: ImageReferenceController)(implicit val swa
   put("/:uuid") {
     validateRequest() // Apply API security
     val uuid = params.getAs[UUID]("uuid").getOrElse(halt(BadRequest(
-      body = "{}",
-      reason = "A 'uuid' parameter is required"
-    )))
+      body = "A 'uuid' parameter is required")))
     val url = params.getAs[URL]("url")
     val format = params.get("format")
     val width = params.getAs[Int]("width_pixels")
@@ -45,7 +51,7 @@ class ImageReferenceV1Api(controller: ImageReferenceController)(implicit val swa
     val imagedMomentUUID = params.getAs[UUID]("imaged_moment_uuid")
     controller.update(uuid, url, description, height, width, format, imagedMomentUUID)
       .map({
-        case None => halt(NotFound(reason = s"An ImageReference with uuid of $uuid was not found"))
+        case None => halt(NotFound(s"An ImageReference with uuid of $uuid was not found"))
         case Some(ir) => toJson(ir)
       })
   }
@@ -53,12 +59,10 @@ class ImageReferenceV1Api(controller: ImageReferenceController)(implicit val swa
   delete("/:uuid") {
     validateRequest() // Apply API security
     val uuid = params.getAs[UUID]("uuid").getOrElse(halt(BadRequest(
-      body = "{}",
-      reason = "A 'uuid' parameter is required"
-    )))
+      body = "A 'uuid' parameter is required")))
     controller.delete(uuid).map({
-      case true => halt(NoContent(reason = s"Success! Deleted observation with UUID of $uuid"))
-      case false => halt(NotFound(reason = s"Failed. No observation with UUID of $uuid was found."))
+      case true => halt(NoContent()) // Success
+      case false => halt(NotFound(s"Failed. No observation with UUID of $uuid was found."))
     })
   }
 }

@@ -1,3 +1,19 @@
+/*
+ * Copyright 2017 Monterey Bay Aquarium Research Institute
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.mbari.vars.annotation.dao.jpa
 
 import java.util.UUID
@@ -35,13 +51,18 @@ abstract class BaseDAO[B <: PersistentObject: ClassTag](val entityManager: Entit
     name: String,
     namedParameters: Map[String, Any] = Map.empty,
     limit: Option[Int] = None,
-    offset: Option[Int] = None
-  ): List[B] = {
+    offset: Option[Int] = None): List[B] = {
+    if (log.isDebugEnabled()) {
+      log.debug(s"JPA Query => $name using $namedParameters")
+    }
     val query = entityManager.createNamedQuery(name)
     limit.foreach(query.setMaxResults)
     offset.foreach(query.setFirstResult)
     namedParameters.foreach({ case (a, b) => query.setParameter(a, b) })
-    query.getResultList.asScala.toList.map(_.asInstanceOf[B])
+    query.getResultList
+      .asScala
+      .toList
+      .map(_.asInstanceOf[B])
   }
 
   def executeNamedQuery(name: String, namedParameters: Map[String, Any] = Map.empty): Int = {

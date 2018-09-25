@@ -1,3 +1,19 @@
+/*
+ * Copyright 2017 Monterey Bay Aquarium Research Institute
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.mbari.vars.annotation.dao.jpa
 
 import java.time.{ Duration, Instant }
@@ -15,8 +31,8 @@ import scala.collection.JavaConverters._
  * @since 2016-06-17T17:10:00
  */
 class ObservationDAOImpl(entityManager: EntityManager)
-    extends BaseDAO[ObservationImpl](entityManager)
-    with ObservationDAO[ObservationImpl] {
+  extends BaseDAO[ObservationImpl](entityManager)
+  with ObservationDAO[ObservationImpl] {
 
   override def newPersistentObject(): ObservationImpl = new ObservationImpl
 
@@ -25,8 +41,7 @@ class ObservationDAOImpl(entityManager: EntityManager)
     observer: String,
     observationDate: Instant = Instant.now(),
     group: Option[String] = None,
-    duration: Option[Duration] = None
-  ): ObservationImpl = {
+    duration: Option[Duration] = None): ObservationImpl = {
 
     val observation = newPersistentObject()
     observation.concept = concept
@@ -81,7 +96,8 @@ class ObservationDAOImpl(entityManager: EntityManager)
     query.setParameter(1, name)
     query.getResultList
       .asScala
-      .map(_.asInstanceOf[Int])
+      .map(_.asInstanceOf[Number])
+      .map(_.intValue())
       .head
   }
 
@@ -90,8 +106,22 @@ class ObservationDAOImpl(entityManager: EntityManager)
     query.setParameter(1, UUIDConverter.uuidToString(uuid))
     query.getResultList
       .asScala
-      .map(_.asInstanceOf[Int])
+      .map(_.asInstanceOf[Number])
+      .map(_.intValue())
       .head
+  }
+
+  override def countAllByVideoReferenceUuids(): Map[UUID, Int] = {
+    val query = entityManager.createNamedQuery("Observation.countAllByVideoReferenceUUIDs")
+    query.getResultList
+      .asScala
+      .map(_.asInstanceOf[Array[Object]])
+      .map(xs => {
+        val uuid = UUID.fromString(xs(0).asInstanceOf[String])
+        val count = xs(1).asInstanceOf[Number].intValue()
+        uuid -> count
+      })
+      .toMap
   }
 
   override def updateConcept(oldConcept: String, newConcept: String): Int = {

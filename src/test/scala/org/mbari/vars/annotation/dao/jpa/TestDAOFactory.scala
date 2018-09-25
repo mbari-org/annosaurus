@@ -1,3 +1,19 @@
+/*
+ * Copyright 2017 Monterey Bay Aquarium Research Institute
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.mbari.vars.annotation.dao.jpa
 
 import java.util.concurrent.TimeUnit
@@ -19,8 +35,7 @@ object TestDAOFactory {
     "eclipselink.logging.level" -> "FINE",
     "javax.persistence.schema-generation.scripts.action" -> "drop-and-create",
     "javax.persistence.schema-generation.scripts.create-target" -> "target/test-database-create.ddl",
-    "javax.persistence.schema-generation.scripts.drop-target" -> "target/test-database-drop.ddl"
-  )
+    "javax.persistence.schema-generation.scripts.drop-target" -> "target/test-database-drop.ddl")
 
   //val Instance: SpecDAOFactory = DerbyTestDAOFactory.asInstanceOf[SpecDAOFactory]
   val Instance: SpecDAOFactory = DevelopmentTestDAOFactory.asInstanceOf[SpecDAOFactory]
@@ -55,8 +70,7 @@ object DerbyTestDAOFactory extends SpecDAOFactory {
   override def testProps(): Map[String, String] = TestDAOFactory.TestProperties ++
     Map(
       "eclipselink.target-database" -> TargetDatabase.Derby,
-      "javax.persistence.database-product-name" -> TargetDatabase.Derby
-    )
+      "javax.persistence.database-product-name" -> TargetDatabase.Derby)
 
   lazy val entityManagerFactory: EntityManagerFactory = {
     val driver = config.getString("org.mbari.vars.annotation.database.derby.driver")
@@ -73,8 +87,7 @@ object H2TestDAOFactory extends SpecDAOFactory {
   override def testProps(): Map[String, String] = TestDAOFactory.TestProperties ++
     Map(
       "eclipselink.target-database" -> TargetDatabase.Derby,
-      "javax.persistence.database-product-name" -> TargetDatabase.Derby
-    )
+      "javax.persistence.database-product-name" -> TargetDatabase.Derby)
 
   lazy val entityManagerFactory: EntityManagerFactory = {
     val driver = config.getString("org.mbari.vars.annotation.database.h2.driver")
@@ -93,8 +106,7 @@ object DevelopmentTestDAOFactory extends SpecDAOFactory {
   override def testProps(): Map[String, String] = TestDAOFactory.TestProperties ++
     Map(
       "eclipselink.target-database" -> productName,
-      "javax.persistence.database-product-name" -> productName
-    )
+      "javax.persistence.database-product-name" -> productName)
 
   lazy val entityManagerFactory: EntityManagerFactory = {
     val driver = config.getString("org.mbari.vars.annotation.database.development.driver")

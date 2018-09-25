@@ -1,10 +1,26 @@
+/*
+ * Copyright 2017 Monterey Bay Aquarium Research Institute
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.mbari.vars.annotation.dao.jpa
 
-import java.time.{Duration, Instant}
-import java.util.{UUID, ArrayList => JArrayList, List => JList}
+import java.time.{ Duration, Instant }
+import java.util.{ UUID, ArrayList => JArrayList, List => JList }
 
-import com.google.gson.annotations.{Expose, SerializedName}
-import org.mbari.vars.annotation.model.{Annotation, Association, ImageReference, Observation}
+import com.google.gson.annotations.{ Expose, SerializedName }
+import org.mbari.vars.annotation.model._
 import org.mbari.vcr4j.time.Timecode
 
 import scala.collection.JavaConverters._
@@ -58,17 +74,23 @@ class AnnotationImpl extends Annotation {
   @Expose(serialize = true)
   @SerializedName(value = "associations")
   protected var javaAssociations: JList[AssociationImpl] = new JArrayList[AssociationImpl]()
-  def associations: Seq[AssociationImpl] = javaAssociations.asScala
-  def associations_=(as: Seq[AssociationImpl]): Unit = {
-    javaAssociations = as.asJava
+  def associations: Seq[Association] = javaAssociations.asScala
+  def associations_=(as: Seq[Association]): Unit = {
+    javaAssociations = as.map({
+      case a: AssociationImpl => a
+      case v: Association => AssociationImpl(v)
+    }).asJava
   }
 
   @Expose(serialize = true)
   @SerializedName(value = "image_references")
   var javaImageReferences: JList[ImageReferenceImpl] = new JArrayList[ImageReferenceImpl]()
-  def imageReferences: Seq[ImageReferenceImpl] = javaImageReferences.asScala
-  def imageReferences_=(irs: Seq[ImageReferenceImpl]): Unit = {
-    javaImageReferences = irs.asJava
+  def imageReferences: Seq[ImageReference] = javaImageReferences.asScala
+  def imageReferences_=(irs: Seq[ImageReference]): Unit = {
+    javaImageReferences = irs.map({
+      case i: ImageReferenceImpl => i
+      case v: ImageReference => ImageReferenceImpl(v)
+    }).asJava
   }
 
 }
@@ -89,9 +111,14 @@ object AnnotationImpl {
     a.duration = observation.duration
     a.group = observation.group
     a.activity = observation.activity
-    a.associations = observation.associations.map(v => AssociationImpl(v)).toSeq
+    a.associations = observation.associations.toSeq
     a.imageReferences = observation.imagedMoment.imageReferences.toSeq
     a
+  }
+
+  def apply(imagedMoment: ImagedMoment): Iterable[AnnotationImpl] = {
+    imagedMoment.observations
+      .map(apply)
   }
 
   def apply(
@@ -104,8 +131,7 @@ object AnnotationImpl {
     recordedDate: Option[Instant] = None,
     duration: Option[Duration] = None,
     group: Option[String] = None,
-    activity: Option[String] = None
-  ): AnnotationImpl = {
+    activity: Option[String] = None): AnnotationImpl = {
 
     val annotation = new AnnotationImpl
     annotation.videoReferenceUuid = videoReferenceUUID

@@ -1,3 +1,19 @@
+/*
+ * Copyright 2017 Monterey Bay Aquarium Research Institute
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.mbari.vars.annotation.dao.jpa
 
 import javax.persistence.{ EntityManagerFactory, Persistence }
@@ -29,8 +45,7 @@ object EntityManagerFactories {
     "eclipselink.logging.thread" -> "false",
     "eclipselink.logging.timestamp" -> "false",
     "javax.persistence.schema-generation.database.action" -> "create",
-    PersistenceUnitProperties.SESSION_CUSTOMIZER -> "org.mbari.vars.annotation.dao.jpa.UUIDSequence"
-  )
+    PersistenceUnitProperties.SESSION_CUSTOMIZER -> "org.mbari.vars.annotation.dao.jpa.UUIDSequence")
 
   def apply(properties: Map[String, String]): EntityManagerFactory = {
     val props = properties ++ PRODUCTION_PROPS
@@ -42,15 +57,13 @@ object EntityManagerFactories {
     username: String,
     password: String,
     driverName: String,
-    properties: Map[String, String] = Map.empty
-  ): EntityManagerFactory = {
+    properties: Map[String, String] = Map.empty): EntityManagerFactory = {
 
     val map = Map(
       "javax.persistence.jdbc.url" -> url,
       "javax.persistence.jdbc.user" -> username,
       "javax.persistence.jdbc.password" -> password,
-      "javax.persistence.jdbc.driver" -> driverName
-    )
+      "javax.persistence.jdbc.driver" -> driverName)
     apply(map ++ properties)
   }
 
@@ -68,8 +81,7 @@ object EntityManagerFactories {
       "javax.persistence.jdbc.driver" -> driver,
       "javax.persistence.jdbc.password" -> password,
       "javax.persistence.jdbc.url" -> url,
-      "javax.persistence.jdbc.user" -> user
-    )
+      "javax.persistence.jdbc.user" -> user)
     apply(props)
   }
 

@@ -1,11 +1,26 @@
+/*
+ * Copyright 2017 Monterey Bay Aquarium Research Institute
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.mbari.vars.annotation.api
 
 import java.util.UUID
 
-import org.mbari.vars.annotation.controllers.{ AssociationController, ImagedMomentController }
+import org.mbari.vars.annotation.controllers.AssociationController
 import org.mbari.vars.annotation.model.Association
 import org.scalatra.{ BadRequest, NoContent, NotFound }
-import org.scalatra.swagger.Swagger
 
 import scala.concurrent.ExecutionContext
 import scala.collection.JavaConverters._
@@ -16,12 +31,8 @@ import scala.collection.JavaConverters._
  * @author Brian Schlining
  * @since 2016-07-13T11:21:00
  */
-class AssociationV1Api(controller: AssociationController)(implicit val swagger: Swagger, val executor: ExecutionContext)
-    extends APIStack {
-
-  override protected def applicationDescription: String = "Association API (v1)"
-
-  override protected val applicationName: Option[String] = Some("AssociationAPI")
+class AssociationV1Api(controller: AssociationController)(implicit val executor: ExecutionContext)
+  extends APIStack {
 
   before() {
     contentType = "application/json"
@@ -33,9 +44,7 @@ class AssociationV1Api(controller: AssociationController)(implicit val swagger: 
     val uuid = params.getAs[UUID]("uuid").getOrElse(halt(BadRequest("Please provide a 'uuid' parameter")))
     controller.findByUUID(uuid).map({
       case None => halt(NotFound(
-        body = "{}",
-        reason = s"An Association with a UUID of $uuid was not found"
-      ))
+        body = s"An Association with a UUID of $uuid was not found"))
       case Some(v) => toJson(v)
     })
   }
@@ -67,7 +76,7 @@ class AssociationV1Api(controller: AssociationController)(implicit val swagger: 
     val linkValue = params.get("link_value")
     val mimeType = params.get("mime_type")
     controller.update(uuid, observationUUID, linkName, toConcept, linkValue, mimeType).map({
-      case None => halt(NotFound(body = "{}", reason = s"No association with uuid of $uuid was found"))
+      case None => halt(NotFound(body = s"No association with uuid of $uuid was found"))
       case Some(a) => toJson(a)
     })
   }
@@ -100,8 +109,8 @@ class AssociationV1Api(controller: AssociationController)(implicit val swagger: 
     validateRequest() // Apply API security
     val uuid = params.getAs[UUID]("uuid").getOrElse(halt(BadRequest("Please provide the 'uuid' of the association")))
     controller.delete(uuid).map({
-      case true => halt(NoContent(reason = s"Success! Deleted association with UUID of $uuid"))
-      case false => halt(NotFound(reason = s"Failed. No association with UUID of $uuid was found."))
+      case true => halt(NoContent()) // Success!
+      case false => halt(NotFound(s"Failed. No association with UUID of $uuid was found."))
     })
   }
 

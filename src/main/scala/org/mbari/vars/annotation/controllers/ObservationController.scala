@@ -1,3 +1,19 @@
+/*
+ * Copyright 2017 Monterey Bay Aquarium Research Institute
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.mbari.vars.annotation.controllers
 
 import java.time.{ Duration, Instant }
@@ -15,7 +31,7 @@ import scala.concurrent.{ ExecutionContext, Future }
  * @since 2016-06-25T20:33:00
  */
 class ObservationController(val daoFactory: BasicDAOFactory)
-    extends BaseController[Observation, ObservationDAO[Observation]] {
+  extends BaseController[Observation, ObservationDAO[Observation]] {
 
   type ODAO = ObservationDAO[Observation]
 
@@ -27,8 +43,7 @@ class ObservationController(val daoFactory: BasicDAOFactory)
     observer: String,
     observationDate: Instant = Instant.now(),
     duration: Option[Duration] = None,
-    group: Option[String] = None
-  )(implicit ec: ExecutionContext): Future[Observation] = {
+    group: Option[String] = None)(implicit ec: ExecutionContext): Future[Observation] = {
 
     def fn(dao: ODAO): Observation = {
       val imDao = daoFactory.newImagedMomentDAO(dao)
@@ -52,8 +67,7 @@ class ObservationController(val daoFactory: BasicDAOFactory)
     duration: Option[Duration] = None,
     group: Option[String] = None,
     activity: Option[String] = None,
-    imagedMomentUUID: Option[UUID] = None
-  )(implicit ec: ExecutionContext): Future[Option[Observation]] = {
+    imagedMomentUUID: Option[UUID] = None)(implicit ec: ExecutionContext): Future[Option[Observation]] = {
 
     def fn(dao: ODAO): Option[Observation] = {
       // --- 1. Does uuid exist?
@@ -143,6 +157,9 @@ class ObservationController(val daoFactory: BasicDAOFactory)
     def fn(dao: ODAO): Int = dao.countByVideoReferenceUUID(uuid)
     exec(fn)
   }
+
+  def countAllGroupByVideoReferenceUUID()(implicit ec: ExecutionContext): Future[Map[UUID, Int]] =
+    exec(dao => dao.countAllByVideoReferenceUuids())
 
   def updateConcept(oldConcept: String, newConcept: String)(implicit ec: ExecutionContext): Future[Int] = {
     def fn(dao: ODAO): Int = dao.updateConcept(oldConcept, newConcept)

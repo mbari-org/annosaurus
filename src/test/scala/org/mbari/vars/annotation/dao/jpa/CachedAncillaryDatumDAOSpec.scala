@@ -1,13 +1,29 @@
+/*
+ * Copyright 2017 Monterey Bay Aquarium Research Institute
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.mbari.vars.annotation.dao.jpa
 
 import java.time.{ Duration, Instant }
 import java.util.UUID
 import java.util.concurrent.TimeUnit
 
-import org.mbari.vars.annotation.dao.{ CachedAncillaryDatumDAO, ImageReferenceDAO }
+import org.mbari.vars.annotation.dao.CachedAncillaryDatumDAO
 import org.scalatest.{ FlatSpec, Matchers, BeforeAndAfterAll }
 
-import scala.concurrent.{ Await, Awaitable }
+import scala.concurrent.Await
 import scala.concurrent.duration.{ Duration => SDuration }
 import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -28,7 +44,7 @@ class CachedAncillaryDatumDAOSpec extends FlatSpec with Matchers with BeforeAndA
   private[this] val now = Instant.now()
   private[this] val imagedMoment0 = ImagedMomentImpl(Some(videoReferenceUUID), Some(now), elapsedTime = Some(Duration.ofMinutes(1)))
   private[this] val ancillaryDatum0 = CachedAncillaryDatumImpl(36.234, 122.0011, 666)
-  private[this] val newTemp = 3.2F
+  private[this] val newTemp = 3.2
 
   private type CADAO = CachedAncillaryDatumDAO[CachedAncillaryDatumImpl]
   def run[R](fn: CADAO => R): R = Await.result(dao.runTransaction(fn), timeout)
@@ -43,11 +59,12 @@ class CachedAncillaryDatumDAOSpec extends FlatSpec with Matchers with BeforeAndA
     run(d => {
       val ad = d.findByUUID(ancillaryDatum0.uuid)
       ad shouldBe defined
-      ad.get.temperatureCelsius = newTemp
+      ad.get.temperatureCelsius = Some(newTemp)
     })
 
     val datum = run(d => d.findByUUID(ancillaryDatum0.uuid)).head
-    datum.temperatureCelsius should be(newTemp +- 0.000001F)
+    datum.temperatureCelsius should not be None
+    datum.temperatureCelsius.get should be(newTemp +- 0.000001D)
   }
 
   it should "findAll" in {

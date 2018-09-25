@@ -10,6 +10,9 @@
         <!-- Converters -->
         <class>org.mbari.vars.annotation.dao.jpa.DurationConverter</class>
         <class>org.mbari.vars.annotation.dao.jpa.InstantConverter</class>
+        <class>org.mbari.vars.annotation.dao.jpa.OptionConverter</class>
+        <class>org.mbari.vars.annotation.dao.jpa.FloatOptionConverter</class>
+        <class>org.mbari.vars.annotation.dao.jpa.DoubleOptionConverter</class>
         <class>org.mbari.vars.annotation.dao.jpa.URIConverter</class>
         <class>org.mbari.vars.annotation.dao.jpa.URLConverter</class>
         <class>org.mbari.vars.annotation.dao.jpa.UUIDConverter</class>
@@ -26,7 +29,7 @@
         <properties>
             <property name="eclipselink.logging.level" value="INFO"/>
             <property name="eclipselink.connection-pool.default.initial" value="2" />
-            <property name="eclipselink.connection-pool.default.max" value="16" />
+            <property name="eclipselink.connection-pool.default.max" value="4" />
             <property name="eclipse.weaving" value="false" />
         </properties>
     </persistence-unit>

@@ -1,3 +1,19 @@
+/*
+ * Copyright 2017 Monterey Bay Aquarium Research Institute
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.mbari.vars.annotation.dao
 
 import java.time.{ Duration, Instant }
@@ -18,8 +34,7 @@ trait ObservationDAO[T <: Observation] extends DAO[T] {
     observer: String,
     observationDate: Instant = Instant.now(),
     group: Option[String] = None,
-    duration: Option[Duration] = None
-  ): T
+    duration: Option[Duration] = None): T
 
   def findByVideoReferenceUUID(uuid: UUID, limit: Option[Int] = None, offset: Option[Int] = None): Iterable[T]
 
@@ -44,6 +59,8 @@ trait ObservationDAO[T <: Observation] extends DAO[T] {
   def countByConcept(name: String): Int
 
   def countByVideoReferenceUUID(uuid: UUID): Int
+
+  def countAllByVideoReferenceUuids(): Map[UUID, Int]
 
   def updateConcept(oldName: String, newName: String): Int
 

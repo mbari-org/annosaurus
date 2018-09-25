@@ -1,3 +1,19 @@
+/*
+ * Copyright 2017 Monterey Bay Aquarium Research Institute
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.mbari.vars.annotation.api
 
 import java.net.{ URL, URLEncoder }
@@ -34,8 +50,7 @@ class ImageV1ApiSpec extends WebApiStack {
       "url" -> "http://www.mbari.org/foo.jpg",
       "width_pixels" -> "1920",
       "height_pixels" -> "1080",
-      "description" -> "This is a test"
-    ) {
+      "description" -> "This is a test") {
         status should be(200)
         image = gson.fromJson(body, classOf[Image])
         image.url should be(new URL("http://www.mbari.org/foo.jpg"))
@@ -53,8 +68,7 @@ class ImageV1ApiSpec extends WebApiStack {
       "video_reference_uuid" -> image.videoReferenceUuid.toString,
       "elapsed_time_millis" -> "12345",
       "format" -> "image/png",
-      "url" -> "http://www.mbari.org/foo.png"
-    ) {
+      "url" -> "http://www.mbari.org/foo.png") {
         status should be(200)
         val im = gson.fromJson(body, classOf[Image])
         image.imagedMomentUuid should be(im.imagedMomentUuid)
@@ -95,8 +109,7 @@ class ImageV1ApiSpec extends WebApiStack {
       "recorded_timestamp" -> "1968-09-22T02:00:55Z",
       "width_pixels" -> "4000",
       "height_pixels" -> "2000",
-      "video_reference_uuid" -> UUID.randomUUID().toString
-    ) {
+      "video_reference_uuid" -> UUID.randomUUID().toString) {
         status should be(200)
         val im = gson.fromJson(body, classOf[Image])
         im.url should be(new URL("http://www.google.com/bar.jpg"))

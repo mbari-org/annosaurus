@@ -1,15 +1,28 @@
+/*
+ * Copyright 2017 Monterey Bay Aquarium Research Institute
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.mbari.vars.annotation.controllers
 
 import java.net.URL
 import java.util.UUID
-import java.util.concurrent.TimeUnit
 
 import org.mbari.vars.annotation.dao.{ ImageReferenceDAO, NotFoundInDatastoreException }
 import org.mbari.vars.annotation.model.ImageReference
 
-import scala.concurrent.duration.Duration
-import scala.concurrent.{ Await, ExecutionContext, Future }
-import scala.util.{ Failure, Success }
+import scala.concurrent.{ ExecutionContext, Future }
 
 /**
  *
@@ -29,8 +42,7 @@ class ImageReferenceController(val daoFactory: BasicDAOFactory) extends BaseCont
     description: Option[String],
     heightPixels: Option[Int],
     widthPixels: Option[Int],
-    format: Option[String]
-  )(implicit ec: ExecutionContext): Future[ImageReference] = {
+    format: Option[String])(implicit ec: ExecutionContext): Future[ImageReference] = {
 
     def fn(dao: IRDAO): ImageReference = {
       val imDao = daoFactory.newImagedMomentDAO()
@@ -53,8 +65,7 @@ class ImageReferenceController(val daoFactory: BasicDAOFactory) extends BaseCont
     heightPixels: Option[Int] = None,
     widthPixels: Option[Int] = None,
     format: Option[String] = None,
-    imagedMomentUUID: Option[UUID] = None
-  )(implicit ec: ExecutionContext): Future[Option[ImageReference]] = {
+    imagedMomentUUID: Option[UUID] = None)(implicit ec: ExecutionContext): Future[Option[ImageReference]] = {
 
     def fn(dao: IRDAO): Option[ImageReference] = {
       dao.findByUUID(uuid).map(imageReference => {

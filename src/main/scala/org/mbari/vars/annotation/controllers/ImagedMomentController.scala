@@ -1,3 +1,19 @@
+/*
+ * Copyright 2017 Monterey Bay Aquarium Research Institute
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.mbari.vars.annotation.controllers
 
 import java.time.{ Duration, Instant }
@@ -17,7 +33,7 @@ import scala.concurrent.{ ExecutionContext, Future }
  * @since 2016-06-17T16:06:00
  */
 class ImagedMomentController(val daoFactory: BasicDAOFactory)
-    extends BaseController[ImagedMoment, ImagedMomentDAO[ImagedMoment]] {
+  extends BaseController[ImagedMoment, ImagedMomentDAO[ImagedMoment]] {
 
   protected type IMDAO = ImagedMomentDAO[ImagedMoment]
 
@@ -51,6 +67,63 @@ class ImagedMomentController(val daoFactory: BasicDAOFactory)
   def findWithImageReferences(videoReferenceUUID: UUID)(implicit ec: ExecutionContext): Future[Iterable[ImagedMoment]] =
     exec(d => d.findWithImageReferences(videoReferenceUUID))
 
+  def findBetweenUpdatedDates(
+    start: Instant,
+    end: Instant,
+    limit: Option[Int] = None,
+    offset: Option[Int] = None)(implicit ec: ExecutionContext): Future[Seq[ImagedMoment]] = {
+    val imDao = daoFactory.newImagedMomentDAO()
+    val f = imDao.runTransaction(d => d.findBetweenUpdatedDates(start, end, limit, offset))
+    f.onComplete(_ => imDao.close())
+    f.map(_.toSeq)
+  }
+
+  def countBetweenUpdatedDates(
+    start: Instant,
+    end: Instant)(implicit ec: ExecutionContext): Future[Int] = {
+    val imDao = daoFactory.newImagedMomentDAO()
+    val f = imDao.runTransaction(d => d.countBetweenUpdatedDates(start, end))
+    f.onComplete(_ => imDao.close())
+    f
+  }
+
+  def countAllGroupByVideoReferenceUUID()(implicit ec: ExecutionContext): Future[Map[UUID, Int]] =
+    exec(dao => dao.countAllByVideoReferenceUuids())
+
+  def findByConcept(
+    concept: String,
+    limit: Option[Int] = None,
+    offset: Option[Int] = None)(implicit ec: ExecutionContext): Future[Iterable[ImagedMoment]] = {
+    val imDao = daoFactory.newImagedMomentDAO()
+    val f = imDao.runTransaction(d => d.findByConcept(concept, limit, offset))
+    f.onComplete(_ => imDao.close())
+    f
+  }
+
+  def countByConcept(concept: String)(implicit ec: ExecutionContext): Future[Int] = {
+    val imDao = daoFactory.newImagedMomentDAO()
+    val f = imDao.runTransaction(d => d.countByConcept(concept))
+    f.onComplete(_ => imDao.close())
+    f
+  }
+
+  def findByConceptWithImages(
+    concept: String,
+    limit: Option[Int] = None,
+    offset: Option[Int] = None)(implicit ec: ExecutionContext): Future[Iterable[ImagedMoment]] = {
+    val imDao = daoFactory.newImagedMomentDAO()
+    val f = imDao.runTransaction(d => d.findByConceptWithImages(concept, limit, offset))
+    f.onComplete(_ => imDao.close())
+    f
+  }
+
+  def countByConceptWithImages(concept: String)(implicit ec: ExecutionContext): Future[Int] = {
+    val imDao = daoFactory.newImagedMomentDAO()
+    val f = imDao.runTransaction(d => d.countByConceptWithImages(concept))
+    f.onComplete(_ => imDao.close())
+    f
+  }
+
   def deleteByVideoReferenceUUID(videoReferenceUUID: UUID)(implicit ec: ExecutionContext): Future[Int] =
     exec(d => d.deleteByVideoReferenceUUUID(videoReferenceUUID))
 
@@ -58,12 +131,10 @@ class ImagedMomentController(val daoFactory: BasicDAOFactory)
     videoReferenceUUID: UUID,
     timecode: Option[Timecode] = None,
     recordedDate: Option[Instant] = None,
-    elapsedTime: Option[Duration] = None
-  )(implicit ec: ExecutionContext): Future[ImagedMoment] = {
+    elapsedTime: Option[Duration] = None)(implicit ec: ExecutionContext): Future[ImagedMoment] = {
 
     def fn(d: IMDAO) = ImagedMomentController.findImagedMoment(
-      d, videoReferenceUUID, timecode, recordedDate, elapsedTime
-    )
+      d, videoReferenceUUID, timecode, recordedDate, elapsedTime)
     exec(fn)
   }
 
@@ -72,8 +143,7 @@ class ImagedMomentController(val daoFactory: BasicDAOFactory)
     videoReferenceUUID: Option[UUID] = None,
     timecode: Option[Timecode] = None,
     recordedDate: Option[Instant] = None,
-    elapsedTime: Option[Duration] = None
-  )(implicit ec: ExecutionContext) = {
+    elapsedTime: Option[Duration] = None)(implicit ec: ExecutionContext) = {
 
     def fn(dao: IMDAO): ImagedMoment = {
       dao.findByUUID(uuid) match {
@@ -87,6 +157,22 @@ class ImagedMomentController(val daoFactory: BasicDAOFactory)
           //dao.update(imagedMoment)
           imagedMoment
       }
+    }
+    exec(fn)
+  }
+
+  def updateRecordedTimestamps(videoReferenceUuid: UUID, newStartTimestamp: Instant)(implicit ec: ExecutionContext): Future[Iterable[ImagedMoment]] = {
+    def fn(dao: IMDAO): Iterable[ImagedMoment] = {
+      dao.findByVideoReferenceUUID(videoReferenceUuid)
+        .map(im => {
+          if (im.elapsedTime != null) {
+            val newRecordedDate = newStartTimestamp.plus(im.elapsedTime)
+            if (newRecordedDate != im.recordedDate) {
+              im.recordedDate = newRecordedDate
+            }
+          }
+          im
+        })
     }
     exec(fn)
   }
@@ -110,8 +196,7 @@ object ImagedMomentController {
     videoReferenceUUID: UUID,
     timecode: Option[Timecode] = None,
     recordedDate: Option[Instant] = None,
-    elapsedTime: Option[Duration] = None
-  ): ImagedMoment = {
+    elapsedTime: Option[Duration] = None): ImagedMoment = {
     // -- Return existing or construct a new one if no match is found
     dao.findByVideoReferenceUUIDAndIndex(videoReferenceUUID, timecode, elapsedTime, recordedDate) match {
       case Some(imagedMoment) => imagedMoment
