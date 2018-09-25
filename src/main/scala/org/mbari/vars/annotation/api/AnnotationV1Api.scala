@@ -26,6 +26,7 @@ import org.scalatra.{ BadRequest, NotFound }
 
 import scala.concurrent.ExecutionContext
 import scala.collection.JavaConverters._
+import scala.util.{ Failure, Success }
 
 /**
  *
@@ -59,6 +60,19 @@ class AnnotationV1Api(controller: AnnotationController)(implicit val executor: E
     controller.findByVideoReferenceUUID(uuid, limit, offset)
       .map(_.asJava)
       .map(toJson)
+  }
+
+  get("/videoreference/chunked/:uuid") {
+    val uuid = params.getAs[UUID]("uuid").getOrElse(halt(BadRequest(
+      body = "A video reference 'uuid' parameter is required")))
+    val limit = params.getAs[Int]("limit")
+    val offset = params.getAs[Int]("offset")
+    controller.streamByVideoReferenceUUID(uuid, limit, offset)
+      .andThen({
+        case Success(annotations) => sendChunkedResponse(response, annotations)
+        case Failure(e) =>
+          s"""{"error": "${e.getCause}"} """
+      })
   }
 
   get("/imagereference/:uuid") {

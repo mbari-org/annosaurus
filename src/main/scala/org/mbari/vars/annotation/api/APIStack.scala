@@ -21,6 +21,7 @@ import java.time.format.DateTimeFormatter
 import java.time.{ Duration, Instant }
 import java.util.UUID
 
+import javax.servlet.http.HttpServletResponse
 import org.mbari.vars.annotation.Constants
 import org.mbari.vcr4j.time.Timecode
 import org.scalatra.{ ContentEncodingSupport, FutureSupport, ScalatraServlet }
@@ -73,5 +74,24 @@ abstract class APIStack extends ScalatraServlet
 
   def toJson(obj: Any): String = Constants.GSON.toJson(obj)
   def fromJson[T](json: String, classOfT: Class[T]) = Constants.GSON.fromJson(json, classOfT)
+
+  def sendChunkedResponse[T](response: HttpServletResponse, items: Iterable[T]): Unit = {
+
+    response.setHeader("Transfer-Encoding", "chunked")
+    response.setStatus(200)
+    val out = response.getWriter
+    out.write("[")
+    def write(item: T, remaining: Iterable[T]): Unit = {
+      out.write(toJson(item))
+      out.flush()
+      if (remaining.nonEmpty) {
+        out.write(",")
+        write(remaining.head, remaining.tail)
+      } else out.write("]")
+    }
+    write(items.head, items.tail)
+    out.flush()
+
+  }
 
 }

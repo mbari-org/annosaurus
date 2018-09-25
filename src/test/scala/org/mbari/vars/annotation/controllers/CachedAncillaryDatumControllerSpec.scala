@@ -76,7 +76,7 @@ class CachedAncillaryDatumControllerSpec extends FlatSpec with Matchers with Bef
       c
     })
 
-    exec(() => controller.bulkCreateOrUpdate(cads))
+    exec(() => controller.bulkCreateOUpdate(cads))
 
     imagedMoments.foreach(im => {
       val maybeMoment = exec(() => imagedMomentController.findByUUID(im.uuid))

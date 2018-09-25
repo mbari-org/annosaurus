@@ -14,6 +14,7 @@ val jtdsVersion = "1.3.1"
 val junitVersion = "4.12"
 val logbackVersion = "1.2.3"
 val mssqlVersion = "6.4.0.jre9"
+val rxjavaVersion = "2.2.1"
 val scilubeVersion = "2.0.4"
 val scalatestVersion = "3.0.5"
 val scalatraVersion = "2.6.3"
@@ -94,6 +95,7 @@ lazy val annosaurus = (project in file("."))
       "javax.servlet"            % "javax.servlet-api"              % servletVersion,
       "javax.transaction"        % "jta"                            % jtaVersion,
       "junit"                    % "junit"                          % junitVersion          % "test",
+      "io.reactivex.rxjava2"     % "rxjava"                         % rxjavaVersion,
       "com.microsoft.sqlserver"  % "mssql-jdbc"                     % mssqlVersion,
       //"net.sourceforge.jtds"     % "jtds"                           % jtdsVersion,
       "scilube"                 %% "scilube-core"                   % scilubeVersion,
