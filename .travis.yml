@@ -1,8 +1,8 @@
 language: scala
 scala:
-  - 2.12.4
+  - 2.12.6
 jdk:
-  - oraclejdk8
+  - oraclejdk11
   
 after_success:
   - sbt clean
