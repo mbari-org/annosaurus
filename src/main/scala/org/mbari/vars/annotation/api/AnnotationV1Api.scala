@@ -26,7 +26,6 @@ import org.scalatra.{ BadRequest, NotFound }
 
 import scala.concurrent.ExecutionContext
 import scala.collection.JavaConverters._
-import scala.util.{ Failure, Success }
 
 /**
  *

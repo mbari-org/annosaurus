@@ -16,7 +16,6 @@
 
 package org.mbari.vars.annotation.dao.jpa
 
-import java.sql.Timestamp
 import java.time.{ Duration, Instant }
 import java.util.UUID
 import javax.persistence.{ Convert, Index, _ }

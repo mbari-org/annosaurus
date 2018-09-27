@@ -18,7 +18,7 @@ package org.mbari.vars.annotation.controllers
 
 import java.time.{ Duration, Instant }
 import java.util.UUID
-
+import java.util.concurrent.Executors
 import org.mbari.vars.annotation.dao.jpa.AnnotationImpl
 import org.mbari.vars.annotation.dao.DAO
 import org.mbari.vars.annotation.model.{ Annotation, Observation }
@@ -104,11 +104,23 @@ class AnnotationController(daoFactory: BasicDAOFactory) {
     f.map(AnnotationImpl(_))
   }
 
-  def bulkCreate(annotations: Iterable[Annotation])(implicit ec: ExecutionContext): Future[Seq[AnnotationImpl]] = {
+  def bulkCreate(annotations: Iterable[Annotation]): Future[Seq[AnnotationImpl]] = {
+
+    // We're inserting the annotations using a single thread executor
+    // grouping them into 50 annotation chunks (ie. 50 annotations per
+    // database transactions
+    implicit val ec = ExecutionContext.fromExecutor(Executors.newFixedThreadPool(1))
+
     val obsDao = daoFactory.newObservationDAO()
-    val f = obsDao.runTransaction(d => annotations.map(a => create(d, a)))
-    f.onComplete(_ => obsDao.close())
-    f.map(obsList => obsList.map(AnnotationImpl(_)).toSeq)
+    val futures = annotations.grouped(50)
+      .map(annos => {
+        val f = obsDao.runTransaction(d => annos.map(a => create(d, a)))
+        f.map(obsList => obsList.map(AnnotationImpl(_)).toSeq)
+      })
+
+    val future = Future.sequence(futures)
+    future.onComplete(_ => obsDao.close())
+    future.map(_.flatten.toSeq)
   }
 
   private def create(dao: DAO[_], annotation: Annotation): Observation = {
