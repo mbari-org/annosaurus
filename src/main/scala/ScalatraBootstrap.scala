@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
-import javax.servlet.ServletContext
+import java.util.concurrent.Executors
 
+import javax.servlet.ServletContext
 import org.mbari.vars.annotation.api._
 import org.mbari.vars.annotation.controllers._
 import org.mbari.vars.annotation.dao.jpa.JPADAOFactory
@@ -38,7 +39,9 @@ class ScalatraBootstrap extends LifeCycle {
 
     log.info("STARTING UP NOW")
 
-    implicit val executionContext = ExecutionContext.global
+    implicit val executionContext: ExecutionContext =
+        ExecutionContext.fromExecutor(Executors.newWorkStealingPool())
+    //implicit val executionContext = ExecutionContext.global
 
     val daoFactory: BasicDAOFactory = JPADAOFactory.asInstanceOf[BasicDAOFactory]
     val ancillaryDatumController = new CachedAncillaryDatumController(daoFactory)

@@ -109,7 +109,10 @@ class AnnotationController(daoFactory: BasicDAOFactory) {
     // We're inserting the annotations using a single thread executor
     // grouping them into 50 annotation chunks (ie. 50 annotations per
     // database transactions
-    implicit val ec = ExecutionContext.fromExecutor(Executors.newFixedThreadPool(1))
+
+    // TODO: This thread pool could be dangerous for environments that frequently
+    //       call bulkCreate. Perhaps use a class executor instead of a method?
+    implicit val ec = ExecutionContext.fromExecutor(Executors.newSingleThreadExecutor())
 
     val obsDao = daoFactory.newObservationDAO()
     val futures = annotations.grouped(50)
