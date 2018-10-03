@@ -18,13 +18,16 @@ package org.mbari.vars.annotation.api
 
 import java.time.{ Duration, Instant }
 import java.util.UUID
+import java.util.concurrent.TimeUnit
 
 import org.mbari.vars.annotation.controllers.ImagedMomentController
+import org.mbari.vars.annotation.model.ImagedMoment
 import org.mbari.vars.annotation.model.simple.ObservationCount
 import org.mbari.vcr4j.time.Timecode
 import org.scalatra.{ BadRequest, NoContent, NotFound }
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ Await, ExecutionContext, Future }
+import scala.concurrent.duration.{ Duration => SDuration }
 import scala.collection.JavaConverters._
 /**
  *
@@ -102,8 +105,27 @@ class ImagedMomentV1Api(controller: ImagedMomentController)(implicit val executo
   //       controller.findByConcept(name, limit, offset)
   //         .map(_.asJava)
   //         .map(toJson)
-  //   }
+  //
   // }
+
+  get("/videoreference/chunked/:uuid") {
+    val uuid = params.getAs[UUID]("uuid").getOrElse(halt(BadRequest("Please provide a Video Reference UUID")))
+    val limit = params.getAs[Int]("limit")
+    val offset = params.getAs[Int]("offset")
+    val pageSize = params.getAs[Int]("pagesize").getOrElse(50)
+    val timeoutSeconds = params.getAs[Int]("timeout").getOrElse[Int](20)
+    val timeout = Duration.ofSeconds(timeoutSeconds)
+
+    val end = limit.getOrElse(
+      Await.result(controller.countByVideoReferenceUuid(uuid), timeout))
+    val start = offset.getOrElse(0)
+
+    def fn(limit: Int, offset: Int): Future[Iterable[ImagedMoment]] =
+      controller.findByVideoReferenceUUID(uuid, Some(limit), Some(offset))
+
+    autoPage(response, start, end, pageSize, fn, timeout)
+
+  }
 
   get("/concept/count/:name") {
     val name = params.get("name")
@@ -158,13 +180,6 @@ class ImagedMomentV1Api(controller: ImagedMomentController)(implicit val executo
     controller.findByVideoReferenceUUID(uuid, limit, offset)
       .map(_.asJava)
       .map(toJson)
-  }
-
-  get("/videoreference/chunked/:uuid") {
-    val uuid = params.getAs[UUID]("uuid").getOrElse(halt(BadRequest("Please provide a Video Reference UUID")))
-    val limit = params.getAs[Int]("limit")
-    val offset = params.getAs[Int]("offset")
-    controller.daoFactory.newImagedMomentDAO()
   }
 
   delete("/videoreference/:uuid") {

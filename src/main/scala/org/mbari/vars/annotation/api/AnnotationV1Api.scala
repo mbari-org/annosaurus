@@ -18,13 +18,15 @@ package org.mbari.vars.annotation.api
 
 import java.time.{ Duration, Instant }
 import java.util.UUID
+import java.util.concurrent.TimeUnit
 
 import org.mbari.vars.annotation.controllers.AnnotationController
 import org.mbari.vars.annotation.dao.jpa.AnnotationImpl
+import org.mbari.vars.annotation.model.Annotation
 import org.mbari.vcr4j.time.Timecode
 import org.scalatra.{ BadRequest, NotFound }
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ Await, ExecutionContext, Future }
 import scala.collection.JavaConverters._
 
 /**
@@ -61,18 +63,23 @@ class AnnotationV1Api(controller: AnnotationController)(implicit val executor: E
       .map(toJson)
   }
 
-  //  get("/videoreference/chunked/:uuid") {
-  //    val uuid = params.getAs[UUID]("uuid").getOrElse(halt(BadRequest(
-  //      body = "A video reference 'uuid' parameter is required")))
-  //    val limit = params.getAs[Int]("limit")
-  //    val offset = params.getAs[Int]("offset")
-  //    controller.streamByVideoReferenceUUID(uuid, limit, offset)
-  //      .andThen({
-  //        case Success(annotations) => sendChunkedResponse(response, annotations)
-  //        case Failure(e) =>
-  //          s"""{"error": "${e.getCause}"} """
-  //      })
-  //  }
+  get("/videoreference/chunked/:uuid") {
+    val uuid = params.getAs[UUID]("uuid").getOrElse(halt(BadRequest(
+      body = "A video reference 'uuid' parameter is required")))
+    val limit = params.getAs[Int]("limit")
+    val offset = params.getAs[Int]("offset")
+    val pageSize = params.getAs[Int]("pagesize").getOrElse(50)
+    val timeoutSeconds = params.getAs[Int]("timeout").getOrElse[Int](20)
+    val timeout = Duration.ofSeconds(timeoutSeconds)
+
+    val end = limit.getOrElse(Await.result(controller.countByVideoReferenceUuid(uuid), timeout))
+    val start = offset.getOrElse(0)
+
+    def fn(limit: Int, offset: Int): Future[Iterable[Annotation]] =
+      controller.findByVideoReferenceUUID(uuid, Some(limit), Some(offset))
+
+    autoPage(response, start, end, pageSize, fn, timeout)
+  }
 
   get("/imagereference/:uuid") {
     val uuid = params.getAs[UUID]("uuid").getOrElse(halt(BadRequest(

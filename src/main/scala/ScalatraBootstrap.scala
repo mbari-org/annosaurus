@@ -40,7 +40,7 @@ class ScalatraBootstrap extends LifeCycle {
     log.info("STARTING UP NOW")
 
     implicit val executionContext: ExecutionContext =
-        ExecutionContext.fromExecutor(Executors.newWorkStealingPool())
+      ExecutionContext.fromExecutor(Executors.newWorkStealingPool())
     //implicit val executionContext = ExecutionContext.global
 
     val daoFactory: BasicDAOFactory = JPADAOFactory.asInstanceOf[BasicDAOFactory]

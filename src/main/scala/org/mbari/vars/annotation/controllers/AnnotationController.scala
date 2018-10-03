@@ -34,11 +34,21 @@ import scala.concurrent.{ ExecutionContext, Future }
  */
 class AnnotationController(daoFactory: BasicDAOFactory) {
 
+  // Executor to throttle bulk inserts
+  private[this] val bulkExecutionContext: ExecutionContext = ExecutionContext.fromExecutor(Executors.newFixedThreadPool(2))
+
   def findByUUID(uuid: UUID)(implicit ec: ExecutionContext): Future[Option[Annotation]] = {
     val obsDao = daoFactory.newObservationDAO()
     val f = obsDao.runTransaction(d => obsDao.findByUUID(uuid))
     f.onComplete(_ => obsDao.close())
     f.map(_.map(AnnotationImpl(_)))
+  }
+
+  def countByVideoReferenceUuid(uuid: UUID)(implicit ec: ExecutionContext): Future[Int] = {
+    val dao = daoFactory.newObservationDAO()
+    val f = dao.runTransaction(d => d.countByVideoReferenceUUID(uuid))
+    f.onComplete(_ => dao.close())
+    f
   }
 
   /*
@@ -58,20 +68,6 @@ class AnnotationController(daoFactory: BasicDAOFactory) {
     f.onComplete(t => imDao.close())
     f.map(_.flatMap(AnnotationImpl(_)).toSeq)
   }
-
-  //  def streamByVideoReferenceUUID(
-  //    videoReferenceUUID: UUID,
-  //    limit: Option[Int] = None,
-  //    offset: Option[Int] = None)(implicit ec: ExecutionContext): Iterable[Annotation] = {
-  //
-  //    // TODO run query outside of transaction. Don't return future,just an iterable
-  //    val imDao = daoFactory.newImagedMomentDAO()
-  //    imDao.streamByVideoReferenceUUID(videoReferenceUUID, limit, offset)
-  //
-  //    //    val f = imDao.runTransaction(d => d.streamByVideoReferenceUUID(videoReferenceUUID, limit, offset))
-  //    //    f.onComplete(t => imDao.close())
-  //    //    f.map(_.flatMap(AnnotationImpl(_)).toSeq)
-  //  }
 
   def findByImageReferenceUUID(imageReferenceUUID: UUID)(implicit ec: ExecutionContext): Future[Iterable[Annotation]] = {
 
@@ -106,13 +102,11 @@ class AnnotationController(daoFactory: BasicDAOFactory) {
 
   def bulkCreate(annotations: Iterable[Annotation]): Future[Seq[AnnotationImpl]] = {
 
-    // We're inserting the annotations using a single thread executor
+    // We're inserting the annotations using a fixed thread executor
     // grouping them into 50 annotation chunks (ie. 50 annotations per
     // database transactions
 
-    // TODO: This thread pool could be dangerous for environments that frequently
-    //       call bulkCreate. Perhaps use a class executor instead of a method?
-    implicit val ec = ExecutionContext.fromExecutor(Executors.newSingleThreadExecutor())
+    implicit val ec: ExecutionContext = bulkExecutionContext
 
     val obsDao = daoFactory.newObservationDAO()
     val futures = annotations.grouped(50)

@@ -48,10 +48,10 @@ class ImagedMomentController(val daoFactory: BasicDAOFactory)
   def findByVideoReferenceUUID(uuid: UUID, limit: Option[Int] = None, offset: Option[Int] = None)(implicit ec: ExecutionContext): Future[Iterable[ImagedMoment]] =
     exec(d => d.findByVideoReferenceUUID(uuid, limit, offset))
 
-  //  def streamByVideoReferenceUUID(uuid: UUID, limit: Option[Int] = None, offset: Option[Int] = None)(implicit ec: ExecutionContext): Iterable[ImagedMoment] = {
-  //    val dao = daoFactory.newImagedMomentDAO()
-  //    dao.streamByVideoReferenceUUID(uuid, limit, offset)
-  //  }
+  def streamByVideoReferenceUUID(uuid: UUID, limit: Option[Int] = None, offset: Option[Int] = None)(implicit ec: ExecutionContext): java.util.stream.Stream[ImagedMoment] = {
+    val dao = daoFactory.newImagedMomentDAO()
+    dao.streamByVideoReferenceUUID(uuid, limit, offset)
+  }
 
   def findByImageReferenceUUID(uuid: UUID)(implicit ec: ExecutionContext): Future[Option[ImagedMoment]] = {
     def fn(dao: IMDAO): Option[ImagedMoment] = {
@@ -94,6 +94,9 @@ class ImagedMomentController(val daoFactory: BasicDAOFactory)
 
   def countAllGroupByVideoReferenceUUID()(implicit ec: ExecutionContext): Future[Map[UUID, Int]] =
     exec(dao => dao.countAllByVideoReferenceUuids())
+
+  def countByVideoReferenceUuid(uuid: UUID)(implicit ec: ExecutionContext): Future[Int] =
+    exec(dao => dao.countByVideoReferenceUUID(uuid))
 
   def findByConcept(
     concept: String,

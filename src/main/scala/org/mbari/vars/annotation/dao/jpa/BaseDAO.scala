@@ -80,20 +80,14 @@ abstract class BaseDAO[B <: PersistentObject: ClassTag](val entityManager: Entit
     name: String,
     namedParameters: Map[String, Any] = Map.empty,
     limit: Option[Int] = None,
-    offset: Option[Int] = None)(implicit executionContext: ExecutionContext): Observable[B] = {
+    offset: Option[Int] = None): java.util.stream.Stream[B] = {
 
-    val subject: PublishSubject[B] = PublishSubject.create()
-    executionContext.execute(() => {
-      val query = entityManager.createNamedQuery(name)
-      limit.foreach(query.setMaxResults)
-      offset.foreach(query.setFirstResult)
-      namedParameters.foreach({ case (a, b) => query.setParameter(a, b) })
-      query.getResultStream
-        .forEach(b => subject.onNext(b.asInstanceOf[B]))
-      subject.onComplete()
-    })
-
-    subject
+    val query = entityManager.createNamedQuery(name)
+    limit.foreach(query.setMaxResults)
+    offset.foreach(query.setFirstResult)
+    namedParameters.foreach({ case (a, b) => query.setParameter(a, b) })
+    query.getResultStream
+      .map(b => b.asInstanceOf[B])
   }
 
   def executeNamedQuery(name: String, namedParameters: Map[String, Any] = Map.empty): Int = {

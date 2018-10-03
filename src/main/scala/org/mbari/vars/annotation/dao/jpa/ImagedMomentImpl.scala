@@ -66,9 +66,7 @@ import scala.collection.JavaConverters._
     query = "SELECT video_reference_uuid, COUNT(uuid) as n FROM imaged_moments GROUP BY video_reference_uuid ORDER BY n"),
   new NamedNativeQuery(
     name = "ImagedMoment.countByVideoReferenceUUID",
-    query = "SELECT COUNT(*) imaged_moments im LEFT JOIN " +
-      "observations obs ON obs.imaged_moment_uuid = im.uuid WHERE " +
-      "im.video_reference_uuid = ?1")))
+    query = "SELECT COUNT(*) FROM imaged_moments WHERE video_reference_uuid = ?1")))
 @NamedQueries(Array(
   new NamedQuery(
     name = "ImagedMoment.findAll",

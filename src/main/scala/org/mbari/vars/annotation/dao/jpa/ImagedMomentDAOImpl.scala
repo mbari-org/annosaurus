@@ -132,7 +132,7 @@ class ImagedMomentDAOImpl(entityManager: EntityManager)
     findByNamedQuery("ImagedMoment.findByConceptWithImages", Map("concept" -> concept), limit, offset)
 
   override def countByVideoReferenceUUID(uuid: UUID): Int = {
-    val query = entityManager.createNamedQuery("ImagedMoment.countBetweenUpdatedDates")
+    val query = entityManager.createNamedQuery("ImagedMoment.countByVideoReferenceUUID")
     query.setParameter(1, uuid)
     query.getResultList
       .asScala
@@ -143,8 +143,8 @@ class ImagedMomentDAOImpl(entityManager: EntityManager)
   override def findByVideoReferenceUUID(uuid: UUID, limit: Option[Int], offset: Option[Int]): Iterable[ImagedMomentImpl] =
     findByNamedQuery("ImagedMoment.findByVideoReferenceUUID", Map("uuid" -> uuid), limit, offset)
 
-  //  override def streamByVideoReferenceUUID(uuid: UUID, limit: Option[Int], offset: Option[Int]): Iterable[ImagedMomentImpl] =
-  //    streamByNamedQuery("ImagedMoment.findByVideoReferenceUUID", Map("uuid" -> uuid), limit, offset)
+  override def streamByVideoReferenceUUID(uuid: UUID, limit: Option[Int], offset: Option[Int]): java.util.stream.Stream[ImagedMomentImpl] =
+    streamByNamedQuery("ImagedMoment.findByVideoReferenceUUID", Map("uuid" -> uuid), limit, offset)
 
   override def findWithImageReferences(videoReferenceUUID: UUID): Iterable[ImagedMomentImpl] =
     findByNamedQuery("ImagedMoment.findWithImageReferences", Map("uuid" -> videoReferenceUUID))
