@@ -44,6 +44,6 @@ object ApiAuthenticationSupport {
   def authorizationService: AuthorizationService = {
     val serviceName = appConfig.getString("authentication.service")
     val clazz = Class.forName(serviceName)
-    clazz.newInstance().asInstanceOf[AuthorizationService]
+    clazz.getDeclaredConstructor().newInstance().asInstanceOf[AuthorizationService]
   }
 }

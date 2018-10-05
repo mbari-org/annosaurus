@@ -18,7 +18,6 @@ package org.mbari.vars.annotation.api
 
 import java.time.{ Duration, Instant }
 import java.util.UUID
-import java.util.concurrent.TimeUnit
 
 import org.mbari.vars.annotation.controllers.AnnotationController
 import org.mbari.vars.annotation.dao.jpa.AnnotationImpl
@@ -72,8 +71,22 @@ class AnnotationV1Api(controller: AnnotationController)(implicit val executor: E
     val timeoutSeconds = params.getAs[Int]("timeout").getOrElse[Int](20)
     val timeout = Duration.ofSeconds(timeoutSeconds)
 
-    val end = limit.getOrElse(Await.result(controller.countByVideoReferenceUuid(uuid), timeout))
     val start = offset.getOrElse(0)
+    val end = limit match {
+      case Some(i) => start + i
+      case None => Await.result(controller.countByVideoReferenceUuid(uuid), timeout)
+    }
+
+    val msg =
+      s""" Running chunk lookup for $uuid
+         |  limit     = ${limit.map(_.toString).getOrElse("undefined")}
+         |  offset    = ${offset.map(_.toString).getOrElse("undefined")}
+         |  pagesize  = $pageSize
+         |  timeout   = $timeoutSeconds seconds
+         |  start idx = $start
+         |  end idx   = $end
+       """.stripMargin
+    log.debug(msg)
 
     def fn(limit: Int, offset: Int): Future[Iterable[Annotation]] =
       controller.findByVideoReferenceUUID(uuid, Some(limit), Some(offset))
@@ -175,6 +188,10 @@ class AnnotationV1Api(controller: AnnotationController)(implicit val executor: E
       case _ =>
         halt(BadRequest("Puts to tapetime only accept JSON body (i.e. Content-Type: application/json)"))
     }
+  }
+
+  get("/test") {
+    response.
   }
 
 }

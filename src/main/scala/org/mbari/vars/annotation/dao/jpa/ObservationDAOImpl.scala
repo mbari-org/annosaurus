@@ -53,7 +53,7 @@ class ObservationDAOImpl(entityManager: EntityManager)
   }
 
   override def findByVideoReferenceUUID(uuid: UUID, limit: Option[Int] = None, offset: Option[Int] = None): Iterable[ObservationImpl] =
-    findByNamedQuery("Observation.findByVideoReferenceUUID", Map("uuid" -> uuid))
+    findByNamedQuery("Observation.findByVideoReferenceUUID", Map("uuid" -> uuid), limit, offset)
 
   /**
    *

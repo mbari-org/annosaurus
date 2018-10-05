@@ -41,7 +41,6 @@ class ScalatraBootstrap extends LifeCycle {
 
     implicit val executionContext: ExecutionContext =
       ExecutionContext.fromExecutor(Executors.newWorkStealingPool())
-    //implicit val executionContext = ExecutionContext.global
 
     val daoFactory: BasicDAOFactory = JPADAOFactory.asInstanceOf[BasicDAOFactory]
     val ancillaryDatumController = new CachedAncillaryDatumController(daoFactory)

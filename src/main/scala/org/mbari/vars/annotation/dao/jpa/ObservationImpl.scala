@@ -53,7 +53,7 @@ import org.mbari.vars.annotation.model.{ Association, ImagedMoment, Observation 
   new NamedNativeQuery(
     name = "Observation.countByVideoReferenceUUID",
     query = "SELECT COUNT(uuid) FROM observations WHERE imaged_moment_uuid IN " +
-      "(SELECT im.uuid FROM imaged_moments im  LEFT JOIN observations obs " +
+      "(SELECT DISTINCT im.uuid FROM imaged_moments im LEFT JOIN observations obs " +
       "ON obs.imaged_moment_uuid = im.uuid WHERE " +
       "im.video_reference_uuid = ?1)"),
   new NamedNativeQuery(

@@ -126,6 +126,8 @@ abstract class APIStack extends ScalatraServlet
     fn: (Int, Int) => Future[Iterable[T]],
     timeout: Duration = Duration.ofSeconds(20)): Unit = {
 
+    log.debug(s"Executing: autoPage(..., $start, $end, $pageSize, ..., ...)")
+
     response.setHeader("Transfer-Encoding", "chunked")
     response.setStatus(200)
     val out = response.getWriter
@@ -143,7 +145,9 @@ abstract class APIStack extends ScalatraServlet
     out.write("[")
     for (j <- start to end by pageSize) {
       val prependComma = j > start
-      processChunk(pageSize, j, prependComma)
+      val limit = if (j + pageSize > end) end - j else pageSize
+      log.debug(s"Executing: autoPage::processChunk($limit, $j, $prependComma)")
+      processChunk(limit, j, prependComma)
     }
     out.write("]")
     out.flush()

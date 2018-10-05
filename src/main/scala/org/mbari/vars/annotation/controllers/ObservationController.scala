@@ -118,7 +118,7 @@ class ObservationController(val daoFactory: BasicDAOFactory)
   }
 
   def findByVideoReferenceUUID(uuid: UUID, limit: Option[Int] = None, offset: Option[Int] = None)(implicit ec: ExecutionContext): Future[Iterable[Observation]] = {
-    def fn(dao: ODAO): Iterable[Observation] = dao.findByVideoReferenceUUID(uuid)
+    def fn(dao: ODAO): Iterable[Observation] = dao.findByVideoReferenceUUID(uuid, limit, offset)
     exec(fn)
   }
 

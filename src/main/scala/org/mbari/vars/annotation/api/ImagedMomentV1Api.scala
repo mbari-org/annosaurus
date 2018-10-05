@@ -18,7 +18,6 @@ package org.mbari.vars.annotation.api
 
 import java.time.{ Duration, Instant }
 import java.util.UUID
-import java.util.concurrent.TimeUnit
 
 import org.mbari.vars.annotation.controllers.ImagedMomentController
 import org.mbari.vars.annotation.model.ImagedMoment
@@ -27,7 +26,6 @@ import org.mbari.vcr4j.time.Timecode
 import org.scalatra.{ BadRequest, NoContent, NotFound }
 
 import scala.concurrent.{ Await, ExecutionContext, Future }
-import scala.concurrent.duration.{ Duration => SDuration }
 import scala.collection.JavaConverters._
 /**
  *
@@ -116,9 +114,11 @@ class ImagedMomentV1Api(controller: ImagedMomentController)(implicit val executo
     val timeoutSeconds = params.getAs[Int]("timeout").getOrElse[Int](20)
     val timeout = Duration.ofSeconds(timeoutSeconds)
 
-    val end = limit.getOrElse(
-      Await.result(controller.countByVideoReferenceUuid(uuid), timeout))
     val start = offset.getOrElse(0)
+    val end = limit match {
+      case Some(i) => start + i
+      case None => Await.result(controller.countByVideoReferenceUuid(uuid), timeout)
+    }
 
     def fn(limit: Int, offset: Int): Future[Iterable[ImagedMoment]] =
       controller.findByVideoReferenceUUID(uuid, Some(limit), Some(offset))
