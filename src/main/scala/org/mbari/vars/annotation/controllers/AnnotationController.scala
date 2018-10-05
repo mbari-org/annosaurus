@@ -35,7 +35,7 @@ import scala.concurrent.{ ExecutionContext, Future }
 class AnnotationController(daoFactory: BasicDAOFactory) {
 
   // Executor to throttle bulk inserts
-  private[this] val bulkExecutionContext: ExecutionContext = ExecutionContext.fromExecutor(Executors.newFixedThreadPool(2))
+  //private[this] val bulkExecutionContext: ExecutionContext = ExecutionContext.fromExecutor(Executors.newFixedThreadPool(1))
 
   def findByUUID(uuid: UUID)(implicit ec: ExecutionContext): Future[Option[Annotation]] = {
     val obsDao = daoFactory.newObservationDAO()
@@ -111,7 +111,7 @@ class AnnotationController(daoFactory: BasicDAOFactory) {
     // grouping them into 50 annotation chunks (ie. 50 annotations per
     // database transactions
 
-    implicit val ec: ExecutionContext = bulkExecutionContext
+    implicit val ec: ExecutionContext = ExecutionContext.fromExecutor(Executors.newSingleThreadExecutor())
 
     val obsDao = daoFactory.newObservationDAO()
     val futures = annotations.grouped(50)

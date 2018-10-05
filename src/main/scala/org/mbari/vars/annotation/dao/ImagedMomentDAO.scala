@@ -90,9 +90,21 @@ trait ImagedMomentDAO[T <: ImagedMoment] extends DAO[T] {
     timecode: Option[Timecode] = None,
     elapsedTime: Option[Duration] = None,
     recordedDate: Option[Instant] = None): Option[T] = {
-    var imagedMoment = timecode.flatMap(findByVideoReferenceUUIDAndTimecode(uuid, _))
-    imagedMoment = if (imagedMoment.isDefined) imagedMoment else elapsedTime.flatMap(findByVideoReferenceUUIDAndElapsedTime(uuid, _))
-    if (imagedMoment.isDefined) imagedMoment else recordedDate.flatMap(findByVideoReferenceUUIDAndRecordedDate(uuid, _))
+
+    // timecode has subsecond resolution. Often recordedDate is stored only
+    // to second resolution.If timecode is defined we will match only on that.
+    // Otherwise, this method ends up finding a matching recordedDate that may
+    // have another, different timecode associated with it.
+    timecode match {
+      case Some(tc) =>
+        findByVideoReferenceUUIDAndTimecode(uuid, tc)
+      case None =>
+        elapsedTime.flatMap(findByVideoReferenceUUIDAndElapsedTime(uuid, _)) match {
+          case None =>
+            recordedDate.flatMap(findByVideoReferenceUUIDAndRecordedDate(uuid, _))
+          case im: Some[T] => im
+        }
+    }
   }
 
   def findByObservationUUID(uuid: UUID): Option[T]
