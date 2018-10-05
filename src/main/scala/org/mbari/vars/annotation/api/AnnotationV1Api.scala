@@ -189,9 +189,6 @@ class AnnotationV1Api(controller: AnnotationController)(implicit val executor: E
         halt(BadRequest("Puts to tapetime only accept JSON body (i.e. Content-Type: application/json)"))
     }
   }
-
-  get("/test") {
-    response.
-  }
+  
 
 }
