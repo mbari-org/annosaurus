@@ -16,7 +16,6 @@
 
 package org.mbari.vars.annotation.math
 
-//import org.slf4j.LoggerFactory
 import scilube.Matlib
 
 /**
@@ -26,8 +25,6 @@ import scilube.Matlib
  * @since 2015-03-02T16:20:00
  */
 object FastCollator {
-
-  //private[this] val log = LoggerFactory.getLogger(getClass)
 
   def apply[A: Numeric, B: Numeric](
     a: Iterable[A],
@@ -44,28 +41,28 @@ object FastCollator {
   }
 
   def apply[A, B](
-    d0: Iterable[A],
-    fn0: A => Double,
-    d1: Iterable[B],
-    fn1: B => Double,
+    a: Iterable[A],
+    fnA: A => Double,
+    b: Iterable[B],
+    fnB: B => Double,
     tolerance: Double): Seq[(A, Option[B])] = {
 
-    val list0 = d0.toSeq.sortBy(fn0) // sorted d0
-    val list1 = d1.toSeq.sortBy(fn1) // sorted d1
+    val listA = a.toSeq.sortBy(fnA) // sorted d0
+    val listB = b.toSeq.sortBy(fnB) // sorted d1
 
-    val vs0 = list0.map(fn0).toArray // transformed d0 in same order as list0
-    val vs1 = list1.map(fn1).toArray // transformed d1 in same order as list1
+    val valuesA = listA.map(fnA).toArray // transformed d0 in same order as list0
+    val valuesB = listB.map(fnB).toArray // transformed d1 in same order as list1
 
     val tmp = for {
-      (v0, i0) <- vs0.zipWithIndex
+      (vA, iA) <- valuesA.zipWithIndex
     } yield {
-      val i1 = Matlib.near(vs1, v0)
-      val nearest = if (i1 >= 0) {
-        val v1 = vs1(i1)
-        if (math.abs(v0 - v1) <= tolerance) Option(list1(i1))
+      val iB = Matlib.near(valuesB, vA, false)
+      val nearest = if (iB >= 0) {
+        val vB = valuesB(iB)
+        if (math.abs(vA - vB) <= tolerance) Option(listB(iB))
         else None
       } else None
-      list0(i0) -> nearest
+      listA(iA) -> nearest
     }
     tmp.toSeq
   }

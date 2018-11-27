@@ -59,15 +59,15 @@ class ImagedMomentDAOSpec extends FlatSpec with Matchers with BeforeAndAfterAll 
   it should "update" in {
     val timecode = new Timecode(2345, 29.97)
     run(d => {
-      val im = d.findByVideoReferenceUUID(videoReferenceUUID).headOption
+      val im = d.findByVideoReferenceUUID(videoReferenceUUID)
+        .find(_.uuid == imagedMoment0.uuid)
       im shouldBe defined
       im.get.timecode = timecode
     })
 
     val imagedMoment = run(_.findByVideoReferenceUUID(videoReferenceUUID))
-      .filter(_.uuid == imagedMoment0.uuid)
-      .headOption
-    imagedMoment should not be (empty)
+      .find(_.uuid == imagedMoment0.uuid)
+    imagedMoment should not be empty
     imagedMoment.get.timecode should not be null
     imagedMoment.get.timecode.toString should be(timecode.toString)
   }

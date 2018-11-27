@@ -17,7 +17,6 @@
 package org.mbari.vars.annotation.dao.jpa
 
 import java.net.URL
-import java.sql.Timestamp
 import javax.persistence._
 
 import com.google.gson.annotations.{ Expose, SerializedName }

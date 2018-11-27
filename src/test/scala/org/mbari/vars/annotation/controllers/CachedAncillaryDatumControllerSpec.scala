@@ -95,6 +95,7 @@ class CachedAncillaryDatumControllerSpec extends FlatSpec with Matchers with Bef
     val cads = imagedMoments.zipWithIndex
       .map({
         case (im, idx) =>
+          //val ts = im.recordedDate.plusMillis(1000)
           val ts = Instant.ofEpochMilli(minEpochMillis + idx * 10 * 1000 + 1000)
           val c = new CachedAncillaryDatumBean
           c.recordedTimestamp = Some(ts)

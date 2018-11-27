@@ -17,8 +17,6 @@
 package org.mbari.vars.annotation.dao
 
 import java.net.URL
-import java.time.Instant
-import java.util.UUID
 
 import org.mbari.vars.annotation.model.ImageReference
 

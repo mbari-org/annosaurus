@@ -19,7 +19,7 @@ package org.mbari.vars.annotation.model.simple
 import java.time.Instant
 import java.util.UUID
 
-import com.google.gson.annotations.{ Expose, JsonAdapter }
+import com.google.gson.annotations.Expose
 import org.mbari.vars.annotation.model.{ CachedAncillaryDatum, ImagedMoment }
 
 /**

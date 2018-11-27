@@ -1,4 +1,4 @@
-FROM openjdk:11-jre
+FROM openjdk:11
 
 MAINTAINER Brian Schlining <bschlining@gmail.com>
 

@@ -37,6 +37,7 @@ class FastCollatorSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
       Some(15.0), None, Some(20D), None)
     for (i <- f.indices) {
       val (_, actual) = f(i)
+      //println(actual + " -> " + expected(i))
       actual should be(expected(i))
     }
   }

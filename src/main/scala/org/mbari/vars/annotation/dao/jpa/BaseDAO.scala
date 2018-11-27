@@ -18,8 +18,6 @@ package org.mbari.vars.annotation.dao.jpa
 
 import java.util.UUID
 
-import io.reactivex.Observable
-import io.reactivex.subjects.PublishSubject
 import javax.persistence.EntityManager
 import org.mbari.vars.annotation.PersistentObject
 import org.mbari.vars.annotation.dao.DAO

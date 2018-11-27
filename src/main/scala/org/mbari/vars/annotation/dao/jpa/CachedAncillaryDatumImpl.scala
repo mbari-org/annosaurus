@@ -16,10 +16,9 @@
 
 package org.mbari.vars.annotation.dao.jpa
 
-import java.sql.Timestamp
 import javax.persistence.{ CascadeType, JoinColumn, _ }
 
-import com.google.gson.annotations.{ Expose, JsonAdapter }
+import com.google.gson.annotations.Expose
 import org.mbari.vars.annotation.model.{ CachedAncillaryDatum, ImagedMoment }
 
 /**
