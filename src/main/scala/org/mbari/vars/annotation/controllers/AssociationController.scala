@@ -115,6 +115,14 @@ class AssociationController(val daoFactory: BasicDAOFactory)
     exec(fn)
   }
 
+  def findByLinkNameAndVideoReferenceUUIDAndConcept(
+    linkName: String,
+    videoReferenceUUID: UUID,
+    concept: Option[String] = None)(implicit ec: ExecutionContext): Future[Iterable[Association]] = {
+    def fn(dao: ADAO): Iterable[Association] = dao.findByLinkNameAndVideoReferenceUUIDAndConcept(linkName, videoReferenceUUID, concept)
+    exec(fn)
+  }
+
   def countByToConcept(concept: String)(implicit ec: ExecutionContext): Future[Int] = {
     def fn(dao: ADAO): Int = dao.countByToConcept(concept)
     exec(fn)

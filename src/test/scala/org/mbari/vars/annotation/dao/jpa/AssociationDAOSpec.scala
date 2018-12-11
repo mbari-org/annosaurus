@@ -91,10 +91,30 @@ class AssociationDAOSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     ass.size should be(1)
   }
 
-  it should "deleteByUUID" in {
-    run(_.deleteByUUID(association0.uuid))
-    val obs = run(_.findByUUID(association0.uuid))
-    obs shouldBe empty
+  it should "findByLinkNameAndVideoReferenceUUID when matches are present" in {
+    val ass = run(_.findByLinkNameAndVideoReferenceUUID("surface-color", videoReferenceUUID))
+    ass.size should be(1)
+  }
+
+  it should "findByLinkNameAndVideoReferenceUUID when matches are absent" in {
+    val ass = run(_.findByLinkNameAndVideoReferenceUUID("bottom-color", videoReferenceUUID))
+    ass.size should be(0)
+  }
+
+  it should "findByLinkNameAndVideoReferenceUUIDAndConcept when matches are present" in {
+    val ass = run(_.findByLinkNameAndVideoReferenceUUIDAndConcept(
+      "surface-color",
+      videoReferenceUUID,
+      Some("Grimpoteuthis")))
+    ass.size should be(1)
+  }
+
+  it should "findByLinkNameAndVideoReferenceUUIDAndConcept when matches are absent" in {
+    val assNon = run(_.findByLinkNameAndVideoReferenceUUIDAndConcept(
+      "surface-color",
+      videoReferenceUUID,
+      Some("Nanomia")))
+    assNon.size should be(0)
   }
 
   it should "delete" in {

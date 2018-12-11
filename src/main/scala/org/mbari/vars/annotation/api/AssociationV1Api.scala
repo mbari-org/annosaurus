@@ -53,7 +53,8 @@ class AssociationV1Api(controller: AssociationController)(implicit val executor:
   get("/:video_reference_uuid/:link_name") {
     val videoReferenceUUID = params.getAs[UUID]("video_reference_uuid").getOrElse(halt(BadRequest("Please provide a video-reference 'uuid'")))
     val linkName = params.get("link_name").getOrElse(halt(BadRequest("A 'link_name' parameter is required")))
-    controller.findByLinkNameAndVideoReferenceUUID(linkName, videoReferenceUUID)
+    val concept = params.get("concept")
+    controller.findByLinkNameAndVideoReferenceUUIDAndConcept(linkName, videoReferenceUUID, concept)
       .map(as => toJson(as.asJava))
   }
 

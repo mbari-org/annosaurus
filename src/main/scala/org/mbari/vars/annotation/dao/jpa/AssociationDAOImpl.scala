@@ -51,10 +51,44 @@ class AssociationDAOImpl(entityManager: EntityManager)
   override def findByLinkName(linkName: String): Iterable[AssociationImpl] =
     findByNamedQuery("Association.findByLinkName", Map("linkName" -> linkName))
 
-  override def findByLinkNameAndVideoReferenceUUID(linkName: String, videoReferenceUUID: UUID): Iterable[AssociationImpl] =
-    findByNamedQuery(
-      "Association.findByLinkNameAndVideoReferenceUUID",
-      Map("linkName" -> linkName, "videoReferenceUuid" -> videoReferenceUUID))
+  //  override def findByLinkNameAndVideoReferenceUUID(linkName: String, videoReferenceUUID: UUID): Iterable[AssociationImpl] =
+  //    findByNamedQuery(
+  //      "Association.findByLinkNameAndVideoReferenceUUID",
+  //      Map("linkName" -> linkName, "videoReferenceUuid" -> videoReferenceUUID))
+
+  override def findByLinkNameAndVideoReferenceUUID(linkName: String, videoReferenceUUID: UUID): Iterable[AssociationImpl] = {
+    findByLinkNameAndVideoReferenceUUIDAndConcept(linkName, videoReferenceUUID, None)
+  }
+
+  def findByLinkNameAndVideoReferenceUUIDAndConcept(
+    linkName: String,
+    videoReferenceUUID: UUID,
+    concept: Option[String] = None): Iterable[AssociationImpl] = {
+    // HACK We are experiencing performance issues with the JPQL query. This
+    // version is native SQL. Faster, but type casting is not pretty
+    val query = entityManager.createNamedQuery("Association.findByLinkNameAndVideoReference")
+    query.setParameter(1, videoReferenceUUID.toString)
+    query.setParameter(2, linkName)
+    // Concept -> Association map
+    val tuples = query.getResultList
+      .asScala
+      .map(obj => obj.asInstanceOf[Array[Object]])
+      .map(obj => obj(0) -> {
+        val ass = newPersistentObject(
+          obj(2).asInstanceOf[String],
+          Option(obj(3).asInstanceOf[String]),
+          Option(obj(4).asInstanceOf[String]),
+          Option(obj(5).asInstanceOf[String]))
+        ass.uuid = UUID.fromString(obj(1).asInstanceOf[String])
+        ass
+      })
+
+    // Filter for a particular concept name
+    concept match {
+      case None => tuples.map(_._2)
+      case Some(c) => tuples.filter(_._1 == c).map(_._2)
+    }
+  }
 
   override def findAll(): Iterable[AssociationImpl] =
     findByNamedQuery("Association.findAll")
@@ -80,3 +114,4 @@ class AssociationDAOImpl(entityManager: EntityManager)
     query.executeUpdate()
   }
 }
+

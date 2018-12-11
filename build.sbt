@@ -25,9 +25,9 @@ val vcr4jVersion = "4.0.2"
 
 lazy val buildSettings = Seq(
   organization := "org.mbari.vars",
-  version := "0.1.3",
-  scalaVersion in ThisBuild := "2.12.7",
-  crossScalaVersions := Seq("2.12.7"),
+  version := "0.1.4",
+  scalaVersion in ThisBuild := "2.12.8",
+  crossScalaVersions := Seq("2.12.8"),
   organizationName := "Monterey Bay Aquarium Research Institute",
   startYear := Some(2017),
   licenses += ("Apache-2.0", new URL("https://www.apache.org/licenses/LICENSE-2.0.txt"))
