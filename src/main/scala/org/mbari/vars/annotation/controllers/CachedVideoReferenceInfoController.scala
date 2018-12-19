@@ -89,7 +89,7 @@ class CachedVideoReferenceInfoController(val daoFactory: BasicDAOFactory)
       val v = dao.newPersistentObject()
       v.videoReferenceUUID = videoReferenceUUID
       v.platformName = platformName
-      v.missionID = missionID
+      v.missionId = missionID
       missionContact.foreach(v.missionContact = _)
       dao.create(v)
       v
@@ -109,7 +109,7 @@ class CachedVideoReferenceInfoController(val daoFactory: BasicDAOFactory)
       case Some(v) =>
         videoReferenceUUID.foreach(v.videoReferenceUUID = _)
         platformName.foreach(v.platformName = _)
-        missionID.foreach(v.missionID = _)
+        missionID.foreach(v.missionId = _)
         missionContact.foreach(v.missionContact = _)
         Some(v)
     }

@@ -66,7 +66,7 @@ class CachedVideoReferenceInfoV1ApiSpec extends WebApiStack {
           val vi = gson.fromJson(body, classOf[CachedVideoReferenceInfoImpl])
           vi.videoReferenceUUID should not be (null)
           vi.missionContact should be("brian")
-          vi.missionID should be(i.toString)
+          vi.missionId should be(i.toString)
           vi.platformName should be(s"Ventana_$i")
           videoinfos += vi
         }
@@ -79,7 +79,7 @@ class CachedVideoReferenceInfoV1ApiSpec extends WebApiStack {
       val vis = gson.fromJson(body, classOf[Array[CachedVideoReferenceInfoImpl]])
       vis.size should be(n)
       vis.map(_.platformName) should contain theSameElementsAs videoinfos.map(_.platformName)
-      vis.map(_.missionID) should contain theSameElementsAs videoinfos.map(_.missionID)
+      vis.map(_.missionId) should contain theSameElementsAs videoinfos.map(_.missionId)
       vis.map(_.videoReferenceUUID) should contain theSameElementsAs videoinfos.map(_.videoReferenceUUID)
       vis.map(_.missionContact) should contain theSameElementsAs videoinfos.map(_.missionContact)
     }
@@ -102,7 +102,7 @@ class CachedVideoReferenceInfoV1ApiSpec extends WebApiStack {
           val v2 = gson.fromJson(body, classOf[CachedVideoReferenceInfoImpl])
           v2.videoReferenceUUID should be(v.videoReferenceUUID)
           v2.missionContact should be("schlin")
-          v2.missionID should be(s"xxx$i")
+          v2.missionId should be(s"xxx$i")
           v2.platformName should be("Doc Ricketts")
         }
     }

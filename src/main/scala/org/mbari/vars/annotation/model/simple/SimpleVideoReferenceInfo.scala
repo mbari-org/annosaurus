@@ -37,5 +37,5 @@ object SimpleVideoReferenceInfo {
 
   def apply(info: CachedVideoReferenceInfo): SimpleVideoReferenceInfo =
     new SimpleVideoReferenceInfo(info.uuid, info.videoReferenceUUID, info.platformName,
-      info.missionID, info.missionContact)
+      info.missionId, info.missionContact)
 }

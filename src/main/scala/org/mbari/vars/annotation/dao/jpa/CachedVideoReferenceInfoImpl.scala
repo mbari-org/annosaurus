@@ -56,7 +56,7 @@ import org.mbari.vars.annotation.model.CachedVideoReferenceInfo
     query = "SELECT v FROM CachedVideoReferenceInfo v WHERE v.platformName = :name ORDER BY v.uuid"),
   new NamedQuery(
     name = "VideoReferenceInfo.findByMissionID",
-    query = "SELECT v FROM CachedVideoReferenceInfo v WHERE v.missionID = :id ORDER BY v.uuid"),
+    query = "SELECT v FROM CachedVideoReferenceInfo v WHERE v.missionId = :id ORDER BY v.uuid"),
   new NamedQuery(
     name = "VideoReferenceInfo.findByMissionContact",
     query = "SELECT v FROM CachedVideoReferenceInfo v WHERE v.missionContact = :contact ORDER BY v.uuid")))
@@ -93,7 +93,7 @@ class CachedVideoReferenceInfoImpl extends CachedVideoReferenceInfo with JPAPers
     name = "mission_id",
     nullable = false,
     length = 256)
-  override var missionID: String = _
+  override var missionId: String = _
 
 }
 
@@ -106,7 +106,7 @@ object CachedVideoReferenceInfoImpl {
 
     val d = new CachedVideoReferenceInfoImpl
     d.videoReferenceUUID = videoReferenceUUID
-    d.missionID = missionID
+    d.missionId = missionID
     d.platformName = platformName
     missionContact.foreach(d.missionContact = _)
     d
