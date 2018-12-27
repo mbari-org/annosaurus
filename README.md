@@ -2,7 +2,7 @@
 
 # annosaurus
 
-[![Build Status](https://travis-ci.org/mbari-media-management/annosaurus.svg?branch=master)](https://travis-ci.org/mbari-media-management/annosaurus)
+[![Build Status](https://travis-ci.org/mbari-media-management/annosaurus.svg?branch=master)](https://travis-ci.org/mbari-media-management/annosaurus)  [![DOI](https://zenodo.org/badge/90171432.svg)](https://zenodo.org/badge/latestdoi/90171432)
 
 ## tl;dr
 
