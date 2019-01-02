@@ -23,13 +23,14 @@ import com.google.gson.annotations.{ Expose, SerializedName }
 import org.mbari.vars.annotation.model.CachedVideoReferenceInfo
 
 /**
- *
+ * idx_video_reference_uuid_vri
  *
  * @author Brian Schlining
  * @since 2016-06-17T15:33:00
  */
 @Entity(name = "CachedVideoReferenceInfo")
-@Table(name = "video_reference_information")
+@Table(name = "video_reference_information", indexes = Array(
+  new Index(name = "idx_video_reference_uuid_vri", columnList = "video_reference_uuid")))
 @EntityListeners(value = Array(classOf[TransactionLogger]))
 @NamedNativeQueries(Array(
   new NamedNativeQuery(
