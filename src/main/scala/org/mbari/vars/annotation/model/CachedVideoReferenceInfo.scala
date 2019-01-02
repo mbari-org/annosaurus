@@ -32,7 +32,7 @@ trait CachedVideoReferenceInfo extends PersistentObject {
   var uuid: UUID
   var videoReferenceUUID: UUID
   var platformName: String
-  var missionID: String
+  var missionId: String
   var missionContact: String
   def lastUpdated: Option[Instant]
 

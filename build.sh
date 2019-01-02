@@ -2,6 +2,13 @@
 
 echo "--- Building annosaurus (reminder: run docker login first!!)"
 
+BUILD_DATE=`date -u +"%Y-%m-%dT%H:%M:%SZ"`
+VCS_REF=`git rev-parse --short HEAD`
+
+
 sbt pack && \
-    docker build -t mbari/annosaurus . && \
+    docker build --build-arg BUILD_DATE=$BUILD_DATE \
+                 --build-arg VCS_REF=$VCS_REF \
+                  -t mbari/annosaurus:${VCS_REF} \
+                  -t mbari/annosaurus:latest . & \
     docker push mbari/annosaurus
