@@ -1,5 +1,6 @@
 # SBT - Simple Build Tool
 
+
 ## Useful [SBT commands](http://www.scala-sbt.org/release/docs/Command-Line-Reference.html) for this project
 
 - `checkVersions`: Show dependency updates
