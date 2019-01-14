@@ -141,7 +141,8 @@ class ImagedMomentImpl extends ImagedMoment with JPAPersistentObject {
   @SerializedName(value = "video_reference_uuid")
   @Column(
     name = "video_reference_uuid",
-    nullable = true)
+    nullable = true,
+    columnDefinition = "CHAR(36)")
   @Convert(converter = classOf[UUIDConverter])
   override var videoReferenceUUID: UUID = _
 

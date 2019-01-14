@@ -92,7 +92,10 @@ class AssociationImpl extends Association with JPAPersistentObject {
     cascade = Array(CascadeType.PERSIST, CascadeType.DETACH),
     optional = false,
     targetEntity = classOf[ObservationImpl])
-  @JoinColumn(name = "observation_uuid", nullable = false)
+  @JoinColumn(
+    name = "observation_uuid",
+    nullable = false,
+    columnDefinition = "CHAR(36)")
   override var observation: Observation = _
 
   @Expose(serialize = true)

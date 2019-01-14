@@ -85,7 +85,8 @@ class CachedVideoReferenceInfoImpl extends CachedVideoReferenceInfo with JPAPers
   @Column(
     name = "video_reference_uuid",
     nullable = false,
-    unique = true)
+    unique = true,
+    columnDefinition = "CHAR(36)")
   @Convert(converter = classOf[UUIDConverter])
   override var videoReferenceUUID: UUID = _
 

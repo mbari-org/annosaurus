@@ -37,7 +37,8 @@ trait HasUUID extends PersistentObject {
     name = "uuid",
     nullable = false,
     updatable = false,
-    length = 36)
+    length = 36,
+    columnDefinition = "CHAR(36)")
   @Convert(converter = classOf[UUIDConverter])
   var uuid: UUID = _
 
