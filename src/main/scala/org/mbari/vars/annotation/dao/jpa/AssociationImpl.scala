@@ -29,9 +29,10 @@ import org.mbari.vars.annotation.model.{ Association, Observation }
  */
 @Entity(name = "Association")
 @Table(name = "associations", indexes = Array(
-  new Index(name = "idx_link_name", columnList = "link_name"),
-  new Index(name = "idx_link_value", columnList = "link_value"),
-  new Index(name = "idx_to_concept", columnList = "to_concept")))
+  new Index(name = "idx_associations__link_name", columnList = "link_name"),
+  new Index(name = "idx_associations__link_value", columnList = "link_value"),
+  new Index(name = "idx_associations__to_concept", columnList = "to_concept"),
+  new Index(name = "idx_associations__observation_uuid", columnList = "observation_uuid")))
 @EntityListeners(value = Array(classOf[TransactionLogger]))
 @NamedNativeQueries(Array(
   new NamedNativeQuery(

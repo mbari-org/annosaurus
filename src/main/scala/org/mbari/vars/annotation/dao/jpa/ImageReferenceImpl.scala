@@ -30,7 +30,8 @@ import org.mbari.vars.annotation.model.{ ImageReference, ImagedMoment }
  */
 @Entity(name = "ImageReference")
 @Table(name = "image_references", indexes = Array(
-  new Index(name = "idx_url", columnList = "url")))
+  new Index(name = "idx_image_references__url", columnList = "url"),
+  new Index(name = "idx_image_references__imaged_moment_uuid", columnList = "imaged_moment_uuid")))
 @EntityListeners(value = Array(classOf[TransactionLogger]))
 @NamedQueries(Array(
   new NamedQuery(

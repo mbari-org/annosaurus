@@ -28,7 +28,9 @@ import org.mbari.vars.annotation.model.{ CachedAncillaryDatum, ImagedMoment }
  * @since 2016-06-17T15:17:00
  */
 @Entity(name = "AncillaryDatum")
-@Table(name = "ancillary_data")
+@Table(name = "ancillary_data", indexes = Array(
+  new Index(name = "idx_ancillary_data__imaged_moment_uuid", columnList = "imaged_moment_uuid"),
+  new Index(name = "idx_ancillary_data__position", columnList = "latitude,longitude,depth_meters"))) //idx_ancillary_data_fk_im
 @EntityListeners(value = Array(classOf[TransactionLogger]))
 @NamedNativeQueries(Array(
   new NamedNativeQuery(

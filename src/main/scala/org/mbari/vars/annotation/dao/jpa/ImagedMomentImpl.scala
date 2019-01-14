@@ -36,10 +36,10 @@ import scala.collection.JavaConverters._
  */
 @Entity(name = "ImagedMoment")
 @Table(name = "imaged_moments", indexes = Array(
-  new Index(name = "idx_video_reference_uuid", columnList = "video_reference_uuid"),
-  new Index(name = "idx_recorded_timestamp", columnList = "recorded_timestamp"),
-  new Index(name = "idx_elapsed_time", columnList = "elapsed_time_millis"),
-  new Index(name = "idx_timecode", columnList = "timecode")))
+  new Index(name = "idx_imaged_moments__video_reference_uuid", columnList = "video_reference_uuid"),
+  new Index(name = "idx_imaged_moments__recorded_timestamp", columnList = "recorded_timestamp"),
+  new Index(name = "idx_imaged_moments__elapsed_time", columnList = "elapsed_time_millis"),
+  new Index(name = "idx_imaged_moments__timecode", columnList = "timecode")))
 @EntityListeners(value = Array(classOf[TransactionLogger]))
 @NamedNativeQueries(Array(
   new NamedNativeQuery(

@@ -33,9 +33,10 @@ import org.mbari.vars.annotation.model.{ Association, ImagedMoment, Observation 
  */
 @Entity(name = "Observation")
 @Table(name = "observations", indexes = Array(
-  new Index(name = "idx_concept", columnList = "concept"),
-  new Index(name = "idx_observation_group", columnList = "observation_group"),
-  new Index(name = "idx_activity", columnList = "activity")))
+  new Index(name = "idx_observations__concept", columnList = "concept"),
+  new Index(name = "idx_observations__group", columnList = "observation_group"),
+  new Index(name = "idx_observations__activity", columnList = "activity"),
+  new Index(name = "idx_observations__imaged_moment_uuid", columnList = "imaged_moment_uuid")))
 @EntityListeners(value = Array(classOf[TransactionLogger]))
 @NamedNativeQueries(Array(
   new NamedNativeQuery(

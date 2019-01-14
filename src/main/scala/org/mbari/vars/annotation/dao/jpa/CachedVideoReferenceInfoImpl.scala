@@ -30,7 +30,7 @@ import org.mbari.vars.annotation.model.CachedVideoReferenceInfo
  */
 @Entity(name = "CachedVideoReferenceInfo")
 @Table(name = "video_reference_information", indexes = Array(
-  new Index(name = "idx_video_reference_uuid_vri", columnList = "video_reference_uuid")))
+  new Index(name = "idx_video_reference_information__video_reference_uuid", columnList = "video_reference_uuid")))
 @EntityListeners(value = Array(classOf[TransactionLogger]))
 @NamedNativeQueries(Array(
   new NamedNativeQuery(
