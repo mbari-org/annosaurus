@@ -32,7 +32,7 @@ import scala.concurrent.duration.Duration
 object TestDAOFactory {
 
   val TestProperties = Map(
-    "eclipselink.logging.level" -> "FINE",
+    "eclipselink.logging.level" -> "INFO",
     "javax.persistence.schema-generation.scripts.action" -> "drop-and-create",
     "javax.persistence.schema-generation.scripts.create-target" -> "target/test-database-create.ddl",
     "javax.persistence.schema-generation.scripts.drop-target" -> "target/test-database-drop.ddl")
@@ -58,7 +58,7 @@ trait SpecDAOFactory extends JPADAOFactory {
       all.foreach(dao.delete)
     })
     f.onComplete(t => dao.close())
-    Await.result(f, Duration(4, TimeUnit.SECONDS))
+    Await.result(f, Duration(400, TimeUnit.SECONDS))
 
   }
 
