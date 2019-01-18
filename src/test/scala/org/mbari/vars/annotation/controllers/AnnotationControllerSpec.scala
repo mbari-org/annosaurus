@@ -22,6 +22,7 @@ import java.util.concurrent.TimeUnit
 
 import org.mbari.vars.annotation.dao.jpa.TestDAOFactory
 import org.scalatest.{ BeforeAndAfterAll, FlatSpec, Matchers }
+import org.slf4j.LoggerFactory
 
 import scala.concurrent.{ Await, Future }
 import scala.concurrent.duration.{ Duration => SDuration }
@@ -37,6 +38,7 @@ class AnnotationControllerSpec extends FlatSpec with Matchers with BeforeAndAfte
   private[this] val controller = new AnnotationController(daoFactory.asInstanceOf[BasicDAOFactory])
   private[this] val timeout = SDuration(200, TimeUnit.SECONDS)
   private[this] val recordedDate = Instant.now()
+  private[this] val log = LoggerFactory.getLogger(getClass)
 
   def exec[R](fn: () => Future[R]): R = Await.result(fn.apply(), timeout)
 
@@ -118,6 +120,22 @@ class AnnotationControllerSpec extends FlatSpec with Matchers with BeforeAndAfte
     c should not be (empty)
     c.get.elapsedTime should be(et0)
   }
+
+//  it should "report insert benchmark" in {
+//    val start = System.nanoTime()
+//    val n = 10000
+//    for (i <- 0 until n) {
+//      exec(() => controller.create(
+//        UUID.randomUUID(),
+//        "Nanomia bijuga",
+//        "brian",
+//        recordedDate = Some(recordedDate)))
+//    }
+//    val end = System.nanoTime();
+//    val nanos = end - start
+//    val duration = Duration.ofNanos(nanos)
+//    log.info(s"Inserted $n records in $duration")
+//  }
 
   protected override def afterAll(): Unit = {
     daoFactory.cleanup()
