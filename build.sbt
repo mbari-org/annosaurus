@@ -20,6 +20,7 @@ val scalatestVersion = "3.0.5"
 val scalatraVersion = "2.6.4"
 val servletVersion = "4.0.1"
 val slf4jVersion = "1.7.25"
+val uuidgenVersion = "0.1.3"
 val vcr4jVersion = "4.0.2"
 
 
@@ -107,6 +108,7 @@ lazy val annosaurus = (project in file("."))
       "org.eclipse.jetty"        % "jetty-webapp"                   % jettyVersion          % "compile;test",
       "org.eclipse.persistence"  % "org.eclipse.persistence.jpa"    % eclipselinkVersion,
       "org.json4s"              %% "json4s-jackson"                 % jsonVersion,
+      "org.mbari.uuid"           % "uuid-gen"                       % uuidgenVersion,
       "org.mbari.vcr4j"          % "vcr4j-core"                     % vcr4jVersion,
       "org.scalatest"           %% "scalatest"                      % scalatestVersion      % "test",
       "org.scalatra"            %% "scalatra"                       % scalatraVersion,
