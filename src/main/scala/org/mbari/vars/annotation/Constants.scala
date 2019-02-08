@@ -22,9 +22,9 @@ import java.util
 
 import com.fatboyindustrial.gsonjavatime.Converters
 import com.google.gson.reflect.TypeToken
-import com.google.gson.{FieldNamingPolicy, Gson, GsonBuilder}
+import com.google.gson.{ FieldNamingPolicy, Gson, GsonBuilder }
 import org.mbari.vars.annotation.gson._
-import org.mbari.vars.annotation.model.{Association, ImageReference}
+import org.mbari.vars.annotation.model.{ Association, ImageReference }
 import org.mbari.vcr4j.time.Timecode
 
 /**

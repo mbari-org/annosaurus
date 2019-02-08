@@ -86,6 +86,7 @@ class IndexImpl extends ImagedMoment with JPAPersistentObject {
   @Expose(serialize = false)
   override def imageReferences: Iterable[ImageReference] = ???
 
+  @Transient
   override var ancillaryDatum: CachedAncillaryDatum = _
 
   override def primaryKey: Option[UUID] = ???
