@@ -14,21 +14,23 @@
  * limitations under the License.
  */
 
-package org.mbari.vars.annotation
+package org.mbari.vars.annotation.dao
 
-import org.mbari.vars.annotation.dao.DAOFactory
-import org.mbari.vars.annotation.model.{ CachedVideoReferenceInfo, _ }
+import java.util.UUID
+
+import org.mbari.vars.annotation.model.ImagedMoment
 
 /**
- *
- *  Controllers abstract away the messier details of the DAO objects. Controllers are used by
- *  the api classes. You should be able to plug in any implementation of DAO's that you like.
- *  Although currently, I've only created a JPA/SQL version.
+ * Special DAO for fetching just the index information from the ImagedMomemnts
  *
  * @author Brian Schlining
- * @since 2016-06-25T17:45:00
+ * @since 2019-02-08T08:53:00
  */
-package object controllers {
+trait IndexDAO[T <: ImagedMoment] extends DAO[T] {
 
-  type BasicDAOFactory = DAOFactory[ImagedMoment, Observation, Association, ImageReference, CachedAncillaryDatum, CachedVideoReferenceInfo, ImagedMoment]
+  def findByVideoReferenceUuid(
+    videoReferenceUuid: UUID,
+    limit: Option[Int] = None,
+    offset: Option[Int] = None): Iterable[ImagedMoment]
+
 }

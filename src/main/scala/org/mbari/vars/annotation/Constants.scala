@@ -18,12 +18,13 @@ package org.mbari.vars.annotation
 
 import java.lang.reflect.Type
 import java.time.Duration
+import java.util
 
 import com.fatboyindustrial.gsonjavatime.Converters
 import com.google.gson.reflect.TypeToken
-import com.google.gson.{ FieldNamingPolicy, Gson, GsonBuilder }
+import com.google.gson.{FieldNamingPolicy, Gson, GsonBuilder}
 import org.mbari.vars.annotation.gson._
-import org.mbari.vars.annotation.model.{ Association, ImageReference }
+import org.mbari.vars.annotation.model.{Association, ImageReference}
 import org.mbari.vcr4j.time.Timecode
 
 /**
@@ -59,6 +60,8 @@ object Constants {
     gsonBuilder.registerTypeAdapter(imageReferenceType, new ImageReferenceCreator)
 
     gsonBuilder.registerTypeAdapter(classOf[Option[Any]], new OptionSerializer)
+
+    gsonBuilder.registerTypeAdapter(classOf[util.Collection[_]], new CollectionConverter)
 
     gsonBuilder.create()
 

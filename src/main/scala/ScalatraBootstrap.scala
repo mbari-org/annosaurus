@@ -49,6 +49,7 @@ class ScalatraBootstrap extends LifeCycle {
     val imageController = new ImageController(daoFactory)
     val imagedMomentController = new ImagedMomentController(daoFactory)
     val imageReferenceController = new ImageReferenceController(daoFactory)
+    val indexController = new IndexController(daoFactory)
     val observationController = new ObservationController(daoFactory)
     val videoReferenceController = new CachedVideoReferenceInfoController(daoFactory)
 
@@ -59,6 +60,7 @@ class ScalatraBootstrap extends LifeCycle {
     val imagedMomentV1Api = new ImagedMomentV1Api(imagedMomentController)
     val imageReferenceV1Api = new ImageReferenceV1Api(imageReferenceController)
     val imageV1Api = new ImageV1Api(imageController)
+    val indexV1Api = new IndexV1Api(indexController)
     val observationV1Api = new ObservationV1Api(observationController)
     val videoReferenceV1Api = new CachedVideoReferenceInfoV1Api(videoReferenceController)
 
@@ -69,6 +71,7 @@ class ScalatraBootstrap extends LifeCycle {
     context.mount(imagedMomentV1Api, "/v1/imagedmoments")
     context.mount(imageReferenceV1Api, "/v1/imagereferences")
     context.mount(imageV1Api, "/v1/images")
+    context.mount(indexV1Api, "/v1/index")
     context.mount(observationV1Api, "/v1/observations")
     context.mount(videoReferenceV1Api, "/v1/videoreferences")
 

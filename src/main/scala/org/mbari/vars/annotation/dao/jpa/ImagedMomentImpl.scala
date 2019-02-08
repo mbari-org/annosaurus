@@ -16,8 +16,10 @@
 
 package org.mbari.vars.annotation.dao.jpa
 
+import java.lang.annotation.Annotation
 import java.time.{ Duration, Instant }
 import java.util.UUID
+
 import javax.persistence.{ Convert, Index, _ }
 import java.util.{ ArrayList => JArrayList, List => JList }
 

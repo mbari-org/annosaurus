@@ -28,7 +28,7 @@ import org.mbari.vars.annotation.dao.{ DAO, ImagedMomentDAO, ObservationDAO, _ }
  * @since 2016-06-25T17:27:00
  */
 trait JPADAOFactory
-  extends DAOFactory[ImagedMomentImpl, ObservationImpl, AssociationImpl, ImageReferenceImpl, CachedAncillaryDatumImpl, CachedVideoReferenceInfoImpl] {
+  extends DAOFactory[ImagedMomentImpl, ObservationImpl, AssociationImpl, ImageReferenceImpl, CachedAncillaryDatumImpl, CachedVideoReferenceInfoImpl, IndexImpl] {
 
   def entityManagerFactory: EntityManagerFactory
 
@@ -58,6 +58,10 @@ trait JPADAOFactory
 
   override def newCachedVideoReferenceInfoDAO(dao: DAO[_]): CachedVideoReferenceInfoDAO[CachedVideoReferenceInfoImpl] =
     new CachedVideoReferenceInfoDAOImpl(extractEntityManager(dao))
+
+  override def newIndexDAO(): IndexDAO[IndexImpl] = new IndexDAOImpl(entityManagerFactory.createEntityManager())
+
+  override def newIndexDAO(dao: DAO[_]): IndexDAO[IndexImpl] = new IndexDAOImpl(extractEntityManager(dao))
 
   override def newImageReferenceDAO(): ImageReferenceDAO[ImageReferenceImpl] =
     new ImageReferenceDAOImpl(entityManagerFactory.createEntityManager())

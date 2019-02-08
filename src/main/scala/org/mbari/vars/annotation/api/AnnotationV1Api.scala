@@ -178,6 +178,8 @@ class AnnotationV1Api(controller: AnnotationController)(implicit val executor: E
     }
   }
 
+  // TODO when there are over about 164 annotations to return this method times-out
+  // Maybe just return an ack.
   put("/tapetime") {
     validateRequest()
     request.getHeader("Content-Type") match {

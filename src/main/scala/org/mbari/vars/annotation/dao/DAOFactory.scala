@@ -24,7 +24,7 @@ import org.mbari.vars.annotation.model._
  * @author Brian Schlining
  * @since 2016-06-16T14:04:00
  */
-trait DAOFactory[IM <: ImagedMoment, OBS <: Observation, A <: Association, IR <: ImageReference, CAD <: CachedAncillaryDatum, CMI <: CachedVideoReferenceInfo] {
+trait DAOFactory[IM <: ImagedMoment, OBS <: Observation, A <: Association, IR <: ImageReference, CAD <: CachedAncillaryDatum, CMI <: CachedVideoReferenceInfo, ID <: ImagedMoment] {
 
   def newAssociationDAO(): AssociationDAO[A]
   def newAssociationDAO(dao: DAO[_]): AssociationDAO[A]
@@ -43,5 +43,8 @@ trait DAOFactory[IM <: ImagedMoment, OBS <: Observation, A <: Association, IR <:
 
   def newObservationDAO(): ObservationDAO[OBS]
   def newObservationDAO(dao: DAO[_]): ObservationDAO[OBS]
+
+  def newIndexDAO(): IndexDAO[ID]
+  def newIndexDAO(dao: DAO[_]): IndexDAO[ID]
 
 }
