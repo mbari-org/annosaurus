@@ -20,6 +20,7 @@ import java.time.{ Duration, Instant }
 import java.util.UUID
 
 import org.mbari.vars.annotation.controllers.ImagedMomentController
+import org.mbari.vars.annotation.dao.jpa.AnnotationImpl
 import org.mbari.vars.annotation.model.ImagedMoment
 import org.mbari.vars.annotation.model.simple.ObservationCount
 import org.mbari.vcr4j.time.Timecode
@@ -239,6 +240,33 @@ class ImagedMomentV1Api(controller: ImagedMomentController)(implicit val executo
     controller.updateRecordedTimestamps(uuid, time)
       .map(_.asJava)
       .map(toJson)
+  }
+
+  /*
+     This endpoint takes annotations as a json body. Annotations should have an
+     observation_uuid and a recoreded_timestamp.
+   */
+  put("/tapetime") {
+    validateRequest()
+    request.getHeader("Content-Type") match {
+      case "application/json" =>
+        val annotations = fromJson(request.body, classOf[Array[AnnotationImpl]])
+        var n = 0
+        for { a <- annotations } {
+          if (a.observationUuid != null && a.recordedTimestamp != null) {
+            controller.updateRecordedTimestampByObservationUuid(
+              a.observationUuid,
+              a.recordedTimestamp)
+            n = n + 1
+          }
+        }
+        val count = Map(
+          "annotation_count" -> annotations.size,
+          "timestamps_updated" -> n).asJava
+        toJson(count)
+      case _ =>
+        halt(BadRequest("Puts to tapetime only accept JSON body (i.e. Content-Type: application/json)"))
+    }
   }
 
   delete("/:uuid") {

@@ -20,6 +20,7 @@ import java.net.URL
 import java.util.UUID
 
 import org.mbari.vars.annotation.controllers.ImageReferenceController
+import org.mbari.vars.annotation.dao.jpa.AnnotationImpl
 import org.scalatra.{ BadRequest, NoContent, NotFound }
 
 import scala.concurrent.ExecutionContext

@@ -109,6 +109,10 @@ trait ImagedMomentDAO[T <: ImagedMoment] extends DAO[T] {
 
   def findByObservationUUID(uuid: UUID): Option[T]
 
+  def updateRecordedTimestampByObservationUuid(
+    observationUuid: UUID,
+    recordedTimestamp: Instant): Boolean
+
   /**
    * A bulk delete operation. This will delete all annotation related data for a single video.
    * (which is identified via its uuid (e.g. videoReferenceUUID))

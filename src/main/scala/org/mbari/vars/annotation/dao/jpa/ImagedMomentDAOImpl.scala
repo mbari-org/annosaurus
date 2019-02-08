@@ -179,6 +179,15 @@ class ImagedMomentDAOImpl(entityManager: EntityManager)
   override def findByObservationUUID(uuid: UUID): Option[ImagedMomentImpl] =
     findByNamedQuery("ImagedMoment.findByObservationUUID", Map("uuid" -> uuid)).headOption
 
+  override def updateRecordedTimestampByObservationUuid(
+    observationUuid: UUID,
+    recordedTimestamp: Instant): Boolean = {
+    val query = entityManager.createNamedQuery("ImagedMoment.updateRecordedTimestampByObservationUuid")
+    query.setParameter(1, recordedTimestamp)
+    query.setParameter(2, observationUuid)
+    query.executeUpdate() > 0
+  }
+
   /**
    * A bulk delete operation. This will delete all annotation related data for a single video.
    * (which is identified via its uuid (e.g. videoReferenceUUID)
