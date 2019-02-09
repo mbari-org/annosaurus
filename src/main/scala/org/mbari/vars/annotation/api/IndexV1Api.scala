@@ -50,8 +50,8 @@ class IndexV1Api(controller: IndexController)(implicit val executor: ExecutionCo
     validateRequest()
     request.getHeader("Content-Type") match {
       case "application/json" =>
-        val indicies = fromJson(request.body, classOf[Array[IndexImpl]])
-        controller.bulkUpdateRecordedTimestamps(indicies)
+        val indices = fromJson(request.body, classOf[Array[IndexImpl]])
+        controller.bulkUpdateRecordedTimestamps(indices)
           .map(_.asJava)
           .map(toJson)
       case _ =>

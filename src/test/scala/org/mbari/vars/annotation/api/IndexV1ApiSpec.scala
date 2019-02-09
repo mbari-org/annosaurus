@@ -7,6 +7,7 @@ import java.util.concurrent.TimeUnit
 
 import org.mbari.vars.annotation.controllers.{AnnotationController, IndexController}
 import org.mbari.vars.annotation.dao.jpa.IndexImpl
+import org.mbari.vcr4j.time.{FrameRates, HMSF, Timecode}
 
 import scala.collection.JavaConverters._
 import scala.concurrent.Await
@@ -44,11 +45,14 @@ class IndexV1ApiSpec extends WebApiStack {
 
   "IndexV1Api" should "find by videoreferenceuuid" in {
 
+
     // Create data
     for (i <- 0 until 10) {
       Await.result(
-        annotationController.create(videoReferenceUuid, "Foo", "brian",
-          elapsedTime = Some(Duration.ofMillis(10000 * i))),
+        annotationController.create(videoReferenceUuid,
+          "Foo",
+          "brian",
+          timecode = Some(new Timecode(i * 100, FrameRates.NTSC))),
         timeout)
     }
 
@@ -63,8 +67,9 @@ class IndexV1ApiSpec extends WebApiStack {
 
   it should "bulkUpdateRecordedTimestamp" in {
 
+    val now = Instant.now()
     val indices = Await.result(indexController.findByVideoReferenceUUID(videoReferenceUuid), timeout)
-    indices.foreach(_.recordedDate = Instant.now())
+    indices.foreach(_.recordedDate = now)
     val json = gson.toJson(indices.asJava)
 
     put ("/v1/index/tapetime",
@@ -77,7 +82,8 @@ class IndexV1ApiSpec extends WebApiStack {
       newIndices.size should be (10)
       for (i <- newIndices) {
         i.recordedDate should not be null
-        i.elapsedTime should not be null
+        i.timecode should not be null
+        i.recordedDate should be (now)
       }
 
     }
