@@ -69,6 +69,23 @@ class IndexImpl extends ImagedMoment with JPAPersistentObject {
   @Convert(converter = classOf[TimecodeConverter])
   override var timecode: Timecode = _
 
+  //  @Expose(serialize = true)
+  //  @SerializedName(value = "ancillary_data")
+  //  @OneToOne(
+  //    mappedBy = "imagedMoment",
+  //    cascade = Array(CascadeType.ALL),
+  //    optional = true,
+  //    fetch = FetchType.LAZY,
+  //    targetEntity = classOf[CachedAncillaryDatumImpl])
+  //  protected var _ancillaryDatum: CachedAncillaryDatum = _
+  //
+  //  def ancillaryDatum: CachedAncillaryDatum = _ancillaryDatum
+  //  def ancillaryDatum_=(ad: CachedAncillaryDatum): Unit = {
+  //    if (_ancillaryDatum != null) _ancillaryDatum.imagedMoment = null
+  //    _ancillaryDatum = ad
+  //    ad.imagedMoment = this
+  //  }
+
   override def toString: String = Constants.GSON.toJson(this)
 
   /* --- IGNORE these methods below --- */

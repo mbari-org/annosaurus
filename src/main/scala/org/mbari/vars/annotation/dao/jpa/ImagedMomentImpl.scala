@@ -202,6 +202,7 @@ class ImagedMomentImpl extends ImagedMoment with JPAPersistentObject {
     mappedBy = "imagedMoment",
     cascade = Array(CascadeType.ALL),
     optional = true,
+    fetch = FetchType.LAZY,
     targetEntity = classOf[CachedAncillaryDatumImpl])
   protected var _ancillaryDatum: CachedAncillaryDatum = _
 
