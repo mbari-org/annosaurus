@@ -23,6 +23,7 @@ import org.eclipse.persistence.internal.databaseaccess.Accessor;
 import org.eclipse.persistence.internal.sessions.AbstractSession;
 import org.eclipse.persistence.sequencing.Sequence;
 import org.eclipse.persistence.sessions.Session;
+import org.mbari.uuid.UUIDs;
 
 /**
  * From https://wiki.eclipse.org/EclipseLink/Examples/JPA/CustomSequencing
@@ -40,7 +41,8 @@ public class UUIDSequence extends Sequence implements SessionCustomizer {
     @Override
     public Object getGeneratedValue(Accessor accessor,
             AbstractSession writeSession, String seqName) {
-        return UUID.randomUUID().toString().toLowerCase();
+        return UUIDs.comb().toString().toLowerCase();
+        //return UUIDs.uuidSequence().toString().toLowerCase();
     }
 
     @Override

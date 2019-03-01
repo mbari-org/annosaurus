@@ -30,5 +30,5 @@ import org.mbari.vars.annotation.model.{ CachedVideoReferenceInfo, _ }
  */
 package object controllers {
 
-  type BasicDAOFactory = DAOFactory[ImagedMoment, Observation, Association, ImageReference, CachedAncillaryDatum, CachedVideoReferenceInfo]
+  type BasicDAOFactory = DAOFactory[ImagedMoment, Observation, Association, ImageReference, CachedAncillaryDatum, CachedVideoReferenceInfo, ImagedMoment]
 }

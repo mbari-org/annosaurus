@@ -16,8 +16,10 @@
 
 package org.mbari.vars.annotation.dao.jpa
 
+import java.lang.annotation.Annotation
 import java.time.{ Duration, Instant }
 import java.util.UUID
+
 import javax.persistence.{ Convert, Index, _ }
 import java.util.{ ArrayList => JArrayList, List => JList }
 
@@ -62,6 +64,10 @@ import scala.collection.JavaConverters._
       "observations obs ON obs.imaged_moment_uuid = im.uuid WHERE " +
       "im.last_updated_timestamp BETWEEN ?1 AND ?2 OR " +
       "obs.last_updated_timestamp BETWEEN ?1 AND ?2"),
+  new NamedNativeQuery(
+    name = "ImageMoment.updateRecordedTimestampByObservationUuid",
+    query = "UPDATE imaged_moments SET recorded_timestamp = ?1 WHERE " +
+      "uuid IN (SELECT obs.imaged_moment_uuid FROM observations obs WHERE obs.uuid = ?2)"),
   new NamedNativeQuery(
     name = "ImagedMoment.countAllByVideoReferenceUUIDs",
     query = "SELECT video_reference_uuid, COUNT(uuid) as n FROM imaged_moments GROUP BY video_reference_uuid ORDER BY n"),
@@ -196,6 +202,7 @@ class ImagedMomentImpl extends ImagedMoment with JPAPersistentObject {
     mappedBy = "imagedMoment",
     cascade = Array(CascadeType.ALL),
     optional = true,
+    fetch = FetchType.LAZY,
     targetEntity = classOf[CachedAncillaryDatumImpl])
   protected var _ancillaryDatum: CachedAncillaryDatum = _
 

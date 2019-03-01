@@ -18,6 +18,7 @@ package org.mbari.vars.annotation
 
 import java.lang.reflect.Type
 import java.time.Duration
+import java.util
 
 import com.fatboyindustrial.gsonjavatime.Converters
 import com.google.gson.reflect.TypeToken
@@ -59,6 +60,8 @@ object Constants {
     gsonBuilder.registerTypeAdapter(imageReferenceType, new ImageReferenceCreator)
 
     gsonBuilder.registerTypeAdapter(classOf[Option[Any]], new OptionSerializer)
+
+    gsonBuilder.registerTypeAdapter(classOf[util.Collection[_]], new CollectionConverter)
 
     gsonBuilder.create()
 

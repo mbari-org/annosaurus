@@ -93,6 +93,7 @@ class CachedAncillaryDatumImpl extends CachedAncillaryDatum with JPAPersistentOb
   @OneToOne(
     cascade = Array(CascadeType.PERSIST, CascadeType.DETACH),
     optional = false,
+    fetch = FetchType.LAZY,
     targetEntity = classOf[ImagedMomentImpl])
   @JoinColumn(
     name = "imaged_moment_uuid",

@@ -14,16 +14,23 @@
  * limitations under the License.
  */
 
-package org.mbari.vars.annotation.dao.jpa
+package org.mbari.vars.annotation.dao
+
+import java.util.UUID
+
+import org.mbari.vars.annotation.model.ImagedMoment
 
 /**
- *
+ * Special DAO for fetching just the index information from the ImagedMomemnts
  *
  * @author Brian Schlining
- * @since 2016-06-16T14:31:00
+ * @since 2019-02-08T08:53:00
  */
-trait JPAPersistentObject extends HasID
-  with HasUUID
-  with HasOptimisticLock {
+trait IndexDAO[T <: ImagedMoment] extends DAO[T] {
+
+  def findByVideoReferenceUuid(
+    videoReferenceUuid: UUID,
+    limit: Option[Int] = None,
+    offset: Option[Int] = None): Iterable[ImagedMoment]
 
 }

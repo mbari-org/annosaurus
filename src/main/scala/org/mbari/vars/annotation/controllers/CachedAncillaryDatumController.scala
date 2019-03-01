@@ -19,6 +19,7 @@ package org.mbari.vars.annotation.controllers
 import java.time.Duration
 import java.util.UUID
 
+import org.mbari.vars.annotation.dao.jpa.BaseDAO
 import org.mbari.vars.annotation.dao.{ CachedAncillaryDatumDAO, NotFoundInDatastoreException }
 import org.mbari.vars.annotation.math.FastCollator
 import org.mbari.vars.annotation.model.{ CachedAncillaryDatum, ImagedMoment }
@@ -76,6 +77,7 @@ class CachedAncillaryDatumController(val daoFactory: BasicDAOFactory)
           }
       }
     }
+
     exec(fn)
   }
 
@@ -94,6 +96,7 @@ class CachedAncillaryDatumController(val daoFactory: BasicDAOFactory)
           }
       }
     }
+
     exec(fn)
   }
 
@@ -141,6 +144,7 @@ class CachedAncillaryDatumController(val daoFactory: BasicDAOFactory)
         cad
       })
     }
+
     exec(fn)
   }
 
@@ -152,33 +156,64 @@ class CachedAncillaryDatumController(val daoFactory: BasicDAOFactory)
         .map(im => CachedAncillaryDatumBean(im.ancillaryDatum))
         .toSeq
     }
+
     exec(fn)
   }
 
   def findByObservationUUID(uuid: UUID)(implicit ec: ExecutionContext): Future[Option[CachedAncillaryDatum]] = {
     def fn(dao: ADDAO): Option[CachedAncillaryDatum] = dao.findByObservationUUID(uuid)
+
     exec(fn)
   }
 
   def findByImagedMomentUUID(uuid: UUID)(implicit ec: ExecutionContext): Future[Option[CachedAncillaryDatum]] = {
     def fn(dao: ADDAO): Option[CachedAncillaryDatum] = dao.findByImagedMomentUUID(uuid)
+
     exec(fn)
   }
 
-  def bulkCreateOrUpdate(data: Iterable[CachedAncillaryDatumBean])(implicit ec: ExecutionContext): Future[Seq[CachedAncillaryDatum]] = {
+  def bulkCreateOrUpdate(data: Seq[CachedAncillaryDatumBean])(implicit ec: ExecutionContext): Future[Seq[CachedAncillaryDatum]] = {
     def fn(dao: ADDAO): Seq[CachedAncillaryDatum] = {
-      val imDao = daoFactory.newImagedMomentDAO(dao)
-      val cads = for {
-        datum <- data
-        imagedMomentUuid <- Option(datum.imagedMomentUuid)
-      } yield {
-        val maybeMoment = imDao.findByUUID(imagedMomentUuid)
-        val cad = dao.asPersistentObject(datum)
-        maybeMoment.flatMap(im => Option(createOrUpdate(cad, im)))
-      }
-      cads.flatten.toSeq
+      val fastDao = new FastAncillaryDataController(dao.asInstanceOf[BaseDAO[_]].entityManager)
+      fastDao.createOrUpdate(data)
+      data
+
+      //      val imDao = daoFactory.newImagedMomentDAO(dao)
+      //      val cads = for {
+      //        datum <- data
+      //        imagedMomentUuid <- Option(datum.imagedMomentUuid)
+      //      } yield {
+      //        val maybeMoment = imDao.findByUUID(imagedMomentUuid)
+      //        val cad = dao.asPersistentObject(datum)
+      //        val existingCad = dao.findByImagedMomentUUID(imagedMomentUuid)
+      //        maybeMoment.flatMap(im => Option(createOrUpdate(cad, im)))
+      //      }
+      //      cads.flatten
     }
+
     exec(fn)
+  }
+
+  /**
+   * This method should be called within a transaction!
+   *
+   * @param d  This MUST be a persistable object! (Not a CahcedAncillaryDatumBean)
+   * @param im The moment whose ancillary data is being updated
+   * @return The CachedAncillaryDatum.
+   */
+  private def createOrUpdate(d: CachedAncillaryDatum, im: ImagedMoment): CachedAncillaryDatum = {
+    require(d != null, "A null CachedAncillaryDatum argument is not allowed")
+    require(im != null, "A null ImagedMoment argument is not allowed")
+    require(im.uuid != null, "The ImagedMoment should already be present in the database. (Null UUID was found")
+    require(!d.isInstanceOf[CachedAncillaryDatumBean], "Can not persist a CachedAncillaryDatumBean")
+
+    if (im.ancillaryDatum != null) {
+      updateValues(im.ancillaryDatum, d)
+      im.ancillaryDatum
+    } else {
+      im.ancillaryDatum = d
+      d
+    }
   }
 
   def merge(
@@ -194,7 +229,9 @@ class CachedAncillaryDatumController(val daoFactory: BasicDAOFactory)
       val usefulData = data.filter(_.recordedTimestamp.isDefined)
 
       def imagedMomentToMillis(im: ImagedMoment) = im.recordedDate.toEpochMilli
+
       def datumToMillis(cd: CachedAncillaryDatumBean) = cd.recordedTimestamp.map(_.toEpochMilli).getOrElse(-1L)
+
       val mergedData = FastCollator(
         imagedMoments,
         imagedMomentToMillis,
@@ -210,32 +247,14 @@ class CachedAncillaryDatumController(val daoFactory: BasicDAOFactory)
         createOrUpdate(d, im)
       }
     }
+
     exec(fn)
   }
 
   def deleteByVideoReferenceUuid(videoReferenceUuid: UUID)(implicit ec: ExecutionContext): Future[Int] = {
     def fn(dao: ADDAO): Int = dao.deleteByVideoReferenceUuid(videoReferenceUuid)
-    exec(fn)
-  }
 
-  /**
-   * This method should be called within a transaction!
-   * @param d This MUST be a persistable object! (Not a CahcedAncillaryDatumBean)
-   * @param im The moment whose ancillary data is being updated
-   * @return The CachedAncillaryDatum.
-   */
-  private def createOrUpdate(d: CachedAncillaryDatum, im: ImagedMoment): CachedAncillaryDatum = {
-    require(d != null, "A null CachedAncillaryDatum argument is not allowed")
-    require(im != null, "A null ImagedMoment argument is not allowed")
-    require(im.uuid != null, "The ImagedMoment should already be present in the database. (Null UUID was found")
-    require(!d.isInstanceOf[CachedAncillaryDatumBean], "Can not persist a CachedAncillaryDatumBean")
-    if (im.ancillaryDatum != null) {
-      updateValues(im.ancillaryDatum, d)
-      im.ancillaryDatum
-    } else {
-      im.ancillaryDatum = d
-      d
-    }
+    exec(fn)
   }
 
   private def updateValues(a: CachedAncillaryDatum, b: CachedAncillaryDatum): Unit = {
