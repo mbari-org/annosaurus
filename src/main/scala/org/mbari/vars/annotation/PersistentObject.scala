@@ -28,5 +28,5 @@ import java.util.UUID
  */
 trait PersistentObject {
 
-  def primaryKey: Option[UUID]
+  def primaryKey: Option[Long]
 }
