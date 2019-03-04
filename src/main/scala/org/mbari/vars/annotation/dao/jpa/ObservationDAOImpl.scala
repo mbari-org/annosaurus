@@ -143,12 +143,13 @@ class ObservationDAOImpl(entityManager: EntityManager)
     dao.findByUUID(imagedMomentUuid) match {
       case None => 0
       case Some(im) =>
-        findByPrimaryKey()
+        findByUUID(observationUuid) match {
+          case None => 0
+          case Some(obs) =>
+            im.addObservation(obs)
+            1
+        }
     }
-    val query = entityManager.createNamedQuery("Observation.updateImagedMomentUUID")
-    query.setParameter(1, imagedMomentUuid.toString)
-    query.setParameter(2, observationUuid.toString)
-    query.executeUpdate()
   }
 
 }

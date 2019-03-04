@@ -65,10 +65,7 @@ import org.mbari.vars.annotation.model.{ Association, ImagedMoment, Observation 
     query = "SELECT COUNT(*) FROM observations WHERE concept = ?1"),
   new NamedNativeQuery(
     name = "Observation.updateConcept",
-    query = "UPDATE observations SET concept = ?1 WHERE concept = ?2"),
-  new NamedNativeQuery(
-    name = "Observation.updateImagedMomentUUID", // FIXME this is no longer valid!!!
-    query = "UPDATE observations SET imaged_moment_uuid = ?1 WHERE uuid = ?2")))
+    query = "UPDATE observations SET concept = ?1 WHERE concept = ?2")))
 @NamedQueries(Array(
   new NamedQuery(
     name = "Observation.findByUuid",

@@ -35,7 +35,7 @@ import org.mbari.vars.annotation.model.{ CachedAncillaryDatum, ImagedMoment }
 @NamedNativeQueries(Array(
   new NamedNativeQuery(
     name = "AncillaryDatum.deleteByVideoReferenceUuid",
-    query = "DELETE FROM ancillary_data WHERE imaged_moment_uuid IN (SELECT uuid FROM imaged_moments WHERE video_reference_uuid = ?1)")))
+    query = "DELETE FROM ancillary_data WHERE imaged_moment_id IN (SELECT id FROM imaged_moments WHERE video_reference_uuid = ?1)")))
 @NamedQueries(Array(
   new NamedQuery(
     name = "AncillaryDatum.findByUuid",

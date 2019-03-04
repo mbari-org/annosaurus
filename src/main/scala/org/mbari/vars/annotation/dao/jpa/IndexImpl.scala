@@ -35,7 +35,7 @@ import org.mbari.vcr4j.time.Timecode
 @NamedQueries(Array(
   new NamedQuery(
     name = "Index.findByUuid",
-    query = "SELECT i FROM Index i WHERE i.uuid = :uuid ORDER BY o.uuid"),
+    query = "SELECT i FROM Index i WHERE i.uuid = :uuid ORDER BY i.uuid"),
   new NamedQuery(
     name = "Index.findByVideoReferenceUUID",
     query = "SELECT i FROM Index i WHERE i.videoReferenceUUID = :uuid ORDER BY i.uuid")))
