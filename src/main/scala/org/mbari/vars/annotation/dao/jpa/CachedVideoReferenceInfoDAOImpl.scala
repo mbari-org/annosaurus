@@ -56,6 +56,10 @@ class CachedVideoReferenceInfoDAOImpl(entityManager: EntityManager)
     fetchUsing("VideoReferenceInfo.findAllVideoReferenceUUIDs")
       .map(s => UUID.fromString(s))
 
+  override def findByUUID(uuid: UUID): Option[CachedVideoReferenceInfoImpl] =
+    findByNamedQuery("VideoReferenceInfo.findByUuid", Map("uuid" -> uuid))
+      .headOption
+
   override def findAllMissionContacts(): Iterable[String] = fetchUsing("VideoReferenceInfo.findAllMissionContacts")
 
   override def findAllPlatformNames(): Iterable[String] = fetchUsing("VideoReferenceInfo.findAllVideoReferenceUUIDs")

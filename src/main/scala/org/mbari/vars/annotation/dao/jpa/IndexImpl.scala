@@ -34,6 +34,9 @@ import org.mbari.vcr4j.time.Timecode
 @EntityListeners(value = Array(classOf[TransactionLogger]))
 @NamedQueries(Array(
   new NamedQuery(
+    name = "Index.findByUuid",
+    query = "SELECT i FROM Index i WHERE i.uuid = :uuid ORDER BY o.uuid"),
+  new NamedQuery(
     name = "Index.findByVideoReferenceUUID",
     query = "SELECT i FROM Index i WHERE i.videoReferenceUUID = :uuid ORDER BY i.uuid")))
 class IndexImpl extends ImagedMoment with JPAPersistentObject {
@@ -106,5 +109,5 @@ class IndexImpl extends ImagedMoment with JPAPersistentObject {
   @Transient
   override var ancillaryDatum: CachedAncillaryDatum = _
 
-  override def primaryKey: Option[UUID] = ???
+  //override def primaryKey: Option[Long] = ???
 }

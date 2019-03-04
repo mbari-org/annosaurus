@@ -36,8 +36,8 @@ import org.mbari.vars.annotation.model.{ Association, ImagedMoment, Observation 
   new Index(name = "idx_observations__concept", columnList = "concept"),
   new Index(name = "idx_observations__group", columnList = "observation_group"),
   new Index(name = "idx_observations__activity", columnList = "activity"),
-  new Index(name = "idx_observations__imaged_moment_uuid", columnList = "imaged_moment_uuid")))
-@EntityListeners(value = Array(classOf[TransactionLogger]))
+  new Index(name = "idx_observations__imaged_moment_id", columnList = "imaged_moment_id")))
+@EntityListeners(value = Array(classOf[TransactionLogger], classOf[UUIDKeyGenerator]))
 @NamedNativeQueries(Array(
   new NamedNativeQuery(
     name = "Observation.findAllNames",
@@ -47,19 +47,19 @@ import org.mbari.vars.annotation.model.{ Association, ImagedMoment, Observation 
     query = "SELECT DISTINCT observation_group FROM observations ORDER BY observation_group"),
   new NamedNativeQuery(
     name = "Observation.findAllNamesByVideoReferenceUUID",
-    query = "SELECT DISTINCT concept FROM imaged_moments LEFT JOIN observations ON observations.imaged_moment_uuid = imaged_moments.uuid WHERE imaged_moments.video_reference_uuid = ?1 ORDER BY concept"),
+    query = "SELECT DISTINCT concept FROM imaged_moments LEFT JOIN observations ON observations.imaged_moment_id = imaged_moments.id WHERE imaged_moments.video_reference_uuid = ?1 ORDER BY concept"),
   new NamedNativeQuery(
     name = "Observation.findAllActivities",
     query = "SELECT DISTINCT activity FROM observations ORDER BY activity"),
   new NamedNativeQuery(
     name = "Observation.countByVideoReferenceUUID",
-    query = "SELECT COUNT(uuid) FROM observations WHERE imaged_moment_uuid IN " +
-      "(SELECT DISTINCT im.uuid FROM imaged_moments im LEFT JOIN observations obs " +
-      "ON obs.imaged_moment_uuid = im.uuid WHERE " +
+    query = "SELECT COUNT(uuid) FROM observations WHERE imaged_moment_id IN " +
+      "(SELECT DISTINCT im.id FROM imaged_moments im LEFT JOIN observations obs " +
+      "ON obs.imaged_moment_id = im.id WHERE " +
       "im.video_reference_uuid = ?1)"),
   new NamedNativeQuery(
     name = "Observation.countAllByVideoReferenceUUIDs",
-    query = "SELECT im.video_reference_uuid, COUNT(obs.uuid) as n FROM observations obs RIGHT JOIN imaged_moments im ON im.uuid = obs.imaged_moment_uuid GROUP BY im.video_reference_uuid ORDER BY n"),
+    query = "SELECT im.video_reference_uuid, COUNT(obs.uuid) as n FROM observations obs RIGHT JOIN imaged_moments im ON im.id = obs.imaged_moment_id GROUP BY im.video_reference_uuid ORDER BY n"),
   new NamedNativeQuery(
     name = "Observation.countByConcept",
     query = "SELECT COUNT(*) FROM observations WHERE concept = ?1"),
@@ -67,9 +67,12 @@ import org.mbari.vars.annotation.model.{ Association, ImagedMoment, Observation 
     name = "Observation.updateConcept",
     query = "UPDATE observations SET concept = ?1 WHERE concept = ?2"),
   new NamedNativeQuery(
-    name = "Observation.updateImagedMomentUUID",
+    name = "Observation.updateImagedMomentUUID", // FIXME this is no longer valid!!!
     query = "UPDATE observations SET imaged_moment_uuid = ?1 WHERE uuid = ?2")))
 @NamedQueries(Array(
+  new NamedQuery(
+    name = "Observation.findByUuid",
+    query = "SELECT o FROM Observation o WHERE o.uuid = :uuid ORDER BY o.uuid"),
   new NamedQuery(
     name = "Observation.findAll",
     query = "SELECT o FROM Observation o ORDER BY o.uuid"),
@@ -97,9 +100,8 @@ class ObservationImpl extends Observation with JPAPersistentObject {
     optional = false,
     targetEntity = classOf[ImagedMomentImpl])
   @JoinColumn(
-    name = "imaged_moment_uuid",
-    nullable = false,
-    columnDefinition = "CHAR(36)")
+    name = "imaged_moment_id",
+    nullable = false)
   override var imagedMoment: ImagedMoment = _
 
   @Expose(serialize = true)

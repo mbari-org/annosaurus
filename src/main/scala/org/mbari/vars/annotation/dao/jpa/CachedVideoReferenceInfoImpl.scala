@@ -31,7 +31,7 @@ import org.mbari.vars.annotation.model.CachedVideoReferenceInfo
 @Entity(name = "CachedVideoReferenceInfo")
 @Table(name = "video_reference_information", indexes = Array(
   new Index(name = "idx_video_reference_information__video_reference_uuid", columnList = "video_reference_uuid")))
-@EntityListeners(value = Array(classOf[TransactionLogger]))
+@EntityListeners(value = Array(classOf[TransactionLogger], classOf[UUIDKeyGenerator]))
 @NamedNativeQueries(Array(
   new NamedNativeQuery(
     name = "VideoReferenceInfo.findAllVideoReferenceUUIDs",
@@ -46,6 +46,9 @@ import org.mbari.vars.annotation.model.CachedVideoReferenceInfo
     name = "VideoReferenceInfo.findAllMissionIDs",
     query = "SELECT DISTINCT mission_id FROM video_reference_information ORDER BY mission_id ASC")))
 @NamedQueries(Array(
+  new NamedQuery(
+    name = "VideoReferenceInfo.findByUuid",
+    query = "SELECT v FROM CachedVideoReferenceInfo v WHERE v.uuid = :uuid ORDER BY v.uuid"),
   new NamedQuery(
     name = "VideoReferenceInfo.findAll",
     query = "SELECT v FROM CachedVideoReferenceInfo v ORDER BY v.uuid"),

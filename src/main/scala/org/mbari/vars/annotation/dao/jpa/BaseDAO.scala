@@ -45,7 +45,10 @@ abstract class BaseDAO[B <: PersistentObject: ClassTag](val entityManager: Entit
   }
 
   def find(obj: B): Option[B] =
-    Option(entityManager.find(obj.getClass, obj.primaryKey))
+    obj.primaryKey.flatMap(pk => Option(entityManager.find(obj.getClass, pk)))
+
+  def findByPrimaryKey(key: Long): Option[B] =
+    Option(entityManager.find(classTag[B].runtimeClass, key).asInstanceOf[B])
 
   def findByNamedQuery(
     name: String,
@@ -93,16 +96,6 @@ abstract class BaseDAO[B <: PersistentObject: ClassTag](val entityManager: Entit
     namedParameters.foreach({ case (a, b) => query.setParameter(a, b) })
     query.executeUpdate()
   }
-
-  /**
-   * Lookup entity by primary key. A DAO will only return entities of their type.
-   * Also, note that I had to use a little scala reflection magic here
-   *
-   * @param primaryKey
-   * @return
-   */
-  override def findByUUID(primaryKey: UUID): Option[B] =
-    Option(entityManager.find(classTag[B].runtimeClass, primaryKey).asInstanceOf[B])
 
   override def deleteByUUID(primaryKey: UUID): Unit =
     findByUUID(primaryKey).foreach(delete)

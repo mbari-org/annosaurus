@@ -32,8 +32,8 @@ import org.mbari.vars.annotation.model.{ Association, Observation }
   new Index(name = "idx_associations__link_name", columnList = "link_name"),
   new Index(name = "idx_associations__link_value", columnList = "link_value"),
   new Index(name = "idx_associations__to_concept", columnList = "to_concept"),
-  new Index(name = "idx_associations__observation_uuid", columnList = "observation_uuid")))
-@EntityListeners(value = Array(classOf[TransactionLogger]))
+  new Index(name = "idx_associations__observation_id", columnList = "observation_id")))
+@EntityListeners(value = Array(classOf[TransactionLogger], classOf[UUIDKeyGenerator]))
 @NamedNativeQueries(Array(
   new NamedNativeQuery(
     name = "Association.findAllToConcepts",
@@ -53,8 +53,8 @@ import org.mbari.vars.annotation.model.{ Association, Observation }
     mime_type
 FROM
     associations a LEFT JOIN
-    observations o ON a.observation_uuid = o.uuid LEFT JOIN
-    imaged_moments i ON o.imaged_moment_uuid = i.uuid
+    observations o ON a.observation_id = o.id LEFT JOIN
+    imaged_moments i ON o.imaged_moment_id = i.id
 WHERE
     i.video_reference_uuid = ?1 AND
     a.link_name = ?2"""),
@@ -62,6 +62,9 @@ WHERE
     name = "Association.updateToConcept",
     query = "UPDATE associations SET to_concept = ?1 WHERE to_concept = ?2")))
 @NamedQueries(Array(
+  new NamedQuery(
+    name = "Association.findByUuid",
+    query = "SELECT a FROM Association a WHERE a.uuid = :uuid ORDER BY a.uuid"),
   new NamedQuery(
     name = "Association.findAll",
     query = "SELECT a FROM Association a ORDER BY a.uuid"),
@@ -93,9 +96,8 @@ class AssociationImpl extends Association with JPAPersistentObject {
     optional = false,
     targetEntity = classOf[ObservationImpl])
   @JoinColumn(
-    name = "observation_uuid",
-    nullable = false,
-    columnDefinition = "CHAR(36)")
+    name = "observation_id",
+    nullable = false)
   override var observation: Observation = _
 
   @Expose(serialize = true)

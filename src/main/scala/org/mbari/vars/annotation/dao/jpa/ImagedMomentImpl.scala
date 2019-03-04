@@ -42,7 +42,7 @@ import scala.collection.JavaConverters._
   new Index(name = "idx_imaged_moments__recorded_timestamp", columnList = "recorded_timestamp"),
   new Index(name = "idx_imaged_moments__elapsed_time", columnList = "elapsed_time_millis"),
   new Index(name = "idx_imaged_moments__timecode", columnList = "timecode")))
-@EntityListeners(value = Array(classOf[TransactionLogger]))
+@EntityListeners(value = Array(classOf[TransactionLogger], classOf[UUIDKeyGenerator]))
 @NamedNativeQueries(Array(
   new NamedNativeQuery(
     name = "ImagedMoment.findAllVideoReferenceUUIDs",
@@ -50,24 +50,24 @@ import scala.collection.JavaConverters._
   new NamedNativeQuery(
     name = "ImagedMoment.countByConcept",
     query = "SELECT COUNT(*) FROM imaged_moments im LEFT JOIN " +
-      "observations obs ON obs.imaged_moment_uuid = im.uuid WHERE " +
+      "observations obs ON obs.imaged_moment_id = im.id WHERE " +
       "obs.concept = ?1"),
   new NamedNativeQuery(
     name = "ImagedMoment.countByConceptWithImages",
     query = "SELECT COUNT(*) FROM imaged_moments im LEFT JOIN " +
-      "observations obs ON obs.imaged_moment_uuid = im.uuid RIGHT JOIN " +
-      "image_references ir ON ir.imaged_moment_uuid = im.uuid " +
+      "observations obs ON obs.imaged_moment_id = im.id RIGHT JOIN " +
+      "image_references ir ON ir.imaged_moment_id = im.id " +
       "WHERE obs.concept = ?1 AND ir.url IS NOT NULL"),
   new NamedNativeQuery(
     name = "ImagedMoment.countBetweenUpdatedDates",
     query = "SELECT COUNT(*) FROM imaged_moments im LEFT JOIN " +
-      "observations obs ON obs.imaged_moment_uuid = im.uuid WHERE " +
+      "observations obs ON obs.imaged_moment_id = im.id WHERE " +
       "im.last_updated_timestamp BETWEEN ?1 AND ?2 OR " +
       "obs.last_updated_timestamp BETWEEN ?1 AND ?2"),
   new NamedNativeQuery(
     name = "ImageMoment.updateRecordedTimestampByObservationUuid",
     query = "UPDATE imaged_moments SET recorded_timestamp = ?1 WHERE " +
-      "uuid IN (SELECT obs.imaged_moment_uuid FROM observations obs WHERE obs.uuid = ?2)"),
+      "id IN (SELECT obs.imaged_moment_id FROM observations obs WHERE obs.uuid = ?2)"),
   new NamedNativeQuery(
     name = "ImagedMoment.countAllByVideoReferenceUUIDs",
     query = "SELECT video_reference_uuid, COUNT(uuid) as n FROM imaged_moments GROUP BY video_reference_uuid ORDER BY n"),
@@ -102,7 +102,7 @@ import scala.collection.JavaConverters._
     name = "ImagedMoment.findByObservationUUID",
     query = "SELECT i FROM ImagedMoment i LEFT JOIN i.javaObservations o WHERE o.uuid = :uuid ORDER BY i.uuid"),
   new NamedQuery(
-    name = "ImagedMoment.findByUUID",
+    name = "ImagedMoment.findByUuid",
     query = "SELECT i FROM ImagedMoment i WHERE i.uuid = :uuid ORDER BY i.uuid"),
   new NamedQuery(
     name = "ImagedMoment.findByVideoReferenceUUIDAndTimecode",

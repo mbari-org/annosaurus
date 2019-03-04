@@ -51,6 +51,10 @@ class ImagedMomentDAOImpl(entityManager: EntityManager)
     imagedMoment
   }
 
+  override def findByUUID(uuid: UUID): Option[ImagedMomentImpl] =
+    findByNamedQuery("ImagedMoment.findByUuid", Map("uuid" -> uuid))
+      .headOption
+
   override def findBetweenUpdatedDates(
     start: Instant,
     end: Instant,

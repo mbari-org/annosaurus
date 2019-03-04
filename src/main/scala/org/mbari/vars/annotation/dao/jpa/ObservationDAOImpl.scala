@@ -83,6 +83,10 @@ class ObservationDAOImpl(entityManager: EntityManager)
   override def findAll(limit: Int, offset: Int): Iterable[ObservationImpl] =
     findByNamedQuery("Observation.findAll", limit = Some(limit), offset = Some(offset))
 
+  override def findByUUID(uuid: UUID): Option[ObservationImpl] =
+    findByNamedQuery("Observation.findByUuid", Map("uuid" -> uuid))
+      .headOption
+
   override def findAllConceptsByVideoReferenceUUID(uuid: UUID): Seq[String] = {
     val query = entityManager.createNamedQuery("Observation.findAllNamesByVideoReferenceUUID")
     query.setParameter(1, UUIDConverter.uuidToString(uuid))
@@ -132,6 +136,15 @@ class ObservationDAOImpl(entityManager: EntityManager)
   }
 
   override def changeImageMoment(imagedMomentUuid: UUID, observationUuid: UUID): Int = {
+
+    // FIXME this should look up the imagedMoment by it's UUID and then set the
+    // observations.imaged_moment_id to be the imagedMoment.id
+    val dao = new ImagedMomentDAOImpl(entityManager)
+    dao.findByUUID(imagedMomentUuid) match {
+      case None => 0
+      case Some(im) =>
+        findByPrimaryKey()
+    }
     val query = entityManager.createNamedQuery("Observation.updateImagedMomentUUID")
     query.setParameter(1, imagedMomentUuid.toString)
     query.setParameter(2, observationUuid.toString)

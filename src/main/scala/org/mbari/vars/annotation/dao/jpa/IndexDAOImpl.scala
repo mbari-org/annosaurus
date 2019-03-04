@@ -32,6 +32,10 @@ class IndexDAOImpl(entityManager: EntityManager)
 
   def newPersistentObject(): IndexImpl = new IndexImpl
 
+  override def findByUUID(uuid: UUID): Option[IndexImpl] =
+    findByNamedQuery("Index.findByUuid", Map("uuid" -> uuid))
+      .headOption
+
   override def findByVideoReferenceUuid(
     videoReferenceUuid: UUID,
     limit: Option[Int] = None,

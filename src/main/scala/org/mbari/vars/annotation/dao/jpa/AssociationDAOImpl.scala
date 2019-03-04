@@ -48,6 +48,10 @@ class AssociationDAOImpl(entityManager: EntityManager)
     a
   }
 
+  override def findByUUID(uuid: UUID): Option[AssociationImpl] =
+    findByNamedQuery("Association.findByUuid", Map("uuid" -> uuid))
+      .headOption
+
   override def findByLinkName(linkName: String): Iterable[AssociationImpl] =
     findByNamedQuery("Association.findByLinkName", Map("linkName" -> linkName))
 

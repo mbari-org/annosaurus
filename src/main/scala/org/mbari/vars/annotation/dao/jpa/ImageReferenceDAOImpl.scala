@@ -17,6 +17,7 @@
 package org.mbari.vars.annotation.dao.jpa
 
 import java.net.URL
+import java.util.UUID
 
 import javax.persistence.EntityManager
 import org.mbari.vars.annotation.dao.ImageReferenceDAO
@@ -53,6 +54,10 @@ class ImageReferenceDAOImpl(entityManager: EntityManager)
 
   override def findAll(limit: Int, offset: Int): Iterable[ImageReferenceImpl] =
     findByNamedQuery("ImageReference.findAll", limit = Some(limit), offset = Some(offset))
+
+  override def findByUUID(uuid: UUID): Option[ImageReferenceImpl] =
+    findByNamedQuery("ImageReference.findByUuid", Map("uuid" -> uuid))
+      .headOption
 
   override def findByURL(url: URL): Option[ImageReferenceImpl] =
     findByNamedQuery("ImageReference.findByURL", Map("url" -> url)).headOption

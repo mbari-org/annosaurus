@@ -29,14 +29,17 @@ import org.mbari.vars.annotation.model.{ CachedAncillaryDatum, ImagedMoment }
  */
 @Entity(name = "AncillaryDatum")
 @Table(name = "ancillary_data", indexes = Array(
-  new Index(name = "idx_ancillary_data__imaged_moment_uuid", columnList = "imaged_moment_uuid"),
+  new Index(name = "idx_ancillary_data__imaged_moment_id", columnList = "imaged_moment_id"),
   new Index(name = "idx_ancillary_data__position", columnList = "latitude,longitude,depth_meters"))) //idx_ancillary_data_fk_im
-@EntityListeners(value = Array(classOf[TransactionLogger]))
+@EntityListeners(value = Array(classOf[TransactionLogger], classOf[UUIDKeyGenerator]))
 @NamedNativeQueries(Array(
   new NamedNativeQuery(
     name = "AncillaryDatum.deleteByVideoReferenceUuid",
     query = "DELETE FROM ancillary_data WHERE imaged_moment_uuid IN (SELECT uuid FROM imaged_moments WHERE video_reference_uuid = ?1)")))
 @NamedQueries(Array(
+  new NamedQuery(
+    name = "AncillaryDatum.findByUuid",
+    query = "SELECT a FROM AncillaryDatum a WHERE a.uuid = :uuid ORDER BY a.uuid"),
   new NamedQuery(
     name = "AncillaryDatum.findAll",
     query = "SELECT a FROM AncillaryDatum a ORDER BY a.uuid"),
@@ -96,9 +99,8 @@ class CachedAncillaryDatumImpl extends CachedAncillaryDatum with JPAPersistentOb
     fetch = FetchType.LAZY,
     targetEntity = classOf[ImagedMomentImpl])
   @JoinColumn(
-    name = "imaged_moment_uuid",
-    nullable = false,
-    columnDefinition = "CHAR(36)")
+    name = "imaged_moment_id",
+    nullable = false)
   override var imagedMoment: ImagedMoment = _
 
   @Expose(serialize = true)

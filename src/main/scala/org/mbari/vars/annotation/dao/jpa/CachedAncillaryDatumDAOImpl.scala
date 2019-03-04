@@ -82,6 +82,10 @@ class CachedAncillaryDatumDAOImpl(entityManager: EntityManager)
   override def findAll(limit: Int, offset: Int): Iterable[CachedAncillaryDatumImpl] =
     findByNamedQuery("AncillaryDatum.findAll", limit = Some(limit), offset = Some(offset))
 
+  override def findByUUID(uuid: UUID): Option[CachedAncillaryDatumImpl] =
+    findByNamedQuery("AncillaryDatum.findByUuid", Map("uuid" -> uuid))
+      .headOption
+
   override def findByObservationUUID(observationUuid: UUID): Option[CachedAncillaryDatum] =
     findByNamedQuery(
       "AncillaryDatum.findByObservationUUID",

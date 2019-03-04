@@ -31,9 +31,12 @@ import org.mbari.vars.annotation.model.{ ImageReference, ImagedMoment }
 @Entity(name = "ImageReference")
 @Table(name = "image_references", indexes = Array(
   new Index(name = "idx_image_references__url", columnList = "url"),
-  new Index(name = "idx_image_references__imaged_moment_uuid", columnList = "imaged_moment_uuid")))
-@EntityListeners(value = Array(classOf[TransactionLogger]))
+  new Index(name = "idx_image_references__imaged_moment_id", columnList = "imaged_moment_id")))
+@EntityListeners(value = Array(classOf[TransactionLogger], classOf[UUIDKeyGenerator]))
 @NamedQueries(Array(
+  new NamedQuery(
+    name = "ImageReference.findByUuid",
+    query = "SELECT r FROM ImageReference r WHERE r.uuid = :uuid ORDER BY r.url"),
   new NamedQuery(
     name = "ImageReference.findAll",
     query = "SELECT r FROM ImageReference r ORDER BY r.url"),
@@ -63,9 +66,8 @@ class ImageReferenceImpl extends ImageReference with JPAPersistentObject {
     optional = false,
     targetEntity = classOf[ImagedMomentImpl])
   @JoinColumn(
-    name = "imaged_moment_uuid",
-    nullable = false,
-    columnDefinition = "CHAR(36)")
+    name = "imaged_moment_id",
+    nullable = false)
   override var imagedMoment: ImagedMoment = _
 
   @Expose(serialize = true)

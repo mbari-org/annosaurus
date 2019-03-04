@@ -94,7 +94,7 @@ class CachedAncillaryDatumBean extends CachedAncillaryDatum {
 
   override val lastUpdated: Option[Instant] = None
 
-  override def primaryKey = Option(uuid)
+  override def primaryKey = ???
 
 }
 
