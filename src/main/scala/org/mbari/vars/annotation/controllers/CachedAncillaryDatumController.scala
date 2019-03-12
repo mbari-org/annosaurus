@@ -19,14 +19,14 @@ package org.mbari.vars.annotation.controllers
 import java.time.Duration
 import java.util.UUID
 
-import org.mbari.vars.annotation.dao.jpa.BaseDAO
-import org.mbari.vars.annotation.dao.{ CachedAncillaryDatumDAO, NotFoundInDatastoreException }
+import org.mbari.vars.annotation.dao.jpa.{BaseDAO, CachedAncillaryDatumImpl}
+import org.mbari.vars.annotation.dao.{CachedAncillaryDatumDAO, NotFoundInDatastoreException}
 import org.mbari.vars.annotation.math.FastCollator
-import org.mbari.vars.annotation.model.{ CachedAncillaryDatum, ImagedMoment }
+import org.mbari.vars.annotation.model.{CachedAncillaryDatum, ImagedMoment}
 import org.mbari.vars.annotation.model.simple.CachedAncillaryDatumBean
 import org.slf4j.LoggerFactory
 
-import scala.concurrent.{ ExecutionContext, Future }
+import scala.concurrent.{ExecutionContext, Future}
 
 /**
  * @author Brian Schlining
@@ -212,6 +212,7 @@ class CachedAncillaryDatumController(val daoFactory: BasicDAOFactory)
       im.ancillaryDatum
     } else {
       im.ancillaryDatum = d
+      im.ancillaryDatum
       d
     }
   }

@@ -2,24 +2,26 @@ val akkaVersion = "2.4.7"
 val auth0Version = "3.7.0"
 val codecVersion = "1.12"
 val configVersion = "1.3.3"
-val derbyVersion = "10.14.2.0"
+val derbyVersion = "10.15.1.3"
+//val derbyVersion = "10.14.2.0"
 val eclipselinkVersion = "2.7.4"
 val gsonJavatimeVersion = "1.1.1"
 val gsonVersion = "2.8.5"
-val h2Version = "1.4.197"
-val jettyVersion = "9.4.14.v20181114"
-val jsonVersion = "3.6.4"
+val h2Version = "1.4.198"
+val jettyVersion = "9.4.15.v20190215"
+val jsonVersion = "3.6.5"
 val jtaVersion = "1.1"
 val jtdsVersion = "1.3.1"
 val junitVersion = "4.12"
 val logbackVersion = "1.2.3"
-val mssqlVersion = "6.4.0.jre9"
-val rxjavaVersion = "2.2.6"
+val postgresqlVersion = "42.2.5"
+val rxjavaVersion = "2.2.7"
+val scalatestVersion = "3.0.6"
+val scalatraVersion = "2.6.5"
 val scilubeVersion = "2.0.4"
-val scalatestVersion = "3.0.5"
-val scalatraVersion = "2.6.4"
 val servletVersion = "4.0.1"
-val slf4jVersion = "1.7.25"
+val slf4jVersion = "1.7.26"
+val sqlserverVersion = "7.2.1.jre11"
 val uuidgenVersion = "0.1.3"
 val vcr4jVersion = "4.0.2"
 
@@ -85,24 +87,24 @@ lazy val annosaurus = (project in file("."))
   .settings(appSettings)
   .settings(
     libraryDependencies ++= Seq(
-      "com.auth0"                % "java-jwt"                       % auth0Version,
       "ch.qos.logback"           % "logback-classic"                % logbackVersion,
       "ch.qos.logback"           % "logback-core"                   % logbackVersion,
+      "com.auth0"                % "java-jwt"                       % auth0Version,
       "com.fatboyindustrial.gson-javatime-serialisers" % "gson-javatime-serialisers" % gsonJavatimeVersion,
       "com.google.code.gson"     % "gson"                           % gsonVersion,
       "com.h2database"           % "h2"                             % h2Version             % "test",
+      "com.microsoft.sqlserver"  % "mssql-jdbc"                     % sqlserverVersion,
       "com.typesafe"             % "config"                         % configVersion,
       "commons-codec"            % "commons-codec"                  % codecVersion,
+      "io.reactivex.rxjava2"     % "rxjava"                         % rxjavaVersion,
       "javax.servlet"            % "javax.servlet-api"              % servletVersion,
       "javax.transaction"        % "jta"                            % jtaVersion,
       "junit"                    % "junit"                          % junitVersion          % "test",
-      "io.reactivex.rxjava2"     % "rxjava"                         % rxjavaVersion,
-      "com.microsoft.sqlserver"  % "mssql-jdbc"                     % mssqlVersion,
-      //"net.sourceforge.jtds"     % "jtds"                           % jtdsVersion,
-      "scilube"                 %% "scilube-core"                   % scilubeVersion,
       "org.apache.derby"         % "derby"                          % derbyVersion, //          % "test",
       "org.apache.derby"         % "derbyclient"                    % derbyVersion, //          % "test",
       "org.apache.derby"         % "derbynet"                       % derbyVersion, //          % "test",
+      "org.apache.derby"         % "derbyshared"                    % derbyVersion,
+      "org.apache.derby"         % "derbytools"                     % derbyVersion,
       "org.eclipse.jetty"        % "jetty-server"                   % jettyVersion          % "compile;test",
       "org.eclipse.jetty"        % "jetty-servlets"                 % jettyVersion          % "compile;test",
       "org.eclipse.jetty"        % "jetty-webapp"                   % jettyVersion          % "compile;test",
@@ -110,12 +112,15 @@ lazy val annosaurus = (project in file("."))
       "org.json4s"              %% "json4s-jackson"                 % jsonVersion,
       "org.mbari.uuid"           % "uuid-gen"                       % uuidgenVersion,
       "org.mbari.vcr4j"          % "vcr4j-core"                     % vcr4jVersion,
+      "org.postgresql"           % "postgresql"                     % postgresqlVersion,
       "org.scalatest"           %% "scalatest"                      % scalatestVersion      % "test",
-      "org.scalatra"            %% "scalatra"                       % scalatraVersion,
       "org.scalatra"            %% "scalatra-json"                  % scalatraVersion,
       "org.scalatra"            %% "scalatra-scalate"               % scalatraVersion,
       "org.scalatra"            %% "scalatra-scalatest"             % scalatraVersion,
+      "org.scalatra"            %% "scalatra"                       % scalatraVersion,
       "org.slf4j"                % "log4j-over-slf4j"               % slf4jVersion,
+      "scilube"                 %% "scilube-core"                   % scilubeVersion,
+      //"net.sourceforge.jtds"     % "jtds"                           % jtdsVersion,
       "org.slf4j"                % "slf4j-api"                      % slf4jVersion
     ).map(_.excludeAll(ExclusionRule("org.slf4j", "slf4j-jdk14"),
       ExclusionRule("org.slf4j", "slf4j-log4j12"),
@@ -131,17 +136,6 @@ lazy val annosaurus = (project in file("."))
   )
 
 
-// -- SCALARIFORM
-// Format code on save with scalariform
-import scalariform.formatter.preferences._
-import com.typesafe.sbt.SbtScalariform
-
-SbtScalariform.scalariformSettings
-
-SbtScalariform.ScalariformKeys.preferences := SbtScalariform.ScalariformKeys.preferences.value
-  .setPreference(IndentSpaces, 2)
-  .setPreference(PlaceScaladocAsterisksBeneathSecondAsterisk, false)
-  .setPreference(DoubleIndentConstructorArguments, true)
 
 // Aliases
 addCommandAlias("cleanall", ";clean;clean-files")

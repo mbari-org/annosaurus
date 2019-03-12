@@ -13,9 +13,6 @@ addSbtPlugin("org.xerial.sbt" % "sbt-pack" % "0.11")
 // https://github.com/rtimush/sbt-updates
 addSbtPlugin("com.timushev.sbt" % "sbt-updates" % "0.3.4")
 
-// https://github.com/sbt/sbt-scalariform
-addSbtPlugin("org.scalariform" % "sbt-scalariform" % "1.8.2")
-
 // http://www.scalastyle.org/sbt.html
 addSbtPlugin("org.scalastyle" %% "scalastyle-sbt-plugin" % "1.0.0")
 

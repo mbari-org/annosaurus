@@ -121,21 +121,21 @@ class AnnotationControllerSpec extends FlatSpec with Matchers with BeforeAndAfte
     c.get.elapsedTime should be(et0)
   }
 
-//  it should "report insert benchmark" in {
-//    val start = System.nanoTime()
-//    val n = 10000
-//    for (i <- 0 until n) {
-//      exec(() => controller.create(
-//        UUID.randomUUID(),
-//        "Nanomia bijuga",
-//        "brian",
-//        recordedDate = Some(recordedDate)))
-//    }
-//    val end = System.nanoTime();
-//    val nanos = end - start
-//    val duration = Duration.ofNanos(nanos)
-//    log.info(s"Inserted $n records in $duration")
-//  }
+  //  it should "report insert benchmark" in {
+  //    val start = System.nanoTime()
+  //    val n = 10000
+  //    for (i <- 0 until n) {
+  //      exec(() => controller.create(
+  //        UUID.randomUUID(),
+  //        "Nanomia bijuga",
+  //        "brian",
+  //        recordedDate = Some(recordedDate)))
+  //    }
+  //    val end = System.nanoTime();
+  //    val nanos = end - start
+  //    val duration = Duration.ofNanos(nanos)
+  //    log.info(s"Inserted $n records in $duration")
+  //  }
 
   protected override def afterAll(): Unit = {
     daoFactory.cleanup()

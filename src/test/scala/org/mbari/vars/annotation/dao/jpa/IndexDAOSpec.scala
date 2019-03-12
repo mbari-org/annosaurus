@@ -1,21 +1,37 @@
+/*
+ * Copyright 2017 Monterey Bay Aquarium Research Institute
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.mbari.vars.annotation.dao.jpa
 
-import java.time.{Duration, Instant}
+import java.time.{ Duration, Instant }
 import java.util.UUID
 import java.util.concurrent.TimeUnit
 
-import org.mbari.vars.annotation.dao.{ImagedMomentDAO, IndexDAO}
+import org.mbari.vars.annotation.dao.{ ImagedMomentDAO, IndexDAO }
 import org.mbari.vcr4j.time.Timecode
-import org.scalatest.{BeforeAndAfterAll, FlatSpec, Matchers}
+import org.scalatest.{ BeforeAndAfterAll, FlatSpec, Matchers }
 
 import scala.concurrent.Await
-import scala.concurrent.duration.{Duration => SDuration}
+import scala.concurrent.duration.{ Duration => SDuration }
 import scala.concurrent.ExecutionContext.Implicits.global
 
 /**
-  * @author Brian Schlining
-  * @since 2019-02-08T09:18:00
-  */
+ * @author Brian Schlining
+ * @since 2019-02-08T09:18:00
+ */
 class IndexDAOSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
 
   private type IMDAO = ImagedMomentDAO[ImagedMomentImpl]
@@ -28,8 +44,6 @@ class IndexDAOSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
   private[this] val now = Instant.now()
   private[this] val imagedMoment0 = ImagedMomentImpl(Some(videoReferenceUUID), Some(now), elapsedTime = Some(Duration.ofMinutes(1)))
   private[this] val imagedMoment1 = ImagedMomentImpl(Some(videoReferenceUUID), Some(now.plusSeconds(60)), elapsedTime = Some(Duration.ofMinutes(5)))
-
-
 
   def runIm[R](fn: IMDAO => R): R = Await.result(imDao.runTransaction(fn), timeout)
 
@@ -46,7 +60,7 @@ class IndexDAOSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
   it should "findByVideoReferenceUuid" in {
     val im = dao.findByVideoReferenceUuid(videoReferenceUUID)
     im should not be empty
-    im.size should be (2)
+    im.size should be(2)
     //im.foreach(println)
   }
 
@@ -54,7 +68,7 @@ class IndexDAOSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     val timecode = new Timecode(2345, 29.97)
     runId(d => {
       val id = d.findByVideoReferenceUuid(videoReferenceUUID)
-          .find(_.uuid == imagedMoment0.uuid)
+        .find(_.uuid == imagedMoment0.uuid)
       id shouldBe defined
       id.get.timecode = timecode
     })

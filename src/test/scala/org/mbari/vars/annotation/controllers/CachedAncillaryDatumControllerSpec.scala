@@ -64,6 +64,7 @@ class CachedAncillaryDatumControllerSpec extends FlatSpec with Matchers with Bef
     cad.imagedMoment.uuid should be(im.uuid)
     cad.depthMeters should not be None
     cad.depthMeters.get should be(1078)
+    cad.lastUpdated should not be None
   }
 
   it should "bulk create datums" in {
