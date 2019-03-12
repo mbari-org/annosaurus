@@ -11,7 +11,7 @@ addSbtPlugin("com.typesafe.sbt" % "sbt-native-packager" % "1.3.15")
 addSbtPlugin("org.xerial.sbt" % "sbt-pack" % "0.11")
 
 // https://github.com/rtimush/sbt-updates
-addSbtPlugin("com.timushev.sbt" % "sbt-updates" % "0.3.4")
+addSbtPlugin("com.timushev.sbt" % "sbt-updates" % "0.4.0")
 
 // http://www.scalastyle.org/sbt.html
 addSbtPlugin("org.scalastyle" %% "scalastyle-sbt-plugin" % "1.0.0")
