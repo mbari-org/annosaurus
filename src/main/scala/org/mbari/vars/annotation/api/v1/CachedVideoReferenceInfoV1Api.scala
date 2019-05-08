@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.mbari.vars.annotation.api
+package org.mbari.vars.annotation.api.v1
 
 import java.util.UUID
 
@@ -32,7 +32,7 @@ import scala.concurrent.ExecutionContext
  * @since 2016-09-14T10:50:00
  */
 class CachedVideoReferenceInfoV1Api(controller: CachedVideoReferenceInfoController)(implicit val executor: ExecutionContext)
-  extends APIStack {
+  extends V1APIStack {
 
   get("/?") {
     val limit = params.getAs[Int]("limit")

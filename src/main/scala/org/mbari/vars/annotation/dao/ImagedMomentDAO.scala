@@ -16,9 +16,10 @@
 
 package org.mbari.vars.annotation.dao
 
-import java.time.{ Duration, Instant }
+import java.time.{Duration, Instant}
 import java.util.UUID
 
+import org.mbari.vars.annotation.dao.jpa.ImagedMomentImpl
 import org.mbari.vars.annotation.model.ImagedMoment
 import org.mbari.vcr4j.time.Timecode
 
@@ -51,8 +52,20 @@ trait ImagedMomentDAO[T <: ImagedMoment] extends DAO[T] {
     limit: Option[Int] = None,
     offset: Option[Int] = None): Iterable[T]
 
+  def streamBetweenUpdatedDates(
+     start: Instant,
+     end: Instant,
+     limit: Option[Int] = None,
+     offset: Option[Int] = None): java.util.stream.Stream[T]
+
+  def streamVideoReferenceUuidsBetweenUpdatedDates(start: Instant,
+                                                 end: Instant,
+                                                 limit: Option[Int] = None,
+                                                 offset: Option[Int] = None): java.util.stream.Stream[UUID]
+
   def countByConcept(concept: String): Int
   def findByConcept(concept: String, limit: Option[Int], offset: Option[Int]): Iterable[T]
+  def streamByConcept(concept: String, limit: Option[Int], offset: Option[Int]): java.util.stream.Stream[T]
 
   def countByConceptWithImages(concept: String): Int
   def findByConceptWithImages(concept: String, limit: Option[Int], offset: Option[Int]): Iterable[T]

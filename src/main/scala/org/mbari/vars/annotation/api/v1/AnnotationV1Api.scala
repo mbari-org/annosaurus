@@ -14,18 +14,18 @@
  * limitations under the License.
  */
 
-package org.mbari.vars.annotation.api
+package org.mbari.vars.annotation.api.v1
 
-import java.time.{ Duration, Instant }
+import java.time.{Duration, Instant}
 import java.util.UUID
 
 import org.mbari.vars.annotation.controllers.AnnotationController
 import org.mbari.vars.annotation.dao.jpa.AnnotationImpl
 import org.mbari.vars.annotation.model.Annotation
 import org.mbari.vcr4j.time.Timecode
-import org.scalatra.{ BadRequest, NotFound }
+import org.scalatra.{BadRequest, NotFound}
 
-import scala.concurrent.{ Await, ExecutionContext, Future }
+import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.collection.JavaConverters._
 
 /**
@@ -35,7 +35,7 @@ import scala.collection.JavaConverters._
  * @since 2016-06-30T10:08:00
  */
 class AnnotationV1Api(controller: AnnotationController)(implicit val executor: ExecutionContext)
-  extends APIStack {
+  extends V1APIStack {
 
   before() {
     contentType = "application/json"

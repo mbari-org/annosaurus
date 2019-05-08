@@ -14,13 +14,14 @@
  * limitations under the License.
  */
 
-package org.mbari.vars.annotation.api
+package org.mbari.vars.annotation.api.v1
 
 import java.nio.charset.StandardCharsets
 import java.time.Duration
 import java.util.UUID
 
 import org.mbari.vars.annotation.Constants
+import org.mbari.vars.annotation.api.WebApiStack
 import org.mbari.vars.annotation.controllers.CachedAncillaryDatumController
 import org.mbari.vars.annotation.dao.jpa.CachedAncillaryDatumImpl
 import org.mbari.vars.annotation.model.simple.CachedAncillaryDatumBean

@@ -14,18 +14,19 @@
  * limitations under the License.
  */
 
-package org.mbari.vars.annotation.api
+package org.mbari.vars.annotation.api.v1
 
 import java.net.URL
 import java.time.Instant
 import java.util.UUID
 import java.util.concurrent.TimeUnit
 
-import org.mbari.vars.annotation.controllers.{ ImageReferenceController, ImagedMomentController }
-import org.mbari.vars.annotation.dao.jpa.{ ImageReferenceImpl, ImagedMomentImpl }
+import org.mbari.vars.annotation.api.WebApiStack
+import org.mbari.vars.annotation.controllers.{ImageReferenceController, ImagedMomentController}
+import org.mbari.vars.annotation.dao.jpa.{ImageReferenceImpl, ImagedMomentImpl}
 
 import scala.concurrent.Await
-import scala.concurrent.duration.{ Duration => SDuration }
+import scala.concurrent.duration.{Duration => SDuration}
 
 /**
  *

@@ -48,7 +48,6 @@ object JettyMain {
 
     val connector = new NetworkTrafficServerConnector(server, new HttpConnectionFactory(httpConfig))
     connector.setPort(conf.port)
-    connector.setSoLingerTime(0)
     connector.setIdleTimeout(conf.connectorIdleTimeout)
     server.addConnector(connector)
 

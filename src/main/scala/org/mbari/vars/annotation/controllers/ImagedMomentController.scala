@@ -16,15 +16,16 @@
 
 package org.mbari.vars.annotation.controllers
 
-import java.time.{ Duration, Instant }
+import java.io.Closeable
+import java.time.{Duration, Instant}
 import java.util.UUID
 
-import org.mbari.vars.annotation.dao.{ ImagedMomentDAO, NotFoundInDatastoreException }
+import org.mbari.vars.annotation.dao.{ImagedMomentDAO, NotFoundInDatastoreException}
 import org.mbari.vars.annotation.model.ImagedMoment
 import org.mbari.vcr4j.time.Timecode
 import org.slf4j.LoggerFactory
 
-import scala.concurrent.{ ExecutionContext, Future }
+import scala.concurrent.{ExecutionContext, Future}
 
 /**
  *
@@ -48,9 +49,17 @@ class ImagedMomentController(val daoFactory: BasicDAOFactory)
   def findByVideoReferenceUUID(uuid: UUID, limit: Option[Int] = None, offset: Option[Int] = None)(implicit ec: ExecutionContext): Future[Iterable[ImagedMoment]] =
     exec(d => d.findByVideoReferenceUUID(uuid, limit, offset))
 
-  def streamByVideoReferenceUUID(uuid: UUID, limit: Option[Int] = None, offset: Option[Int] = None)(implicit ec: ExecutionContext): java.util.stream.Stream[ImagedMoment] = {
+  /**
+    *
+    * @param uuid
+    * @param limit
+    * @param offset
+    * @return A butple of a closeable, and a stream. When the stream is done being processed
+    *         invoke the closeable
+    */
+  def streamByVideoReferenceUUID(uuid: UUID, limit: Option[Int] = None, offset: Option[Int] = None): (Closeable, java.util.stream.Stream[ImagedMoment]) = {
     val dao = daoFactory.newImagedMomentDAO()
-    dao.streamByVideoReferenceUUID(uuid, limit, offset)
+    (() => dao.close(), dao.streamByVideoReferenceUUID(uuid, limit, offset))
   }
 
   def findByImageReferenceUUID(uuid: UUID)(implicit ec: ExecutionContext): Future[Option[ImagedMoment]] = {
@@ -83,6 +92,26 @@ class ImagedMomentController(val daoFactory: BasicDAOFactory)
     f.map(_.toSeq)
   }
 
+  def streamBetweenUpdatedDates(start: Instant,
+                                end: Instant,
+                                limit: Option[Int] = None,
+                                offset: Option[Int] = None): (Closeable, java.util.stream.Stream[ImagedMoment]) = {
+    val dao = daoFactory.newImagedMomentDAO()
+    (() => dao.close(), dao.streamBetweenUpdatedDates(start, end, limit, offset))
+  }
+
+
+
+  def streamVideoReferenceUuidsBetweenUpdatedDates(start: Instant,
+                                                   end: Instant,
+                                                   limit: Option[Int] = None,
+                                                   offset: Option[Int] = None):
+      (Closeable, java.util.stream.Stream[UUID]) = {
+    val dao = daoFactory.newImagedMomentDAO()
+    (() => dao.close(), dao.streamVideoReferenceUuidsBetweenUpdatedDates(start, end, limit, offset))
+  }
+
+
   def countBetweenUpdatedDates(
     start: Instant,
     end: Instant)(implicit ec: ExecutionContext): Future[Int] = {
@@ -106,6 +135,12 @@ class ImagedMomentController(val daoFactory: BasicDAOFactory)
     val f = imDao.runTransaction(d => d.findByConcept(concept, limit, offset))
     f.onComplete(_ => imDao.close())
     f
+  }
+
+  def streamByConcept(concept: String, limit: Option[Int] = None, offset: Option[Int] = None):
+      (Closeable, java.util.stream.Stream[ImagedMoment]) = {
+    val dao = daoFactory.newImagedMomentDAO()
+    (() => dao.close(), dao.streamByConcept(concept, limit, offset))
   }
 
   def countByConcept(concept: String)(implicit ec: ExecutionContext): Future[Int] = {

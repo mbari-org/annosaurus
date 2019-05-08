@@ -16,21 +16,23 @@
 
 package org.mbari.vars.annotation.api
 
-import java.net.{ URI, URL }
+import java.net.{URI, URL}
 import java.time.format.DateTimeFormatter
-import java.time.{ Duration, Instant }
+import java.time.{Duration, Instant}
 import java.util.UUID
 import java.util.concurrent.TimeUnit
+import java.util.function.{Consumer, Function}
+import java.util.stream.Stream
 
 import javax.servlet.http.HttpServletResponse
 import org.mbari.vars.annotation.Constants
 import org.mbari.vcr4j.time.Timecode
-import org.scalatra.{ ContentEncodingSupport, FutureSupport, ScalatraServlet }
 import org.scalatra.util.conversion.TypeConverter
+import org.scalatra.{FutureSupport, ScalatraServlet}
 import org.slf4j.LoggerFactory
 
-import scala.concurrent.{ Await, Future }
-import scala.concurrent.duration.{ Duration => SDuration }
+import scala.concurrent.duration.{Duration => SDuration}
+import scala.concurrent.{Await, Future}
 import scala.util.Try
 
 /**
@@ -42,7 +44,6 @@ import scala.util.Try
  */
 abstract class APIStack extends ScalatraServlet
   with ApiAuthenticationSupport
-  with ContentEncodingSupport
   with FutureSupport {
 
   implicit def toScalaDuration(duration: Duration): SDuration =
@@ -105,6 +106,7 @@ abstract class APIStack extends ScalatraServlet
     out.flush()
 
   }
+
 
   /**
    * Pages data and sends each page back as a chunked response to the server

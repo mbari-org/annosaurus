@@ -16,10 +16,10 @@
 
 package org.mbari.vars.annotation.dao.jpa
 
-import java.time.{ Duration, Instant }
-import java.util.UUID
-import javax.persistence.EntityManager
+import java.time.{Duration, Instant}
+import java.util.{UUID, stream}
 
+import javax.persistence.EntityManager
 import org.mbari.vars.annotation.dao.ObservationDAO
 
 import scala.collection.JavaConverters._
@@ -54,6 +54,10 @@ class ObservationDAOImpl(entityManager: EntityManager)
 
   override def findByVideoReferenceUUID(uuid: UUID, limit: Option[Int] = None, offset: Option[Int] = None): Iterable[ObservationImpl] =
     findByNamedQuery("Observation.findByVideoReferenceUUID", Map("uuid" -> uuid), limit, offset)
+
+
+  override def streamByVideoReferenceUUID(uuid: UUID, limit: Option[Int], offset: Option[Int]): stream.Stream[ObservationImpl] =
+    streamByNamedQuery("Observation.findByVideoReferenceUUID", Map("uuid" -> uuid), limit, offset)
 
   /**
    *

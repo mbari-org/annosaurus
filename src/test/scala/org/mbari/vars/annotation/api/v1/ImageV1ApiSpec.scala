@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 
-package org.mbari.vars.annotation.api
+package org.mbari.vars.annotation.api.v1
 
-import java.net.{ URL, URLEncoder }
-import java.time.{ Duration, Instant }
+import java.net.{URL, URLEncoder}
+import java.time.{Duration, Instant}
 import java.util.UUID
 
+import org.mbari.vars.annotation.api.WebApiStack
 import org.mbari.vars.annotation.controllers.ImageController
 import org.mbari.vars.annotation.model.simple.Image
 

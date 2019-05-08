@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.mbari.vars.annotation.api
+package org.mbari.vars.annotation.api.v1
 
 import java.time.{ Duration, Instant }
 import java.util.UUID
@@ -33,7 +33,7 @@ import scala.collection.JavaConverters._
  * @since 2016-07-04T21:56:00
  */
 class ObservationV1Api(controller: ObservationController)(implicit val executor: ExecutionContext)
-  extends APIStack {
+  extends V1APIStack {
 
   get("/:uuid") {
     val uuid = params.getAs[UUID]("uuid").getOrElse(halt(BadRequest("Please provide a UUID")))

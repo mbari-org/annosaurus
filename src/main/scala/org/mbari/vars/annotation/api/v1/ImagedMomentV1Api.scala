@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.mbari.vars.annotation.api
+package org.mbari.vars.annotation.api.v1
 
 import java.time.{ Duration, Instant }
 import java.util.UUID
@@ -35,7 +35,7 @@ import scala.collection.JavaConverters._
  * @since 2016-07-11T16:58:00
  */
 class ImagedMomentV1Api(controller: ImagedMomentController)(implicit val executor: ExecutionContext)
-  extends APIStack {
+  extends V1APIStack {
 
   before() {
     contentType = "application/json"
