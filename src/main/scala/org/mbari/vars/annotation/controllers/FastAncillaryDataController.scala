@@ -16,13 +16,15 @@
 
 package org.mbari.vars.annotation.controllers
 
+import java.sql.Timestamp
+import java.time.Instant
 import java.util.UUID
 
 import javax.persistence.EntityManager
 import org.mbari.vars.annotation.model.simple.CachedAncillaryDatumBean
 import org.slf4j.LoggerFactory
 
-import scala.concurrent.{ ExecutionContext, Future }
+import scala.concurrent.{ExecutionContext, Future}
 import scala.collection.JavaConverters._
 
 /**
@@ -85,6 +87,7 @@ class FastAncillaryDataController(entityManager: EntityManager) {
 
   def dataAsSql(datum: CachedAncillaryDatumBean): Map[String, String] = {
     require(datum.imagedMomentUuid != null)
+    val lastUpdated = Timestamp.from(Instant.now())
     (datum.altitude.map(v => "altitude" -> s"$v") ::
       Option(datum.crs).map(v => "coordinate_reference_system" -> s"'$v'") ::
       datum.depthMeters.map(v => "depth_meters" -> s"$v") ::
@@ -102,6 +105,7 @@ class FastAncillaryDataController(entityManager: EntityManager) {
       datum.salinity.map(v => "salinity" -> s"$v") ::
       datum.temperatureCelsius.map(v => "temperature_celsius" -> s"$v") ::
       datum.pressureDbar.map(v => "pressure_dbar" -> s"$v") ::
+      Some("last_updated_timestamp" -> s"'$lastUpdated'") ::
       Nil).flatten.toMap
   }
 

@@ -16,27 +16,34 @@
 
 package org.mbari.vars.annotation.controllers
 
-import java.time.{ Duration, Instant }
+import java.time.{Duration, Instant}
 import java.util.UUID
 import java.util.concurrent.TimeUnit
 
 import org.mbari.vars.annotation.dao.jpa.TestDAOFactory
 import org.mbari.vars.annotation.model.simple.CachedAncillaryDatumBean
-import org.scalatest.{ BeforeAndAfterAll, FlatSpec, Matchers }
+import org.scalatest.{BeforeAndAfterAll, FlatSpec, Matchers}
 
-import scala.concurrent.duration.{ Duration => SDuration }
-import scala.concurrent.{ Await, Future }
+import scala.concurrent.duration.{Duration => SDuration}
+import scala.concurrent.{Await, Future}
 import scala.concurrent.ExecutionContext.Implicits.global
 
 /**
- * @author Brian Schlining
- * @since 2017-11-09T15:19:00
- */
-class CachedAncillaryDatumControllerSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
+  * @author Brian Schlining
+  * @since 2017-11-09T15:19:00
+  */
+class CachedAncillaryDatumControllerSpec
+    extends FlatSpec
+    with Matchers
+    with BeforeAndAfterAll {
 
   private[this] val daoFactory = TestDAOFactory.Instance
-  private[this] val controller = new CachedAncillaryDatumController(daoFactory.asInstanceOf[BasicDAOFactory])
-  private[this] val imagedMomentController = new ImagedMomentController(daoFactory.asInstanceOf[BasicDAOFactory])
+  private[this] val controller = new CachedAncillaryDatumController(
+    daoFactory.asInstanceOf[BasicDAOFactory]
+  )
+  private[this] val imagedMomentController = new ImagedMomentController(
+    daoFactory.asInstanceOf[BasicDAOFactory]
+  )
   private[this] val timeout = SDuration(200, TimeUnit.SECONDS)
   private[this] val recordedDate = Instant.now()
   private[this] val videoReferenceUuid = UUID.randomUUID()
@@ -44,10 +51,14 @@ class CachedAncillaryDatumControllerSpec extends FlatSpec with Matchers with Bef
   private[this] val imagedMoments = {
 
     val dao = daoFactory.newImagedMomentDAO()
-    val ims = (0 until 4).map(i => dao.newPersistentObject(
-      videoReferenceUuid,
-      elapsedTime = Some(Duration.ofMillis(1000 + i * 10 * 1000)),
-      recordedDate = Some(recordedDate.plusSeconds(10 * i))))
+    val ims = (0 until 4).map(
+      i =>
+        dao.newPersistentObject(
+          videoReferenceUuid,
+          elapsedTime = Some(Duration.ofMillis(1000 + i * 10 * 1000)),
+          recordedDate = Some(recordedDate.plusSeconds(10 * i))
+        )
+    )
     dao.runTransaction(d => {
       ims.foreach(dao.create)
     })
@@ -85,6 +96,7 @@ class CachedAncillaryDatumControllerSpec extends FlatSpec with Matchers with Bef
       val i = maybeMoment.get
       i.ancillaryDatum.depthMeters should not be None
       i.ancillaryDatum.depthMeters.get should be(1000)
+      i.ancillaryDatum.lastUpdated should not be None
     })
   }
 
@@ -106,12 +118,14 @@ class CachedAncillaryDatumControllerSpec extends FlatSpec with Matchers with Bef
           c.imagedMomentUuid = im.uuid
           c.lightTransmission = Some(50)
           c.temperatureCelsius = Some(4)
-          c.salinity = Some(33.5F)
+          c.salinity = Some(33.5f)
           c.crs = "EPSG:4326"
           c
       })
 
-    exec(() => controller.merge(cads, videoReferenceUuid, Duration.ofMillis(15000)))
+    exec(
+      () => controller.merge(cads, videoReferenceUuid, Duration.ofMillis(15000))
+    )
 
     imagedMoments.foreach(im => {
       val maybeMoment = exec(() => imagedMomentController.findByUUID(im.uuid))
@@ -122,11 +136,15 @@ class CachedAncillaryDatumControllerSpec extends FlatSpec with Matchers with Bef
       ad.depthMeters should not be None
       ad.depthMeters.get should be(2000)
       ad.salinity should not be None
-      ad.salinity.get should be(33.5F)
+      ad.salinity.get should be(33.5f)
       ad.lightTransmission should not be None
       ad.lightTransmission.get should be(50)
     })
 
+  }
+
+  protected override def afterAll(): Unit = {
+    daoFactory.cleanup()
   }
 
 }

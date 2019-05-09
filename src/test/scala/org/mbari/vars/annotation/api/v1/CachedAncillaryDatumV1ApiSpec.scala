@@ -78,6 +78,10 @@ class CachedAncillaryDatumV1ApiSpec extends WebApiStack {
       headers = Map("Content-Type" -> "application/json"),
       body = json.getBytes(StandardCharsets.UTF_8)) {
         status should be(200)
+
+        // Note that if bulid create is successful it just sends back
+        // the exact same data you sent. So there will be no lastUpdated
+        // or uuid values set.
         val persistedData = Constants.GSON
           .fromJson(body, classOf[Array[CachedAncillaryDatumImpl]])
           .toSeq
@@ -86,7 +90,7 @@ class CachedAncillaryDatumV1ApiSpec extends WebApiStack {
           val a = data(i)
           val b = persistedData(i)
 
-          b.uuid should not be null
+          b.uuid === null
           b.latitude.get should be(a.latitude.get)
           b.longitude.get should be(a.longitude.get)
           b.depthMeters.get should be(a.depthMeters.get)
@@ -117,7 +121,7 @@ class CachedAncillaryDatumV1ApiSpec extends WebApiStack {
           val a = data(i)
           val b = persistedData(i)
 
-          b.uuid should not be null
+          b.uuid === null
           b.latitude.get should be(a.latitude.get)
           b.longitude.get should be(a.longitude.get)
           b.depthMeters.get should be(a.depthMeters.get)
