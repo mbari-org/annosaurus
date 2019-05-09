@@ -17,7 +17,8 @@
 import java.util.concurrent.Executors
 
 import javax.servlet.ServletContext
-import org.mbari.vars.annotation.api._
+import org.mbari.vars.annotation.api.v1._
+import org.mbari.vars.annotation.api.v2._
 import org.mbari.vars.annotation.controllers._
 import org.mbari.vars.annotation.dao.jpa.JPADAOFactory
 import org.scalatra.LifeCycle
@@ -64,6 +65,9 @@ class ScalatraBootstrap extends LifeCycle {
     val observationV1Api = new ObservationV1Api(observationController)
     val videoReferenceV1Api = new CachedVideoReferenceInfoV1Api(videoReferenceController)
 
+    val annotationV2Api = new AnnotationV2Api(annotationController)
+    val imagedMomentV2Api = new ImagedMomentV2Api(imagedMomentController)
+
     context.mount(ancillaryDatumV1Api, "/v1/ancillarydata")
     context.mount(annotationV1Api, "/v1/annotations")
     context.mount(associationV1Api, "/v1/associations")
@@ -74,6 +78,9 @@ class ScalatraBootstrap extends LifeCycle {
     context.mount(indexV1Api, "/v1/index")
     context.mount(observationV1Api, "/v1/observations")
     context.mount(videoReferenceV1Api, "/v1/videoreferences")
+
+    context.mount(annotationV2Api, "/v2/annotations")
+    context.mount(imagedMomentV2Api, "/v2/imagedmoments")
 
   }
 

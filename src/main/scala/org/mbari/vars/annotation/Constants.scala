@@ -18,7 +18,6 @@ package org.mbari.vars.annotation
 
 import java.lang.reflect.Type
 import java.time.Duration
-import java.util
 
 import com.fatboyindustrial.gsonjavatime.Converters
 import com.google.gson.reflect.TypeToken
@@ -41,7 +40,6 @@ object Constants {
   val GSON: Gson = {
 
     val gsonBuilder = new GsonBuilder()
-      .setPrettyPrinting()
       .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
       .excludeFieldsWithoutExposeAnnotation()
       .setDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'")
@@ -61,7 +59,7 @@ object Constants {
 
     gsonBuilder.registerTypeAdapter(classOf[Option[Any]], new OptionSerializer)
 
-    gsonBuilder.registerTypeAdapter(classOf[util.Collection[_]], new CollectionConverter)
+    gsonBuilder.registerTypeAdapter(classOf[java.util.Collection[_]], new CollectionConverter)
 
     gsonBuilder.create()
 

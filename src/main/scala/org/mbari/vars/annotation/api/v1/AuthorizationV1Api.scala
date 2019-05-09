@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.mbari.vars.annotation.api
+package org.mbari.vars.annotation.api.v1
 
 import org.scalatra.Unauthorized
 
@@ -25,7 +25,7 @@ import scala.concurrent.ExecutionContext
  * @since 2017-01-19T11:07:00
  */
 class AuthorizationV1Api(implicit val executor: ExecutionContext)
-  extends APIStack {
+  extends V1APIStack {
 
   before() {
     contentType = "application/json"

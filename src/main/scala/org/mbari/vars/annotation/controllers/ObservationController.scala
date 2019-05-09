@@ -122,6 +122,11 @@ class ObservationController(val daoFactory: BasicDAOFactory)
     exec(fn)
   }
 
+  def streamByVideoReferenceUUID(uuid: UUID, limit: Option[Int] = None, offset: Option[Int] = None): java.util.stream.Stream[Observation] = {
+    val dao = daoFactory.newObservationDAO()
+    dao.streamByVideoReferenceUUID(uuid, limit, offset)
+  }
+
   def findByAssociationUUID(uuid: UUID)(implicit ec: ExecutionContext): Future[Option[Observation]] = {
     def fn(dao: ODAO): Option[Observation] = {
       val adao = daoFactory.newAssociationDAO(dao)

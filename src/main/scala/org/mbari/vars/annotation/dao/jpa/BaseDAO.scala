@@ -86,6 +86,7 @@ abstract class BaseDAO[B <: PersistentObject: ClassTag](val entityManager: Entit
     namedParameters.foreach({ case (a, b) => query.setParameter(a, b) })
     query.getResultStream
       .map(b => b.asInstanceOf[B])
+
   }
 
   def executeNamedQuery(name: String, namedParameters: Map[String, Any] = Map.empty): Int = {

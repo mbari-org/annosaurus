@@ -16,15 +16,17 @@
 
 package org.mbari.vars.annotation.controllers
 
-import java.time.{ Duration, Instant }
+import java.io.Closeable
+import java.time.{Duration, Instant}
 import java.util.UUID
 import java.util.concurrent.Executors
+
 import org.mbari.vars.annotation.dao.jpa.AnnotationImpl
 import org.mbari.vars.annotation.dao.DAO
-import org.mbari.vars.annotation.model.{ Annotation, Observation }
+import org.mbari.vars.annotation.model.{Annotation, ImagedMoment, Observation}
 import org.mbari.vcr4j.time.Timecode
 
-import scala.concurrent.{ ExecutionContext, Future }
+import scala.concurrent.{ExecutionContext, Future}
 
 /**
  *
@@ -63,15 +65,26 @@ class AnnotationController(daoFactory: BasicDAOFactory) {
     limit: Option[Int] = None,
     offset: Option[Int] = None)(implicit ec: ExecutionContext): Future[Seq[Annotation]] = {
 
-    //    val imDao = daoFactory.newImagedMomentDAO()
-    //    val f = imDao.runTransaction(d => d.findByVideoReferenceUUID(videoReferenceUUID, limit, offset))
-    //    f.onComplete(_ => imDao.close())
-    //    f.map(_.flatMap(AnnotationImpl(_)).toSeq)
-
     val dao = daoFactory.newObservationDAO()
     val f = dao.runTransaction(d => d.findByVideoReferenceUUID(videoReferenceUUID, limit, offset))
     f.onComplete(_ => dao.close())
     f.map(_.map(AnnotationImpl(_)).toSeq)
+  }
+
+  /**
+    *
+    * @param videoReferenceUuid
+    * @param limit
+    * @param offset
+    * @return A butple of a closeable, and a stream. When the stream is done being processed
+    *         invoke the closeable
+    */
+  def streamByVideoReferenceUUID(videoReferenceUuid: UUID,
+                                 limit: Option[Int] = None,
+                                 offset: Option[Int] = None): (Closeable, java.util.stream.Stream[Annotation]) = {
+    val dao = daoFactory.newObservationDAO()
+    (() => dao.close(), dao.streamByVideoReferenceUUID(videoReferenceUuid, limit, offset)
+      .map(obs => AnnotationImpl(obs)))
   }
 
   def findByImageReferenceUUID(imageReferenceUUID: UUID)(implicit ec: ExecutionContext): Future[Iterable[Annotation]] = {

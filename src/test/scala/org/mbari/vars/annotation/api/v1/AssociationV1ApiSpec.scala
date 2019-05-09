@@ -14,18 +14,19 @@
  * limitations under the License.
  */
 
-package org.mbari.vars.annotation.api
+package org.mbari.vars.annotation.api.v1
 
 import java.time.Duration
 import java.util.UUID
 import java.util.concurrent.TimeUnit
 
-import org.mbari.vars.annotation.controllers.{ AnnotationController, AssociationController, BasicDAOFactory, ObservationController }
+import org.mbari.vars.annotation.api.WebApiStack
+import org.mbari.vars.annotation.controllers.{AnnotationController, AssociationController, BasicDAOFactory, ObservationController}
 import org.mbari.vars.annotation.dao.jpa.AssociationImpl
-import org.mbari.vars.annotation.model.{ Annotation, Association }
+import org.mbari.vars.annotation.model.{Annotation, Association}
 
 import scala.concurrent.Await
-import scala.concurrent.duration.{ Duration => SDuration }
+import scala.concurrent.duration.{Duration => SDuration}
 
 /**
  *

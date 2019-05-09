@@ -14,20 +14,21 @@
  * limitations under the License.
  */
 
-package org.mbari.vars.annotation.api
+package org.mbari.vars.annotation.api.v1
 
 import java.nio.charset.StandardCharsets
-import java.time.{ Duration, Instant }
+import java.time.Instant
 import java.util.UUID
 import java.util.concurrent.TimeUnit
 
-import org.mbari.vars.annotation.controllers.{ AnnotationController, IndexController }
+import org.mbari.vars.annotation.api.WebApiStack
+import org.mbari.vars.annotation.controllers.{AnnotationController, IndexController}
 import org.mbari.vars.annotation.dao.jpa.IndexImpl
-import org.mbari.vcr4j.time.{ FrameRates, HMSF, Timecode }
+import org.mbari.vcr4j.time.{FrameRates, Timecode}
 
 import scala.collection.JavaConverters._
 import scala.concurrent.Await
-import scala.concurrent.duration.{ Duration => SDuration }
+import scala.concurrent.duration.{Duration => SDuration}
 
 /**
  * @author Brian Schlining

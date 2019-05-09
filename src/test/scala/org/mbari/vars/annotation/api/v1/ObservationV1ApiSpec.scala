@@ -14,21 +14,22 @@
  * limitations under the License.
  */
 
-package org.mbari.vars.annotation.api
+package org.mbari.vars.annotation.api.v1
 
 import java.nio.charset.StandardCharsets
-import java.time.{ Duration, Instant }
+import java.time.{Duration, Instant}
 import java.util.UUID
 import java.util.concurrent.TimeUnit
 
 import org.mbari.vars.annotation.Constants
+import org.mbari.vars.annotation.api.WebApiStack
 import org.mbari.vars.annotation.controllers.ObservationController
-import org.mbari.vars.annotation.dao.jpa.{ AnnotationImpl, AssociationImpl, ImagedMomentImpl, ObservationImpl }
+import org.mbari.vars.annotation.dao.jpa.{AnnotationImpl, AssociationImpl, ImagedMomentImpl, ObservationImpl}
 import org.mbari.vars.annotation.model.Observation
 
 import scala.collection.JavaConverters._
 import scala.concurrent.Await
-import scala.concurrent.duration.{ Duration => SDuration }
+import scala.concurrent.duration.{Duration => SDuration}
 
 /**
  *

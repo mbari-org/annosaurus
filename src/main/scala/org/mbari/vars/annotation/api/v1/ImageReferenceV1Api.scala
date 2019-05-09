@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.mbari.vars.annotation.api
+package org.mbari.vars.annotation.api.v1
 
 import java.net.URL
 import java.util.UUID
@@ -29,7 +29,7 @@ import scala.concurrent.ExecutionContext
  * Created by brian on 7/14/16.
  */
 class ImageReferenceV1Api(controller: ImageReferenceController)(implicit val executor: ExecutionContext)
-  extends APIStack {
+  extends V1APIStack {
 
   get("/:uuid") {
     val uuid = params.getAs[UUID]("uuid").getOrElse(halt(BadRequest("Please provide a UUID")))

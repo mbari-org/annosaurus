@@ -138,7 +138,7 @@ class ImageController(daoFactory: BasicDAOFactory) {
         ir
       })
     })
-    f.onComplete(t => irDao.close())
+    f.onComplete(_ => irDao.close())
     f.map(_.map(Image(_)))
   }
 

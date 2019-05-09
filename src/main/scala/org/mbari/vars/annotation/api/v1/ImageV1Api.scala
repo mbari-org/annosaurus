@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.mbari.vars.annotation.api
+package org.mbari.vars.annotation.api.v1
 
 import java.net.URL
 import java.time.{ Duration, Instant }
@@ -31,7 +31,7 @@ import scala.collection.JavaConverters._
  * Created by brian on 7/14/16.
  */
 class ImageV1Api(controller: ImageController)(implicit val executor: ExecutionContext)
-  extends APIStack {
+  extends V1APIStack {
 
   before() {
     contentType = "application/json"

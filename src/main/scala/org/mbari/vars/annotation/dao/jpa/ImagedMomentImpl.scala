@@ -48,6 +48,13 @@ import scala.collection.JavaConverters._
     name = "ImagedMoment.findAllVideoReferenceUUIDs",
     query = "SELECT DISTINCT video_reference_uuid FROM imaged_moments ORDER BY video_reference_uuid ASC"),
   new NamedNativeQuery(
+    name = "ImagedMoment.findVideoReferenceUUIDsModifiedBetweenDates",
+    query = "SELECT DISTINCT video_reference_uuid FROM imaged_moments im LEFT JOIN " +
+      "observations obs ON obs.imaged_moment_uuid = im.uuid WHERE " +
+      "im.last_updated_timestamp BETWEEN ?1 AND ?2 OR " +
+      "obs.last_updated_timestamp BETWEEN ?1 AND ?2 " +
+      "ORDER BY video_reference_uuid ASC"),
+  new NamedNativeQuery(
     name = "ImagedMoment.countByConcept",
     query = "SELECT COUNT(*) FROM imaged_moments im LEFT JOIN " +
       "observations obs ON obs.imaged_moment_uuid = im.uuid WHERE " +

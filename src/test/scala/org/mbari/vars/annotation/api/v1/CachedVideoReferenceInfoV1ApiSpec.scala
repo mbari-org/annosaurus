@@ -14,19 +14,20 @@
  * limitations under the License.
  */
 
-package org.mbari.vars.annotation.api
+package org.mbari.vars.annotation.api.v1
 
 import java.util.UUID
 import java.util.concurrent.TimeUnit
 
 import org.mbari.vars.annotation.Constants
-import org.mbari.vars.annotation.controllers.{ BasicDAOFactory, CachedVideoReferenceInfoController }
+import org.mbari.vars.annotation.api.WebApiStack
+import org.mbari.vars.annotation.controllers.CachedVideoReferenceInfoController
 import org.mbari.vars.annotation.dao.jpa.CachedVideoReferenceInfoImpl
 import org.mbari.vars.annotation.model.CachedVideoReferenceInfo
 
-import scala.concurrent.duration.{ Duration => SDuration }
 import scala.collection.mutable
 import scala.concurrent.Await
+import scala.concurrent.duration.{Duration => SDuration}
 
 /**
  *

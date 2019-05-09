@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.mbari.vars.annotation.api
+package org.mbari.vars.annotation.api.v1
 
 import java.util.UUID
 
@@ -30,7 +30,7 @@ import scala.concurrent.ExecutionContext
  * @since 2019-02-08T11:00:00
  */
 class IndexV1Api(controller: IndexController)(implicit val executor: ExecutionContext)
-  extends APIStack {
+  extends V1APIStack {
 
   before() {
     contentType = "application/json"

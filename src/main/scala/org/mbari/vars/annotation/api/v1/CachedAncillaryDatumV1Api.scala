@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.mbari.vars.annotation.api
+package org.mbari.vars.annotation.api.v1
 
 import java.time.Duration
 import java.util.UUID
@@ -31,7 +31,7 @@ import scala.collection.JavaConverters._
  * @since 2017-05-01T13:24:00
  */
 class CachedAncillaryDatumV1Api(controller: CachedAncillaryDatumController)(implicit val executor: ExecutionContext)
-  extends APIStack {
+  extends V1APIStack {
 
   before() {
     contentType = "application/json"

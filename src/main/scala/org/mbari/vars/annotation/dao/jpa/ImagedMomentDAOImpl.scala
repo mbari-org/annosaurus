@@ -17,8 +17,9 @@
 package org.mbari.vars.annotation.dao.jpa
 
 import java.sql.Timestamp
-import java.time.{ Duration, Instant }
-import java.util.UUID
+import java.time.{Duration, Instant}
+import java.util.function.Function
+import java.util.{UUID, stream}
 
 import javax.persistence.EntityManager
 import org.mbari.vars.annotation.dao.ImagedMomentDAO
@@ -65,6 +66,35 @@ class ImagedMomentDAOImpl(entityManager: EntityManager)
       Map("start" -> startTimestamp, "end" -> endTimestamp),
       limit,
       offset)
+  }
+
+  override def streamBetweenUpdatedDates(
+                                        start: Instant,
+                                        end: Instant,
+                                        limit: Option[Int] = None,
+                                        offset: Option[Int] = None): java.util.stream.Stream[ImagedMomentImpl] = {
+
+    val startTimestamp = Timestamp.from(start)
+    val endTimestamp = Timestamp.from(end)
+
+    streamByNamedQuery(
+      "ImagedMoment.findBetweenUpdatedDates",
+      Map("start" -> startTimestamp, "end" -> endTimestamp),
+      limit,
+      offset)
+  }
+
+
+  override def streamVideoReferenceUuidsBetweenUpdatedDates(start: Instant, end: Instant, limit: Option[Int], offset: Option[Int]): java.util.stream.Stream[UUID] = {
+    val query = entityManager.createNamedQuery("ImagedMoment.findVideoReferenceUUIDsModifiedBetweenDates")
+    val startTimestamp = Timestamp.from(start)
+    val endTimestamp = Timestamp.from(end)
+    query.setParameter(1, startTimestamp)
+    query.setParameter(2, endTimestamp)
+    query.getResultStream
+        .map(new Function[Any, UUID] {
+          override def apply(t: Any): UUID = UUID.fromString(t.toString)
+        })
   }
 
   override def countBetweenUpdatedDates(start: Instant, end: Instant): Int = {
@@ -115,6 +145,11 @@ class ImagedMomentDAOImpl(entityManager: EntityManager)
     limit: Option[Int],
     offset: Option[Int]): Iterable[ImagedMomentImpl] =
     findByNamedQuery("ImagedMoment.findByConcept", Map("concept" -> concept), limit, offset)
+
+
+  override def streamByConcept(concept: String, limit: Option[Int], offset: Option[Int]): stream.Stream[ImagedMomentImpl] =
+    streamByNamedQuery("ImagedMoment.findByConcept", Map("concept" -> concept), limit, offset)
+
 
   override def countByConceptWithImages(concept: String): Int = {
     val query = entityManager.createNamedQuery("ImagedMoment.countByConceptWithImages")
