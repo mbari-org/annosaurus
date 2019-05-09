@@ -117,20 +117,5 @@ class ImagedMomentV2Api(controller: ImagedMomentController)(implicit val executo
   }
 
 
-//  get("/modified/:start/:end") {
-//    val start = params.getAs[Instant]("start").getOrElse(halt(BadRequest("Please provide a start date (yyyy-mm-ddThh:mm:ssZ)")))
-//    val end = params.getAs[Instant]("end").getOrElse(halt(BadRequest("Please provide an end date (yyyy-mm-ddThh:mm:ssZ)")))
-//    val limit = params.getAs[Int]("limit")
-//    val offset = params.getAs[Int]("offset")
-//
-//    val dao = controller.daoFactory.newImagedMomentDAO()
-//    dao.runTransaction(d => {
-//      dao.streamByVideoReferenceUUID()
-//    });
-//
-//    controller.findBetweenUpdatedDates(start, end, limit, offset)
-//      .map(_.asJava)
-//      .map(toJson)
-//  }
 
 }
