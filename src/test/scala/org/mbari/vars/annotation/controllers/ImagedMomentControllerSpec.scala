@@ -5,6 +5,7 @@ import java.util.UUID
 import java.util.concurrent.TimeUnit
 
 import org.mbari.vars.annotation.dao.jpa.TestDAOFactory
+import org.mbari.vars.annotation.model.ImagedMoment
 import org.scalatest.{BeforeAndAfterAll, FlatSpec, Matchers}
 import org.slf4j.LoggerFactory
 
@@ -43,6 +44,23 @@ class ImagedMomentControllerSpec extends FlatSpec with Matchers with BeforeAndAf
     val b = exec(() => controller.create(videoReferenceUuid, recordedDate = Some(recordedDate)))
     a.uuid should be (b.uuid)
   }
+
+  it should "create one imagedmoment if multiple creates use the same recordedDate parsed from a string" in {
+
+    val s = "2019-09-22T01:23:45.6789Z"
+
+    def create(): Future[ImagedMoment] = {
+      val i = Instant.parse(s)
+      val c = new ImagedMomentController(daoFactory.asInstanceOf[BasicDAOFactory])
+      c.create(videoReferenceUuid, recordedDate = Some(i))
+    }
+
+    val a = exec(create)
+    val b = exec(create)
+    a.uuid should be (b.uuid)
+  }
+
+
 
   it should "create one imagedmoment if multiple creates use the same elasped_time" in {
     val elapsedTime = Duration.ofMillis(123456)
