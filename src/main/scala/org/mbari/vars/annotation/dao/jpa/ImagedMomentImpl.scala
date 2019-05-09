@@ -23,7 +23,6 @@ import javax.persistence.{Convert, Index, _}
 import java.util.{ArrayList => JArrayList, List => JList}
 
 import com.google.gson.annotations.{Expose, SerializedName}
-//import org.eclipse.persistence.annotations.{BatchFetch, BatchFetchType}
 import org.mbari.vars.annotation.Constants
 import org.mbari.vars.annotation.model.{CachedAncillaryDatum, ImageReference, ImagedMoment, Observation}
 import org.mbari.vcr4j.time.Timecode
@@ -214,7 +213,6 @@ class ImagedMomentImpl extends ImagedMoment with JPAPersistentObject {
     mappedBy = "imagedMoment",
     orphanRemoval = true
   )
-//  @BatchFetch(value = BatchFetchType.JOIN)
   protected var javaObservations: JList[ObservationImpl] =
     new JArrayList[ObservationImpl]
 
@@ -239,7 +237,6 @@ class ImagedMomentImpl extends ImagedMoment with JPAPersistentObject {
     mappedBy = "imagedMoment",
     orphanRemoval = true
   )
-//  @BatchFetch(value = BatchFetchType.JOIN)
   protected var javaImageReferences: JList[ImageReferenceImpl] =
     new JArrayList[ImageReferenceImpl]
 

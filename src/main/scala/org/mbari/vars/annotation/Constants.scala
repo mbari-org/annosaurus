@@ -40,6 +40,7 @@ object Constants {
   val GSON: Gson = {
 
     val gsonBuilder = new GsonBuilder()
+      .setPrettyPrinting()
       .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
       .excludeFieldsWithoutExposeAnnotation()
       .setDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'")

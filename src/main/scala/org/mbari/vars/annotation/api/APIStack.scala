@@ -149,7 +149,9 @@ abstract class APIStack extends ScalatraServlet
       val prependComma = j > start
       val limit = if (j + pageSize > end) end - j else pageSize
       log.debug(s"Executing: autoPage::processChunk($limit, $j, $prependComma)")
-      processChunk(limit, j, prependComma)
+      if (limit > 0) {
+        processChunk(limit, j, prependComma)
+      }
     }
     out.write("]")
     out.flush()
