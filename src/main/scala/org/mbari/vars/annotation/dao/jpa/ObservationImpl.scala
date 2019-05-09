@@ -22,7 +22,7 @@ import javax.persistence._
 import java.util.{ArrayList => JArrayList, List => JList}
 
 import com.google.gson.annotations.{Expose, SerializedName}
-import org.eclipse.persistence.annotations.{BatchFetch, BatchFetchType}
+//import org.eclipse.persistence.annotations.{BatchFetch, BatchFetchType}
 
 import scala.collection.JavaConverters._
 import org.mbari.vars.annotation.model.{Association, ImagedMoment, Observation}
@@ -142,7 +142,7 @@ class ObservationImpl extends Observation with JPAPersistentObject {
     fetch = FetchType.EAGER,
     mappedBy = "observation",
     orphanRemoval = true)
-  @BatchFetch(value = BatchFetchType.JOIN)
+//  @BatchFetch(value = BatchFetchType.JOIN)
   protected var javaAssociations: JList[AssociationImpl] = new JArrayList[AssociationImpl]
 
   override def addAssociation(association: Association): Unit = {
