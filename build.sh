@@ -10,5 +10,5 @@ sbt pack && \
     docker build --build-arg BUILD_DATE=$BUILD_DATE \
                  --build-arg VCS_REF=$VCS_REF \
                   -t mbari/annosaurus:${VCS_REF} \
-                  -t mbari/annosaurus:latest . & \
+                  -t mbari/annosaurus:latest . && \
     docker push mbari/annosaurus
