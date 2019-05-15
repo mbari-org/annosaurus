@@ -33,7 +33,7 @@ import org.slf4j.LoggerFactory
 
 import scala.concurrent.duration.{Duration => SDuration}
 import scala.concurrent.{Await, Future}
-import scala.util.Try
+import scala.util.{Failure, Success, Try}
 
 /**
  * All Api classes should mixin this trait. It defines the common traits used by all implementations
@@ -51,6 +51,7 @@ abstract class APIStack extends ScalatraServlet
 
   protected[this] val log = LoggerFactory.getLogger(getClass)
   protected[this] val timeFormatter = DateTimeFormatter.ISO_DATE_TIME
+  protected[this] val compactTimeFormatter = DateTimeFormatter.ofPattern("yyyyMMdd'T'HHmmssX")
 
   //protected[this] implicit val jsonFormats: Formats = DefaultFormats ++ JavaTypesSerializers.all
 
@@ -59,8 +60,13 @@ abstract class APIStack extends ScalatraServlet
   }
 
   protected implicit val stringToInstant = new TypeConverter[String, Instant] {
-    //override def apply(s: String): Option[Instant] = Try(Instant.parse(s)).toOption
-    override def apply(s: String): Option[Instant] = Try(Instant.from(timeFormatter.parse(s))).toOption
+    override def apply(s: String): Option[Instant] = {
+      val try1 = Try(Instant.from(compactTimeFormatter.parse(s))).toOption
+      try1 match {
+        case Some(t) => try1
+        case None => Try(Instant.from(timeFormatter.parse(s))).toOption
+      }
+    }
   }
 
   protected implicit val stringToDuration = new TypeConverter[String, Duration] {

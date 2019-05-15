@@ -16,16 +16,17 @@
 
 package org.mbari.vars.annotation.controllers
 
-import java.time.{ Duration, Instant }
+import java.time.{Duration, Instant}
 import java.util.UUID
 import java.util.concurrent.TimeUnit
 
 import org.mbari.vars.annotation.dao.jpa.TestDAOFactory
-import org.scalatest.{ BeforeAndAfterAll, FlatSpec, Matchers }
+import org.scalatest.{BeforeAndAfterAll, FlatSpec, Matchers}
 import org.slf4j.LoggerFactory
 
-import scala.concurrent.{ Await, Future }
-import scala.concurrent.duration.{ Duration => SDuration }
+import scala.collection.JavaConverters._
+import scala.concurrent.{Await, Future}
+import scala.concurrent.duration.{Duration => SDuration}
 import scala.concurrent.ExecutionContext.Implicits.global
 
 /**
@@ -75,6 +76,38 @@ class AnnotationControllerSpec extends FlatSpec with Matchers with BeforeAndAfte
     b should not be empty
     b.size should be(1)
     b.head.concept should be("Slime mold")
+  }
+
+  it should "stream by videoReferenceUuid" in {
+    val videoReferenceUuid = UUID.randomUUID()
+    val xs = for (i <- 0 until 3) yield {
+      exec(() => controller.create(
+         videoReferenceUuid,
+        "Grimpoteuthis " + i,
+        "brian",
+        recordedDate = Some(recordedDate.plusSeconds(i * 3600))))
+    }
+
+    val (closeable, stream) = controller.streamByVideoReferenceUUID(videoReferenceUuid)
+    val annos = stream.iterator().asScala.toList
+    annos.size should be(xs.size)
+  }
+
+  it should "stream by videoReferenceUuid and timestamps" in {
+    val videoReferenceUuid = UUID.randomUUID()
+    val xs = for (i <- 0 until 5) yield {
+      exec(() => controller.create(
+        videoReferenceUuid,
+        "Goblin " + i,
+        "brian",
+        recordedDate = Some(recordedDate.plusSeconds(i * 3600))))
+    }
+
+    val (closeable, stream) = controller.streamByVideoReferenceUUIDAndTimestamps(videoReferenceUuid,
+        recordedDate,
+      recordedDate.plusSeconds(4000))
+    val annos = stream.iterator().asScala.toList
+    annos.size should be(2)
   }
 
   it should "create and update" in {

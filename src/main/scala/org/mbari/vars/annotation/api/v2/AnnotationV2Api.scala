@@ -16,6 +16,7 @@
 
 package org.mbari.vars.annotation.api.v2
 
+import java.time.Instant
 import java.util.UUID
 
 import org.mbari.vars.annotation.api.APIStack
@@ -41,12 +42,29 @@ class AnnotationV2Api(controller: AnnotationController)(implicit val executor: E
   get("/videoreference/:uuid") {
     val uuid = params.getAs[UUID]("uuid").getOrElse(halt(BadRequest(
       body = "A video reference 'uuid' parameter is required")))
+
+    // Optional params to filter between dates
+    val startTimestamp = params.getAs[Instant]("start")
+    val endTimestamp = params.getAs[Instant]("end")
+
     val limit = params.getAs[Int]("limit")
     val offset = params.getAs[Int]("offset")
-    val (closeable, stream) = controller.streamByVideoReferenceUUID(uuid, limit, offset)
+
+    val (closeable, stream) = if (startTimestamp.isDefined && endTimestamp.isDefined) {
+      controller.streamByVideoReferenceUUIDAndTimestamps(uuid,
+        startTimestamp.get,
+        endTimestamp.get,
+        limit,
+        offset)
+    }
+    else {
+      controller.streamByVideoReferenceUUID(uuid, limit, offset)
+    }
+
     ResponseUtilities.sendStreamedResponse(response, stream, (a: Annotation) => toJson(a))
     closeable.close()
     Unit
   }
+
 
 }

@@ -16,6 +16,7 @@
 
 package org.mbari.vars.annotation.dao.jpa
 
+import java.sql.Timestamp
 import java.time.{Duration, Instant}
 import java.util.{UUID, stream}
 
@@ -58,6 +59,18 @@ class ObservationDAOImpl(entityManager: EntityManager)
 
   override def streamByVideoReferenceUUID(uuid: UUID, limit: Option[Int], offset: Option[Int]): stream.Stream[ObservationImpl] =
     streamByNamedQuery("Observation.findByVideoReferenceUUID", Map("uuid" -> uuid), limit, offset)
+
+  override def streamByVideoReferenceUUIDAndTimestamps(uuid: UUID,
+                                                  startTimestamp: Instant,
+                                                  endTimestamp: Instant,
+                                                  limit: Option[Int],
+                                                  offset: Option[Int]): stream.Stream[ObservationImpl] = {
+
+    streamByNamedQuery("Observation.findByVideoReferenceUUIDAndTimestamps",
+      Map("uuid" -> uuid,
+        "start" -> startTimestamp,
+        "end" -> endTimestamp))
+  }
 
   /**
    *

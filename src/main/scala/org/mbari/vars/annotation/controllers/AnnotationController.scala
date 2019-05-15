@@ -23,6 +23,7 @@ import java.util.concurrent.Executors
 
 import org.mbari.vars.annotation.dao.jpa.AnnotationImpl
 import org.mbari.vars.annotation.dao.DAO
+import org.mbari.vars.annotation.model.simple.ConcurrentRequest
 import org.mbari.vars.annotation.model.{Annotation, ImagedMoment, Observation}
 import org.mbari.vcr4j.time.Timecode
 
@@ -86,6 +87,19 @@ class AnnotationController(daoFactory: BasicDAOFactory) {
     (() => dao.close(), dao.streamByVideoReferenceUUID(videoReferenceUuid, limit, offset)
       .map(obs => AnnotationImpl(obs)))
   }
+
+  def streamByVideoReferenceUUIDAndTimestamps(videoReferenceUuid: UUID,
+                                              startTimestamp: Instant,
+                                              endTimestamp: Instant,
+                                limit: Option[Int] = None,
+                                 offset: Option[Int] = None): (Closeable, java.util.stream.Stream[Annotation]) = {
+    val dao = daoFactory.newObservationDAO()
+    (() => dao.close(),
+      dao.streamByVideoReferenceUUIDAndTimestamps(videoReferenceUuid, startTimestamp, endTimestamp, limit, offset)
+      .map(obs => AnnotationImpl(obs)))
+  }
+
+
 
   def findByImageReferenceUUID(imageReferenceUUID: UUID)(implicit ec: ExecutionContext): Future[Iterable[Annotation]] = {
 
