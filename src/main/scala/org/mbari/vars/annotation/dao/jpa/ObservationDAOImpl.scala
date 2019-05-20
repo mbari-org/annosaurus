@@ -69,7 +69,7 @@ class ObservationDAOImpl(entityManager: EntityManager)
     streamByNamedQuery("Observation.findByVideoReferenceUUIDAndTimestamps",
       Map("uuid" -> uuid,
         "start" -> startTimestamp,
-        "end" -> endTimestamp))
+        "end" -> endTimestamp), limit, offset)
   }
 
   /**

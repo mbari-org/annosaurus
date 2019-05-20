@@ -18,10 +18,14 @@ package org.mbari.vars.annotation.api.v2
 
 import java.time.Instant
 import java.util.UUID
+import java.util.concurrent.TimeUnit
 
 import org.mbari.vars.annotation.api.WebApiStack
 import org.mbari.vars.annotation.controllers.AnnotationController
 import org.mbari.vars.annotation.dao.jpa.AnnotationImpl
+
+import scala.concurrent.Await
+import scala.concurrent.duration.Duration
 
 class AnnotationV2ApiSpec extends WebApiStack {
 
@@ -36,18 +40,20 @@ class AnnotationV2ApiSpec extends WebApiStack {
 
   override protected def beforeAll(): Unit = {
     super.beforeAll()
-    controller.create(videoReferenceUuid,
+    val timeout = Duration(5, TimeUnit.SECONDS)
+
+    Await.result(controller.create(videoReferenceUuid,
       "one",
       "brian",
-      recordedDate = Some(startTimestamp))
-    controller.create(videoReferenceUuid,
+      recordedDate = Some(startTimestamp)), timeout)
+    Await.result(controller.create(videoReferenceUuid,
       "two",
       "brian",
-      recordedDate = Some(endTimestamp))
-    controller.create(videoReferenceUuid,
+      recordedDate = Some(endTimestamp)), timeout)
+    Await.result(controller.create(videoReferenceUuid,
       "three",
       "brian",
-      recordedDate = Some(Instant.parse("2019-01-01T00:00:00Z")))
+      recordedDate = Some(Instant.parse("2019-01-01T00:00:00Z"))), timeout)
   }
 
   "AnnotationV2Api" should "find by videoReferenceUuid" in {

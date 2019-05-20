@@ -50,10 +50,12 @@ class AnnotationV2Api(controller: AnnotationController)(implicit val executor: E
     val limit = params.getAs[Int]("limit")
     val offset = params.getAs[Int]("offset")
 
-    val (closeable, stream) = if (startTimestamp.isDefined && endTimestamp.isDefined) {
+    val (closeable, stream) = if (startTimestamp.isDefined || endTimestamp.isDefined) {
+      val start = startTimestamp.getOrElse(Instant.EPOCH)
+      val end = endTimestamp.getOrElse(Instant.now())
       controller.streamByVideoReferenceUUIDAndTimestamps(uuid,
-        startTimestamp.get,
-        endTimestamp.get,
+        start,
+        end,
         limit,
         offset)
     }

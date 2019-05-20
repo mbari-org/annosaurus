@@ -136,6 +136,10 @@ import scala.collection.JavaConverters._
         "SELECT i FROM ImagedMoment i WHERE i.videoReferenceUUID = :uuid ORDER BY i.uuid"
     ),
     new NamedQuery(
+      name = "ImagedMoment.findByVideoReferenceUUIDAndTimestamps",
+      query = "SELECT i FROM ImagedMoment i WHERE i.videoReferenceUUID = :uuid AND i.recordedDate BETWEEN :start AND :end"
+    ),
+    new NamedQuery(
       name = "ImagedMoment.findWithImageReferences",
       query =
         "SELECT i FROM ImagedMoment i LEFT JOIN i.javaImageReferences r WHERE i.videoReferenceUUID = :uuid ORDER BY i.uuid"
@@ -213,7 +217,7 @@ class ImagedMomentImpl extends ImagedMoment with JPAPersistentObject {
     mappedBy = "imagedMoment",
     orphanRemoval = true
   )
-  protected var javaObservations: JList[ObservationImpl] =
+  var javaObservations: JList[ObservationImpl] =
     new JArrayList[ObservationImpl]
 
   override def addObservation(observation: Observation): Unit = {
