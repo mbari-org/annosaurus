@@ -39,7 +39,7 @@ class AnnotationControllerSpec extends FlatSpec with Matchers with BeforeAndAfte
   private[this] val controller = new AnnotationController(daoFactory.asInstanceOf[BasicDAOFactory])
   private[this] val timeout = SDuration(200, TimeUnit.SECONDS)
   private[this] val recordedDate = Instant.now()
-  private[this] val log = LoggerFactory.getLogger(getClass)
+//  private[this] val log = LoggerFactory.getLogger(getClass)
 
   def exec[R](fn: () => Future[R]): R = Await.result(fn.apply(), timeout)
 
@@ -102,6 +102,8 @@ class AnnotationControllerSpec extends FlatSpec with Matchers with BeforeAndAfte
         "brian",
         recordedDate = Some(recordedDate.plusSeconds(i * 3600))))
     }
+
+    xs.size should be (5)
 
     val (closeable, stream) = controller.streamByVideoReferenceUUIDAndTimestamps(videoReferenceUuid,
         recordedDate,

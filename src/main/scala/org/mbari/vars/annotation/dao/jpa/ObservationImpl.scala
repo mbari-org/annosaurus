@@ -79,7 +79,7 @@ import org.mbari.vars.annotation.model.{Association, ImagedMoment, Observation}
     query = "SELECT o FROM Observation o LEFT JOIN o.imagedMoment i WHERE i.videoReferenceUUID = :uuid ORDER BY o.uuid"),
   new NamedQuery(
     name = "Observation.findByVideoReferenceUUIDAndTimestamps",
-    query = "SELECT o FROM Observation o LEFT JOIN o.imagedMoment i WHERE i.videoReferenceUUID = :uuid AND i.recordedDate BETWEEN :start AND :end ORDER BY o.uuid")))
+    query = "SELECT o FROM Observation o LEFT JOIN o.imagedMoment i WHERE i.videoReferenceUUID = :uuid AND i.recordedDate BETWEEN :start AND :end ORDER BY i.recordedDate")))
 class ObservationImpl extends Observation with JPAPersistentObject {
 
   @Expose(serialize = true)

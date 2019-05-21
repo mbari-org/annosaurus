@@ -40,9 +40,7 @@ class IndexDAOImpl(entityManager: EntityManager)
 
   // --- These methods are deliberately overridden ---
 
-  override def findAll(): Iterable[IndexImpl] = ???
-
-  override def findAll(limit: Int, offset: Int): Iterable[IndexImpl] = ???
+  override def findAll(limit: Option[Int] = None, offset: Option[Int] = None): Iterable[IndexImpl] = ???
 
   override def deleteByUUID(primaryKey: UUID): Unit = ???
 

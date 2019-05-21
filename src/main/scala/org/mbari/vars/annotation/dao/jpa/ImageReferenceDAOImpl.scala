@@ -48,11 +48,9 @@ class ImageReferenceDAOImpl(entityManager: EntityManager)
     imageReference
   }
 
-  override def findAll(): Iterable[ImageReferenceImpl] =
-    findByNamedQuery("ImageReference.findAll")
 
-  override def findAll(limit: Int, offset: Int): Iterable[ImageReferenceImpl] =
-    findByNamedQuery("ImageReference.findAll", limit = Some(limit), offset = Some(offset))
+  override def findAll(limit: Option[Int] = None, offset: Option[Int] = None): Iterable[ImageReferenceImpl] =
+    findByNamedQuery("ImageReference.findAll", limit = limit, offset = offset)
 
   override def findByURL(url: URL): Option[ImageReferenceImpl] =
     findByNamedQuery("ImageReference.findByURL", Map("url" -> url)).headOption

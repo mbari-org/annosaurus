@@ -40,7 +40,7 @@ class ImagedMomentController(val daoFactory: BasicDAOFactory)
 
   override def newDAO(): IMDAO = daoFactory.newImagedMomentDAO()
 
-  def findAll(limit: Int, offset: Int)(implicit ec: ExecutionContext): Future[Iterable[ImagedMoment]] =
+  override def findAll(limit: Option[Int] = None, offset: Option[Int] = None)(implicit ec: ExecutionContext): Future[Iterable[ImagedMoment]] =
     exec(d => d.findAll(limit, offset))
 
   def findAllVideoReferenceUUIDs(limit: Option[Int] = None, offset: Option[Int] = None)(implicit ec: ExecutionContext): Future[Iterable[UUID]] =

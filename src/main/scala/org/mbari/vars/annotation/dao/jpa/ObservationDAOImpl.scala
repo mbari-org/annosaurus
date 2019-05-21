@@ -94,11 +94,9 @@ class ObservationDAOImpl(entityManager: EntityManager)
     .filter(_ != null)
     .map(_.toString)
 
-  override def findAll(): Iterable[ObservationImpl] =
-    findByNamedQuery("Observation.findAll")
 
-  override def findAll(limit: Int, offset: Int): Iterable[ObservationImpl] =
-    findByNamedQuery("Observation.findAll", limit = Some(limit), offset = Some(offset))
+  override def findAll(limit: Option[Int] = None, offset: Option[Int] = None): Iterable[ObservationImpl] =
+    findByNamedQuery("Observation.findAll", limit = limit, offset = offset)
 
   override def findAllConceptsByVideoReferenceUUID(uuid: UUID): Seq[String] = {
     val query = entityManager.createNamedQuery("Observation.findAllNamesByVideoReferenceUUID")

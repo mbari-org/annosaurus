@@ -40,7 +40,6 @@ class CachedAncillaryDatumV1ApiSpec extends WebApiStack {
     val controller = new CachedAncillaryDatumController(daoFactory)
     new CachedAncillaryDatumV1Api(controller)
   }
-  protected[this] override val gson = Constants.GSON
 
   private[this] val path = "/v1/ancillarydata"
   addServlet(datumV1Api, path)

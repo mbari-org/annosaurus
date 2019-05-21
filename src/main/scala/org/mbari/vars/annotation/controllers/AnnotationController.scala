@@ -94,10 +94,14 @@ class AnnotationController(daoFactory: BasicDAOFactory) {
                                               endTimestamp: Instant,
                                 limit: Option[Int] = None,
                                  offset: Option[Int] = None): (Closeable, java.util.stream.Stream[Annotation]) = {
-    val dao = daoFactory.newImagedMomentDAO()
+//    val dao = daoFactory.newImagedMomentDAO()
+//    (() => dao.close(),
+//      dao.streamByVideoReferenceUUIDAndTimestamps(videoReferenceUuid, startTimestamp, endTimestamp, limit, offset)
+//        .flatMap(im => im.javaObservations.stream().map(obs => AnnotationImpl(obs))))
+    val dao = daoFactory.newObservationDAO()
     (() => dao.close(),
       dao.streamByVideoReferenceUUIDAndTimestamps(videoReferenceUuid, startTimestamp, endTimestamp, limit, offset)
-        .flatMap(im => im.javaObservations.stream().map(obs => AnnotationImpl(obs))))
+        .map(obs => AnnotationImpl(obs)))
   }
 
 

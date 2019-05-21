@@ -46,11 +46,9 @@ class CachedVideoReferenceInfoDAOImpl(entityManager: EntityManager)
   override def findByVideoReferenceUUID(uuid: UUID): Option[CachedVideoReferenceInfoImpl] =
     findByNamedQuery("VideoReferenceInfo.findByVideoReferenceUUID", Map("uuid" -> uuid)).headOption
 
-  override def findAll(): Iterable[CachedVideoReferenceInfoImpl] =
-    findByNamedQuery("VideoReferenceInfo.findAll")
 
-  override def findAll(limit: Int, offset: Int): Iterable[CachedVideoReferenceInfoImpl] =
-    findByNamedQuery("VideoReferenceInfo.findAll", limit = Some(limit), offset = Some(offset))
+  override def findAll(limit: Option[Int] = None, offset: Option[Int] = None): Iterable[CachedVideoReferenceInfoImpl] =
+    findByNamedQuery("VideoReferenceInfo.findAll", limit = limit, offset = offset)
 
   override def findAllVideoReferenceUUIDs(): Iterable[UUID] =
     fetchUsing("VideoReferenceInfo.findAllVideoReferenceUUIDs")

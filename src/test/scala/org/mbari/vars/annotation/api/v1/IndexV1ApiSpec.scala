@@ -36,8 +36,6 @@ import scala.concurrent.duration.{Duration => SDuration}
  */
 class IndexV1ApiSpec extends WebApiStack {
 
-  private[this] val startTimestamp = Instant.now()
-
   private[this] val indexController = new IndexController(daoFactory)
 
   private[this] val indexV1Api = new IndexV1Api(indexController)

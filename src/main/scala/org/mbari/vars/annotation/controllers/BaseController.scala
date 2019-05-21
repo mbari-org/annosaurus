@@ -55,8 +55,8 @@ trait BaseController[A <: PersistentObject, B <: DAO[A]] {
     exec(fn)
   }
 
-  def findAll()(implicit ec: ExecutionContext): Future[Iterable[A]] =
-    exec(d => d.findAll())
+  def findAll(limit: Option[Int] = None, offset: Option[Int] = None)(implicit ec: ExecutionContext): Future[Iterable[A]] =
+    exec(d => d.findAll(limit, offset))
 
   def findByUUID(uuid: UUID)(implicit ec: ExecutionContext): Future[Option[A]] =
     exec(d => d.findByUUID(uuid))

@@ -21,8 +21,6 @@ import java.time.format.DateTimeFormatter
 import java.time.{Duration, Instant}
 import java.util.UUID
 import java.util.concurrent.TimeUnit
-import java.util.function.{Consumer, Function}
-import java.util.stream.Stream
 
 import javax.servlet.http.HttpServletResponse
 import org.mbari.vars.annotation.Constants
@@ -33,7 +31,7 @@ import org.slf4j.LoggerFactory
 
 import scala.concurrent.duration.{Duration => SDuration}
 import scala.concurrent.{Await, Future}
-import scala.util.{Failure, Success, Try}
+import scala.util.Try
 
 /**
  * All Api classes should mixin this trait. It defines the common traits used by all implementations

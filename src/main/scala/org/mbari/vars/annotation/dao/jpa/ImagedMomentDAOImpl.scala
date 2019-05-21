@@ -202,11 +202,9 @@ class ImagedMomentDAOImpl(entityManager: EntityManager)
   //  override def findByUUID(primaryKey: UUID): Option[ImagedMomentImpl] =
   //    findByNamedQuery("ImagedMoment.findByUUID", Map("uuid" -> primaryKey)).headOption
 
-  override def findAll(): Iterable[ImagedMomentImpl] =
-    findByNamedQuery("ImagedMoment.findAll")
 
-  override def findAll(limit: Int, offset: Int): Iterable[ImagedMomentImpl] =
-    findByNamedQuery("ImagedMoment.findAll", limit = Some(limit), offset = Some(offset))
+  override def findAll(limit: Option[Int] = None, offset: Option[Int] = None): Iterable[ImagedMomentImpl] =
+    findByNamedQuery("ImagedMoment.findAll", limit = limit, offset = offset)
 
   override def findByVideoReferenceUUIDAndElapsedTime(uuid: UUID, elapsedTime: Duration): Option[ImagedMomentImpl] =
     findByNamedQuery(

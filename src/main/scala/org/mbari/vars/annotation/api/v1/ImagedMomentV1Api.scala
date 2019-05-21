@@ -43,8 +43,8 @@ class ImagedMomentV1Api(controller: ImagedMomentController)(implicit val executo
   }
 
   get("/") {
-    val limit = params.getAs[Int]("limit").getOrElse(1000)
-    val offset = params.getAs[Int]("offset").getOrElse(0)
+    val limit = params.getAs[Int]("limit").orElse(Some(100))
+    val offset = params.getAs[Int]("offset").orElse(Some(0))
     controller.findAll(limit, offset)
       .map(_.asJava)
       .map(toJson)

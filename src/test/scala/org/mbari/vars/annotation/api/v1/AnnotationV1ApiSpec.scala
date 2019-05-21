@@ -43,8 +43,6 @@ class AnnotationV1ApiSpec extends WebApiStack {
     new AnnotationV1Api(controller)
   }
 
-  protected[this] override val gson = Constants.GSON_FOR_ANNOTATION
-
   addServlet(annotationV1Api, "/v1/annotations")
 
   var annotation: Annotation = _

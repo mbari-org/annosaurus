@@ -90,11 +90,9 @@ class AssociationDAOImpl(entityManager: EntityManager)
     }
   }
 
-  override def findAll(): Iterable[AssociationImpl] =
-    findByNamedQuery("Association.findAll")
 
-  override def findAll(limit: Int, offset: Int): Iterable[AssociationImpl] =
-    findByNamedQuery("Association.findAll", limit = Some(limit), offset = Some(offset))
+  override def findAll(limit: Option[Int] = None, offset: Option[Int] = None): Iterable[AssociationImpl] =
+    findByNamedQuery("Association.findAll", limit = limit, offset = offset)
 
   override def countByToConcept(toConcept: String): Int = {
     //val query = entityManager.createNativeQuery("Association.countByToConcept")

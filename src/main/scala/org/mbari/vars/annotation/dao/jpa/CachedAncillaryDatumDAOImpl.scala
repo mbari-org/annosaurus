@@ -76,11 +76,9 @@ class CachedAncillaryDatumDAOImpl(entityManager: EntityManager)
   override def asPersistentObject(datum: CachedAncillaryDatum): CachedAncillaryDatum =
     CachedAncillaryDatumImpl(datum)
 
-  override def findAll(): Iterable[CachedAncillaryDatumImpl] =
-    findByNamedQuery("AncillaryDatum.findAll")
 
-  override def findAll(limit: Int, offset: Int): Iterable[CachedAncillaryDatumImpl] =
-    findByNamedQuery("AncillaryDatum.findAll", limit = Some(limit), offset = Some(offset))
+  override def findAll(limit: Option[Int] = None, offset: Option[Int] = None): Iterable[CachedAncillaryDatumImpl] =
+    findByNamedQuery("AncillaryDatum.findAll", limit = limit, offset = offset)
 
   override def findByObservationUUID(observationUuid: UUID): Option[CachedAncillaryDatum] =
     findByNamedQuery(
