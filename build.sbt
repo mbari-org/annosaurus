@@ -1,5 +1,5 @@
 val akkaVersion = "2.4.7"
-val auth0Version = "3.8.0"
+val auth0Version = "3.8.1"
 val codecVersion = "1.12"
 val configVersion = "1.3.4"
 val derbyVersion = "10.15.1.3"
@@ -9,7 +9,7 @@ val gsonJavatimeVersion = "1.1.1"
 val gsonVersion = "2.8.5"
 val h2Version = "1.4.199"
 val jettyVersion = "9.4.18.v20190429"
-val jsonVersion = "3.6.5"
+val jsonVersion = "3.6.6"
 val jtaVersion = "1.1"
 val jtdsVersion = "1.3.1"
 val junitVersion = "4.12"
@@ -27,7 +27,7 @@ val vcr4jVersion = "4.0.2"
 
 lazy val buildSettings = Seq(
   organization := "org.mbari.vars",
-  version := "0.2.3",
+  version := "0.2.4",
   scalaVersion in ThisBuild := "2.12.8",
   crossScalaVersions := Seq("2.12.8"),
   organizationName := "Monterey Bay Aquarium Research Institute",
