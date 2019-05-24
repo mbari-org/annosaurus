@@ -40,10 +40,11 @@ class ConcurrentRequest {
 }
 
 object ConcurrentRequest {
-  def apply(startTimestamp: Instant, endTimestamp: Instant, videoReferenceUuids: Seq[UUID]): Unit = {
+  def apply(startTimestamp: Instant, endTimestamp: Instant, videoReferenceUuids: Seq[UUID]): ConcurrentRequest = {
     val cr = new ConcurrentRequest
     cr.startTimestamp = startTimestamp
     cr.endTimestamp = endTimestamp
     videoReferenceUuids.foreach(uuid => cr.videoReferenceUuids.add(uuid))
+    cr
   }
 }

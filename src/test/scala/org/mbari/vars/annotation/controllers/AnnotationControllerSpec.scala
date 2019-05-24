@@ -21,6 +21,7 @@ import java.util.UUID
 import java.util.concurrent.TimeUnit
 
 import org.mbari.vars.annotation.dao.jpa.TestDAOFactory
+import org.mbari.vars.annotation.model.simple.ConcurrentRequest
 import org.scalatest.{BeforeAndAfterAll, FlatSpec, Matchers}
 import org.slf4j.LoggerFactory
 
@@ -110,6 +111,41 @@ class AnnotationControllerSpec extends FlatSpec with Matchers with BeforeAndAfte
       recordedDate.plusSeconds(4000))
     val annos = stream.iterator().asScala.toList
     annos.size should be(2)
+  }
+
+  it should "stream by concurrent request" in {
+    val start = Instant.now()
+    val uuids = 0 until 5 map(_ => UUID.randomUUID())
+    val xs = for {
+      uuid <- uuids
+      i <- 0 until 5
+    } yield {
+      exec(() => controller.create(uuid,
+        "Sharktopod",
+        "brian",
+        recordedDate = Some(Instant.now())))
+    }
+
+    val end = Instant.now()
+    xs.size should be(25)
+    val concurrentRequest = ConcurrentRequest(start, end, uuids)
+
+    // Verify count call is working
+    val a = exec(() => controller.countByConcurrentRequest(concurrentRequest))
+    a.intValue() should be (xs.size)
+
+    // Verify stream works
+    val (closeable, stream) = controller.streamByConcurrentRequest(concurrentRequest, None, None)
+    val annos = stream.iterator().asScala.toList
+    annos.size should be (xs.size)
+    closeable.close()
+
+    // Verify limit and offset work
+    val (closeable2, stream2) = controller.streamByConcurrentRequest(concurrentRequest, Some(10), Some(2))
+    val annos2 = stream2.iterator().asScala.toList
+    annos2.size should be (10)
+    closeable2.close()
+
   }
 
   it should "create and update" in {

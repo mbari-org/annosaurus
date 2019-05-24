@@ -22,6 +22,7 @@ import java.util.{UUID, stream}
 
 import javax.persistence.EntityManager
 import org.mbari.vars.annotation.dao.ObservationDAO
+import org.mbari.vars.annotation.model.simple.ConcurrentRequest
 
 import scala.collection.JavaConverters._
 
@@ -70,6 +71,31 @@ class ObservationDAOImpl(entityManager: EntityManager)
       Map("uuid" -> uuid,
         "start" -> startTimestamp,
         "end" -> endTimestamp), limit, offset)
+  }
+
+
+  override def countByVideoReferenceUUIDAndTimestamps(uuid: UUID, startTimestamp: Instant, endTimestamp: Instant): Int = {
+    val query = entityManager.createNamedQuery("Observation.countByVideoReferenceUUIDAndTimestamps")
+    query.setParameter(1, UUIDConverter.uuidToString(uuid))
+    query.setParameter(2, Timestamp.from(startTimestamp))
+    query.setParameter(3, Timestamp.from(endTimestamp))
+    query.getSingleResult.asInstanceOf[Int]
+  }
+
+
+  override def streamByConcurrentRequest(request: ConcurrentRequest, limit: Option[Int], offset: Option[Int]): stream.Stream[ObservationImpl] = {
+    streamByNamedQuery("Observation.findByConcurrentRequest",
+      Map("uuids" -> request.videoReferenceUuids,
+        "start" -> request.startTimestamp,
+        "end" -> request.endTimestamp), limit, offset)
+  }
+
+  override def countByConcurrentRequest(request: ConcurrentRequest): Long = {
+    val query = entityManager.createNamedQuery("Observation.countByConcurrentRequest")
+    query.setParameter("uuids", request.videoReferenceUuids)
+    query.setParameter("start", request.startTimestamp)
+    query.setParameter("end", request.endTimestamp)
+    query.getSingleResult.asInstanceOf[Long]
   }
 
   /**

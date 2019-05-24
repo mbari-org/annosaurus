@@ -97,10 +97,19 @@ class ObservationV1Api(controller: ObservationController)(implicit val executor:
 
   get("/videoreference/count/:uuid") {
     val uuid = params.getAs[UUID]("uuid").getOrElse(halt(BadRequest("Please provide a video-reference 'uuid'")))
-    controller.countByVideoReferenceUUID(uuid)
-      .map(n => ObservationCount(uuid, n))
+    val start = params.getAs[Instant]("start")
+    val end = params.getAs[Instant]("end")
+
+    val f =  if (start.isDefined && end.isDefined) {
+      controller.countByVideoReferenceUUIDAndTimestamps(uuid, start.get, end.get)
+    }
+    else {
+      controller.countByVideoReferenceUUID(uuid)
+    }
+
+    f.map(n => ObservationCount(uuid, n))
       .map(toJson)
-    //.map(n => s"""{"video_reference_uuid": "${uuid}", "count":"$n"}""")
+
   }
 
   get("/counts") {

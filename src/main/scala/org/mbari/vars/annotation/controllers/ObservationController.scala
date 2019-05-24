@@ -16,13 +16,15 @@
 
 package org.mbari.vars.annotation.controllers
 
-import java.time.{ Duration, Instant }
+import java.io.Closeable
+import java.time.{Duration, Instant}
 import java.util.UUID
 
-import org.mbari.vars.annotation.dao.{ NotFoundInDatastoreException, ObservationDAO }
+import org.mbari.vars.annotation.dao.{NotFoundInDatastoreException, ObservationDAO}
 import org.mbari.vars.annotation.model.Observation
+import org.mbari.vars.annotation.model.simple.ConcurrentRequest
 
-import scala.concurrent.{ ExecutionContext, Future }
+import scala.concurrent.{ExecutionContext, Future}
 
 /**
  *
@@ -122,10 +124,7 @@ class ObservationController(val daoFactory: BasicDAOFactory)
     exec(fn)
   }
 
-  def streamByVideoReferenceUUID(uuid: UUID, limit: Option[Int] = None, offset: Option[Int] = None): java.util.stream.Stream[Observation] = {
-    val dao = daoFactory.newObservationDAO()
-    dao.streamByVideoReferenceUUID(uuid, limit, offset)
-  }
+
 
   def findByAssociationUUID(uuid: UUID)(implicit ec: ExecutionContext): Future[Option[Observation]] = {
     def fn(dao: ODAO): Option[Observation] = {
@@ -160,6 +159,11 @@ class ObservationController(val daoFactory: BasicDAOFactory)
 
   def countByVideoReferenceUUID(uuid: UUID)(implicit ec: ExecutionContext): Future[Int] = {
     def fn(dao: ODAO): Int = dao.countByVideoReferenceUUID(uuid)
+    exec(fn)
+  }
+
+  def countByVideoReferenceUUIDAndTimestamps(uuid: UUID, start: Instant, end: Instant)(implicit ec: ExecutionContext): Future[Int] = {
+    def fn(dao: ODAO): Int = dao.countByVideoReferenceUUIDAndTimestamps(uuid, start, end)
     exec(fn)
   }
 

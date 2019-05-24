@@ -22,6 +22,8 @@ import java.util.UUID
 import org.mbari.vars.annotation.controllers.AnnotationController
 import org.mbari.vars.annotation.dao.jpa.AnnotationImpl
 import org.mbari.vars.annotation.model.Annotation
+import org.mbari.vars.annotation.model.simple.{ConcurrentRequest, ConcurrentRequestCount, ErrorMsg}
+import org.mbari.vars.annotation.util.ResponseUtilities
 import org.mbari.vcr4j.time.Timecode
 import org.scalatra.{BadRequest, NotFound}
 
@@ -60,6 +62,34 @@ class AnnotationV1Api(controller: AnnotationController)(implicit val executor: E
     controller.findByVideoReferenceUUID(uuid, limit, offset)
       .map(_.asJava)
       .map(toJson)
+  }
+
+  get ("/concurrent/count") {
+    request.getHeader("Content-Type") match {
+      case "application/json" =>
+        val b = request.body
+        val concurrentRequest = fromJson(b, classOf[ConcurrentRequest])
+        controller.countByConcurrentRequest(concurrentRequest)
+          .map(c => ConcurrentRequestCount(concurrentRequest, c))
+          .map(toJson)
+      case _ =>
+        halt(BadRequest(toJson(ErrorMsg(500, "Posts to /concurrent/count only accept a JSON body (i.e. Content-Type: application/json)"))))
+    }
+  }
+  get("/concurrent") {
+    request.getHeader("Content-Type") match {
+      case "application/json" =>
+        val b = request.body
+        val limit = params.getAs[Int]("limit")
+        val offset = params.getAs[Int]("offset")
+        val concurrentRequest = fromJson(b, classOf[ConcurrentRequest])
+        val (closeable, stream) = controller.streamByConcurrentRequest(concurrentRequest, limit, offset)
+        ResponseUtilities.sendStreamedResponse(response, stream, (a: Annotation) => toJson(a))
+        closeable.close()
+        Unit
+      case _ =>
+        halt(BadRequest(toJson(ErrorMsg(500, "Posts to /concurrent/count only accept a JSON body (i.e. Content-Type: application/json)"))))
+    }
   }
 
   get("/videoreference/chunked/:uuid") {

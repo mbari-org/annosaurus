@@ -97,6 +97,8 @@ class ImagedMomentDAOImpl(entityManager: EntityManager)
   }
 
 
+
+
   override def streamVideoReferenceUuidsBetweenUpdatedDates(start: Instant, end: Instant, limit: Option[Int], offset: Option[Int]): java.util.stream.Stream[UUID] = {
     val query = entityManager.createNamedQuery("ImagedMoment.findVideoReferenceUUIDsModifiedBetweenDates")
     val startTimestamp = Timestamp.from(start)

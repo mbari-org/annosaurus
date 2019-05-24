@@ -16,10 +16,11 @@
 
 package org.mbari.vars.annotation.dao
 
-import java.time.{ Duration, Instant }
+import java.time.{Duration, Instant}
 import java.util.UUID
 
 import org.mbari.vars.annotation.model.Observation
+import org.mbari.vars.annotation.model.simple.ConcurrentRequest
 
 /**
  *
@@ -46,6 +47,14 @@ trait ObservationDAO[T <: Observation] extends DAO[T] {
                                 endTimestamp: Instant,
                                 limit: Option[Int] = None,
                                  offset: Option[Int] = None): java.util.stream.Stream[T]
+
+  def countByVideoReferenceUUIDAndTimestamps(uuid: UUID, startTimestamp: Instant, endTimestamp: Instant): Int
+
+  def streamByConcurrentRequest(request: ConcurrentRequest,
+                                limit: Option[Int] = None,
+                                offset: Option[Int] = None): java.util.stream.Stream[T]
+
+  def countByConcurrentRequest(request: ConcurrentRequest): Long
 
   /**
    *

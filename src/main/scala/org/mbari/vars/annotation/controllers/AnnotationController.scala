@@ -23,10 +23,10 @@ import java.util.concurrent.Executors
 
 import org.mbari.vars.annotation.dao.jpa.AnnotationImpl
 import org.mbari.vars.annotation.dao.DAO
-import org.mbari.vars.annotation.model.{Annotation, ImagedMoment, Observation}
+import org.mbari.vars.annotation.model.simple.ConcurrentRequest
+import org.mbari.vars.annotation.model.{Annotation, Observation}
 import org.mbari.vcr4j.time.Timecode
 
-import scala.collection.JavaConverters._
 import scala.concurrent.{ExecutionContext, Future}
 
 
@@ -102,6 +102,19 @@ class AnnotationController(daoFactory: BasicDAOFactory) {
     (() => dao.close(),
       dao.streamByVideoReferenceUUIDAndTimestamps(videoReferenceUuid, startTimestamp, endTimestamp, limit, offset)
         .map(obs => AnnotationImpl(obs)))
+  }
+
+  def streamByConcurrentRequest(request: ConcurrentRequest, limit: Option[Int], offset: Option[Int]): (Closeable, java.util.stream.Stream[Annotation]) = {
+    val dao = daoFactory.newObservationDAO()
+    (() => dao.close(),
+      dao.streamByConcurrentRequest(request, limit, offset).map(obs => AnnotationImpl(obs)))
+  }
+
+  def countByConcurrentRequest(request: ConcurrentRequest)(implicit ec: ExecutionContext): Future[Long] = {
+    def dao = daoFactory.newObservationDAO()
+    val f = dao.runTransaction(d => d.countByConcurrentRequest(request))
+    f.onComplete(t => dao.close())
+    f
   }
 
 

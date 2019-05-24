@@ -54,10 +54,13 @@ import org.mbari.vars.annotation.model.{Association, ImagedMoment, Observation}
     query = "SELECT DISTINCT activity FROM observations ORDER BY activity"),
   new NamedNativeQuery(
     name = "Observation.countByVideoReferenceUUID",
-    query = "SELECT COUNT(uuid) FROM observations WHERE imaged_moment_uuid IN " +
-      "(SELECT DISTINCT im.uuid FROM imaged_moments im LEFT JOIN observations obs " +
-      "ON obs.imaged_moment_uuid = im.uuid WHERE " +
-      "im.video_reference_uuid = ?1)"),
+    query = "SELECT COUNT(uuid) FROM observations obs RIGHT JOIN imaged_moments im ON obs.imaged_moment_uuid = im.uuid " +
+      "WHERE im.uuid = ?1"),
+  new NamedNativeQuery(
+    name = "Observation.countByVideoReferenceUUIDAndTimestamps",
+    query = "SELECT COUNT(uuid) FROM observations obs RIGHT JOIN imaged_moments im ON obs.imaged_moment_uuid = im.uuid " +
+      "WHERE im.uuid = ?1 AND im.recorded_timestamp BETWEEN ?2 AND ?3"
+  ),
   new NamedNativeQuery(
     name = "Observation.countAllByVideoReferenceUUIDs",
     query = "SELECT im.video_reference_uuid, COUNT(obs.uuid) as n FROM observations obs RIGHT JOIN imaged_moments im ON im.uuid = obs.imaged_moment_uuid GROUP BY im.video_reference_uuid ORDER BY n"),
@@ -74,6 +77,15 @@ import org.mbari.vars.annotation.model.{Association, ImagedMoment, Observation}
   new NamedQuery(
     name = "Observation.findAll",
     query = "SELECT o FROM Observation o ORDER BY o.uuid"),
+  new NamedQuery(
+    name = "Observation.findByConcurrentRequest",
+    query =
+      "SELECT o FROM Observation o LEFT JOIN o.imagedMoment i WHERE i.videoReferenceUUID IN :uuids AND i.recordedDate BETWEEN :start AND :end ORDER BY o.uuid"),
+  new NamedQuery(
+    name = "Observation.countByConcurrentRequest",
+    query =
+      "SELECT COUNT(o.uuid) FROM Observation o LEFT JOIN o.imagedMoment i WHERE i.videoReferenceUUID IN :uuids AND i.recordedDate BETWEEN :start AND :end"),
+
   new NamedQuery(
     name = "Observation.findByVideoReferenceUUID",
     query = "SELECT o FROM Observation o LEFT JOIN o.imagedMoment i WHERE i.videoReferenceUUID = :uuid ORDER BY o.uuid"),

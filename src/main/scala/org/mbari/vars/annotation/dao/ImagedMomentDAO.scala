@@ -64,6 +64,7 @@ trait ImagedMomentDAO[T <: ImagedMoment] extends DAO[T] {
                                               limit: Option[Int],
                                               offset: Option[Int]): java.util.stream.Stream[ImagedMomentImpl]
 
+
   def streamVideoReferenceUuidsBetweenUpdatedDates(start: Instant,
                                                  end: Instant,
                                                  limit: Option[Int] = None,
