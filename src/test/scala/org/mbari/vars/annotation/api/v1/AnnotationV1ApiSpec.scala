@@ -26,6 +26,7 @@ import org.mbari.vars.annotation.api.WebApiStack
 import org.mbari.vars.annotation.controllers.AnnotationController
 import org.mbari.vars.annotation.dao.jpa.{AnnotationImpl, AssociationImpl, ImageReferenceImpl}
 import org.mbari.vars.annotation.model.Annotation
+import org.mbari.vars.annotation.model.simple.{ConcurrentRequest, ConcurrentRequestCount}
 import org.mbari.vcr4j.time.Timecode
 
 import scala.collection.JavaConverters._
@@ -37,6 +38,7 @@ import scala.collection.JavaConverters._
  * @since 2016-09-08T10:47:00
  */
 class AnnotationV1ApiSpec extends WebApiStack {
+
 
   private[this] val annotationV1Api = {
     val controller = new AnnotationController(daoFactory)
@@ -176,6 +178,8 @@ class AnnotationV1ApiSpec extends WebApiStack {
       }
   }
 
+
+
   val anno0 = {
     val a0 = AnnotationImpl(uuid0, "Nanomia bijuga", "brian", recordedDate = recordedDate)
     val ir = ImageReferenceImpl(new URL("http://www.foo.bar/woot.png"), Option(1920), Option(1080))
@@ -248,6 +252,68 @@ class AnnotationV1ApiSpec extends WebApiStack {
           a.observer should be("carolina")
         }
       }
+  }
+
+  // Create annotations for concurrent requests
+  val startTimestamp = recordedDate.get
+  val cUuid0 = UUID.randomUUID()
+  val cUuid1 = UUID.randomUUID()
+  val concurrentAnnotations = Seq(
+    AnnotationImpl(cUuid0, "Nanomia bijuga", "brian", recordedDate = Some(startTimestamp)),
+    AnnotationImpl(cUuid0, "bony-eared assfish", "brian", recordedDate = Some(startTimestamp)),
+    AnnotationImpl(cUuid1, "Pandalus platyceros", "schlin", recordedDate = Some(startTimestamp.plus(Duration.ofSeconds(1)))),
+    AnnotationImpl(cUuid1, "Peobius", "stephalopod", elapsedTime = elapsedTime, recordedDate = Some(startTimestamp.plus(Duration.ofSeconds(2)))),
+    AnnotationImpl(cUuid1, "Peobius", "stephalopod", recordedDate = Some(startTimestamp.plus(Duration.ofSeconds(100)))))
+
+  it should "count by concurrent request" in {
+
+    // Create the concurrent annotations
+    val jsonC = Constants.GSON.toJson(concurrentAnnotations.asJava)
+    post(
+      "/v1/annotations/bulk",
+      headers = Map("Content-Type" -> "application/json"),
+      body = jsonC.getBytes(StandardCharsets.UTF_8)) {
+      status should be(200)
+    }
+
+    val start = recordedDate.get
+    val end = start.plus(Duration.ofSeconds(5))
+    val cr = ConcurrentRequest(start, end, Seq(cUuid0, cUuid1))
+    val json = Constants.GSON.toJson(cr)
+    post("/v1/annotations/concurrent/count",
+      headers = Map("Content-Type" -> "application/json"),
+      body = json.getBytes(StandardCharsets.UTF_8)) {
+
+      status should be(200)
+      var count = Constants.GSON.fromJson(body, classOf[ConcurrentRequestCount])
+      // ONe of the concurrent annotations is outside the date range. This was deliberate
+      // So we expect one less annotation
+      count.count should be (concurrentAnnotations.size - 1)
+    }
+
+  }
+
+  it should "find by concurrent request" in {
+    val start = recordedDate.get
+    val end = start.plus(Duration.ofSeconds(5))
+    val cr = ConcurrentRequest(start, end, Seq(cUuid0, cUuid1))
+    val json = Constants.GSON.toJson(cr)
+
+    post("/v1/annotations/concurrent",
+      headers = Map("Content-Type" -> "application/json"),
+      body = json.getBytes(StandardCharsets.UTF_8)) {
+
+      status should be(200)
+
+      var concurrentAnnos = Constants.GSON
+        .fromJson(body, classOf[Array[AnnotationImpl]])
+        .toSeq
+
+
+      concurrentAnnos.size should be(4)
+      println(concurrentAnnos)
+
+    }
   }
 
 }

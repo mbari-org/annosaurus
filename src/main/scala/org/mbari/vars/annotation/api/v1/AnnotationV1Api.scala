@@ -64,7 +64,7 @@ class AnnotationV1Api(controller: AnnotationController)(implicit val executor: E
       .map(toJson)
   }
 
-  get ("/concurrent/count") {
+  post("/concurrent/count") {
     request.getHeader("Content-Type") match {
       case "application/json" =>
         val b = request.body
@@ -76,7 +76,7 @@ class AnnotationV1Api(controller: AnnotationController)(implicit val executor: E
         halt(BadRequest(toJson(ErrorMsg(500, "Posts to /concurrent/count only accept a JSON body (i.e. Content-Type: application/json)"))))
     }
   }
-  get("/concurrent") {
+  post("/concurrent") {
     request.getHeader("Content-Type") match {
       case "application/json" =>
         val b = request.body

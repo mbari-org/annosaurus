@@ -93,6 +93,8 @@ class AnnotationImpl extends Annotation {
     }).asJava
   }
 
+
+  override def toString = s"AnnotationImpl($concept, $observer, $observationTimestamp)"
 }
 
 object AnnotationImpl {
