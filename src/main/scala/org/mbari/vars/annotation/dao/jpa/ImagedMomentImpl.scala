@@ -137,7 +137,8 @@ import scala.collection.JavaConverters._
     ),
     new NamedQuery(
       name = "ImagedMoment.findByVideoReferenceUUIDAndTimestamps",
-      query = "SELECT i FROM ImagedMoment i WHERE i.videoReferenceUUID = :uuid AND i.recordedDate BETWEEN :start AND :end ORDER BY i.recordedDate"
+      query = "SELECT i FROM ImagedMoment i WHERE i.videoReferenceUUID = :uuid AND " +
+        "i.recordedDate BETWEEN :start AND :end ORDER BY i.recordedDate"
     ),
     new NamedQuery(
       name = "ImagedMoment.findWithImageReferences",

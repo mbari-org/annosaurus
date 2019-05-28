@@ -43,21 +43,7 @@ import org.mbari.vars.annotation.model.{ Association, Observation }
     query = "SELECT COUNT(*) FROM associations WHERE to_concept = ?1"),
   new NamedNativeQuery(
     name = "Association.findByLinkNameAndVideoReference",
-    query =
-      """SELECT
-    o.concept,
-    a.uuid,
-    link_name,
-    to_concept,
-    link_value,
-    mime_type
-FROM
-    associations a LEFT JOIN
-    observations o ON a.observation_uuid = o.uuid LEFT JOIN
-    imaged_moments i ON o.imaged_moment_uuid = i.uuid
-WHERE
-    i.video_reference_uuid = ?1 AND
-    a.link_name = ?2"""),
+    query ="SELECT o.concept, a.uuid, link_name, to_concept, link_value, mime_type FROM associations a LEFT JOIN observations o ON a.observation_uuid = o.uuid LEFT JOIN imaged_moments i ON o.imaged_moment_uuid = i.uuid WHERE i.video_reference_uuid = ?1 AND a.link_name = ?2"),
   new NamedNativeQuery(
     name = "Association.updateToConcept",
     query = "UPDATE associations SET to_concept = ?1 WHERE to_concept = ?2")))
