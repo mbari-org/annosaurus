@@ -71,6 +71,8 @@ class ImageControllerSpec extends FlatSpec with Matchers with BeforeAndAfterAll 
 
   }
 
-
+  protected override def afterAll(): Unit = {
+    daoFactory.cleanup()
+  }
 
 }
