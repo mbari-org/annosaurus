@@ -93,7 +93,7 @@ class AssociationV1ApiSpec extends WebApiStack {
       body = json.getBytes(StandardCharsets.UTF_8)) {
 //      println("---" + body)
       status should be (200)
-      var resp = Constants.GSON.fromJson(body, classOf[ConceptAssociationResponse])
+      val resp = Constants.GSON.fromJson(body, classOf[ConceptAssociationResponse])
       resp.associations should not be empty
     }
   }

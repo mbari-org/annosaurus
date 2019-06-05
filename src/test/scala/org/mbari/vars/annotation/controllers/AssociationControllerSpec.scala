@@ -4,7 +4,6 @@ import java.time.Instant
 import java.util.UUID
 import java.util.concurrent.TimeUnit
 
-import org.mbari.vars.annotation.Constants
 import org.mbari.vars.annotation.dao.jpa.{AnnotationImpl, AssociationImpl, ImagedMomentImpl, ObservationImpl, TestDAOFactory}
 import org.mbari.vars.annotation.model.simple.ConceptAssociationRequest
 import org.scalatest.{BeforeAndAfterAll, FlatSpec, Matchers}

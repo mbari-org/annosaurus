@@ -15,7 +15,7 @@ val jtdsVersion = "1.3.1"
 val junitVersion = "4.12"
 val logbackVersion = "1.2.3"
 val postgresqlVersion = "42.2.5"
-val rxjavaVersion = "2.2.8"
+val rxjavaVersion = "2.2.9"
 val scalatestVersion = "3.0.7"
 val scalatraVersion = "2.6.5"
 val scilubeVersion = "2.0.4"
@@ -27,7 +27,7 @@ val vcr4jVersion = "4.0.2"
 
 lazy val buildSettings = Seq(
   organization := "org.mbari.vars",
-  version := "0.2.6",
+  version := "0.2.7",
   scalaVersion in ThisBuild := "2.12.8",
   crossScalaVersions := Seq("2.12.8"),
   organizationName := "Monterey Bay Aquarium Research Institute",
