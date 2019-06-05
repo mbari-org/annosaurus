@@ -20,7 +20,8 @@ import java.util.UUID
 
 import org.mbari.vars.annotation.controllers.AssociationController
 import org.mbari.vars.annotation.model.Association
-import org.scalatra.{ BadRequest, NoContent, NotFound }
+import org.mbari.vars.annotation.model.simple.ErrorMsg
+import org.scalatra.{BadRequest, NoContent, NotFound}
 
 import scala.concurrent.ExecutionContext
 import scala.collection.JavaConverters._
@@ -51,7 +52,8 @@ class AssociationV1Api(controller: AssociationController)(implicit val executor:
 
   // find associations
   get("/:video_reference_uuid/:link_name") {
-    val videoReferenceUUID = params.getAs[UUID]("video_reference_uuid").getOrElse(halt(BadRequest("Please provide a video-reference 'uuid'")))
+    val videoReferenceUUID = params.getAs[UUID]("video_reference_uuid")
+      .getOrElse(halt(BadRequest(toJson(ErrorMsg(400, "Please provide a video-reference 'uuid'")))))
     val linkName = params.get("link_name").getOrElse(halt(BadRequest("A 'link_name' parameter is required")))
     val concept = params.get("concept")
     controller.findByLinkNameAndVideoReferenceUUIDAndConcept(linkName, videoReferenceUUID, concept)
@@ -60,7 +62,8 @@ class AssociationV1Api(controller: AssociationController)(implicit val executor:
 
   post("/") {
     validateRequest() // Apply API security
-    val uuid = params.getAs[UUID]("observation_uuid").getOrElse(halt(BadRequest("Please provide an 'observation_uuid'")))
+    val uuid = params.getAs[UUID]("observation_uuid")
+      .getOrElse(halt(BadRequest(toJson(ErrorMsg(400, "Please provide an 'observation_uuid'"))))
     val linkName = params.get("link_name").getOrElse(halt(BadRequest("A 'link_name' parameter is required")))
     val toConcept = params.get("to_concept").getOrElse(Association.TO_CONCEPT_SELF)
     val linkValue = params.get("link_value").getOrElse(Association.LINK_VALUE_NIL)
@@ -70,14 +73,15 @@ class AssociationV1Api(controller: AssociationController)(implicit val executor:
 
   put("/:uuid") {
     validateRequest() // Apply API security
-    val uuid = params.getAs[UUID]("uuid").getOrElse(halt(BadRequest("Please provide the 'uuid' of the association")))
+    val uuid = params.getAs[UUID]("uuid")
+      .getOrElse(halt(BadRequest(toJson(ErrorMsg(400, "Please provide the 'uuid' of the association")))))
     val observationUUID = params.getAs[UUID]("observation_uuid")
     val linkName = params.get("link_name")
     val toConcept = params.get("to_concept")
     val linkValue = params.get("link_value")
     val mimeType = params.get("mime_type")
     controller.update(uuid, observationUUID, linkName, toConcept, linkValue, mimeType).map({
-      case None => halt(NotFound(body = s"No association with uuid of $uuid was found"))
+      case None => halt(NotFound(toJson(ErrorMsg(404, s"No association with uuid of $uuid was found"))
       case Some(a) => toJson(a)
     })
   }
@@ -90,7 +94,7 @@ class AssociationV1Api(controller: AssociationController)(implicit val executor:
         controller.bulkUpdate(associations)
           .map(assos => toJson(assos.asJava))
       case _ =>
-        halt(BadRequest("Puts to /bulk only accept JSON body (i.e. Content-Type: application/json"))
+        halt(BadRequest(toJson(ErrorMsg(412, "Puts to /bulk only accept JSON body (i.e. Content-Type: application/json")))
     }
   }
 
@@ -99,31 +103,35 @@ class AssociationV1Api(controller: AssociationController)(implicit val executor:
     request.getHeader("Content-Type") match {
       case "application/json" =>
         val uuids = fromJson(request.body, classOf[Array[UUID]])
-        if (uuids == null || uuids.isEmpty) halt(BadRequest("No observation UUIDs were provided as JSON"))
+        if (uuids == null || uuids.isEmpty) halt(BadRequest(toJson(ErrorMsg(404, "No observation UUIDs were provided as JSON"))))
         controller.bulkDelete(uuids)
       case _ =>
-        halt(BadRequest("bulk delete only accepts JSON (Content-Type: application/json)"))
+        halt(BadRequest(toJson(ErrorMsg(412, "bulk delete only accepts JSON (Content-Type: application/json)"))))
     }
   }
 
   delete("/:uuid") {
     validateRequest() // Apply API security
-    val uuid = params.getAs[UUID]("uuid").getOrElse(halt(BadRequest("Please provide the 'uuid' of the association")))
+    val uuid = params.getAs[UUID]("uuid")
+      .getOrElse(halt(BadRequest(toJson(ErrorMsg(400, "Please provide the 'uuid' of the association")))))
     controller.delete(uuid).map({
       case true => halt(NoContent()) // Success!
-      case false => halt(NotFound(s"Failed. No association with UUID of $uuid was found."))
+      case false => halt(NotFound(toJson(ErrorMsg(412, s"Failed. No association with UUID of $uuid was found."))))
     })
   }
 
   get("/toconcept/count/:concept") {
-    val concept = params.get("concept").getOrElse(halt(BadRequest("Please provide a concept to search for")))
+    val concept = params.get("concept")
+      .getOrElse(halt(BadRequest(toJson(ErrorMsg(400, "Please provide a concept to search for")))))
     controller.countByToConcept(concept)
       .map(n => s"""{"concept":"$concept", "count":"$n"}""")
   }
 
   put("/toconcept/rename") {
-    val oldConcept = params.get("old").getOrElse(halt(BadRequest("Please provide the concept being replaced")))
-    val newConcept = params.get("new").getOrElse(halt(BadRequest("Please provide the replacement concept")))
+    val oldConcept = params.get("old")
+      .getOrElse(halt(BadRequest(toJson(ErrorMsg(400, "Please provide the concept being replaced")))))
+    val newConcept = params.get("new")
+      .getOrElse(halt(BadRequest(toJson(ErrorMsg(400, "Please provide the replacement concept")))))
     controller.updateToConcept(oldConcept, newConcept)
       .map(n => s"""{"old_concept":"$oldConcept", "new_concept":"$newConcept", "number_updated":"$n"}""")
   }
