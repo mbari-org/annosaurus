@@ -18,6 +18,7 @@ package org.mbari.vars.annotation.dao
 
 import java.net.URL
 
+import org.mbari.vars.annotation.dao.jpa.ImageReferenceImpl
 import org.mbari.vars.annotation.model.ImageReference
 
 /**
@@ -36,5 +37,7 @@ trait ImageReferenceDAO[T <: ImageReference] extends DAO[T] {
     format: Option[String] = None): T
 
   def findByURL(url: URL): Option[T]
+
+  def findByImageName(name: String): Seq[ImageReferenceImpl]
 
 }

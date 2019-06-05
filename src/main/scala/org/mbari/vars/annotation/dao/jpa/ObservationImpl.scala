@@ -54,11 +54,11 @@ import org.mbari.vars.annotation.model.{Association, ImagedMoment, Observation}
     query = "SELECT DISTINCT activity FROM observations ORDER BY activity"),
   new NamedNativeQuery(
     name = "Observation.countByVideoReferenceUUID",
-    query = "SELECT COUNT(uuid) FROM observations obs RIGHT JOIN imaged_moments im ON obs.imaged_moment_uuid = im.uuid " +
-      "WHERE im.uuid = ?1"),
+    query = "SELECT COUNT(obs.uuid) FROM observations obs RIGHT JOIN imaged_moments im ON obs.imaged_moment_uuid = im.uuid " +
+      "WHERE im.video_reference_uuid = ?1"),
   new NamedNativeQuery(
     name = "Observation.countByVideoReferenceUUIDAndTimestamps",
-    query = "SELECT COUNT(uuid) FROM observations obs RIGHT JOIN imaged_moments im ON obs.imaged_moment_uuid = im.uuid " +
+    query = "SELECT COUNT(obs.uuid) FROM observations obs RIGHT JOIN imaged_moments im ON obs.imaged_moment_uuid = im.uuid " +
       "WHERE im.uuid = ?1 AND im.recorded_timestamp BETWEEN ?2 AND ?3"
   ),
   new NamedNativeQuery(
@@ -85,7 +85,6 @@ import org.mbari.vars.annotation.model.{Association, ImagedMoment, Observation}
     name = "Observation.countByConcurrentRequest",
     query =
       "SELECT COUNT(o.uuid) FROM Observation o LEFT JOIN o.imagedMoment i WHERE i.videoReferenceUUID IN :uuids AND i.recordedDate BETWEEN :start AND :end"),
-
   new NamedQuery(
     name = "Observation.findByVideoReferenceUUID",
     query = "SELECT o FROM Observation o LEFT JOIN o.imagedMoment i WHERE i.videoReferenceUUID = :uuid ORDER BY o.uuid"),

@@ -102,6 +102,16 @@ class ImageV1ApiSpec extends WebApiStack {
     }
   }
 
+  it should "find by name" in {
+    val name = "foo.png"
+    get(s"$path/name/$name") {
+      status should be (200)
+      val im = gson.fromJson(body, classOf[Array[Image]])
+      im.size should be (1)
+      im.head.url.toExternalForm.endsWith(name) should be (true)
+    }
+  }
+
   it should "update" in {
     put(
       s"$path/${image.imageReferenceUuid}",
