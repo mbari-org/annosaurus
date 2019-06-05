@@ -43,21 +43,9 @@ import org.mbari.vars.annotation.model.{ Association, Observation }
     query = "SELECT COUNT(*) FROM associations WHERE to_concept = ?1"),
   new NamedNativeQuery(
     name = "Association.findByLinkNameAndVideoReference",
-    query =
-      """SELECT
-    o.concept,
-    a.uuid,
-    link_name,
-    to_concept,
-    link_value,
-    mime_type
-FROM
-    associations a LEFT JOIN
-    observations o ON a.observation_uuid = o.uuid LEFT JOIN
-    imaged_moments i ON o.imaged_moment_uuid = i.uuid
-WHERE
-    i.video_reference_uuid = ?1 AND
-    a.link_name = ?2"""),
+    query ="SELECT o.concept, a.uuid, link_name, to_concept, link_value, mime_type " +
+      "FROM associations a LEFT JOIN observations o ON a.observation_uuid = o.uuid LEFT JOIN " +
+      "imaged_moments i ON o.imaged_moment_uuid = i.uuid WHERE i.video_reference_uuid = ?1 AND a.link_name = ?2"),
   new NamedNativeQuery(
     name = "Association.updateToConcept",
     query = "UPDATE associations SET to_concept = ?1 WHERE to_concept = ?2")))
@@ -70,7 +58,9 @@ WHERE
     query = "SELECT a FROM Association a WHERE a.linkName = :linkName ORDER BY a.uuid"),
   new NamedQuery(
     name = "Association.findByLinkNameAndVideoReferenceUUID",
-    query = "SELECT a FROM Association a INNER JOIN FETCH a.observation o INNER JOIN FETCH o.imagedMoment im WHERE im.videoReferenceUUID = :videoReferenceUuid AND a.linkName = :linkName ORDER BY a.uuid")))
+    query = "SELECT a FROM Association a INNER JOIN FETCH a.observation o " +
+      "INNER JOIN FETCH o.imagedMoment im WHERE im.videoReferenceUUID = :videoReferenceUuid " +
+      "AND a.linkName = :linkName ORDER BY a.uuid")))
 class AssociationImpl extends Association with JPAPersistentObject {
 
   @Expose(serialize = true)
