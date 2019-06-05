@@ -88,7 +88,7 @@ class AnnotationV1Api(controller: AnnotationController)(implicit val executor: E
         closeable.close()
         Unit
       case _ =>
-        halt(BadRequest(toJson(ErrorMsg(500, "Posts to /concurrent/count only accept a JSON body (i.e. Content-Type: application/json)"))))
+        halt(BadRequest(toJson(ErrorMsg(400, "Posts to /concurrent/count only accept a JSON body (i.e. Content-Type: application/json)"))))
     }
   }
 

@@ -16,13 +16,16 @@
 
 package org.mbari.vars.annotation.api.v1
 
+import java.nio.charset.StandardCharsets
 import java.time.Duration
 import java.util.UUID
 import java.util.concurrent.TimeUnit
 
+import org.mbari.vars.annotation.Constants
 import org.mbari.vars.annotation.api.WebApiStack
 import org.mbari.vars.annotation.controllers.{AnnotationController, AssociationController, BasicDAOFactory, ObservationController}
 import org.mbari.vars.annotation.dao.jpa.AssociationImpl
+import org.mbari.vars.annotation.model.simple.{ConceptAssociationRequest, ConceptAssociationResponse}
 import org.mbari.vars.annotation.model.{Annotation, Association}
 
 import scala.concurrent.Await
@@ -37,6 +40,7 @@ import scala.concurrent.duration.{Duration => SDuration}
 class AssociationV1ApiSpec extends WebApiStack {
 
   private[this] val timeout = SDuration(3000, TimeUnit.MILLISECONDS)
+  private[this] val videoReferenceUuid = UUID.randomUUID()
 
   private[this] val associationV1Api = {
     val controller = new AssociationController(daoFactory)
@@ -53,7 +57,7 @@ class AssociationV1ApiSpec extends WebApiStack {
     annotation = {
       val controller = new AnnotationController(daoFactory)
       Await.result(
-        controller.create(UUID.randomUUID(), "Foo", "brian",
+        controller.create(videoReferenceUuid, "Foo", "brian",
           elapsedTime = Some(Duration.ofMillis(2000))), timeout)
     }
 
@@ -77,6 +81,20 @@ class AssociationV1ApiSpec extends WebApiStack {
       a.linkName should be(association.linkName)
       a.toConcept should be(association.toConcept)
       a.linkValue should be(association.linkValue)
+    }
+  }
+
+  it should "find by concept association request" in {
+
+    val car = ConceptAssociationRequest(association.linkName, Seq(annotation.videoReferenceUuid))
+    val json = Constants.GSON.toJson(car)
+    post("/v1/associations/conceptassociations",
+      headers = Map("Content-Type" -> "application/json"),
+      body = json.getBytes(StandardCharsets.UTF_8)) {
+//      println("---" + body)
+      status should be (200)
+      var resp = Constants.GSON.fromJson(body, classOf[ConceptAssociationResponse])
+      resp.associations should not be empty
     }
   }
 
@@ -133,14 +151,17 @@ class AssociationV1ApiSpec extends WebApiStack {
 
   }
 
+
+
+  it should "bulk delete" in {
+    // TODO implement bulk delete spec
+  }
+
+
   it should "delete" in {
     delete(s"/v1/associations/${association.uuid}") {
       status should be(204)
     }
-  }
-
-  it should "bulk delete" in {
-    // TODO implement bulk delete spec
   }
 
 }

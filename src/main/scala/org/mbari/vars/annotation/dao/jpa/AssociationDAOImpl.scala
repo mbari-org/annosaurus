@@ -17,9 +17,10 @@
 package org.mbari.vars.annotation.dao.jpa
 
 import java.util.UUID
-import javax.persistence.EntityManager
 
+import javax.persistence.EntityManager
 import org.mbari.vars.annotation.dao.AssociationDAO
+import org.mbari.vars.annotation.model.simple.{ConceptAssociation, ConceptAssociationRequest, ConceptAssociationResponse}
 
 import scala.collection.JavaConverters._
 
@@ -88,6 +89,45 @@ class AssociationDAOImpl(entityManager: EntityManager)
       case None => tuples.map(_._2)
       case Some(c) => tuples.filter(_._1 == c).map(_._2)
     }
+  }
+
+  def findByConceptAssociationRequest(request: ConceptAssociationRequest): Iterable[ConceptAssociation] = {
+
+    val sql =
+      s"""
+        |SELECT
+        |  a.uuid,
+        |  i.video_reference_uuid,
+        |  o.concept,
+        |  a.link_name,
+        |  a.to_concept,
+        |  a.link_value,
+        |  a.mime_type
+        |FROM
+        |  associations a RIGHT JOIN
+        |  observations o ON a.observation_uuid = o.uuid RIGHT JOIN
+        |  imaged_moments i ON o.imaged_moment_uuid = i.uuid
+        |WHERE
+        |  i.video_reference_uuid IN ${request.uuids.mkString("('", "','", "')")} AND
+        |  a.link_name = '${request.linkName}'
+      """.stripMargin
+    val query = entityManager.createNativeQuery(sql)
+    // HACK: Dropping into SQL. Fast with ugly typecasting
+    // a.uuid, i.video_reference_uuid, o.concept, a.link_name, a.to_concept, a.link_value, a.mime_type
+    query.getResultList
+      .asScala
+      .map(obj => obj.asInstanceOf[Array[Object]])
+      .map(obj => {
+//        obj.foreach(println)
+        val uuid = UUID.fromString(obj(0).asInstanceOf[String])
+        val videoReferenceUuid = UUID.fromString(obj(1).asInstanceOf[String])
+        val conept = obj(2).asInstanceOf[String]
+        val linkName = obj(3).asInstanceOf[String]
+        val toConcept = obj(4).asInstanceOf[String]
+        val linkValue = obj(5).asInstanceOf[String]
+        val mimeType = obj(6).asInstanceOf[String]
+        ConceptAssociation(uuid, videoReferenceUuid, conept, linkName, toConcept, linkValue, mimeType)
+      })
   }
 
 

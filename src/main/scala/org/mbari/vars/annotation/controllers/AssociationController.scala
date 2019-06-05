@@ -18,10 +18,11 @@ package org.mbari.vars.annotation.controllers
 
 import java.util.UUID
 
-import org.mbari.vars.annotation.dao.{ AssociationDAO, NotFoundInDatastoreException }
+import org.mbari.vars.annotation.dao.{AssociationDAO, NotFoundInDatastoreException}
 import org.mbari.vars.annotation.model.Association
+import org.mbari.vars.annotation.model.simple.{ConceptAssociation, ConceptAssociationRequest, ConceptAssociationResponse}
 
-import scala.concurrent.{ ExecutionContext, Future }
+import scala.concurrent.{ExecutionContext, Future}
 
 /**
  *
@@ -123,6 +124,11 @@ class AssociationController(val daoFactory: BasicDAOFactory)
     exec(fn)
   }
 
+  def findByConceptAssociationRequest(request: ConceptAssociationRequest)(implicit ec: ExecutionContext): Future[ConceptAssociationResponse] = {
+    def fn(dao: ADAO): Iterable[ConceptAssociation] = dao.findByConceptAssociationRequest(request)
+    exec(fn).map(ca => ConceptAssociationResponse(request, ca.toSeq))
+  }
+
   def countByToConcept(concept: String)(implicit ec: ExecutionContext): Future[Int] = {
     def fn(dao: ADAO): Int = dao.countByToConcept(concept)
     exec(fn)
@@ -132,5 +138,7 @@ class AssociationController(val daoFactory: BasicDAOFactory)
     def fn(dao: ADAO): Int = dao.updateToConcept(oldToConcept, newToConcept)
     exec(fn)
   }
+
+
 
 }

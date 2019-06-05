@@ -19,6 +19,7 @@ package org.mbari.vars.annotation.dao
 import java.util.UUID
 
 import org.mbari.vars.annotation.model.Association
+import org.mbari.vars.annotation.model.simple.{ConceptAssociation, ConceptAssociationRequest}
 
 /**
  *
@@ -42,6 +43,8 @@ trait AssociationDAO[T <: Association] extends DAO[T] {
     linkName: String,
     videoReferenceUUID: UUID,
     concept: Option[String] = None): Iterable[T]
+
+  def findByConceptAssociationRequest(request: ConceptAssociationRequest): Iterable[ConceptAssociation]
 
   def countByToConcept(toConcept: String): Int
 

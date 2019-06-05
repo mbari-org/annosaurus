@@ -20,7 +20,7 @@ import java.util.UUID
 
 import org.mbari.vars.annotation.controllers.AssociationController
 import org.mbari.vars.annotation.model.Association
-import org.mbari.vars.annotation.model.simple.ErrorMsg
+import org.mbari.vars.annotation.model.simple.{ConceptAssociationRequest, ErrorMsg}
 import org.scalatra.{BadRequest, NoContent, NotFound}
 
 import scala.concurrent.ExecutionContext
@@ -63,7 +63,7 @@ class AssociationV1Api(controller: AssociationController)(implicit val executor:
   post("/") {
     validateRequest() // Apply API security
     val uuid = params.getAs[UUID]("observation_uuid")
-      .getOrElse(halt(BadRequest(toJson(ErrorMsg(400, "Please provide an 'observation_uuid'"))))
+      .getOrElse(halt(BadRequest(toJson(ErrorMsg(400, "Please provide an 'observation_uuid'")))))
     val linkName = params.get("link_name").getOrElse(halt(BadRequest("A 'link_name' parameter is required")))
     val toConcept = params.get("to_concept").getOrElse(Association.TO_CONCEPT_SELF)
     val linkValue = params.get("link_value").getOrElse(Association.LINK_VALUE_NIL)
@@ -81,7 +81,7 @@ class AssociationV1Api(controller: AssociationController)(implicit val executor:
     val linkValue = params.get("link_value")
     val mimeType = params.get("mime_type")
     controller.update(uuid, observationUUID, linkName, toConcept, linkValue, mimeType).map({
-      case None => halt(NotFound(toJson(ErrorMsg(404, s"No association with uuid of $uuid was found"))
+      case None => halt(NotFound(toJson(ErrorMsg(404, s"No association with uuid of $uuid was found"))))
       case Some(a) => toJson(a)
     })
   }
@@ -94,7 +94,7 @@ class AssociationV1Api(controller: AssociationController)(implicit val executor:
         controller.bulkUpdate(associations)
           .map(assos => toJson(assos.asJava))
       case _ =>
-        halt(BadRequest(toJson(ErrorMsg(412, "Puts to /bulk only accept JSON body (i.e. Content-Type: application/json")))
+        halt(BadRequest(toJson(ErrorMsg(412, "Puts to /bulk only accept JSON body (i.e. Content-Type: application/json"))))
     }
   }
 
@@ -134,6 +134,20 @@ class AssociationV1Api(controller: AssociationController)(implicit val executor:
       .getOrElse(halt(BadRequest(toJson(ErrorMsg(400, "Please provide the replacement concept")))))
     controller.updateToConcept(oldConcept, newConcept)
       .map(n => s"""{"old_concept":"$oldConcept", "new_concept":"$newConcept", "number_updated":"$n"}""")
+  }
+
+  post("/conceptassociations") {
+    request.getHeader("Content-Type") match {
+      case "application/json" =>
+        val b = request.body
+        val limit = params.getAs[Int]("limit")
+        val offset = params.getAs[Int]("offset")
+        val conceptAssociationRequest = fromJson(b, classOf[ConceptAssociationRequest])
+        controller.findByConceptAssociationRequest(conceptAssociationRequest)
+          .map(toJson)
+      case _ =>
+        halt(BadRequest(toJson(ErrorMsg(400, "Posts to /conceptassociations only accept a JSON body (i.e. Content-Type: application/json)"))))
+    }
   }
 
 }
