@@ -78,6 +78,14 @@ import org.mbari.vars.annotation.model.{Association, ImagedMoment, Observation}
     name = "Observation.findAll",
     query = "SELECT o FROM Observation o ORDER BY o.uuid"),
   new NamedQuery(
+    name = "Observation.findByMultiRequest",
+    query =
+      "SELECT o FROM Observation o LEFT JOIN o.imagedMoment i WHERE i.videoReferenceUUID IN :uuids ORDER BY o.uuid"),
+  new NamedQuery(
+    name = "Observation.countByMultiRequest",
+    query =
+      "SELECT COUNT(o.uuid) FROM Observation o LEFT JOIN o.imagedMoment i WHERE i.videoReferenceUUID IN :uuids"),
+  new NamedQuery(
     name = "Observation.findByConcurrentRequest",
     query =
       "SELECT o FROM Observation o LEFT JOIN o.imagedMoment i WHERE i.videoReferenceUUID IN :uuids AND i.recordedDate BETWEEN :start AND :end ORDER BY o.uuid"),

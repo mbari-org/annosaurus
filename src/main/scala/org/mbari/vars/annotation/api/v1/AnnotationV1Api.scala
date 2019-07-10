@@ -22,7 +22,7 @@ import java.util.UUID
 import org.mbari.vars.annotation.controllers.AnnotationController
 import org.mbari.vars.annotation.dao.jpa.AnnotationImpl
 import org.mbari.vars.annotation.model.Annotation
-import org.mbari.vars.annotation.model.simple.{ConcurrentRequest, ConcurrentRequestCount, ErrorMsg}
+import org.mbari.vars.annotation.model.simple.{ConcurrentRequest, ConcurrentRequestCount, ErrorMsg, MultiRequest, MultiRequestCount}
 import org.mbari.vars.annotation.util.ResponseUtilities
 import org.mbari.vcr4j.time.Timecode
 import org.scalatra.{BadRequest, NotFound}
@@ -88,7 +88,35 @@ class AnnotationV1Api(controller: AnnotationController)(implicit val executor: E
         closeable.close()
         Unit
       case _ =>
-        halt(BadRequest(toJson(ErrorMsg(400, "Posts to /concurrent/count only accept a JSON body (i.e. Content-Type: application/json)"))))
+        halt(BadRequest(toJson(ErrorMsg(400, "Posts to /concurrent only accept a JSON body (i.e. Content-Type: application/json)"))))
+    }
+  }
+
+  post("/multi/count") {
+    request.getHeader("Content-Type") match {
+      case "application/json" =>
+        val b = request.body
+        val multiRequest = fromJson(b, classOf[MultiRequest])
+        controller.countByMultiRequest(multiRequest)
+          .map(c => MultiRequestCount(multiRequest, c))
+          .map(toJson)
+      case _ =>
+        halt(BadRequest(toJson(ErrorMsg(500, "Posts to /multi/count only accept a JSON body (i.e. Content-Type: application/json)"))))
+    }
+  }
+  post("/multi") {
+    request.getHeader("Content-Type") match {
+      case "application/json" =>
+        val b = request.body
+        val limit = params.getAs[Int]("limit")
+        val offset = params.getAs[Int]("offset")
+        val multiRequest = fromJson(b, classOf[MultiRequest])
+        val (closeable, stream) = controller.streamByMultiRequest(multiRequest, limit, offset)
+        ResponseUtilities.sendStreamedResponse(response, stream, (a: Annotation) => toJson(a))
+        closeable.close()
+        Unit
+      case _ =>
+        halt(BadRequest(toJson(ErrorMsg(400, "Posts to /multi only accept a JSON body (i.e. Content-Type: application/json)"))))
     }
   }
 

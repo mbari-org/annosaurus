@@ -17,10 +17,11 @@
 package org.mbari.vars.annotation.dao
 
 import java.time.{Duration, Instant}
-import java.util.UUID
+import java.util.{UUID, stream}
 
+import org.mbari.vars.annotation.dao.jpa.ObservationImpl
 import org.mbari.vars.annotation.model.Observation
-import org.mbari.vars.annotation.model.simple.ConcurrentRequest
+import org.mbari.vars.annotation.model.simple.{ConcurrentRequest, MultiRequest}
 
 /**
  *
@@ -55,6 +56,10 @@ trait ObservationDAO[T <: Observation] extends DAO[T] {
                                 offset: Option[Int] = None): java.util.stream.Stream[T]
 
   def countByConcurrentRequest(request: ConcurrentRequest): Long
+
+  def streamByMultiRequest(request: MultiRequest, limit: Option[Int], offset: Option[Int]): java.util.stream.Stream[ObservationImpl]
+
+  def countByMultiRequest(request: MultiRequest): Long
 
   /**
    *

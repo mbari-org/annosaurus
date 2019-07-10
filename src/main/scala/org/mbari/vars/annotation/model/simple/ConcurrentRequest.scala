@@ -24,6 +24,10 @@ import com.google.gson.annotations.Expose
 
 import scala.collection.JavaConverters._
 
+/**
+ * Data class enacpsulating information for concurrent requests. That is a request
+  * of annotations from multiple videos between a given time span
+  */
 class ConcurrentRequest {
 
   @Expose(serialize = true)

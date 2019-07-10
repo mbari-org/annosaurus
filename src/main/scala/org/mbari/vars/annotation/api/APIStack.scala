@@ -50,6 +50,7 @@ abstract class APIStack extends ScalatraServlet
   protected[this] val log = LoggerFactory.getLogger(getClass)
   protected[this] val timeFormatter = DateTimeFormatter.ISO_DATE_TIME
   protected[this] val compactTimeFormatter = DateTimeFormatter.ofPattern("yyyyMMdd'T'HHmmssX")
+  protected[this] val defaultLimit = 50
 
   //protected[this] implicit val jsonFormats: Formats = DefaultFormats ++ JavaTypesSerializers.all
 

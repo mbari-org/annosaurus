@@ -26,7 +26,7 @@ import org.mbari.vars.annotation.api.WebApiStack
 import org.mbari.vars.annotation.controllers.AnnotationController
 import org.mbari.vars.annotation.dao.jpa.{AnnotationImpl, AssociationImpl, ImageReferenceImpl}
 import org.mbari.vars.annotation.model.Annotation
-import org.mbari.vars.annotation.model.simple.{ConcurrentRequest, ConcurrentRequestCount}
+import org.mbari.vars.annotation.model.simple.{ConcurrentRequest, ConcurrentRequestCount, MultiRequest}
 import org.mbari.vcr4j.time.Timecode
 
 import scala.collection.JavaConverters._
@@ -312,6 +312,26 @@ class AnnotationV1ApiSpec extends WebApiStack {
 
       concurrentAnnos.size should be(4)
       println(concurrentAnnos)
+
+    }
+  }
+
+  it should "find by multi request" in {
+    val r = MultiRequest(Seq(cUuid0, cUuid1))
+    val json = Constants.GSON.toJson(r)
+
+    post("/v1/annotations/multi",
+      headers = Map("Content-Type" -> "application/json"),
+      body = json.getBytes(StandardCharsets.UTF_8)) {
+
+      status should be(200)
+
+      var annos = Constants.GSON
+        .fromJson(body, classOf[Array[AnnotationImpl]])
+        .toSeq
+
+      annos.size should be(5)
+      println(annos)
 
     }
   }

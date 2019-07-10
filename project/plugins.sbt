@@ -5,7 +5,7 @@ addSbtPlugin("com.earldouglas" % "xsbt-web-plugin" % "4.0.2")
 addSbtPlugin("org.xerial.sbt" % "sbt-pack" % "0.12")
 
 // https://github.com/rtimush/sbt-updates
-addSbtPlugin("com.timushev.sbt" % "sbt-updates" % "0.4.0")
+addSbtPlugin("com.timushev.sbt" % "sbt-updates" % "0.4.1")
 
 // http://www.scalastyle.org/sbt.html
 addSbtPlugin("org.scalastyle" %% "scalastyle-sbt-plugin" % "1.0.0")

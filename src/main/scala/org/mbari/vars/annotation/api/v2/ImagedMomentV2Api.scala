@@ -42,7 +42,7 @@ class ImagedMomentV2Api(controller: ImagedMomentController)(implicit val executo
 
   get("/videoreference/:uuid") {
     val uuid = params.getAs[UUID]("uuid").getOrElse(halt(BadRequest("Please provide a Video Reference UUID")))
-    val limit = params.getAs[Int]("limit")
+    val limit = params.getAs[Int]("limit").orElse(Some(defaultLimit))
     val offset = params.getAs[Int]("offset")
 
     val (closeable, stream) = controller.streamByVideoReferenceUUID(uuid, limit, offset)
@@ -96,7 +96,7 @@ class ImagedMomentV2Api(controller: ImagedMomentController)(implicit val executo
   get("/modified/:start/:end") {
     val start = params.getAs[Instant]("start").getOrElse(halt(BadRequest("Please provide a start date (yyyy-mm-ddThh:mm:ssZ)")))
     val end = params.getAs[Instant]("end").getOrElse(halt(BadRequest("Please provide an end date (yyyy-mm-ddThh:mm:ssZ)")))
-    val limit = params.getAs[Int]("limit")
+    val limit = params.getAs[Int]("limit").orElse(Some(defaultLimit))
     val offset = params.getAs[Int]("offset")
 
     val (closeable, stream) = controller.streamBetweenUpdatedDates(start, end, limit, offset)

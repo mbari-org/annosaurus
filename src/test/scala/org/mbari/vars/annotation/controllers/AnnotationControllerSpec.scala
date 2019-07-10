@@ -21,7 +21,7 @@ import java.util.UUID
 import java.util.concurrent.TimeUnit
 
 import org.mbari.vars.annotation.dao.jpa.TestDAOFactory
-import org.mbari.vars.annotation.model.simple.ConcurrentRequest
+import org.mbari.vars.annotation.model.simple.{ConcurrentRequest, MultiRequest}
 import org.scalatest.{BeforeAndAfterAll, FlatSpec, Matchers}
 import org.slf4j.LoggerFactory
 
@@ -142,6 +142,39 @@ class AnnotationControllerSpec extends FlatSpec with Matchers with BeforeAndAfte
 
     // Verify limit and offset work
     val (closeable2, stream2) = controller.streamByConcurrentRequest(concurrentRequest, Some(10), Some(2))
+    val annos2 = stream2.iterator().asScala.toList
+    annos2.size should be (10)
+    closeable2.close()
+
+  }
+
+  it should "stream by multi request" in {
+    val uuids = 0 until 5 map(_ => UUID.randomUUID())
+    val xs = for {
+      uuid <- uuids
+      i <- 0 until 5
+    } yield {
+      exec(() => controller.create(uuid,
+        "Octosaurus",
+        "brian",
+        recordedDate = Some(Instant.now())))
+    }
+
+    xs.size should be(25)
+    val multiRequest = MultiRequest(uuids)
+
+    // Verify count call is working
+    val a = exec(() => controller.countByMultiRequest(multiRequest))
+    a.intValue() should be (xs.size)
+
+    // Verify stream works
+    val (closeable, stream) = controller.streamByMultiRequest(multiRequest, None, None)
+    val annos = stream.iterator().asScala.toList
+    annos.size should be (xs.size)
+    closeable.close()
+
+    // Verify limit and offset work
+    val (closeable2, stream2) = controller.streamByMultiRequest(multiRequest, Some(10), Some(2))
     val annos2 = stream2.iterator().asScala.toList
     annos2.size should be (10)
     closeable2.close()

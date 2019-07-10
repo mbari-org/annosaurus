@@ -22,7 +22,7 @@ import java.util.{UUID, stream}
 
 import javax.persistence.EntityManager
 import org.mbari.vars.annotation.dao.ObservationDAO
-import org.mbari.vars.annotation.model.simple.ConcurrentRequest
+import org.mbari.vars.annotation.model.simple.{ConcurrentRequest, MultiRequest}
 
 import scala.collection.JavaConverters._
 
@@ -95,6 +95,17 @@ class ObservationDAOImpl(entityManager: EntityManager)
     query.setParameter("uuids", request.videoReferenceUuids)
     query.setParameter("start", request.startTimestamp)
     query.setParameter("end", request.endTimestamp)
+    query.getSingleResult.asInstanceOf[Long]
+  }
+
+  override def streamByMultiRequest(request: MultiRequest, limit: Option[Int], offset: Option[Int]): stream.Stream[ObservationImpl] = {
+    streamByNamedQuery("Observation.findByMultiRequest",
+      Map("uuids" -> request.videoReferenceUuids), limit, offset)
+  }
+
+  override def countByMultiRequest(request: MultiRequest): Long = {
+    val query = entityManager.createNamedQuery("Observation.countByMultiRequest")
+    query.setParameter("uuids", request.videoReferenceUuids)
     query.getSingleResult.asInstanceOf[Long]
   }
 

@@ -23,7 +23,7 @@ import java.util.concurrent.Executors
 
 import org.mbari.vars.annotation.dao.jpa.AnnotationImpl
 import org.mbari.vars.annotation.dao.DAO
-import org.mbari.vars.annotation.model.simple.ConcurrentRequest
+import org.mbari.vars.annotation.model.simple.{ConcurrentRequest, MultiRequest}
 import org.mbari.vars.annotation.model.{Annotation, Observation}
 import org.mbari.vcr4j.time.Timecode
 
@@ -117,6 +117,18 @@ class AnnotationController(daoFactory: BasicDAOFactory) {
     f
   }
 
+  def streamByMultiRequest(request: MultiRequest, limit: Option[Int], offset: Option[Int]): (Closeable, java.util.stream.Stream[Annotation]) = {
+    val dao = daoFactory.newObservationDAO()
+    (() => dao.close(),
+      dao.streamByMultiRequest(request, limit, offset).map(obs => AnnotationImpl(obs)))
+  }
+
+  def countByMultiRequest(request: MultiRequest)(implicit ec: ExecutionContext): Future[Long] = {
+    def dao = daoFactory.newObservationDAO()
+    val f = dao.runTransaction(d => d.countByMultiRequest(request))
+    f.onComplete(t => dao.close())
+    f
+  }
 
 
   def findByImageReferenceUUID(imageReferenceUUID: UUID)(implicit ec: ExecutionContext): Future[Iterable[Annotation]] = {
