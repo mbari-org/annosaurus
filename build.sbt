@@ -7,6 +7,7 @@ val derbyVersion = "10.15.1.3"
 val eclipselinkVersion = "2.7.4"
 val gsonJavatimeVersion = "1.1.1"
 val gsonVersion = "2.8.5"
+val hikariVersion = "3.3.1"
 val h2Version = "1.4.199"
 val jettyVersion = "9.4.19.v20190610"
 val jsonVersion = "3.6.7"
@@ -99,6 +100,7 @@ lazy val annosaurus = (project in file("."))
       "com.h2database" % "h2" % h2Version % "test",
       "com.microsoft.sqlserver" % "mssql-jdbc" % sqlserverVersion,
       "com.typesafe" % "config" % configVersion,
+      "com.zaxxer" % "HikariCP" % hikariVersion,
       "commons-codec" % "commons-codec" % codecVersion,
       "io.reactivex.rxjava2" % "rxjava" % rxjavaVersion,
       "javax.servlet" % "javax.servlet-api" % servletVersion,
