@@ -73,7 +73,7 @@ class AnnotationImpl extends Annotation {
 
   @Expose(serialize = true)
   @SerializedName(value = "associations")
-  protected var javaAssociations: JList[AssociationImpl] = new JArrayList[AssociationImpl]()
+  var javaAssociations: JList[AssociationImpl] = new JArrayList[AssociationImpl]()
   def associations: Seq[Association] = javaAssociations.asScala
   def associations_=(as: Seq[Association]): Unit = {
     javaAssociations = as.map({

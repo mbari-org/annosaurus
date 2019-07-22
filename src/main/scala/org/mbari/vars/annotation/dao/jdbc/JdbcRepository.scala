@@ -20,25 +20,30 @@ import java.sql.{ResultSet, Timestamp}
 import java.time.Duration
 import java.util.UUID
 
+import com.google.gson.annotations.Expose
 import com.typesafe.config.ConfigFactory
 import com.zaxxer.hikari.{HikariConfig, HikariDataSource}
 import io.reactivex.{Scheduler, Single}
 import javax.persistence.EntityManager
 import javax.sql.DataSource
-import org.mbari.vars.annotation.dao.jpa.AnnotationImpl
-import org.mbari.vars.annotation.model.Annotation
+import org.mbari.vars.annotation.dao.jpa.{AnnotationImpl, AssociationImpl}
+import org.mbari.vars.annotation.model.{Annotation, Association}
 import org.mbari.vcr4j.time.Timecode
+import org.slf4j.LoggerFactory
 
 import scala.collection.JavaConverters._
 
 
 class JdbcRepository(entityManager: EntityManager) {
 
+  private[this] val log = LoggerFactory.getLogger(getClass)
+
   def findByVideoReferenceUuid(videoReferenceUuid: UUID,
                                limit: Option[Int] = None,
-                               offset: Option[Int]): Seq[Annotation] = {
+                               offset: Option[Int]): Seq[AnnotationImpl] = {
 
     // Fetch annotations
+    log.debug(s"Running:\n${AnnotationSQL.byVideoReferenceUuid}")
     val q0 = entityManager.createNativeQuery(AnnotationSQL.byVideoReferenceUuid)
     q0.setParameter(1, videoReferenceUuid)
     limit.foreach(q0.setMaxResults)
@@ -47,6 +52,12 @@ class JdbcRepository(entityManager: EntityManager) {
     val annotations = AnnotationSQL.resultListToAnnotations(r0)
 
     // Fetch association
+    log.debug(s"Running:\n${AssociationSQL.byVideoReferenceUuid}")
+    val q1 = entityManager.createNativeQuery(AssociationSQL.byVideoReferenceUuid)
+    q1.setParameter(1, videoReferenceUuid)
+    val r1 = q1.getResultList.asScala.toList
+    val associations = AssociationSQL.resultListToAssociations(r1)
+    AssociationSQL.join(annotations, associations)
 
     annotations
 
@@ -58,7 +69,7 @@ class JdbcRepository(entityManager: EntityManager) {
 
 object AnnotationSQL {
 
-  def resultListToAnnotations(rows: List[_]): Seq[Annotation] = {
+  def resultListToAnnotations(rows: List[_]): Seq[AnnotationImpl] = {
     for {
       row <- rows
     } yield {
@@ -92,35 +103,6 @@ object AnnotationSQL {
     }
   }
 
-//  def resultSetToAnnotations(rs: ResultSet): Seq[Annotation] = {
-//    val annotations = new mutable.ArrayBuffer[Annotation]
-//    while (rs.next()) {
-//      val a = new AnnotationImpl
-//      a.imagedMomentUuid = UUID.fromString(rs.getString(1))
-//      a.videoReferenceUuid = UUID.fromString(rs.getString(2))
-//      Option(rs.getLong(3))
-//        .map(Duration.ofMillis)
-//        .foreach(v => a.elapsedTime = v)
-//      Option(rs.getTimestamp(4))
-//        .map(v => v.toInstant)
-//        .foreach(v => a.recordedTimestamp = v)
-//      Option(rs.getString(5))
-//        .map(v => new Timecode(v))
-//        .foreach(v => a.timecode = v)
-//      a.observationUuid = UUID.fromString(rs.getString(6))
-//      a.concept = rs.getString(7)
-//      a.activity = rs.getString(8)
-//      Option(rs.getLong(9))
-//        .map(Duration.ofMillis)
-//        .foreach(v => a.duration = v)
-//      a.group = rs.getString(10)
-//      a.observationTimestamp = rs.getTimestamp(11).toInstant
-//      a.observer = rs.getString(12)
-//      annotations += a
-//    }
-//    annotations
-//  }
-
   val SELECT: String =
     """ SELECT
       |  im.uuid AS imaged_moment_uuid,
@@ -147,24 +129,62 @@ object AnnotationSQL {
       |  observations obs ON obs.imaged_moment_uuid = im.uuid LEFT JOIN
       |  image_references ir ON ir.imaged_moment_uuid = im.uuid """.stripMargin
 
-  val all: String = SELECT + FROM
+  val ORDER: String = " ORDER BY im.uuid"
 
-  val byVideoReferenceUuid: String = SELECT + FROM + " WHERE im.video_reference_uuid = ?"
+  val all: String = SELECT + FROM + ORDER
 
-  val byConcept: String = SELECT + FROM + " WHERE obs.concept = ?"
+  val byVideoReferenceUuid: String = SELECT + FROM + " WHERE im.video_reference_uuid = ?" + ORDER
+
+  val byConcept: String = SELECT + FROM + " WHERE obs.concept = ?" + ORDER
 
   val byConceptWithImages: String = SELECT + FROM_WITH_IMAGES +
-    " WHERE ir.url IS NOT NULL AND obs.concept = ?"
+    " WHERE ir.url IS NOT NULL AND obs.concept = ?" + ORDER
 
   val betweenDates: String = SELECT + FROM +
-    " WHERE im.recorded_timestamp BETWEEN ? AND ?"
+    " WHERE im.recorded_timestamp BETWEEN ? AND ?" + ORDER
 
   val byVideoReferenceUuidBetweenDates: String = SELECT + FROM +
-    " WHERE im.video_reference_uuid = ? AND im.recorded_timestamp BETWEEN ? AND ? "
+    " WHERE im.video_reference_uuid = ? AND im.recorded_timestamp BETWEEN ? AND ? " + ORDER
 
 }
 
+class AssociationExt extends AssociationImpl {
+//  @Expose(serialize = true)
+  var observationUuid: UUID = _
+}
+
 object AssociationSQL {
+
+  def resultListToAssociations(rows: List[_]): Seq[AssociationExt] = {
+    for {
+      row <- rows
+    } yield {
+      val xs = row.asInstanceOf[Array[Object]]
+      val a = new AssociationExt
+      a.uuid = UUID.fromString(xs(0).toString)
+      a.observationUuid = UUID.fromString(xs(1).toString)
+      a.linkName = xs(2).toString
+      a.toConcept = xs(3).toString
+      a.linkValue = xs(4).toString
+      a.mimeType = xs(5).toString
+      a
+    }
+  }
+
+  def join(annotations: Seq[AnnotationImpl], associations: Seq[AssociationExt]): Seq[Annotation] = {
+    for {
+      a <- associations
+    } {
+      annotations.find(anno => anno.observationUuid == a.observationUuid) match {
+        case None =>
+          // TODO warn of missing match?
+        case Some(anno) =>
+          anno.javaAssociations.add(a)
+      }
+    }
+    annotations
+  }
+
   val SELECT: String =
     """ SELECT
       |  ass.uuid AS association_uuid,
@@ -208,23 +228,23 @@ object ImageReferenceSQL {
 
 }
 
-object JdbcRepository {
-
-
-  val DataSource: DataSource = {
-    val config = ConfigFactory.load()
-    val environment = config.getString("database.environment")
-    val nodeName = if (environment.equalsIgnoreCase("production")) "org.mbari.vars.annotation.database.production"
-    else "org.mbari.vars.annotation.database.development"
-    val hikariConfig = new HikariConfig
-    val url = config.getString(nodeName + ".url")
-    val user = config.getString(nodeName + ".user")
-    val password = config.getString(nodeName + ".password")
-    hikariConfig.setJdbcUrl(url)
-    hikariConfig.setUsername(user)
-    hikariConfig.setPassword(password)
-    hikariConfig.setMaximumPoolSize(Runtime.getRuntime.availableProcessors * 2)
-
-    new HikariDataSource(hikariConfig)
-  }
-}
+//object JdbcRepository {
+//
+//
+//  val DataSource: DataSource = {
+//    val config = ConfigFactory.load()
+//    val environment = config.getString("database.environment")
+//    val nodeName = if (environment.equalsIgnoreCase("production")) "org.mbari.vars.annotation.database.production"
+//    else "org.mbari.vars.annotation.database.development"
+//    val hikariConfig = new HikariConfig
+//    val url = config.getString(nodeName + ".url")
+//    val user = config.getString(nodeName + ".user")
+//    val password = config.getString(nodeName + ".password")
+//    hikariConfig.setJdbcUrl(url)
+//    hikariConfig.setUsername(user)
+//    hikariConfig.setPassword(password)
+//    hikariConfig.setMaximumPoolSize(Runtime.getRuntime.availableProcessors * 2)
+//
+//    new HikariDataSource(hikariConfig)
+//  }
+//}
