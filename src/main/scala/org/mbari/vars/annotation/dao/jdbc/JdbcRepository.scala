@@ -21,19 +21,20 @@ object AnnotationSQL {
       |  obs.uuid AS observation_uuid,
       |  obs.concept,
       |  obs.activity,
+      |  obs.duration
       |  obs.observation_group,
       |  obs.observation_timestamp,
       |  obs.observer """.stripMargin
 
   val FROM: String =
     """ FROM
-      |  imaged_moments im RIGHT JOIN
+      |  imaged_moments im LEFT JOIN
       |  observations obs ON obs.imaged_moment_uuid = im.uuid """.stripMargin
 
   val FROM_WITH_IMAGES: String =
     """ FROM
-      |  imaged_moments im RIGHT JOIN
-      |  observations obs ON obs.imaged_moment_uuid = im.uuid RIGHT JOIN
+      |  imaged_moments im LEFT JOIN
+      |  observations obs ON obs.imaged_moment_uuid = im.uuid LEFT JOIN
       |  image_references ir ON ir.imaged_moment_uuid = im.uuid """.stripMargin
 
   val all: String = SELECT + FROM
@@ -56,13 +57,25 @@ object AnnotationSQL {
 object AssociationSQL {
   val SELECT: String =
     """ SELECT
-      |
+      |  ass.uuid,
+      |  ass.observation_uuid,
+      |  ass.link_name,
+      |  ass.to_concept,
+      |  ass.link_value,
+      |  ass.mime_type
     """.stripMargin
+
+  val FROM: String =
+    """ FROM
+      |  associations ass RIGHT JOIN
+      |  observations obs ON ass.observation_uuid = obs.uuid RIGHT JOIN
+      |  imaged_moments im ON obs.imaged_moment_uuid = im.uuid
+    """.stripMargin
+
+  val byVideoReferenceUuid = SELECT + FROM + " WHERE im.video_reference_uuid = ?"
 }
 
 object JdbcRepository {
-
-
 
 
   val dataSource: DataSource = {
