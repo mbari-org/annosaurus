@@ -16,6 +16,7 @@
 
 package org.mbari.vars.annotation.dao.jdbc
 
+import java.net.URL
 import java.sql.{ResultSet, Timestamp}
 import java.time.Duration
 import java.util.UUID
@@ -26,7 +27,7 @@ import com.zaxxer.hikari.{HikariConfig, HikariDataSource}
 import io.reactivex.{Scheduler, Single}
 import javax.persistence.EntityManager
 import javax.sql.DataSource
-import org.mbari.vars.annotation.dao.jpa.{AnnotationImpl, AssociationImpl}
+import org.mbari.vars.annotation.dao.jpa.{AnnotationImpl, AssociationImpl, ImageReferenceImpl}
 import org.mbari.vars.annotation.model.{Annotation, Association}
 import org.mbari.vcr4j.time.Timecode
 import org.slf4j.LoggerFactory
@@ -58,6 +59,14 @@ class JdbcRepository(entityManager: EntityManager) {
     val r1 = q1.getResultList.asScala.toList
     val associations = AssociationSQL.resultListToAssociations(r1)
     AssociationSQL.join(annotations, associations)
+
+    // Fetch Image References
+    log.debug(s"Running:\n${ImageReferenceSQL.byVideoReferenceUuid}")
+    val q2 = entityManager.createNativeQuery(ImageReferenceSQL.byVideoReferenceUuid)
+    q2.setParameter(1, videoReferenceUuid)
+    val r2 = q2.getResultList.asScala.toList
+    val imageReferences = ImageReferenceSQL.resultListToImageReferences(r2)
+    ImageReferenceSQL.join(annotations, imageReferences)
 
     annotations
 
@@ -205,6 +214,10 @@ object AssociationSQL {
   val byVideoReferenceUuid: String = SELECT + FROM + " WHERE im.video_reference_uuid = ?"
 }
 
+class ImageReferenceExt extends ImageReferenceImpl {
+  var imagedMomentUuid: UUID = _
+}
+
 object ImageReferenceSQL {
   val SELECT: String =
     """ SELECT
@@ -217,7 +230,7 @@ object ImageReferenceSQL {
       |  ir.imaged_moment_uuid
     """.stripMargin
 
-  var FROM: String =
+  val FROM: String =
     """ FROM
       |  image_references ir RIGHT JOIN
       |  observations obs ON ir.observation_uuid = obs.uuid RIGHT JOIN
@@ -225,6 +238,38 @@ object ImageReferenceSQL {
     """.stripMargin
 
   val byVideoReferenceUuid: String = SELECT + FROM + " WHERE im.video_reference_uuid = ?"
+
+  def resultListToImageReferences(rows: List[_]): Seq[ImageReferenceExt] = {
+    for {
+      row <- rows
+    } yield {
+      val xs = row.asInstanceOf[Array[Object]]
+      val i = new ImageReferenceExt
+      i.uuid = UUID.fromString(xs(0).toString)
+      Option(xs(1)).map(_.toString).foreach(v => i.description = v)
+      Option(xs(2)).map(_.toString).foreach(v => i.format = v)
+      Option(xs(3)).map(_.asInstanceOf[Int]).foreach(v => i.height = v)
+      i.url =  new URL(xs(4).toString)
+      Option(xs(5)).map(_.asInstanceOf[Int]).foreach(v => i.width = v)
+      i.imagedMomentUuid = UUID.fromString(xs(6).toString)
+      i
+    }
+  }
+
+  def join(annotations: Seq[AnnotationImpl], images: Seq[ImageReferenceExt]): Seq[Annotation] = {
+    for {
+      i <- images
+    } {
+
+      annotations.find(anno => anno.imagedMomentUuid == i.imagedMomentUuid) match {
+        case None =>
+        // TODO warn of missing match?
+        case Some(anno) =>
+          anno.javaImageReferences.add(i)
+      }
+    }
+    annotations
+  }
 
 }
 
