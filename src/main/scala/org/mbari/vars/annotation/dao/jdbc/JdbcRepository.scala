@@ -288,12 +288,12 @@ object AnnotationSQL {
 
   val FROM: String =
     """ FROM
-      |  imaged_moments im LEFT JOIN
+      |  imaged_moments im RIGHT JOIN
       |  observations obs ON obs.imaged_moment_uuid = im.uuid """.stripMargin
 
   val FROM_WITH_IMAGES: String =
     """ FROM
-      |  imaged_moments im LEFT JOIN
+      |  imaged_moments im RIGHT JOIN
       |  observations obs ON obs.imaged_moment_uuid = im.uuid LEFT JOIN
       |  image_references ir ON ir.imaged_moment_uuid = im.uuid """.stripMargin
 
