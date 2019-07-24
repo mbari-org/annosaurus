@@ -17,25 +17,29 @@
 package org.mbari.vars.annotation.dao.jdbc
 
 import java.net.URL
-import java.sql.{ResultSet, Timestamp}
-import java.time.Duration
+import java.sql.Timestamp
+import java.time.{Duration, Instant}
 import java.util.UUID
 
-import com.google.gson.annotations.Expose
-import com.typesafe.config.ConfigFactory
-import com.zaxxer.hikari.{HikariConfig, HikariDataSource}
-import io.reactivex.{Scheduler, Single}
-import javax.persistence.EntityManager
-import javax.sql.DataSource
+import javax.persistence.{EntityManagerFactory, Query}
 import org.mbari.vars.annotation.dao.jpa.{AnnotationImpl, AssociationImpl, ImageReferenceImpl}
-import org.mbari.vars.annotation.model.{Annotation, Association}
+import org.mbari.vars.annotation.model.Annotation
+import org.mbari.vars.annotation.model.simple.{ConcurrentRequest, MultiRequest}
 import org.mbari.vcr4j.time.Timecode
 import org.slf4j.LoggerFactory
 
 import scala.collection.JavaConverters._
 
+/**
+ * Database access (read-only) provider that uses SQL for fast lookups. WHY?
+  * JPA makes about 1 + (rows * 4) database requests when looking up annotations.
+  * For 1000 rows that 4001 database calls which is very SLOW!!. With SQL we can
+  * fetch annotations for a video using 3 database queries which is so amazingly
+  * fast compared to JPA.
+  * @param entityManagerFactory
+  */
+class JdbcRepository(entityManagerFactory: EntityManagerFactory) {
 
-class JdbcRepository(entityManager: EntityManager) {
 
   private[this] val log = LoggerFactory.getLogger(getClass)
 
@@ -43,39 +47,133 @@ class JdbcRepository(entityManager: EntityManager) {
                                limit: Option[Int] = None,
                                offset: Option[Int]): Seq[AnnotationImpl] = {
 
+    val entityManager = entityManagerFactory.createEntityManager()
+
     // Fetch annotations
-    log.debug(s"Running:\n${AnnotationSQL.byVideoReferenceUuid}")
-    val q0 = entityManager.createNativeQuery(AnnotationSQL.byVideoReferenceUuid)
-    q0.setParameter(1, videoReferenceUuid)
-    limit.foreach(q0.setMaxResults)
-    limit.foreach(q0.setFirstResult)
-    val r0 = q0.getResultList.asScala.toList
-    val annotations = AnnotationSQL.resultListToAnnotations(r0)
+    val queries = List(
+      entityManager.createNativeQuery(AnnotationSQL.byVideoReferenceUuid),
+      entityManager.createNativeQuery(AssociationSQL.byVideoReferenceUuid),
+      entityManager.createNativeQuery(ImageReferenceSQL.byVideoReferenceUuid)
+    )
 
-    // Fetch association
-    log.debug(s"Running:\n${AssociationSQL.byVideoReferenceUuid}")
-    val q1 = entityManager.createNativeQuery(AssociationSQL.byVideoReferenceUuid)
-    q1.setParameter(1, videoReferenceUuid)
-    val r1 = q1.getResultList.asScala.toList
-    val associations = AssociationSQL.resultListToAssociations(r1)
-    AssociationSQL.join(annotations, associations)
+    queries.foreach(q => {
+      q.setParameter(1, videoReferenceUuid)
+    })
 
-    // Fetch Image References
-    log.debug(s"Running:\n${ImageReferenceSQL.byVideoReferenceUuid}")
-    val q2 = entityManager.createNativeQuery(ImageReferenceSQL.byVideoReferenceUuid)
-    q2.setParameter(1, videoReferenceUuid)
-    val r2 = q2.getResultList.asScala.toList
-    val imageReferences = ImageReferenceSQL.resultListToImageReferences(r2)
-    ImageReferenceSQL.join(annotations, imageReferences)
+    val annos = executeQuery(queries(0), queries(1), queries(2), limit, offset)
+    entityManager.close()
+    annos
+  }
 
-    annotations
+  def findByVideoReferenceUuidAndTimestamps(videoReferenceUuid: UUID,
+                                            startTimestamp: Instant,
+                                            endTimestamp: Instant,
+                                            limit: Option[Int] = None,
+                                            offset: Option[Int]): Seq[AnnotationImpl] = {
+
+    val entityManager = entityManagerFactory.createEntityManager()
+    val queries = List(
+      entityManager.createNativeQuery(AnnotationSQL.byVideoReferenceUuidBetweenDates),
+      entityManager.createNativeQuery(AssociationSQL.byVideoReferenceUuidBetweenDates),
+      entityManager.createNativeQuery(ImageReferenceSQL.byVideoReferenceUuidBetweenDates)
+    )
+
+    queries.foreach(q => {
+      q.setParameter(1, videoReferenceUuid)
+      q.setParameter(2, Timestamp.from(startTimestamp))
+      q.setParameter(3, Timestamp.from(endTimestamp))
+    })
+
+    val annos = executeQuery(queries(0), queries(1), queries(2), limit, offset)
+    entityManager.close()
+    annos
+  }
+
+  def findByConcurrentRequest(request: ConcurrentRequest,
+                               limit: Option[Int] = None,
+                               offset: Option[Int] = None): Seq[Annotation] = {
+
+    val uuids = request.uuids.mkString("('", "','", "')")
+
+    val entityManager = entityManagerFactory.createEntityManager()
+    val queries = List(AnnotationSQL.byConcurrentRequest,
+      AssociationSQL.byConcurrentRequest,
+      ImageReferenceSQL.byConcurrentRequest)
+      .map(_.replace("(?)", uuids))
+      .map(entityManager.createNativeQuery)
+
+    queries.foreach(q => {
+      q.setParameter(1, Timestamp.from(request.startTimestamp))
+      q.setParameter(2, Timestamp.from(request.endTimestamp))
+    })
+
+    val annos = executeQuery(queries(0), queries(1), queries(2), limit, offset)
+    entityManager.close()
+    annos
 
   }
 
+  def findByMultiRequest(request: MultiRequest,
+                         limit: Option[Int] = None,
+                         offset: Option[Int] = None): Seq[AnnotationImpl] = {
+    val uuids = request.uuids.mkString("('", "','", "')")
+    val entityManager = entityManagerFactory.createEntityManager()
+    val queries = List(AnnotationSQL.byMultiRequest,
+      AssociationSQL.byMultiRequest,
+      ImageReferenceSQL.byMultiRequest)
+      .map(_.replace("(?)", uuids))
+      .map(entityManager.createNativeQuery)
+
+    val annos = executeQuery(queries(0), queries(1), queries(2), limit, offset)
+    entityManager.close()
+    annos
+  }
+
+  def findByConcept(concept: String,
+                    limit: Option[Int] = None,
+                    offset: Option[Int] = None): Seq[AnnotationImpl] = ???
+
+  def findByConcepts(concepts: Seq[String],
+                     limit: Option[Int] = None,
+                     offset: Option[Int] = None): Seq[AnnotationImpl] = ???
+
+  private def executeQuery(annotationQuery: Query,
+                   associationQuery: Query,
+                   imageReferenceQuery: Query,
+                   limit: Option[Int] = None,
+                   offset: Option[Int] = None): Seq[AnnotationImpl] = {
+
+    limit.foreach(annotationQuery.setMaxResults)
+    offset.foreach(annotationQuery.setFirstResult)
+
+    log.debug("Running annotation query")
+    val r0 = annotationQuery.getResultList.asScala.toList
+    log.debug(s"Transforming ${r0.size} annotations")
+    val annotations = AnnotationSQL.resultListToAnnotations(r0)
+
+    log.debug("Running association query")
+    val r1 = associationQuery.getResultList.asScala.toList
+    log.debug(s"Transforming ${r1.size} associations")
+    val associations = AssociationSQL.resultListToAssociations(r1)
+    log.debug("Joining annotations to associations")
+    AssociationSQL.join(annotations, associations)
+
+    log.debug("Running imageReference query")
+    val r2 = imageReferenceQuery.getResultList.asScala.toList
+    log.debug(s"Transforming ${r2.size} imageReferences")
+    val imageReferences = ImageReferenceSQL.resultListToImageReferences(r2)
+    log.debug("Joining annotations to imageReferences")
+    ImageReferenceSQL.join(annotations, imageReferences)
+
+    annotations
+  }
 
 
 }
 
+/**
+* Object that contains the SQL and methods to build annotations
+  */
 object AnnotationSQL {
 
   def resultListToAnnotations(rows: List[_]): Seq[AnnotationImpl] = {
@@ -138,7 +236,7 @@ object AnnotationSQL {
       |  observations obs ON obs.imaged_moment_uuid = im.uuid LEFT JOIN
       |  image_references ir ON ir.imaged_moment_uuid = im.uuid """.stripMargin
 
-  val ORDER: String = " ORDER BY im.uuid"
+  val ORDER: String = " ORDER BY obs.uuid"
 
   val all: String = SELECT + FROM + ORDER
 
@@ -154,6 +252,12 @@ object AnnotationSQL {
 
   val byVideoReferenceUuidBetweenDates: String = SELECT + FROM +
     " WHERE im.video_reference_uuid = ? AND im.recorded_timestamp BETWEEN ? AND ? " + ORDER
+
+  val byConcurrentRequest: String = SELECT + FROM +
+    " WHERE im.video_reference_uuid IN (?) AND im.recorded_timestamp BETWEEN ? AND ? " + ORDER
+
+  val byMultiRequest: String = SELECT + FROM + " WHERE im.video_reference_uuid IN (?) " + ORDER
+
 
 }
 
@@ -206,12 +310,20 @@ object AssociationSQL {
 
   val FROM: String =
     """ FROM
-      |  associations ass RIGHT JOIN
-      |  observations obs ON ass.observation_uuid = obs.uuid RIGHT JOIN
+      |  associations ass LEFT JOIN
+      |  observations obs ON ass.observation_uuid = obs.uuid LEFT JOIN
       |  imaged_moments im ON obs.imaged_moment_uuid = im.uuid
     """.stripMargin
 
   val byVideoReferenceUuid: String = SELECT + FROM + " WHERE im.video_reference_uuid = ?"
+
+  val byVideoReferenceUuidBetweenDates: String = SELECT + FROM +
+    " WHERE im.video_reference_uuid = ? AND im.recorded_timestamp BETWEEN ? AND ? "
+
+  val byConcurrentRequest: String = SELECT + FROM +
+    " WHERE im.video_reference_uuid IN (?) AND im.recorded_timestamp BETWEEN ? AND ?"
+
+  val byMultiRequest: String = SELECT + FROM + " WHERE im.video_reference_uuid IN (?)"
 }
 
 class ImageReferenceExt extends ImageReferenceImpl {
@@ -221,7 +333,7 @@ class ImageReferenceExt extends ImageReferenceImpl {
 object ImageReferenceSQL {
   val SELECT: String =
     """ SELECT
-      |  ir.uuid AS image_reference_uuid
+      |  ir.uuid AS image_reference_uuid,
       |  ir.description,
       |  ir.format,
       |  ir.height_pixels,
@@ -232,12 +344,19 @@ object ImageReferenceSQL {
 
   val FROM: String =
     """ FROM
-      |  image_references ir RIGHT JOIN
-      |  observations obs ON ir.observation_uuid = obs.uuid RIGHT JOIN
-      |  imaged_moments im ON obs.imaged_moment_uuid = im.uuid
+      |  image_references ir LEFT JOIN
+      |  imaged_moments im ON ir.imaged_moment_uuid = im.uuid
     """.stripMargin
 
   val byVideoReferenceUuid: String = SELECT + FROM + " WHERE im.video_reference_uuid = ?"
+
+  val byVideoReferenceUuidBetweenDates: String = SELECT + FROM +
+    " WHERE im.video_reference_uuid = ? AND im.recorded_timestamp BETWEEN ? AND ? "
+
+  val byConcurrentRequest: String = SELECT + FROM +
+    " WHERE im.video_reference_uuid IN (?) AND im.recorded_timestamp BETWEEN ? AND ?"
+
+  val byMultiRequest: String = SELECT + FROM + " WHERE im.video_reference_uuid IN (?)"
 
   def resultListToImageReferences(rows: List[_]): Seq[ImageReferenceExt] = {
     for {
@@ -260,36 +379,11 @@ object ImageReferenceSQL {
     for {
       i <- images
     } {
-
-      annotations.find(anno => anno.imagedMomentUuid == i.imagedMomentUuid) match {
-        case None =>
-        // TODO warn of missing match?
-        case Some(anno) =>
-          anno.javaImageReferences.add(i)
-      }
+      annotations.filter(anno => anno.imagedMomentUuid == i.imagedMomentUuid)
+        .foreach(anno => anno.javaImageReferences.add(i))
     }
     annotations
   }
 
 }
 
-//object JdbcRepository {
-//
-//
-//  val DataSource: DataSource = {
-//    val config = ConfigFactory.load()
-//    val environment = config.getString("database.environment")
-//    val nodeName = if (environment.equalsIgnoreCase("production")) "org.mbari.vars.annotation.database.production"
-//    else "org.mbari.vars.annotation.database.development"
-//    val hikariConfig = new HikariConfig
-//    val url = config.getString(nodeName + ".url")
-//    val user = config.getString(nodeName + ".user")
-//    val password = config.getString(nodeName + ".password")
-//    hikariConfig.setJdbcUrl(url)
-//    hikariConfig.setUsername(user)
-//    hikariConfig.setPassword(password)
-//    hikariConfig.setMaximumPoolSize(Runtime.getRuntime.availableProcessors * 2)
-//
-//    new HikariDataSource(hikariConfig)
-//  }
-//}

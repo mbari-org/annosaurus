@@ -20,6 +20,7 @@ import java.util.UUID
 
 import org.mbari.vars.annotation.dao.jdbc.JdbcRepository
 import org.mbari.vars.annotation.dao.jpa.JPADAOFactory
+import org.mbari.vars.annotation.model.simple.{ConcurrentRequest, ErrorMsg, MultiRequest}
 import org.scalatra.BadRequest
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -37,17 +38,54 @@ class FastAnnotationV1Api(daoFactory: JPADAOFactory)
     response.headers += ("Access-Control-Allow-Origin" -> "*")
   }
 
-  get("/videoreferenceuuid/:uuid") {
+  private[this] val repository = new JdbcRepository(daoFactory.entityManagerFactory)
+
+  get("/videoreference/:uuid") {
     val uuid = params.getAs[UUID]("uuid").getOrElse(halt(BadRequest(
       body = "A video reference 'uuid' parameter is required")))
     val limit = params.getAs[Int]("limit")
     val offset = params.getAs[Int]("offset")
     Future({
-      val repo = new JdbcRepository(daoFactory.entityManagerFactory.createEntityManager())
-      val annos = repo.findByVideoReferenceUuid(uuid, limit, offset)
+      val annos = repository.findByVideoReferenceUuid(uuid, limit, offset)
         .asJava
       toJson(annos)
     })
+  }
+
+  post("/concurrent") {
+    request.getHeader("Content-Type") match {
+      case "application/json" =>
+        val b = request.body
+        val limit = params.getAs[Int]("limit")
+        val offset = params.getAs[Int]("offset")
+        val concurrentRequest = fromJson(b, classOf[ConcurrentRequest])
+        Future({
+          val annos = repository.findByConcurrentRequest(concurrentRequest, limit, offset)
+            .asJava
+          toJson(annos)
+        })
+      case _ =>
+        halt(BadRequest(toJson(ErrorMsg(400, "Posts to /concurrent only accept a JSON body (i.e. Content-Type: application/json)"))))
+
+    }
+  }
+
+  post("/multi") {
+    request.getHeader("Content-Type") match {
+      case "application/json" =>
+        val b = request.body
+        val limit = params.getAs[Int]("limit")
+        val offset = params.getAs[Int]("offset")
+        val multiRequest = fromJson(b, classOf[MultiRequest])
+        Future({
+          val annos = repository.findByMultiRequest(multiRequest, limit, offset)
+            .asJava
+          toJson(annos)
+        })
+      case _ =>
+        halt(BadRequest(toJson(ErrorMsg(400, "Posts to /multi only accept a JSON body (i.e. Content-Type: application/json)"))))
+
+    }
   }
 
 

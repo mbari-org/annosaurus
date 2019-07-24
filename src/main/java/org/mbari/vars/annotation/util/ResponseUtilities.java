@@ -16,6 +16,8 @@
 
 package org.mbari.vars.annotation.util;
 
+import io.reactivex.Observable;
+
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -55,5 +57,19 @@ public class ResponseUtilities {
         }
         out.write("]".getBytes());
 
+    }
+
+    public static <T> void sendRxResponse(HttpServletResponse response,
+                                     Observable<T> observable,
+                                     Function<T, String> fn) throws IOException {
+        response.setHeader("Transfer-Encoding", "chunked");
+        response.setStatus(200);
+        ServletOutputStream out = response.getOutputStream();
+        out.write("[\n".getBytes());
+
+        observable.subscribe(next -> {
+            String s = fn.apply(next);
+            out.write(s.getBytes());
+        }, e -> {}, () -> out.write("]".getBytes()));
     }
 }
