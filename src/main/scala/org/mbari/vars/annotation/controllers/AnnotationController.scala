@@ -21,8 +21,9 @@ import java.time.{Duration, Instant}
 import java.util.UUID
 import java.util.concurrent.Executors
 
-import org.mbari.vars.annotation.dao.jpa.AnnotationImpl
+import org.mbari.vars.annotation.dao.jpa.{AnnotationImpl, JPADAOFactory}
 import org.mbari.vars.annotation.dao.DAO
+import org.mbari.vars.annotation.dao.jdbc.JdbcRepository
 import org.mbari.vars.annotation.model.simple.{ConcurrentRequest, MultiRequest}
 import org.mbari.vars.annotation.model.{Annotation, Observation}
 import org.mbari.vcr4j.time.Timecode
@@ -37,6 +38,12 @@ import scala.concurrent.{ExecutionContext, Future}
  * @since 2016-06-25T20:28:00
  */
 class AnnotationController(daoFactory: BasicDAOFactory) {
+
+  // HACK Assumes where using JDADAPFactory!
+  private[this] val repository: JdbcRepository = {
+    val entityManagerFactory = daoFactory.asInstanceOf[JPADAOFactory].entityManagerFactory
+    new JdbcRepository(entityManagerFactory)
+  }
 
   // Executor to throttle bulk inserts
   //private[this] val bulkExecutionContext: ExecutionContext = ExecutionContext.fromExecutor(Executors.newFixedThreadPool(1))
@@ -65,7 +72,8 @@ class AnnotationController(daoFactory: BasicDAOFactory) {
   def findByVideoReferenceUUID(
     videoReferenceUUID: UUID,
     limit: Option[Int] = None,
-    offset: Option[Int] = None)(implicit ec: ExecutionContext): Future[Seq[Annotation]] = {
+    offset: Option[Int] = None,
+    includedAncillaryData: Boolean = false)(implicit ec: ExecutionContext): Future[Seq[Annotation]] = {
 
     val dao = daoFactory.newObservationDAO()
     val f = dao.runTransaction(d => d.findByVideoReferenceUUID(videoReferenceUUID, limit, offset))

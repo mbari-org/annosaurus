@@ -45,8 +45,22 @@ class FastAnnotationV1Api(daoFactory: JPADAOFactory)
       body = "A video reference 'uuid' parameter is required")))
     val limit = params.getAs[Int]("limit")
     val offset = params.getAs[Int]("offset")
+    val addData = params.getAs[Boolean]("data").getOrElse(false)
     Future({
-      val annos = repository.findByVideoReferenceUuid(uuid, limit, offset)
+      val annos = repository.findByVideoReferenceUuid(uuid, limit, offset, addData)
+        .asJava
+      toJson(annos)
+    })
+  }
+
+  get("/concept/:concept") {
+    val concept = params.get("concept").getOrElse(halt(BadRequest(
+      body = "A 'concept' parameter is required")))
+    val limit = params.getAs[Int]("limit")
+    val offset = params.getAs[Int]("offset")
+    val addData = params.getAs[Boolean]("data").getOrElse(false)
+    Future({
+      val annos = repository.findByConcept(concept, limit, offset, addData)
         .asJava
       toJson(annos)
     })
@@ -59,8 +73,9 @@ class FastAnnotationV1Api(daoFactory: JPADAOFactory)
         val limit = params.getAs[Int]("limit")
         val offset = params.getAs[Int]("offset")
         val concurrentRequest = fromJson(b, classOf[ConcurrentRequest])
+        val addData = params.getAs[Boolean]("data").getOrElse(false)
         Future({
-          val annos = repository.findByConcurrentRequest(concurrentRequest, limit, offset)
+          val annos = repository.findByConcurrentRequest(concurrentRequest, limit, offset, addData)
             .asJava
           toJson(annos)
         })
@@ -77,8 +92,9 @@ class FastAnnotationV1Api(daoFactory: JPADAOFactory)
         val limit = params.getAs[Int]("limit")
         val offset = params.getAs[Int]("offset")
         val multiRequest = fromJson(b, classOf[MultiRequest])
+        val addData = params.getAs[Boolean]("data").getOrElse(false)
         Future({
-          val annos = repository.findByMultiRequest(multiRequest, limit, offset)
+          val annos = repository.findByMultiRequest(multiRequest, limit, offset, addData)
             .asJava
           toJson(annos)
         })
@@ -87,6 +103,8 @@ class FastAnnotationV1Api(daoFactory: JPADAOFactory)
 
     }
   }
+
+
 
 
 }

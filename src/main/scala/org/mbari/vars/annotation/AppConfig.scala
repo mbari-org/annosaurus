@@ -18,11 +18,20 @@ package org.mbari.vars.annotation
 
 import com.typesafe.config.{Config, ConfigFactory}
 
+import scala.util.Try
+import scala.util.control.NonFatal
+
 case class HttpConfig(port: Int,
                       stopTimeout: Int,
                       connectorIdleTimeout: Int,
                       webapp: String,
                       contextPath: String)
+
+case class BasicJwtConfig(issuer: String,
+                    clientSecret: String,
+                    signingSecret: String)
+
+
 
 class AppConfig(config: Config) {
 
@@ -34,6 +43,22 @@ class AppConfig(config: Config) {
     val contextPath = config.getString("http.context.path")
     HttpConfig(port, stopTimeout, connectorIdleTimeout, webapp, contextPath)
   }
+
+  lazy val authenticationService: String =
+    Try(config.getString("authentication.service"))
+    .getOrElse("org.mbari.vars.annotation.auth.NoopAuthService")
+
+  lazy val basicJwtConfig: Option[BasicJwtConfig] = try {
+    val issuer = config.getString("basicjwt.issuer")
+    val clientSecret = config.getString("basicjwt.client.secret")
+    val signingSecret = config.getString("basicjwt.signing.secret")
+   Some(BasicJwtConfig(issuer, clientSecret, signingSecret))
+  }
+  catch {
+    case NonFatal(e) => None
+  }
+
+//  lazy val databaseConfig: DatabaseConfig =
 
 
 

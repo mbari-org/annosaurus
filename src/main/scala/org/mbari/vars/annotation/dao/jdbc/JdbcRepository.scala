@@ -21,8 +21,9 @@ import java.sql.Timestamp
 import java.time.{Duration, Instant}
 import java.util.UUID
 
+import com.google.gson.annotations.Expose
 import javax.persistence.{EntityManagerFactory, Query}
-import org.mbari.vars.annotation.dao.jpa.{AnnotationImpl, AssociationImpl, ImageReferenceImpl}
+import org.mbari.vars.annotation.dao.jpa.{AnnotationImpl, AssociationImpl, CachedAncillaryDatumImpl, ImageReferenceImpl}
 import org.mbari.vars.annotation.model.Annotation
 import org.mbari.vars.annotation.model.simple.{ConcurrentRequest, MultiRequest}
 import org.mbari.vcr4j.time.Timecode
@@ -45,7 +46,8 @@ class JdbcRepository(entityManagerFactory: EntityManagerFactory) {
 
   def findByVideoReferenceUuid(videoReferenceUuid: UUID,
                                limit: Option[Int] = None,
-                               offset: Option[Int]): Seq[AnnotationImpl] = {
+                               offset: Option[Int],
+                               includeAncillaryData: Boolean = false): Seq[AnnotationExt] = {
 
     val entityManager = entityManagerFactory.createEntityManager()
 
@@ -60,7 +62,7 @@ class JdbcRepository(entityManagerFactory: EntityManagerFactory) {
       q.setParameter(1, videoReferenceUuid)
     })
 
-    val annos = executeQuery(queries(0), queries(1), queries(2), limit, offset)
+    val annos = executeQuery(queries(0), queries(1), queries(2), limit, offset, includeAncillaryData)
     entityManager.close()
     annos
   }
@@ -69,7 +71,8 @@ class JdbcRepository(entityManagerFactory: EntityManagerFactory) {
                                             startTimestamp: Instant,
                                             endTimestamp: Instant,
                                             limit: Option[Int] = None,
-                                            offset: Option[Int]): Seq[AnnotationImpl] = {
+                                            offset: Option[Int],
+                                            includeAncillaryData: Boolean = false): Seq[AnnotationExt] = {
 
     val entityManager = entityManagerFactory.createEntityManager()
     val queries = List(
@@ -84,22 +87,23 @@ class JdbcRepository(entityManagerFactory: EntityManagerFactory) {
       q.setParameter(3, Timestamp.from(endTimestamp))
     })
 
-    val annos = executeQuery(queries(0), queries(1), queries(2), limit, offset)
+    val annos = executeQuery(queries(0), queries(1), queries(2), limit, offset, includeAncillaryData)
     entityManager.close()
     annos
   }
 
   def findByConcurrentRequest(request: ConcurrentRequest,
                                limit: Option[Int] = None,
-                               offset: Option[Int] = None): Seq[Annotation] = {
+                               offset: Option[Int] = None,
+                              includeAncillaryData: Boolean = false): Seq[Annotation] = {
 
-    val uuids = request.uuids.mkString("('", "','", "')")
+    val uuids = request.uuids.map(_.toString)
 
     val entityManager = entityManagerFactory.createEntityManager()
     val queries = List(AnnotationSQL.byConcurrentRequest,
       AssociationSQL.byConcurrentRequest,
       ImageReferenceSQL.byConcurrentRequest)
-      .map(_.replace("(?)", uuids))
+      .map(sql => inClause(sql, uuids))
       .map(entityManager.createNativeQuery)
 
     queries.foreach(q => {
@@ -107,7 +111,7 @@ class JdbcRepository(entityManagerFactory: EntityManagerFactory) {
       q.setParameter(2, Timestamp.from(request.endTimestamp))
     })
 
-    val annos = executeQuery(queries(0), queries(1), queries(2), limit, offset)
+    val annos = executeQuery(queries(0), queries(1), queries(2), limit, offset, includeAncillaryData)
     entityManager.close()
     annos
 
@@ -115,33 +119,69 @@ class JdbcRepository(entityManagerFactory: EntityManagerFactory) {
 
   def findByMultiRequest(request: MultiRequest,
                          limit: Option[Int] = None,
-                         offset: Option[Int] = None): Seq[AnnotationImpl] = {
-    val uuids = request.uuids.mkString("('", "','", "')")
+                         offset: Option[Int] = None,
+                         includeAncillaryData: Boolean = false): Seq[AnnotationExt] = {
+    val uuids = request.uuids.map(_.toString)
     val entityManager = entityManagerFactory.createEntityManager()
     val queries = List(AnnotationSQL.byMultiRequest,
       AssociationSQL.byMultiRequest,
       ImageReferenceSQL.byMultiRequest)
-      .map(_.replace("(?)", uuids))
+      .map(sql => inClause(sql, uuids))
       .map(entityManager.createNativeQuery)
 
-    val annos = executeQuery(queries(0), queries(1), queries(2), limit, offset)
+    val annos = executeQuery(queries(0), queries(1), queries(2), limit, offset, includeAncillaryData)
     entityManager.close()
     annos
   }
 
   def findByConcept(concept: String,
                     limit: Option[Int] = None,
-                    offset: Option[Int] = None): Seq[AnnotationImpl] = ???
+                    offset: Option[Int] = None,
+                    includeAncillaryData: Boolean = false): Seq[AnnotationExt] = {
+    val entityManager = entityManagerFactory.createEntityManager()
+    val query1 = entityManager.createNativeQuery(AnnotationSQL.byConcept)
+    query1.setParameter(1, concept)
+    limit.foreach(query1.setMaxResults)
+    offset.foreach(query1.setFirstResult)
 
-  def findByConcepts(concepts: Seq[String],
-                     limit: Option[Int] = None,
-                     offset: Option[Int] = None): Seq[AnnotationImpl] = ???
+    val r1 = query1.getResultList.asScala.toList
+    val annotations = AnnotationSQL.resultListToAnnotations(r1)
+
+    val observationUuids = annotations.map(_.observationUuid.toString).distinct
+    for (obs <- observationUuids.grouped(200)) {
+      val sql2 = inClause(AssociationSQL.byObservationUuids, obs)
+      val query2 = entityManager.createNativeQuery(sql2)
+      val r2 = query2.getResultList.asScala.toList
+      val associations = AssociationSQL.resultListToAssociations(r2)
+      AssociationSQL.join(annotations, associations)
+    }
+
+    val imagedMomentUuids = annotations.map(_.imagedMomentUuid.toString).distinct
+    for (im <- imagedMomentUuids.grouped(200)) {
+      val sql3 = inClause(ImageReferenceSQL.byImagedMomentUuids, im)
+      val query3 = entityManager.createNativeQuery(sql3)
+      val r3 = query3.getResultList.asScala.toList
+      val imagedReferences = ImageReferenceSQL.resultListToImageReferences(r3)
+      ImageReferenceSQL.join(annotations, imagedReferences)
+    }
+    entityManager.close()
+
+    if (includeAncillaryData) findAncillaryData(annotations)
+    annotations
+  }
+
+
+  private def inClause(sql: String, items: Seq[String]): String = {
+    val p = items.mkString("('", "','", "')")
+    sql.replace("(?)", p)
+  }
 
   private def executeQuery(annotationQuery: Query,
                    associationQuery: Query,
                    imageReferenceQuery: Query,
                    limit: Option[Int] = None,
-                   offset: Option[Int] = None): Seq[AnnotationImpl] = {
+                   offset: Option[Int] = None,
+                   includeAncillaryData: Boolean = false): Seq[AnnotationExt] = {
 
     limit.foreach(annotationQuery.setMaxResults)
     offset.foreach(annotationQuery.setFirstResult)
@@ -165,10 +205,31 @@ class JdbcRepository(entityManagerFactory: EntityManagerFactory) {
     log.debug("Joining annotations to imageReferences")
     ImageReferenceSQL.join(annotations, imageReferences)
 
+    if (includeAncillaryData) findAncillaryData(annotations)
+
     annotations
   }
 
+  private def findAncillaryData(annotations: Seq[AnnotationExt]): Seq[AnnotationExt] = {
+    val entityManager = entityManagerFactory.createEntityManager()
 
+    for (annos <- annotations.grouped(200)) {
+      val ims = annos.map(_.imagedMomentUuid.toString).distinct
+      val sql = inClause(AncillaryDatumSQL.byImagedMomentUuid, ims)
+      val query = entityManager.createNativeQuery(sql)
+      val rows = query.getResultList.asScala.toList
+      val data = AncillaryDatumSQL.resultListToAnncillaryData(rows)
+      AncillaryDatumSQL.join(annos, data)
+    }
+    entityManager.close()
+    annotations
+  }
+
+}
+
+class AnnotationExt extends AnnotationImpl {
+  @Expose(serialize = true)
+  var ancillaryData: AncillaryDatumExt = _
 }
 
 /**
@@ -176,16 +237,16 @@ class JdbcRepository(entityManagerFactory: EntityManagerFactory) {
   */
 object AnnotationSQL {
 
-  def resultListToAnnotations(rows: List[_]): Seq[AnnotationImpl] = {
+  def resultListToAnnotations(rows: List[_]): Seq[AnnotationExt] = {
     for {
       row <- rows
     } yield {
       val xs = row.asInstanceOf[Array[Object]]
-      val a = new AnnotationImpl
+      val a = new AnnotationExt
       a.imagedMomentUuid = UUID.fromString(xs(0).toString)
       a.videoReferenceUuid = UUID.fromString(xs(1).toString)
       Option(xs(2))
-        .map(v => v.asInstanceOf[Long])
+        .map(v => v.asInstanceOf[java.math.BigDecimal].longValue())
         .map(Duration.ofMillis)
         .foreach(v => a.elapsedTime = v)
       Option(xs(3))
@@ -198,12 +259,12 @@ object AnnotationSQL {
         .foreach(v => a.timecode = v)
       a.observationUuid = UUID.fromString(xs(5).toString)
       a.concept = xs(6).toString
-      a.activity = xs(7).toString
+      Option(xs(7)).foreach(v => a.activity = v.toString)
       Option(xs(8))
         .map(v => v.asInstanceOf[Long])
         .map(Duration.ofMillis)
         .foreach(v => a.duration = v)
-      a.group = xs(9).toString
+      Option(xs(9)).foreach(v => a.group = v.toString)
       a.observationTimestamp = xs(10).asInstanceOf[Timestamp].toInstant
       a.observer = xs(11).toString
       a
@@ -243,6 +304,8 @@ object AnnotationSQL {
   val byVideoReferenceUuid: String = SELECT + FROM + " WHERE im.video_reference_uuid = ?" + ORDER
 
   val byConcept: String = SELECT + FROM + " WHERE obs.concept = ?" + ORDER
+
+  val byConcepts: String = SELECT + FROM + " WHERE obs.concept IN (?)" + ORDER
 
   val byConceptWithImages: String = SELECT + FROM_WITH_IMAGES +
     " WHERE ir.url IS NOT NULL AND obs.concept = ?" + ORDER
@@ -315,15 +378,19 @@ object AssociationSQL {
       |  imaged_moments im ON obs.imaged_moment_uuid = im.uuid
     """.stripMargin
 
-  val byVideoReferenceUuid: String = SELECT + FROM + " WHERE im.video_reference_uuid = ?"
+  val ORDER: String = " ORDER BY ass.uuid"
+
+  val byVideoReferenceUuid: String = SELECT + FROM + " WHERE im.video_reference_uuid = ?" + ORDER
 
   val byVideoReferenceUuidBetweenDates: String = SELECT + FROM +
-    " WHERE im.video_reference_uuid = ? AND im.recorded_timestamp BETWEEN ? AND ? "
+    " WHERE im.video_reference_uuid = ? AND im.recorded_timestamp BETWEEN ? AND ? " + ORDER
 
   val byConcurrentRequest: String = SELECT + FROM +
-    " WHERE im.video_reference_uuid IN (?) AND im.recorded_timestamp BETWEEN ? AND ?"
+    " WHERE im.video_reference_uuid IN (?) AND im.recorded_timestamp BETWEEN ? AND ?" + ORDER
 
-  val byMultiRequest: String = SELECT + FROM + " WHERE im.video_reference_uuid IN (?)"
+  val byMultiRequest: String = SELECT + FROM + " WHERE im.video_reference_uuid IN (?)" + ORDER
+
+  val byObservationUuids: String = SELECT + FROM + " WHERE obs.uuid IN (?)" + ORDER
 }
 
 class ImageReferenceExt extends ImageReferenceImpl {
@@ -348,15 +415,20 @@ object ImageReferenceSQL {
       |  imaged_moments im ON ir.imaged_moment_uuid = im.uuid
     """.stripMargin
 
-  val byVideoReferenceUuid: String = SELECT + FROM + " WHERE im.video_reference_uuid = ?"
+  val ORDER: String = " ORDER BY ir.uuid"
+
+  val byVideoReferenceUuid: String = SELECT + FROM + " WHERE im.video_reference_uuid = ?" + ORDER
 
   val byVideoReferenceUuidBetweenDates: String = SELECT + FROM +
-    " WHERE im.video_reference_uuid = ? AND im.recorded_timestamp BETWEEN ? AND ? "
+    " WHERE im.video_reference_uuid = ? AND im.recorded_timestamp BETWEEN ? AND ? " + ORDER
+
 
   val byConcurrentRequest: String = SELECT + FROM +
-    " WHERE im.video_reference_uuid IN (?) AND im.recorded_timestamp BETWEEN ? AND ?"
+    " WHERE im.video_reference_uuid IN (?) AND im.recorded_timestamp BETWEEN ? AND ?" + ORDER
 
-  val byMultiRequest: String = SELECT + FROM + " WHERE im.video_reference_uuid IN (?)"
+  val byMultiRequest: String = SELECT + FROM + " WHERE im.video_reference_uuid IN (?)" + ORDER
+
+  val byImagedMomentUuids: String = SELECT + FROM + " WHERE im.uuid IN (?)" + ORDER
 
   def resultListToImageReferences(rows: List[_]): Seq[ImageReferenceExt] = {
     for {
@@ -387,3 +459,95 @@ object ImageReferenceSQL {
 
 }
 
+class AncillaryDatumExt extends CachedAncillaryDatumImpl {
+  var imagedMomentUuid: UUID = _
+}
+
+object AncillaryDatumSQL {
+
+  def resultListToAnncillaryData(rows: List[_]): Seq[AncillaryDatumExt] = {
+    for {
+      row <- rows
+    } yield {
+      val xs = row.asInstanceOf[Array[Object]]
+      val a = new AncillaryDatumExt
+      a.uuid = UUID.fromString(xs(0).toString)
+      a.altitude = toDouble(xs(1).asInstanceOf[Number])
+      Option(xs(2)).foreach(v => a.crs = v.toString)
+      a.depthMeters = toDouble(xs(3).asInstanceOf[Number])
+      a.latitude = toDouble(xs(4).asInstanceOf[Number])
+      a.longitude = toDouble(xs(5).asInstanceOf[Number])
+      a.oxygenMlL = toDouble(xs(6).asInstanceOf[Number])
+      a.phi = toDouble(xs(7).asInstanceOf[Number])
+      Option(xs(8)).foreach(v => a.posePositionUnits = v.toString)
+      a.pressureDbar = toDouble(xs(9).asInstanceOf[Number])
+      a.psi = toDouble(xs(10).asInstanceOf[Number])
+      a.salinity = toDouble(xs(11).asInstanceOf[Number])
+      a.temperatureCelsius = toDouble(xs(12).asInstanceOf[Number])
+      a.theta = toDouble(xs(13).asInstanceOf[Number])
+      a.x = toDouble(xs(14).asInstanceOf[Number])
+      a.y = toDouble(xs(15).asInstanceOf[Number])
+      a.z = toDouble(xs(16).asInstanceOf[Number])
+      a.lightTransmission = toDouble(xs(17).asInstanceOf[Number])
+      a.imagedMomentUuid = UUID.fromString(xs(18).toString)
+      a
+    }
+  }
+
+  private def toDouble(obj: Number): Option[Double] = if (obj != null) Some(obj.doubleValue())
+    else None
+
+  val SELECT: String =
+    """ SELECT
+      |  ad.uuid AS ancillary_data_uuid,
+      |  ad.altitude,
+      |  ad.coordinate_reference_system,
+      |  ad.depth_meters,
+      |  ad.latitude,
+      |  ad.longitude,
+      |  ad.oxygen_ml_per_l,
+      |  ad.phi,
+      |  ad.xyz_position_units,
+      |  ad.pressure_dbar,
+      |  ad.psi,
+      |  ad.salinity,
+      |  ad.temperature_celsius,
+      |  ad.theta,
+      |  ad.x,
+      |  ad.y,
+      |  ad.z,
+      |  ad.light_transmission,
+      |  im.uuid as imaged_moment_uuid
+    """.stripMargin
+
+  val FROM: String =
+    """ FROM
+      |  ancillary_data ad LEFT JOIN
+      |  imaged_moments im ON ad.imaged_moment_uuid = im.uuid
+    """.stripMargin
+
+  val ORDER: String = " ORDER BY ad.uuid"
+
+  val byVideoReferenceUuid: String = SELECT + FROM + " WHERE im.video_reference_uuid = ?" + ORDER
+
+  val byImagedMomentUuid: String = SELECT + FROM + " WHERE im.uuid IN (?)" + ORDER
+
+  val byVideoReferenceUuidBetweenDates: String = SELECT + FROM +
+    " WHERE im.video_reference_uuid = ? AND im.recorded_timestamp BETWEEN ? AND ? " + ORDER
+
+  val byConcurrentRequest: String = SELECT + FROM +
+    " WHERE im.video_reference_uuid IN (?) AND im.recorded_timestamp BETWEEN ? AND ?" + ORDER
+
+  val byMultiRequest: String = SELECT + FROM + " WHERE im.video_reference_uuid IN (?)" + ORDER
+
+  def join(annotations: Seq[AnnotationExt], data: Seq[AncillaryDatumExt]): Seq[Annotation] = {
+    for {
+      d <- data
+    } {
+      annotations.filter(anno => anno.imagedMomentUuid == d.imagedMomentUuid)
+        .foreach(anno => anno.ancillaryData = d)
+    }
+    annotations
+  }
+
+}
