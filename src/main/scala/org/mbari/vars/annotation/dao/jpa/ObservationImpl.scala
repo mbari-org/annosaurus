@@ -68,6 +68,13 @@ import org.mbari.vars.annotation.model.{Association, ImagedMoment, Observation}
     name = "Observation.countByConcept",
     query = "SELECT COUNT(*) FROM observations WHERE concept = ?1"),
   new NamedNativeQuery(
+    name = "Observation.countByConceptWithImages",
+    query = "SELECT COUNT(*) FROM (" +
+      "SELECT DISTINCT obs.uuid FROM observations obs " +
+      "LEFT JOIN imaged_moments im ON obs.imaged_moment_uuid = im.uuid " +
+      "LEFT JOIN image_references ir ON ir.imaged_moment_uuid = im.uuid " +
+      "WHERE obs.uuid IS NOT NULL AND obs.concept = ?1 AND ir.url IS NOT NULL) foo"),
+  new NamedNativeQuery(
     name = "Observation.updateConcept",
     query = "UPDATE observations SET concept = ?1 WHERE concept = ?2"),
   new NamedNativeQuery(

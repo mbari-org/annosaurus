@@ -157,6 +157,11 @@ class ObservationController(val daoFactory: BasicDAOFactory)
     exec(fn)
   }
 
+  def countByConceptWithImages(concept: String)(implicit ec: ExecutionContext): Future[Int] = {
+    def fn(dao: ODAO): Int = dao.countByConceptWithImages(concept)
+    exec(fn)
+  }
+
   def countByVideoReferenceUUID(uuid: UUID)(implicit ec: ExecutionContext): Future[Int] = {
     def fn(dao: ODAO): Int = dao.countByVideoReferenceUUID(uuid)
     exec(fn)

@@ -87,6 +87,12 @@ class ObservationV1Api(controller: ObservationController)(implicit val executor:
       .map(n => s"""{"concept":"$concept", "count":"$n"}""")
   }
 
+  get("/concept/images/count/:concept") {
+    val concept = params.get("concept").getOrElse(halt(BadRequest("Please provide a concept to search for")))
+    controller.countByConceptWithImages(concept)
+      .map(n => s"""{"concept":"$concept", "count":"$n"}""")
+  }
+
   // TODO add method that returns all concepts and their count
 
   get("/groups") {
