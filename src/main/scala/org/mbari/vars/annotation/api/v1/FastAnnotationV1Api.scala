@@ -66,6 +66,19 @@ class FastAnnotationV1Api(daoFactory: JPADAOFactory)
     })
   }
 
+  get("/concept/:concept") {
+    val concept = params.get("concept").getOrElse(halt(BadRequest(
+      body = "A 'concept' parameter is required")))
+    val limit = params.getAs[Int]("limit")
+    val offset = params.getAs[Int]("offset")
+    val addData = params.getAs[Boolean]("data").getOrElse(false)
+    Future({
+      val annos = repository.findByConcept(concept, limit, offset, addData)
+        .asJava
+      toJson(annos)
+    })
+  }
+
   post("/concurrent") {
     request.getHeader("Content-Type") match {
       case "application/json" =>
