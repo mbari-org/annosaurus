@@ -3,7 +3,7 @@
 echo "--- Building annosaurus (reminder: run docker login first!!)"
 
 BUILD_DATE=`date -u +"%Y-%m-%dT%H:%M:%SZ"`
-VCS_REF=`git tag | tail -1`
+VCS_REF=`git tag | sort -V | tail -1`
 
 
 sbt pack && \
