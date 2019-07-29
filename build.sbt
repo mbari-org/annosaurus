@@ -9,6 +9,7 @@ val gsonJavatimeVersion = "1.1.1"
 val gsonVersion = "2.8.5"
 val hikariVersion = "3.3.1"
 val h2Version = "1.4.199"
+val javamelodyVersion = "1.79.0"
 val jettyVersion = "9.4.19.v20190610"
 val jsonVersion = "3.6.7"
 val jtaVersion = "1.1"
@@ -106,6 +107,7 @@ lazy val annosaurus = (project in file("."))
       "javax.servlet" % "javax.servlet-api" % servletVersion,
       "javax.transaction" % "jta" % jtaVersion,
       "junit" % "junit" % junitVersion % "test",
+      "net.bull.javamelody" % "javamelody-core" % javamelodyVersion,
       "org.apache.derby" % "derby" % derbyVersion, //          % "test",
       "org.apache.derby" % "derbyclient" % derbyVersion, //          % "test",
       "org.apache.derby" % "derbynet" % derbyVersion, //          % "test",

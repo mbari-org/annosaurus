@@ -18,7 +18,10 @@ class JettyMain {
 
 }
 import com.typesafe.config.ConfigFactory
+import javax.servlet.DispatcherType
+import net.bull.javamelody.{MonitoringFilter, Parameter, ReportServlet, SessionListener}
 import org.eclipse.jetty.server._
+import org.eclipse.jetty.servlet.FilterHolder
 import org.eclipse.jetty.webapp.WebAppContext
 import org.scalatra.servlet.ScalatraListener
 
@@ -55,6 +58,14 @@ object JettyMain {
     webApp.setContextPath(conf.contextPath)
     webApp.setResourceBase(conf.webapp)
     webApp.setEventListeners(Array(new ScalatraListener))
+
+    // Add JavaMelody for monitoring
+    webApp.addServlet(classOf[ReportServlet], "/monitoring")
+    webApp.addEventListener(new SessionListener)
+    val monitoringFilter = new FilterHolder(new MonitoringFilter())
+    monitoringFilter.setInitParameter(Parameter.APPLICATION_NAME.getCode, conf.webapp)
+    monitoringFilter.setInitParameter("authorized-users", "adminz:Cranchiidae")
+    webApp.addFilter(monitoringFilter, "/*", java.util.EnumSet.of(DispatcherType.REQUEST, DispatcherType.ASYNC))
 
     server.setHandler(webApp)
 
