@@ -313,7 +313,7 @@ object AnnotationSQL {
   }
 
   val SELECT: String =
-    """ SELECT
+    """ SELECT DISTINCT
       |  im.uuid AS imaged_moment_uuid,
       |  im.video_reference_uuid,
       |  im.elapsed_time_millis,
@@ -403,7 +403,7 @@ object AssociationSQL {
   }
 
   val SELECT: String =
-    """ SELECT
+    """ SELECT DISTINCT
       |  ass.uuid AS association_uuid,
       |  ass.observation_uuid,
       |  ass.link_name,
