@@ -79,6 +79,18 @@ class FastAnnotationV1Api(daoFactory: JPADAOFactory)
     })
   }
 
+  get("/imagedmoments/concept/images/:concept") {
+    val concept = params.get("concept").getOrElse(halt(BadRequest(
+      body = "A 'concept' parameter is required")))
+    val limit = params.getAs[Int]("limit")
+    val offset = params.getAs[Int]("offset")
+    Future({
+      val imagedMomentUuids = repository.findImagedMomentUuidsByConceptWithImages(concept, limit, offset)
+          .asJava
+      toJson(imagedMomentUuids)
+    })
+  }
+
   post("/concurrent") {
     request.getHeader("Content-Type") match {
       case "application/json" =>

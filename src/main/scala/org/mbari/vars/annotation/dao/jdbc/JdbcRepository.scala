@@ -169,6 +169,20 @@ class JdbcRepository(entityManagerFactory: EntityManagerFactory) {
     annotations
   }
 
+  def findImagedMomentUuidsByConceptWithImages(concept: String,
+                                               limit: Option[Int] = None,
+                                               offset: Option[Int] = None): Seq[UUID] = {
+    implicit val entityManager: EntityManager = entityManagerFactory.createEntityManager()
+    val query = entityManager.createNativeQuery(ImagedMomentSQL.byConceptWithImages)
+    query.setParameter(1, concept)
+    val results = query.getResultList.asScala.toList
+    val uuids = results.map(_.toString)
+      .map(UUID.fromString)
+    entityManager.close()
+    uuids
+
+  }
+
 
   private def inClause(sql: String, items: Seq[String]): String = {
     val p = items.mkString("('", "','", "')")
@@ -591,4 +605,18 @@ object AncillaryDatumSQL {
     annotations
   }
 
+}
+
+object ImagedMomentSQL {
+
+  val SELECT_UUID = "SELECT DISTINCT im.uuid "
+
+  val FROM_UUID =
+    """FROM
+      | imaged_moments im LEFT JOIN
+      | observations obs ON obs.imaged_moment_uuid = im.uuid LEFT JOIN
+      | image_references ir ON ir.imaged_moment_uuid = im.uuid
+      |""".stripMargin
+
+  val byConceptWithImages: String = SELECT_UUID + FROM_UUID + " WHERE concept = ? AND ir.url IS NOT NULL"
 }
