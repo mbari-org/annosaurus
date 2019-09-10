@@ -53,6 +53,18 @@ class FastAnnotationV1Api(daoFactory: JPADAOFactory)
     })
   }
 
+  get("/images/videoreference/:uuid") {
+    val uuid = params.getAs[UUID]("uuid").getOrElse(halt(BadRequest(
+      body = "A video reference 'uuid' parameter is required")))
+    val limit = params.getAs[Int]("limit")
+    val offset = params.getAs[Int]("offset")
+    Future({
+      val images = repository.findImagesByVideoReferenceUuid(uuid, limit, offset)
+        .asJava
+      toJson(images)
+    })
+  }
+
   get("/concept/:concept") {
     val concept = params.get("concept").getOrElse(halt(BadRequest(
       body = "A 'concept' parameter is required")))

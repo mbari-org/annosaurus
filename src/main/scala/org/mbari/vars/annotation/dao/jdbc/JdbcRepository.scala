@@ -25,7 +25,7 @@ import com.google.gson.annotations.Expose
 import javax.persistence.{EntityManager, EntityManagerFactory, Query}
 import org.mbari.vars.annotation.dao.jpa.{AnnotationImpl, AssociationImpl, CachedAncillaryDatumImpl, ImageReferenceImpl}
 import org.mbari.vars.annotation.model.Annotation
-import org.mbari.vars.annotation.model.simple.{ConcurrentRequest, MultiRequest}
+import org.mbari.vars.annotation.model.simple.{ConcurrentRequest, Image, MultiRequest}
 import org.mbari.vcr4j.time.Timecode
 import org.slf4j.LoggerFactory
 
@@ -66,6 +66,7 @@ class JdbcRepository(entityManagerFactory: EntityManagerFactory) {
     entityManager.close()
     annos
   }
+
 
   def findByVideoReferenceUuidAndTimestamps(videoReferenceUuid: UUID,
                                             startTimestamp: Instant,
@@ -180,20 +181,30 @@ class JdbcRepository(entityManagerFactory: EntityManagerFactory) {
       .map(UUID.fromString)
     entityManager.close()
     uuids
-
   }
 
+  def findImagesByVideoReferenceUuid(videoReferenceUuid: UUID,
+                                     limit: Option[Int] = None,
+                                     offset: Option[Int]): Seq[Image] = {
+    implicit val entityManager: EntityManager = entityManagerFactory.createEntityManager()
+    val query = entityManager.createNativeQuery(ImagedMomentSQL.byVideoReferenceUuid)
+    query.setParameter(1, videoReferenceUuid.toString)
+    limit.foreach(query.setMaxResults)
+    offset.foreach(query.setFirstResult)
+    val results = query.getResultList.asScala.toList
+    val images = ImagedMomentSQL.resultListToImages(results)
+    entityManager.close()
+    images
+  }
 
   private def inClause(sql: String, items: Seq[String]): String = {
     val p = items.mkString("('", "','", "')")
     sql.replace("(?)", p)
   }
 
-
   private def executeQueryForAnnotations(annotations: Seq[AnnotationExt],
                                          includeAncillaryData: Boolean = false)
                                         (implicit entityManager: EntityManager): Seq[AnnotationExt] = {
-
 
     val observationUuids = annotations.map(_.observationUuid.toString).distinct
     for (obs <- observationUuids.grouped(200)) {
@@ -609,14 +620,65 @@ object AncillaryDatumSQL {
 
 object ImagedMomentSQL {
 
-  val SELECT_UUID = "SELECT DISTINCT im.uuid "
+  val SELECT_UUID: String = "SELECT DISTINCT im.uuid "
 
-  val FROM_UUID =
+  val SELECT_IMAGES: String =
+    """SELECT
+      |  im.uuid AS imaged_moment_uuid,
+      |  im.video_reference_uuid,
+      |  im.elapsed_time_millis,
+      |  im.recorded_timestamp,
+      |  im.timecode,
+      |  ir.description,
+      |  ir.format,
+      |  ir.height_pixels,
+      |  ir.width_pixels,
+      |  ir.url,
+      |  ir.uuid as image_reference_uuid
+      |""".stripMargin
+
+  val FROM: String =
     """FROM
       | imaged_moments im LEFT JOIN
       | observations obs ON obs.imaged_moment_uuid = im.uuid LEFT JOIN
       | image_references ir ON ir.imaged_moment_uuid = im.uuid
       |""".stripMargin
 
-  val byConceptWithImages: String = SELECT_UUID + FROM_UUID + " WHERE concept = ? AND ir.url IS NOT NULL"
+  val byConceptWithImages: String = SELECT_UUID + FROM + " WHERE concept = ? AND ir.url IS NOT NULL"
+
+  val byVideoReferenceUuid: String = SELECT_IMAGES + FROM + " WHERE im.video_reference_uuid = ? AND ir.url IS NOT NULL"
+
+  def resultListToImages(rows: List[_]): Seq[Image] = {
+    for {
+      row <- rows
+    } yield {
+      val xs = row.asInstanceOf[Array[Object]]
+      val i = new Image;
+      i.imagedMomentUuid = UUID.fromString(xs(0).toString)
+      i.videoReferenceUuid = UUID.fromString(xs(1).toString)
+      Option(xs(2))
+        .map(v => v.asInstanceOf[java.math.BigDecimal].longValue())
+        .map(Duration.ofMillis)
+        .foreach(v => i.elapsedTime = v)
+      Option(xs(3))
+        .map(v => v.asInstanceOf[Timestamp])
+        .map(v => v.toInstant)
+        .foreach(v => i.recordedTimestamp = v)
+      Option(xs(4))
+        .map(v => v.toString)
+        .map(v => new Timecode(v))
+        .foreach(v => i.timecode = v)
+      Option(xs(5)).foreach(v => i.description = v.toString)
+      Option(xs(6)).foreach(v => i.format = v.toString)
+      Option(xs(7)).foreach(v => i.height = v.asInstanceOf[Number].intValue())
+      Option(xs(8)).foreach(v => i.width = v.asInstanceOf[Number].intValue())
+      i.url =  new URL(xs(9).toString)
+      i.imageReferenceUuid = UUID.fromString(xs(10).toString)
+
+      i
+    }
+  }
+
 }
+
+
