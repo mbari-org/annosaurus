@@ -171,8 +171,10 @@ class ImagedMomentController(val daoFactory: BasicDAOFactory)
   def deleteByVideoReferenceUUID(videoReferenceUUID: UUID)(implicit ec: ExecutionContext): Future[Int] =
     exec(d => d.deleteByVideoReferenceUUUID(videoReferenceUUID))
 
-  def findByWindowRequest(windowRequest: WindowRequest)(implicit ec: ExecutionContext): Future[Iterable[ImagedMoment]] =
-    exec(d => d.findByWindowRequest(windowRequest))
+  def findByWindowRequest(windowRequest: WindowRequest,
+                          limit: Option[Int] = None,
+                          offset: Option[Int] = None)(implicit ec: ExecutionContext): Future[Iterable[ImagedMoment]] =
+    exec(d => d.findByWindowRequest(windowRequest, limit, offset))
 
   def create(
     videoReferenceUUID: UUID,
