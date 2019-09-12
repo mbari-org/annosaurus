@@ -33,4 +33,8 @@ trait IndexDAO[T <: ImagedMoment] extends DAO[T] {
     limit: Option[Int] = None,
     offset: Option[Int] = None): Iterable[ImagedMoment]
 
+
+
+
+
 }

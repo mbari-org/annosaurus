@@ -35,8 +35,10 @@ class IndexController(val daoFactory: BasicDAOFactory)
 
   override def newDAO(): IndexDAO[ImagedMoment] = daoFactory.newIndexDAO()
 
-  def findByVideoReferenceUUID(uuid: UUID, limit: Option[Int] = None, offset: Option[Int] = None)(implicit ec: ExecutionContext): Future[Iterable[ImagedMoment]] =
+  def findByVideoReferenceUUID(uuid: UUID, limit: Option[Int] = None, offset: Option[Int] = None)
+                              (implicit ec: ExecutionContext): Future[Iterable[ImagedMoment]] =
     exec(d => d.findByVideoReferenceUuid(uuid, limit, offset))
+
 
   /**
    * Updates all recordedTimestamps thave have an elapsed time using
