@@ -16,17 +16,17 @@
 
 package org.mbari.vars.annotation.api.v1
 
-import java.time.{ Duration, Instant }
+import java.time.{Duration, Instant}
 import java.util.UUID
 
 import org.mbari.vars.annotation.controllers.ImagedMomentController
 import org.mbari.vars.annotation.dao.jpa.AnnotationImpl
 import org.mbari.vars.annotation.model.ImagedMoment
-import org.mbari.vars.annotation.model.simple.ObservationCount
+import org.mbari.vars.annotation.model.simple.{ErrorMsg, ObservationCount, WindowRequest}
 import org.mbari.vcr4j.time.Timecode
-import org.scalatra.{ BadRequest, NoContent, NotFound }
+import org.scalatra.{BadRequest, NoContent, NotFound}
 
-import scala.concurrent.{ Await, ExecutionContext, Future }
+import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.collection.JavaConverters._
 /**
  *
@@ -181,6 +181,21 @@ class ImagedMomentV1Api(controller: ImagedMomentController)(implicit val executo
     controller.findByVideoReferenceUUID(uuid, limit, offset)
       .map(_.asJava)
       .map(toJson)
+  }
+
+  post("/windowrequest") {
+    request.getHeader("Content-Type") match {
+      case "application/json" =>
+        val b = request.body
+        val limit = params.getAs[Int]("limit")
+        val offset = params.getAs[Int]("offset")
+        val windowRequest = fromJson(b, classOf[WindowRequest])
+        controller.findByWindowRequest(windowRequest, limit, offset)
+          .map(_.asJava)
+          .map(toJson)
+      case _ =>
+        halt(BadRequest(toJson(ErrorMsg(400, "Posts to /windowrequest only accept a JSON body (i.e. Content-Type: application/json)"))))
+    }
   }
 
   delete("/videoreference/:uuid") {

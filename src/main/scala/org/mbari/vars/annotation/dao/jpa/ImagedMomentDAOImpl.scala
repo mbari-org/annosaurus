@@ -23,6 +23,7 @@ import java.util.{UUID, stream}
 
 import javax.persistence.EntityManager
 import org.mbari.vars.annotation.dao.ImagedMomentDAO
+import org.mbari.vars.annotation.model.simple.WindowRequest
 import org.mbari.vcr4j.time.Timecode
 
 import scala.collection.JavaConverters._
@@ -204,6 +205,22 @@ class ImagedMomentDAOImpl(entityManager: EntityManager)
   //  override def findByUUID(primaryKey: UUID): Option[ImagedMomentImpl] =
   //    findByNamedQuery("ImagedMoment.findByUUID", Map("uuid" -> primaryKey)).headOption
 
+
+  override def findByWindowRequest(windowRequest: WindowRequest,
+                                   limit: Option[Int] = None,
+                                   offset: Option[Int] = None): Iterable[ImagedMomentImpl] = {
+
+    findByUUID(windowRequest.imagedMomentUuid) match {
+      case None => Nil
+      case Some(im) =>
+        val start = im.recordedDate.plus(windowRequest.window)
+        val end = im.recordedDate.minus(windowRequest.window)
+        findByNamedQuery("ImagedMoment.findByWindowRequest",
+          Map("uuids" -> windowRequest.uuids, "start" -> start, "end" -> end),
+          limit, offset)
+    }
+
+  }
 
   override def findAll(limit: Option[Int] = None, offset: Option[Int] = None): Iterable[ImagedMomentImpl] =
     findByNamedQuery("ImagedMoment.findAll", limit = limit, offset = offset)

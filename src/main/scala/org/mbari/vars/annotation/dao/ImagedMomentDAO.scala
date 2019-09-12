@@ -21,6 +21,7 @@ import java.util.UUID
 
 import org.mbari.vars.annotation.dao.jpa.ImagedMomentImpl
 import org.mbari.vars.annotation.model.ImagedMoment
+import org.mbari.vars.annotation.model.simple.WindowRequest
 import org.mbari.vcr4j.time.Timecode
 
 /**
@@ -91,6 +92,8 @@ trait ImagedMomentDAO[T <: ImagedMoment] extends DAO[T] {
   def findByVideoReferenceUUIDAndTimecode(uuid: UUID, timecode: Timecode): Option[T]
   def findByVideoReferenceUUIDAndRecordedDate(uuid: UUID, recordedDate: Instant): Option[T]
   def findByVideoReferenceUUIDAndElapsedTime(uuid: UUID, elapsedTime: Duration): Option[T]
+
+  def findByWindowRequest(windowRequest: WindowRequest, limit: Option[Int] = None, offset: Option[Int] = None): Iterable[T]
 
   /**
    * Look up an imaged moment based on the videoReferenceUUID and one of the indices into a video.

@@ -38,7 +38,7 @@ trait BaseController[A <: PersistentObject, B <: DAO[A]] {
   protected def exec[T](fn: B => T)(implicit ec: ExecutionContext): Future[T] = {
     val dao = newDAO()
     val f = dao.runTransaction(fn)
-    f.onComplete(t => dao.close())
+    f.onComplete(_ => dao.close())
     f
   }
 

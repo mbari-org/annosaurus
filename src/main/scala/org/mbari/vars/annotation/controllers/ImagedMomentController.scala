@@ -22,6 +22,7 @@ import java.util.UUID
 
 import org.mbari.vars.annotation.dao.{ImagedMomentDAO, NotFoundInDatastoreException}
 import org.mbari.vars.annotation.model.ImagedMoment
+import org.mbari.vars.annotation.model.simple.WindowRequest
 import org.mbari.vcr4j.time.Timecode
 import org.slf4j.LoggerFactory
 
@@ -169,6 +170,9 @@ class ImagedMomentController(val daoFactory: BasicDAOFactory)
 
   def deleteByVideoReferenceUUID(videoReferenceUUID: UUID)(implicit ec: ExecutionContext): Future[Int] =
     exec(d => d.deleteByVideoReferenceUUUID(videoReferenceUUID))
+
+  def findByWindowRequest(windowRequest: WindowRequest)(implicit ec: ExecutionContext): Future[Iterable[ImagedMoment]] =
+    exec(d => d.findByWindowRequest(windowRequest))
 
   def create(
     videoReferenceUUID: UUID,

@@ -175,6 +175,10 @@ import scala.collection.JavaConverters._
       query = "DELETE FROM ImagedMoment i WHERE i.videoReferenceUUID = :uuid"
     ),
     new NamedQuery(
+      name = "ImagedMoment.findByWindowRequest",
+      query = "SELECT i from ImagedMoment i WHERE i.videoReferenceUUID IN :uuids AND i.recordedDate BETWEEN :start AND :end"
+    ),
+    new NamedQuery(
       name = "ImagedMoment.findByImageReferenceUUID",
       query =
         "SELECT i FROM ImagedMoment i LEFT JOIN i.javaImageReferences r WHERE r.uuid = :uuid ORDER BY i.uuid"
