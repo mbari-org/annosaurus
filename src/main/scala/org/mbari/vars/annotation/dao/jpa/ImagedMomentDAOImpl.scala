@@ -213,11 +213,15 @@ class ImagedMomentDAOImpl(entityManager: EntityManager)
     findByUUID(windowRequest.imagedMomentUuid) match {
       case None => Nil
       case Some(im) =>
-        val start = im.recordedDate.plus(windowRequest.window)
-        val end = im.recordedDate.minus(windowRequest.window)
-        findByNamedQuery("ImagedMoment.findByWindowRequest",
-          Map("uuids" -> windowRequest.uuids, "start" -> start, "end" -> end),
-          limit, offset)
+        Option(im.recordedDate) match {
+          case None => Nil
+          case Some(recordedDate) =>
+            val start = recordedDate.minus(windowRequest.window)
+            val end = recordedDate.plus(windowRequest.window)
+            findByNamedQuery("ImagedMoment.findByWindowRequest",
+              Map("uuids" -> windowRequest.uuids.asJava, "start" -> start, "end" -> end),
+              limit, offset)
+        }
     }
 
   }

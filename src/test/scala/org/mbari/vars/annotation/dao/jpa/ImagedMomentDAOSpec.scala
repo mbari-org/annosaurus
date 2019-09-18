@@ -16,16 +16,17 @@
 
 package org.mbari.vars.annotation.dao.jpa
 
-import java.time.{ Duration, Instant }
+import java.time.{Duration, Instant}
 import java.util.UUID
 import java.util.concurrent.TimeUnit
 
 import org.mbari.vars.annotation.dao.ImagedMomentDAO
+import org.mbari.vars.annotation.model.simple.WindowRequest
 import org.mbari.vcr4j.time.Timecode
-import org.scalatest.{ FlatSpec, Matchers, BeforeAndAfterAll }
+import org.scalatest.{BeforeAndAfterAll, FlatSpec, Matchers}
 
 import scala.concurrent.Await
-import scala.concurrent.duration.{ Duration => SDuration }
+import scala.concurrent.duration.{Duration => SDuration}
 import scala.concurrent.ExecutionContext.Implicits.global
 
 /**
@@ -92,6 +93,12 @@ class ImagedMomentDAOSpec extends FlatSpec with Matchers with BeforeAndAfterAll 
     im0 shouldBe defined
     val im1 = run(_.findByVideoReferenceUUIDAndIndex(videoReferenceUUID, recordedDate = Option(imagedMoment0.recordedDate)))
     im1 shouldBe defined
+  }
+
+  it should "findByWindowRequest" in {
+    val windowRequest = WindowRequest(Seq(videoReferenceUUID), imagedMoment0.uuid, Duration.ofSeconds(61))
+    val im0 = run(_.findByWindowRequest(windowRequest))
+    im0.size should be >= 2
   }
 
   it should "findAll" in {

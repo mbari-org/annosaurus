@@ -24,6 +24,7 @@ import org.mbari.vars.annotation.api.WebApiStack
 import org.mbari.vars.annotation.controllers.{AnnotationController, ImagedMomentController}
 import org.mbari.vars.annotation.dao.jpa.ImagedMomentImpl
 import org.mbari.vars.annotation.model.Annotation
+import org.mbari.vars.annotation.model.simple.WindowRequest
 
 import scala.concurrent.Await
 import scala.concurrent.duration.{Duration => SDuration}
@@ -60,7 +61,7 @@ class ImagedMomentV1ApiSpec extends WebApiStack {
       val controller = new AnnotationController(daoFactory)
       Await.result(
         controller.create(UUID.randomUUID(), "Foo", "brian",
-          elapsedTime = Some(Duration.ofMillis(2000))),
+          elapsedTime = Some(Duration.ofMillis(2000)), recordedDate = Some(Instant.now())),
         SDuration(3000, TimeUnit.MILLISECONDS))
     }
 
@@ -96,6 +97,21 @@ class ImagedMomentV1ApiSpec extends WebApiStack {
   it should "find last updated imagedmoments between timestamps" in {
     get(s"/v1/imagedmoments/modified/$startTimestamp/${Instant.now()}") {
       status should be(200)
+      val im = gson.fromJson(body, classOf[Array[ImagedMomentImpl]]).toList
+      im.size should be > 0
+    }
+  }
+
+  it should "find by window reference" in {
+    val windowRequest = WindowRequest(Seq(annotation.videoReferenceUuid),
+      annotation.imagedMomentUuid,
+      Duration.ofSeconds(10))
+    val json = gson.toJson(windowRequest)
+    post(s"/v1/imagedmoments/windowrequest",
+      body = json,
+      headers = Map("Content-Type" -> "application/json")) {
+
+      status should be (200)
       val im = gson.fromJson(body, classOf[Array[ImagedMomentImpl]]).toList
       im.size should be > 0
     }
