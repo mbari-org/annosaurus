@@ -4,6 +4,10 @@
 -->
 <configuration scan="true">
 
+    <statusListener class="ch.qos.logback.core.status.NopStatusListener" />
+
+    <variable name="LOGBACK_LEVEL" value="${LOGBACK_LEVEL:-INFO}" />
+
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
         <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
             <level>debug</level>
@@ -16,7 +20,7 @@
     <logger name="java.util.Date" level="WARN" />
     <logger name="org.mbari.vars.annotation.dao.jpa" level="WARN" />
 
-    <root level="INFO">
+    <root level="${LOGBACK_LEVEL}">
         <appender-ref ref="CONSOLE"/>
     </root>
 
