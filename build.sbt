@@ -7,7 +7,7 @@ val eclipselinkVersion = "2.7.4"
 val gsonJavatimeVersion = "1.1.1"
 val gsonVersion = "2.8.5"
 val h2Version = "1.4.199"
-val hikariVersion = "3.3.1"
+val hikariVersion = "3.4.1"
 val javamelodyVersion = "1.79.0"
 val jettyVersion = "9.4.20.v20190813"
 val jsonVersion = "3.6.7"
@@ -15,7 +15,8 @@ val jtaVersion = "1.1"
 val jtdsVersion = "1.3.1"
 val junitVersion = "4.12"
 val logbackVersion = "1.2.3"
-val postgresqlVersion = "42.2.7"
+val oracleVersion = "19.3.0.0"
+val postgresqlVersion = "42.2.8"
 val rxjavaVersion = "2.2.12"
 val scalatestVersion = "3.0.8"
 val scalatraVersion = "2.6.5"
@@ -99,6 +100,7 @@ lazy val annosaurus = (project in file("."))
       "com.google.code.gson" % "gson" % gsonVersion,
       "com.h2database" % "h2" % h2Version % "test",
       "com.microsoft.sqlserver" % "mssql-jdbc" % sqlserverVersion,
+      "com.oracle.ojdbc" % "ojdbc8" % oracleVersion,
       "com.typesafe" % "config" % configVersion,
       "com.zaxxer" % "HikariCP" % hikariVersion,
       "commons-codec" % "commons-codec" % codecVersion,
