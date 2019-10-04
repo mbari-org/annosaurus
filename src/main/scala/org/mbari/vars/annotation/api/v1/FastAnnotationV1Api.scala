@@ -103,6 +103,19 @@ class FastAnnotationV1Api(daoFactory: JPADAOFactory)
     })
   }
 
+  get("/details/:link_name/:link_value") {
+    val linkName = params.get("link_name")
+      .getOrElse(halt(BadRequest(ErrorMsg(400, "A link_name parameter is required"))))
+    val linkValue = params.get("link_value")
+      .getOrElse(halt(BadRequest(ErrorMsg(400, "A link_value parameter is required"))))
+    val addData = params.getAs[Boolean]("data").getOrElse(false)
+    Future({
+      val annos = repository.findByLinkNameAndLinkValue(linkName, linkValue, addData)
+        .asJava
+      toJson(annos)
+    })
+  }
+
   post("/concurrent") {
     request.getHeader("Content-Type") match {
       case "application/json" =>

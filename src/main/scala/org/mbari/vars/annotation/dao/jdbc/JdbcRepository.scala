@@ -197,9 +197,37 @@ class JdbcRepository(entityManagerFactory: EntityManagerFactory) {
     images
   }
 
+  def findByLinkNameAndLinkValue(linkName: String,
+                                 linkValue: String,
+                                 includeAncillaryData: Boolean = false): Seq[AnnotationExt] = {
+    implicit val entityManager: EntityManager = entityManagerFactory.createEntityManager()
+    val query = entityManager.createNativeQuery(AssociationSQL.byLinkNameAndLinkValue)
+    query.setParameter(1, linkName)
+    query.setParameter(2, linkValue)
+    val results = query.getResultList.asScala.toList
+    val associations = AssociationSQL.resultListToAssociations(results)
+    val imagedMomentUuids = associations.map(_.imagedMomentUuid)
+    val annotations = executeQueryForAnnotationsUsingImagedMomentUuids(imagedMomentUuids, includeAncillaryData)
+    entityManager.close()
+    annotations
+  }
+
   private def inClause(sql: String, items: Seq[String]): String = {
     val p = items.mkString("('", "','", "')")
     sql.replace("(?)", p)
+  }
+
+  private def executeQueryForAnnotationsUsingImagedMomentUuids(imagedMomentUuids: Seq[UUID],
+                                                              includeAncillaryData: Boolean = false)
+                                                             (implicit  entityManager: EntityManager): Seq[AnnotationExt] = {
+    val imUuids = imagedMomentUuids.map(_.toString).distinct
+    val annotations = (for (im <- imUuids.grouped(200)) yield {
+      val sql = inClause(AnnotationSQL.byImagedMomentUuids, im)
+      val query = entityManager.createNativeQuery(sql)
+      val results = query.getResultList.asScala.toList
+      AnnotationSQL.resultListToAnnotations(results)
+    }).flatten.toSeq
+    executeQueryForAnnotations(annotations, includeAncillaryData)
   }
 
   private def executeQueryForAnnotations(annotations: Seq[AnnotationExt],
@@ -387,12 +415,15 @@ object AnnotationSQL {
 
   val byMultiRequest: String = SELECT + FROM + " WHERE im.video_reference_uuid IN (?) " + ORDER
 
+  val byImagedMomentUuids: String = SELECT + FROM + " WHERE im.uuid IN (?) " + ORDER
+
 
 }
 
 class AssociationExt extends AssociationImpl {
 //  @Expose(serialize = true)
   var observationUuid: UUID = _
+  var imagedMomentUuid: UUID = _
 }
 
 object AssociationSQL {
@@ -409,6 +440,7 @@ object AssociationSQL {
       a.toConcept = xs(3).toString
       a.linkValue = xs(4).toString
       a.mimeType = xs(5).toString
+      a.imagedMomentUuid = UUID.fromString(xs(6).toString)
       a
     }
   }
@@ -434,7 +466,8 @@ object AssociationSQL {
       |  ass.link_name,
       |  ass.to_concept,
       |  ass.link_value,
-      |  ass.mime_type
+      |  ass.mime_type,
+      |  im.uuid AS imaged_moment_uuid
     """.stripMargin
 
   val FROM: String =
@@ -457,6 +490,8 @@ object AssociationSQL {
   val byMultiRequest: String = SELECT + FROM + " WHERE im.video_reference_uuid IN (?)" + ORDER
 
   val byObservationUuids: String = SELECT + FROM + " WHERE obs.uuid IN (?)" + ORDER
+
+  val byLinkNameAndLinkValue: String = SELECT + FROM + " WHERE link_name = ? AND link_value = ?" + ORDER;
 }
 
 class ImageReferenceExt extends ImageReferenceImpl {
