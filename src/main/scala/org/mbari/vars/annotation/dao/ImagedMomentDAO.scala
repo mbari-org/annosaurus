@@ -76,6 +76,7 @@ trait ImagedMomentDAO[T <: ImagedMoment] extends DAO[T] {
   def streamByConcept(concept: String, limit: Option[Int], offset: Option[Int]): java.util.stream.Stream[T]
 
   def countByConceptWithImages(concept: String): Int
+  def countModifiedBeforeDate(videoReferenceUuid: UUID, date: Instant): Int
   def findByConceptWithImages(concept: String, limit: Option[Int], offset: Option[Int]): Iterable[T]
 
   def countBetweenUpdatedDates(start: Instant, end: Instant): Int

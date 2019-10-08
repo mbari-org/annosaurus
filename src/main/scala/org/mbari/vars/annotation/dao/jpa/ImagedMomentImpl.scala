@@ -101,6 +101,10 @@ import scala.collection.JavaConverters._
         "SELECT video_reference_uuid, COUNT(uuid) as n FROM imaged_moments GROUP BY video_reference_uuid ORDER BY n"
     ),
     new NamedNativeQuery(
+      name = "ImagedMoment.countModifiedBeforeDate",
+      query = "SELECT COUNT(*) FROM imaged_moments WHERE video_reference_uuid = ?1 AND last_updated_timestamp < ?2"
+    ),
+    new NamedNativeQuery(
       name = "ImagedMoment.countByVideoReferenceUUID",
       query =
         "SELECT COUNT(*) FROM imaged_moments WHERE video_reference_uuid = ?1"

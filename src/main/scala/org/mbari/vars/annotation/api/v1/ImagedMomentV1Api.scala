@@ -183,6 +183,14 @@ class ImagedMomentV1Api(controller: ImagedMomentController)(implicit val executo
       .map(toJson)
   }
 
+  get("/videoreference/modified/:uuid/:date") {
+    val uuid = params.getAs[UUID]("uuid").getOrElse(halt(BadRequest("Please provide a Video Reference UUID")))
+    val date = params.getAs[Instant]("date").getOrElse(halt(BadRequest("Please provide a start date (yyyy-mm-ddThh:mm:ssZ)")))
+    controller.countModifiedBeforeDate(uuid, date)
+      .map(i => ObservationCount(uuid, i))
+      .map(toJson)
+  }
+
   post("/windowrequest") {
     request.getHeader("Content-Type") match {
       case "application/json" =>

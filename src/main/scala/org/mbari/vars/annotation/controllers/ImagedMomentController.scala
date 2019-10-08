@@ -168,6 +168,14 @@ class ImagedMomentController(val daoFactory: BasicDAOFactory)
     f
   }
 
+  def countModifiedBeforeDate(videoReferenceUuid: UUID, date: Instant)
+                             (implicit ec: ExecutionContext): Future[Int] = {
+    val dao = daoFactory.newImagedMomentDAO()
+    val f = dao.runTransaction(d => d.countModifiedBeforeDate(videoReferenceUuid, date))
+    f.onComplete(_ => dao.close())
+    f
+  }
+
   def deleteByVideoReferenceUUID(videoReferenceUUID: UUID)(implicit ec: ExecutionContext): Future[Int] =
     exec(d => d.deleteByVideoReferenceUUUID(videoReferenceUUID))
 

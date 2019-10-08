@@ -175,6 +175,16 @@ class ImagedMomentDAOImpl(entityManager: EntityManager)
       .head
   }
 
+  override def countModifiedBeforeDate(videoReferenceUuid: UUID, date: Instant): Int = {
+    val query = entityManager.createNamedQuery("ImagedMoment.countModifiedBeforeDate")
+    query.setParameter(1, videoReferenceUuid)
+    query.setParameter(2, Timestamp.from(date))
+    query.getResultList
+      .asScala
+      .map(_.asInstanceOf[Int])
+      .head
+  }
+
   override def findByConceptWithImages(
     concept: String,
     limit: Option[Int],
