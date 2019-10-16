@@ -24,10 +24,11 @@ import java.util.{ArrayList => JArrayList, List => JList}
 
 import com.google.gson.annotations.{Expose, SerializedName}
 import org.mbari.vars.annotation.Constants
-import org.mbari.vars.annotation.model.{CachedAncillaryDatum, ImageReference, ImagedMoment, Observation}
+import org.mbari.vars.annotation.model.{Annotation, CachedAncillaryDatum, ImageReference, ImagedMoment, Observation}
 import org.mbari.vcr4j.time.Timecode
 
 import scala.collection.JavaConverters._
+import scala.collection.mutable
 
 /**
   *
@@ -302,6 +303,50 @@ object ImagedMomentImpl {
     timecode.foreach(im.timecode = _)
     elapsedTime.foreach(im.elapsedTime = _)
     im
+  }
+
+  def apply(annotations: Seq[Annotation]): Seq[ImagedMomentImpl] ={
+    val moments = new mutable.ArrayBuffer[ImagedMomentImpl]()
+    // -- 1st pass create moments
+    for (a <- annotations) {
+
+      // Grab the correct imageMoment
+      val imagedMoment = moments.find(i => (i.videoReferenceUUID == a.videoReferenceUuid)
+          && (i.uuid == a.imagedMomentUuid
+            || i.recordedDate == a.recordedTimestamp
+            || i.elapsedTime == a.elapsedTime
+            || i.timecode == a.timecode)) match {
+
+        case None =>
+          val i = ImagedMomentImpl(Some(a.videoReferenceUuid),
+            Option(a.recordedTimestamp),
+            Option(a.timecode),
+            Option(a.elapsedTime))
+          Option(a.imagedMomentUuid).foreach(uuid => i.uuid = uuid)
+          moments.append(i)
+          i
+
+        case Some(i) => i
+      }
+
+      // Add the observation
+      val o = ObservationImpl(a.concept,
+        Option(a.duration),
+        Option(a.observationTimestamp),
+        Option(a.observer),
+        Option(a.group),
+        Option(a.activity))
+      Option(a.observationUuid).foreach(uuid => o.uuid = uuid)
+      imagedMoment.addObservation(o)
+
+      // TODO Add the associations
+
+      // TODO Add the images (if needed)
+
+      // TODO Add the ancillary data
+    }
+    moments
+
   }
 
 }
