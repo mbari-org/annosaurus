@@ -305,6 +305,11 @@ object ImagedMomentImpl {
     im
   }
 
+  /**
+  * Map a group of annotations to the equivalent group of imagedMOments
+   * @param annotations
+   * @return
+   */
   def apply(annotations: Seq[Annotation]): Seq[ImagedMomentImpl] ={
     val moments = new mutable.ArrayBuffer[ImagedMomentImpl]()
     // -- 1st pass create moments
@@ -315,19 +320,15 @@ object ImagedMomentImpl {
           && (i.uuid == a.imagedMomentUuid
             || i.recordedDate == a.recordedTimestamp
             || i.elapsedTime == a.elapsedTime
-            || i.timecode == a.timecode)) match {
-
-        case None =>
-          val i = ImagedMomentImpl(Some(a.videoReferenceUuid),
-            Option(a.recordedTimestamp),
-            Option(a.timecode),
-            Option(a.elapsedTime))
-          Option(a.imagedMomentUuid).foreach(uuid => i.uuid = uuid)
-          moments.append(i)
-          i
-
-        case Some(i) => i
-      }
+            || i.timecode == a.timecode)).getOrElse({
+              val i = ImagedMomentImpl(Some(a.videoReferenceUuid),
+                Option(a.recordedTimestamp),
+                Option(a.timecode),
+                Option(a.elapsedTime))
+              Option(a.imagedMomentUuid).foreach(uuid => i.uuid = uuid)
+              moments.append(i)
+              i
+      })
 
       // Add the observation
       val o = ObservationImpl(a.concept,
@@ -339,11 +340,19 @@ object ImagedMomentImpl {
       Option(a.observationUuid).foreach(uuid => o.uuid = uuid)
       imagedMoment.addObservation(o)
 
-      // TODO Add the associations
+      // Add the associations
+      a.associations.foreach(ass => o.addAssociation(ass))
 
-      // TODO Add the images (if needed)
+      // Add the images (if needed)
+      a.imageReferences.foreach(img => {
+        imagedMoment.imageReferences
+          .find(i => i.url == img.url) match {
+          case None => imagedMoment.addImageReference(img)
+          case Some(i) => // Do nothing. Image already exists
+        }
 
-      // TODO Add the ancillary data
+      })
+
     }
     moments
 
