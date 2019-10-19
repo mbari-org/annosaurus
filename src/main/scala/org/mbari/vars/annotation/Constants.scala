@@ -72,7 +72,7 @@ object Constants {
   //      .setPrettyPrinting()
   //      .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
   //      .setDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'")
-  //    Converters.registerInstant(gsonBuilder)
+  //    Convertders.registerInstant(gsonBuilder)
   //
   //    val durationType: Type = new TypeToken[Duration]() {}.getType
   //    gsonBuilder.registerTypeAdapter(durationType, new DurationConverter)

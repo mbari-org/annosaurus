@@ -21,7 +21,7 @@ import java.time.{Duration, Instant}
 import java.util.UUID
 import java.util.concurrent.Executors
 
-import org.mbari.vars.annotation.dao.jpa.{AnnotationImpl, JPADAOFactory}
+import org.mbari.vars.annotation.dao.jpa.{AnnotationImpl, ImagedMomentImpl, JPADAOFactory}
 import org.mbari.vars.annotation.dao.DAO
 import org.mbari.vars.annotation.dao.jdbc.JdbcRepository
 import org.mbari.vars.annotation.model.simple.{ConcurrentRequest, MultiRequest}
@@ -188,6 +188,9 @@ class AnnotationController(daoFactory: BasicDAOFactory) {
     val future = Future.sequence(futures)
     future.onComplete(_ => obsDao.close())
     future.map(_.flatten.toSeq)
+
+    val imagedMoments = ImagedMomentImpl(annotations.toSeq)
+
   }
 
   private def create(dao: DAO[_], annotation: Annotation): Observation = {
@@ -195,7 +198,7 @@ class AnnotationController(daoFactory: BasicDAOFactory) {
     val obsDao = daoFactory.newObservationDAO(dao)
     val assDao = daoFactory.newAssociationDAO(dao)
     val irDao = daoFactory.newImageReferenceDAO(dao)
-    val imagedMoment = ImagedMomentController.findImagedMoment(
+    val imagedMoment = ImagedMomentController.findOrCreateImagedMoment(
       imDao,
       annotation.videoReferenceUuid,
       Option(annotation.timecode),
@@ -414,7 +417,7 @@ class AnnotationController(daoFactory: BasicDAOFactory) {
         val tc = Option(timecode.getOrElse(obs.imagedMoment.timecode))
         val rd = Option(recordedDate.getOrElse(obs.imagedMoment.recordedDate))
         val et = Option(elapsedTime.getOrElse(obs.imagedMoment.elapsedTime))
-        val newIm = ImagedMomentController.findImagedMoment(imDao, vrUUID, tc, rd, et)
+        val newIm = ImagedMomentController.findOrCreateImagedMoment(imDao, vrUUID, tc, rd, et)
         obsDao.changeImageMoment(newIm.uuid, obs.uuid)
       }
 

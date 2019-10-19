@@ -316,19 +316,21 @@ object ImagedMomentImpl {
     for (a <- annotations) {
 
       // Grab the correct imageMoment
-      val imagedMoment = moments.find(i => (i.videoReferenceUUID == a.videoReferenceUuid)
-          && (i.uuid == a.imagedMomentUuid
-            || i.recordedDate == a.recordedTimestamp
-            || i.elapsedTime == a.elapsedTime
-            || i.timecode == a.timecode)).getOrElse({
-              val i = ImagedMomentImpl(Some(a.videoReferenceUuid),
-                Option(a.recordedTimestamp),
-                Option(a.timecode),
-                Option(a.elapsedTime))
-              Option(a.imagedMomentUuid).foreach(uuid => i.uuid = uuid)
-              moments.append(i)
-              i
-      })
+      val  imagedMoment = moments.filter(i => i.videoReferenceUUID == a.videoReferenceUuid)
+        .find(i => (a.imagedMomentUuid != null && i.uuid == a.imagedMomentUuid)
+          || (a.recordedTimestamp != null && i.recordedDate == a.recordedTimestamp)
+          || (a.elapsedTime != null && i.elapsedTime == a.elapsedTime)
+          || (a.timecode != null && i.timecode == a.timecode))
+        .getOrElse({
+          val i = ImagedMomentImpl(Some(a.videoReferenceUuid),
+            Option(a.recordedTimestamp),
+            Option(a.timecode),
+            Option(a.elapsedTime))
+          Option(a.imagedMomentUuid).foreach(uuid => i.uuid = uuid)
+          moments.append(i)
+          i
+        })
+
 
       // Add the observation
       val o = ObservationImpl(a.concept,
@@ -348,7 +350,7 @@ object ImagedMomentImpl {
         imagedMoment.imageReferences
           .find(i => i.url == img.url) match {
           case None => imagedMoment.addImageReference(img)
-          case Some(i) => // Do nothing. Image already exists
+          case Some(_) => // Do nothing. Image already exists
         }
 
       })

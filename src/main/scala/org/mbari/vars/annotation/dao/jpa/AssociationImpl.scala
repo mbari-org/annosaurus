@@ -131,11 +131,12 @@ object AssociationImpl {
   def apply(
     linkName: String,
     toConcept: Option[String] = None,
-    linkValue: Option[String] = None): Unit = {
+    linkValue: Option[String] = None): AssociationImpl = {
     val a = new AssociationImpl
     a.linkName = linkName
     toConcept.foreach(a.toConcept = _)
     linkValue.foreach(a.linkValue = _)
+    a
   }
 
   def apply(v: Association): AssociationImpl = {

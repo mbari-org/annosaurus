@@ -50,7 +50,7 @@ class ImagedMomentControllerSpec extends FlatSpec with Matchers with BeforeAndAf
   }
 
   it should "find by videoReferenceUuid and recordedDate" in {
-    val a = ImagedMomentController.findImagedMoment(controller.newDAO(),
+    val a = ImagedMomentController.findOrCreateImagedMoment(controller.newDAO(),
       videoReferenceUuid,
       recordedDate = Some(recordedDate))
     a should not be (null)

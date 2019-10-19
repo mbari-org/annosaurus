@@ -78,7 +78,7 @@ class ImageController(daoFactory: BasicDAOFactory) {
     val imDao = daoFactory.newImagedMomentDAO()
     val irDao = daoFactory.newImageReferenceDAO(imDao)
     val f = irDao.runTransaction(d => {
-      val imagedMoment = ImagedMomentController.findImagedMoment(imDao, videoReferenceUUID, timecode,
+      val imagedMoment = ImagedMomentController.findOrCreateImagedMoment(imDao, videoReferenceUUID, timecode,
         recordedDate, elapsedTime)
       val imageReference = irDao.newPersistentObject(url, description, height, width, format)
       irDao.create(imageReference)
@@ -126,14 +126,14 @@ class ImageController(daoFactory: BasicDAOFactory) {
         val vrUUID = videoReferenceUUID.getOrElse(ir.imagedMoment.videoReferenceUUID)
         if (timecode.isDefined || elapsedTime.isDefined || recordedDate.isDefined) {
           // change indices
-          val newIm = ImagedMomentController.findImagedMoment(imDao, vrUUID, timecode, recordedDate, elapsedTime)
+          val newIm = ImagedMomentController.findOrCreateImagedMoment(imDao, vrUUID, timecode, recordedDate, elapsedTime)
           move(imDao, newIm, ir)
         } else if (videoReferenceUUID.isDefined) {
           // move to new video-reference/imaged-moment using the existing images
           val tc = Option(ir.imagedMoment.timecode)
           val rd = Option(ir.imagedMoment.recordedDate)
           val et = Option(ir.imagedMoment.elapsedTime)
-          val newIm = ImagedMomentController.findImagedMoment(imDao, vrUUID, tc, rd, et)
+          val newIm = ImagedMomentController.findOrCreateImagedMoment(imDao, vrUUID, tc, rd, et)
           move(imDao, newIm, ir)
         }
 

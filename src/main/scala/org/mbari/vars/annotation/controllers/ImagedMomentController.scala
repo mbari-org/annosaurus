@@ -20,7 +20,8 @@ import java.io.Closeable
 import java.time.{Duration, Instant}
 import java.util.UUID
 
-import org.mbari.vars.annotation.dao.{ImagedMomentDAO, NotFoundInDatastoreException}
+import org.mbari.vars.annotation.dao.jpa.ImagedMomentImpl
+import org.mbari.vars.annotation.dao.{DAO, ImagedMomentDAO, NotFoundInDatastoreException}
 import org.mbari.vars.annotation.model.ImagedMoment
 import org.mbari.vars.annotation.model.simple.WindowRequest
 import org.mbari.vcr4j.time.Timecode
@@ -190,10 +191,58 @@ class ImagedMomentController(val daoFactory: BasicDAOFactory)
     recordedDate: Option[Instant] = None,
     elapsedTime: Option[Duration] = None)(implicit ec: ExecutionContext): Future[ImagedMoment] = {
 
-    def fn(d: IMDAO) = ImagedMomentController.findImagedMoment(
+    def fn(d: IMDAO) = ImagedMomentController.findOrCreateImagedMoment(
       d, videoReferenceUUID, timecode, recordedDate, elapsedTime)
     exec(fn)
   }
+
+  def create(dao: DAO[_], sourceImagedMoment: ImagedMoment)(implicit ex: ExecutionContext): ImagedMoment = {
+    val imDao = daoFactory.newImagedMomentDAO(dao)
+    val obsDao = daoFactory.newObservationDAO(dao)
+    val assDao = daoFactory.newAssociationDAO(dao)
+    val irDao = daoFactory.newImageReferenceDAO(dao)
+    val targetImagedMoment = ImagedMomentController.findOrCreateImagedMoment(imDao,
+      sourceImagedMoment.videoReferenceUUID,
+      Option(sourceImagedMoment.timecode),
+      Option(sourceImagedMoment.recordedDate),
+      Option(sourceImagedMoment.elapsedTime))
+    for (sourceObservations <- sourceImagedMoment.observations) {
+      val targetObservation = obsDao.newPersistentObject(sourceObservations.concept,
+        sourceObservations.observer,
+        sourceObservations.observationDate,
+        Option(sourceObservations.group),
+        Option(sourceObservations.duration))
+      Option(sourceObservations.activity).foreach(targetObservation.activity = _)
+      obsDao.create(targetObservation)
+      targetImagedMoment.addObservation(targetObservation)
+
+      // Add associations
+      sourceObservations.associations.foreach(a => {
+        val targetAssociation = assDao.newPersistentObject(
+          a.linkName,
+          Option(a.toConcept), Option(a.linkValue), Option(a.mimeType))
+        targetAssociation.uuid = a.uuid
+        assDao.create(targetAssociation)
+        targetObservation.addAssociation(targetAssociation)
+      })
+    }
+
+    sourceImagedMoment.imageReferences.foreach(i => {
+      irDao.findByURL(i.url) match {
+        case Some(v) => // Do nothing. It should already be attached to the imagedmoment
+        case None =>
+          val targetImageReference = irDao.newPersistentObject(i.url, Option(i.description),
+            Option(i.height), Option(i.width), Option(i.format))
+          targetImageReference.uuid = i.uuid
+          irDao.create(targetImageReference)
+          targetImagedMoment.addImageReference(targetImageReference)
+      }
+    })
+
+    targetImagedMoment
+
+  }
+
 
   def update(
     uuid: UUID,
@@ -256,7 +305,7 @@ object ImagedMomentController {
    * @param elapsedTime
    * @return
    */
-  def findImagedMoment(
+  def findOrCreateImagedMoment(
     dao: ImagedMomentDAO[ImagedMoment],
     videoReferenceUUID: UUID,
     timecode: Option[Timecode] = None,
