@@ -35,6 +35,8 @@ trait AssociationDAO[T <: Association] extends DAO[T] {
     linkValue: Option[String] = Some(Association.LINK_VALUE_NIL),
     mimeType: Option[String] = Some("text/plain")): T
 
+  def newPersistentObject(association: Association): T
+
   def findByLinkName(linkName: String): Iterable[T]
 
   def findByLinkNameAndVideoReferenceUUID(linkName: String, videoReferenceUUID: UUID): Iterable[T]

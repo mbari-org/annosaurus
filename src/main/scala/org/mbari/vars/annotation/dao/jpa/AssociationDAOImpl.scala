@@ -20,6 +20,7 @@ import java.util.UUID
 
 import javax.persistence.EntityManager
 import org.mbari.vars.annotation.dao.AssociationDAO
+import org.mbari.vars.annotation.model.Association
 import org.mbari.vars.annotation.model.simple.{ConceptAssociation, ConceptAssociationRequest, ConceptAssociationResponse}
 
 import scala.collection.JavaConverters._
@@ -48,6 +49,8 @@ class AssociationDAOImpl(entityManager: EntityManager)
     mimeType.foreach(a.mimeType = _)
     a
   }
+
+  override def newPersistentObject(association: Association): AssociationImpl = AssociationImpl(association)
 
   override def findByLinkName(linkName: String): Iterable[AssociationImpl] =
     findByNamedQuery("Association.findByLinkName", Map("linkName" -> linkName))

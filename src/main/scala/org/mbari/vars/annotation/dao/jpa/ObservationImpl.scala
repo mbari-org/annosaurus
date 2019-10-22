@@ -205,4 +205,16 @@ object ObservationImpl {
     obs
   }
 
+  def apply(observation: Observation): ObservationImpl = {
+    val newObservation = apply(observation.concept,
+      Option(observation.duration),
+      Option(observation.observationDate),
+      Option(observation.observer),
+      Option(observation.group),
+      Option(observation.activity))
+    newObservation.uuid = observation.uuid
+    observation.associations.foreach(a => newObservation.addAssociation(AssociationImpl(a)))
+    newObservation
+  }
+
 }

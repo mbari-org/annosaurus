@@ -51,7 +51,7 @@ trait CachedAncillaryDatumDAO[T <: CachedAncillaryDatum] extends DAO[T] {
 
   def findByImagedMomentUUID(imagedMomentUuid: UUID): Option[CachedAncillaryDatum]
 
-  def asPersistentObject(bean: CachedAncillaryDatum): CachedAncillaryDatum
+  def newPersistentObject(bean: CachedAncillaryDatum): CachedAncillaryDatum
 
   /**
    * Delete all ancillary data associated with annotations for a given

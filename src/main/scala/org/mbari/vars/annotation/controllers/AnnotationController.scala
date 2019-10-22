@@ -45,6 +45,8 @@ class AnnotationController(daoFactory: BasicDAOFactory) {
     new JdbcRepository(entityManagerFactory)
   }
 
+  private[this] val imagedMomentController = new ImagedMomentController(daoFactory)
+
   // Executor to throttle bulk inserts
   //private[this] val bulkExecutionContext: ExecutionContext = ExecutionContext.fromExecutor(Executors.newFixedThreadPool(1))
 
@@ -179,20 +181,29 @@ class AnnotationController(daoFactory: BasicDAOFactory) {
     implicit val ec: ExecutionContext = ExecutionContext.fromExecutor(Executors.newSingleThreadExecutor())
 
     val obsDao = daoFactory.newObservationDAO()
-    val futures = annotations.grouped(50)
-      .map(annos => {
-        val f = obsDao.runTransaction(d => annos.map(a => create(d, a)))
-        f.map(obsList => obsList.map(AnnotationImpl(_)).toSeq)
-      })
+//    val futures = annotations.grouped(50)
+//      .map(annos => {
+//        val f = obsDao.runTransaction(d => annos.map(a => create(d, a)))
+//        f.map(obsList => obsList.map(AnnotationImpl(_)).toSeq)
+//      })
+//
+//    val future = Future.sequence(futures)
+//    future.onComplete(_ => obsDao.close())
+//    future.map(_.flatten.toSeq)
 
+    val imagedMoments = ImagedMomentImpl(annotations.toSeq)
+    val futures = imagedMoments.grouped(50)
+      .map(imagedMoments => {
+        val f = obsDao.runTransaction(d => imagedMoments.map(i => imagedMomentController.create(d, i)))
+        f.map(imagedMomentList => imagedMomentList.flatMap(i => AnnotationImpl(i)))
+      })
     val future = Future.sequence(futures)
     future.onComplete(_ => obsDao.close())
     future.map(_.flatten.toSeq)
 
-    val imagedMoments = ImagedMomentImpl(annotations.toSeq)
-
   }
 
+  @deprecated(message = "Use ImagedMomentController.create instead", since = "2019-10-21")
   private def create(dao: DAO[_], annotation: Annotation): Observation = {
     val imDao = daoFactory.newImagedMomentDAO(dao)
     val obsDao = daoFactory.newObservationDAO(dao)

@@ -23,6 +23,7 @@ import java.util.{UUID, stream}
 
 import javax.persistence.EntityManager
 import org.mbari.vars.annotation.dao.ImagedMomentDAO
+import org.mbari.vars.annotation.model.ImagedMoment
 import org.mbari.vars.annotation.model.simple.WindowRequest
 import org.mbari.vcr4j.time.Timecode
 
@@ -40,7 +41,7 @@ class ImagedMomentDAOImpl(entityManager: EntityManager)
 
   override def newPersistentObject(): ImagedMomentImpl = new ImagedMomentImpl
 
-  def newPersistentObject(
+  override def newPersistentObject(
     videoReferenceUUID: UUID,
     timecode: Option[Timecode] = None,
     elapsedTime: Option[Duration] = None,
@@ -52,6 +53,9 @@ class ImagedMomentDAOImpl(entityManager: EntityManager)
     recordedDate.foreach(imagedMoment.recordedDate = _)
     imagedMoment
   }
+
+  override def newPersistentObject(imagedMoment: ImagedMoment): ImagedMomentImpl = ImagedMomentImpl(imagedMoment)
+
 
   override def findBetweenUpdatedDates(
     start: Instant,

@@ -305,6 +305,21 @@ object ImagedMomentImpl {
     im
   }
 
+  def apply(imagedMoment: ImagedMoment): ImagedMomentImpl = {
+    val newImagedMoment = apply(Option(imagedMoment.videoReferenceUUID),
+      Option(imagedMoment.recordedDate),
+      Option(imagedMoment.timecode),
+      Option(imagedMoment.elapsedTime))
+    newImagedMoment.uuid = imagedMoment.uuid
+    Option(imagedMoment.ancillaryDatum)
+      .foreach(ad => newImagedMoment.ancillaryDatum = CachedAncillaryDatumImpl(ad))
+    imagedMoment.observations.foreach(obs => newImagedMoment.addObservation(ObservationImpl(obs)))
+    imagedMoment.imageReferences.foreach(ir => newImagedMoment.addImageReference(ImageReferenceImpl(ir)))
+    newImagedMoment
+  }
+
+
+
   /**
   * Map a group of annotations to the equivalent group of imagedMOments
    * @param annotations

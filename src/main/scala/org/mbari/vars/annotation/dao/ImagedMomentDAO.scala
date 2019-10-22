@@ -38,6 +38,8 @@ trait ImagedMomentDAO[T <: ImagedMoment] extends DAO[T] {
     elapsedTime: Option[Duration] = None,
     recordedDate: Option[Instant] = None): T
 
+  def newPersistentObject(imagedMoment: ImagedMoment): T
+
   /**
    * Find ImagedMoments where the imagedmoment OR observation has been updated
    * between the requested dates.

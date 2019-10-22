@@ -73,7 +73,7 @@ class CachedAncillaryDatumDAOImpl(entityManager: EntityManager)
     cad
   }
 
-  override def asPersistentObject(datum: CachedAncillaryDatum): CachedAncillaryDatum =
+  override def newPersistentObject(datum: CachedAncillaryDatum): CachedAncillaryDatum =
     CachedAncillaryDatumImpl(datum)
 
 

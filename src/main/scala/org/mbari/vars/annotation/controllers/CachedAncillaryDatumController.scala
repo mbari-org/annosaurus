@@ -244,7 +244,7 @@ class CachedAncillaryDatumController(val daoFactory: BasicDAOFactory)
         (im, opt) <- mergedData
         cad <- opt
       } yield {
-        val d = dao.asPersistentObject(cad)
+        val d = dao.newPersistentObject(cad)
         createOrUpdate(d, im)
       }
     }
