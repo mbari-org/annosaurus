@@ -23,6 +23,7 @@ import org.mbari.vars.annotation.dao.jpa.ImagedMomentImpl
 import org.mbari.vars.annotation.model.ImagedMoment
 import org.mbari.vars.annotation.model.simple.WindowRequest
 import org.mbari.vcr4j.time.Timecode
+import org.slf4j.LoggerFactory
 
 /**
  *
@@ -121,16 +122,10 @@ trait ImagedMomentDAO[T <: ImagedMoment] extends DAO[T] {
     // to second resolution.If timecode is defined we will match only on that.
     // Otherwise, this method ends up finding a matching recordedDate that may
     // have another, different timecode associated with it.
-    timecode match {
-      case Some(tc) =>
-        findByVideoReferenceUUIDAndTimecode(uuid, tc)
-      case None =>
-        elapsedTime.flatMap(findByVideoReferenceUUIDAndElapsedTime(uuid, _)) match {
-          case None =>
-            recordedDate.flatMap(findByVideoReferenceUUIDAndRecordedDate(uuid, _))
-          case im: Some[T] => im
-        }
-    }
+    val im0 = timecode.flatMap(findByVideoReferenceUUIDAndTimecode(uuid, _))
+    val im1 = if (im0.isEmpty) elapsedTime.flatMap(findByVideoReferenceUUIDAndElapsedTime(uuid, _)) else im0
+    if (im1.isEmpty) recordedDate.flatMap(findByVideoReferenceUUIDAndRecordedDate(uuid, _)) else im1
+
   }
 
   def findByObservationUUID(uuid: UUID): Option[T]

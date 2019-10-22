@@ -21,7 +21,7 @@ import java.time.{Duration, Instant}
 import java.util.UUID
 import java.util.concurrent.TimeUnit
 
-import org.mbari.vars.annotation.dao.jpa.{AnnotationImpl, TestDAOFactory}
+import org.mbari.vars.annotation.dao.jpa.{TestDAOFactory}
 import org.mbari.vars.annotation.model.ImagedMoment
 import org.scalatest.{BeforeAndAfterAll, FlatSpec, Matchers}
 import org.slf4j.LoggerFactory
@@ -35,12 +35,12 @@ import scala.util.Random
 class ImagedMomentControllerSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
 
   private[this] val daoFactory = TestDAOFactory.Instance
+  private[this] val entityFactory = new TestEntityFactory(daoFactory)
   private[this] val controller = new ImagedMomentController(daoFactory.asInstanceOf[BasicDAOFactory])
   private[this] val recordedDate = Instant.now()
   private[this] val log = LoggerFactory.getLogger(getClass)
   private[this] val timeout = SDuration(200, TimeUnit.SECONDS)
   private[this] val videoReferenceUuid = UUID.randomUUID()
-  private[this] val random = new Random()
 
   def exec[R](fn: () => Future[R]): R = Await.result(fn.apply(), timeout)
 
@@ -57,11 +57,14 @@ class ImagedMomentControllerSpec extends FlatSpec with Matchers with BeforeAndAf
       videoReferenceUuid,
       recordedDate = Some(recordedDate))
     a should not be (null)
+    checkUuids(a)
   }
 
+
   it should "create one imagedmoment if multiple creates use the same recordedDate" in {
-    val a = exec(() => controller.create(videoReferenceUuid, recordedDate = Some(recordedDate)))
-    val b = exec(() => controller.create(videoReferenceUuid, recordedDate = Some(recordedDate)))
+    val now = Instant.parse("2007-01-02T00:12:34.3456Z")
+    val a = exec(() => controller.create(videoReferenceUuid, recordedDate = Some(now)))
+    val b = exec(() => controller.create(videoReferenceUuid, recordedDate = Some(now)))
     a.uuid should be (b.uuid)
   }
 
@@ -80,45 +83,88 @@ class ImagedMomentControllerSpec extends FlatSpec with Matchers with BeforeAndAf
     a.uuid should be (b.uuid)
   }
 
+  it should "fail if trying to insert the same URL more than once" in {
+    val videoReferenceUuid = UUID.randomUUID()
+    val url = new URL("http://www.mbari.org/foo/image.png")
+    val dao = daoFactory.newImagedMomentDAO()
+    assertThrows[Exception] {
+      for (i <- 0 until 2) {
+        val source = entityFactory.createImagedMoment(1,
+          videoReferenceUuid = videoReferenceUuid,
+          concept = "URL Test" + i,
+          recordedTimestamp = Instant.now().plus(Duration.ofSeconds(Random.nextInt())))
+        source.imageReferences.foreach(_.url = url)
+        exec(() => dao.runTransaction(d => controller.create(d, source)))
+      }
+    }
+    dao.close()
+  }
+
+  it should "create a single merged imagedmoment from ones with the same index" in {
+    val now = Instant.now()
+    val videoReferenceUuid = UUID.randomUUID()
+//    val url = new URL("http://www.mbari.org/foo/image.png")
+    val ims = for (i <- 0 to 2) yield {
+      val source = entityFactory.createImagedMoment(1,
+        videoReferenceUuid = videoReferenceUuid,
+        concept = "Yo" + i,
+        recordedTimestamp = now)
+//      source.imageReferences.foreach(i => i.url = url)
+      val dao0 = daoFactory.newImagedMomentDAO()
+      val target = exec(() => dao0.runTransaction(d => controller.create(d, source)))
+      dao0.close()
+      target
+    }
+    print(ims)
+
+    ims.map(_.uuid.toString).distinct.size should be (1)
+
+  }
+
   it should "create a single imagedmoment with multiple observations" in {
-    val imagedMoment = createImagedMoment(1, concept = "Create test")
+    val imagedMoment = entityFactory.createImagedMoment(1, concept = "Create test")
     val imDao = daoFactory.newImagedMomentDAO()
     val newImagedMoment = controller.create(imDao, imagedMoment)
-    print(newImagedMoment)
+    //print(newImagedMoment)
+    checkUuids(newImagedMoment)
+    newImagedMoment.observations.size should be (1)
+    newImagedMoment.observations.head.associations.size should be (1)
   }
 
-  private def createImagedMoment(n: Int,
-                                  videoReferenceUuid: UUID = UUID.randomUUID(),
-                                  concept: String = "foo",
-                                  recordedTimestamp: Instant = Instant.now()): ImagedMoment = {
-
+  it should "create multiple imagedmoments" in {
+    val now = Instant.now()
+    val imagedMoment0 = entityFactory.createImagedMoment(1, concept = "A", recordedTimestamp = now)
+    val imagedMoment1 = entityFactory.createImagedMoment(1, concept = "B", recordedTimestamp = now)
     val imDao = daoFactory.newImagedMomentDAO()
-    val obsDao = daoFactory.newObservationDAO(imDao)
-    val assDao = daoFactory.newAssociationDAO(imDao)
-    val dataDao = daoFactory.newCachedAncillaryDatumDAO(imDao)
-    val irDao = daoFactory.newImageReferenceDAO(imDao)
-    val imagedMoment = imDao.newPersistentObject(videoReferenceUuid, recordedDate = Some(recordedTimestamp))
-    for (i <- 0 until n) {
-      val observation = obsDao.newPersistentObject(concept, "brian")
-      imagedMoment.addObservation(observation)
-      for (j <- 0 until n) {
-        val association = assDao.newPersistentObject("test" + j, linkValue = Some("value " + i))
-        observation.addAssociation(association)
-      }
-
-      val imageReference = irDao.newPersistentObject(new URL("http://www.mbari.org/path/name" + i))
-      imagedMoment.addImageReference(imageReference)
-    }
-
-    val data = dataDao.newPersistentObject(random.nextDouble() * 90,
-      random.nextDouble() * 180,
-      random.nextDouble() * 2000)
-
-    imagedMoment.ancillaryDatum = data
+    val future = imDao.runTransaction(d => {
+      controller.create(d, imagedMoment0) :: controller.create(d, imagedMoment1) :: Nil
+    })
+    val ims = exec(() => future)
     imDao.close()
-    imagedMoment
+    ims.size should be (2)
+    ims.foreach(checkUuids)
+    print(ims)
+  }
+
+  it should "create multiple imagedMoments with many observations" in {
 
   }
+
+  private def checkUuids(imagedMoment: ImagedMoment): Unit = {
+    imagedMoment.uuid should not be null
+    for (obs <- imagedMoment.observations) {
+      obs.uuid should not be null
+      for (ass <- obs.associations) {
+        ass.uuid should not be null
+      }
+    }
+    for (ir <- imagedMoment.imageReferences) {
+      ir.uuid should not be null
+    }
+    Option(imagedMoment.ancillaryDatum).foreach(ad => ad.uuid should not be null)
+  }
+
+
 
 
 
@@ -145,3 +191,5 @@ class ImagedMomentControllerSpec extends FlatSpec with Matchers with BeforeAndAf
   }
 
 }
+
+

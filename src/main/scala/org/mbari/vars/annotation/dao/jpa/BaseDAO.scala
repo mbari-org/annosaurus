@@ -40,7 +40,7 @@ abstract class BaseDAO[B <: PersistentObject: ClassTag](val entityManager: Entit
   if (log.isInfoEnabled) {
     val props = entityManager.getProperties
     if (props.containsKey(BaseDAO.JDBC_URL_KEY)) {
-      log.info(s"Wrapping EntityManager with DAO for database: ${props.get(BaseDAO.JDBC_URL_KEY)}")
+      log.debug(s"Wrapping EntityManager with DAO for database: ${props.get(BaseDAO.JDBC_URL_KEY)}")
     }
   }
 
@@ -120,7 +120,9 @@ abstract class BaseDAO[B <: PersistentObject: ClassTag](val entityManager: Entit
 
   override def delete(entity: B): Unit = entityManager.remove(entity)
 
-  def close(): Unit = if (entityManager.isOpen) entityManager.close()
+  def close(): Unit = if (entityManager.isOpen) {
+    entityManager.close()
+  }
 
 }
 

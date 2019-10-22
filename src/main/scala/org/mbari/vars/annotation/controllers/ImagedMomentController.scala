@@ -198,12 +198,22 @@ class ImagedMomentController(val daoFactory: BasicDAOFactory)
   def create(dao: DAO[_], sourceImagedMoment: ImagedMoment)(implicit ex: ExecutionContext): ImagedMoment = {
     val imDao = daoFactory.newImagedMomentDAO(dao)
     val irDao = daoFactory.newImageReferenceDAO(dao)
-    val targetImagedMoment = imDao.newPersistentObject(sourceImagedMoment)
+
+    // Reuse existing imagedmoments if it already exists
+    val targetImagedMoment = ImagedMomentController.findOrCreateImagedMoment(imDao, sourceImagedMoment)
+
+    // Transform source to correct types and remove any existing image references
+    val mockImagedMoment = imDao.newPersistentObject(sourceImagedMoment)
     val existingImageReferences = sourceImagedMoment.imageReferences
       .filter(i => irDao.findByURL(i.url).isDefined)
       .toSeq
-    existingImageReferences.foreach(ir => targetImagedMoment.removeImageReference(ir))
-    imDao.create(targetImagedMoment)
+    existingImageReferences.foreach(ir => mockImagedMoment.removeImageReference(ir))
+
+    Option(mockImagedMoment.ancillaryDatum).foreach(targetImagedMoment.ancillaryDatum = _)
+    mockImagedMoment.imageReferences.foreach(targetImagedMoment.addImageReference)
+    mockImagedMoment.observations.foreach(targetImagedMoment.addObservation)
+
+    imDao.update(targetImagedMoment)
     targetImagedMoment
   }
 
@@ -284,5 +294,13 @@ object ImagedMomentController {
         dao.create(imagedMoment)
         imagedMoment
     }
+  }
+
+  def findOrCreateImagedMoment(dao: ImagedMomentDAO[ImagedMoment], imagedMoment: ImagedMoment): ImagedMoment = {
+    findOrCreateImagedMoment(dao,
+      imagedMoment.videoReferenceUUID,
+      Option(imagedMoment.timecode),
+      Option(imagedMoment.recordedDate),
+      Option(imagedMoment.elapsedTime))
   }
 }
