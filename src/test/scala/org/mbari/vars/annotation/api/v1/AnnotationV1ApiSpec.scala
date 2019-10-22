@@ -181,7 +181,7 @@ class AnnotationV1ApiSpec extends WebApiStack {
 
 
   val anno0 = {
-    val a0 = AnnotationImpl(uuid0, "Nanomia bijuga", "brian", recordedDate = recordedDate)
+    val a0 = AnnotationImpl(UUID.randomUUID(), "Nanomia bijuga", "brian", recordedDate = recordedDate)
     val ir = ImageReferenceImpl(new URL("http://www.foo.bar/woot.png"), Option(1920), Option(1080))
     a0.imageReferences = Seq(ir)
     a0
@@ -190,12 +190,13 @@ class AnnotationV1ApiSpec extends WebApiStack {
   it should "bulk create with an imagereference" in {
     val annos = Seq(anno0)
     val json = Constants.GSON_FOR_ANNOTATION.toJson(annos.asJava)
+    print(json)
     post(
       "/v1/annotations/bulk",
       headers = Map("Content-Type" -> "application/json"),
       body = json.getBytes(StandardCharsets.UTF_8)) {
         status should be(200)
-        var pas0 = Constants.GSON_FOR_ANNOTATION
+        val pas0 = Constants.GSON_FOR_ANNOTATION
           .fromJson(body, classOf[Array[AnnotationImpl]])
           .toSeq
         pas0.size should be(1)

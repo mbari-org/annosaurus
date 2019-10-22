@@ -18,7 +18,7 @@
     </appender>
 
     <logger name="java.util.Date" level="WARN" />
-    <logger name="org.mbari.vars.annotation.dao.jpa" level="DEBUG" />
+    <logger name="org.mbari.vars.annotation.dao.jpa" level="WARN" />
 
     <root level="${LOGBACK_LEVEL}">
         <appender-ref ref="CONSOLE" />

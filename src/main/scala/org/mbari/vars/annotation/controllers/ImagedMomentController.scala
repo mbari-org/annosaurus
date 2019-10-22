@@ -20,6 +20,8 @@ import java.io.Closeable
 import java.time.{Duration, Instant}
 import java.util.UUID
 
+import org.mbari.vars.annotation.dao.jdbc.JdbcRepository
+import org.mbari.vars.annotation.dao.jpa.JPADAOFactory
 import org.mbari.vars.annotation.dao.{DAO, ImagedMomentDAO, NotFoundInDatastoreException}
 import org.mbari.vars.annotation.model.ImagedMoment
 import org.mbari.vars.annotation.model.simple.WindowRequest
@@ -38,6 +40,9 @@ class ImagedMomentController(val daoFactory: BasicDAOFactory)
   extends BaseController[ImagedMoment, ImagedMomentDAO[ImagedMoment]] {
 
   protected type IMDAO = ImagedMomentDAO[ImagedMoment]
+
+  // HACK. Assumes daoFactory is JPA
+  private[this] val jdbcRepository = new JdbcRepository(daoFactory.asInstanceOf[JPADAOFactory].entityManagerFactory)
 
   override def newDAO(): IMDAO = daoFactory.newImagedMomentDAO()
 
@@ -176,8 +181,14 @@ class ImagedMomentController(val daoFactory: BasicDAOFactory)
     f
   }
 
-  def deleteByVideoReferenceUUID(videoReferenceUUID: UUID)(implicit ec: ExecutionContext): Future[Int] =
-    exec(d => d.deleteByVideoReferenceUUUID(videoReferenceUUID))
+  def deleteByVideoReferenceUUID(videoReferenceUUID: UUID)(implicit ec: ExecutionContext): Future[Int] = {
+    def fn(dao: IMDAO): Int = {
+      val moments = dao.findByVideoReferenceUUID(videoReferenceUUID)
+      moments.foreach(dao.delete)
+      moments.size
+    }
+    exec(fn)
+  }
 
   def findByWindowRequest(windowRequest: WindowRequest,
                           limit: Option[Int] = None,

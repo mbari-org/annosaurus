@@ -268,7 +268,7 @@ class AnnotationControllerSpec extends FlatSpec with Matchers with BeforeAndAfte
     newAnnos.foreach(checkUuids)
   }
 
-  private def checkUuids(a: Annotation): Unit = {
+  def checkUuids(a: Annotation): Unit = {
     a.imagedMomentUuid should not be null
     a.imageReferences.foreach(_.uuid should not be null)
     a.associations.foreach(_.uuid should not be null)

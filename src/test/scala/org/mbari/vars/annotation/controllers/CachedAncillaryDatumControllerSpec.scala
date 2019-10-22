@@ -59,9 +59,7 @@ class CachedAncillaryDatumControllerSpec
           recordedDate = Some(recordedDate.plusSeconds(10 * i))
         )
     )
-    dao.runTransaction(d => {
-      ims.foreach(dao.create)
-    })
+    exec(() => dao.runTransaction(d => ims.map(d.create)))
     ims
   }
 

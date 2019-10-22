@@ -150,6 +150,27 @@ class ImagedMomentControllerSpec extends FlatSpec with Matchers with BeforeAndAf
 
   }
 
+  it should "delete by videoReferenceUuid" in {
+    val videoReferenceUuid = UUID.randomUUID()
+    val now = Instant.now()
+    val ims = (1 to 4).map(i => entityFactory.createImagedMoment(i,
+        videoReferenceUuid = videoReferenceUuid,
+        concept = s"delete $i",
+        recordedTimestamp = now.plus(Duration.ofSeconds(i))))
+
+    val dao = daoFactory.newImagedMomentDAO()
+    val newImagedMoments = exec(() => dao.runTransaction(d =>  ims.map(i => controller.create(d, i))))
+    newImagedMoments.size should be (4)
+    newImagedMoments.foreach(checkUuids)
+
+    val deleteCount = exec(() => controller.deleteByVideoReferenceUUID(videoReferenceUuid))
+    deleteCount should be (newImagedMoments.size)
+
+    val existingImagedMoments = exec(() => controller.findByVideoReferenceUUID(videoReferenceUuid))
+    existingImagedMoments.isEmpty should be (true)
+
+  }
+
   private def checkUuids(imagedMoment: ImagedMoment): Unit = {
     imagedMoment.uuid should not be null
     for (obs <- imagedMoment.observations) {

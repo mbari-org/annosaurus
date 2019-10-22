@@ -53,11 +53,11 @@ trait SpecDAOFactory extends JPADAOFactory {
     import scala.concurrent.ExecutionContext.Implicits.global
     val dao = newImagedMomentDAO()
 
-    val f = dao.runTransaction(d => {
+    val f = dao.runTransaction(_ => {
       val all = dao.findAll()
       all.foreach(dao.delete)
     })
-    f.onComplete(t => dao.close())
+    f.onComplete(_ => dao.close())
     Await.result(f, Duration(400, TimeUnit.SECONDS))
 
   }

@@ -210,6 +210,7 @@ class ImagedMomentV1Api(controller: ImagedMomentController)(implicit val executo
     validateRequest() // Apply API security
     val uuid = params.getAs[UUID]("uuid").getOrElse(halt(BadRequest("Please provide a Video Reference UUID")))
     controller.deleteByVideoReferenceUUID(uuid)
+      .map(ObservationCount(uuid, _))
       .map(toJson)
   }
 

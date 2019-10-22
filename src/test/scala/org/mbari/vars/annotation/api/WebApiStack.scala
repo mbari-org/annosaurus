@@ -39,14 +39,16 @@ trait WebApiStack extends ScalatraFlatSpec with BeforeAndAfterAll {
   protected[this] val daoFactory = TestDAOFactory.Instance.asInstanceOf[BasicDAOFactory]
   protected[this] implicit val executionContext = ExecutionContext.global
 
+
+
   protected override def afterAll(): Unit = {
     val dao = daoFactory.newImagedMomentDAO()
 
     val f = dao.runTransaction(d => {
-      val all = dao.findAll()
-      all.foreach(dao.delete)
+      val all = d.findAll()
+      all.foreach(d.delete)
     })
-    f.onComplete(t => dao.close())
+    f.onComplete(_ => dao.close())
     Await.result(f, Duration(4, TimeUnit.SECONDS))
 
     super.afterAll()
