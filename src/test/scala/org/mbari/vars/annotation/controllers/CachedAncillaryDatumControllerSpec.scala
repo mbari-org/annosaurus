@@ -130,7 +130,7 @@ class CachedAncillaryDatumControllerSpec
       maybeMoment should not be None
       val i = maybeMoment.get
       val ad = i.ancillaryDatum
-      println(im.recordedDate)
+//      println(im.recordedDate)
       ad.depthMeters should not be None
       ad.depthMeters.get should be(2000)
       ad.salinity should not be None

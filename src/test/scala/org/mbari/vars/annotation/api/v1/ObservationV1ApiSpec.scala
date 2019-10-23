@@ -63,7 +63,7 @@ class ObservationV1ApiSpec extends WebApiStack {
       activity = Some("transect"))
     imagedMoment.addObservation(observation)
     val f = dao.runTransaction(d => d.create(observation))
-    f.onComplete(t => dao.close())
+    f.onComplete(_ => dao.close())
     Await.result(f, timeout)
 
     // --- find it via the web api
@@ -127,13 +127,13 @@ class ObservationV1ApiSpec extends WebApiStack {
       activity = Some("transit"))
     imagedMoment.addObservation(obs)
     val f = dao.runTransaction(d => d.create(obs))
-    f.onComplete(t => dao.close())
+    f.onComplete(_ => dao.close())
     Await.result(f, timeout)
 
     // --- find all names
     get(s"$path/concepts") {
       status should be(200)
-      println(body)
+//      println(body)
       val concepts = gson.fromJson(body, classOf[Array[String]])
       concepts should contain theSameElementsAs Array("squid", "submarine", "rocketship")
     }
@@ -143,7 +143,7 @@ class ObservationV1ApiSpec extends WebApiStack {
     get(s"$path/concepts/${observation.imagedMoment.videoReferenceUUID}") {
       status should be(200)
       val concepts = gson.fromJson(body, classOf[Array[String]])
-      println(body)
+//      println(body)
       concepts should contain theSameElementsAs Array("submarine", "rocketship")
     }
   }

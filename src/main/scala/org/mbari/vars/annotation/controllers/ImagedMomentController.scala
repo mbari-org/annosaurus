@@ -18,6 +18,7 @@ package org.mbari.vars.annotation.controllers
 
 import java.io.Closeable
 import java.time.{Duration, Instant}
+import java.util
 import java.util.UUID
 
 import org.mbari.vars.annotation.dao.jdbc.JdbcRepository
@@ -206,9 +207,33 @@ class ImagedMomentController(val daoFactory: BasicDAOFactory)
     exec(fn)
   }
 
+  /**
+  *
+   * @param imagedMoments For your sanity, make sure that they have unique indices BEFORE creating them
+   * @param ex
+   * @return
+   */
+  def create(imagedMoments: Seq[ImagedMoment])(implicit ex: ExecutionContext): Future[Seq[ImagedMoment]] = {
+    val dao = daoFactory.newImagedMomentDAO()
+    val future = dao.runTransaction(d => imagedMoments.map(im => create(d, im)))
+    future.onComplete(_ => dao.close())
+    future
+  }
+
+
+  /**
+  * This needs to be called inside a transaction. creates a new imaged moment
+   * base on the current one
+   * @param dao
+   * @param sourceImagedMoment
+   * @param ex
+   * @return
+   */
   def create(dao: DAO[_], sourceImagedMoment: ImagedMoment)(implicit ex: ExecutionContext): ImagedMoment = {
     val imDao = daoFactory.newImagedMomentDAO(dao)
     val irDao = daoFactory.newImageReferenceDAO(dao)
+    val adDao = daoFactory.newCachedAncillaryDatumDAO(dao)
+    val obsDao = daoFactory.newObservationDAO(dao)
 
     // Reuse existing imagedmoments if it already exists
     val targetImagedMoment = ImagedMomentController.findOrCreateImagedMoment(imDao, sourceImagedMoment)
@@ -220,11 +245,24 @@ class ImagedMomentController(val daoFactory: BasicDAOFactory)
       .toSeq
     existingImageReferences.foreach(ir => mockImagedMoment.removeImageReference(ir))
 
-    Option(mockImagedMoment.ancillaryDatum).foreach(targetImagedMoment.ancillaryDatum = _)
-    mockImagedMoment.imageReferences.foreach(targetImagedMoment.addImageReference)
-    mockImagedMoment.observations.foreach(targetImagedMoment.addObservation)
+    Option(mockImagedMoment.ancillaryDatum).foreach(ad => {
+      ad.imagedMoment = null
+      targetImagedMoment.ancillaryDatum = ad
+      adDao.create(ad)
+    })
 
-    imDao.update(targetImagedMoment)
+    mockImagedMoment.imageReferences.toArray.foreach(ir => {
+      mockImagedMoment.removeImageReference(ir)
+      targetImagedMoment.addImageReference(ir)
+      irDao.create(ir)
+    })
+
+    mockImagedMoment.observations.toArray.foreach(obs => {
+      mockImagedMoment.removeObservation(obs)
+      targetImagedMoment.addObservation(obs)
+      obsDao.create(obs)
+    })
+
     targetImagedMoment
   }
 
@@ -300,7 +338,7 @@ object ImagedMomentController {
     dao.findByVideoReferenceUUIDAndIndex(videoReferenceUUID, timecode, elapsedTime, recordedDate) match {
       case Some(imagedMoment) => imagedMoment
       case None =>
-        log.info(s"Creating new imaged moment at timecode = ${timecode.getOrElse("")}, recordedDate = ${recordedDate.getOrElse("")}, elapsedTime = ${elapsedTime.getOrElse("")}")
+        log.debug(s"Creating new imaged moment at timecode = ${timecode.getOrElse("")}, recordedDate = ${recordedDate.getOrElse("")}, elapsedTime = ${elapsedTime.getOrElse("")}")
         val imagedMoment = dao.newPersistentObject(videoReferenceUUID, timecode, elapsedTime, recordedDate)
         dao.create(imagedMoment)
         imagedMoment

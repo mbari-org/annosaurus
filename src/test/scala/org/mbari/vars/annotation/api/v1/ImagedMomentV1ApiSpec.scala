@@ -120,7 +120,7 @@ class ImagedMomentV1ApiSpec extends WebApiStack {
   it should "count last updated imagedmoments between timestamps" in {
     get(s"/v1/imagedmoments/modified/count/$startTimestamp/${Instant.now()}") {
       status should be(200)
-      println(body)
+//      println(body)
     }
   }
 

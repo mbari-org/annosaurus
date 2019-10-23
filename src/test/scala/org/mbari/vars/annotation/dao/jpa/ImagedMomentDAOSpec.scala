@@ -104,7 +104,7 @@ class ImagedMomentDAOSpec extends FlatSpec with Matchers with BeforeAndAfterAll 
   it should "findAll" in {
     run(_.create(imagedMoment1))
     val all = run(_.findAll())
-    println(all)
+//    println(all)
     all.size should be >= 2
   }
 

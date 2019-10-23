@@ -72,13 +72,13 @@ class ImageControllerSpec extends FlatSpec with Matchers with BeforeAndAfterAll 
 
     val b = exec(() => controller.findByImageName("foo"))
     b.size should be (2)
-    println(b)
+//    println(b)
     b.head.url should not be b.last.url
 
     val c = exec(() => controller.findByImageName("foo.png"))
     c.size should be (1)
     c.head.url should be (urlPng)
-    println(c)
+//    println(c)
 
     val d = exec(() => controller.findByImageName("foo.jpg"))
     d.size should be (1)

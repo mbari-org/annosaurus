@@ -53,10 +53,10 @@ class ImagedMomentImplSpec extends FlatSpec with Matchers with BeforeAndAfterAll
 
     val annos = xs.flatMap(o => AnnotationImpl(o))
     annos.size should be (5)
-    println(annos)
+//    println(annos)
     val ims = ImagedMomentImpl(annos)
 
-    print(ims)
+//    print(ims)
     ims.size should be (4)
     val obs = ims.flatMap(i => i.observations)
     obs.size should be (5)

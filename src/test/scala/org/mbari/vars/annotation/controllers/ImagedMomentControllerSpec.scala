@@ -101,23 +101,21 @@ class ImagedMomentControllerSpec extends FlatSpec with Matchers with BeforeAndAf
   }
 
   it should "create a single merged imagedmoment from ones with the same index" in {
-    val now = Instant.now()
+    val now =Instant.parse("2011-01-02T00:12:34.3456Z")
     val videoReferenceUuid = UUID.randomUUID()
-//    val url = new URL("http://www.mbari.org/foo/image.png")
-    val ims = for (i <- 0 to 2) yield {
+    val dao = daoFactory.newImagedMomentDAO()
+    for (i <- 0 to 2) {
       val source = entityFactory.createImagedMoment(1,
         videoReferenceUuid = videoReferenceUuid,
         concept = "Yo" + i,
         recordedTimestamp = now)
-//      source.imageReferences.foreach(i => i.url = url)
-      val dao0 = daoFactory.newImagedMomentDAO()
-      val target = exec(() => dao0.runTransaction(d => controller.create(d, source)))
-      dao0.close()
-      target
+//      println(source)
+      exec(() => dao.runTransaction(d => controller.create(d, source)))
     }
-    print(ims)
+    dao.close()
 
-    ims.map(_.uuid.toString).distinct.size should be (1)
+    val ims = exec(() => controller.findByVideoReferenceUUID(videoReferenceUuid))
+    ims.size should be (1)
 
   }
 
@@ -143,31 +141,36 @@ class ImagedMomentControllerSpec extends FlatSpec with Matchers with BeforeAndAf
     imDao.close()
     ims.size should be (2)
     ims.foreach(checkUuids)
-    print(ims)
+//    print(ims)
   }
 
-  it should "create multiple imagedMoments with many observations" in {
+  it should "create multiple imagedMoments with the same videoreference" in {
+    val videoReferenceUuid = UUID.randomUUID()
+
 
   }
 
   it should "delete by videoReferenceUuid" in {
     val videoReferenceUuid = UUID.randomUUID()
     val now = Instant.now()
-    val ims = (1 to 4).map(i => entityFactory.createImagedMoment(i,
+    val n = 10
+    val ims = (1 to n).map(i => entityFactory.createImagedMoment(1,
         videoReferenceUuid = videoReferenceUuid,
         concept = s"delete $i",
         recordedTimestamp = now.plus(Duration.ofSeconds(i))))
+    ims.size should be (n)
 
-    val dao = daoFactory.newImagedMomentDAO()
-    val newImagedMoments = exec(() => dao.runTransaction(d =>  ims.map(i => controller.create(d, i))))
-    newImagedMoments.size should be (4)
+    val newImagedMoments = exec(() => controller.create(ims))
+    newImagedMoments.size should be (n)
     newImagedMoments.foreach(checkUuids)
+    val sanityCount = exec(() => controller.findByVideoReferenceUUID(videoReferenceUuid))
+    sanityCount.size should be (n)
 
     val deleteCount = exec(() => controller.deleteByVideoReferenceUUID(videoReferenceUuid))
     deleteCount should be (newImagedMoments.size)
 
-    val existingImagedMoments = exec(() => controller.findByVideoReferenceUUID(videoReferenceUuid))
-    existingImagedMoments.isEmpty should be (true)
+    val remainingCount = exec(() => controller.findByVideoReferenceUUID(videoReferenceUuid))
+    remainingCount.isEmpty should be (true)
 
   }
 

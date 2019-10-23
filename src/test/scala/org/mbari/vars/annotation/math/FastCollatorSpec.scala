@@ -32,7 +32,7 @@ class FastCollatorSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
 
     val f = FastCollator(a, b, 1D)
 
-    println(f)
+//    println(f)
     val expected = Seq(None, Some(10D), None, Some(15.0), Some(15.0),
       Some(15.0), None, Some(20D), None)
     for (i <- f.indices) {

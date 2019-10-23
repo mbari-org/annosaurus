@@ -247,7 +247,7 @@ class ImagedMomentImpl extends ImagedMoment with JPAPersistentObject {
   @OneToMany(
     targetEntity = classOf[ImageReferenceImpl],
     cascade = Array(CascadeType.ALL),
-    fetch = FetchType.EAGER,
+    fetch = FetchType.LAZY,
     mappedBy = "imagedMoment",
     orphanRemoval = true
   )

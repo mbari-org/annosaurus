@@ -190,7 +190,7 @@ class AnnotationV1ApiSpec extends WebApiStack {
   it should "bulk create with an imagereference" in {
     val annos = Seq(anno0)
     val json = Constants.GSON_FOR_ANNOTATION.toJson(annos.asJava)
-    print(json)
+//    print(json)
     post(
       "/v1/annotations/bulk",
       headers = Map("Content-Type" -> "application/json"),
@@ -222,7 +222,7 @@ class AnnotationV1ApiSpec extends WebApiStack {
       headers = Map("Content-Type" -> "application/json"),
       body = json.getBytes(StandardCharsets.UTF_8)) {
         status should be(200)
-        var pas0 = Constants.GSON_FOR_ANNOTATION
+        val pas0 = Constants.GSON_FOR_ANNOTATION
           .fromJson(body, classOf[Array[AnnotationImpl]])
           .toSeq
         pas0.size should be(1)
@@ -286,7 +286,7 @@ class AnnotationV1ApiSpec extends WebApiStack {
       body = json.getBytes(StandardCharsets.UTF_8)) {
 
       status should be(200)
-      var count = Constants.GSON.fromJson(body, classOf[ConcurrentRequestCount])
+      val count = Constants.GSON.fromJson(body, classOf[ConcurrentRequestCount])
       // ONe of the concurrent annotations is outside the date range. This was deliberate
       // So we expect one less annotation
       count.count should be (concurrentAnnotations.size - 1)
@@ -306,13 +306,13 @@ class AnnotationV1ApiSpec extends WebApiStack {
 
       status should be(200)
 
-      var concurrentAnnos = Constants.GSON
+      val concurrentAnnos = Constants.GSON
         .fromJson(body, classOf[Array[AnnotationImpl]])
         .toSeq
 
 
       concurrentAnnos.size should be(4)
-      println(concurrentAnnos)
+//      println(concurrentAnnos)
 
     }
   }
@@ -327,12 +327,12 @@ class AnnotationV1ApiSpec extends WebApiStack {
 
       status should be(200)
 
-      var annos = Constants.GSON
+      val annos = Constants.GSON
         .fromJson(body, classOf[Array[AnnotationImpl]])
         .toSeq
 
       annos.size should be(5)
-      println(annos)
+//      println(annos)
 
     }
   }

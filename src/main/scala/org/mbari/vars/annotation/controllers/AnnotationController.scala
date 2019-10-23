@@ -181,15 +181,6 @@ class AnnotationController(daoFactory: BasicDAOFactory) {
     implicit val ec: ExecutionContext = ExecutionContext.fromExecutor(Executors.newSingleThreadExecutor())
 
     val obsDao = daoFactory.newObservationDAO()
-//    val futures = annotations.grouped(50)
-//      .map(annos => {
-//        val f = obsDao.runTransaction(d => annos.map(a => create(d, a)))
-//        f.map(obsList => obsList.map(AnnotationImpl(_)).toSeq)
-//      })
-//
-//    val future = Future.sequence(futures)
-//    future.onComplete(_ => obsDao.close())
-//    future.map(_.flatten.toSeq)
 
     val imagedMoments = ImagedMomentImpl(annotations.toSeq)
     val futures = imagedMoments.grouped(50)

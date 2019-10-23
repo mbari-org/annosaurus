@@ -75,7 +75,7 @@ class IndexV1ApiSpec extends WebApiStack {
       status should be(200)
       val ids = gson.fromJson(body, classOf[Array[IndexImpl]])
       ids.size should be(10)
-      println(body)
+//      println(body)
     }
 
   }
