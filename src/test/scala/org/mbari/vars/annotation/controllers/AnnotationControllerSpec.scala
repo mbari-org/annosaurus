@@ -16,11 +16,13 @@
 
 package org.mbari.vars.annotation.controllers
 
+import java.nio.charset.StandardCharsets
 import java.time.{Duration, Instant}
 import java.util.UUID
 import java.util.concurrent.TimeUnit
 
-import org.mbari.vars.annotation.dao.jpa.{AnnotationImpl, AssociationImpl, TestDAOFactory}
+import org.mbari.vars.annotation.Constants
+import org.mbari.vars.annotation.dao.jpa.{AnnotationImpl, AssociationImpl, SpecDAOFactory, TestDAOFactory}
 import org.mbari.vars.annotation.model.Annotation
 import org.mbari.vars.annotation.model.simple.{ConcurrentRequest, MultiRequest}
 import org.scalatest.{BeforeAndAfterAll, FlatSpec, Matchers}
@@ -30,6 +32,7 @@ import scala.collection.JavaConverters._
 import scala.concurrent.{Await, Future}
 import scala.concurrent.duration.{Duration => SDuration}
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.io.Source
 import scala.util.Random
 
 /**
@@ -266,6 +269,62 @@ class AnnotationControllerSpec extends FlatSpec with Matchers with BeforeAndAfte
     val newAnnos = exec(() => controller.bulkCreate(annos))
     newAnnos.size should be (3)
     newAnnos.foreach(checkUuids)
+  }
+
+  it should "bulk insert a full dive of annotations" in {
+
+    daoFactory.cleanup()
+    val df = daoFactory.asInstanceOf[BasicDAOFactory]
+    val imagedMomentController = new ImagedMomentController(df)
+    val associationController = new AssociationController(df)
+    val observationController = new ObservationController(df)
+    val imageReferenceController = new ImageReferenceController(df)
+
+    // --- Read data
+    val url = getClass.getResource("/json/annotation_full_dive.json").toURI
+    val source = Source.fromFile(url, "UTF-8")
+    val json = source.getLines()
+      .mkString("\n")
+    source.close()
+
+    // --- Insert all annotations
+    val annos = Constants.GSON.fromJson(json, classOf[Array[AnnotationImpl]])
+    annos should not be null
+    annos.isEmpty should be (false)
+    val newAnnos = exec(() => controller.bulkCreate(annos))
+    newAnnos.size should be (annos.size)
+
+    // --- Trust insert, but verify
+    val videoReferenceUuid = newAnnos.head.videoReferenceUuid
+    val n = exec(() => imagedMomentController.countByVideoReferenceUuid(videoReferenceUuid))
+    n should be > (0)
+    val obsCount = exec(() => observationController.countByVideoReferenceUUID(videoReferenceUuid))
+    obsCount should be (newAnnos.size)
+
+    val allAssociations = annos.flatMap(_.associations)
+    val insertedAssociations = exec(() => associationController.findAll())
+    insertedAssociations should have size allAssociations.size
+
+    // --- Delete all annotations
+    videoReferenceUuid should not be null
+    val deleteCount = exec(() => imagedMomentController.deleteByVideoReferenceUUID(videoReferenceUuid))
+    deleteCount should equal  (newAnnos.size +- 1)
+
+    val associations = exec(() => associationController.findAll())
+    associations should be (empty)
+
+    val imageReferences = exec(() => imageReferenceController.findAll())
+    imageReferences should be (empty)
+
+    val observations = exec(() => observationController.findAll())
+    observations should be (empty)
+
+    val imagedMoments = exec(() => imagedMomentController.findAll())
+    imagedMoments should be (empty)
+
+//    val newAnnos0 = exec(() => controller.bulkCreate(annos))
+//    newAnnos0.size should be (annos.size)
+
   }
 
   def checkUuids(a: Annotation): Unit = {

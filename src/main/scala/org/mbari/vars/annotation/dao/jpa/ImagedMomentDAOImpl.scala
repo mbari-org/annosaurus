@@ -197,7 +197,7 @@ class ImagedMomentDAOImpl(entityManager: EntityManager)
 
   override def countByVideoReferenceUUID(uuid: UUID): Int = {
     val query = entityManager.createNamedQuery("ImagedMoment.countByVideoReferenceUUID")
-    query.setParameter(1, uuid)
+    query.setParameter(1, uuid.toString)
     query.getResultList
       .asScala
       .map(_.asInstanceOf[Int])
