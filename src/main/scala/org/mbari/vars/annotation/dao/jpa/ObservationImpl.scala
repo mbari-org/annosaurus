@@ -168,8 +168,7 @@ class ObservationImpl extends Observation with JPAPersistentObject {
     targetEntity = classOf[AssociationImpl],
     cascade = Array(CascadeType.ALL),
     fetch = FetchType.EAGER,
-    mappedBy = "observation",
-    orphanRemoval = true)
+    mappedBy = "observation")
   protected var javaAssociations: JList[AssociationImpl] = new JArrayList[AssociationImpl]
 
   override def addAssociation(association: Association): Unit = {

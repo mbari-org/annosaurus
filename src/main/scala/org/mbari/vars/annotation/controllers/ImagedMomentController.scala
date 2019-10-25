@@ -247,20 +247,20 @@ class ImagedMomentController(val daoFactory: BasicDAOFactory)
 
     Option(mockImagedMoment.ancillaryDatum).foreach(ad => {
       ad.imagedMoment = null
-      targetImagedMoment.ancillaryDatum = ad
       adDao.create(ad)
+      targetImagedMoment.ancillaryDatum = ad
     })
 
     mockImagedMoment.imageReferences.toArray.foreach(ir => {
       mockImagedMoment.removeImageReference(ir)
-      targetImagedMoment.addImageReference(ir)
       irDao.create(ir)
+      targetImagedMoment.addImageReference(ir)
     })
 
     mockImagedMoment.observations.toArray.foreach(obs => {
       mockImagedMoment.removeObservation(obs)
-      targetImagedMoment.addObservation(obs)
       obsDao.create(obs)
+      targetImagedMoment.addObservation(obs)
     })
 
     targetImagedMoment

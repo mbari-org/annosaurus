@@ -235,7 +235,6 @@ class AnnotationController(daoFactory: BasicDAOFactory) {
           newI.uuid = i.uuid
           imagedMoment.addImageReference(newI)
       }
-
     })
 
     observation
