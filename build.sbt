@@ -117,6 +117,7 @@ lazy val annosaurus = (project in file("."))
       "org.eclipse.jetty" % "jetty-server" % jettyVersion % "compile;test",
       "org.eclipse.jetty" % "jetty-servlets" % jettyVersion % "compile;test",
       "org.eclipse.jetty" % "jetty-webapp" % jettyVersion % "compile;test",
+      "org.eclipse.persistence" % "org.eclipse.persistence.extension" % eclipselinkVersion,
       "org.eclipse.persistence" % "org.eclipse.persistence.jpa" % eclipselinkVersion,
       "org.json4s" %% "json4s-jackson" % jsonVersion,
       "org.mbari.uuid" % "uuid-gen" % uuidgenVersion,
