@@ -22,10 +22,11 @@ import java.util.UUID
 
 import javax.persistence.{EntityManager, EntityManagerFactory, Query}
 import org.mbari.vars.annotation.model.Annotation
-import org.mbari.vars.annotation.model.simple.{ConcurrentRequest, Image, MultiRequest, ObservationCount}
+import org.mbari.vars.annotation.model.simple.{ConcurrentRequest, DeleteCount, Image, MultiRequest, ObservationCount}
 import org.slf4j.LoggerFactory
 
 import scala.collection.JavaConverters._
+import scala.util.control.NonFatal
 
 /**
  * Database access (read-only) provider that uses SQL for fast lookups. WHY?
@@ -39,6 +40,42 @@ class JdbcRepository(entityManagerFactory: EntityManagerFactory) {
 
 
   private[this] val log = LoggerFactory.getLogger(getClass)
+
+  def deleteByVideoReferenceUuid(videoReferenceUuid: UUID): DeleteCount = {
+    implicit val entityManager: EntityManager = entityManagerFactory.createEntityManager()
+    val transaction = entityManager.getTransaction
+    transaction.begin()
+    val queries = List(AncillaryDatumSQL.deleteByVideoReferenceUuid,
+        ImageReferenceSQL.deleteByVideoReferenceUuid,
+        AssociationSQL.deleteByVideoReferenceUuid,
+        ObservationSQL.deleteByVideoReferenceUuid,
+        ImagedMomentSQL.deleteByVideoReferenceUuid)
+      .map(entityManager.createNativeQuery)
+    queries.foreach(_.setParameter(1, videoReferenceUuid.toString))
+    var deleteCount = DeleteCount(videoReferenceUuid)
+    try {
+      val counts = queries.map(_.executeUpdate())
+      deleteCount = DeleteCount(videoReferenceUuid,
+        counts(4),
+        counts(1),
+        counts(3),
+        counts(2),
+        counts(0))
+      transaction.commit()
+    }
+    catch {
+      case NonFatal(e) =>
+        deleteCount.errorMessage = s"A(n) ${e.getClass} was thrown. It reports: `${e.getMessage}`"
+    }
+    finally {
+      if (transaction.isActive) {
+        transaction.rollback()
+      }
+    }
+    entityManager.close()
+    deleteCount
+
+  }
 
 
   def findByVideoReferenceUuid(videoReferenceUuid: UUID,
@@ -56,7 +93,7 @@ class JdbcRepository(entityManagerFactory: EntityManagerFactory) {
     )
 
     queries.foreach(q => {
-      q.setParameter(1, videoReferenceUuid)
+      q.setParameter(1, videoReferenceUuid.toString)
     })
 
     val annos = executeQuery(queries(0), queries(1), queries(2), limit, offset, includeAncillaryData)
@@ -80,7 +117,7 @@ class JdbcRepository(entityManagerFactory: EntityManagerFactory) {
     )
 
     queries.foreach(q => {
-      q.setParameter(1, videoReferenceUuid)
+      q.setParameter(1, videoReferenceUuid.toString)
       q.setParameter(2, Timestamp.from(startTimestamp))
       q.setParameter(3, Timestamp.from(endTimestamp))
     })

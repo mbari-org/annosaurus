@@ -56,6 +56,18 @@ object ImageReferenceSQL {
 
   val byImagedMomentUuids: String = SELECT + FROM + " WHERE im.uuid IN (?)" + ORDER
 
+  val deleteByVideoReferenceUuid: String =
+    """ DELETE FROM image_references WHERE EXISTS (
+      |   SELECT
+      |     *
+      |   FROM
+      |     imaged_moments im
+      |   WHERE
+      |     im.video_reference_uuid = ? AND
+      |     im.uuid = image_references.imaged_moment_uuid
+      | )
+      |""".stripMargin
+
   def resultListToImageReferences(rows: List[_]): Seq[ImageReferenceExt] = {
     for {
       row <- rows

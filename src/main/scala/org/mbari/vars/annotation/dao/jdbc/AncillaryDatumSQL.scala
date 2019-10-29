@@ -98,6 +98,17 @@ object AncillaryDatumSQL {
 
   val byMultiRequest: String = SELECT + FROM + " WHERE im.video_reference_uuid IN (?)" + ORDER
 
+  val deleteByVideoReferenceUuid: String =
+    """ DELETE FROM ancillary_data WHERE EXISTS (
+      |   SELECT
+      |     *
+      |   FROM
+      |     imaged_moments im
+      |   WHERE
+      |     im.video_reference_uuid = ? AND
+      |     im.uuid = ancillary_data.imaged_moment_uuid
+      | )
+      |""".stripMargin
 
   def join(annotations: Seq[AnnotationExt], data: Seq[AncillaryDatumExt]): Seq[Annotation] = {
     for {

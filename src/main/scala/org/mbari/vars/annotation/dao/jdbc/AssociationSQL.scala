@@ -89,4 +89,17 @@ object AssociationSQL {
 
   val byLinkNameAndLinkValue: String = SELECT + FROM + " WHERE link_name = ? AND link_value = ?" + ORDER
 
+  val deleteByVideoReferenceUuid: String =
+    """ DELETE FROM associations WHERE EXISTS (
+      |   SELECT
+      |     *
+      |   FROM
+      |     imaged_moments im RIGHT JOIN
+      |     observations obs ON obs.imaged_moment_uuid = im.uuid
+      |   WHERE
+      |     im.video_reference_uuid = ? AND
+      |     obs.uuid = associations.observation_uuid
+      | )
+      |""".stripMargin
+
 }

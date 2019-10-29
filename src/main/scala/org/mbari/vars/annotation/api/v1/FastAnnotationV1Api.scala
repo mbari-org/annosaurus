@@ -116,6 +116,16 @@ class FastAnnotationV1Api(daoFactory: JPADAOFactory)
     })
   }
 
+  delete("/videoreference/:uuid") {
+    validateRequest()
+    val uuid = params.getAs[UUID]("uuid").getOrElse(halt(BadRequest(
+      body = "A video reference 'uuid' parameter is required")))
+    Future({
+      val deleteCount = repository.deleteByVideoReferenceUuid(uuid)
+      toJson(deleteCount)
+    })
+  }
+
   post("/concurrent") {
     request.getHeader("Content-Type") match {
       case "application/json" =>

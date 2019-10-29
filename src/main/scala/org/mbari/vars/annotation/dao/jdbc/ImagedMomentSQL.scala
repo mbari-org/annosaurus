@@ -54,7 +54,7 @@ object ImagedMomentSQL {
 
   val byVideoReferenceUuid: String = SELECT_IMAGES + FROM + " WHERE im.video_reference_uuid = ? AND ir.url IS NOT NULL"
 
-  val deleteByVideoReferenceUuid: String = "DELETE im " + FROM + " WHERE im.video_reference_uuid = ?"
+  val deleteByVideoReferenceUuid: String = "DELETE FROM imaged_moments WHERE video_reference_uuid = ?"
 
   def resultListToImages(rows: List[_]): Seq[Image] = {
     for {
