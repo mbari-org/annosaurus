@@ -29,7 +29,7 @@ val vcr4jVersion = "4.0.2"
 
 lazy val buildSettings = Seq(
   organization := "org.mbari.vars",
-  version := "0.5.0",
+  version := "0.5.1",
   scalaVersion in ThisBuild := "2.12.10",
   crossScalaVersions := Seq("2.12.10"),
   organizationName := "Monterey Bay Aquarium Research Institute",
