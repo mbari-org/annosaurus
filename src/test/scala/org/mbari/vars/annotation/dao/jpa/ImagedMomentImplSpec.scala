@@ -19,6 +19,7 @@ package org.mbari.vars.annotation.dao.jpa
 import java.time.{Duration, Instant}
 import java.util.UUID
 
+import org.mbari.vars.annotation.Constants
 import org.mbari.vcr4j.time.{FrameRates, Timecode}
 import org.scalatest.{BeforeAndAfterAll, FlatSpec, Matchers}
 
@@ -66,6 +67,37 @@ class ImagedMomentImplSpec extends FlatSpec with Matchers with BeforeAndAfterAll
         o.uuid should not be null
         o.associations.size should be (1)
     }
+
+  }
+
+  it should "round trip an annotation without a video index" in {
+    val json =
+      """[
+        |  {
+        |    "concept": "test",
+        |    "observer": "brian",
+        |    "observation_timestamp": "2019-10-31T21:00:20.131533Z",
+        |    "video_reference_uuid": "a9f75399-9bc5-4ff3-934c-0bd72ba4dccb",
+        |    "imaged_moment_uuid": "c72cb4d4-b4a5-41e1-d965-4c9f16c29f1e",
+        |    "recorded_timestamp": "2019-10-31T21:00:05.275Z",
+        |    "group": "ROV",
+        |    "activity": "descend",
+        |    "associations": [],
+        |    "image_references": []
+        |  }
+        |]""".stripMargin
+
+    val annotations = Constants.GSON.fromJson(json, classOf[Array[AnnotationImpl]])
+    val imagedMoments = ImagedMomentImpl(annotations)
+    imagedMoments should have size (1)
+    val im = imagedMoments.head
+    im.videoReferenceUUID should be (UUID.fromString("a9f75399-9bc5-4ff3-934c-0bd72ba4dccb"))
+    im.imageReferences should have size(0)
+    im.observations should have size(1)
+    val obs = im.observations.head
+    obs.concept should be ("test")
+    obs.group should be ("ROV")
+    obs.activity should be ("descend")
 
   }
 

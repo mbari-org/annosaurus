@@ -172,6 +172,12 @@ class AnnotationController(daoFactory: BasicDAOFactory) {
     f.map(AnnotationImpl(_))
   }
 
+  /**
+   * Bulk create annotations
+   * @param annotations THe annotations to create
+   * @return The newly created annotations along with any existing ones that share
+   *         the same imagedMoment
+   */
   def bulkCreate(annotations: Iterable[Annotation]): Future[Seq[AnnotationImpl]] = {
 
     // We're inserting the annotations using a fixed thread executor
@@ -181,6 +187,7 @@ class AnnotationController(daoFactory: BasicDAOFactory) {
     implicit val ec: ExecutionContext = ExecutionContext.fromExecutor(Executors.newSingleThreadExecutor())
 
     val obsDao = daoFactory.newObservationDAO()
+
 
     val imagedMoments = ImagedMomentImpl(annotations.toSeq)
     val futures = imagedMoments.grouped(50)
