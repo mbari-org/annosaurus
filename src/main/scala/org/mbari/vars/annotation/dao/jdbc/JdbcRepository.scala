@@ -77,6 +77,32 @@ class JdbcRepository(entityManagerFactory: EntityManagerFactory) {
 
   }
 
+  def findAll(limit: Option[Int] = Some(1000),
+              offset: Option[Int] = None,
+              includeAncillaryData: Boolean = false): Seq[AnnotationExt] = {
+
+    implicit val entityManager: EntityManager = entityManagerFactory.createEntityManager()
+    val query1 = entityManager.createNativeQuery(AnnotationSQL.all)
+    limit.foreach(query1.setMaxResults)
+    offset.foreach(query1.setFirstResult)
+
+    val r1 = query1.getResultList.asScala.toList
+    val annotations = AnnotationSQL.resultListToAnnotations(r1)
+    executeQueryForAnnotations(annotations, includeAncillaryData)
+    if (includeAncillaryData) findAncillaryData(annotations)
+    entityManager.close()
+    annotations
+
+  }
+
+  def countAll(): Long = {
+    implicit val entityManager: EntityManager = entityManagerFactory.createEntityManager()
+    val query = entityManager.createNativeQuery(ObservationSQL.countAll)
+    val count = query.getSingleResult.asInstanceOf[Long]
+    entityManager.close()
+    count
+  }
+
 
   def findByVideoReferenceUuid(videoReferenceUuid: UUID,
                                limit: Option[Int] = None,

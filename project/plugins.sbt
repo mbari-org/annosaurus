@@ -14,6 +14,6 @@ addSbtPlugin("org.scalastyle" %% "scalastyle-sbt-plugin" % "1.0.0")
 addSbtPlugin("de.heikoseeberger" % "sbt-header" % "5.2.0")
 
 // https://github.com/atais/sbt-eclipselink-static-weave
-//addSbtPlugin("com.github.atais" % "sbt-eclipselink-static-weave" % "0.1.1")
+addSbtPlugin("com.github.atais" % "sbt-eclipselink-static-weave" % "0.1.1")
 
 resolvers += Resolver.sonatypeRepo("releases")

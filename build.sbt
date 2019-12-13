@@ -89,7 +89,8 @@ lazy val annosaurus = (project in file("."))
   .enablePlugins(JettyPlugin)
   .enablePlugins(AutomateHeaderPlugin)
   .enablePlugins(PackPlugin)
-//  .enablePlugins(EclipseLinkStaticWeaver)
+  // .enablePlugins(EclipseLinkStaticWeaver)
+  // .settings(staticWeaverLogLevel := 0)
   .settings(appSettings)
   .settings(
     libraryDependencies ++= Seq(

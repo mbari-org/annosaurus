@@ -19,88 +19,91 @@ package org.mbari.vars.annotation.dao.jpa
 import java.net.URL
 import javax.persistence._
 
-import com.google.gson.annotations.{ Expose, SerializedName }
-import org.mbari.vars.annotation.model.{ ImageReference, ImagedMoment }
+import com.google.gson.annotations.{Expose, SerializedName}
+import org.mbari.vars.annotation.model.{ImageReference, ImagedMoment}
 
 /**
- *
- *
- * @author Brian Schlining
- * @since 2016-06-17T13:10:00
- */
+  *
+  *
+  * @author Brian Schlining
+  * @since 2016-06-17T13:10:00
+  */
 @Entity(name = "ImageReference")
-@Table(name = "image_references", indexes = Array(
-  new Index(name = "idx_image_references__url", columnList = "url"),
-  new Index(name = "idx_image_references__imaged_moment_uuid", columnList = "imaged_moment_uuid")))
+@Table(
+  name = "image_references",
+  indexes = Array(
+    new Index(name = "idx_image_references__url", columnList = "url"),
+    new Index(
+      name = "idx_image_references__imaged_moment_uuid",
+      columnList = "imaged_moment_uuid"
+    )
+  )
+)
 @EntityListeners(value = Array(classOf[TransactionLogger]))
-@NamedQueries(Array(
-  new NamedQuery(
-    name = "ImageReference.findAll",
-    query = "SELECT r FROM ImageReference r ORDER BY r.url"),
-  new NamedQuery(
-    name = "ImageReference.findByImageName",
-    query = "SELECT r FROM ImageReference r WHERE TRIM(r.url) LIKE :name ORDER BY r.url"),
-  new NamedQuery(
-    name = "ImageReference.findByURL",
-    query = "SELECT r FROM ImageReference r WHERE r.url = :url ORDER BY r.url")))
+@NamedQueries(
+  Array(
+    new NamedQuery(
+      name = "ImageReference.findAll",
+      query = "SELECT r FROM ImageReference r ORDER BY r.url"
+    ),
+    new NamedQuery(
+      name = "ImageReference.findByImageName",
+      query =
+        "SELECT r FROM ImageReference r WHERE TRIM(r.url) LIKE :name ORDER BY r.url"
+    ),
+    new NamedQuery(
+      name = "ImageReference.findByURL",
+      query = "SELECT r FROM ImageReference r WHERE r.url = :url ORDER BY r.url"
+    )
+  )
+)
 class ImageReferenceImpl extends ImageReference with JPAPersistentObject {
 
   @Expose(serialize = true)
-  @Column(
-    name = "description",
-    length = 256,
-    nullable = true)
+  @Column(name = "description", length = 256, nullable = true)
   override var description: String = _
 
   @Expose(serialize = true)
-  @Column(
-    name = "url",
-    unique = true,
-    length = 1024,
-    nullable = false)
+  @Column(name = "url", unique = true, length = 1024, nullable = false)
   @Convert(converter = classOf[URLConverter])
   override var url: URL = _
 
   @ManyToOne(
     cascade = Array(CascadeType.PERSIST, CascadeType.DETACH),
     optional = false,
-    targetEntity = classOf[ImagedMomentImpl])
+    targetEntity = classOf[ImagedMomentImpl]
+  )
   @JoinColumn(
     name = "imaged_moment_uuid",
     nullable = false,
-    columnDefinition = "CHAR(36)")
+    columnDefinition = "CHAR(36)"
+  )
   override var imagedMoment: ImagedMoment = _
 
   @Expose(serialize = true)
   @SerializedName(value = "height_pixels")
-  @Column(
-    name = "height_pixels",
-    nullable = true)
+  @Column(name = "height_pixels", nullable = true)
   override var height: Int = _
 
   @Expose(serialize = true)
   @SerializedName(value = "width_pixels")
-  @Column(
-    name = "width_pixels",
-    nullable = true)
+  @Column(name = "width_pixels", nullable = true)
   override var width: Int = _
 
   @Expose(serialize = true)
-  @Column(
-    name = "format",
-    length = 64,
-    nullable = true)
+  @Column(name = "format", length = 64, nullable = true)
   override var format: String = _
 }
 
 object ImageReferenceImpl {
 
   def apply(
-    url: URL,
-    width: Option[Int] = None,
-    height: Option[Int] = None,
-    format: Option[String] = None,
-    description: Option[String] = None): ImageReferenceImpl = {
+      url: URL,
+      width: Option[Int] = None,
+      height: Option[Int] = None,
+      format: Option[String] = None,
+      description: Option[String] = None
+  ): ImageReferenceImpl = {
     val i = new ImageReferenceImpl()
     i.url = url
     width.foreach(i.width = _)

@@ -14,26 +14,25 @@
  * limitations under the License.
  */
 
-package org.mbari.vars.annotation.dao.jdbc
+package org.mbari.vars.annotation.model.simple
+
+import com.google.gson.annotations.Expose
 
 /**
  * @author Brian Schlining
- * @since 2019-10-28T16:39:00
+ * @since 2019-12-12T10:46:00
  */
-object ObservationSQL {
+class Count {
 
-  val countAll: String = "SELECT COUNT(*) FROM observation"
+  @Expose(serialize = true)
+  var count: Long = _
 
-  val deleteByVideoReferenceUuid: String =
-    """ DELETE FROM observations WHERE EXISTS (
-      |   SELECT
-      |     *
-      |   FROM
-      |     imaged_moments im
-      |   WHERE
-      |     im.video_reference_uuid = ? AND
-      |     im.uuid = observations.imaged_moment_uuid
-      | )
-      |""".stripMargin
+}
 
+object Count {
+  def apply(n: Long) = {
+    val c = new Count
+    c.count = n
+    c
+  }
 }

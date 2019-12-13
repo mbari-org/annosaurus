@@ -20,7 +20,7 @@ import java.util.UUID
 
 import org.mbari.vars.annotation.dao.jdbc.JdbcRepository
 import org.mbari.vars.annotation.dao.jpa.JPADAOFactory
-import org.mbari.vars.annotation.model.simple.{ConcurrentRequest, ErrorMsg, MultiRequest}
+import org.mbari.vars.annotation.model.simple.{ConcurrentRequest, Count, ErrorMsg, MultiRequest}
 import org.scalatra.BadRequest
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -39,6 +39,20 @@ class FastAnnotationV1Api(daoFactory: JPADAOFactory)
   }
 
   private[this] val repository = new JdbcRepository(daoFactory.entityManagerFactory)
+
+  get("/") {
+    val limit = params.getAs[Int]("limit").orElse(Some(5000))
+    val offset = params.getAs[Int]("offset")
+
+
+  }
+
+  get("/count") {
+    Future({
+      val count = repository.countAll()
+      toJson(Count(count))
+    })
+  }
 
   get("/videoreference/:uuid") {
     val uuid = params.getAs[UUID]("uuid").getOrElse(halt(BadRequest(
