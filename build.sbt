@@ -26,6 +26,7 @@ val slf4jVersion = "1.7.30"
 val sqlserverVersion = "7.4.1.jre11"
 val uuidgenVersion = "0.1.3"
 val vcr4jVersion = "4.0.2"
+val zeromqVersion = "0.5.1"
 
 lazy val buildSettings = Seq(
   organization := "org.mbari.vars",
@@ -132,7 +133,8 @@ lazy val annosaurus = (project in file("."))
       "org.slf4j" % "log4j-over-slf4j" % slf4jVersion,
       "scilube" %% "scilube-core" % scilubeVersion,
       //"net.sourceforge.jtds"     % "jtds"                           % jtdsVersion,
-      "org.slf4j" % "slf4j-api" % slf4jVersion
+      "org.slf4j" % "slf4j-api" % slf4jVersion,
+      "org.zeromq" % "jeromq" % zeromqVersion
     ).map(
       _.excludeAll(
         ExclusionRule("org.slf4j", "slf4j-jdk14"),

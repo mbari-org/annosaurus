@@ -31,6 +31,8 @@ case class BasicJwtConfig(issuer: String,
                     clientSecret: String,
                     signingSecret: String)
 
+case class ZeroMQConfig(port: Int, enable: Boolean)
+
 
 
 class AppConfig(config: Config) {
@@ -58,7 +60,14 @@ class AppConfig(config: Config) {
     case NonFatal(e) => None
   }
 
-//  lazy val databaseConfig: DatabaseConfig =
+  lazy val zeroMQConfig: Option[ZeroMQConfig] = try {
+    val port = config.getInt("messaging.zeromq.port")
+    val enable = config.getBoolean("messaging.zeromq.enable")
+    Some(ZeroMQConfig(port, enable))
+  }
+  catch {
+    case NonFatal(e) => None
+  }
 
 
 
