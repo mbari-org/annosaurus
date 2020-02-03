@@ -38,6 +38,7 @@ class ZeroMQPublisherSpec extends FlatSpec with Matchers with BeforeAndAfterAll 
     val port = 9997
     val mq = new ZeroMQPublisher("test", port, MessageBus.RxSubject)
 
+
     // Counts messages recieved
     @volatile
     var count = 0
@@ -62,14 +63,16 @@ class ZeroMQPublisherSpec extends FlatSpec with Matchers with BeforeAndAfterAll 
       }
     })
     listenerThread.start()
+    Thread.sleep(200) // Give the thread above time to get set up.
 
     // Publish annotations
     val annotation = new AnnotationImpl
     annotation.concept = "foo"
     annotation.observationUuid = UUID.randomUUID()
     annotation.recordedTimestamp = Instant.now()
-    MessageBus.RxSubject
-      .onNext(AnnotationMessage(annotation))
+    val thread = new Thread(() => MessageBus.RxSubject
+      .onNext(AnnotationMessage(annotation)))
+    thread.run()
     Thread.sleep(1000)
     mq.close()
     count should be (1)
@@ -103,6 +106,7 @@ class ZeroMQPublisherSpec extends FlatSpec with Matchers with BeforeAndAfterAll 
       }
     })
     listenerThread.start()
+    Thread.sleep(200) // Give the thread above time to get set up.
 
     // Publish annotations
     for (i <- 0 until 1000) {
