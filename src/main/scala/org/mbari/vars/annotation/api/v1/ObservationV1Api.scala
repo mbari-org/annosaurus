@@ -16,12 +16,14 @@
 
 package org.mbari.vars.annotation.api.v1
 
-import java.time.{ Duration, Instant }
+import java.time.{Duration, Instant}
 import java.util.UUID
 
+import io.reactivex.subjects.Subject
 import org.mbari.vars.annotation.controllers.ObservationController
+import org.mbari.vars.annotation.messaging.MessageBus
 import org.mbari.vars.annotation.model.simple.ObservationCount
-import org.scalatra.{ BadRequest, NoContent, NotFound }
+import org.scalatra.{BadRequest, NoContent, NotFound}
 
 import scala.concurrent.ExecutionContext
 import scala.collection.JavaConverters._
@@ -32,7 +34,8 @@ import scala.collection.JavaConverters._
  * @author Brian Schlining
  * @since 2016-07-04T21:56:00
  */
-class ObservationV1Api(controller: ObservationController)(implicit val executor: ExecutionContext)
+class ObservationV1Api(controller: ObservationController)
+                      (implicit val executor: ExecutionContext)
   extends V1APIStack {
 
   get("/:uuid") {

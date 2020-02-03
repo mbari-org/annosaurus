@@ -17,10 +17,13 @@
 package org.mbari.vars.annotation.messaging
 
 import io.reactivex.subjects.{PublishSubject, Subject}
-import org.mbari.vars.annotation.model.Annotation
+import org.mbari.vars.annotation.dao.jpa.AnnotationImpl
+import org.mbari.vars.annotation.model.{Annotation, Observation}
+
+import scala.util.Try
 
 
-sealed trait PublisherMessage[A] {
+sealed trait PublisherMessage[+A] {
   def content: A
 }
 
@@ -31,6 +34,19 @@ sealed trait PublisherMessage[A] {
 case class AnnotationMessage(content: Annotation)
   extends PublisherMessage[Annotation]
 
+class AnnotationPublisher(subject: Subject[Any]) {
+  def publish(annotation: Annotation): Unit = Try(subject.onNext(AnnotationMessage(annotation)))
+  def publish(annotations: Iterable[Annotation]): Unit = for {
+      a <- annotations
+    } publish(a)
+  def publish(opt: Option[Annotation]): Unit = opt match {
+    case None => // do nothing
+    case Some(a) => Try(publish(a))
+  }
+  def publish(observation: Observation): Unit = publish(AnnotationImpl(observation))
+
+}
+
 
 /**
  * This is the shared message bus. All publishers whould listen to this bus and
@@ -38,7 +54,7 @@ case class AnnotationMessage(content: Annotation)
  */
 object MessageBus {
 
-  val RxSubject: Subject[PublisherMessage[Any]] =
-    PublishSubject.create[PublisherMessage[Any]]().toSerialized
+  val RxSubject: Subject[Any] =
+    PublishSubject.create[Any]().toSerialized
 
 }

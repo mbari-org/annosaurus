@@ -21,9 +21,11 @@ import java.time.{Duration, Instant}
 import java.util.UUID
 import java.util.concurrent.Executors
 
+import io.reactivex.subjects.Subject
 import org.mbari.vars.annotation.dao.jpa.{AnnotationImpl, ImagedMomentImpl, JPADAOFactory}
 import org.mbari.vars.annotation.dao.DAO
 import org.mbari.vars.annotation.dao.jdbc.JdbcRepository
+import org.mbari.vars.annotation.messaging.{AnnotationMessage, AnnotationPublisher, MessageBus}
 import org.mbari.vars.annotation.model.simple.{ConcurrentRequest, MultiRequest}
 import org.mbari.vars.annotation.model.{Annotation, Observation}
 import org.mbari.vcr4j.time.Timecode
@@ -37,7 +39,7 @@ import scala.concurrent.{ExecutionContext, Future}
  * @author Brian Schlining
  * @since 2016-06-25T20:28:00
  */
-class AnnotationController(daoFactory: BasicDAOFactory) {
+class AnnotationController(daoFactory: BasicDAOFactory, bus: Subject[Any] = MessageBus.RxSubject) {
 
   // HACK Assumes where using JDADAPFactory!
   private[this] val repository: JdbcRepository = {
@@ -46,6 +48,7 @@ class AnnotationController(daoFactory: BasicDAOFactory) {
   }
 
   private[this] val imagedMomentController = new ImagedMomentController(daoFactory)
+  private[this] val annotationPublisher = new AnnotationPublisher(bus)
 
   // Executor to throttle bulk inserts
   //private[this] val bulkExecutionContext: ExecutionContext = ExecutionContext.fromExecutor(Executors.newFixedThreadPool(1))
@@ -169,7 +172,9 @@ class AnnotationController(daoFactory: BasicDAOFactory) {
       observationDate, timecode, elapsedTime, recordedDate, duration, group, activity)
     val f = obsDao.runTransaction(d => create(d, annotation))
     f.onComplete(_ => obsDao.close())
-    f.map(AnnotationImpl(_))
+    val rf = f.map(AnnotationImpl(_))
+    rf.foreach(annotationPublisher.publish) // publish new annotations
+    rf
   }
 
   /**
@@ -197,7 +202,9 @@ class AnnotationController(daoFactory: BasicDAOFactory) {
       })
     val future = Future.sequence(futures)
     future.onComplete(_ => obsDao.close())
-    future.map(_.flatten.toSeq)
+    val rf = future.map(_.flatten.toSeq)
+    rf.foreach(annotationPublisher.publish) // publish new annotations
+    rf
 
   }
 
@@ -244,6 +251,7 @@ class AnnotationController(daoFactory: BasicDAOFactory) {
       }
     })
 
+    annotationPublisher.publish(observation)
     observation
   }
 
@@ -277,6 +285,8 @@ class AnnotationController(daoFactory: BasicDAOFactory) {
       ff
     })
 
+    g.foreach(annotationPublisher.publish)
+
     g
   }
 
@@ -309,6 +319,7 @@ class AnnotationController(daoFactory: BasicDAOFactory) {
       val dao1 = daoFactory.newObservationDAO()
       val ff = dao1.runTransaction(d => obs.flatMap(o => d.findByUUID(o.uuid).map(AnnotationImpl(_))))
       ff.onComplete(_ => dao1.close())
+      ff.foreach(annotationPublisher.publish)
       ff
     })
     g

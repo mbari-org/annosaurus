@@ -20,7 +20,9 @@ import java.io.Closeable
 import java.time.{Duration, Instant}
 import java.util.UUID
 
+import io.reactivex.subjects.Subject
 import org.mbari.vars.annotation.dao.{NotFoundInDatastoreException, ObservationDAO}
+import org.mbari.vars.annotation.messaging.{AnnotationPublisher, MessageBus}
 import org.mbari.vars.annotation.model.Observation
 import org.mbari.vars.annotation.model.simple.ConcurrentRequest
 
@@ -32,10 +34,13 @@ import scala.concurrent.{ExecutionContext, Future}
  * @author Brian Schlining
  * @since 2016-06-25T20:33:00
  */
-class ObservationController(val daoFactory: BasicDAOFactory)
+class ObservationController(val daoFactory: BasicDAOFactory,
+                            bus: Subject[Any] = MessageBus.RxSubject)
   extends BaseController[Observation, ObservationDAO[Observation]] {
 
   type ODAO = ObservationDAO[Observation]
+
+  private[this] val annotationPublisher = new AnnotationPublisher(bus)
 
   override def newDAO(): ODAO = daoFactory.newObservationDAO()
 
@@ -54,6 +59,7 @@ class ObservationController(val daoFactory: BasicDAOFactory)
         case Some(imagedMoment) =>
           val observation = dao.newPersistentObject(concept, observer, observationDate, group, duration)
           observation.imagedMoment = imagedMoment
+          annotationPublisher.publish(observation)
           observation
       }
     }
@@ -91,6 +97,7 @@ class ObservationController(val daoFactory: BasicDAOFactory)
           newIm.addObservation(obs)
         }
 
+        annotationPublisher.publish(obs)
         obs
       })
     }
