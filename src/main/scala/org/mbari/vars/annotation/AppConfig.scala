@@ -17,6 +17,7 @@
 package org.mbari.vars.annotation
 
 import com.typesafe.config.{Config, ConfigFactory}
+import org.slf4j.LoggerFactory
 
 import scala.util.Try
 import scala.util.control.NonFatal
@@ -31,11 +32,13 @@ case class BasicJwtConfig(issuer: String,
                     clientSecret: String,
                     signingSecret: String)
 
-case class ZeroMQConfig(port: Int, enable: Boolean)
+case class ZeroMQConfig(port: Int, enable: Boolean, topic: String)
 
 
 
 class AppConfig(config: Config) {
+
+  private[this] val log = LoggerFactory.getLogger(getClass)
 
   lazy val httpConfig: HttpConfig = {
     val port = config.getInt("http.port")
@@ -63,10 +66,13 @@ class AppConfig(config: Config) {
   lazy val zeroMQConfig: Option[ZeroMQConfig] = try {
     val port = config.getInt("messaging.zeromq.port")
     val enable = config.getBoolean("messaging.zeromq.enable")
-    Some(ZeroMQConfig(port, enable))
+    val topic = config.getString("messaging.zeromq.topic")
+    Some(ZeroMQConfig(port, enable, topic))
   }
   catch {
-    case NonFatal(e) => None
+    case NonFatal(e) =>
+      log.warn("Failed to load ZeroMQ configuration", e)
+      None
   }
 
 

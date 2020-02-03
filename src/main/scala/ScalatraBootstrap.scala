@@ -16,11 +16,14 @@
 
 import java.util.concurrent.Executors
 
+import com.typesafe.config.ConfigFactory
 import javax.servlet.ServletContext
+import org.mbari.vars.annotation.{AppConfig, Constants}
 import org.mbari.vars.annotation.api.v1._
 import org.mbari.vars.annotation.api.v2._
 import org.mbari.vars.annotation.controllers._
 import org.mbari.vars.annotation.dao.jpa.JPADAOFactory
+import org.mbari.vars.annotation.messaging.zeromq.ZeroMQPublisher
 import org.scalatra.LifeCycle
 import org.slf4j.LoggerFactory
 

@@ -21,9 +21,10 @@ import java.time.Duration
 
 import com.fatboyindustrial.gsonjavatime.Converters
 import com.google.gson.reflect.TypeToken
-import com.google.gson.{ FieldNamingPolicy, Gson, GsonBuilder }
+import com.google.gson.{FieldNamingPolicy, Gson, GsonBuilder}
+import com.typesafe.config.ConfigFactory
 import org.mbari.vars.annotation.gson._
-import org.mbari.vars.annotation.model.{ Association, ImageReference }
+import org.mbari.vars.annotation.model.{Association, ImageReference}
 import org.mbari.vcr4j.time.Timecode
 
 /**
@@ -33,6 +34,8 @@ import org.mbari.vcr4j.time.Timecode
  * @since 2016-07-11T15:53:00
  */
 object Constants {
+
+  val AppConfig: AppConfig = new AppConfig(ConfigFactory.load())
 
   /**
    * Gson parser configured for the VAM's use cases.

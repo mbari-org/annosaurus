@@ -17,28 +17,26 @@
 class JettyMain {
 
 }
-import com.typesafe.config.ConfigFactory
 import javax.servlet.DispatcherType
 import net.bull.javamelody.{MonitoringFilter, Parameter, ReportServlet, SessionListener}
 import org.eclipse.jetty.server._
 import org.eclipse.jetty.servlet.FilterHolder
 import org.eclipse.jetty.webapp.WebAppContext
+import org.mbari.vars.annotation.Constants
+import org.mbari.vars.annotation.messaging.zeromq.ZeroMQPublisher
 import org.scalatra.servlet.ScalatraListener
 
 object JettyMain {
 
-  object conf {
-    private[this] val config = ConfigFactory.load()
-    val port = config.getInt("http.port")
-    val stopTimeout = config.getInt("http.stop.timeout")
-    val connectorIdleTimeout = config.getInt("http.connector.idle.timeout")
-    val webapp = config.getString("http.webapp")
-    val contextPath = config.getString("http.context.path")
-  }
+  // hold on to messaging objects so they don't get GC'd
+  private[this] val zmq = ZeroMQPublisher.autowire(Constants.AppConfig.zeroMQConfig)
 
   def main(args: Array[String]) = {
     System.setProperty("user.timezone", "UTC")
     val server: Server = new Server
+
+    val conf = Constants.AppConfig.httpConfig
+
     println("Starting Annosaurus on " + conf.port)
 
     server.setStopTimeout(conf.stopTimeout)

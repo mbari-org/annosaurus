@@ -21,7 +21,7 @@ import java.util.concurrent.{LinkedBlockingQueue, TimeUnit}
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.Subject
-import org.mbari.vars.annotation.Constants
+import org.mbari.vars.annotation.{Constants, ZeroMQConfig}
 import org.mbari.vars.annotation.messaging.{AnnotationMessage, MessageBus}
 import org.slf4j.LoggerFactory
 import org.zeromq.{SocketType, ZContext}
@@ -77,5 +77,27 @@ class ZeroMQPublisher(val topic: String,
     ok = false
   }
 
+}
+
+object ZeroMQPublisher {
+
+  private[this] val log = LoggerFactory.getLogger(getClass)
+
+  /**
+   * @param opt The ZeroMQ config infor. The Config parser may not contain info
+   *            for ZeroMQ. If it doesn't it returns None.
+   * @param subject The message bus for zeromq to listen to
+   * @return An option with a wired and active ZeroMQ publisher that will
+   *         publish new or updated annotations as they happen.
+   */
+  def autowire(opt: Option[ZeroMQConfig],
+               subject: Subject[Any] = MessageBus.RxSubject): Option[ZeroMQPublisher] =
+    for {
+      conf <- opt
+      if conf.enable
+    } yield {
+      log.debug(s"Starting ZeroMQ PUB using port ${conf.port} and topic '${conf.topic}''")
+      new ZeroMQPublisher(conf.topic, conf.port, subject)
+    }
 
 }
