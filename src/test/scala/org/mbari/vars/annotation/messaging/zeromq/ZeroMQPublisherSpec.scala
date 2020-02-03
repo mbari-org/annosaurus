@@ -1,8 +1,25 @@
+/*
+ * Copyright 2017 Monterey Bay Aquarium Research Institute
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.mbari.vars.annotation.messaging.zeromq
 
 import java.time.Instant
 import java.util.UUID
 
+import io.reactivex.schedulers.Schedulers
 import org.mbari.vars.annotation.dao.jpa.AnnotationImpl
 import org.mbari.vars.annotation.messaging.{AnnotationMessage, MessageBus}
 import org.scalatest.{BeforeAndAfterAll, FlatSpec, Matchers}
@@ -40,6 +57,7 @@ class ZeroMQPublisherSpec extends FlatSpec with Matchers with BeforeAndAfterAll 
           val contents = subscriber.recvStr()
           println(s"$address : $contents")
           count = count + 1
+          ok = false
         }
       }
     })
@@ -50,9 +68,9 @@ class ZeroMQPublisherSpec extends FlatSpec with Matchers with BeforeAndAfterAll 
     annotation.concept = "foo"
     annotation.observationUuid = UUID.randomUUID()
     annotation.recordedTimestamp = Instant.now()
-    MessageBus.RxSubject.onNext(AnnotationMessage(annotation))
-    Thread.sleep(300)
-    ok = false
+    MessageBus.RxSubject
+      .onNext(AnnotationMessage(annotation))
+    Thread.sleep(1000)
     mq.close()
     count should be (1)
 
@@ -79,7 +97,7 @@ class ZeroMQPublisherSpec extends FlatSpec with Matchers with BeforeAndAfterAll 
         while(ok) {
           val address = subscriber.recvStr()
           val contents = subscriber.recvStr()
-          println(s"$address : $contents")
+//          println(s"$address : $contents")
           count = count + 1
         }
       }
@@ -97,7 +115,7 @@ class ZeroMQPublisherSpec extends FlatSpec with Matchers with BeforeAndAfterAll 
       thread.start()
     }
 
-    Thread.sleep(1000) // Give messages a chance to propagate
+    Thread.sleep(2000) // Give messages a chance to propagate
     ok = false
     mq.close()
     count should be (1000)

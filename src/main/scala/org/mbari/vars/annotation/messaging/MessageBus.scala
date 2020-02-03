@@ -23,6 +23,14 @@ import org.mbari.vars.annotation.model.{Annotation, Observation}
 import scala.util.Try
 
 
+/*
+    MessageBus.RxSubject: Subject[Any]
+              ^
+              |
+     AnnotationPublisher
+           .publish(msg)
+ */
+
 sealed trait PublisherMessage[+A] {
   def content: A
 }
@@ -34,6 +42,11 @@ sealed trait PublisherMessage[+A] {
 case class AnnotationMessage(content: Annotation)
   extends PublisherMessage[Annotation]
 
+/**
+ * Decorator for an reactive Subject that publishes AnnotationMessages for
+ * common use cases.
+ * @param subject
+ */
 class AnnotationPublisher(subject: Subject[Any]) {
   def publish(annotation: Annotation): Unit = Try(subject.onNext(AnnotationMessage(annotation)))
   def publish(annotations: Iterable[Annotation]): Unit = for {
@@ -44,7 +57,6 @@ class AnnotationPublisher(subject: Subject[Any]) {
     case Some(a) => Try(publish(a))
   }
   def publish(observation: Observation): Unit = publish(AnnotationImpl(observation))
-
 }
 
 
