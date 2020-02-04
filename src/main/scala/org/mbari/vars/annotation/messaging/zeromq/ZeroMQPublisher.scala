@@ -47,6 +47,8 @@ class ZeroMQPublisher(val topic: String,
     .subscribe(m => queue.offer(m))
   private[this] val log = LoggerFactory.getLogger(getClass)
 
+
+
   @volatile
   var ok = true
   val thread = new Thread(new Runnable {
@@ -96,9 +98,17 @@ object ZeroMQPublisher {
     for {
       conf <- opt
       if conf.enable
-    } yield {
-      log.debug(s"Starting ZeroMQ PUB using port ${conf.port} and topic '${conf.topic}''")
-      new ZeroMQPublisher(conf.topic, conf.port, subject)
-    }
+    } yield new ZeroMQPublisher(conf.topic, conf.port, subject)
+
+  /**
+   * Logs info about the ZMQ configuration
+   * @param opt
+   */
+  def log(opt: Option[ZeroMQPublisher]): Unit = opt match {
+    case None => log.info("ZeroMQ is not enabled/configured")
+    case Some(z) =>
+      log.info(s"ZeroMQ is publishing annotations on port ${z.port} using topic '${z.topic}''")
+  }
+
 
 }

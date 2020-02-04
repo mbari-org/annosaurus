@@ -39,12 +39,7 @@ object JettyMain {
     val conf = Constants.AppConfig.httpConfig
 
     println("Starting Annosaurus on " + conf.port)
-    val log = LoggerFactory.getLogger(JettyMain.getClass)
-    zmq match {
-      case None => log.info("ZeroMQ is not enabled/configured")
-      case Some(z) =>
-        log.info(s"ZeroMQ is publishing on port ${z.port} using topic '${z.topic}''")
-    }
+    ZeroMQPublisher.log(zmq)
 
     server.setStopTimeout(conf.stopTimeout)
     //server setDumpAfterStart true

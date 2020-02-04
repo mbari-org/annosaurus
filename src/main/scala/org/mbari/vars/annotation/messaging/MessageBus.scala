@@ -41,7 +41,20 @@ sealed trait PublisherMessage[+A] {
  * @param content
  */
 case class AnnotationMessage(content: Annotation)
-  extends PublisherMessage[Annotation]
+  extends PublisherMessage[Annotation] {
+
+  override def hashCode(): Int = this.content.observationUuid.hashCode() +
+    this.content.observationTimestamp.hashCode() * 3
+
+  override def equals(obj: Any): Boolean =
+    obj match {
+      case that: AnnotationMessage =>
+        this.content.observationUuid == that.content.observationUuid &&
+          this.content.observationTimestamp == that.content.observationTimestamp
+      case _ => false
+    }
+
+}
 
 /**
  * Decorator for an reactive Subject that publishes AnnotationMessages for

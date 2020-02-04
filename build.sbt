@@ -30,7 +30,7 @@ val zeromqVersion = "0.5.2"
 
 lazy val buildSettings = Seq(
   organization := "org.mbari.vars",
-  version := "0.6.0",
+  version := "0.6.1",
   scalaVersion in ThisBuild := "2.12.10",
   crossScalaVersions := Seq("2.12.10"),
   organizationName := "Monterey Bay Aquarium Research Institute",
