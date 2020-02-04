@@ -37,6 +37,7 @@ object Constants {
 
   val AppConfig: AppConfig = new AppConfig(ConfigFactory.load())
 
+
   /**
    * Gson parser configured for the VAM's use cases.
    */
@@ -70,29 +71,6 @@ object Constants {
   }
 
   val GSON_FOR_ANNOTATION: Gson = GSON
-  //  {
-  //    val gsonBuilder = new GsonBuilder()
-  //      .setPrettyPrinting()
-  //      .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
-  //      .setDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'")
-  //    Convertders.registerInstant(gsonBuilder)
-  //
-  //    val durationType: Type = new TypeToken[Duration]() {}.getType
-  //    gsonBuilder.registerTypeAdapter(durationType, new DurationConverter)
-  //
-  //    val timecodeType: Type = new TypeToken[Timecode]() {}.getType
-  //    gsonBuilder.registerTypeAdapter(timecodeType, new TimecodeConverter)
-  //
-  //    val optionType: Type = new TypeToken[Option[_]]() {}.getType
-  //    gsonBuilder.registerTypeAdapter(optionType, new OptionConverter)
-  //
-  //    val associationType: Type = new TypeToken[Association]() {}.getType
-  //    gsonBuilder.registerTypeAdapter(associationType, new AssociationCreator)
-  //
-  //    val imageReferenceType: Type = new TypeToken[ImageReference]() {}.getType
-  //    gsonBuilder.registerTypeAdapter(imageReferenceType, new ImageReferenceCreator)
-  //
-  //    gsonBuilder.create()
-  //  }
+
 
 }

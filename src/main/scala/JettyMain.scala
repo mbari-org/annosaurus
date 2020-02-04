@@ -25,11 +25,12 @@ import org.eclipse.jetty.webapp.WebAppContext
 import org.mbari.vars.annotation.Constants
 import org.mbari.vars.annotation.messaging.zeromq.ZeroMQPublisher
 import org.scalatra.servlet.ScalatraListener
+import org.slf4j.LoggerFactory
 
 object JettyMain {
 
   // hold on to messaging objects so they don't get GC'd
-  private[this] val zmq = ZeroMQPublisher.autowire(Constants.AppConfig.zeroMQConfig)
+  private[this] var zmq = ZeroMQPublisher.autowire(Constants.AppConfig.zeroMQConfig)
 
   def main(args: Array[String]) = {
     System.setProperty("user.timezone", "UTC")
@@ -38,6 +39,12 @@ object JettyMain {
     val conf = Constants.AppConfig.httpConfig
 
     println("Starting Annosaurus on " + conf.port)
+    val log = LoggerFactory.getLogger(JettyMain.getClass)
+    zmq match {
+      case None => log.info("ZeroMQ is not enabled/configured")
+      case Some(z) =>
+        log.info(s"ZeroMQ is publishing on port ${z.port} using topic '${z.topic}''")
+    }
 
     server.setStopTimeout(conf.stopTimeout)
     //server setDumpAfterStart true

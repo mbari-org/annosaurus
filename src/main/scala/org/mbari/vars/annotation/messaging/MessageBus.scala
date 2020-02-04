@@ -19,6 +19,7 @@ package org.mbari.vars.annotation.messaging
 import io.reactivex.subjects.{PublishSubject, Subject}
 import org.mbari.vars.annotation.dao.jpa.AnnotationImpl
 import org.mbari.vars.annotation.model.{Annotation, Observation}
+import org.slf4j.LoggerFactory
 
 import scala.util.Try
 
@@ -66,7 +67,13 @@ class AnnotationPublisher(subject: Subject[Any]) {
  */
 object MessageBus {
 
+  private lazy val log = LoggerFactory.getLogger(getClass)
+
   val RxSubject: Subject[Any] =
     PublishSubject.create[Any]().toSerialized
+
+  if (log.isDebugEnabled()) {
+    RxSubject.subscribe(m => log.debug(m.toString))
+  }
 
 }
