@@ -43,6 +43,7 @@ class ZeroMQPublisher(val topic: String,
   private[this] val disposable: Disposable = MessageBus.RxSubject
     .ofType(classOf[AnnotationMessage])
     .observeOn(Schedulers.io())
+    .distinct()
     .subscribe(m => queue.offer(m))
   private[this] val log = LoggerFactory.getLogger(getClass)
 
