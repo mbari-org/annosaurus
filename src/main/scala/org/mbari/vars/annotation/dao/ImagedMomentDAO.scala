@@ -110,7 +110,7 @@ trait ImagedMomentDAO[T <: ImagedMoment] extends DAO[T] {
    * @param timecode The timecode index
    * @param elapsedTime The elapsedTime index (This is the index of runtime into the video)
    * @param recordedDate The recordedDate index
-   * @return
+   * @return None if no match is found. Some if a match exists
    */
   def findByVideoReferenceUUIDAndIndex(
     uuid: UUID,
@@ -118,13 +118,17 @@ trait ImagedMomentDAO[T <: ImagedMoment] extends DAO[T] {
     elapsedTime: Option[Duration] = None,
     recordedDate: Option[Instant] = None): Option[T] = {
 
-    // timecode has subsecond resolution. Often recordedDate is stored only
-    // to second resolution.If timecode is defined we will match only on that.
-    // Otherwise, this method ends up finding a matching recordedDate that may
-    // have another, different timecode associated with it.
-    val im0 = timecode.flatMap(findByVideoReferenceUUIDAndTimecode(uuid, _))
-    val im1 = if (im0.isEmpty) elapsedTime.flatMap(findByVideoReferenceUUIDAndElapsedTime(uuid, _)) else im0
-    if (im1.isEmpty) recordedDate.flatMap(findByVideoReferenceUUIDAndRecordedDate(uuid, _)) else im1
+    // If timecode is supplied and no existing match is found return None.
+    timecode match {
+      case Some(t) => findByVideoReferenceUUIDAndTimecode(uuid, t)
+      case None => None
+        val im0 = elapsedTime.flatMap(findByVideoReferenceUUIDAndElapsedTime(uuid, _))
+        if (im0.isEmpty) recordedDate.flatMap(findByVideoReferenceUUIDAndRecordedDate(uuid, _)) else im0
+    }
+      // This code has bug when resolving timecodes. See M3-15
+//    val im0 = timecode.flatMap(findByVideoReferenceUUIDAndTimecode(uuid, _))
+//    val im1 = if (im0.isEmpty) elapsedTime.flatMap(findByVideoReferenceUUIDAndElapsedTime(uuid, _)) else im0
+//    if (im1.isEmpty) recordedDate.flatMap(findByVideoReferenceUUIDAndRecordedDate(uuid, _)) else im1
 
   }
 
