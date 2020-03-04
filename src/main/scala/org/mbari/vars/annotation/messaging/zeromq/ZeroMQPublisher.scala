@@ -22,11 +22,12 @@ import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.Subject
 import org.mbari.vars.annotation.{Constants, ZeroMQConfig}
-import org.mbari.vars.annotation.messaging.{AnnotationMessage, MessageBus}
+import org.mbari.vars.annotation.messaging.{AnnotationMessage, MessageBus, GenericMessage}
 import org.slf4j.LoggerFactory
 import org.zeromq.{SocketType, ZContext}
 
 import scala.util.control.NonFatal
+import org.mbari.vars.annotation.messaging.JsonEncoders._
 
 
 
@@ -39,15 +40,13 @@ class ZeroMQPublisher(val topic: String,
                       val subject: Subject[_]) {
 
   private[this] val context = new ZContext()
-  private[this] val queue = new LinkedBlockingQueue[AnnotationMessage]()
+  private[this] val queue = new LinkedBlockingQueue[GenericMessage[_]]()
   private[this] val disposable: Disposable = MessageBus.RxSubject
-    .ofType(classOf[AnnotationMessage])
+    .ofType(classOf[GenericMessage[_]])
     .observeOn(Schedulers.io())
     .distinct()
     .subscribe(m => queue.offer(m))
   private[this] val log = LoggerFactory.getLogger(getClass)
-
-
 
   @volatile
   var ok = true
@@ -59,7 +58,7 @@ class ZeroMQPublisher(val topic: String,
       try {
         val msg = queue.poll(3600L, TimeUnit.SECONDS)
         if (msg != null) {
-          val json = Constants.GSON.toJson(msg.content)
+          val json = msg.toJson
           publisher.sendMore(topic)
           publisher.send(json)
         }

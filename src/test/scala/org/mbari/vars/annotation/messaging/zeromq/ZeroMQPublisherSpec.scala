@@ -20,8 +20,8 @@ import java.time.Instant
 import java.util.UUID
 
 import io.reactivex.schedulers.Schedulers
-import org.mbari.vars.annotation.dao.jpa.AnnotationImpl
-import org.mbari.vars.annotation.messaging.{AnnotationMessage, MessageBus}
+import org.mbari.vars.annotation.dao.jpa.{AnnotationImpl, AssociationImpl, ObservationImpl}
+import org.mbari.vars.annotation.messaging.{AnnotationMessage, AssociationMessage, MessageBus}
 import org.scalatest.{BeforeAndAfterAll, FlatSpec, Matchers}
 import org.zeromq.{SocketType, ZContext}
 import zmq.ZMQ
@@ -34,7 +34,7 @@ class ZeroMQPublisherSpec extends FlatSpec with Matchers with BeforeAndAfterAll 
 
   val context = new ZContext()
 
-  "ZeroMQPublisher" should "publish" in {
+  "ZeroMQPublisher" should "publish annotations" in {
     val port = 9997
     val mq = new ZeroMQPublisher("test", port, MessageBus.RxSubject)
 
@@ -69,6 +69,7 @@ class ZeroMQPublisherSpec extends FlatSpec with Matchers with BeforeAndAfterAll 
     val annotation = new AnnotationImpl
     annotation.concept = "foo"
     annotation.observationUuid = UUID.randomUUID()
+    annotation.observationTimestamp = Instant.now()
     annotation.recordedTimestamp = Instant.now()
     val thread = new Thread(() => MessageBus.RxSubject
       .onNext(AnnotationMessage(annotation)))
@@ -79,7 +80,7 @@ class ZeroMQPublisherSpec extends FlatSpec with Matchers with BeforeAndAfterAll 
 
   }
 
-  it should "publish many from multiple threads" in {
+  it should "publish many annotations from multiple threads" in {
     val port = 9997
     val mq = new ZeroMQPublisher("test", port, MessageBus.RxSubject)
 
@@ -114,6 +115,7 @@ class ZeroMQPublisherSpec extends FlatSpec with Matchers with BeforeAndAfterAll 
       annotation.concept = "bar" + i
       annotation.observationUuid = UUID.randomUUID()
       annotation.recordedTimestamp = Instant.now()
+      annotation.observationTimestamp = Instant.now()
       val thread = new Thread(() => MessageBus.RxSubject.onNext(AnnotationMessage(annotation)))
       thread.setDaemon(true)
       thread.start()
@@ -123,6 +125,52 @@ class ZeroMQPublisherSpec extends FlatSpec with Matchers with BeforeAndAfterAll 
     ok = false
     mq.close()
     count should be (1000)
+  }
+
+  it should "publish associations" in {
+    val port = 9997
+    val mq = new ZeroMQPublisher("test", port, MessageBus.RxSubject)
+
+
+    // Counts messages recieved
+    @volatile
+    var count = 0
+
+    @volatile
+    var ok = true
+
+    val listenerThread = new Thread(new Runnable {
+
+      val subscriber = context.createSocket(SocketType.SUB)
+      subscriber.connect(s"tcp://localhost:$port")
+      subscriber.subscribe(mq.topic.getBytes(ZMQ.CHARSET))
+
+      override def run(): Unit = {
+        while(ok) {
+          val address = subscriber.recvStr()
+          val contents = subscriber.recvStr()
+          println(s"$address : $contents")
+          count = count + 1
+          ok = false
+        }
+      }
+    })
+    listenerThread.start()
+    Thread.sleep(200) // Give the thread above time to get set up.
+
+    // Publish association
+    val observation = ObservationImpl("foo")
+    observation.uuid = UUID.randomUUID()
+    val association = AssociationImpl("test", "self", "foo", "text/plain")
+    association.uuid = UUID.randomUUID()
+    observation.addAssociation(association)
+    val thread = new Thread(() => MessageBus.RxSubject
+      .onNext(AssociationMessage(association)))
+    thread.run()
+    Thread.sleep(1000)
+    mq.close()
+    count should be (1)
+
   }
 
 }

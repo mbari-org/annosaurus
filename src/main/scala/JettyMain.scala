@@ -30,7 +30,7 @@ import org.slf4j.LoggerFactory
 object JettyMain {
 
   // hold on to messaging objects so they don't get GC'd
-  private[this] var zmq = ZeroMQPublisher.autowire(Constants.AppConfig.zeroMQConfig)
+  private[this] val zmq = ZeroMQPublisher.autowire(Constants.AppConfig.zeroMQConfig)
 
   def main(args: Array[String]) = {
     System.setProperty("user.timezone", "UTC")

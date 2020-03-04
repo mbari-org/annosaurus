@@ -18,7 +18,9 @@ package org.mbari.vars.annotation.controllers
 
 import java.util.UUID
 
+import io.reactivex.subjects.Subject
 import org.mbari.vars.annotation.dao.{AssociationDAO, NotFoundInDatastoreException}
+import org.mbari.vars.annotation.messaging.{AssociationPublisher, MessageBus}
 import org.mbari.vars.annotation.model.Association
 import org.mbari.vars.annotation.model.simple.{ConceptAssociation, ConceptAssociationRequest, ConceptAssociationResponse}
 
@@ -30,10 +32,13 @@ import scala.concurrent.{ExecutionContext, Future}
  * @author Brian Schlining
  * @since 2016-07-09T15:51:00
  */
-class AssociationController(val daoFactory: BasicDAOFactory)
+class AssociationController(val daoFactory: BasicDAOFactory,
+                            bus: Subject[Any] = MessageBus.RxSubject)
   extends BaseController[Association, AssociationDAO[Association]] {
 
   type ADAO = AssociationDAO[Association]
+
+  private[this] val associationPublisher = new AssociationPublisher(bus)
 
   override def newDAO(): AssociationDAO[Association] = daoFactory.newAssociationDAO()
 
@@ -50,6 +55,7 @@ class AssociationController(val daoFactory: BasicDAOFactory)
         case Some(observation) =>
           val association = dao.newPersistentObject(linkName, Some(toConcept), Some(linkValue), Some(mimeType))
           observation.addAssociation(association)
+          associationPublisher.publish(association)
           association
       }
     }
@@ -79,7 +85,7 @@ class AssociationController(val daoFactory: BasicDAOFactory)
           association.observation.removeAssociation(association)
           obs.addAssociation(association)
         }
-
+        associationPublisher.publish(association)
         association
       })
     }
