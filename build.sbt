@@ -8,6 +8,7 @@ val gsonJavatimeVersion = "1.1.1"
 val gsonVersion = "2.8.6"
 val h2Version = "1.4.200"
 val hikariVersion = "3.4.2"
+val jansiVersion = "1.18"
 val javamelodyVersion = "1.81.0"
 val jettyVersion = "9.4.26.v20200117"
 val jsonVersion = "3.6.7"
@@ -121,6 +122,7 @@ lazy val annosaurus = (project in file("."))
       "org.eclipse.jetty" % "jetty-webapp" % jettyVersion % "compile;test",
       "org.eclipse.persistence" % "org.eclipse.persistence.extension" % eclipselinkVersion,
       "org.eclipse.persistence" % "org.eclipse.persistence.jpa" % eclipselinkVersion,
+      "org.fusesource.jansi" % "jansi" % jansiVersion % "runtime",
       "org.json4s" %% "json4s-jackson" % jsonVersion,
       "org.mbari.uuid" % "uuid-gen" % uuidgenVersion,
       "org.mbari.vcr4j" % "vcr4j-core" % vcr4jVersion,

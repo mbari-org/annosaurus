@@ -104,6 +104,7 @@ class AnnotationV1Api(controller: AnnotationController)(implicit val executor: E
         halt(BadRequest(toJson(ErrorMsg(500, "Posts to /multi/count only accept a JSON body (i.e. Content-Type: application/json)"))))
     }
   }
+  
   post("/multi") {
     request.getHeader("Content-Type") match {
       case "application/json" =>
