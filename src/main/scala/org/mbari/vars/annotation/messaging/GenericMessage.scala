@@ -59,12 +59,12 @@ case class AnnotationMessage(content: Annotation)
 
 case class AssociationMessage(content: Association)
   extends GenericMessage[Association] {
-  override def hashCode(): Int = this.content.uuid.hashCode()
-
-  override def equals(obj: Any): Boolean = obj match {
-    case that: AssociationMessage => this.content.uuid == that.content.uuid
-    case _ => false
-  }
+//  override def hashCode(): Int = this.content.uuid.hashCode()
+//
+//  override def equals(obj: Any): Boolean = obj match {
+//    case that: AssociationMessage => this.content.uuid == that.content.uuid
+//    case _ => false
+//  }
 
   override def toJson: String = {
       val ea = ExtendedAssociation(content)
