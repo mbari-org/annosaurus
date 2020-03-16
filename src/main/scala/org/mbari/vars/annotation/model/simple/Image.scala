@@ -17,16 +17,16 @@
 package org.mbari.vars.annotation.model.simple
 
 import java.net.URL
-import java.time.{ Duration, Instant }
+import java.time.{Duration, Instant}
 import java.util.UUID
 
-import com.google.gson.annotations.{ Expose, SerializedName }
+import com.google.gson.annotations.{Expose, SerializedName}
 import org.mbari.vars.annotation.model.ImageReference
 import org.mbari.vcr4j.time.Timecode
 
 /**
- * Created by brian on 7/14/16.
- */
+  * Created by brian on 7/14/16.
+  */
 class Image {
 
   @Expose(serialize = true)

@@ -20,12 +20,12 @@ import java.time.Instant
 import java.util.UUID
 
 import com.google.gson.annotations.Expose
-import org.mbari.vars.annotation.model.{ CachedAncillaryDatum, ImagedMoment }
+import org.mbari.vars.annotation.model.{CachedAncillaryDatum, ImagedMoment}
 
 /**
- * @author Brian Schlining
- * @since 2017-11-09T12:55:00
- */
+  * @author Brian Schlining
+  * @since 2017-11-09T12:55:00
+  */
 class CachedAncillaryDatumBean extends CachedAncillaryDatum {
 
   @Expose(serialize = true)
@@ -50,9 +50,10 @@ class CachedAncillaryDatumBean extends CachedAncillaryDatum {
 
   @Expose(serialize = true)
   override var altitude: Option[Double] = None
+
   /**
-   * Coordinate Reference System for latitude and longitude
-   */
+    * Coordinate Reference System for latitude and longitude
+    */
   @Expose(serialize = true)
   override var crs: String = _
 

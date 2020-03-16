@@ -48,8 +48,7 @@ import org.mbari.vars.annotation.model.{ImageReference, ImagedMoment}
     ),
     new NamedQuery(
       name = "ImageReference.findByImageName",
-      query =
-        "SELECT r FROM ImageReference r WHERE TRIM(r.url) LIKE :name ORDER BY r.url"
+      query = "SELECT r FROM ImageReference r WHERE TRIM(r.url) LIKE :name ORDER BY r.url"
     ),
     new NamedQuery(
       name = "ImageReference.findByURL",

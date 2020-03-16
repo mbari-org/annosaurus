@@ -21,9 +21,9 @@ import java.util.UUID
 import com.google.gson.annotations.Expose
 
 /**
- * @author Brian Schlining
- * @since 2018-07-19T13:57:00
- */
+  * @author Brian Schlining
+  * @since 2018-07-19T13:57:00
+  */
 class ObservationCount {
 
   @Expose(serialize = true)

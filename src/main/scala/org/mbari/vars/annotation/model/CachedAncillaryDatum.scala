@@ -22,11 +22,11 @@ import java.util.UUID
 import org.mbari.vars.annotation.PersistentObject
 
 /**
- *
- *
- * @author Brian Schlining
- * @since 2016-06-15T16:55:00
- */
+  *
+  *
+  * @author Brian Schlining
+  * @since 2016-06-15T16:55:00
+  */
 trait CachedAncillaryDatum extends PersistentObject {
 
   var uuid: UUID
@@ -39,8 +39,8 @@ trait CachedAncillaryDatum extends PersistentObject {
   var altitude: Option[Double]
 
   /**
-   * Coordinate Reference System for latitude and longitude
-   */
+    * Coordinate Reference System for latitude and longitude
+    */
   var crs: String
 
   // --- CTDO

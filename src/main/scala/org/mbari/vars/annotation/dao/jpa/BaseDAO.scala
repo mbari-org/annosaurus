@@ -23,18 +23,19 @@ import org.mbari.vars.annotation.PersistentObject
 import org.mbari.vars.annotation.dao.DAO
 import org.slf4j.LoggerFactory
 
-import scala.collection.JavaConverters._
-import scala.concurrent.{ ExecutionContext, Future }
+import scala.jdk.CollectionConverters._
+import scala.concurrent.{ExecutionContext, Future}
 import scala.reflect.ClassTag
 import scala.reflect.classTag
 
 /**
- *
- *
- * @author Brian Schlining
- * @since 2016-05-06T11:18:00
- */
-abstract class BaseDAO[B <: PersistentObject: ClassTag](val entityManager: EntityManager) extends DAO[B] {
+  *
+  *
+  * @author Brian Schlining
+  * @since 2016-05-06T11:18:00
+  */
+abstract class BaseDAO[B <: PersistentObject: ClassTag](val entityManager: EntityManager)
+    extends DAO[B] {
   private[this] val log = LoggerFactory.getLogger(getClass)
 
   if (log.isInfoEnabled) {
@@ -48,10 +49,11 @@ abstract class BaseDAO[B <: PersistentObject: ClassTag](val entityManager: Entit
     Option(entityManager.find(obj.getClass, obj.primaryKey))
 
   def findByNamedQuery(
-    name: String,
-    namedParameters: Map[String, Any] = Map.empty,
-    limit: Option[Int] = None,
-    offset: Option[Int] = None): List[B] = {
+      name: String,
+      namedParameters: Map[String, Any] = Map.empty,
+      limit: Option[Int] = None,
+      offset: Option[Int] = None
+  ): List[B] = {
     if (log.isDebugEnabled()) {
       log.debug(s"JPA Query => $name using $namedParameters")
     }
@@ -59,32 +61,35 @@ abstract class BaseDAO[B <: PersistentObject: ClassTag](val entityManager: Entit
     limit.foreach(query.setMaxResults)
     offset.foreach(query.setFirstResult)
     namedParameters.foreach({ case (a, b) => query.setParameter(a, b) })
-    query.getResultList
+    query
+      .getResultList
       .asScala
       .toList
       .map(_.asInstanceOf[B])
   }
 
   /**
-   * Fetches the results as a stream. This better allows for fetching large
-   * sets and returning them as chunked responses.
-   * @param name
-   * @param namedParameters
-   * @param limit
-   * @param offset
-   * @return
-   */
+    * Fetches the results as a stream. This better allows for fetching large
+    * sets and returning them as chunked responses.
+    * @param name
+    * @param namedParameters
+    * @param limit
+    * @param offset
+    * @return
+    */
   def streamByNamedQuery(
-    name: String,
-    namedParameters: Map[String, Any] = Map.empty,
-    limit: Option[Int] = None,
-    offset: Option[Int] = None): java.util.stream.Stream[B] = {
+      name: String,
+      namedParameters: Map[String, Any] = Map.empty,
+      limit: Option[Int] = None,
+      offset: Option[Int] = None
+  ): java.util.stream.Stream[B] = {
 
     val query = entityManager.createNamedQuery(name)
     limit.foreach(query.setMaxResults)
     offset.foreach(query.setFirstResult)
     namedParameters.foreach({ case (a, b) => query.setParameter(a, b) })
-    query.getResultStream
+    query
+      .getResultStream
       .map(b => b.asInstanceOf[B])
 
   }
@@ -96,12 +101,12 @@ abstract class BaseDAO[B <: PersistentObject: ClassTag](val entityManager: Entit
   }
 
   /**
-   * Lookup entity by primary key. A DAO will only return entities of their type.
-   * Also, note that I had to use a little scala reflection magic here
-   *
-   * @param primaryKey
-   * @return
-   */
+    * Lookup entity by primary key. A DAO will only return entities of their type.
+    * Also, note that I had to use a little scala reflection magic here
+    *
+    * @param primaryKey
+    * @return
+    */
   override def findByUUID(primaryKey: UUID): Option[B] =
     Option(entityManager.find(classTag[B].runtimeClass, primaryKey).asInstanceOf[B])
 

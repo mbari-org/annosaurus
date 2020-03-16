@@ -18,32 +18,33 @@ package org.mbari.vars.annotation.dao.jpa
 
 import java.sql.Timestamp
 import java.time.{Duration, Instant}
-import java.util.{UUID, stream}
+import java.util.{stream, UUID}
 
 import javax.persistence.EntityManager
 import org.mbari.vars.annotation.dao.ObservationDAO
 import org.mbari.vars.annotation.model.simple.{ConcurrentRequest, MultiRequest}
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 /**
- *
- *
- * @author Brian Schlining
- * @since 2016-06-17T17:10:00
- */
+  *
+  *
+  * @author Brian Schlining
+  * @since 2016-06-17T17:10:00
+  */
 class ObservationDAOImpl(entityManager: EntityManager)
-  extends BaseDAO[ObservationImpl](entityManager)
-  with ObservationDAO[ObservationImpl] {
+    extends BaseDAO[ObservationImpl](entityManager)
+    with ObservationDAO[ObservationImpl] {
 
   override def newPersistentObject(): ObservationImpl = new ObservationImpl
 
   override def newPersistentObject(
-    concept: String,
-    observer: String,
-    observationDate: Instant = Instant.now(),
-    group: Option[String] = None,
-    duration: Option[Duration] = None): ObservationImpl = {
+      concept: String,
+      observer: String,
+      observationDate: Instant = Instant.now(),
+      group: Option[String] = None,
+      duration: Option[Duration] = None
+  ): ObservationImpl = {
 
     val observation = newPersistentObject()
     observation.concept = concept
@@ -54,27 +55,41 @@ class ObservationDAOImpl(entityManager: EntityManager)
     observation
   }
 
-  override def findByVideoReferenceUUID(uuid: UUID, limit: Option[Int] = None, offset: Option[Int] = None): Iterable[ObservationImpl] =
+  override def findByVideoReferenceUUID(
+      uuid: UUID,
+      limit: Option[Int] = None,
+      offset: Option[Int] = None
+  ): Iterable[ObservationImpl] =
     findByNamedQuery("Observation.findByVideoReferenceUUID", Map("uuid" -> uuid), limit, offset)
 
-
-  override def streamByVideoReferenceUUID(uuid: UUID, limit: Option[Int], offset: Option[Int]): stream.Stream[ObservationImpl] =
+  override def streamByVideoReferenceUUID(
+      uuid: UUID,
+      limit: Option[Int],
+      offset: Option[Int]
+  ): stream.Stream[ObservationImpl] =
     streamByNamedQuery("Observation.findByVideoReferenceUUID", Map("uuid" -> uuid), limit, offset)
 
-  override def streamByVideoReferenceUUIDAndTimestamps(uuid: UUID,
-                                                  startTimestamp: Instant,
-                                                  endTimestamp: Instant,
-                                                  limit: Option[Int],
-                                                  offset: Option[Int]): stream.Stream[ObservationImpl] = {
+  override def streamByVideoReferenceUUIDAndTimestamps(
+      uuid: UUID,
+      startTimestamp: Instant,
+      endTimestamp: Instant,
+      limit: Option[Int],
+      offset: Option[Int]
+  ): stream.Stream[ObservationImpl] = {
 
-    streamByNamedQuery("Observation.findByVideoReferenceUUIDAndTimestamps",
-      Map("uuid" -> uuid,
-        "start" -> startTimestamp,
-        "end" -> endTimestamp), limit, offset)
+    streamByNamedQuery(
+      "Observation.findByVideoReferenceUUIDAndTimestamps",
+      Map("uuid" -> uuid, "start" -> startTimestamp, "end" -> endTimestamp),
+      limit,
+      offset
+    )
   }
 
-
-  override def countByVideoReferenceUUIDAndTimestamps(uuid: UUID, startTimestamp: Instant, endTimestamp: Instant): Int = {
+  override def countByVideoReferenceUUIDAndTimestamps(
+      uuid: UUID,
+      startTimestamp: Instant,
+      endTimestamp: Instant
+  ): Int = {
     val query = entityManager.createNamedQuery("Observation.countByVideoReferenceUUIDAndTimestamps")
     query.setParameter(1, UUIDConverter.uuidToString(uuid))
     query.setParameter(2, Timestamp.from(startTimestamp))
@@ -82,12 +97,21 @@ class ObservationDAOImpl(entityManager: EntityManager)
     query.getSingleResult.asInstanceOf[Int]
   }
 
-
-  override def streamByConcurrentRequest(request: ConcurrentRequest, limit: Option[Int], offset: Option[Int]): stream.Stream[ObservationImpl] = {
-    streamByNamedQuery("Observation.findByConcurrentRequest",
-      Map("uuids" -> request.videoReferenceUuids,
+  override def streamByConcurrentRequest(
+      request: ConcurrentRequest,
+      limit: Option[Int],
+      offset: Option[Int]
+  ): stream.Stream[ObservationImpl] = {
+    streamByNamedQuery(
+      "Observation.findByConcurrentRequest",
+      Map(
+        "uuids" -> request.videoReferenceUuids,
         "start" -> request.startTimestamp,
-        "end" -> request.endTimestamp), limit, offset)
+        "end"   -> request.endTimestamp
+      ),
+      limit,
+      offset
+    )
   }
 
   override def countByConcurrentRequest(request: ConcurrentRequest): Long = {
@@ -98,9 +122,17 @@ class ObservationDAOImpl(entityManager: EntityManager)
     query.getSingleResult.asInstanceOf[Long]
   }
 
-  override def streamByMultiRequest(request: MultiRequest, limit: Option[Int], offset: Option[Int]): stream.Stream[ObservationImpl] = {
-    streamByNamedQuery("Observation.findByMultiRequest",
-      Map("uuids" -> request.videoReferenceUuids), limit, offset)
+  override def streamByMultiRequest(
+      request: MultiRequest,
+      limit: Option[Int],
+      offset: Option[Int]
+  ): stream.Stream[ObservationImpl] = {
+    streamByNamedQuery(
+      "Observation.findByMultiRequest",
+      Map("uuids" -> request.videoReferenceUuids),
+      limit,
+      offset
+    )
   }
 
   override def countByMultiRequest(request: MultiRequest): Long = {
@@ -110,43 +142,57 @@ class ObservationDAOImpl(entityManager: EntityManager)
   }
 
   /**
-   *
-   * @return Order sequence of all concept names used
-   */
-  override def findAllConcepts(): Seq[String] = entityManager.createNamedQuery("Observation.findAllNames")
-    .getResultList
-    .asScala
-    .filter(_ != null)
-    .map(_.toString)
+    *
+    * @return Order sequence of all concept names used
+    */
+  override def findAllConcepts(): Seq[String] =
+    entityManager
+      .createNamedQuery("Observation.findAllNames")
+      .getResultList
+      .asScala
+      .filter(_ != null)
+      .map(_.toString)
+      .toSeq
 
-  override def findAllGroups(): Seq[String] = entityManager.createNamedQuery("Observation.findAllGroups")
-    .getResultList
-    .asScala
-    .filter(_ != null)
-    .map(_.toString)
+  override def findAllGroups(): Seq[String] =
+    entityManager
+      .createNamedQuery("Observation.findAllGroups")
+      .getResultList
+      .asScala
+      .filter(_ != null)
+      .map(_.toString)
+      .toSeq
 
-  override def findAllActivities(): Seq[String] = entityManager.createNamedQuery("Observation.findAllActivities")
-    .getResultList
-    .asScala
-    .filter(_ != null)
-    .map(_.toString)
+  override def findAllActivities(): Seq[String] =
+    entityManager
+      .createNamedQuery("Observation.findAllActivities")
+      .getResultList
+      .asScala
+      .filter(_ != null)
+      .map(_.toString)
+      .toSeq
 
-
-  override def findAll(limit: Option[Int] = None, offset: Option[Int] = None): Iterable[ObservationImpl] =
+  override def findAll(
+      limit: Option[Int] = None,
+      offset: Option[Int] = None
+  ): Iterable[ObservationImpl] =
     findByNamedQuery("Observation.findAll", limit = limit, offset = offset)
 
   override def findAllConceptsByVideoReferenceUUID(uuid: UUID): Seq[String] = {
     val query = entityManager.createNamedQuery("Observation.findAllNamesByVideoReferenceUUID")
     query.setParameter(1, UUIDConverter.uuidToString(uuid))
-    query.getResultList
+    query
+      .getResultList
       .asScala
       .map(_.toString)
+      .toSeq
   }
 
   override def countByConcept(name: String): Int = {
     val query = entityManager.createNamedQuery("Observation.countByConcept")
     query.setParameter(1, name)
-    query.getResultList
+    query
+      .getResultList
       .asScala
       .map(_.asInstanceOf[Number])
       .map(_.intValue())
@@ -156,7 +202,8 @@ class ObservationDAOImpl(entityManager: EntityManager)
   override def countByConceptWithImages(name: String): Int = {
     val query = entityManager.createNamedQuery("Observation.countByConceptWithImages")
     query.setParameter(1, name)
-    query.getResultList
+    query
+      .getResultList
       .asScala
       .map(_.asInstanceOf[Number])
       .map(_.intValue())
@@ -166,7 +213,8 @@ class ObservationDAOImpl(entityManager: EntityManager)
   override def countByVideoReferenceUUID(uuid: UUID): Int = {
     val query = entityManager.createNamedQuery("Observation.countByVideoReferenceUUID")
     query.setParameter(1, UUIDConverter.uuidToString(uuid))
-    query.getResultList
+    query
+      .getResultList
       .asScala
       .map(_.asInstanceOf[Number])
       .map(_.intValue())
@@ -175,11 +223,12 @@ class ObservationDAOImpl(entityManager: EntityManager)
 
   override def countAllByVideoReferenceUuids(): Map[UUID, Int] = {
     val query = entityManager.createNamedQuery("Observation.countAllByVideoReferenceUUIDs")
-    query.getResultList
+    query
+      .getResultList
       .asScala
       .map(_.asInstanceOf[Array[Object]])
       .map(xs => {
-        val uuid = UUID.fromString(xs(0).asInstanceOf[String])
+        val uuid  = UUID.fromString(xs(0).asInstanceOf[String])
         val count = xs(1).asInstanceOf[Number].intValue()
         uuid -> count
       })

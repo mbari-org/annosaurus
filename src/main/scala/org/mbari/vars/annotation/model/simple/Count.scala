@@ -19,9 +19,9 @@ package org.mbari.vars.annotation.model.simple
 import com.google.gson.annotations.Expose
 
 /**
- * @author Brian Schlining
- * @since 2019-12-12T10:46:00
- */
+  * @author Brian Schlining
+  * @since 2019-12-12T10:46:00
+  */
 class Count {
 
   @Expose(serialize = true)

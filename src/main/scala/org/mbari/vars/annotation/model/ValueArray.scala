@@ -21,13 +21,13 @@ import java.util.UUID
 import com.google.gson.annotations.Expose
 
 /**
- * This is just a class to help GSON generate a list of values from an array.
- * Note that GSON chokes on this and assigns a Java ArrayList to the values.
- * So don't used the generic ValueArray
- *
- * @author Brian Schlining
- * @since 2016-09-14T14:02:00
- */
+  * This is just a class to help GSON generate a list of values from an array.
+  * Note that GSON chokes on this and assigns a Java ArrayList to the values.
+  * So don't used the generic ValueArray
+  *
+  * @author Brian Schlining
+  * @since 2016-09-14T14:02:00
+  */
 class ValueArray[A: Manifest] {
 
   @Expose(serialize = true)

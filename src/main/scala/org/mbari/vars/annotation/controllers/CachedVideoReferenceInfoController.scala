@@ -21,40 +21,51 @@ import java.util.UUID
 import org.mbari.vars.annotation.dao.CachedVideoReferenceInfoDAO
 import org.mbari.vars.annotation.model.CachedVideoReferenceInfo
 
-import scala.concurrent.{ ExecutionContext, Future }
+import scala.concurrent.{ExecutionContext, Future}
 
 /**
- *
- *
- * @author Brian Schlining
- * @since 2016-09-14T10:50:00
- */
+  *
+  *
+  * @author Brian Schlining
+  * @since 2016-09-14T10:50:00
+  */
 class CachedVideoReferenceInfoController(val daoFactory: BasicDAOFactory)
-  extends BaseController[CachedVideoReferenceInfo, CachedVideoReferenceInfoDAO[CachedVideoReferenceInfo]] {
+    extends BaseController[CachedVideoReferenceInfo, CachedVideoReferenceInfoDAO[
+      CachedVideoReferenceInfo
+    ]] {
 
   protected type VRDAO = CachedVideoReferenceInfoDAO[CachedVideoReferenceInfo]
 
-  override def newDAO(): CachedVideoReferenceInfoDAO[CachedVideoReferenceInfo] = daoFactory.newCachedVideoReferenceInfoDAO()
+  override def newDAO(): CachedVideoReferenceInfoDAO[CachedVideoReferenceInfo] =
+    daoFactory.newCachedVideoReferenceInfoDAO()
 
   //  def findAll(limit: Int, offset: Int)(implicit ec: ExecutionContext): Future[Iterable[CachedVideoReferenceInfo]] =
   //    exec(d => d.findAll(limit, offset))
 
-  def findByVideoReferenceUUID(uuid: UUID)(implicit ec: ExecutionContext): Future[Option[CachedVideoReferenceInfo]] = {
+  def findByVideoReferenceUUID(
+      uuid: UUID
+  )(implicit ec: ExecutionContext): Future[Option[CachedVideoReferenceInfo]] = {
     def fn(dao: VRDAO): Option[CachedVideoReferenceInfo] = dao.findByVideoReferenceUUID(uuid)
     exec(fn)
   }
 
-  def findByPlatformName(name: String)(implicit ec: ExecutionContext): Future[Iterable[CachedVideoReferenceInfo]] = {
+  def findByPlatformName(
+      name: String
+  )(implicit ec: ExecutionContext): Future[Iterable[CachedVideoReferenceInfo]] = {
     def fn(dao: VRDAO): Iterable[CachedVideoReferenceInfo] = dao.findByPlatformName(name)
     exec(fn)
   }
 
-  def findByMissionID(id: String)(implicit ec: ExecutionContext): Future[Iterable[CachedVideoReferenceInfo]] = {
+  def findByMissionID(
+      id: String
+  )(implicit ec: ExecutionContext): Future[Iterable[CachedVideoReferenceInfo]] = {
     def fn(dao: VRDAO): Iterable[CachedVideoReferenceInfo] = dao.findByMissionID(id)
     exec(fn)
   }
 
-  def findByMissionContact(contact: String)(implicit ec: ExecutionContext): Future[Iterable[CachedVideoReferenceInfo]] = {
+  def findByMissionContact(
+      contact: String
+  )(implicit ec: ExecutionContext): Future[Iterable[CachedVideoReferenceInfo]] = {
     def fn(dao: VRDAO): Iterable[CachedVideoReferenceInfo] = dao.findByMissionContact(contact)
     exec(fn)
   }
@@ -80,10 +91,11 @@ class CachedVideoReferenceInfoController(val daoFactory: BasicDAOFactory)
   }
 
   def create(
-    videoReferenceUUID: UUID,
-    platformName: String,
-    missionID: String,
-    missionContact: Option[String] = None)(implicit ec: ExecutionContext): Future[CachedVideoReferenceInfo] = {
+      videoReferenceUUID: UUID,
+      platformName: String,
+      missionID: String,
+      missionContact: Option[String] = None
+  )(implicit ec: ExecutionContext): Future[CachedVideoReferenceInfo] = {
 
     def fn(dao: VRDAO): CachedVideoReferenceInfo = {
       val v = dao.newPersistentObject()
@@ -98,11 +110,12 @@ class CachedVideoReferenceInfoController(val daoFactory: BasicDAOFactory)
   }
 
   def update(
-    uuid: UUID,
-    videoReferenceUUID: Option[UUID] = None,
-    platformName: Option[String] = None,
-    missionID: Option[String] = None,
-    missionContact: Option[String] = None)(implicit ec: ExecutionContext): Future[Option[CachedVideoReferenceInfo]] = {
+      uuid: UUID,
+      videoReferenceUUID: Option[UUID] = None,
+      platformName: Option[String] = None,
+      missionID: Option[String] = None,
+      missionContact: Option[String] = None
+  )(implicit ec: ExecutionContext): Future[Option[CachedVideoReferenceInfo]] = {
 
     def fn(dao: VRDAO): Option[CachedVideoReferenceInfo] = dao.findByUUID(uuid) match {
       case None => None

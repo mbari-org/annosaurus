@@ -26,22 +26,25 @@ import scala.collection.JavaConverters._
 import scala.concurrent.ExecutionContext
 
 /**
- * @author Brian Schlining
- * @since 2019-02-08T11:00:00
- */
+  * @author Brian Schlining
+  * @since 2019-02-08T11:00:00
+  */
 class IndexV1Api(controller: IndexController)(implicit val executor: ExecutionContext)
-  extends V1APIStack {
+    extends V1APIStack {
 
   before() {
     contentType = "application/json"
-    response.headers += ("Access-Control-Allow-Origin" -> "*")
+    response.headers.set("Access-Control-Allow-Origin", "*")
   }
 
   get("/videoreference/:uuid") {
-    val uuid = params.getAs[UUID]("uuid").getOrElse(halt(BadRequest("Please provide a Video Reference UUID")))
-    val limit = params.getAs[Int]("limit")
+    val uuid = params
+      .getAs[UUID]("uuid")
+      .getOrElse(halt(BadRequest("Please provide a Video Reference UUID")))
+    val limit  = params.getAs[Int]("limit")
     val offset = params.getAs[Int]("offset")
-    controller.findByVideoReferenceUUID(uuid, limit, offset)
+    controller
+      .findByVideoReferenceUUID(uuid, limit, offset)
       .map(_.asJava)
       .map(toJson)
   }
@@ -51,11 +54,14 @@ class IndexV1Api(controller: IndexController)(implicit val executor: ExecutionCo
     request.getHeader("Content-Type") match {
       case "application/json" =>
         val indices = fromJson(request.body, classOf[Array[IndexImpl]])
-        controller.bulkUpdateRecordedTimestamps(indices)
+        controller
+          .bulkUpdateRecordedTimestamps(indices)
           .map(_.asJava)
           .map(toJson)
       case _ =>
-        val m = Map("error" -> "Puts to tapetime only accept JSON body (i.e. Content-Type: application/json)").asJava
+        val m = Map(
+          "error" -> "Puts to tapetime only accept JSON body (i.e. Content-Type: application/json)"
+        ).asJava
         halt(BadRequest(toJson(m)))
     }
   }

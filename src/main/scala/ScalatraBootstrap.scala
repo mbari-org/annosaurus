@@ -30,11 +30,11 @@ import org.slf4j.LoggerFactory
 import scala.concurrent.ExecutionContext
 
 /**
- *
- *
- * @author Brian Schlining
- * @since 2016-05-20T14:41:00
- */
+  *
+  *
+  * @author Brian Schlining
+  * @since 2016-05-20T14:41:00
+  */
 class ScalatraBootstrap extends LifeCycle {
 
   private[this] val log = LoggerFactory.getLogger(getClass)
@@ -47,28 +47,28 @@ class ScalatraBootstrap extends LifeCycle {
       ExecutionContext.fromExecutor(Executors.newWorkStealingPool())
 
     val daoFactory: BasicDAOFactory = JPADAOFactory.asInstanceOf[BasicDAOFactory]
-    val ancillaryDatumController = new CachedAncillaryDatumController(daoFactory)
-    val annotationController = new AnnotationController(daoFactory)
-    val associationController = new AssociationController(daoFactory)
-    val imageController = new ImageController(daoFactory)
-    val imagedMomentController = new ImagedMomentController(daoFactory)
-    val imageReferenceController = new ImageReferenceController(daoFactory)
-    val indexController = new IndexController(daoFactory)
-    val observationController = new ObservationController(daoFactory)
-    val videoReferenceController = new CachedVideoReferenceInfoController(daoFactory)
+    val ancillaryDatumController    = new CachedAncillaryDatumController(daoFactory)
+    val annotationController        = new AnnotationController(daoFactory)
+    val associationController       = new AssociationController(daoFactory)
+    val imageController             = new ImageController(daoFactory)
+    val imagedMomentController      = new ImagedMomentController(daoFactory)
+    val imageReferenceController    = new ImageReferenceController(daoFactory)
+    val indexController             = new IndexController(daoFactory)
+    val observationController       = new ObservationController(daoFactory)
+    val videoReferenceController    = new CachedVideoReferenceInfoController(daoFactory)
 
     val ancillaryDatumV1Api = new CachedAncillaryDatumV1Api(ancillaryDatumController)
-    val annotationV1Api = new AnnotationV1Api(annotationController)
-    val associationV1Api = new AssociationV1Api(associationController)
-    val authorizationV1Api = new AuthorizationV1Api
-    val imagedMomentV1Api = new ImagedMomentV1Api(imagedMomentController)
+    val annotationV1Api     = new AnnotationV1Api(annotationController)
+    val associationV1Api    = new AssociationV1Api(associationController)
+    val authorizationV1Api  = new AuthorizationV1Api
+    val imagedMomentV1Api   = new ImagedMomentV1Api(imagedMomentController)
     val imageReferenceV1Api = new ImageReferenceV1Api(imageReferenceController)
-    val imageV1Api = new ImageV1Api(imageController)
-    val indexV1Api = new IndexV1Api(indexController)
-    val observationV1Api = new ObservationV1Api(observationController)
+    val imageV1Api          = new ImageV1Api(imageController)
+    val indexV1Api          = new IndexV1Api(indexController)
+    val observationV1Api    = new ObservationV1Api(observationController)
     val videoReferenceV1Api = new CachedVideoReferenceInfoV1Api(videoReferenceController)
 
-    val annotationV2Api = new AnnotationV2Api(annotationController)
+    val annotationV2Api   = new AnnotationV2Api(annotationController)
     val imagedMomentV2Api = new ImagedMomentV2Api(imagedMomentController)
 
     val fastAnnotationV1Api = new FastAnnotationV1Api(JPADAOFactory)

@@ -29,14 +29,15 @@ import org.mbari.vars.annotation.model.simple.ConcurrentRequest
 import scala.concurrent.{ExecutionContext, Future}
 
 /**
- *
- *
- * @author Brian Schlining
- * @since 2016-06-25T20:33:00
- */
-class ObservationController(val daoFactory: BasicDAOFactory,
-                            bus: Subject[Any] = MessageBus.RxSubject)
-  extends BaseController[Observation, ObservationDAO[Observation]] {
+  *
+  *
+  * @author Brian Schlining
+  * @since 2016-06-25T20:33:00
+  */
+class ObservationController(
+    val daoFactory: BasicDAOFactory,
+    bus: Subject[Any] = MessageBus.RxSubject
+) extends BaseController[Observation, ObservationDAO[Observation]] {
 
   type ODAO = ObservationDAO[Observation]
 
@@ -45,19 +46,24 @@ class ObservationController(val daoFactory: BasicDAOFactory,
   override def newDAO(): ODAO = daoFactory.newObservationDAO()
 
   def create(
-    imagedMomentUUID: UUID,
-    concept: String,
-    observer: String,
-    observationDate: Instant = Instant.now(),
-    duration: Option[Duration] = None,
-    group: Option[String] = None)(implicit ec: ExecutionContext): Future[Observation] = {
+      imagedMomentUUID: UUID,
+      concept: String,
+      observer: String,
+      observationDate: Instant = Instant.now(),
+      duration: Option[Duration] = None,
+      group: Option[String] = None
+  )(implicit ec: ExecutionContext): Future[Observation] = {
 
     def fn(dao: ODAO): Observation = {
       val imDao = daoFactory.newImagedMomentDAO(dao)
       imDao.findByUUID(imagedMomentUUID) match {
-        case None => throw new NotFoundInDatastoreException(s"ImagedMoment with UUID of $imagedMomentUUID not found")
+        case None =>
+          throw new NotFoundInDatastoreException(
+            s"ImagedMoment with UUID of $imagedMomentUUID not found"
+          )
         case Some(imagedMoment) =>
-          val observation = dao.newPersistentObject(concept, observer, observationDate, group, duration)
+          val observation =
+            dao.newPersistentObject(concept, observer, observationDate, group, duration)
           observation.imagedMoment = imagedMoment
           annotationPublisher.publish(observation)
           observation
@@ -68,14 +74,15 @@ class ObservationController(val daoFactory: BasicDAOFactory,
   }
 
   def update(
-    uuid: UUID,
-    concept: Option[String] = None,
-    observer: Option[String] = None,
-    observationDate: Instant = Instant.now(),
-    duration: Option[Duration] = None,
-    group: Option[String] = None,
-    activity: Option[String] = None,
-    imagedMomentUUID: Option[UUID] = None)(implicit ec: ExecutionContext): Future[Option[Observation]] = {
+      uuid: UUID,
+      concept: Option[String] = None,
+      observer: Option[String] = None,
+      observationDate: Instant = Instant.now(),
+      duration: Option[Duration] = None,
+      group: Option[String] = None,
+      activity: Option[String] = None,
+      imagedMomentUUID: Option[UUID] = None
+  )(implicit ec: ExecutionContext): Future[Option[Observation]] = {
 
     def fn(dao: ODAO): Option[Observation] = {
       // --- 1. Does uuid exist?
@@ -90,8 +97,8 @@ class ObservationController(val daoFactory: BasicDAOFactory,
         activity.foreach(obs.activity = _)
         for {
           imUUID <- imagedMomentUUID
-          imDao = daoFactory.newImagedMomentDAO(dao)
-          newIm <- imDao.findByUUID(imUUID)
+          imDao  = daoFactory.newImagedMomentDAO(dao)
+          newIm  <- imDao.findByUUID(imUUID)
         } {
           obs.imagedMoment.removeObservation(obs)
           newIm.addObservation(obs)
@@ -121,19 +128,23 @@ class ObservationController(val daoFactory: BasicDAOFactory,
     exec(fn)
   }
 
-  def findAllConceptsByVideoReferenceUUID(uuid: UUID)(implicit ec: ExecutionContext): Future[Iterable[String]] = {
+  def findAllConceptsByVideoReferenceUUID(
+      uuid: UUID
+  )(implicit ec: ExecutionContext): Future[Iterable[String]] = {
     def fn(dao: ODAO): Iterable[String] = dao.findAllConceptsByVideoReferenceUUID(uuid)
     exec(fn)
   }
 
-  def findByVideoReferenceUUID(uuid: UUID, limit: Option[Int] = None, offset: Option[Int] = None)(implicit ec: ExecutionContext): Future[Iterable[Observation]] = {
+  def findByVideoReferenceUUID(uuid: UUID, limit: Option[Int] = None, offset: Option[Int] = None)(
+      implicit ec: ExecutionContext
+  ): Future[Iterable[Observation]] = {
     def fn(dao: ODAO): Iterable[Observation] = dao.findByVideoReferenceUUID(uuid, limit, offset)
     exec(fn)
   }
 
-
-
-  def findByAssociationUUID(uuid: UUID)(implicit ec: ExecutionContext): Future[Option[Observation]] = {
+  def findByAssociationUUID(
+      uuid: UUID
+  )(implicit ec: ExecutionContext): Future[Option[Observation]] = {
     def fn(dao: ODAO): Option[Observation] = {
       val adao = daoFactory.newAssociationDAO(dao)
       adao.findByUUID(uuid).map(_.observation)
@@ -142,12 +153,12 @@ class ObservationController(val daoFactory: BasicDAOFactory,
   }
 
   /**
-   * This controller will also delete the [[org.mbari.vars.annotation.model.ImagedMoment]] if
-   * it is empty (i.e. no observations or other imageReferences)
-   * @param uuid
-   * @param ec
-   * @return
-   */
+    * This controller will also delete the [[org.mbari.vars.annotation.model.ImagedMoment]] if
+    * it is empty (i.e. no observations or other imageReferences)
+    * @param uuid
+    * @param ec
+    * @return
+    */
   override def delete(uuid: UUID)(implicit ec: ExecutionContext): Future[Boolean] = {
     def fn(dao: ODAO) = deleteFunction(dao, uuid)
     exec(fn)
@@ -174,7 +185,9 @@ class ObservationController(val daoFactory: BasicDAOFactory,
     exec(fn)
   }
 
-  def countByVideoReferenceUUIDAndTimestamps(uuid: UUID, start: Instant, end: Instant)(implicit ec: ExecutionContext): Future[Int] = {
+  def countByVideoReferenceUUIDAndTimestamps(uuid: UUID, start: Instant, end: Instant)(
+      implicit ec: ExecutionContext
+  ): Future[Int] = {
     def fn(dao: ODAO): Int = dao.countByVideoReferenceUUIDAndTimestamps(uuid, start, end)
     exec(fn)
   }
@@ -182,7 +195,9 @@ class ObservationController(val daoFactory: BasicDAOFactory,
   def countAllGroupByVideoReferenceUUID()(implicit ec: ExecutionContext): Future[Map[UUID, Int]] =
     exec(dao => dao.countAllByVideoReferenceUuids())
 
-  def updateConcept(oldConcept: String, newConcept: String)(implicit ec: ExecutionContext): Future[Int] = {
+  def updateConcept(oldConcept: String, newConcept: String)(
+      implicit ec: ExecutionContext
+  ): Future[Int] = {
     def fn(dao: ODAO): Int = dao.updateConcept(oldConcept, newConcept)
     exec(fn)
   }
@@ -196,7 +211,8 @@ class ObservationController(val daoFactory: BasicDAOFactory,
         if (imagedMoment.observations.size == 1 && imagedMoment.imageReferences.isEmpty) {
           val imDao = daoFactory.newImagedMomentDAO(dao)
           imDao.delete(imagedMoment)
-        } else {
+        }
+        else {
           dao.delete(observation)
         }
         true

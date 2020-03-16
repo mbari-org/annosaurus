@@ -21,9 +21,9 @@ import java.util.UUID
 import org.mbari.vars.annotation.dao.jpa.ImageReferenceImpl
 
 /**
- * @author Brian Schlining
- * @since 2019-10-22T14:37:00
- */
+  * @author Brian Schlining
+  * @since 2019-10-22T14:37:00
+  */
 class ImageReferenceExt extends ImageReferenceImpl {
   var imagedMomentUuid: UUID = _
 }

@@ -23,9 +23,9 @@ import com.google.gson.annotations.Expose
 import scala.collection.JavaConverters._
 
 /**
- * @author Brian Schlining
- * @since 2019-06-05T13:55:00
- */
+  * @author Brian Schlining
+  * @since 2019-06-05T13:55:00
+  */
 class ConceptAssociationResponse {
 
   @Expose(serialize = true)
@@ -39,7 +39,10 @@ class ConceptAssociationResponse {
 }
 
 object ConceptAssociationResponse {
-  def apply(request: ConceptAssociationRequest, conceptAssociations: Seq[ConceptAssociation]): ConceptAssociationResponse = {
+  def apply(
+      request: ConceptAssociationRequest,
+      conceptAssociations: Seq[ConceptAssociation]
+  ): ConceptAssociationResponse = {
     val car = new ConceptAssociationResponse
     car.conceptAssociationRequest = request
     conceptAssociations.foreach(ca => car.conceptAssociations.add(ca))

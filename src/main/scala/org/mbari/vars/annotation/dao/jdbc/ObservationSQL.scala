@@ -17,9 +17,9 @@
 package org.mbari.vars.annotation.dao.jdbc
 
 /**
- * @author Brian Schlining
- * @since 2019-10-28T16:39:00
- */
+  * @author Brian Schlining
+  * @since 2019-10-28T16:39:00
+  */
 object ObservationSQL {
 
   val countAll: String = "SELECT COUNT(*) FROM observation"

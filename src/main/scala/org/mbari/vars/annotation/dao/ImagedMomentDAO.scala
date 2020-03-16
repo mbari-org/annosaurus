@@ -26,57 +26,67 @@ import org.mbari.vcr4j.time.Timecode
 import org.slf4j.LoggerFactory
 
 /**
- *
- *
- * @author Brian Schlining
- * @since 2016-06-17T16:07:00
- */
+  *
+  *
+  * @author Brian Schlining
+  * @since 2016-06-17T16:07:00
+  */
 trait ImagedMomentDAO[T <: ImagedMoment] extends DAO[T] {
 
   def newPersistentObject(
-    videoReferenceUUID: UUID,
-    timecode: Option[Timecode] = None,
-    elapsedTime: Option[Duration] = None,
-    recordedDate: Option[Instant] = None): T
+      videoReferenceUUID: UUID,
+      timecode: Option[Timecode] = None,
+      elapsedTime: Option[Duration] = None,
+      recordedDate: Option[Instant] = None
+  ): T
 
   def newPersistentObject(imagedMoment: ImagedMoment): T
 
   /**
-   * Find ImagedMoments where the imagedmoment OR observation has been updated
-   * between the requested dates.
-   * @param start The starting date
-   * @param end The ending date
-   * @param limit The number of results to return. Default is all of them
-   * @param offset The starting index of the results to return. Default is 0.
-   * @return ImagedMoments between the given dates
-   */
+    * Find ImagedMoments where the imagedmoment OR observation has been updated
+    * between the requested dates.
+    * @param start The starting date
+    * @param end The ending date
+    * @param limit The number of results to return. Default is all of them
+    * @param offset The starting index of the results to return. Default is 0.
+    * @return ImagedMoments between the given dates
+    */
   def findBetweenUpdatedDates(
-    start: Instant,
-    end: Instant,
-    limit: Option[Int] = None,
-    offset: Option[Int] = None): Iterable[T]
+      start: Instant,
+      end: Instant,
+      limit: Option[Int] = None,
+      offset: Option[Int] = None
+  ): Iterable[T]
 
   def streamBetweenUpdatedDates(
-     start: Instant,
-     end: Instant,
-     limit: Option[Int] = None,
-     offset: Option[Int] = None): java.util.stream.Stream[T]
+      start: Instant,
+      end: Instant,
+      limit: Option[Int] = None,
+      offset: Option[Int] = None
+  ): java.util.stream.Stream[T]
 
-  def streamByVideoReferenceUUIDAndTimestamps(uuid: UUID,
-                                              startTimestamp: Instant,
-                                              endTimestamp: Instant,
-                                              limit: Option[Int],
-                                              offset: Option[Int]): java.util.stream.Stream[ImagedMomentImpl]
+  def streamByVideoReferenceUUIDAndTimestamps(
+      uuid: UUID,
+      startTimestamp: Instant,
+      endTimestamp: Instant,
+      limit: Option[Int],
+      offset: Option[Int]
+  ): java.util.stream.Stream[ImagedMomentImpl]
 
-
-  def streamVideoReferenceUuidsBetweenUpdatedDates(start: Instant,
-                                                 end: Instant,
-                                                 limit: Option[Int] = None,
-                                                 offset: Option[Int] = None): java.util.stream.Stream[UUID]
+  def streamVideoReferenceUuidsBetweenUpdatedDates(
+      start: Instant,
+      end: Instant,
+      limit: Option[Int] = None,
+      offset: Option[Int] = None
+  ): java.util.stream.Stream[UUID]
 
   def countByConcept(concept: String): Int
   def findByConcept(concept: String, limit: Option[Int], offset: Option[Int]): Iterable[T]
-  def streamByConcept(concept: String, limit: Option[Int], offset: Option[Int]): java.util.stream.Stream[T]
+  def streamByConcept(
+      concept: String,
+      limit: Option[Int],
+      offset: Option[Int]
+  ): java.util.stream.Stream[T]
 
   def countByConceptWithImages(concept: String): Int
   def countModifiedBeforeDate(videoReferenceUuid: UUID, date: Instant): Int
@@ -86,8 +96,16 @@ trait ImagedMomentDAO[T <: ImagedMoment] extends DAO[T] {
   def countAllByVideoReferenceUuids(): Map[UUID, Int]
 
   def findAllVideoReferenceUUIDs(limit: Option[Int], offset: Option[Int]): Iterable[UUID]
-  def findByVideoReferenceUUID(uuid: UUID, limit: Option[Int] = None, offset: Option[Int] = None): Iterable[T]
-  def streamByVideoReferenceUUID(uuid: UUID, limit: Option[Int] = None, offset: Option[Int] = None): java.util.stream.Stream[T]
+  def findByVideoReferenceUUID(
+      uuid: UUID,
+      limit: Option[Int] = None,
+      offset: Option[Int] = None
+  ): Iterable[T]
+  def streamByVideoReferenceUUID(
+      uuid: UUID,
+      limit: Option[Int] = None,
+      offset: Option[Int] = None
+  ): java.util.stream.Stream[T]
   def countByVideoReferenceUUID(uUID: UUID): Int
 
   def findWithImageReferences(videoReferenceUUID: UUID): Iterable[T]
@@ -97,35 +115,42 @@ trait ImagedMomentDAO[T <: ImagedMoment] extends DAO[T] {
   def findByVideoReferenceUUIDAndRecordedDate(uuid: UUID, recordedDate: Instant): Option[T]
   def findByVideoReferenceUUIDAndElapsedTime(uuid: UUID, elapsedTime: Duration): Option[T]
 
-  def findByWindowRequest(windowRequest: WindowRequest, limit: Option[Int] = None, offset: Option[Int] = None): Iterable[T]
+  def findByWindowRequest(
+      windowRequest: WindowRequest,
+      limit: Option[Int] = None,
+      offset: Option[Int] = None
+  ): Iterable[T]
 
   /**
-   * Look up an imaged moment based on the videoReferenceUUID and one of the indices into a video.
-   * The order of search is
-   * 1. Timecode
-   * 2. ElapsedTime
-   * 3. RecordedDate
-   *
-   * @param uuid The videoReferenceUUID that the imagedMoment is attached to
-   * @param timecode The timecode index
-   * @param elapsedTime The elapsedTime index (This is the index of runtime into the video)
-   * @param recordedDate The recordedDate index
-   * @return None if no match is found. Some if a match exists
-   */
+    * Look up an imaged moment based on the videoReferenceUUID and one of the indices into a video.
+    * The order of search is
+    * 1. Timecode
+    * 2. ElapsedTime
+    * 3. RecordedDate
+    *
+    * @param uuid The videoReferenceUUID that the imagedMoment is attached to
+    * @param timecode The timecode index
+    * @param elapsedTime The elapsedTime index (This is the index of runtime into the video)
+    * @param recordedDate The recordedDate index
+    * @return None if no match is found. Some if a match exists
+    */
   def findByVideoReferenceUUIDAndIndex(
-    uuid: UUID,
-    timecode: Option[Timecode] = None,
-    elapsedTime: Option[Duration] = None,
-    recordedDate: Option[Instant] = None): Option[T] = {
+      uuid: UUID,
+      timecode: Option[Timecode] = None,
+      elapsedTime: Option[Duration] = None,
+      recordedDate: Option[Instant] = None
+  ): Option[T] = {
 
     // If timecode is supplied and no existing match is found return None.
     timecode match {
       case Some(t) => findByVideoReferenceUUIDAndTimecode(uuid, t)
-      case None => None
+      case None =>
+        None
         val im0 = elapsedTime.flatMap(findByVideoReferenceUUIDAndElapsedTime(uuid, _))
-        if (im0.isEmpty) recordedDate.flatMap(findByVideoReferenceUUIDAndRecordedDate(uuid, _)) else im0
+        if (im0.isEmpty) recordedDate.flatMap(findByVideoReferenceUUIDAndRecordedDate(uuid, _))
+        else im0
     }
-      // This code has bug when resolving timecodes. See M3-15
+    // This code has bug when resolving timecodes. See M3-15
 //    val im0 = timecode.flatMap(findByVideoReferenceUUIDAndTimecode(uuid, _))
 //    val im1 = if (im0.isEmpty) elapsedTime.flatMap(findByVideoReferenceUUIDAndElapsedTime(uuid, _)) else im0
 //    if (im1.isEmpty) recordedDate.flatMap(findByVideoReferenceUUIDAndRecordedDate(uuid, _)) else im1
@@ -135,24 +160,25 @@ trait ImagedMomentDAO[T <: ImagedMoment] extends DAO[T] {
   def findByObservationUUID(uuid: UUID): Option[T]
 
   def updateRecordedTimestampByObservationUuid(
-    observationUuid: UUID,
-    recordedTimestamp: Instant): Boolean
+      observationUuid: UUID,
+      recordedTimestamp: Instant
+  ): Boolean
 
   /**
-   * A bulk delete operation. This will delete all annotation related data for a single video.
-   * (which is identified via its uuid (e.g. videoReferenceUUID))
-   *
-   * @param uuid The UUID of the VideoReference. WARNING!! All annotation data associated to
-   *             this videoReference will be deleted.
-   * @return The number of records deleted
-   */
+    * A bulk delete operation. This will delete all annotation related data for a single video.
+    * (which is identified via its uuid (e.g. videoReferenceUUID))
+    *
+    * @param uuid The UUID of the VideoReference. WARNING!! All annotation data associated to
+    *             this videoReference will be deleted.
+    * @return The number of records deleted
+    */
   def deleteByVideoReferenceUUUID(uuid: UUID): Int
 
   /**
-   * Deletes an imagedMoment if it does not contain any observations or imageReferences
-   * @param imagedMoment The object to delete
-   * @return true if deleted, false if not deleted.
-   */
+    * Deletes an imagedMoment if it does not contain any observations or imageReferences
+    * @param imagedMoment The object to delete
+    * @return true if deleted, false if not deleted.
+    */
   def deleteIfEmpty(imagedMoment: T): Boolean = deleteIfEmptyByUUID(imagedMoment.uuid)
 
   def deleteIfEmptyByUUID(uuid: UUID): Boolean = {
@@ -161,7 +187,8 @@ trait ImagedMomentDAO[T <: ImagedMoment] extends DAO[T] {
       if (imagedMoment.imageReferences.isEmpty && imagedMoment.observations.isEmpty) {
         delete(imagedMoment)
         true
-      } else false
+      }
+      else false
     })
   }
 }

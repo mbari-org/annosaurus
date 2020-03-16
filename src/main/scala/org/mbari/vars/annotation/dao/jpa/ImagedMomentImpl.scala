@@ -24,10 +24,16 @@ import java.util.{ArrayList => JArrayList, List => JList}
 
 import com.google.gson.annotations.{Expose, SerializedName}
 import org.mbari.vars.annotation.Constants
-import org.mbari.vars.annotation.model.{Annotation, CachedAncillaryDatum, ImageReference, ImagedMoment, Observation}
+import org.mbari.vars.annotation.model.{
+  Annotation,
+  CachedAncillaryDatum,
+  ImageReference,
+  ImagedMoment,
+  Observation
+}
 import org.mbari.vcr4j.time.Timecode
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 import scala.collection.mutable
 
 /**
@@ -103,12 +109,12 @@ import scala.collection.mutable
     ),
     new NamedNativeQuery(
       name = "ImagedMoment.countModifiedBeforeDate",
-      query = "SELECT COUNT(*) FROM imaged_moments WHERE video_reference_uuid = ?1 AND last_updated_timestamp < ?2"
+      query =
+        "SELECT COUNT(*) FROM imaged_moments WHERE video_reference_uuid = ?1 AND last_updated_timestamp < ?2"
     ),
     new NamedNativeQuery(
       name = "ImagedMoment.countByVideoReferenceUUID",
-      query =
-        "SELECT COUNT(*) FROM imaged_moments WHERE video_reference_uuid = ?1"
+      query = "SELECT COUNT(*) FROM imaged_moments WHERE video_reference_uuid = ?1"
     )
   )
 )
@@ -137,8 +143,7 @@ import scala.collection.mutable
     ),
     new NamedQuery(
       name = "ImagedMoment.findByVideoReferenceUUID",
-      query =
-        "SELECT i FROM ImagedMoment i WHERE i.videoReferenceUUID = :uuid ORDER BY i.uuid"
+      query = "SELECT i FROM ImagedMoment i WHERE i.videoReferenceUUID = :uuid ORDER BY i.uuid"
     ),
     new NamedQuery(
       name = "ImagedMoment.findByVideoReferenceUUIDAndTimestamps",
@@ -157,8 +162,7 @@ import scala.collection.mutable
     ),
     new NamedQuery(
       name = "ImagedMoment.findByUUID",
-      query =
-        "SELECT i FROM ImagedMoment i WHERE i.uuid = :uuid ORDER BY i.uuid"
+      query = "SELECT i FROM ImagedMoment i WHERE i.uuid = :uuid ORDER BY i.uuid"
     ),
     new NamedQuery(
       name = "ImagedMoment.findByVideoReferenceUUIDAndTimecode",
@@ -181,7 +185,8 @@ import scala.collection.mutable
     ),
     new NamedQuery(
       name = "ImagedMoment.findByWindowRequest",
-      query = "SELECT i from ImagedMoment i WHERE i.videoReferenceUUID IN :uuids AND i.recordedDate BETWEEN :start AND :end"
+      query =
+        "SELECT i from ImagedMoment i WHERE i.videoReferenceUUID IN :uuids AND i.recordedDate BETWEEN :start AND :end"
     ),
     new NamedQuery(
       name = "ImagedMoment.findByImageReferenceUUID",
@@ -306,54 +311,62 @@ object ImagedMomentImpl {
   }
 
   def apply(imagedMoment: ImagedMoment): ImagedMomentImpl = {
-    val newImagedMoment = apply(Option(imagedMoment.videoReferenceUUID),
+    val newImagedMoment = apply(
+      Option(imagedMoment.videoReferenceUUID),
       Option(imagedMoment.recordedDate),
       Option(imagedMoment.timecode),
-      Option(imagedMoment.elapsedTime))
+      Option(imagedMoment.elapsedTime)
+    )
     newImagedMoment.uuid = imagedMoment.uuid
     Option(imagedMoment.ancillaryDatum)
       .foreach(ad => newImagedMoment.ancillaryDatum = CachedAncillaryDatumImpl(ad))
     imagedMoment.observations.foreach(obs => newImagedMoment.addObservation(ObservationImpl(obs)))
-    imagedMoment.imageReferences.foreach(ir => newImagedMoment.addImageReference(ImageReferenceImpl(ir)))
+    imagedMoment
+      .imageReferences
+      .foreach(ir => newImagedMoment.addImageReference(ImageReferenceImpl(ir)))
     newImagedMoment
   }
 
-
-
   /**
-  * Map a group of annotations to the equivalent group of imagedMOments
-   * @param annotations
-   * @return
-   */
-  def apply(annotations: Seq[Annotation]): Seq[ImagedMomentImpl] ={
+    * Map a group of annotations to the equivalent group of imagedMOments
+    * @param annotations
+    * @return
+    */
+  def apply(annotations: Seq[Annotation]): Seq[ImagedMomentImpl] = {
     val moments = new mutable.ArrayBuffer[ImagedMomentImpl]()
     // -- 1st pass create moments
     for (a <- annotations) {
 
       // Grab the correct imageMoment
-      val  imagedMoment = moments.filter(i => i.videoReferenceUUID == a.videoReferenceUuid)
-        .find(i => (a.imagedMomentUuid != null && i.uuid == a.imagedMomentUuid)
-          || (a.recordedTimestamp != null && i.recordedDate == a.recordedTimestamp)
-          || (a.elapsedTime != null && i.elapsedTime == a.elapsedTime)
-          || (a.timecode != null && i.timecode == a.timecode))
-        .getOrElse({
-          val i = ImagedMomentImpl(Some(a.videoReferenceUuid),
+      val imagedMoment = moments
+        .filter(i => i.videoReferenceUUID == a.videoReferenceUuid)
+        .find(i =>
+          (a.imagedMomentUuid != null && i.uuid == a.imagedMomentUuid)
+            || (a.recordedTimestamp != null && i.recordedDate == a.recordedTimestamp)
+            || (a.elapsedTime != null && i.elapsedTime == a.elapsedTime)
+            || (a.timecode != null && i.timecode == a.timecode)
+        )
+        .getOrElse {
+          val i = ImagedMomentImpl(
+            Some(a.videoReferenceUuid),
             Option(a.recordedTimestamp),
             Option(a.timecode),
-            Option(a.elapsedTime))
+            Option(a.elapsedTime)
+          )
           Option(a.imagedMomentUuid).foreach(uuid => i.uuid = uuid)
           moments.append(i)
           i
-        })
-
+        }
 
       // Add the observation
-      val o = ObservationImpl(a.concept,
+      val o = ObservationImpl(
+        a.concept,
         Option(a.duration),
         Option(a.observationTimestamp),
         Option(a.observer),
         Option(a.group),
-        Option(a.activity))
+        Option(a.activity)
+      )
       Option(a.observationUuid).foreach(uuid => o.uuid = uuid)
       imagedMoment.addObservation(o)
 
@@ -361,17 +374,19 @@ object ImagedMomentImpl {
       a.associations.foreach(ass => o.addAssociation(ass))
 
       // Add the images (if needed)
-      a.imageReferences.foreach(img => {
-        imagedMoment.imageReferences
-          .find(i => i.url == img.url) match {
-          case None => imagedMoment.addImageReference(img)
-          case Some(_) => // Do nothing. Image already exists
-        }
+      a.imageReferences
+        .foreach(img => {
+          imagedMoment
+            .imageReferences
+            .find(i => i.url == img.url) match {
+            case None    => imagedMoment.addImageReference(img)
+            case Some(_) => // Do nothing. Image already exists
+          }
 
-      })
+        })
 
     }
-    moments
+    moments.toSeq
 
   }
 

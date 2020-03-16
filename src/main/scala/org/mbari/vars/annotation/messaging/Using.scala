@@ -19,9 +19,9 @@ package org.mbari.vars.annotation.messaging
 import scala.util.control.NonFatal
 
 /**
- * @author Brian Schlining
- * @since 2020-01-30T15:57:00
- */
+  * @author Brian Schlining
+  * @since 2020-01-30T15:57:00
+  */
 object Using {
 
   def apply[T <: AutoCloseable, V](r: => T)(f: T => V): V = {
@@ -30,11 +30,13 @@ object Using {
     var exception: Throwable = null
     try {
       f(resource)
-    } catch {
+    }
+    catch {
       case e: Throwable =>
         exception = e
         throw e
-    } finally {
+    }
+    finally {
       closeAndAddSuppressed(exception, resource)
     }
   }
@@ -43,7 +45,8 @@ object Using {
     if (e != null) {
       try {
         resource.close()
-      } catch {
+      }
+      catch {
         case NonFatal(suppressed) =>
           e.addSuppressed(suppressed)
         case fatal: Throwable if NonFatal(e) =>
@@ -55,10 +58,10 @@ object Using {
         case fatal: Throwable =>
           e.addSuppressed(fatal)
       }
-    } else {
+    }
+    else {
       resource.close()
     }
   }
-
 
 }

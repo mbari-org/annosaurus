@@ -16,32 +16,40 @@
 
 package org.mbari.vars.annotation.gson
 
-import java.lang.reflect.{ ParameterizedType, Type }
+import java.lang.reflect.{ParameterizedType, Type}
 
 import com.google.gson._
 
 /**
- * @author Brian Schlining
- * @since 2017-11-14T11:42:00
- */
+  * @author Brian Schlining
+  * @since 2017-11-14T11:42:00
+  */
 class OptionSerializer extends JsonSerializer[Option[Any]] with JsonDeserializer[Option[Any]] {
 
   private def innerType(outerType: Type) = outerType match {
     case pt: ParameterizedType => pt.getActualTypeArguments()(0)
-    case _ => throw new UnsupportedOperationException(outerType.toString)
+    case _                     => throw new UnsupportedOperationException(outerType.toString)
   }
 
-  override def serialize(src: Option[Any], typeOfSrc: Type, context: JsonSerializationContext): JsonElement = {
+  override def serialize(
+      src: Option[Any],
+      typeOfSrc: Type,
+      context: JsonSerializationContext
+  ): JsonElement = {
     src match {
-      case None => JsonNull.INSTANCE
+      case None    => JsonNull.INSTANCE
       case Some(v) => context.serialize(v, innerType(typeOfSrc))
     }
   }
-  override def deserialize(json: JsonElement, typeOfT: Type, context: JsonDeserializationContext): Option[Any] = {
+  override def deserialize(
+      json: JsonElement,
+      typeOfT: Type,
+      context: JsonDeserializationContext
+  ): Option[Any] = {
     json match {
-      case null => None
+      case null                 => None
       case _ if json.isJsonNull => None
-      case _ => Some(context.deserialize(json, innerType(typeOfT)))
+      case _                    => Some(context.deserialize(json, innerType(typeOfT)))
     }
   }
 }

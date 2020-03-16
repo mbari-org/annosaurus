@@ -21,11 +21,11 @@ import java.util.UUID
 import org.mbari.vars.annotation.dao.jpa.AssociationImpl
 
 /**
- * @author Brian Schlining
- * @since 2019-10-22T14:35:00
- */
+  * @author Brian Schlining
+  * @since 2019-10-22T14:35:00
+  */
 class AssociationExt extends AssociationImpl {
   //  @Expose(serialize = true)
-  var observationUuid: UUID = _
+  var observationUuid: UUID  = _
   var imagedMomentUuid: UUID = _
 }

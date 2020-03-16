@@ -21,14 +21,14 @@ import java.util.UUID
 import org.mbari.vars.annotation.PersistentObject
 import org.mbari.vars.annotation.dao.DAO
 
-import scala.concurrent.{ ExecutionContext, Future }
+import scala.concurrent.{ExecutionContext, Future}
 
 /**
- *
- *
- * @author Brian Schlining
- * @since 2016-06-25T17:17:00
- */
+  *
+  *
+  * @author Brian Schlining
+  * @since 2016-06-25T17:17:00
+  */
 trait BaseController[A <: PersistentObject, B <: DAO[A]] {
 
   def daoFactory: BasicDAOFactory
@@ -37,7 +37,7 @@ trait BaseController[A <: PersistentObject, B <: DAO[A]] {
 
   protected def exec[T](fn: B => T)(implicit ec: ExecutionContext): Future[T] = {
     val dao = newDAO()
-    val f = dao.runTransaction(fn)
+    val f   = dao.runTransaction(fn)
     f.onComplete(_ => dao.close())
     f
   }
@@ -55,7 +55,9 @@ trait BaseController[A <: PersistentObject, B <: DAO[A]] {
     exec(fn)
   }
 
-  def findAll(limit: Option[Int] = None, offset: Option[Int] = None)(implicit ec: ExecutionContext): Future[Iterable[A]] =
+  def findAll(limit: Option[Int] = None, offset: Option[Int] = None)(
+      implicit ec: ExecutionContext
+  ): Future[Iterable[A]] =
     exec(d => d.findAll(limit, offset))
 
   def findByUUID(uuid: UUID)(implicit ec: ExecutionContext): Future[Option[A]] =

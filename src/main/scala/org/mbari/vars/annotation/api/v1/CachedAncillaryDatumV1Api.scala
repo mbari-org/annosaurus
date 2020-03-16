@@ -21,84 +21,120 @@ import java.util.UUID
 
 import org.mbari.vars.annotation.controllers.CachedAncillaryDatumController
 import org.mbari.vars.annotation.model.simple.CachedAncillaryDatumBean
-import org.scalatra.{ BadRequest, NotFound }
+import org.scalatra.{BadRequest, NotFound}
 
 import scala.concurrent.ExecutionContext
 import scala.collection.JavaConverters._
 
 /**
- * @author Brian Schlining
- * @since 2017-05-01T13:24:00
- */
-class CachedAncillaryDatumV1Api(controller: CachedAncillaryDatumController)(implicit val executor: ExecutionContext)
-  extends V1APIStack {
+  * @author Brian Schlining
+  * @since 2017-05-01T13:24:00
+  */
+class CachedAncillaryDatumV1Api(controller: CachedAncillaryDatumController)(
+    implicit val executor: ExecutionContext
+) extends V1APIStack {
 
   before() {
     contentType = "application/json"
-    response.headers += ("Access-Control-Allow-Origin" -> "*")
+    response.headers.set("Access-Control-Allow-Origin", "*")
   }
 
   get("/:uuid") {
-    val uuid = params.getAs[UUID]("uuid").getOrElse(halt(BadRequest("{\"error\": \"Please provide a ancillary data UUID\"}")))
-    controller.findByUUID(uuid).map({
-      case None => halt(NotFound(
-        body = s"An AncillaryDatum with a UUID of $uuid was not found"))
-      case Some(v) => toJson(v)
-    })
+    val uuid = params
+      .getAs[UUID]("uuid")
+      .getOrElse(halt(BadRequest("{\"error\": \"Please provide a ancillary data UUID\"}")))
+    controller
+      .findByUUID(uuid)
+      .map({
+        case None    => halt(NotFound(body = s"An AncillaryDatum with a UUID of $uuid was not found"))
+        case Some(v) => toJson(v)
+      })
   }
 
   get("/videoreference/:uuid") {
-    val uuid = params.getAs[UUID]("uuid").getOrElse(halt(BadRequest("{\"error\": \"Please provide a video reference UUID\"}")))
-    controller.findByVideoReferenceUUID(uuid)
+    val uuid = params
+      .getAs[UUID]("uuid")
+      .getOrElse(halt(BadRequest("{\"error\": \"Please provide a video reference UUID\"}")))
+    controller
+      .findByVideoReferenceUUID(uuid)
       .map(_.asJava)
       .map(toJson)
   }
 
   get("/imagedmoment/:uuid") {
-    val uuid = params.getAs[UUID]("uuid").getOrElse(halt(BadRequest("{\"error\": \"Please provide an image reference UUID\"}")))
-    controller.findByImagedMomentUUID(uuid)
+    val uuid = params
+      .getAs[UUID]("uuid")
+      .getOrElse(halt(BadRequest("{\"error\": \"Please provide an image reference UUID\"}")))
+    controller
+      .findByImagedMomentUUID(uuid)
       .map({
-        case None => halt(NotFound(body = s"No imagereference with a uuid of $uuid was found"))
+        case None     => halt(NotFound(body = s"No imagereference with a uuid of $uuid was found"))
         case Some(im) => toJson(im)
       })
   }
 
   get("/observation/:uuid") {
-    val uuid = params.getAs[UUID]("uuid").getOrElse(halt(BadRequest("{\"error\": \"Please provide an observation UUID\"}")))
-    controller.findByObservationUUID(uuid)
+    val uuid = params
+      .getAs[UUID]("uuid")
+      .getOrElse(halt(BadRequest("{\"error\": \"Please provide an observation UUID\"}")))
+    controller
+      .findByObservationUUID(uuid)
       .map({
-        case None => halt(NotFound(body = s"No observation with a uuid of $uuid was found"))
+        case None     => halt(NotFound(body = s"No observation with a uuid of $uuid was found"))
         case Some(im) => toJson(im)
       })
   }
 
   post("/") {
     validateRequest() // Apply API security
-    val imagedMomentUuid = params.getAs[UUID]("imaged_moment_uuid")
+    val imagedMomentUuid = params
+      .getAs[UUID]("imaged_moment_uuid")
       .getOrElse(halt(BadRequest("An imaged_moment_uuid is required")))
-    val latitude = params.getAs[Double]("latitude")
+    val latitude = params
+      .getAs[Double]("latitude")
       .getOrElse(halt(BadRequest("A latitude is required")))
-    val longitude = params.getAs[Double]("longitude")
+    val longitude = params
+      .getAs[Double]("longitude")
       .getOrElse(halt(BadRequest("A longitude is required")))
-    val depthMeters = params.getAs[Double]("depth_meters")
+    val depthMeters = params
+      .getAs[Double]("depth_meters")
       .getOrElse(halt(BadRequest("A depth_meters is required")))
-    val altitude = params.getAs[Double]("altitude_meters")
-    val crs = params.get("crs")
-    val salinity = params.getAs[Double]("salinity")
-    val oxygenMlL = params.getAs[Double]("oxygen")
-    val temperature = params.getAs[Double]("temperature_celsius")
-    val pressureDbar = params.getAs[Double]("pressure_dbar")
+    val altitude          = params.getAs[Double]("altitude_meters")
+    val crs               = params.get("crs")
+    val salinity          = params.getAs[Double]("salinity")
+    val oxygenMlL         = params.getAs[Double]("oxygen")
+    val temperature       = params.getAs[Double]("temperature_celsius")
+    val pressureDbar      = params.getAs[Double]("pressure_dbar")
     val lightTransmission = params.getAs[Double]("light_transmission")
-    val x = params.getAs[Double]("x")
-    val y = params.getAs[Double]("y")
-    val z = params.getAs[Double]("z")
+    val x                 = params.getAs[Double]("x")
+    val y                 = params.getAs[Double]("y")
+    val z                 = params.getAs[Double]("z")
     val posePositionUnits = params.get("pose_position_units")
-    val phi = params.getAs[Double]("phi")
-    val theta = params.getAs[Double]("theta")
-    val psi = params.getAs[Double]("psi")
+    val phi               = params.getAs[Double]("phi")
+    val theta             = params.getAs[Double]("theta")
+    val psi               = params.getAs[Double]("psi")
 
-    controller.create(imagedMomentUuid, latitude, longitude, depthMeters, altitude, crs, salinity,
-      temperature, oxygenMlL, pressureDbar, lightTransmission, x, y, z, posePositionUnits, phi, theta, psi)
+    controller
+      .create(
+        imagedMomentUuid,
+        latitude,
+        longitude,
+        depthMeters,
+        altitude,
+        crs,
+        salinity,
+        temperature,
+        oxygenMlL,
+        pressureDbar,
+        lightTransmission,
+        x,
+        y,
+        z,
+        posePositionUnits,
+        phi,
+        theta,
+        psi
+      )
       .map(toJson)
 
   }
@@ -107,67 +143,101 @@ class CachedAncillaryDatumV1Api(controller: CachedAncillaryDatumController)(impl
     validateRequest()
     request.getHeader("Content-Type") match {
       case "application/json" =>
-        val b = request.body
+        val b    = request.body
         val data = fromJson(b, classOf[Array[CachedAncillaryDatumBean]])
         //log.info("Recieved >>> " + b)
         //log.info("Parse    <<< " + toJson(data))
-        controller.bulkCreateOrUpdate(data)
+        controller
+          .bulkCreateOrUpdate(data)
           .map(ds => toJson(ds.asJava))
       case _ =>
-        halt(BadRequest("Posts to /bulk only accept a JSON body (i.e. Content-Type: application/json)"))
+        halt(
+          BadRequest("Posts to /bulk only accept a JSON body (i.e. Content-Type: application/json)")
+        )
     }
   }
 
   put("/merge/:uuid") {
     validateRequest()
-    val uuid = params.getAs[UUID]("uuid").getOrElse(halt(BadRequest(
-      body = "A video reference 'uuid' parameter is required")))
+    val uuid = params
+      .getAs[UUID]("uuid")
+      .getOrElse(halt(BadRequest(body = "A video reference 'uuid' parameter is required")))
     val windowMillis = params.getAs[Int]("window").getOrElse(7500)
     request.getHeader("Content-Type") match {
       case "application/json" =>
         val data = fromJson(request.body, classOf[Array[CachedAncillaryDatumBean]])
-        controller.merge(data, uuid, Duration.ofMillis(windowMillis))
+        controller
+          .merge(data, uuid, Duration.ofMillis(windowMillis))
           .map(ds => toJson(ds.asJava))
       case _ =>
-        halt(BadRequest("Posts to /merge only accept a JSON body (i.e. Content-Type: application/json)"))
+        halt(
+          BadRequest(
+            "Posts to /merge only accept a JSON body (i.e. Content-Type: application/json)"
+          )
+        )
     }
   }
 
   put("/:uuid") {
     validateRequest() // Apply API security
-    val uuid = params.getAs[UUID]("uuid").getOrElse(halt(BadRequest(
-      body = "A video reference 'uuid' parameter is required")))
-    val latitude = params.getAs[Double]("latitude")
-    val longitude = params.getAs[Double]("longitude")
-    val depthMeters = params.getAs[Double]("depth_meters")
-    val altitudeMeters = params.getAs[Double]("altitude_meters")
-    val crs = params.get("crs")
-    val salinity = params.getAs[Double]("salinity")
-    val oxygenMlL = params.getAs[Double]("oxygen")
-    val temperature = params.getAs[Double]("temperature_celsius")
-    val pressureDbar = params.getAs[Double]("pressure_dbar")
+    val uuid = params
+      .getAs[UUID]("uuid")
+      .getOrElse(halt(BadRequest(body = "A video reference 'uuid' parameter is required")))
+    val latitude          = params.getAs[Double]("latitude")
+    val longitude         = params.getAs[Double]("longitude")
+    val depthMeters       = params.getAs[Double]("depth_meters")
+    val altitudeMeters    = params.getAs[Double]("altitude_meters")
+    val crs               = params.get("crs")
+    val salinity          = params.getAs[Double]("salinity")
+    val oxygenMlL         = params.getAs[Double]("oxygen")
+    val temperature       = params.getAs[Double]("temperature_celsius")
+    val pressureDbar      = params.getAs[Double]("pressure_dbar")
     val lightTransmission = params.getAs[Double]("light_transmission")
-    val x = params.getAs[Double]("x")
-    val y = params.getAs[Double]("y")
-    val z = params.getAs[Double]("z")
+    val x                 = params.getAs[Double]("x")
+    val y                 = params.getAs[Double]("y")
+    val z                 = params.getAs[Double]("z")
     val posePositionUnits = params.get("pose_position_units")
-    val phi = params.getAs[Double]("phi")
-    val theta = params.getAs[Double]("theta")
-    val psi = params.getAs[Double]("psi")
+    val phi               = params.getAs[Double]("phi")
+    val theta             = params.getAs[Double]("theta")
+    val psi               = params.getAs[Double]("psi")
 
-    controller.update(uuid, latitude, longitude, depthMeters, altitudeMeters, crs, salinity,
-      oxygenMlL, temperature, pressureDbar, lightTransmission, x, y, z, posePositionUnits, phi, theta, psi)
+    controller
+      .update(
+        uuid,
+        latitude,
+        longitude,
+        depthMeters,
+        altitudeMeters,
+        crs,
+        salinity,
+        oxygenMlL,
+        temperature,
+        pressureDbar,
+        lightTransmission,
+        x,
+        y,
+        z,
+        posePositionUnits,
+        phi,
+        theta,
+        psi
+      )
       .map({
-        case None => halt(NotFound(body = s"A CachedAncillaryDatum with uuid of $uuid was not found"))
+        case None =>
+          halt(NotFound(body = s"A CachedAncillaryDatum with uuid of $uuid was not found"))
         case Some(v) => toJson(v)
       })
   }
 
   delete("/videoreference/:uuid") {
     validateRequest()
-    val uuid = params.getAs[UUID]("uuid").getOrElse(halt(BadRequest(
-      body = "{\"error\": \"A video reference 'uuid' parameter is required\"}")))
-    controller.deleteByVideoReferenceUuid(uuid)
+    val uuid = params
+      .getAs[UUID]("uuid")
+      .getOrElse(
+        halt(BadRequest(body = "{\"error\": \"A video reference 'uuid' parameter is required\"}"))
+      )
+    controller
+      .deleteByVideoReferenceUuid(uuid)
       .map(n => s"""{"video_reference_uuid": "$uuid", "count": $n}""")
   }
 

@@ -19,9 +19,9 @@ package org.mbari.vars.annotation.model.simple
 import com.google.gson.annotations.Expose
 
 /**
- * @author Brian Schlining
- * @since 2019-05-23T16:55:00
- */
+  * @author Brian Schlining
+  * @since 2019-05-23T16:55:00
+  */
 class ConcurrentRequestCount {
 
   @Expose(serialize = true)

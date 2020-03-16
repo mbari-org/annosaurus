@@ -34,65 +34,63 @@ import scala.concurrent.{Await, Future}
 import scala.util.Try
 
 /**
- * All Api classes should mixin this trait. It defines the common traits used by all implementations
- * as well implicits need for type conversions.
- *
- * @author Brian Schlining
- * @since 2016-05-23T13:32:00
- */
-abstract class APIStack extends ScalatraServlet
-  with ApiAuthenticationSupport
-  with FutureSupport {
+  * All Api classes should mixin this trait. It defines the common traits used by all implementations
+  * as well implicits need for type conversions.
+  *
+  * @author Brian Schlining
+  * @since 2016-05-23T13:32:00
+  */
+abstract class APIStack extends ScalatraServlet with ApiAuthenticationSupport with FutureSupport {
 
   implicit def toScalaDuration(duration: Duration): SDuration =
     SDuration(duration.toNanos, TimeUnit.NANOSECONDS)
 
-  protected[this] val log = LoggerFactory.getLogger(getClass)
-  protected[this] val timeFormatter = DateTimeFormatter.ISO_DATE_TIME
+  protected[this] val log                  = LoggerFactory.getLogger(getClass)
+  protected[this] val timeFormatter        = DateTimeFormatter.ISO_DATE_TIME
   protected[this] val compactTimeFormatter = DateTimeFormatter.ofPattern("yyyyMMdd'T'HHmmssX")
-  protected[this] val defaultLimit = 50
+  protected[this] val defaultLimit         = 50
 
   //protected[this] implicit val jsonFormats: Formats = DefaultFormats ++ JavaTypesSerializers.all
 
-  protected implicit val stringToUUID = new TypeConverter[String, UUID] {
+  implicit protected val stringToUUID = new TypeConverter[String, UUID] {
     override def apply(s: String): Option[UUID] = Try(UUID.fromString(s)).toOption
   }
 
-  protected implicit val stringToInstant = new TypeConverter[String, Instant] {
+  implicit protected val stringToInstant = new TypeConverter[String, Instant] {
     override def apply(s: String): Option[Instant] = {
       val try1 = Try(Instant.from(compactTimeFormatter.parse(s))).toOption
       try1 match {
         case Some(t) => try1
-        case None => Try(Instant.from(timeFormatter.parse(s))).toOption
+        case None    => Try(Instant.from(timeFormatter.parse(s))).toOption
       }
     }
   }
 
-  protected implicit val stringToDuration = new TypeConverter[String, Duration] {
+  implicit protected val stringToDuration = new TypeConverter[String, Duration] {
     override def apply(s: String): Option[Duration] = Try(Duration.ofMillis(s.toLong)).toOption
   }
 
-  protected implicit val stringToURI = new TypeConverter[String, URI] {
+  implicit protected val stringToURI = new TypeConverter[String, URI] {
     override def apply(s: String): Option[URI] = Try(URI.create(s)).toOption
   }
 
-  protected implicit val stringToURL = new TypeConverter[String, URL] {
+  implicit protected val stringToURL = new TypeConverter[String, URL] {
     override def apply(s: String): Option[URL] = Try(new URL(s)).toOption
   }
 
-  protected implicit val stringToTimecode = new TypeConverter[String, Timecode] {
+  implicit protected val stringToTimecode = new TypeConverter[String, Timecode] {
     override def apply(s: String): Option[Timecode] = Try(new Timecode(s)).toOption
   }
 
-  def toJson(obj: Any): String = Constants.GSON.toJson(obj)
+  def toJson(obj: Any): String                      = Constants.GSON.toJson(obj)
   def fromJson[T](json: String, classOfT: Class[T]) = Constants.GSON.fromJson(json, classOfT)
 
   /**
-   * "Stream" the iterable data as a chunked response.
-   * @param response The original response
-   * @param items The items to stream back
-   * @tparam T The type of each item in items
-   */
+    * "Stream" the iterable data as a chunked response.
+    * @param response The original response
+    * @param items The items to stream back
+    * @tparam T The type of each item in items
+    */
   def sendChunkedResponse[T](response: HttpServletResponse, items: Iterable[T]): Unit = {
 
     response.setHeader("Transfer-Encoding", "chunked")
@@ -105,33 +103,34 @@ abstract class APIStack extends ScalatraServlet
       if (remaining.nonEmpty) {
         out.write(",")
         write(remaining.head, remaining.tail)
-      } else out.write("]")
+      }
+      else out.write("]")
     }
     write(items.head, items.tail)
     out.flush()
 
   }
 
-
   /**
-   * Pages data and sends each page back as a chunked response to the server
-   * @param response The response object
-   * @param start The starting index of the data to stream (same as offset)
-   * @param end The ending index of the data to stream (could be offset + limit)
-   * @param pageSize The number of items in each chunked page
-   * @param fn A function that takes (limit, offset) and fetches a iterable
-   *           of items (as a future). This function is fetching a page of
-   *           data from the database.
-   * @param timeout The timeout for a chunk.
-   * @tparam T The type of items returned from the database.
-   */
+    * Pages data and sends each page back as a chunked response to the server
+    * @param response The response object
+    * @param start The starting index of the data to stream (same as offset)
+    * @param end The ending index of the data to stream (could be offset + limit)
+    * @param pageSize The number of items in each chunked page
+    * @param fn A function that takes (limit, offset) and fetches a iterable
+    *           of items (as a future). This function is fetching a page of
+    *           data from the database.
+    * @param timeout The timeout for a chunk.
+    * @tparam T The type of items returned from the database.
+    */
   def autoPage[T](
-    response: HttpServletResponse,
-    start: Int,
-    end: Int,
-    pageSize: Int,
-    fn: (Int, Int) => Future[Iterable[T]],
-    timeout: Duration = Duration.ofSeconds(20)): Unit = {
+      response: HttpServletResponse,
+      start: Int,
+      end: Int,
+      pageSize: Int,
+      fn: (Int, Int) => Future[Iterable[T]],
+      timeout: Duration = Duration.ofSeconds(20)
+  ): Unit = {
 
     log.debug(s"Executing: autoPage(..., $start, $end, $pageSize, ..., ...)")
 
@@ -152,7 +151,7 @@ abstract class APIStack extends ScalatraServlet
     out.write("[")
     for (j <- start to end by pageSize) {
       val prependComma = j > start
-      val limit = if (j + pageSize > end) end - j else pageSize
+      val limit        = if (j + pageSize > end) end - j else pageSize
       log.debug(s"Executing: autoPage::processChunk($limit, $j, $prependComma)")
       if (limit > 0) {
         processChunk(limit, j, prependComma)

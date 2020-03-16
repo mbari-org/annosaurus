@@ -22,11 +22,11 @@ import java.util.UUID
 import org.mbari.vars.annotation.PersistentObject
 
 /**
- *
- *
- * @author Brian Schlining
- * @since 2016-06-15T16:54:00
- */
+  *
+  *
+  * @author Brian Schlining
+  * @since 2016-06-15T16:54:00
+  */
 trait Association extends PersistentObject {
 
   var uuid: UUID
@@ -36,8 +36,8 @@ trait Association extends PersistentObject {
   var linkValue: String
 
   /**
-   * The mime-type of the linkValue
-   */
+    * The mime-type of the linkValue
+    */
   var mimeType: String
   def lastUpdated: Option[Instant]
 
@@ -58,4 +58,3 @@ object Association {
   }
 
 }
-

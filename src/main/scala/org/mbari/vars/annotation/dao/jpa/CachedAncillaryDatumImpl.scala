@@ -16,76 +16,79 @@
 
 package org.mbari.vars.annotation.dao.jpa
 
-import javax.persistence.{ CascadeType, JoinColumn, _ }
+import javax.persistence.{CascadeType, JoinColumn, _}
 
 import com.google.gson.annotations.Expose
-import org.mbari.vars.annotation.model.{ CachedAncillaryDatum, ImagedMoment }
+import org.mbari.vars.annotation.model.{CachedAncillaryDatum, ImagedMoment}
 
 /**
- *
- *
- * @author Brian Schlining
- * @since 2016-06-17T15:17:00
- */
+  *
+  *
+  * @author Brian Schlining
+  * @since 2016-06-17T15:17:00
+  */
 @Entity(name = "AncillaryDatum")
-@Table(name = "ancillary_data", indexes = Array(
-  new Index(name = "idx_ancillary_data__imaged_moment_uuid", columnList = "imaged_moment_uuid"),
-  new Index(name = "idx_ancillary_data__position", columnList = "latitude,longitude,depth_meters"))) //idx_ancillary_data_fk_im
+@Table(
+  name = "ancillary_data",
+  indexes = Array(
+    new Index(name = "idx_ancillary_data__imaged_moment_uuid", columnList = "imaged_moment_uuid"),
+    new Index(name = "idx_ancillary_data__position", columnList = "latitude,longitude,depth_meters")
+  )
+) //idx_ancillary_data_fk_im
 @EntityListeners(value = Array(classOf[TransactionLogger]))
-@NamedNativeQueries(Array(
-  new NamedNativeQuery(
-    name = "AncillaryDatum.deleteByVideoReferenceUuid",
-    query = "DELETE FROM ancillary_data WHERE imaged_moment_uuid IN (SELECT uuid FROM imaged_moments WHERE video_reference_uuid = ?1)")))
-@NamedQueries(Array(
-  new NamedQuery(
-    name = "AncillaryDatum.findAll",
-    query = "SELECT a FROM AncillaryDatum a ORDER BY a.uuid"),
-  new NamedQuery(
-    name = "AncillaryDatum.findByImagedMomentUUID",
-    query = "SELECT a FROM AncillaryDatum a JOIN a.imagedMoment i WHERE i.uuid = :uuid ORDER BY a.uuid"),
-  new NamedQuery(
-    name = "AncillaryDatum.findByObservationUUID",
-    query = "SELECT a FROM AncillaryDatum a INNER JOIN FETCH a.imagedMoment im INNER JOIN FETCH im.javaObservations o WHERE o.uuid = :uuid ORDER BY a.uuid")))
+@NamedNativeQueries(
+  Array(
+    new NamedNativeQuery(
+      name = "AncillaryDatum.deleteByVideoReferenceUuid",
+      query = "DELETE FROM ancillary_data WHERE imaged_moment_uuid IN (SELECT uuid FROM imaged_moments WHERE video_reference_uuid = ?1)"
+    )
+  )
+)
+@NamedQueries(
+  Array(
+    new NamedQuery(
+      name = "AncillaryDatum.findAll",
+      query = "SELECT a FROM AncillaryDatum a ORDER BY a.uuid"
+    ),
+    new NamedQuery(
+      name = "AncillaryDatum.findByImagedMomentUUID",
+      query =
+        "SELECT a FROM AncillaryDatum a JOIN a.imagedMoment i WHERE i.uuid = :uuid ORDER BY a.uuid"
+    ),
+    new NamedQuery(
+      name = "AncillaryDatum.findByObservationUUID",
+      query =
+        "SELECT a FROM AncillaryDatum a INNER JOIN FETCH a.imagedMoment im INNER JOIN FETCH im.javaObservations o WHERE o.uuid = :uuid ORDER BY a.uuid"
+    )
+  )
+)
 class CachedAncillaryDatumImpl extends CachedAncillaryDatum with JPAPersistentObject {
 
   @Expose(serialize = true)
-  @Column(
-    name = "coordinate_reference_system",
-    length = 32,
-    nullable = true)
+  @Column(name = "coordinate_reference_system", length = 32, nullable = true)
   override var crs: String = _
 
   @Expose(serialize = true)
-  @Column(
-    name = "oxygen_ml_per_l",
-    nullable = true)
+  @Column(name = "oxygen_ml_per_l", nullable = true)
   @Convert(converter = classOf[DoubleOptionConverter])
   override var oxygenMlL: Option[Double] = None
 
   @Expose(serialize = true)
-  @Column(
-    name = "depth_meters",
-    nullable = true)
+  @Column(name = "depth_meters", nullable = true)
   @Convert(converter = classOf[DoubleOptionConverter])
   override var depthMeters: Option[Double] = None
 
   @Expose(serialize = true)
-  @Column(
-    name = "z",
-    nullable = true)
+  @Column(name = "z", nullable = true)
   @Convert(converter = classOf[DoubleOptionConverter])
   override var z: Option[Double] = None
 
   @Expose(serialize = true)
-  @Column(
-    name = "xyz_position_units",
-    nullable = true)
+  @Column(name = "xyz_position_units", nullable = true)
   override var posePositionUnits: String = _
 
   @Expose(serialize = true)
-  @Column(
-    name = "latitude",
-    nullable = true)
+  @Column(name = "latitude", nullable = true)
   @Convert(converter = classOf[DoubleOptionConverter])
   override var latitude: Option[Double] = None
 
@@ -94,87 +97,63 @@ class CachedAncillaryDatumImpl extends CachedAncillaryDatum with JPAPersistentOb
     cascade = Array(CascadeType.PERSIST, CascadeType.DETACH),
     optional = false,
     fetch = FetchType.LAZY,
-    targetEntity = classOf[ImagedMomentImpl])
-  @JoinColumn(
-    name = "imaged_moment_uuid",
-    nullable = false,
-    columnDefinition = "CHAR(36)")
+    targetEntity = classOf[ImagedMomentImpl]
+  )
+  @JoinColumn(name = "imaged_moment_uuid", nullable = false, columnDefinition = "CHAR(36)")
   override var imagedMoment: ImagedMoment = _
 
   @Expose(serialize = true)
-  @Column(
-    name = "y",
-    nullable = true)
+  @Column(name = "y", nullable = true)
   @Convert(converter = classOf[DoubleOptionConverter])
   override var y: Option[Double] = None
 
   @Expose(serialize = true)
-  @Column(
-    name = "temperature_celsius",
-    nullable = true)
+  @Column(name = "temperature_celsius", nullable = true)
   @Convert(converter = classOf[DoubleOptionConverter])
   override var temperatureCelsius: Option[Double] = None
 
   @Expose(serialize = true)
-  @Column(
-    name = "x",
-    nullable = true)
+  @Column(name = "x", nullable = true)
   @Convert(converter = classOf[DoubleOptionConverter])
   override var x: Option[Double] = None
 
   @Expose(serialize = true)
-  @Column(
-    name = "theta",
-    nullable = true)
+  @Column(name = "theta", nullable = true)
   @Convert(converter = classOf[DoubleOptionConverter])
   override var theta: Option[Double] = None
 
   @Expose(serialize = true)
-  @Column(
-    name = "longitude",
-    nullable = true)
+  @Column(name = "longitude", nullable = true)
   @Convert(converter = classOf[DoubleOptionConverter])
   override var longitude: Option[Double] = None
 
   @Expose(serialize = true)
-  @Column(
-    name = "phi",
-    nullable = true)
+  @Column(name = "phi", nullable = true)
   @Convert(converter = classOf[DoubleOptionConverter])
   override var phi: Option[Double] = None
 
   @Expose(serialize = true)
-  @Column(
-    name = "psi",
-    nullable = true)
+  @Column(name = "psi", nullable = true)
   @Convert(converter = classOf[DoubleOptionConverter])
   override var psi: Option[Double] = None
 
   @Expose(serialize = true)
-  @Column(
-    name = "pressure_dbar",
-    nullable = true)
+  @Column(name = "pressure_dbar", nullable = true)
   @Convert(converter = classOf[DoubleOptionConverter])
   override var pressureDbar: Option[Double] = None
 
   @Expose(serialize = true)
-  @Column(
-    name = "salinity",
-    nullable = true)
+  @Column(name = "salinity", nullable = true)
   @Convert(converter = classOf[DoubleOptionConverter])
   override var salinity: Option[Double] = None
 
   @Expose(serialize = true)
-  @Column(
-    name = "altitude",
-    nullable = true)
+  @Column(name = "altitude", nullable = true)
   @Convert(converter = classOf[DoubleOptionConverter])
   override var altitude: Option[Double] = None
 
   @Expose(serialize = true)
-  @Column(
-    name = "light_transmission",
-    nullable = true)
+  @Column(name = "light_transmission", nullable = true)
   @Convert(converter = classOf[DoubleOptionConverter])
   override var lightTransmission: Option[Double] = None
 }
@@ -210,12 +189,12 @@ object CachedAncillaryDatumImpl {
   }
 
   /**
-   *
-   * @param latitude
-   * @param longitude
-   * @param depthMeters
-   * @return
-   */
+    *
+    * @param latitude
+    * @param longitude
+    * @param depthMeters
+    * @return
+    */
   def apply(latitude: Double, longitude: Double, depthMeters: Float): CachedAncillaryDatumImpl = {
     val d = new CachedAncillaryDatumImpl
     d.latitude = Option(latitude)
@@ -225,14 +204,15 @@ object CachedAncillaryDatumImpl {
   }
 
   def apply(
-    latitude: Double,
-    longitude: Double,
-    depthMeters: Float,
-    salinity: Float,
-    temperatureCelsius: Float,
-    pressureDbar: Float,
-    oxygenMlL: Float,
-    crs: String = "CRS:84"): CachedAncillaryDatumImpl = {
+      latitude: Double,
+      longitude: Double,
+      depthMeters: Float,
+      salinity: Float,
+      temperatureCelsius: Float,
+      pressureDbar: Float,
+      oxygenMlL: Float,
+      crs: String = "CRS:84"
+  ): CachedAncillaryDatumImpl = {
     val d = apply(latitude, longitude, depthMeters)
     d.salinity = Option(salinity)
     d.temperatureCelsius = Option(temperatureCelsius)

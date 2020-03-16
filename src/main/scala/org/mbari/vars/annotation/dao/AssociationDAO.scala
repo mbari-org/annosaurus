@@ -22,18 +22,19 @@ import org.mbari.vars.annotation.model.Association
 import org.mbari.vars.annotation.model.simple.{ConceptAssociation, ConceptAssociationRequest}
 
 /**
- *
- *
- * @author Brian Schlining
- * @since 2016-06-17T16:08:00
- */
+  *
+  *
+  * @author Brian Schlining
+  * @since 2016-06-17T16:08:00
+  */
 trait AssociationDAO[T <: Association] extends DAO[T] {
 
   def newPersistentObject(
-    linkName: String,
-    toConcept: Option[String] = Some(Association.TO_CONCEPT_SELF),
-    linkValue: Option[String] = Some(Association.LINK_VALUE_NIL),
-    mimeType: Option[String] = Some("text/plain")): T
+      linkName: String,
+      toConcept: Option[String] = Some(Association.TO_CONCEPT_SELF),
+      linkValue: Option[String] = Some(Association.LINK_VALUE_NIL),
+      mimeType: Option[String] = Some("text/plain")
+  ): T
 
   def newPersistentObject(association: Association): T
 
@@ -42,11 +43,14 @@ trait AssociationDAO[T <: Association] extends DAO[T] {
   def findByLinkNameAndVideoReferenceUUID(linkName: String, videoReferenceUUID: UUID): Iterable[T]
 
   def findByLinkNameAndVideoReferenceUUIDAndConcept(
-    linkName: String,
-    videoReferenceUUID: UUID,
-    concept: Option[String] = None): Iterable[T]
+      linkName: String,
+      videoReferenceUUID: UUID,
+      concept: Option[String] = None
+  ): Iterable[T]
 
-  def findByConceptAssociationRequest(request: ConceptAssociationRequest): Iterable[ConceptAssociation]
+  def findByConceptAssociationRequest(
+      request: ConceptAssociationRequest
+  ): Iterable[ConceptAssociation]
 
   def countByToConcept(toConcept: String): Int
 

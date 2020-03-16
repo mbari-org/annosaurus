@@ -20,13 +20,13 @@ import io.reactivex.subjects.{PublishSubject, Subject}
 import org.slf4j.LoggerFactory
 
 /**
- * This is the shared message bus. All publishers whould listen to this bus and
- * publish the appropriate events to their subscribers.
- *
- * MessageBus.RxSubject: Subject[Any]
- *      ^
- *      |
- * AnnotationPublisher.publish(msg)
+  * This is the shared message bus. All publishers whould listen to this bus and
+  * publish the appropriate events to their subscribers.
+  *
+  * MessageBus.RxSubject: Subject[Any]
+  *      ^
+  *      |
+  * AnnotationPublisher.publish(msg)
  **/
 object MessageBus {
 

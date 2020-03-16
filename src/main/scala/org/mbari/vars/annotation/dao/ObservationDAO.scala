@@ -16,65 +16,84 @@
 
 package org.mbari.vars.annotation.dao
 
+import java.util.UUID
 import java.time.{Duration, Instant}
-import java.util.{UUID, stream}
 
 import org.mbari.vars.annotation.dao.jpa.ObservationImpl
 import org.mbari.vars.annotation.model.Observation
 import org.mbari.vars.annotation.model.simple.{ConcurrentRequest, MultiRequest}
 
 /**
- *
- *
- * @author Brian Schlining
- * @since 2016-06-17T16:10:00
- */
+  *
+  *
+  * @author Brian Schlining
+  * @since 2016-06-17T16:10:00
+  */
 trait ObservationDAO[T <: Observation] extends DAO[T] {
 
   def newPersistentObject(
-    concept: String,
-    observer: String,
-    observationDate: Instant = Instant.now(),
-    group: Option[String] = None,
-    duration: Option[Duration] = None): T
+      concept: String,
+      observer: String,
+      observationDate: Instant = Instant.now(),
+      group: Option[String] = None,
+      duration: Option[Duration] = None
+  ): T
 
-  def findByVideoReferenceUUID(uuid: UUID, limit: Option[Int] = None, offset: Option[Int] = None): Iterable[T]
-  def streamByVideoReferenceUUID(uuid: UUID,
-                                 limit: Option[Int] = None,
-                                 offset: Option[Int] = None): java.util.stream.Stream[T]
+  def findByVideoReferenceUUID(
+      uuid: UUID,
+      limit: Option[Int] = None,
+      offset: Option[Int] = None
+  ): Iterable[T]
+  def streamByVideoReferenceUUID(
+      uuid: UUID,
+      limit: Option[Int] = None,
+      offset: Option[Int] = None
+  ): java.util.stream.Stream[T]
 
-  def streamByVideoReferenceUUIDAndTimestamps(uuid: UUID,
-                                startTimestamp: Instant,
-                                endTimestamp: Instant,
-                                limit: Option[Int] = None,
-                                 offset: Option[Int] = None): java.util.stream.Stream[T]
+  def streamByVideoReferenceUUIDAndTimestamps(
+      uuid: UUID,
+      startTimestamp: Instant,
+      endTimestamp: Instant,
+      limit: Option[Int] = None,
+      offset: Option[Int] = None
+  ): java.util.stream.Stream[T]
 
-  def countByVideoReferenceUUIDAndTimestamps(uuid: UUID, startTimestamp: Instant, endTimestamp: Instant): Int
+  def countByVideoReferenceUUIDAndTimestamps(
+      uuid: UUID,
+      startTimestamp: Instant,
+      endTimestamp: Instant
+  ): Int
 
-  def streamByConcurrentRequest(request: ConcurrentRequest,
-                                limit: Option[Int] = None,
-                                offset: Option[Int] = None): java.util.stream.Stream[T]
+  def streamByConcurrentRequest(
+      request: ConcurrentRequest,
+      limit: Option[Int] = None,
+      offset: Option[Int] = None
+  ): java.util.stream.Stream[T]
 
   def countByConcurrentRequest(request: ConcurrentRequest): Long
 
-  def streamByMultiRequest(request: MultiRequest, limit: Option[Int], offset: Option[Int]): java.util.stream.Stream[ObservationImpl]
+  def streamByMultiRequest(
+      request: MultiRequest,
+      limit: Option[Int],
+      offset: Option[Int]
+  ): java.util.stream.Stream[ObservationImpl]
 
   def countByMultiRequest(request: MultiRequest): Long
 
   /**
-   *
-   * @return Order sequence of all concept names used
-   */
+    *
+    * @return Order sequence of all concept names used
+    */
   def findAllConcepts(): Seq[String]
 
   /**
-   * @return Ordered sequence of all activities used.
-   */
+    * @return Ordered sequence of all activities used.
+    */
   def findAllActivities(): Seq[String]
 
   /**
-   * @return Ordered sequence of all groups used.
-   */
+    * @return Ordered sequence of all groups used.
+    */
   def findAllGroups(): Seq[String]
 
   def findAllConceptsByVideoReferenceUUID(uuid: UUID): Seq[String]
@@ -90,11 +109,11 @@ trait ObservationDAO[T <: Observation] extends DAO[T] {
   def updateConcept(oldName: String, newName: String): Int
 
   /**
-   * Move an observation to a different imaged moment efficeintly
-   * @param imagedMomentUuid The image moment we want to move to
-   * @param observationUuid The observation to move
-   * @return The number of records affected. Should be 1
-   */
+    * Move an observation to a different imaged moment efficeintly
+    * @param imagedMomentUuid The image moment we want to move to
+    * @param observationUuid The observation to move
+    * @return The number of records affected. Should be 1
+    */
   def changeImageMoment(imagedMomentUuid: UUID, observationUuid: UUID): Int
 
 }

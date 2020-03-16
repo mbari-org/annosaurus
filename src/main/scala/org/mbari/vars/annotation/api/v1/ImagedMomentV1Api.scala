@@ -28,53 +28,60 @@ import org.scalatra.{BadRequest, NoContent, NotFound}
 
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.collection.JavaConverters._
+
 /**
- *
- *
- * @author Brian Schlining
- * @since 2016-07-11T16:58:00
- */
+  *
+  *
+  * @author Brian Schlining
+  * @since 2016-07-11T16:58:00
+  */
 class ImagedMomentV1Api(controller: ImagedMomentController)(implicit val executor: ExecutionContext)
-  extends V1APIStack {
+    extends V1APIStack {
 
   before() {
     contentType = "application/json"
-    response.headers += ("Access-Control-Allow-Origin" -> "*")
+    response.headers.set("Access-Control-Allow-Origin", "*")
   }
 
   get("/") {
-    val limit = params.getAs[Int]("limit").orElse(Some(100))
+    val limit  = params.getAs[Int]("limit").orElse(Some(100))
     val offset = params.getAs[Int]("offset").orElse(Some(0))
-    controller.findAll(limit, offset)
+    controller
+      .findAll(limit, offset)
       .map(_.asJava)
       .map(toJson)
   }
 
   get("/:uuid") {
     val uuid = params.getAs[UUID]("uuid").getOrElse(halt(BadRequest("Please provide a UUID")))
-    controller.findByUUID(uuid).map({
-      case None => halt(NotFound(
-        body = s"An ImagedMoment with a UUID of $uuid was not found"))
-      case Some(v) => toJson(v)
-    })
+    controller
+      .findByUUID(uuid)
+      .map({
+        case None    => halt(NotFound(body = s"An ImagedMoment with a UUID of $uuid was not found"))
+        case Some(v) => toJson(v)
+      })
   }
 
   get("/concept/:name") {
-    val name = params.get("name")
+    val name = params
+      .get("name")
       .getOrElse(halt(BadRequest("""{"reason": "Please provide a concept name"}""")))
-    val limit = params.getAs[Int]("limit")
+    val limit  = params.getAs[Int]("limit")
     val offset = params.getAs[Int]("offset")
-    controller.findByConcept(name, limit, offset)
+    controller
+      .findByConcept(name, limit, offset)
       .map(_.asJava)
       .map(toJson)
   }
 
   get("/concept/images/:name") {
-    val name = params.get("name")
+    val name = params
+      .get("name")
       .getOrElse(halt(BadRequest("""{"reason": "Please provide a concept name"}""")))
-    val limit = params.getAs[Int]("limit")
+    val limit  = params.getAs[Int]("limit")
     val offset = params.getAs[Int]("offset")
-    controller.findByConceptWithImages(name, limit, offset)
+    controller
+      .findByConceptWithImages(name, limit, offset)
       .map(_.asJava)
       .map(toJson)
   }
@@ -108,17 +115,19 @@ class ImagedMomentV1Api(controller: ImagedMomentController)(implicit val executo
   // }
 
   get("/videoreference/chunked/:uuid") {
-    val uuid = params.getAs[UUID]("uuid").getOrElse(halt(BadRequest("Please provide a Video Reference UUID")))
-    val limit = params.getAs[Int]("limit")
-    val offset = params.getAs[Int]("offset")
-    val pageSize = params.getAs[Int]("pagesize").getOrElse(50)
+    val uuid = params
+      .getAs[UUID]("uuid")
+      .getOrElse(halt(BadRequest("Please provide a Video Reference UUID")))
+    val limit          = params.getAs[Int]("limit")
+    val offset         = params.getAs[Int]("offset")
+    val pageSize       = params.getAs[Int]("pagesize").getOrElse(50)
     val timeoutSeconds = params.getAs[Int]("timeout").getOrElse[Int](20)
-    val timeout = Duration.ofSeconds(timeoutSeconds)
+    val timeout        = Duration.ofSeconds(timeoutSeconds)
 
     val start = offset.getOrElse(0)
     val end = limit match {
       case Some(i) => start + i
-      case None => Await.result(controller.countByVideoReferenceUuid(uuid), timeout)
+      case None    => Await.result(controller.countByVideoReferenceUuid(uuid), timeout)
     }
 
     def fn(limit: Int, offset: Int): Future[Iterable[ImagedMoment]] =
@@ -129,64 +138,88 @@ class ImagedMomentV1Api(controller: ImagedMomentController)(implicit val executo
   }
 
   get("/concept/count/:name") {
-    val name = params.get("name")
+    val name = params
+      .get("name")
       .getOrElse(halt(BadRequest("""{"reason": "Please provide a concept name"}""")))
-    controller.countByConcept(name)
+    controller
+      .countByConcept(name)
       .map(c => s"""{"concept": "$name", "count": $c}""")
   }
 
   get("/concept/images/count/:name") {
-    val name = params.get("name")
+    val name = params
+      .get("name")
       .getOrElse(halt(BadRequest("""{"reason": "Please provide a concept name"}""")))
-    controller.countByConceptWithImages(name)
+    controller
+      .countByConceptWithImages(name)
       .map(c => s"""{"concept": "$name", "count": $c}""")
   }
 
   get("/modified/:start/:end") {
-    val start = params.getAs[Instant]("start").getOrElse(halt(BadRequest("Please provide a start date (yyyy-mm-ddThh:mm:ssZ)")))
-    val end = params.getAs[Instant]("end").getOrElse(halt(BadRequest("Please provide an end date (yyyy-mm-ddThh:mm:ssZ)")))
-    val limit = params.getAs[Int]("limit")
+    val start = params
+      .getAs[Instant]("start")
+      .getOrElse(halt(BadRequest("Please provide a start date (yyyy-mm-ddThh:mm:ssZ)")))
+    val end = params
+      .getAs[Instant]("end")
+      .getOrElse(halt(BadRequest("Please provide an end date (yyyy-mm-ddThh:mm:ssZ)")))
+    val limit  = params.getAs[Int]("limit")
     val offset = params.getAs[Int]("offset")
-    controller.findBetweenUpdatedDates(start, end, limit, offset)
+    controller
+      .findBetweenUpdatedDates(start, end, limit, offset)
       .map(_.asJava)
       .map(toJson)
   }
 
   get("/modified/count/:start/:end") {
-    val start = params.getAs[Instant]("start").getOrElse(halt(BadRequest("Please provide a start date (yyyy-mm-ddThh:mm:ssZ)")))
-    val end = params.getAs[Instant]("end").getOrElse(halt(BadRequest("Please provide an end date (yyyy-mm-ddThh:mm:ssZ)")))
-    controller.countBetweenUpdatedDates(start, end)
+    val start = params
+      .getAs[Instant]("start")
+      .getOrElse(halt(BadRequest("Please provide a start date (yyyy-mm-ddThh:mm:ssZ)")))
+    val end = params
+      .getAs[Instant]("end")
+      .getOrElse(halt(BadRequest("Please provide an end date (yyyy-mm-ddThh:mm:ssZ)")))
+    controller
+      .countBetweenUpdatedDates(start, end)
       .map(n => s"""{"start_timestamp":"$start", "end_timestamp":"$end", "count": "$n"}""")
   }
 
   get("/counts") {
-    controller.countAllGroupByVideoReferenceUUID()
+    controller
+      .countAllGroupByVideoReferenceUUID()
       .map(_.map({ case (uuid, count) => ObservationCount(uuid, count) }))
       .map(_.asJava)
       .map(toJson)
   }
 
   get("/videoreference") {
-    val limit = params.getAs[Int]("limit")
+    val limit  = params.getAs[Int]("limit")
     val offset = params.getAs[Int]("offset")
-    controller.findAllVideoReferenceUUIDs(limit, offset)
+    controller
+      .findAllVideoReferenceUUIDs(limit, offset)
       .map(_.toArray)
       .map(toJson)
   }
 
   get("/videoreference/:uuid") {
-    val uuid = params.getAs[UUID]("uuid").getOrElse(halt(BadRequest("Please provide a Video Reference UUID")))
-    val limit = params.getAs[Int]("limit")
+    val uuid = params
+      .getAs[UUID]("uuid")
+      .getOrElse(halt(BadRequest("Please provide a Video Reference UUID")))
+    val limit  = params.getAs[Int]("limit")
     val offset = params.getAs[Int]("offset")
-    controller.findByVideoReferenceUUID(uuid, limit, offset)
+    controller
+      .findByVideoReferenceUUID(uuid, limit, offset)
       .map(_.asJava)
       .map(toJson)
   }
 
   get("/videoreference/modified/:uuid/:date") {
-    val uuid = params.getAs[UUID]("uuid").getOrElse(halt(BadRequest("Please provide a Video Reference UUID")))
-    val date = params.getAs[Instant]("date").getOrElse(halt(BadRequest("Please provide a start date (yyyy-mm-ddThh:mm:ssZ)")))
-    controller.countModifiedBeforeDate(uuid, date)
+    val uuid = params
+      .getAs[UUID]("uuid")
+      .getOrElse(halt(BadRequest("Please provide a Video Reference UUID")))
+    val date = params
+      .getAs[Instant]("date")
+      .getOrElse(halt(BadRequest("Please provide a start date (yyyy-mm-ddThh:mm:ssZ)")))
+    controller
+      .countModifiedBeforeDate(uuid, date)
       .map(i => ObservationCount(uuid, i))
       .map(toJson)
   }
@@ -194,40 +227,58 @@ class ImagedMomentV1Api(controller: ImagedMomentController)(implicit val executo
   post("/windowrequest") {
     request.getHeader("Content-Type") match {
       case "application/json" =>
-        val b = request.body
-        val limit = params.getAs[Int]("limit")
-        val offset = params.getAs[Int]("offset")
+        val b             = request.body
+        val limit         = params.getAs[Int]("limit")
+        val offset        = params.getAs[Int]("offset")
         val windowRequest = fromJson(b, classOf[WindowRequest])
-        controller.findByWindowRequest(windowRequest, limit, offset)
+        controller
+          .findByWindowRequest(windowRequest, limit, offset)
           .map(_.asJava)
           .map(toJson)
       case _ =>
-        halt(BadRequest(toJson(ErrorMsg(400, "Posts to /windowrequest only accept a JSON body (i.e. Content-Type: application/json)"))))
+        halt(
+          BadRequest(
+            toJson(
+              ErrorMsg(
+                400,
+                "Posts to /windowrequest only accept a JSON body (i.e. Content-Type: application/json)"
+              )
+            )
+          )
+        )
     }
   }
 
   delete("/videoreference/:uuid") {
     validateRequest() // Apply API security
-    val uuid = params.getAs[UUID]("uuid").getOrElse(halt(BadRequest("Please provide a Video Reference UUID")))
-    controller.deleteByVideoReferenceUUID(uuid)
+    val uuid = params
+      .getAs[UUID]("uuid")
+      .getOrElse(halt(BadRequest("Please provide a Video Reference UUID")))
+    controller
+      .deleteByVideoReferenceUUID(uuid)
       .map(ObservationCount(uuid, _))
       .map(toJson)
   }
 
   get("/imagereference/:uuid") {
-    val uuid = params.getAs[UUID]("uuid").getOrElse(halt(BadRequest("Please provide an ImageReference UUID")))
-    controller.findByImageReferenceUUID(uuid)
+    val uuid = params
+      .getAs[UUID]("uuid")
+      .getOrElse(halt(BadRequest("Please provide an ImageReference UUID")))
+    controller
+      .findByImageReferenceUUID(uuid)
       .map({
-        case None => halt(NotFound(s"No imagereference with a uuid of $uuid was found"))
+        case None     => halt(NotFound(s"No imagereference with a uuid of $uuid was found"))
         case Some(im) => toJson(im)
       })
   }
 
   get("/observation/:uuid") {
-    val uuid = params.getAs[UUID]("uuid").getOrElse(halt(BadRequest("Please provide an Observation UUID")))
-    controller.findByObservationUUID(uuid)
+    val uuid =
+      params.getAs[UUID]("uuid").getOrElse(halt(BadRequest("Please provide an Observation UUID")))
+    controller
+      .findByObservationUUID(uuid)
       .map({
-        case None => halt(NotFound(s"No observation with a uuid of $uuid was found"))
+        case None     => halt(NotFound(s"No observation with a uuid of $uuid was found"))
         case Some(im) => toJson(im)
       })
   }
@@ -246,22 +297,28 @@ class ImagedMomentV1Api(controller: ImagedMomentController)(implicit val executo
 
   put("/:uuid") {
     validateRequest() // Apply API security
-    val uuid = params.getAs[UUID]("uuid").getOrElse(halt(BadRequest("Please provide a UUID")))
-    val timecode = params.getAs[Timecode]("timecode")
-    val elapsedTime = params.getAs[Duration]("elapsed_time_millis")
-    val recordedDate = params.getAs[Instant]("recorded_timestamp")
+    val uuid               = params.getAs[UUID]("uuid").getOrElse(halt(BadRequest("Please provide a UUID")))
+    val timecode           = params.getAs[Timecode]("timecode")
+    val elapsedTime        = params.getAs[Duration]("elapsed_time_millis")
+    val recordedDate       = params.getAs[Instant]("recorded_timestamp")
     val videoReferenceUUID = params.getAs[UUID]("video_reference_uuid")
-    controller.update(uuid, videoReferenceUUID, timecode, recordedDate, elapsedTime)
+    controller
+      .update(uuid, videoReferenceUUID, timecode, recordedDate, elapsedTime)
       .map(toJson)
   }
 
   put("/newtime/:uuid/:time") {
     validateRequest()
-    val uuid = params.getAs[UUID]("uuid")
-      .getOrElse(halt(BadRequest("{\"error\": \"Please provide a video reference UUID parameter\"}")))
-    val time = params.getAs[Instant]("time")
+    val uuid = params
+      .getAs[UUID]("uuid")
+      .getOrElse(
+        halt(BadRequest("{\"error\": \"Please provide a video reference UUID parameter\"}"))
+      )
+    val time = params
+      .getAs[Instant]("time")
       .getOrElse(halt(BadRequest("{\"error\": \"Please provide a new start 'time' parameter\"}")))
-    controller.updateRecordedTimestamps(uuid, time)
+    controller
+      .updateRecordedTimestamps(uuid, time)
       .map(_.asJava)
       .map(toJson)
   }
@@ -275,31 +332,36 @@ class ImagedMomentV1Api(controller: ImagedMomentController)(implicit val executo
     request.getHeader("Content-Type") match {
       case "application/json" =>
         val annotations = fromJson(request.body, classOf[Array[AnnotationImpl]])
-        var n = 0
+        var n           = 0
         for { a <- annotations } {
           if (a.observationUuid != null && a.recordedTimestamp != null) {
             controller.updateRecordedTimestampByObservationUuid(
               a.observationUuid,
-              a.recordedTimestamp)
+              a.recordedTimestamp
+            )
             n = n + 1
           }
         }
-        val count = Map(
-          "annotation_count" -> annotations.size,
-          "timestamps_updated" -> n).asJava
+        val count = Map("annotation_count" -> annotations.size, "timestamps_updated" -> n).asJava
         toJson(count)
       case _ =>
-        halt(BadRequest("Puts to tapetime only accept JSON body (i.e. Content-Type: application/json)"))
+        halt(
+          BadRequest("Puts to tapetime only accept JSON body (i.e. Content-Type: application/json)")
+        )
     }
   }
 
   delete("/:uuid") {
     validateRequest() // Apply API security
-    val uuid = params.getAs[UUID]("uuid").getOrElse(halt(BadRequest("Please provide the 'uuid' of the association")))
-    controller.delete(uuid).map({
-      case true => halt(NoContent()) // Success
-      case false => halt(NotFound(s"Failed. No ImagedMoment with UUID of $uuid was found."))
-    })
+    val uuid = params
+      .getAs[UUID]("uuid")
+      .getOrElse(halt(BadRequest("Please provide the 'uuid' of the association")))
+    controller
+      .delete(uuid)
+      .map({
+        case true  => halt(NoContent()) // Success
+        case false => halt(NotFound(s"Failed. No ImagedMoment with UUID of $uuid was found."))
+      })
   }
 
 }

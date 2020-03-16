@@ -19,11 +19,11 @@ package org.mbari.vars.annotation.model.simple
 import org.mbari.vars.annotation.model._
 
 /**
- *
- *
- * @author Brian Schlining
- * @since 2016-07-11T14:41:00
- */
+  *
+  *
+  * @author Brian Schlining
+  * @since 2016-07-11T14:41:00
+  */
 object Implicits {
 
   implicit def toCaseClass(association: Association): SimpleAssociation =

@@ -52,16 +52,18 @@ object ImagedMomentSQL {
 
   val byConceptWithImages: String = SELECT_UUID + FROM + " WHERE concept = ? AND ir.url IS NOT NULL"
 
-  val byVideoReferenceUuid: String = SELECT_IMAGES + FROM + " WHERE im.video_reference_uuid = ? AND ir.url IS NOT NULL"
+  val byVideoReferenceUuid: String =
+    SELECT_IMAGES + FROM + " WHERE im.video_reference_uuid = ? AND ir.url IS NOT NULL"
 
-  val deleteByVideoReferenceUuid: String = "DELETE FROM imaged_moments WHERE video_reference_uuid = ?"
+  val deleteByVideoReferenceUuid: String =
+    "DELETE FROM imaged_moments WHERE video_reference_uuid = ?"
 
   def resultListToImages(rows: List[_]): Seq[Image] = {
     for {
       row <- rows
     } yield {
       val xs = row.asInstanceOf[Array[Object]]
-      val i = new Image;
+      val i  = new Image;
       i.imagedMomentUuid = UUID.fromString(xs(0).toString)
       i.videoReferenceUuid = UUID.fromString(xs(1).toString)
       Option(xs(2))
@@ -80,12 +82,10 @@ object ImagedMomentSQL {
       Option(xs(6)).foreach(v => i.format = v.toString)
       Option(xs(7)).foreach(v => i.height = v.asInstanceOf[Number].intValue())
       Option(xs(8)).foreach(v => i.width = v.asInstanceOf[Number].intValue())
-      i.url =  new URL(xs(9).toString)
+      i.url = new URL(xs(9).toString)
       i.imageReferenceUuid = UUID.fromString(xs(10).toString)
       i
     }
   }
 
 }
-
-

@@ -23,9 +23,9 @@ import org.mbari.vars.annotation.model.simple.ExtendedAssociation
 import org.mbari.vars.annotation.model.{Annotation, Association}
 
 /**
- * @author Brian Schlining
- * @since 2020-03-04T13:53:00
- */
+  * @author Brian Schlining
+  * @since 2020-03-04T13:53:00
+  */
 trait JsonEncoder[A] {
   def toJson: String
 }
@@ -47,7 +47,8 @@ object JsonEncoders {
   implicit class AssocationEncoder(val x: Association) extends JsonEncoder[Association] {
     override def toJson: String = Constants.GSON.toJson(x)
   }
-  implicit class ExtendedAssocationEncoder(val x: ExtendedAssociation) extends JsonEncoder[ExtendedAssociation] {
+  implicit class ExtendedAssocationEncoder(val x: ExtendedAssociation)
+      extends JsonEncoder[ExtendedAssociation] {
     override def toJson: String = caseClassGson.toJson(x)
   }
 }

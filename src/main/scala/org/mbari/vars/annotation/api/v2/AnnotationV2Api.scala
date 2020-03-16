@@ -32,32 +32,29 @@ import scala.concurrent.ExecutionContext
   * @since 2019-05-08T13:50:00
   */
 class AnnotationV2Api(controller: AnnotationController)(implicit val executor: ExecutionContext)
-  extends APIStack {
+    extends APIStack {
 
   before() {
     contentType = "application/json"
-    response.headers += ("Access-Control-Allow-Origin" -> "*")
+    response.headers.set("Access-Control-Allow-Origin", "*")
   }
 
   get("/videoreference/:uuid") {
-    val uuid = params.getAs[UUID]("uuid").getOrElse(halt(BadRequest(
-      body = "A video reference 'uuid' parameter is required")))
+    val uuid = params
+      .getAs[UUID]("uuid")
+      .getOrElse(halt(BadRequest(body = "A video reference 'uuid' parameter is required")))
 
     // Optional params to filter between dates
     val startTimestamp = params.getAs[Instant]("start")
-    val endTimestamp = params.getAs[Instant]("end")
+    val endTimestamp   = params.getAs[Instant]("end")
 
-    val limit = params.getAs[Int]("limit")
+    val limit  = params.getAs[Int]("limit")
     val offset = params.getAs[Int]("offset")
 
     val (closeable, stream) = if (startTimestamp.isDefined || endTimestamp.isDefined) {
       val start = startTimestamp.getOrElse(Instant.EPOCH)
-      val end = endTimestamp.getOrElse(Instant.now())
-      controller.streamByVideoReferenceUUIDAndTimestamps(uuid,
-        start,
-        end,
-        limit,
-        offset)
+      val end   = endTimestamp.getOrElse(Instant.now())
+      controller.streamByVideoReferenceUUIDAndTimestamps(uuid, start, end, limit, offset)
     }
     else {
       controller.streamByVideoReferenceUUID(uuid, limit, offset)
@@ -65,8 +62,7 @@ class AnnotationV2Api(controller: AnnotationController)(implicit val executor: E
 
     ResponseUtilities.sendStreamedResponse(response, stream, (a: Annotation) => toJson(a))
     closeable.close()
-    Unit
+    ()
   }
-
 
 }

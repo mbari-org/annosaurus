@@ -23,11 +23,11 @@ import com.google.gson.annotations.Expose
 import org.mbari.vars.annotation.PersistentObject
 
 /**
- * Mixin that supports the UUID fields
- *
- * @author Brian Schlining
- * @since 2016-05-05T17:50:00
- */
+  * Mixin that supports the UUID fields
+  *
+  * @author Brian Schlining
+  * @since 2016-05-05T17:50:00
+  */
 trait HasUUID extends PersistentObject {
 
   @Expose(serialize = true)
@@ -38,7 +38,8 @@ trait HasUUID extends PersistentObject {
     nullable = false,
     updatable = false,
     length = 36,
-    columnDefinition = "CHAR(36)")
+    columnDefinition = "CHAR(36)"
+  )
   @Convert(converter = classOf[UUIDConverter])
   var uuid: UUID = _
 

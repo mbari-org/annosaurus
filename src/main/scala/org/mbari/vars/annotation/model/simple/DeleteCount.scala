@@ -21,9 +21,9 @@ import java.util.UUID
 import com.google.gson.annotations.Expose
 
 /**
- * @author Brian Schlining
- * @since 2019-10-28T16:57:00
- */
+  * @author Brian Schlining
+  * @since 2019-10-28T16:57:00
+  */
 class DeleteCount {
   @Expose(serialize = true)
   var videoReferenceUuid: UUID = _
@@ -48,12 +48,14 @@ class DeleteCount {
 }
 
 object DeleteCount {
-  def apply(videoReferenceUuid: UUID,
-            imagedMomentCount: Int,
-            imageReferenceCount: Int,
-            observationCount: Int,
-            associationCount: Int,
-            ancillaryDataCount: Int): DeleteCount = {
+  def apply(
+      videoReferenceUuid: UUID,
+      imagedMomentCount: Int,
+      imageReferenceCount: Int,
+      observationCount: Int,
+      associationCount: Int,
+      ancillaryDataCount: Int
+  ): DeleteCount = {
     val d = new DeleteCount
     d.videoReferenceUuid = videoReferenceUuid
     d.imagedMomentCount = imagedMomentCount

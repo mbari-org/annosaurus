@@ -26,42 +26,52 @@ import org.mbari.vcr4j.time.Timecode
 import org.scalatra.{BadRequest, NotFound}
 
 import scala.concurrent.ExecutionContext
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 /**
- * Created by brian on 7/14/16.
- */
+  * Created by brian on 7/14/16.
+  */
 class ImageV1Api(controller: ImageController)(implicit val executor: ExecutionContext)
-  extends V1APIStack {
+    extends V1APIStack {
 
   before() {
     contentType = "application/json"
-    response.headers += ("Access-Control-Allow-Origin" -> "*")
+    response.headers.set("Access-Control-Allow-Origin", "*")
   }
 
   get("/:uuid") {
-    val uuid = params.getAs[UUID]("uuid")
+    val uuid = params
+      .getAs[UUID]("uuid")
       .getOrElse(halt(BadRequest(ErrorMsg(400, "A 'uuid' parameter is required"))))
-    controller.findByUUID(uuid).map({
-      case None => halt(NotFound(ErrorMsg(404, s"an Image with an image_reference_uuid of $uuid was not found")))
-      case Some(v) => toJson(v)
-    })
+    controller
+      .findByUUID(uuid)
+      .map({
+        case None =>
+          halt(
+            NotFound(ErrorMsg(404, s"an Image with an image_reference_uuid of $uuid was not found"))
+          )
+        case Some(v) => toJson(v)
+      })
   }
 
   get("/videoreference/:uuid") {
-    val uuid = params.getAs[UUID]("uuid")
+    val uuid = params
+      .getAs[UUID]("uuid")
       .getOrElse(halt(BadRequest(ErrorMsg(400, "A video reference 'uuid' parameter is required"))))
-    val limit = params.getAs[Int]("limit")
+    val limit  = params.getAs[Int]("limit")
     val offset = params.getAs[Int]("offset")
-    controller.findByVideoReferenceUUID(uuid, limit, offset)
+    controller
+      .findByVideoReferenceUUID(uuid, limit, offset)
       .map(_.asJava)
       .map(toJson)
   }
 
   get("/name/:name") {
-    val name = params.get("name")
+    val name = params
+      .get("name")
       .getOrElse(halt(BadRequest(ErrorMsg(400, "An image name is required as part of the path"))))
-    controller.findByImageName(name)
+    controller
+      .findByImageName(name)
       .map(_.asJava)
       .map(toJson)
   }
@@ -75,54 +85,90 @@ class ImageV1Api(controller: ImageController)(implicit val executor: ExecutionCo
     //     body = "{}",
     //     reason = "A 'url' parameter is required"
     //   )))
-    val url = params.getAs[URL]("url")
+    val url = params
+      .getAs[URL]("url")
       .getOrElse(halt(BadRequest(ErrorMsg(400, "Please provide a URL"))))
-    controller.findByURL(url).map({
-      case None => halt(NotFound(body = s"an Image with a URL of $url was not found"))
-      case Some(i) => toJson(i)
-    })
+    controller
+      .findByURL(url)
+      .map({
+        case None    => halt(NotFound(body = s"an Image with a URL of $url was not found"))
+        case Some(i) => toJson(i)
+      })
   }
 
   post("/") {
     validateRequest() // Apply API security
-    val videoReferenceUUID = params.getAs[UUID]("video_reference_uuid")
+    val videoReferenceUUID = params
+      .getAs[UUID]("video_reference_uuid")
       .getOrElse(halt(BadRequest(ErrorMsg(400, "A 'video_reference_uuid' parameter is required"))))
-    val url = params.getAs[URL]("url").getOrElse(halt(BadRequest(
-      body = "A 'url' parameter is required")))
-    val timecode = params.getAs[Timecode]("timecode")
-    val elapsedTime = params.getAs[Duration]("elapsed_time_millis")
+    val url =
+      params.getAs[URL]("url").getOrElse(halt(BadRequest(body = "A 'url' parameter is required")))
+    val timecode     = params.getAs[Timecode]("timecode")
+    val elapsedTime  = params.getAs[Duration]("elapsed_time_millis")
     val recordedDate = params.getAs[Instant]("recorded_timestamp")
 
     if (timecode.isEmpty && elapsedTime.isEmpty && recordedDate.isEmpty) {
-      halt(BadRequest(ErrorMsg(400, "An valid index of timecode, elapsed_time_millis, or recorded_timestamp is required")))
+      halt(
+        BadRequest(
+          ErrorMsg(
+            400,
+            "An valid index of timecode, elapsed_time_millis, or recorded_timestamp is required"
+          )
+        )
+      )
     }
 
-    val format = params.get("format")
-    val width = params.getAs[Int]("width_pixels")
-    val height = params.getAs[Int]("height_pixels")
+    val format      = params.get("format")
+    val width       = params.getAs[Int]("width_pixels")
+    val height      = params.getAs[Int]("height_pixels")
     val description = params.get("description")
-    controller.create(videoReferenceUUID, url, timecode, elapsedTime, recordedDate,
-      format, width, height, description)
+    controller
+      .create(
+        videoReferenceUUID,
+        url,
+        timecode,
+        elapsedTime,
+        recordedDate,
+        format,
+        width,
+        height,
+        description
+      )
       .map(toJson)
   }
 
   put("/:uuid") {
     validateRequest() // Apply API security
-    val uuid = params.getAs[UUID]("uuid")
+    val uuid = params
+      .getAs[UUID]("uuid")
       .getOrElse(halt(BadRequest(ErrorMsg(400, "A image reference 'uuid' parameter is required"))))
     val videoReferenceUUID = params.getAs[UUID]("video_reference_uuid")
-    val url = params.getAs[URL]("url")
-    val timecode = params.getAs[Timecode]("timecode")
-    val elapsedTime = params.getAs[Duration]("elapsed_time_millis")
-    val recordedDate = params.getAs[Instant]("recorded_timestamp")
-    val format = params.get("format")
-    val width = params.getAs[Int]("width_pixels")
-    val height = params.getAs[Int]("height_pixels")
-    val description = params.get("description")
-    controller.update(uuid, url, videoReferenceUUID, timecode, elapsedTime, recordedDate,
-      format, width, height, description)
+    val url                = params.getAs[URL]("url")
+    val timecode           = params.getAs[Timecode]("timecode")
+    val elapsedTime        = params.getAs[Duration]("elapsed_time_millis")
+    val recordedDate       = params.getAs[Instant]("recorded_timestamp")
+    val format             = params.get("format")
+    val width              = params.getAs[Int]("width_pixels")
+    val height             = params.getAs[Int]("height_pixels")
+    val description        = params.get("description")
+    controller
+      .update(
+        uuid,
+        url,
+        videoReferenceUUID,
+        timecode,
+        elapsedTime,
+        recordedDate,
+        format,
+        width,
+        height,
+        description
+      )
       .map({
-        case None => halt(NotFound(ErrorMsg(404, s"an Image with an image_reference_uuid of $uuid was not found")))
+        case None =>
+          halt(
+            NotFound(ErrorMsg(404, s"an Image with an image_reference_uuid of $uuid was not found"))
+          )
         case Some(v) => toJson(v)
       })
   }

@@ -19,9 +19,9 @@ package org.mbari.vars.annotation.model.simple
 import com.google.gson.annotations.Expose
 
 /**
- * @author Brian Schlining
- * @since 2019-05-23T16:50:00
- */
+  * @author Brian Schlining
+  * @since 2019-05-23T16:50:00
+  */
 class ErrorMsg {
 
   @Expose(serialize = true)

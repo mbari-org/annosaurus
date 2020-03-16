@@ -23,24 +23,31 @@ import org.mbari.vars.annotation.dao.IndexDAO
 import org.mbari.vars.annotation.model.ImagedMoment
 
 /**
- * @author Brian Schlining
- * @since 2019-02-08T08:55:00
- */
+  * @author Brian Schlining
+  * @since 2019-02-08T08:55:00
+  */
 class IndexDAOImpl(entityManager: EntityManager)
-  extends BaseDAO[IndexImpl](entityManager)
-  with IndexDAO[IndexImpl] {
+    extends BaseDAO[IndexImpl](entityManager)
+    with IndexDAO[IndexImpl] {
 
   def newPersistentObject(): IndexImpl = new IndexImpl
 
   override def findByVideoReferenceUuid(
-    videoReferenceUuid: UUID,
-    limit: Option[Int] = None,
-    offset: Option[Int] = None): Iterable[ImagedMoment] =
-    findByNamedQuery("Index.findByVideoReferenceUUID", Map("uuid" -> videoReferenceUuid), limit, offset)
+      videoReferenceUuid: UUID,
+      limit: Option[Int] = None,
+      offset: Option[Int] = None
+  ): Iterable[ImagedMoment] =
+    findByNamedQuery(
+      "Index.findByVideoReferenceUUID",
+      Map("uuid" -> videoReferenceUuid),
+      limit,
+      offset
+    )
 
   // --- These methods are deliberately overridden ---
 
-  override def findAll(limit: Option[Int] = None, offset: Option[Int] = None): Iterable[IndexImpl] = ???
+  override def findAll(limit: Option[Int] = None, offset: Option[Int] = None): Iterable[IndexImpl] =
+    ???
 
   override def deleteByUUID(primaryKey: UUID): Unit = ???
 

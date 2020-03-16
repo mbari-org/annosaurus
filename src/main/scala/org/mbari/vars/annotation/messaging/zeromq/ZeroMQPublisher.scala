@@ -22,26 +22,23 @@ import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.Subject
 import org.mbari.vars.annotation.{Constants, ZeroMQConfig}
-import org.mbari.vars.annotation.messaging.{AnnotationMessage, MessageBus, GenericMessage}
+import org.mbari.vars.annotation.messaging.{AnnotationMessage, GenericMessage, MessageBus}
 import org.slf4j.LoggerFactory
 import org.zeromq.{SocketType, ZContext}
 
 import scala.util.control.NonFatal
 import org.mbari.vars.annotation.messaging.JsonEncoders._
 
-
-
 /**
- * @author Brian Schlining
- * @since 2020-01-30T15:47:00
- */
-class ZeroMQPublisher(val topic: String,
-                      val port: Int,
-                      val subject: Subject[_]) {
+  * @author Brian Schlining
+  * @since 2020-01-30T15:47:00
+  */
+class ZeroMQPublisher(val topic: String, val port: Int, val subject: Subject[_]) {
 
   private[this] val context = new ZContext()
-  private[this] val queue = new LinkedBlockingQueue[GenericMessage[_]]()
-  private[this] val disposable: Disposable = MessageBus.RxSubject
+  private[this] val queue   = new LinkedBlockingQueue[GenericMessage[_]]()
+  private[this] val disposable: Disposable = MessageBus
+    .RxSubject
     .ofType(classOf[GenericMessage[_]])
     .observeOn(Schedulers.io())
     .distinct()
@@ -72,7 +69,6 @@ class ZeroMQPublisher(val topic: String,
   thread.setDaemon(true)
   thread.start()
 
-
   def close(): Unit = {
     context.destroy()
     disposable.dispose()
@@ -86,28 +82,29 @@ object ZeroMQPublisher {
   private[this] val log = LoggerFactory.getLogger(getClass)
 
   /**
-   * @param opt The ZeroMQ config infor. The Config parser may not contain info
-   *            for ZeroMQ. If it doesn't it returns None.
-   * @param subject The message bus for zeromq to listen to
-   * @return An option with a wired and active ZeroMQ publisher that will
-   *         publish new or updated annotations as they happen.
-   */
-  def autowire(opt: Option[ZeroMQConfig],
-               subject: Subject[Any] = MessageBus.RxSubject): Option[ZeroMQPublisher] =
+    * @param opt The ZeroMQ config infor. The Config parser may not contain info
+    *            for ZeroMQ. If it doesn't it returns None.
+    * @param subject The message bus for zeromq to listen to
+    * @return An option with a wired and active ZeroMQ publisher that will
+    *         publish new or updated annotations as they happen.
+    */
+  def autowire(
+      opt: Option[ZeroMQConfig],
+      subject: Subject[Any] = MessageBus.RxSubject
+  ): Option[ZeroMQPublisher] =
     for {
       conf <- opt
       if conf.enable
     } yield new ZeroMQPublisher(conf.topic, conf.port, subject)
 
   /**
-   * Logs info about the ZMQ configuration
-   * @param opt
-   */
+    * Logs info about the ZMQ configuration
+    * @param opt
+    */
   def log(opt: Option[ZeroMQPublisher]): Unit = opt match {
     case None => log.info("ZeroMQ is not enabled/configured")
     case Some(z) =>
       log.info(s"ZeroMQ is publishing annotations on port ${z.port} using topic '${z.topic}''")
   }
-
 
 }

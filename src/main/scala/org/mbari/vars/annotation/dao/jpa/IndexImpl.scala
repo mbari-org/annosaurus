@@ -16,56 +16,56 @@
 
 package org.mbari.vars.annotation.dao.jpa
 
-import java.time.{ Duration, Instant }
+import java.time.{Duration, Instant}
 import java.util.UUID
 
-import com.google.gson.annotations.{ Expose, SerializedName }
+import com.google.gson.annotations.{Expose, SerializedName}
 import javax.persistence._
 import org.mbari.vars.annotation.Constants
-import org.mbari.vars.annotation.model.{ CachedAncillaryDatum, ImageReference, ImagedMoment, Observation }
+import org.mbari.vars.annotation.model.{
+  CachedAncillaryDatum,
+  ImageReference,
+  ImagedMoment,
+  Observation
+}
 import org.mbari.vcr4j.time.Timecode
 
 /**
- * @author Brian Schlining
- * @since 2019-02-08T10:15:00
- */
+  * @author Brian Schlining
+  * @since 2019-02-08T10:15:00
+  */
 @Entity(name = "Index")
 @Table(name = "imaged_moments")
 @EntityListeners(value = Array(classOf[TransactionLogger]))
-@NamedQueries(Array(
-  new NamedQuery(
-    name = "Index.findByVideoReferenceUUID",
-    query = "SELECT i FROM Index i WHERE i.videoReferenceUUID = :uuid ORDER BY i.uuid")))
+@NamedQueries(
+  Array(
+    new NamedQuery(
+      name = "Index.findByVideoReferenceUUID",
+      query = "SELECT i FROM Index i WHERE i.videoReferenceUUID = :uuid ORDER BY i.uuid"
+    )
+  )
+)
 class IndexImpl extends ImagedMoment with JPAPersistentObject {
 
   @Expose(serialize = true)
   @SerializedName(value = "video_reference_uuid")
-  @Column(
-    name = "video_reference_uuid",
-    nullable = true,
-    columnDefinition = "CHAR(36)")
+  @Column(name = "video_reference_uuid", nullable = true, columnDefinition = "CHAR(36)")
   @Convert(converter = classOf[UUIDConverter])
   override var videoReferenceUUID: UUID = _
 
   @Expose(serialize = true)
-  @Column(
-    name = "elapsed_time_millis",
-    nullable = true)
+  @Column(name = "elapsed_time_millis", nullable = true)
   @Convert(converter = classOf[DurationConverter])
   override var elapsedTime: Duration = _
 
   @Expose(serialize = true)
-  @Column(
-    name = "recorded_timestamp",
-    nullable = true)
+  @Column(name = "recorded_timestamp", nullable = true)
   @Temporal(value = TemporalType.TIMESTAMP)
   @Convert(converter = classOf[InstantConverter])
   override var recordedDate: Instant = _
 
   @Expose(serialize = true)
-  @Column(
-    name = "timecode",
-    nullable = true)
+  @Column(name = "timecode", nullable = true)
   @Convert(converter = classOf[TimecodeConverter])
   override var timecode: Timecode = _
 

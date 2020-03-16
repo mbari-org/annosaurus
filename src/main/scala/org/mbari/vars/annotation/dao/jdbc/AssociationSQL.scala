@@ -21,7 +21,6 @@ import java.util.UUID
 import org.mbari.vars.annotation.dao.jpa.AnnotationImpl
 import org.mbari.vars.annotation.model.Annotation
 
-
 object AssociationSQL {
 
   def resultListToAssociations(rows: List[_]): Seq[AssociationExt] = {
@@ -29,7 +28,7 @@ object AssociationSQL {
       row <- rows
     } yield {
       val xs = row.asInstanceOf[Array[Object]]
-      val a = new AssociationExt
+      val a  = new AssociationExt
       a.uuid = UUID.fromString(xs(0).toString)
       a.observationUuid = UUID.fromString(xs(1).toString)
       a.linkName = xs(2).toString
@@ -87,7 +86,8 @@ object AssociationSQL {
 
   val byObservationUuids: String = SELECT + FROM + " WHERE obs.uuid IN (?)" + ORDER
 
-  val byLinkNameAndLinkValue: String = SELECT + FROM + " WHERE link_name = ? AND link_value = ?" + ORDER
+  val byLinkNameAndLinkValue: String =
+    SELECT + FROM + " WHERE link_name = ? AND link_value = ?" + ORDER
 
   val deleteByVideoReferenceUuid: String =
     """ DELETE FROM associations WHERE EXISTS (

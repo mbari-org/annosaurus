@@ -29,49 +29,72 @@ import org.slf4j.LoggerFactory
 import scala.concurrent.{ExecutionContext, Future}
 
 /**
- * @author Brian Schlining
- * @since 2017-05-01T10:53:00
- */
+  * @author Brian Schlining
+  * @since 2017-05-01T10:53:00
+  */
 class CachedAncillaryDatumController(val daoFactory: BasicDAOFactory)
-  extends BaseController[CachedAncillaryDatum, CachedAncillaryDatumDAO[CachedAncillaryDatum]] {
+    extends BaseController[CachedAncillaryDatum, CachedAncillaryDatumDAO[CachedAncillaryDatum]] {
 
   protected type ADDAO = CachedAncillaryDatumDAO[CachedAncillaryDatum]
   private[this] val log = LoggerFactory.getLogger(getClass)
 
-  override def newDAO(): CachedAncillaryDatumDAO[CachedAncillaryDatum] = daoFactory.newCachedAncillaryDatumDAO()
+  override def newDAO(): CachedAncillaryDatumDAO[CachedAncillaryDatum] =
+    daoFactory.newCachedAncillaryDatumDAO()
 
   def create(
-    imagedMomentUuid: UUID,
-    latitude: Double,
-    longitude: Double,
-    depthMeters: Double,
-    altitude: Option[Double] = None,
-    crs: Option[String] = None,
-    salinity: Option[Double] = None,
-    temperatureCelsius: Option[Double] = None,
-    oxygenMlL: Option[Double] = None,
-    pressureDbar: Option[Double] = None,
-    lightTransmission: Option[Double] = None,
-    x: Option[Double] = None,
-    y: Option[Double] = None,
-    z: Option[Double] = None,
-    posePositionUnits: Option[String] = None,
-    phi: Option[Double] = None,
-    theta: Option[Double] = None,
-    psi: Option[Double] = None)(implicit ec: ExecutionContext): Future[CachedAncillaryDatum] = {
+      imagedMomentUuid: UUID,
+      latitude: Double,
+      longitude: Double,
+      depthMeters: Double,
+      altitude: Option[Double] = None,
+      crs: Option[String] = None,
+      salinity: Option[Double] = None,
+      temperatureCelsius: Option[Double] = None,
+      oxygenMlL: Option[Double] = None,
+      pressureDbar: Option[Double] = None,
+      lightTransmission: Option[Double] = None,
+      x: Option[Double] = None,
+      y: Option[Double] = None,
+      z: Option[Double] = None,
+      posePositionUnits: Option[String] = None,
+      phi: Option[Double] = None,
+      theta: Option[Double] = None,
+      psi: Option[Double] = None
+  )(implicit ec: ExecutionContext): Future[CachedAncillaryDatum] = {
 
     def fn(dao: ADDAO): CachedAncillaryDatum = {
       val imDao = daoFactory.newImagedMomentDAO(dao)
       imDao.findByUUID(imagedMomentUuid) match {
         case None =>
-          throw new NotFoundInDatastoreException(s"ImagedMoment with UUID of $imagedMomentUuid was no found")
+          throw new NotFoundInDatastoreException(
+            s"ImagedMoment with UUID of $imagedMomentUuid was no found"
+          )
         case Some(imagedMoment) =>
           if (imagedMoment.ancillaryDatum != null) {
-            throw new RuntimeException(s"ImagedMoment with UUID of $imagedMomentUuid already has ancillary data")
-          } else {
-            val cad = dao.newPersistentObject(latitude, longitude, depthMeters, altitude, crs,
-              salinity, temperatureCelsius, oxygenMlL, pressureDbar, lightTransmission,
-              x, y, z, posePositionUnits, phi, theta, psi)
+            throw new RuntimeException(
+              s"ImagedMoment with UUID of $imagedMomentUuid already has ancillary data"
+            )
+          }
+          else {
+            val cad = dao.newPersistentObject(
+              latitude,
+              longitude,
+              depthMeters,
+              altitude,
+              crs,
+              salinity,
+              temperatureCelsius,
+              oxygenMlL,
+              pressureDbar,
+              lightTransmission,
+              x,
+              y,
+              z,
+              posePositionUnits,
+              phi,
+              theta,
+              psi
+            )
             imagedMoment.ancillaryDatum = cad
             cad
           }
@@ -81,16 +104,23 @@ class CachedAncillaryDatumController(val daoFactory: BasicDAOFactory)
     exec(fn)
   }
 
-  def create(imagedMomentUuid: UUID, datum: CachedAncillaryDatum)(implicit ec: ExecutionContext): Future[CachedAncillaryDatum] = {
+  def create(imagedMomentUuid: UUID, datum: CachedAncillaryDatum)(
+      implicit ec: ExecutionContext
+  ): Future[CachedAncillaryDatum] = {
     def fn(dao: ADDAO): CachedAncillaryDatum = {
       val imDao = daoFactory.newImagedMomentDAO(dao)
       imDao.findByUUID(imagedMomentUuid) match {
         case None =>
-          throw new NotFoundInDatastoreException(s"ImagedMoment with UUID of $imagedMomentUuid was no found")
+          throw new NotFoundInDatastoreException(
+            s"ImagedMoment with UUID of $imagedMomentUuid was no found"
+          )
         case Some(imagedMoment) =>
           if (imagedMoment.ancillaryDatum != null) {
-            throw new RuntimeException(s"ImagedMoment with UUID of $imagedMomentUuid already has ancillary data")
-          } else {
+            throw new RuntimeException(
+              s"ImagedMoment with UUID of $imagedMomentUuid already has ancillary data"
+            )
+          }
+          else {
             imagedMoment.ancillaryDatum = datum
             datum
           }
@@ -100,59 +130,67 @@ class CachedAncillaryDatumController(val daoFactory: BasicDAOFactory)
     exec(fn)
   }
 
-  def create(datum: CachedAncillaryDatumBean)(implicit ec: ExecutionContext): Future[CachedAncillaryDatum] =
+  def create(
+      datum: CachedAncillaryDatumBean
+  )(implicit ec: ExecutionContext): Future[CachedAncillaryDatum] =
     create(datum.imagedMomentUuid, datum)
 
   def update(
-    uuid: UUID,
-    latitude: Option[Double] = None,
-    longitude: Option[Double] = None,
-    depthMeters: Option[Double] = None,
-    altitude: Option[Double] = None,
-    crs: Option[String] = None,
-    salinity: Option[Double] = None,
-    temperatureCelsius: Option[Double] = None,
-    oxygenMlL: Option[Double] = None,
-    pressureDbar: Option[Double] = None,
-    lightTransmission: Option[Double] = None,
-    x: Option[Double] = None,
-    y: Option[Double] = None,
-    z: Option[Double] = None,
-    posePositionUnits: Option[String] = None,
-    phi: Option[Double] = None,
-    theta: Option[Double] = None,
-    psi: Option[Double] = None)(implicit ec: ExecutionContext): Future[Option[CachedAncillaryDatum]] = {
+      uuid: UUID,
+      latitude: Option[Double] = None,
+      longitude: Option[Double] = None,
+      depthMeters: Option[Double] = None,
+      altitude: Option[Double] = None,
+      crs: Option[String] = None,
+      salinity: Option[Double] = None,
+      temperatureCelsius: Option[Double] = None,
+      oxygenMlL: Option[Double] = None,
+      pressureDbar: Option[Double] = None,
+      lightTransmission: Option[Double] = None,
+      x: Option[Double] = None,
+      y: Option[Double] = None,
+      z: Option[Double] = None,
+      posePositionUnits: Option[String] = None,
+      phi: Option[Double] = None,
+      theta: Option[Double] = None,
+      psi: Option[Double] = None
+  )(implicit ec: ExecutionContext): Future[Option[CachedAncillaryDatum]] = {
 
     def fn(dao: ADDAO): Option[CachedAncillaryDatum] = {
-      dao.findByUUID(uuid).map(cad => {
-        cad.latitude = latitude
-        cad.longitude = longitude
-        cad.depthMeters = depthMeters
-        cad.altitude = altitude
-        crs.foreach(cad.crs = _)
-        cad.salinity = salinity
-        cad.temperatureCelsius = temperatureCelsius
-        cad.oxygenMlL = oxygenMlL
-        cad.pressureDbar = pressureDbar
-        cad.x = x
-        cad.y = y
-        cad.z = z
-        posePositionUnits.foreach(cad.posePositionUnits = _)
-        cad.phi = phi
-        cad.theta = theta
-        cad.psi = psi
-        cad
-      })
+      dao
+        .findByUUID(uuid)
+        .map(cad => {
+          cad.latitude = latitude
+          cad.longitude = longitude
+          cad.depthMeters = depthMeters
+          cad.altitude = altitude
+          crs.foreach(cad.crs = _)
+          cad.salinity = salinity
+          cad.temperatureCelsius = temperatureCelsius
+          cad.oxygenMlL = oxygenMlL
+          cad.pressureDbar = pressureDbar
+          cad.x = x
+          cad.y = y
+          cad.z = z
+          posePositionUnits.foreach(cad.posePositionUnits = _)
+          cad.phi = phi
+          cad.theta = theta
+          cad.psi = psi
+          cad
+        })
     }
 
     exec(fn)
   }
 
-  def findByVideoReferenceUUID(uuid: UUID)(implicit ec: ExecutionContext): Future[Seq[CachedAncillaryDatumBean]] = {
+  def findByVideoReferenceUUID(
+      uuid: UUID
+  )(implicit ec: ExecutionContext): Future[Seq[CachedAncillaryDatumBean]] = {
     def fn(dao: ADDAO): Seq[CachedAncillaryDatumBean] = {
-      val imDao = daoFactory.newImagedMomentDAO(dao)
+      val imDao   = daoFactory.newImagedMomentDAO(dao)
       val moments = imDao.findByVideoReferenceUUID(uuid)
-      moments.filter(_.ancillaryDatum != null)
+      moments
+        .filter(_.ancillaryDatum != null)
         .map(im => CachedAncillaryDatumBean(im.ancillaryDatum))
         .toSeq
     }
@@ -160,19 +198,25 @@ class CachedAncillaryDatumController(val daoFactory: BasicDAOFactory)
     exec(fn)
   }
 
-  def findByObservationUUID(uuid: UUID)(implicit ec: ExecutionContext): Future[Option[CachedAncillaryDatum]] = {
+  def findByObservationUUID(
+      uuid: UUID
+  )(implicit ec: ExecutionContext): Future[Option[CachedAncillaryDatum]] = {
     def fn(dao: ADDAO): Option[CachedAncillaryDatum] = dao.findByObservationUUID(uuid)
 
     exec(fn)
   }
 
-  def findByImagedMomentUUID(uuid: UUID)(implicit ec: ExecutionContext): Future[Option[CachedAncillaryDatum]] = {
+  def findByImagedMomentUUID(
+      uuid: UUID
+  )(implicit ec: ExecutionContext): Future[Option[CachedAncillaryDatum]] = {
     def fn(dao: ADDAO): Option[CachedAncillaryDatum] = dao.findByImagedMomentUUID(uuid)
 
     exec(fn)
   }
 
-  def bulkCreateOrUpdate(data: Seq[CachedAncillaryDatumBean])(implicit ec: ExecutionContext): Future[Seq[CachedAncillaryDatum]] = {
+  def bulkCreateOrUpdate(
+      data: Seq[CachedAncillaryDatumBean]
+  )(implicit ec: ExecutionContext): Future[Seq[CachedAncillaryDatum]] = {
     def fn(dao: ADDAO): Seq[CachedAncillaryDatum] = {
       val fastDao = new FastAncillaryDataController(dao.asInstanceOf[BaseDAO[_]].entityManager)
       fastDao.createOrUpdate(data)
@@ -195,22 +239,26 @@ class CachedAncillaryDatumController(val daoFactory: BasicDAOFactory)
   }
 
   /**
-   * This method should be called within a transaction!
-   *
-   * @param d  This MUST be a persistable object! (Not a CahcedAncillaryDatumBean)
-   * @param im The moment whose ancillary data is being updated
-   * @return The CachedAncillaryDatum.
-   */
+    * This method should be called within a transaction!
+    *
+    * @param d  This MUST be a persistable object! (Not a CahcedAncillaryDatumBean)
+    * @param im The moment whose ancillary data is being updated
+    * @return The CachedAncillaryDatum.
+    */
   private def createOrUpdate(d: CachedAncillaryDatum, im: ImagedMoment): CachedAncillaryDatum = {
     require(d != null, "A null CachedAncillaryDatum argument is not allowed")
     require(im != null, "A null ImagedMoment argument is not allowed")
-    require(im.uuid != null, "The ImagedMoment should already be present in the database. (Null UUID was found")
+    require(
+      im.uuid != null,
+      "The ImagedMoment should already be present in the database. (Null UUID was found"
+    )
     require(!d.isInstanceOf[CachedAncillaryDatumBean], "Can not persist a CachedAncillaryDatumBean")
 
     if (im.ancillaryDatum != null) {
       updateValues(im.ancillaryDatum, d)
       im.ancillaryDatum
-    } else {
+    }
+    else {
       im.ancillaryDatum = d
       im.ancillaryDatum
       d
@@ -218,31 +266,35 @@ class CachedAncillaryDatumController(val daoFactory: BasicDAOFactory)
   }
 
   def merge(
-    data: Iterable[CachedAncillaryDatumBean],
-    videoReferenceUuid: UUID,
-    tolerance: Duration = Duration.ofMillis(7500))(implicit ec: ExecutionContext): Future[Seq[CachedAncillaryDatum]] = {
+      data: Iterable[CachedAncillaryDatumBean],
+      videoReferenceUuid: UUID,
+      tolerance: Duration = Duration.ofMillis(7500)
+  )(implicit ec: ExecutionContext): Future[Seq[CachedAncillaryDatum]] = {
 
     def fn(dao: ADDAO): Seq[CachedAncillaryDatum] = {
       val imDao = daoFactory.newImagedMomentDAO(dao)
-      val imagedMoments = imDao.findByVideoReferenceUUID(videoReferenceUuid)
+      val imagedMoments = imDao
+        .findByVideoReferenceUUID(videoReferenceUuid)
         .filter(ir => ir.recordedDate != null)
 
       val usefulData = data.filter(_.recordedTimestamp.isDefined)
 
       def imagedMomentToMillis(im: ImagedMoment) = im.recordedDate.toEpochMilli
 
-      def datumToMillis(cd: CachedAncillaryDatumBean) = cd.recordedTimestamp.map(_.toEpochMilli).getOrElse(-1L)
+      def datumToMillis(cd: CachedAncillaryDatumBean) =
+        cd.recordedTimestamp.map(_.toEpochMilli).getOrElse(-1L)
 
       val mergedData = FastCollator(
         imagedMoments,
         imagedMomentToMillis,
         usefulData,
         datumToMillis,
-        tolerance.toMillis)
+        tolerance.toMillis
+      )
 
       for {
         (im, opt) <- mergedData
-        cad <- opt
+        cad       <- opt
       } yield {
         val d = dao.newPersistentObject(cad)
         createOrUpdate(d, im)
@@ -252,7 +304,9 @@ class CachedAncillaryDatumController(val daoFactory: BasicDAOFactory)
     exec(fn)
   }
 
-  def deleteByVideoReferenceUuid(videoReferenceUuid: UUID)(implicit ec: ExecutionContext): Future[Int] = {
+  def deleteByVideoReferenceUuid(
+      videoReferenceUuid: UUID
+  )(implicit ec: ExecutionContext): Future[Int] = {
     def fn(dao: ADDAO): Int = dao.deleteByVideoReferenceUuid(videoReferenceUuid)
 
     exec(fn)

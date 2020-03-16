@@ -14,9 +14,7 @@
  * limitations under the License.
  */
 
-class JettyMain {
-
-}
+class JettyMain {}
 import javax.servlet.DispatcherType
 import net.bull.javamelody.{MonitoringFilter, Parameter, ReportServlet, SessionListener}
 import org.eclipse.jetty.server._
@@ -65,7 +63,11 @@ object JettyMain {
     val monitoringFilter = new FilterHolder(new MonitoringFilter())
     monitoringFilter.setInitParameter(Parameter.APPLICATION_NAME.getCode, conf.webapp)
     monitoringFilter.setInitParameter("authorized-users", "adminz:Cranchiidae")
-    webApp.addFilter(monitoringFilter, "/*", java.util.EnumSet.of(DispatcherType.REQUEST, DispatcherType.ASYNC))
+    webApp.addFilter(
+      monitoringFilter,
+      "/*",
+      java.util.EnumSet.of(DispatcherType.REQUEST, DispatcherType.ASYNC)
+    )
 
     server.setHandler(webApp)
 

@@ -23,28 +23,28 @@ import org.mbari.vars.annotation.model.{Annotation, Association, Observation}
 import scala.util.Try
 
 /**
- * @author Brian Schlining
- * @since 2020-03-04T13:32:00
- */
-
-
+  * @author Brian Schlining
+  * @since 2020-03-04T13:32:00
+  */
 trait GenericPublisher[A] {
   def publish(x: A)
-  def publish(xs: Iterable[A]): Unit = for {
-    x <- xs
-  } publish(x)
+  def publish(xs: Iterable[A]): Unit =
+    for {
+      x <- xs
+    } publish(x)
   def publish(opt: Option[A]): Unit = opt match {
-    case None => // do nothing
+    case None    => // do nothing
     case Some(a) => Try(publish(a))
   }
 }
+
 /**
- * Decorator for an reactive Subject that publishes AnnotationMessages for
- * common use cases.
- * @param subject
- */
+  * Decorator for an reactive Subject that publishes AnnotationMessages for
+  * common use cases.
+  * @param subject
+  */
 class AnnotationPublisher(subject: Subject[Any]) extends GenericPublisher[Annotation] {
-  def publish(annotation: Annotation): Unit = Try(subject.onNext(AnnotationMessage(annotation)))
+  def publish(annotation: Annotation): Unit   = Try(subject.onNext(AnnotationMessage(annotation)))
   def publish(observation: Observation): Unit = publish(AnnotationImpl(observation))
 }
 

@@ -22,60 +22,57 @@ import org.slf4j.LoggerFactory
 import scala.util.Try
 import scala.util.control.NonFatal
 
-case class HttpConfig(port: Int,
-                      stopTimeout: Int,
-                      connectorIdleTimeout: Int,
-                      webapp: String,
-                      contextPath: String)
+case class HttpConfig(
+    port: Int,
+    stopTimeout: Int,
+    connectorIdleTimeout: Int,
+    webapp: String,
+    contextPath: String
+)
 
-case class BasicJwtConfig(issuer: String,
-                    clientSecret: String,
-                    signingSecret: String)
+case class BasicJwtConfig(issuer: String, clientSecret: String, signingSecret: String)
 
 case class ZeroMQConfig(port: Int, enable: Boolean, topic: String)
-
-
 
 class AppConfig(config: Config) {
 
   private[this] val log = LoggerFactory.getLogger(getClass)
 
   lazy val httpConfig: HttpConfig = {
-    val port = config.getInt("http.port")
-    val stopTimeout = config.getInt("http.stop.timeout")
+    val port                 = config.getInt("http.port")
+    val stopTimeout          = config.getInt("http.stop.timeout")
     val connectorIdleTimeout = config.getInt("http.connector.idle.timeout")
-    val webapp = config.getString("http.webapp")
-    val contextPath = config.getString("http.context.path")
+    val webapp               = config.getString("http.webapp")
+    val contextPath          = config.getString("http.context.path")
     HttpConfig(port, stopTimeout, connectorIdleTimeout, webapp, contextPath)
   }
 
   lazy val authenticationService: String =
     Try(config.getString("authentication.service"))
-    .getOrElse("org.mbari.vars.annotation.auth.NoopAuthService")
+      .getOrElse("org.mbari.vars.annotation.auth.NoopAuthService")
 
-  lazy val basicJwtConfig: Option[BasicJwtConfig] = try {
-    val issuer = config.getString("basicjwt.issuer")
-    val clientSecret = config.getString("basicjwt.client.secret")
-    val signingSecret = config.getString("basicjwt.signing.secret")
-   Some(BasicJwtConfig(issuer, clientSecret, signingSecret))
-  }
-  catch {
-    case NonFatal(e) => None
-  }
+  lazy val basicJwtConfig: Option[BasicJwtConfig] =
+    try {
+      val issuer        = config.getString("basicjwt.issuer")
+      val clientSecret  = config.getString("basicjwt.client.secret")
+      val signingSecret = config.getString("basicjwt.signing.secret")
+      Some(BasicJwtConfig(issuer, clientSecret, signingSecret))
+    }
+    catch {
+      case NonFatal(e) => None
+    }
 
-  lazy val zeroMQConfig: Option[ZeroMQConfig] = try {
-    val port = config.getInt("messaging.zeromq.port")
-    val enable = config.getBoolean("messaging.zeromq.enable")
-    val topic = config.getString("messaging.zeromq.topic")
-    Some(ZeroMQConfig(port, enable, topic))
-  }
-  catch {
-    case NonFatal(e) =>
-      log.warn("Failed to load ZeroMQ configuration", e)
-      None
-  }
-
-
-
+  lazy val zeroMQConfig: Option[ZeroMQConfig] =
+    try {
+      val port   = config.getInt("messaging.zeromq.port")
+      val enable = config.getBoolean("messaging.zeromq.enable")
+      val topic  = config.getString("messaging.zeromq.topic")
+      Some(ZeroMQConfig(port, enable, topic))
+    }
+    catch {
+      case NonFatal(e) =>
+        log.warn("Failed to load ZeroMQ configuration", e)
+        None
+    }
 
 }

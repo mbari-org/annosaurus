@@ -20,9 +20,9 @@ import com.google.gson.annotations.Expose
 import org.mbari.vars.annotation.dao.jpa.AnnotationImpl
 
 /**
- * @author Brian Schlining
- * @since 2019-10-22T14:34:00
- */
+  * @author Brian Schlining
+  * @since 2019-10-22T14:34:00
+  */
 class AnnotationExt extends AnnotationImpl {
   @Expose(serialize = true)
   var ancillaryData: AncillaryDatumExt = _
@@ -32,8 +32,8 @@ class AnnotationExt extends AnnotationImpl {
     else {
       val other: AnnotationExt = obj.asInstanceOf[AnnotationExt]
       other.observationUuid != null &&
-        this.observationUuid != null &&
-        other.observationUuid == this.observationUuid
+      this.observationUuid != null &&
+      other.observationUuid == this.observationUuid
     }
   }
 

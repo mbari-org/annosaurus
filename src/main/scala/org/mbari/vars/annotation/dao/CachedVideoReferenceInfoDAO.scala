@@ -21,11 +21,11 @@ import java.util.UUID
 import org.mbari.vars.annotation.model.CachedVideoReferenceInfo
 
 /**
- *
- *
- * @author Brian Schlining
- * @since 2016-06-17T16:10:00
- */
+  *
+  *
+  * @author Brian Schlining
+  * @since 2016-06-17T16:10:00
+  */
 trait CachedVideoReferenceInfoDAO[T <: CachedVideoReferenceInfo] extends DAO[T] {
 
   def findByVideoReferenceUUID(uuid: UUID): Option[CachedVideoReferenceInfo]

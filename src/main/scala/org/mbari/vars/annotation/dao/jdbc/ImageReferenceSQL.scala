@@ -22,7 +22,6 @@ import java.util.UUID
 import org.mbari.vars.annotation.dao.jpa.AnnotationImpl
 import org.mbari.vars.annotation.model.Annotation
 
-
 object ImageReferenceSQL {
   val SELECT: String =
     """ SELECT
@@ -48,7 +47,6 @@ object ImageReferenceSQL {
   val byVideoReferenceUuidBetweenDates: String = SELECT + FROM +
     " WHERE im.video_reference_uuid = ? AND im.recorded_timestamp BETWEEN ? AND ? " + ORDER
 
-
   val byConcurrentRequest: String = SELECT + FROM +
     " WHERE im.video_reference_uuid IN (?) AND im.recorded_timestamp BETWEEN ? AND ?" + ORDER
 
@@ -73,7 +71,7 @@ object ImageReferenceSQL {
       row <- rows
     } yield {
       val xs = row.asInstanceOf[Array[Object]]
-      val i = new ImageReferenceExt
+      val i  = new ImageReferenceExt
       i.uuid = UUID.fromString(xs(0).toString)
       Option(xs(1))
         .map(_.toString)
@@ -84,7 +82,7 @@ object ImageReferenceSQL {
       Option(xs(3))
         .map(_.asInstanceOf[Number].intValue())
         .foreach(v => i.height = v)
-      i.url =  new URL(xs(4).toString)
+      i.url = new URL(xs(4).toString)
       Option(xs(5))
         .map(_.asInstanceOf[Number].intValue())
         .foreach(v => i.width = v)
@@ -97,7 +95,8 @@ object ImageReferenceSQL {
     for {
       i <- images
     } {
-      annotations.filter(anno => anno.imagedMomentUuid == i.imagedMomentUuid)
+      annotations
+        .filter(anno => anno.imagedMomentUuid == i.imagedMomentUuid)
         .foreach(anno => anno.javaImageReferences.add(i))
     }
     annotations

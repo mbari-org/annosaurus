@@ -16,15 +16,15 @@
 
 package org.mbari.vars.annotation.model
 
-import java.time.{ Duration, Instant }
+import java.time.{Duration, Instant}
 import java.util.UUID
 
 import org.mbari.vcr4j.time.Timecode
 
 /**
- * @author Brian Schlining
- * @since 2017-09-20T15:58:00
- */
+  * @author Brian Schlining
+  * @since 2017-09-20T15:58:00
+  */
 trait Annotation {
 
   var observationUuid: UUID

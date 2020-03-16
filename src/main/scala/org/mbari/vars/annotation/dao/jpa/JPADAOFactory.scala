@@ -16,19 +16,27 @@
 
 package org.mbari.vars.annotation.dao.jpa
 
-import javax.persistence.{ EntityManager, EntityManagerFactory }
+import javax.persistence.{EntityManager, EntityManagerFactory}
 
 import com.typesafe.config.ConfigFactory
-import org.mbari.vars.annotation.dao.{ DAO, ImagedMomentDAO, ObservationDAO, _ }
+import org.mbari.vars.annotation.dao.{DAO, ImagedMomentDAO, ObservationDAO, _}
 
 /**
- *
- *
- * @author Brian Schlining
- * @since 2016-06-25T17:27:00
- */
+  *
+  *
+  * @author Brian Schlining
+  * @since 2016-06-25T17:27:00
+  */
 trait JPADAOFactory
-  extends DAOFactory[ImagedMomentImpl, ObservationImpl, AssociationImpl, ImageReferenceImpl, CachedAncillaryDatumImpl, CachedVideoReferenceInfoImpl, IndexImpl] {
+    extends DAOFactory[
+      ImagedMomentImpl,
+      ObservationImpl,
+      AssociationImpl,
+      ImageReferenceImpl,
+      CachedAncillaryDatumImpl,
+      CachedVideoReferenceInfoImpl,
+      IndexImpl
+    ] {
 
   def entityManagerFactory: EntityManagerFactory
 
@@ -44,7 +52,9 @@ trait JPADAOFactory
   override def newCachedAncillaryDatumDAO(): CachedAncillaryDatumDAO[CachedAncillaryDatumImpl] =
     new CachedAncillaryDatumDAOImpl(entityManagerFactory.createEntityManager())
 
-  override def newCachedAncillaryDatumDAO(dao: DAO[_]): CachedAncillaryDatumDAO[CachedAncillaryDatumImpl] =
+  override def newCachedAncillaryDatumDAO(
+      dao: DAO[_]
+  ): CachedAncillaryDatumDAO[CachedAncillaryDatumImpl] =
     new CachedAncillaryDatumDAOImpl(extractEntityManager(dao))
 
   override def newObservationDAO(): ObservationDAO[ObservationImpl] =
@@ -53,15 +63,20 @@ trait JPADAOFactory
   override def newObservationDAO(dao: DAO[_]): ObservationDAO[ObservationImpl] =
     new ObservationDAOImpl(extractEntityManager(dao))
 
-  override def newCachedVideoReferenceInfoDAO(): CachedVideoReferenceInfoDAO[CachedVideoReferenceInfoImpl] =
+  override def newCachedVideoReferenceInfoDAO()
+      : CachedVideoReferenceInfoDAO[CachedVideoReferenceInfoImpl] =
     new CachedVideoReferenceInfoDAOImpl(entityManagerFactory.createEntityManager())
 
-  override def newCachedVideoReferenceInfoDAO(dao: DAO[_]): CachedVideoReferenceInfoDAO[CachedVideoReferenceInfoImpl] =
+  override def newCachedVideoReferenceInfoDAO(
+      dao: DAO[_]
+  ): CachedVideoReferenceInfoDAO[CachedVideoReferenceInfoImpl] =
     new CachedVideoReferenceInfoDAOImpl(extractEntityManager(dao))
 
-  override def newIndexDAO(): IndexDAO[IndexImpl] = new IndexDAOImpl(entityManagerFactory.createEntityManager())
+  override def newIndexDAO(): IndexDAO[IndexImpl] =
+    new IndexDAOImpl(entityManagerFactory.createEntityManager())
 
-  override def newIndexDAO(dao: DAO[_]): IndexDAO[IndexImpl] = new IndexDAOImpl(extractEntityManager(dao))
+  override def newIndexDAO(dao: DAO[_]): IndexDAO[IndexImpl] =
+    new IndexDAOImpl(extractEntityManager(dao))
 
   override def newImageReferenceDAO(): ImageReferenceDAO[ImageReferenceImpl] =
     new ImageReferenceDAOImpl(entityManagerFactory.createEntityManager())
@@ -82,10 +97,12 @@ class JPADAOFactoryImpl(val entityManagerFactory: EntityManagerFactory) extends 
 object JPADAOFactory extends JPADAOFactory {
 
   lazy val entityManagerFactory = {
-    val config = ConfigFactory.load()
+    val config      = ConfigFactory.load()
     val environment = config.getString("database.environment")
-    val nodeName = if (environment.equalsIgnoreCase("production")) "org.mbari.vars.annotation.database.production"
-    else "org.mbari.vars.annotation.database.development"
+    val nodeName =
+      if (environment.equalsIgnoreCase("production"))
+        "org.mbari.vars.annotation.database.production"
+      else "org.mbari.vars.annotation.database.development"
 
     EntityManagerFactories(nodeName)
   }

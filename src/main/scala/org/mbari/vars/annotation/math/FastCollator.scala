@@ -19,17 +19,18 @@ package org.mbari.vars.annotation.math
 import scilube.Matlib
 
 /**
- *
- *
- * @author Brian Schlining
- * @since 2015-03-02T16:20:00
- */
+  *
+  *
+  * @author Brian Schlining
+  * @since 2015-03-02T16:20:00
+  */
 object FastCollator {
 
   def apply[A: Numeric, B: Numeric](
-    a: Iterable[A],
-    b: Iterable[B],
-    tolerance: Double): Seq[(A, Option[B])] = {
+      a: Iterable[A],
+      b: Iterable[B],
+      tolerance: Double
+  ): Seq[(A, Option[B])] = {
     val numericA = implicitly[Numeric[A]]
     val numericB = implicitly[Numeric[B]]
 
@@ -41,11 +42,12 @@ object FastCollator {
   }
 
   def apply[A, B](
-    a: Iterable[A],
-    fnA: A => Double,
-    b: Iterable[B],
-    fnB: B => Double,
-    tolerance: Double): Seq[(A, Option[B])] = {
+      a: Iterable[A],
+      fnA: A => Double,
+      b: Iterable[B],
+      fnB: B => Double,
+      tolerance: Double
+  ): Seq[(A, Option[B])] = {
 
     val listA = a.toSeq.sortBy(fnA) // sorted d0
     val listB = b.toSeq.sortBy(fnB) // sorted d1
@@ -61,7 +63,8 @@ object FastCollator {
         val vB = valuesB(iB)
         if (math.abs(vA - vB) <= tolerance) Option(listB(iB))
         else None
-      } else None
+      }
+      else None
       listA(iA) -> nearest
     }
     tmp.toSeq

@@ -20,14 +20,14 @@ import javax.persistence.EntityManager
 
 import org.slf4j.LoggerFactory
 
-import scala.concurrent.{ ExecutionContext, Future }
+import scala.concurrent.{ExecutionContext, Future}
 
 /**
- * Implicits used in this package
- *
- * @author Brian Schlining
- * @since 2016-05-06T13:34:00
- */
+  * Implicits used in this package
+  *
+  * @author Brian Schlining
+  * @since 2016-05-06T13:34:00
+  */
 object Implicits {
 
   private[this] val log = LoggerFactory.getLogger(getClass)
@@ -41,7 +41,8 @@ object Implicits {
           val n = fn.apply(entityManager)
           transaction.commit()
           n
-        } finally {
+        }
+        finally {
           if (transaction.isActive) {
             transaction.rollback()
           }

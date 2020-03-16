@@ -24,9 +24,9 @@ import com.google.gson.annotations.Expose
 import scala.collection.JavaConverters._
 
 /**
- * @author Brian Schlining
- * @since 2019-06-05T13:46:00
- */
+  * @author Brian Schlining
+  * @since 2019-06-05T13:46:00
+  */
 class ConceptAssociationRequest {
 
   @Expose(serialize = true)

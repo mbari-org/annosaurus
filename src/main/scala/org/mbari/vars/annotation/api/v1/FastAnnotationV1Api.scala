@@ -27,134 +27,142 @@ import scala.concurrent.{ExecutionContext, Future}
 import scala.collection.JavaConverters._
 
 /**
- * @author Brian Schlining
- * @since 2019-07-22T11:33:00
- */
-class FastAnnotationV1Api(daoFactory: JPADAOFactory)
-                         (implicit val executor: ExecutionContext) extends V1APIStack {
+  * @author Brian Schlining
+  * @since 2019-07-22T11:33:00
+  */
+class FastAnnotationV1Api(daoFactory: JPADAOFactory)(implicit val executor: ExecutionContext)
+    extends V1APIStack {
 
   before() {
     contentType = "application/json"
-    response.headers += ("Access-Control-Allow-Origin" -> "*")
+    response.headers.set("Access-Control-Allow-Origin", "*")
   }
 
   private[this] val repository = new JdbcRepository(daoFactory.entityManagerFactory)
 
   get("/") {
-    val limit = params.getAs[Int]("limit").orElse(Some(5000))
+    val limit  = params.getAs[Int]("limit").orElse(Some(5000))
     val offset = params.getAs[Int]("offset")
-
 
   }
 
   get("/count") {
-    Future({
+    Future {
       val count = repository.countAll()
       toJson(Count(count))
-    })
+    }
   }
 
   get("/videoreference/:uuid") {
-    val uuid = params.getAs[UUID]("uuid").getOrElse(halt(BadRequest(
-      body = "A video reference 'uuid' parameter is required")))
-    val limit = params.getAs[Int]("limit")
-    val offset = params.getAs[Int]("offset")
+    val uuid = params
+      .getAs[UUID]("uuid")
+      .getOrElse(halt(BadRequest(body = "A video reference 'uuid' parameter is required")))
+    val limit   = params.getAs[Int]("limit")
+    val offset  = params.getAs[Int]("offset")
     val addData = params.getAs[Boolean]("data").getOrElse(false)
-    Future({
-      val annos = repository.findByVideoReferenceUuid(uuid, limit, offset, addData)
-        .asJava
+    Future {
+      val annos = repository.findByVideoReferenceUuid(uuid, limit, offset, addData).asJava
       toJson(annos)
-    })
+    }
   }
 
   get("/images/videoreference/:uuid") {
-    val uuid = params.getAs[UUID]("uuid").getOrElse(halt(BadRequest(
-      body = "A video reference 'uuid' parameter is required")))
-    val limit = params.getAs[Int]("limit")
+    val uuid = params
+      .getAs[UUID]("uuid")
+      .getOrElse(halt(BadRequest(body = "A video reference 'uuid' parameter is required")))
+    val limit  = params.getAs[Int]("limit")
     val offset = params.getAs[Int]("offset")
-    Future({
-      val images = repository.findImagesByVideoReferenceUuid(uuid, limit, offset)
-        .asJava
+    Future {
+      val images = repository.findImagesByVideoReferenceUuid(uuid, limit, offset).asJava
       toJson(images)
-    })
+    }
   }
 
   get("/concept/:concept") {
-    val concept = params.get("concept").getOrElse(halt(BadRequest(
-      body = "A 'concept' parameter is required")))
-    val limit = params.getAs[Int]("limit")
-    val offset = params.getAs[Int]("offset")
+    val concept =
+      params.get("concept").getOrElse(halt(BadRequest(body = "A 'concept' parameter is required")))
+    val limit   = params.getAs[Int]("limit")
+    val offset  = params.getAs[Int]("offset")
     val addData = params.getAs[Boolean]("data").getOrElse(false)
-    Future({
-      val annos = repository.findByConcept(concept, limit, offset, addData)
-        .asJava
+    Future {
+      val annos = repository.findByConcept(concept, limit, offset, addData).asJava
       toJson(annos)
-    })
+    }
   }
 
   get("/concept/images/:concept") {
-    val concept = params.get("concept").getOrElse(halt(BadRequest(
-      body = "A 'concept' parameter is required")))
-    val limit = params.getAs[Int]("limit")
-    val offset = params.getAs[Int]("offset")
+    val concept =
+      params.get("concept").getOrElse(halt(BadRequest(body = "A 'concept' parameter is required")))
+    val limit   = params.getAs[Int]("limit")
+    val offset  = params.getAs[Int]("offset")
     val addData = params.getAs[Boolean]("data").getOrElse(false)
-    Future({
-      val annos = repository.findByConceptWithImages(concept, limit, offset, addData)
-        .asJava
+    Future {
+      val annos = repository.findByConceptWithImages(concept, limit, offset, addData).asJava
       toJson(annos)
-    })
+    }
   }
 
   get("/imagedmoments/concept/images/:concept") {
-    val concept = params.get("concept").getOrElse(halt(BadRequest(
-      body = "A 'concept' parameter is required")))
-    val limit = params.getAs[Int]("limit")
+    val concept =
+      params.get("concept").getOrElse(halt(BadRequest(body = "A 'concept' parameter is required")))
+    val limit  = params.getAs[Int]("limit")
     val offset = params.getAs[Int]("offset")
-    Future({
-      val imagedMomentUuids = repository.findImagedMomentUuidsByConceptWithImages(concept, limit, offset)
-          .asJava
+    Future {
+      val imagedMomentUuids =
+        repository.findImagedMomentUuidsByConceptWithImages(concept, limit, offset).asJava
       toJson(imagedMomentUuids)
-    })
+    }
   }
 
   get("/details/:link_name/:link_value") {
-    val linkName = params.get("link_name")
+    val linkName = params
+      .get("link_name")
       .getOrElse(halt(BadRequest(ErrorMsg(400, "A link_name parameter is required"))))
-    val linkValue = params.get("link_value")
+    val linkValue = params
+      .get("link_value")
       .getOrElse(halt(BadRequest(ErrorMsg(400, "A link_value parameter is required"))))
     val addData = params.getAs[Boolean]("data").getOrElse(false)
-    Future({
-      val annos = repository.findByLinkNameAndLinkValue(linkName, linkValue, addData)
-        .asJava
+    Future {
+      val annos = repository.findByLinkNameAndLinkValue(linkName, linkValue, addData).asJava
       toJson(annos)
-    })
+    }
   }
 
   delete("/videoreference/:uuid") {
     validateRequest()
-    val uuid = params.getAs[UUID]("uuid").getOrElse(halt(BadRequest(
-      body = "A video reference 'uuid' parameter is required")))
-    Future({
+    val uuid = params
+      .getAs[UUID]("uuid")
+      .getOrElse(halt(BadRequest(body = "A video reference 'uuid' parameter is required")))
+    Future {
       val deleteCount = repository.deleteByVideoReferenceUuid(uuid)
       toJson(deleteCount)
-    })
+    }
   }
 
   post("/concurrent") {
     request.getHeader("Content-Type") match {
       case "application/json" =>
-        val b = request.body
-        val limit = params.getAs[Int]("limit")
-        val offset = params.getAs[Int]("offset")
+        val b                 = request.body
+        val limit             = params.getAs[Int]("limit")
+        val offset            = params.getAs[Int]("offset")
         val concurrentRequest = fromJson(b, classOf[ConcurrentRequest])
-        val addData = params.getAs[Boolean]("data").getOrElse(false)
-        Future({
-          val annos = repository.findByConcurrentRequest(concurrentRequest, limit, offset, addData)
-            .asJava
+        val addData           = params.getAs[Boolean]("data").getOrElse(false)
+        Future {
+          val annos =
+            repository.findByConcurrentRequest(concurrentRequest, limit, offset, addData).asJava
           toJson(annos)
-        })
+        }
       case _ =>
-        halt(BadRequest(toJson(ErrorMsg(400, "Posts to /concurrent only accept a JSON body (i.e. Content-Type: application/json)"))))
+        halt(
+          BadRequest(
+            toJson(
+              ErrorMsg(
+                400,
+                "Posts to /concurrent only accept a JSON body (i.e. Content-Type: application/json)"
+              )
+            )
+          )
+        )
 
     }
   }
@@ -162,23 +170,28 @@ class FastAnnotationV1Api(daoFactory: JPADAOFactory)
   post("/multi") {
     request.getHeader("Content-Type") match {
       case "application/json" =>
-        val b = request.body
-        val limit = params.getAs[Int]("limit")
-        val offset = params.getAs[Int]("offset")
+        val b            = request.body
+        val limit        = params.getAs[Int]("limit")
+        val offset       = params.getAs[Int]("offset")
         val multiRequest = fromJson(b, classOf[MultiRequest])
-        val addData = params.getAs[Boolean]("data").getOrElse(false)
-        Future({
-          val annos = repository.findByMultiRequest(multiRequest, limit, offset, addData)
-            .asJava
+        val addData      = params.getAs[Boolean]("data").getOrElse(false)
+        Future {
+          val annos = repository.findByMultiRequest(multiRequest, limit, offset, addData).asJava
           toJson(annos)
-        })
+        }
       case _ =>
-        halt(BadRequest(toJson(ErrorMsg(400, "Posts to /multi only accept a JSON body (i.e. Content-Type: application/json)"))))
+        halt(
+          BadRequest(
+            toJson(
+              ErrorMsg(
+                400,
+                "Posts to /multi only accept a JSON body (i.e. Content-Type: application/json)"
+              )
+            )
+          )
+        )
 
     }
   }
-
-
-
 
 }

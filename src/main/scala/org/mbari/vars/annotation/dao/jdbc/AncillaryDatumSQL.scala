@@ -20,7 +20,6 @@ import java.util.UUID
 
 import org.mbari.vars.annotation.model.Annotation
 
-
 object AncillaryDatumSQL {
 
   def resultListToAnncillaryData(rows: List[_]): Seq[AncillaryDatumExt] = {
@@ -28,7 +27,7 @@ object AncillaryDatumSQL {
       row <- rows
     } yield {
       val xs = row.asInstanceOf[Array[Object]]
-      val a = new AncillaryDatumExt
+      val a  = new AncillaryDatumExt
       a.uuid = UUID.fromString(xs(0).toString)
       a.altitude = toDouble(xs(1).asInstanceOf[Number])
       Option(xs(2)).foreach(v => a.crs = v.toString)
@@ -52,8 +51,9 @@ object AncillaryDatumSQL {
     }
   }
 
-  private def toDouble(obj: Number): Option[Double] = if (obj != null) Some(obj.doubleValue())
-  else None
+  private def toDouble(obj: Number): Option[Double] =
+    if (obj != null) Some(obj.doubleValue())
+    else None
 
   val SELECT: String =
     """ SELECT
@@ -114,7 +114,8 @@ object AncillaryDatumSQL {
     for {
       d <- data
     } {
-      annotations.filter(anno => anno.imagedMomentUuid == d.imagedMomentUuid)
+      annotations
+        .filter(anno => anno.imagedMomentUuid == d.imagedMomentUuid)
         .foreach(anno => anno.ancillaryData = d)
     }
     annotations

@@ -26,9 +26,9 @@ import com.google.gson.annotations.Expose
 /**
   * Data class for information needed to request all annotations from multiple
   * videos in a single REST call
- * @author Brian Schlining
- * @since 2019-07-10T14:10:00
- */
+  * @author Brian Schlining
+  * @since 2019-07-10T14:10:00
+  */
 class MultiRequest {
 
   @Expose(serialize = true)

@@ -26,23 +26,23 @@ import scala.util.Try
 import scala.util.control.NonFatal
 
 /**
- * @author Brian Schlining
- * @since 2020-03-04T13:31:00
- */
+  * @author Brian Schlining
+  * @since 2020-03-04T13:31:00
+  */
 sealed trait GenericMessage[+A] {
   def content: A
   def toJson: String
 }
 
 /**
- * Send when a new annotation is created or an existing one is updated
- * @param content
- */
-case class AnnotationMessage(content: Annotation)
-  extends GenericMessage[Annotation] {
+  * Send when a new annotation is created or an existing one is updated
+  * @param content
+  */
+case class AnnotationMessage(content: Annotation) extends GenericMessage[Annotation] {
 
-  override def hashCode(): Int = this.content.observationUuid.hashCode() +
-    this.content.observationTimestamp.hashCode() * 3
+  override def hashCode(): Int =
+    this.content.observationUuid.hashCode() +
+      this.content.observationTimestamp.hashCode() * 3
 
   override def equals(obj: Any): Boolean =
     obj match {
@@ -55,10 +55,7 @@ case class AnnotationMessage(content: Annotation)
   override def toJson: String = JsonEncoders.AnnotationEncoder(content).toJson
 }
 
-
-
-case class AssociationMessage(content: Association)
-  extends GenericMessage[Association] {
+case class AssociationMessage(content: Association) extends GenericMessage[Association] {
 //  override def hashCode(): Int = this.content.uuid.hashCode()
 //
 //  override def equals(obj: Any): Boolean = obj match {
@@ -67,7 +64,7 @@ case class AssociationMessage(content: Association)
 //  }
 
   override def toJson: String = {
-      val ea = ExtendedAssociation(content)
+    val ea = ExtendedAssociation(content)
     JsonEncoders.ExtendedAssocationEncoder(ea).toJson
   }
 }

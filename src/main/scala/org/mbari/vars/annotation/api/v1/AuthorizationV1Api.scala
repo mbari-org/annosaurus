@@ -21,11 +21,10 @@ import org.scalatra.Unauthorized
 import scala.concurrent.ExecutionContext
 
 /**
- * @author Brian Schlining
- * @since 2017-01-19T11:07:00
- */
-class AuthorizationV1Api(implicit val executor: ExecutionContext)
-  extends V1APIStack {
+  * @author Brian Schlining
+  * @since 2017-01-19T11:07:00
+  */
+class AuthorizationV1Api(implicit val executor: ExecutionContext) extends V1APIStack {
 
   before() {
     contentType = "application/json"
@@ -33,7 +32,7 @@ class AuthorizationV1Api(implicit val executor: ExecutionContext)
 
   post("/") {
     authorizationService.requestAuthorization(request) match {
-      case None => halt(Unauthorized())
+      case None    => halt(Unauthorized())
       case Some(s) => s
     }
   }

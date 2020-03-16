@@ -19,65 +19,87 @@ package org.mbari.vars.annotation.dao.jpa
 import java.util.UUID
 import javax.persistence._
 
-import com.google.gson.annotations.{ Expose, SerializedName }
+import com.google.gson.annotations.{Expose, SerializedName}
 import org.mbari.vars.annotation.model.CachedVideoReferenceInfo
 
 /**
- * idx_video_reference_uuid_vri
- *
- * @author Brian Schlining
- * @since 2016-06-17T15:33:00
- */
+  * idx_video_reference_uuid_vri
+  *
+  * @author Brian Schlining
+  * @since 2016-06-17T15:33:00
+  */
 @Entity(name = "CachedVideoReferenceInfo")
-@Table(name = "video_reference_information", indexes = Array(
-  new Index(name = "idx_video_reference_information__video_reference_uuid", columnList = "video_reference_uuid")))
+@Table(
+  name = "video_reference_information",
+  indexes = Array(
+    new Index(
+      name = "idx_video_reference_information__video_reference_uuid",
+      columnList = "video_reference_uuid"
+    )
+  )
+)
 @EntityListeners(value = Array(classOf[TransactionLogger]))
-@NamedNativeQueries(Array(
-  new NamedNativeQuery(
-    name = "VideoReferenceInfo.findAllVideoReferenceUUIDs",
-    query = "SELECT DISTINCT video_reference_uuid FROM video_reference_information ORDER BY video_reference_uuid ASC"),
-  new NamedNativeQuery(
-    name = "VideoReferenceInfo.findAllMissionContacts",
-    query = "SELECT DISTINCT mission_contact FROM video_reference_information ORDER BY mission_contact ASC"),
-  new NamedNativeQuery(
-    name = "VideoReferenceInfo.findAllPlatformNames",
-    query = "SELECT DISTINCT platform_name FROM video_reference_information ORDER BY platform_name ASC"),
-  new NamedNativeQuery(
-    name = "VideoReferenceInfo.findAllMissionIDs",
-    query = "SELECT DISTINCT mission_id FROM video_reference_information ORDER BY mission_id ASC")))
-@NamedQueries(Array(
-  new NamedQuery(
-    name = "VideoReferenceInfo.findAll",
-    query = "SELECT v FROM CachedVideoReferenceInfo v ORDER BY v.uuid"),
-  new NamedQuery(
-    name = "VideoReferenceInfo.findByVideoReferenceUUID",
-    query = "SELECT v FROM CachedVideoReferenceInfo v WHERE v.videoReferenceUUID = :uuid ORDER BY v.uuid"),
-  new NamedQuery(
-    name = "VideoReferenceInfo.findByPlatformName",
-    query = "SELECT v FROM CachedVideoReferenceInfo v WHERE v.platformName = :name ORDER BY v.uuid"),
-  new NamedQuery(
-    name = "VideoReferenceInfo.findByMissionID",
-    query = "SELECT v FROM CachedVideoReferenceInfo v WHERE v.missionId = :id ORDER BY v.uuid"),
-  new NamedQuery(
-    name = "VideoReferenceInfo.findByMissionContact",
-    query = "SELECT v FROM CachedVideoReferenceInfo v WHERE v.missionContact = :contact ORDER BY v.uuid")))
+@NamedNativeQueries(
+  Array(
+    new NamedNativeQuery(
+      name = "VideoReferenceInfo.findAllVideoReferenceUUIDs",
+      query =
+        "SELECT DISTINCT video_reference_uuid FROM video_reference_information ORDER BY video_reference_uuid ASC"
+    ),
+    new NamedNativeQuery(
+      name = "VideoReferenceInfo.findAllMissionContacts",
+      query =
+        "SELECT DISTINCT mission_contact FROM video_reference_information ORDER BY mission_contact ASC"
+    ),
+    new NamedNativeQuery(
+      name = "VideoReferenceInfo.findAllPlatformNames",
+      query =
+        "SELECT DISTINCT platform_name FROM video_reference_information ORDER BY platform_name ASC"
+    ),
+    new NamedNativeQuery(
+      name = "VideoReferenceInfo.findAllMissionIDs",
+      query = "SELECT DISTINCT mission_id FROM video_reference_information ORDER BY mission_id ASC"
+    )
+  )
+)
+@NamedQueries(
+  Array(
+    new NamedQuery(
+      name = "VideoReferenceInfo.findAll",
+      query = "SELECT v FROM CachedVideoReferenceInfo v ORDER BY v.uuid"
+    ),
+    new NamedQuery(
+      name = "VideoReferenceInfo.findByVideoReferenceUUID",
+      query =
+        "SELECT v FROM CachedVideoReferenceInfo v WHERE v.videoReferenceUUID = :uuid ORDER BY v.uuid"
+    ),
+    new NamedQuery(
+      name = "VideoReferenceInfo.findByPlatformName",
+      query =
+        "SELECT v FROM CachedVideoReferenceInfo v WHERE v.platformName = :name ORDER BY v.uuid"
+    ),
+    new NamedQuery(
+      name = "VideoReferenceInfo.findByMissionID",
+      query = "SELECT v FROM CachedVideoReferenceInfo v WHERE v.missionId = :id ORDER BY v.uuid"
+    ),
+    new NamedQuery(
+      name = "VideoReferenceInfo.findByMissionContact",
+      query =
+        "SELECT v FROM CachedVideoReferenceInfo v WHERE v.missionContact = :contact ORDER BY v.uuid"
+    )
+  )
+)
 class CachedVideoReferenceInfoImpl extends CachedVideoReferenceInfo with JPAPersistentObject {
 
   /**
-   * typically this will be the chief scientist
-   */
+    * typically this will be the chief scientist
+    */
   @Expose(serialize = true)
-  @Column(
-    name = "mission_contact",
-    nullable = true,
-    length = 64)
+  @Column(name = "mission_contact", nullable = true, length = 64)
   override var missionContact: String = _
 
   @Expose(serialize = true)
-  @Column(
-    name = "platform_name",
-    nullable = false,
-    length = 64)
+  @Column(name = "platform_name", nullable = false, length = 64)
   override var platformName: String = _
 
   @Expose(serialize = true)
@@ -86,25 +108,24 @@ class CachedVideoReferenceInfoImpl extends CachedVideoReferenceInfo with JPAPers
     name = "video_reference_uuid",
     nullable = false,
     unique = true,
-    columnDefinition = "CHAR(36)")
+    columnDefinition = "CHAR(36)"
+  )
   @Convert(converter = classOf[UUIDConverter])
   override var videoReferenceUUID: UUID = _
 
   @Expose(serialize = true)
-  @Column(
-    name = "mission_id",
-    nullable = false,
-    length = 256)
+  @Column(name = "mission_id", nullable = false, length = 256)
   override var missionId: String = _
 
 }
 
 object CachedVideoReferenceInfoImpl {
   def apply(
-    videoReferenceUUID: UUID,
-    missionID: String,
-    platformName: String,
-    missionContact: Option[String] = None): CachedVideoReferenceInfoImpl = {
+      videoReferenceUUID: UUID,
+      missionID: String,
+      platformName: String,
+      missionContact: Option[String] = None
+  ): CachedVideoReferenceInfoImpl = {
 
     val d = new CachedVideoReferenceInfoImpl
     d.videoReferenceUUID = videoReferenceUUID

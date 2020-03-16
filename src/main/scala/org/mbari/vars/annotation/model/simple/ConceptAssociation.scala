@@ -23,7 +23,7 @@ import com.google.gson.annotations.Expose
 class ConceptAssociation {
 
   /**
-  * This is the association UUID
+    * This is the association UUID
     */
   @Expose(serialize = true)
   var uuid: UUID = _
@@ -49,8 +49,15 @@ class ConceptAssociation {
 }
 
 object ConceptAssociation {
-  def apply(uuid: UUID, videoReferenceUuid: UUID, concept: String, linkName: String,
-            toConcept: String, linkValue: String, mimeType: String):  ConceptAssociation = {
+  def apply(
+      uuid: UUID,
+      videoReferenceUuid: UUID,
+      concept: String,
+      linkName: String,
+      toConcept: String,
+      linkValue: String,
+      mimeType: String
+  ): ConceptAssociation = {
     val ca = new ConceptAssociation
     ca.uuid = uuid
     ca.videoReferenceUuid = videoReferenceUuid

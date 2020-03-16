@@ -21,20 +21,17 @@ import java.util.UUID
 import org.mbari.vars.annotation.model.ImagedMoment
 
 /**
- * Special DAO for fetching just the index information from the ImagedMomemnts
- *
- * @author Brian Schlining
- * @since 2019-02-08T08:53:00
- */
+  * Special DAO for fetching just the index information from the ImagedMomemnts
+  *
+  * @author Brian Schlining
+  * @since 2019-02-08T08:53:00
+  */
 trait IndexDAO[T <: ImagedMoment] extends DAO[T] {
 
   def findByVideoReferenceUuid(
-    videoReferenceUuid: UUID,
-    limit: Option[Int] = None,
-    offset: Option[Int] = None): Iterable[ImagedMoment]
-
-
-
-
+      videoReferenceUuid: UUID,
+      limit: Option[Int] = None,
+      offset: Option[Int] = None
+  ): Iterable[ImagedMoment]
 
 }

@@ -22,10 +22,9 @@ import java.util.UUID
 
 import org.mbari.vcr4j.time.Timecode
 
-
 /**
- * Object that contains the SQL and methods to build annotations
- */
+  * Object that contains the SQL and methods to build annotations
+  */
 object AnnotationSQL {
 
   def resultListToAnnotations(rows: List[_]): Seq[AnnotationExt] = {
@@ -33,7 +32,7 @@ object AnnotationSQL {
       row <- rows
     } yield {
       val xs = row.asInstanceOf[Array[Object]]
-      val a = new AnnotationExt
+      val a  = new AnnotationExt
       a.imagedMomentUuid = UUID.fromString(xs(0).toString)
       a.videoReferenceUuid = UUID.fromString(xs(1).toString)
       Option(xs(2))
@@ -113,8 +112,5 @@ object AnnotationSQL {
   val byMultiRequest: String = SELECT + FROM + " WHERE im.video_reference_uuid IN (?) " + ORDER
 
   val byImagedMomentUuids: String = SELECT + FROM + " WHERE im.uuid IN (?) " + ORDER
-
-
-
 
 }

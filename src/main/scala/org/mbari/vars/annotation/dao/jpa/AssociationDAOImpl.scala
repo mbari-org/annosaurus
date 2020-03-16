@@ -21,27 +21,32 @@ import java.util.UUID
 import javax.persistence.EntityManager
 import org.mbari.vars.annotation.dao.AssociationDAO
 import org.mbari.vars.annotation.model.Association
-import org.mbari.vars.annotation.model.simple.{ConceptAssociation, ConceptAssociationRequest, ConceptAssociationResponse}
+import org.mbari.vars.annotation.model.simple.{
+  ConceptAssociation,
+  ConceptAssociationRequest,
+  ConceptAssociationResponse
+}
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 /**
- *
- *
- * @author Brian Schlining
- * @since 2016-06-17T17:11:00
- */
+  *
+  *
+  * @author Brian Schlining
+  * @since 2016-06-17T17:11:00
+  */
 class AssociationDAOImpl(entityManager: EntityManager)
-  extends BaseDAO[AssociationImpl](entityManager)
-  with AssociationDAO[AssociationImpl] {
+    extends BaseDAO[AssociationImpl](entityManager)
+    with AssociationDAO[AssociationImpl] {
 
   override def newPersistentObject(): AssociationImpl = new AssociationImpl
 
   override def newPersistentObject(
-    linkName: String,
-    toConcept: Option[String],
-    linkValue: Option[String],
-    mimeType: Option[String]): AssociationImpl = {
+      linkName: String,
+      toConcept: Option[String],
+      linkValue: Option[String],
+      mimeType: Option[String]
+  ): AssociationImpl = {
     val a = new AssociationImpl
     a.linkName = linkName
     toConcept.foreach(a.toConcept = _)
@@ -50,7 +55,8 @@ class AssociationDAOImpl(entityManager: EntityManager)
     a
   }
 
-  override def newPersistentObject(association: Association): AssociationImpl = AssociationImpl(association)
+  override def newPersistentObject(association: Association): AssociationImpl =
+    AssociationImpl(association)
 
   override def findByLinkName(linkName: String): Iterable[AssociationImpl] =
     findByNamedQuery("Association.findByLinkName", Map("linkName" -> linkName))
@@ -60,41 +66,51 @@ class AssociationDAOImpl(entityManager: EntityManager)
   //      "Association.findByLinkNameAndVideoReferenceUUID",
   //      Map("linkName" -> linkName, "videoReferenceUuid" -> videoReferenceUUID))
 
-  override def findByLinkNameAndVideoReferenceUUID(linkName: String, videoReferenceUUID: UUID): Iterable[AssociationImpl] = {
+  override def findByLinkNameAndVideoReferenceUUID(
+      linkName: String,
+      videoReferenceUUID: UUID
+  ): Iterable[AssociationImpl] = {
     findByLinkNameAndVideoReferenceUUIDAndConcept(linkName, videoReferenceUUID, None)
   }
 
   def findByLinkNameAndVideoReferenceUUIDAndConcept(
-    linkName: String,
-    videoReferenceUUID: UUID,
-    concept: Option[String] = None): Iterable[AssociationImpl] = {
+      linkName: String,
+      videoReferenceUUID: UUID,
+      concept: Option[String] = None
+  ): Iterable[AssociationImpl] = {
     // HACK We are experiencing performance issues with the JPQL query. This
     // version is native SQL. Faster, but type casting is not pretty
     val query = entityManager.createNamedQuery("Association.findByLinkNameAndVideoReference")
     query.setParameter(1, videoReferenceUUID.toString)
     query.setParameter(2, linkName)
     // Concept -> Association map
-    val tuples = query.getResultList
+    val tuples = query
+      .getResultList
       .asScala
       .map(obj => obj.asInstanceOf[Array[Object]])
-      .map(obj => obj(0) -> {
-        val ass = newPersistentObject(
-          obj(2).asInstanceOf[String],
-          Option(obj(3).asInstanceOf[String]),
-          Option(obj(4).asInstanceOf[String]),
-          Option(obj(5).asInstanceOf[String]))
-        ass.uuid = UUID.fromString(obj(1).asInstanceOf[String])
-        ass
-      })
+      .map(obj =>
+        obj(0) -> {
+          val ass = newPersistentObject(
+            obj(2).asInstanceOf[String],
+            Option(obj(3).asInstanceOf[String]),
+            Option(obj(4).asInstanceOf[String]),
+            Option(obj(5).asInstanceOf[String])
+          )
+          ass.uuid = UUID.fromString(obj(1).asInstanceOf[String])
+          ass
+        }
+      )
 
     // Filter for a particular concept name
     concept match {
-      case None => tuples.map(_._2)
+      case None    => tuples.map(_._2)
       case Some(c) => tuples.filter(_._1 == c).map(_._2)
     }
   }
 
-  def findByConceptAssociationRequest(request: ConceptAssociationRequest): Iterable[ConceptAssociation] = {
+  def findByConceptAssociationRequest(
+      request: ConceptAssociationRequest
+  ): Iterable[ConceptAssociation] = {
 
     val sql =
       s"""
@@ -117,31 +133,43 @@ class AssociationDAOImpl(entityManager: EntityManager)
     val query = entityManager.createNativeQuery(sql)
     // HACK: Dropping into SQL. Fast with ugly typecasting
     // a.uuid, i.video_reference_uuid, o.concept, a.link_name, a.to_concept, a.link_value, a.mime_type
-    query.getResultList
+    query
+      .getResultList
       .asScala
       .map(obj => obj.asInstanceOf[Array[Object]])
       .map(obj => {
 //        obj.foreach(println)
-        val uuid = UUID.fromString(obj(0).asInstanceOf[String])
+        val uuid               = UUID.fromString(obj(0).asInstanceOf[String])
         val videoReferenceUuid = UUID.fromString(obj(1).asInstanceOf[String])
-        val conept = obj(2).asInstanceOf[String]
-        val linkName = obj(3).asInstanceOf[String]
-        val toConcept = obj(4).asInstanceOf[String]
-        val linkValue = obj(5).asInstanceOf[String]
-        val mimeType = obj(6).asInstanceOf[String]
-        ConceptAssociation(uuid, videoReferenceUuid, conept, linkName, toConcept, linkValue, mimeType)
+        val conept             = obj(2).asInstanceOf[String]
+        val linkName           = obj(3).asInstanceOf[String]
+        val toConcept          = obj(4).asInstanceOf[String]
+        val linkValue          = obj(5).asInstanceOf[String]
+        val mimeType           = obj(6).asInstanceOf[String]
+        ConceptAssociation(
+          uuid,
+          videoReferenceUuid,
+          conept,
+          linkName,
+          toConcept,
+          linkValue,
+          mimeType
+        )
       })
   }
 
-
-  override def findAll(limit: Option[Int] = None, offset: Option[Int] = None): Iterable[AssociationImpl] =
+  override def findAll(
+      limit: Option[Int] = None,
+      offset: Option[Int] = None
+  ): Iterable[AssociationImpl] =
     findByNamedQuery("Association.findAll", limit = limit, offset = offset)
 
   override def countByToConcept(toConcept: String): Int = {
     //val query = entityManager.createNativeQuery("Association.countByToConcept")
     val query = entityManager.createNamedQuery("Association.countByToConcept")
     query.setParameter(1, toConcept)
-    query.getResultList
+    query
+      .getResultList
       .asScala
       .map(_.asInstanceOf[Int])
       .head
@@ -155,4 +183,3 @@ class AssociationDAOImpl(entityManager: EntityManager)
     query.executeUpdate()
   }
 }
-

@@ -28,19 +28,18 @@ import org.mbari.vars.annotation.model.{Association, ImageReference}
 import org.mbari.vcr4j.time.Timecode
 
 /**
- *
- *
- * @author Brian Schlining
- * @since 2016-07-11T15:53:00
- */
+  *
+  *
+  * @author Brian Schlining
+  * @since 2016-07-11T15:53:00
+  */
 object Constants {
 
   val AppConfig: AppConfig = new AppConfig(ConfigFactory.load())
 
-
   /**
-   * Gson parser configured for the VAM's use cases.
-   */
+    * Gson parser configured for the VAM's use cases.
+    */
   val GSON: Gson = {
 
     val gsonBuilder = new GsonBuilder()
@@ -71,6 +70,5 @@ object Constants {
   }
 
   val GSON_FOR_ANNOTATION: Gson = GSON
-
 
 }
