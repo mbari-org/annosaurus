@@ -21,9 +21,11 @@ import java.util.UUID
 
 import org.mbari.vars.annotation.Constants
 import org.mbari.vcr4j.time.{FrameRates, Timecode}
-import org.scalatest.{BeforeAndAfterAll, FlatSpec, Matchers}
+import org.scalatest.BeforeAndAfterAll
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 
-class ImagedMomentImplSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
+class ImagedMomentImplSpec extends AnyFlatSpec with Matchers with BeforeAndAfterAll {
 
   "ImagedMomentImpl" should "round trip to/from annotations" in {
     val now  = Instant.now()

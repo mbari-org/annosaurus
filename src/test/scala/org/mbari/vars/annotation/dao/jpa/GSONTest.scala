@@ -22,7 +22,8 @@ import java.util.UUID
 
 import org.mbari.vars.annotation.Constants
 import org.mbari.vars.annotation.model.simple.CachedAncillaryDatumBean
-import org.scalatest.{ FlatSpec, Matchers }
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 
 import scala.io.Source
 
@@ -30,7 +31,7 @@ import scala.io.Source
  * @author Brian Schlining
  * @since 2017-09-20T14:59:00
  */
-class GSONTest extends FlatSpec with Matchers {
+class GSONTest extends AnyFlatSpec with Matchers {
 
   "GSON" should "convert to an annotation with image references" in {
     val src = getClass.getResource("/json/annotation_single.json")

@@ -23,7 +23,9 @@ import java.util.concurrent.TimeUnit
 import org.mbari.vars.annotation.dao.ImagedMomentDAO
 import org.mbari.vars.annotation.model.simple.WindowRequest
 import org.mbari.vcr4j.time.Timecode
-import org.scalatest.{BeforeAndAfterAll, FlatSpec, Matchers}
+import org.scalatest.BeforeAndAfterAll
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 
 import scala.concurrent.Await
 import scala.concurrent.duration.{Duration => SDuration}
@@ -35,7 +37,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
  * @author Brian Schlining
  * @since 2016-06-27T15:12:00
  */
-class ImagedMomentDAOSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
+class ImagedMomentDAOSpec extends AnyFlatSpec with Matchers with BeforeAndAfterAll {
 
   private[this] val daoFactory = TestDAOFactory.Instance
 

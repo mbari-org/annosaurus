@@ -19,10 +19,11 @@ package org.mbari.vars.annotation.messaging.zeromq
 import java.time.Instant
 import java.util.UUID
 
-import io.reactivex.schedulers.Schedulers
 import org.mbari.vars.annotation.dao.jpa.{AnnotationImpl, AssociationImpl, ObservationImpl}
 import org.mbari.vars.annotation.messaging.{AnnotationMessage, AssociationMessage, MessageBus}
-import org.scalatest.{BeforeAndAfterAll, FlatSpec, Matchers}
+import org.scalatest.BeforeAndAfterAll
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 import org.zeromq.{SocketType, ZContext}
 import zmq.ZMQ
 
@@ -30,7 +31,7 @@ import zmq.ZMQ
  * @author Brian Schlining
  * @since 2020-02-03T09:27:00
  */
-class ZeroMQPublisherSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
+class ZeroMQPublisherSpec extends AnyFlatSpec with Matchers with BeforeAndAfterAll {
 
   val context = new ZContext()
 

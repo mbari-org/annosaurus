@@ -16,7 +16,7 @@
 
 package org.mbari.vars.annotation.api.v1
 
-import java.net.URL
+import java.net.{URL, URLDecoder}
 import java.time.{Duration, Instant}
 import java.util.UUID
 
@@ -78,13 +78,12 @@ class ImageV1Api(controller: ImageController)(implicit val executor: ExecutionCo
 
   // URL should be encoded e.g. URLEncoder.encode(...)
   get("/url/:url") {
-    // val url = params.get("url")
-    //   .map(URLDecoder.decode(_, "UTF-8"))
-    //   .map(new URL(_))
-    //   .getOrElse(halt(BadRequest(
-    //     body = "{}",
-    //     reason = "A 'url' parameter is required"
-    //   )))
+//     val url = params.get("url")
+//       .map(URLDecoder.decode(_, "UTF-8"))
+//       .map(new URL(_))
+//       .getOrElse(halt(BadRequest(
+//         ErrorMsg(400, "Please provide a URL")
+//       )))
     val url = params
       .getAs[URL]("url")
       .getOrElse(halt(BadRequest(ErrorMsg(400, "Please provide a URL"))))

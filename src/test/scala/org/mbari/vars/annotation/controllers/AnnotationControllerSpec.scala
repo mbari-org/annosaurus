@@ -25,10 +25,11 @@ import org.mbari.vars.annotation.Constants
 import org.mbari.vars.annotation.dao.jpa.{AnnotationImpl, AssociationImpl, SpecDAOFactory, TestDAOFactory}
 import org.mbari.vars.annotation.model.Annotation
 import org.mbari.vars.annotation.model.simple.{ConcurrentRequest, MultiRequest}
-import org.scalatest.{BeforeAndAfterAll, FlatSpec, Matchers}
-import org.slf4j.LoggerFactory
+import org.scalatest.BeforeAndAfterAll
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 import scala.concurrent.{Await, Future}
 import scala.concurrent.duration.{Duration => SDuration}
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -39,7 +40,7 @@ import scala.util.Random
  * @author Brian Schlining
  * @since 2017-01-23T15:12:00
  */
-class AnnotationControllerSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
+class AnnotationControllerSpec extends AnyFlatSpec with Matchers with BeforeAndAfterAll {
 
   private[this] val daoFactory = TestDAOFactory.Instance
   private[this] val entityFactory = new TestEntityFactory(daoFactory)

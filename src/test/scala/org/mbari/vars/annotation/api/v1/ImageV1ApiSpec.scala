@@ -95,10 +95,10 @@ class ImageV1ApiSpec extends WebApiStack {
 
   it should "find by url" in {
     val url = URLEncoder.encode(image.url.toExternalForm, "UTF-8")
-    get(s"$path/url/${url}") {
+    get(s"$path/url/$url") {
       status should be(200)
       val im = gson.fromJson(body, classOf[Image])
-      im.url should be(new URL("http://www.mbari.org/foo.jpg"))
+      im.url should be(image.url)
     }
   }
 

@@ -23,7 +23,9 @@ import java.util.concurrent.TimeUnit
 
 import org.mbari.vars.annotation.dao.jpa.{TestDAOFactory}
 import org.mbari.vars.annotation.model.ImagedMoment
-import org.scalatest.{BeforeAndAfterAll, FlatSpec, Matchers}
+import org.scalatest.BeforeAndAfterAll
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 import org.slf4j.LoggerFactory
 
 import scala.collection.JavaConverters._
@@ -32,7 +34,7 @@ import scala.concurrent.duration.{Duration => SDuration}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.util.Random
 
-class ImagedMomentControllerSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
+class ImagedMomentControllerSpec extends AnyFlatSpec with Matchers with BeforeAndAfterAll {
 
   private[this] val daoFactory = TestDAOFactory.Instance
   private[this] val entityFactory = new TestEntityFactory(daoFactory)

@@ -21,7 +21,9 @@ import java.util.UUID
 import java.util.concurrent.TimeUnit
 
 import org.mbari.vars.annotation.dao.CachedAncillaryDatumDAO
-import org.scalatest.{ FlatSpec, Matchers, BeforeAndAfterAll }
+import org.scalatest.BeforeAndAfterAll
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 
 import scala.concurrent.Await
 import scala.concurrent.duration.{ Duration => SDuration }
@@ -33,7 +35,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
  * @author Brian Schlining
  * @since 2016-06-28T15:39:00
  */
-class CachedAncillaryDatumDAOSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
+class CachedAncillaryDatumDAOSpec extends AnyFlatSpec with Matchers with BeforeAndAfterAll {
 
   private[this] val daoFactory = TestDAOFactory.Instance
 

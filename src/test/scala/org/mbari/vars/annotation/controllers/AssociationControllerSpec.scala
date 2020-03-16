@@ -22,7 +22,9 @@ import java.util.concurrent.TimeUnit
 
 import org.mbari.vars.annotation.dao.jpa.{AnnotationImpl, AssociationImpl, ImagedMomentImpl, ObservationImpl, TestDAOFactory}
 import org.mbari.vars.annotation.model.simple.ConceptAssociationRequest
-import org.scalatest.{BeforeAndAfterAll, FlatSpec, Matchers}
+import org.scalatest.BeforeAndAfterAll
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 
 import scala.concurrent.{Await, Future}
 import scala.concurrent.duration.{Duration => SDuration}
@@ -32,7 +34,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
  * @author Brian Schlining
  * @since 2019-06-05T14:52:00
  */
-class AssociationControllerSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
+class AssociationControllerSpec extends AnyFlatSpec with Matchers with BeforeAndAfterAll {
 
   private[this] val daoFactory = TestDAOFactory.Instance
   private[this] val controller = new AssociationController(daoFactory.asInstanceOf[BasicDAOFactory])

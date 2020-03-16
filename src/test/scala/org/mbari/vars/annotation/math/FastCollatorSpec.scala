@@ -16,13 +16,15 @@
 
 package org.mbari.vars.annotation.math
 
-import org.scalatest.{ BeforeAndAfterAll, FlatSpec, Matchers }
+import org.scalatest.BeforeAndAfterAll
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 
 /**
  * @author Brian Schlining
  * @since 2018-05-31T11:33:00
  */
-class FastCollatorSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
+class FastCollatorSpec extends AnyFlatSpec with Matchers with BeforeAndAfterAll {
 
   "FastCollator" should "collate" in {
 

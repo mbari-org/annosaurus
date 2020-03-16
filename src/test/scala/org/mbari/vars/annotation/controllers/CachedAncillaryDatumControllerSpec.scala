@@ -22,7 +22,9 @@ import java.util.concurrent.TimeUnit
 
 import org.mbari.vars.annotation.dao.jpa.TestDAOFactory
 import org.mbari.vars.annotation.model.simple.CachedAncillaryDatumBean
-import org.scalatest.{BeforeAndAfterAll, FlatSpec, Matchers}
+import org.scalatest.BeforeAndAfterAll
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 
 import scala.concurrent.duration.{Duration => SDuration}
 import scala.concurrent.{Await, Future}
@@ -33,7 +35,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
   * @since 2017-11-09T15:19:00
   */
 class CachedAncillaryDatumControllerSpec
-    extends FlatSpec
+    extends AnyFlatSpec
     with Matchers
     with BeforeAndAfterAll {
 

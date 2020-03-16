@@ -22,7 +22,9 @@ import java.util.UUID
 import java.util.concurrent.TimeUnit
 
 import org.mbari.vars.annotation.dao.jpa.TestDAOFactory
-import org.scalatest.{BeforeAndAfterAll, FlatSpec, Matchers}
+import org.scalatest.BeforeAndAfterAll
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 
 import scala.concurrent.{Await, Future}
 import scala.concurrent.duration.{Duration => SDuration}
@@ -32,7 +34,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
  * @author Brian Schlining
  * @since 2019-06-04T09:31:00
  */
-class ImageControllerSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
+class ImageControllerSpec extends AnyFlatSpec with Matchers with BeforeAndAfterAll {
 
   private[this] val daoFactory = TestDAOFactory.Instance
   private[this] val controller = new ImageController(daoFactory.asInstanceOf[BasicDAOFactory])

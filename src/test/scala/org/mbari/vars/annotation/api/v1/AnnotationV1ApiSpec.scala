@@ -29,7 +29,7 @@ import org.mbari.vars.annotation.model.Annotation
 import org.mbari.vars.annotation.model.simple.{ConcurrentRequest, ConcurrentRequestCount, MultiRequest}
 import org.mbari.vcr4j.time.Timecode
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 /**
  *

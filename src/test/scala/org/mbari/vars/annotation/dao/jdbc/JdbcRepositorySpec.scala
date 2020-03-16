@@ -23,7 +23,9 @@ import java.util.concurrent.TimeUnit
 import org.mbari.vars.annotation.Constants
 import org.mbari.vars.annotation.controllers.{AnnotationController, BasicDAOFactory, TestEntityFactory}
 import org.mbari.vars.annotation.dao.jpa.{AnnotationImpl, JPADAOFactory, TestDAOFactory}
-import org.scalatest.{BeforeAndAfterAll, FlatSpec, Matchers}
+import org.scalatest.BeforeAndAfterAll
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 
 import scala.concurrent.duration.{Duration => SDuration}
 import scala.concurrent.{Await, Future}
@@ -34,7 +36,7 @@ import scala.util.Random
  * @author Brian Schlining
  * @since 2019-10-22T15:02:00
  */
-class JdbcRepositorySpec extends FlatSpec with Matchers with BeforeAndAfterAll {
+class JdbcRepositorySpec extends AnyFlatSpec with Matchers with BeforeAndAfterAll {
 
   private[this] val daoFactory = TestDAOFactory.Instance
   private[this] val controller = new AnnotationController(daoFactory.asInstanceOf[BasicDAOFactory])
