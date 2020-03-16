@@ -23,7 +23,7 @@ import java.util.{ArrayList => JArrayList, List => JList}
 
 import com.google.gson.annotations.{Expose, SerializedName}
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 import org.mbari.vars.annotation.model.{Association, ImagedMoment, Observation}
 
 /**

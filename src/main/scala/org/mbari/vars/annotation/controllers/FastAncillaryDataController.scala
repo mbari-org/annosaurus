@@ -25,7 +25,7 @@ import org.mbari.vars.annotation.model.simple.CachedAncillaryDatumBean
 import org.slf4j.LoggerFactory
 
 import scala.concurrent.{ExecutionContext, Future}
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 /**
   * @author Brian Schlining

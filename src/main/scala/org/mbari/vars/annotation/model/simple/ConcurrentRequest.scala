@@ -22,7 +22,7 @@ import java.util.{UUID, List => JList}
 
 import com.google.gson.annotations.Expose
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 /**
   * Data class enacpsulating information for concurrent requests. That is a request

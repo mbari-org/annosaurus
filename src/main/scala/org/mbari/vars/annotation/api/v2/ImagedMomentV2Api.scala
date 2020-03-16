@@ -25,7 +25,7 @@ import org.mbari.vars.annotation.model.ImagedMoment
 import org.mbari.vars.annotation.util.ResponseUtilities
 import org.scalatra.BadRequest
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 import scala.concurrent.ExecutionContext
 
 /**

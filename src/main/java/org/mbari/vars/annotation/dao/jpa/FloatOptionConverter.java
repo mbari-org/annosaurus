@@ -26,6 +26,7 @@ import javax.persistence.Converter;
  * @since 2017-11-10T07:53:00
  * @deprecated Causes issues with JPA. Eclipslink is reading Float columns as Doubles so conversion fails
  */
+@Deprecated(since="2020-01-01T00:00:00Z")
 @Converter(autoApply = true)
 public class FloatOptionConverter implements AttributeConverter<Option<Float>, Float> {
 

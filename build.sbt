@@ -31,10 +31,6 @@ val zeromqVersion       = "0.5.2"
 
 Global / onChangedBuildSource := ReloadOnSourceChanges
 
-scalafixDependencies in ThisBuild += "org.scalatest" %% "autofix" % "3.1.0.0"
-
-addCompilerPlugin(scalafixSemanticdb) // enable SemanticDB
-
 lazy val buildSettings = Seq(
   organization := "org.mbari.vars",
   version := "0.6.3",

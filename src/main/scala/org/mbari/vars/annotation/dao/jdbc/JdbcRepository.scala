@@ -22,16 +22,10 @@ import java.util.UUID
 
 import javax.persistence.{EntityManager, EntityManagerFactory, Query}
 import org.mbari.vars.annotation.model.Annotation
-import org.mbari.vars.annotation.model.simple.{
-  ConcurrentRequest,
-  DeleteCount,
-  Image,
-  MultiRequest,
-  ObservationCount
-}
+import org.mbari.vars.annotation.model.simple.{ConcurrentRequest, DeleteCount, Image, MultiRequest}
 import org.slf4j.LoggerFactory
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 import scala.util.control.NonFatal
 
 /**

@@ -26,7 +26,7 @@ import org.mbari.vars.annotation.model.simple.ObservationCount
 import org.scalatra.{BadRequest, NoContent, NotFound}
 
 import scala.concurrent.ExecutionContext
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 /**
   *

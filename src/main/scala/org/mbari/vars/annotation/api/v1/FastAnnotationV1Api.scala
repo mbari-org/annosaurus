@@ -24,7 +24,7 @@ import org.mbari.vars.annotation.model.simple.{ConcurrentRequest, Count, ErrorMs
 import org.scalatra.BadRequest
 
 import scala.concurrent.{ExecutionContext, Future}
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 /**
   * @author Brian Schlining

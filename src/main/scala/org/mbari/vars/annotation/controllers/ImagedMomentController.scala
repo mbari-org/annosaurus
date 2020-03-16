@@ -18,11 +18,10 @@ package org.mbari.vars.annotation.controllers
 
 import java.io.Closeable
 import java.time.{Duration, Instant}
-import java.util
 import java.util.UUID
-
-import org.mbari.vars.annotation.dao.jdbc.JdbcRepository
-import org.mbari.vars.annotation.dao.jpa.JPADAOFactory
+//
+//import org.mbari.vars.annotation.dao.jdbc.JdbcRepository
+//import org.mbari.vars.annotation.dao.jpa.JPADAOFactory
 import org.mbari.vars.annotation.dao.{DAO, ImagedMomentDAO, NotFoundInDatastoreException}
 import org.mbari.vars.annotation.model.ImagedMoment
 import org.mbari.vars.annotation.model.simple.WindowRequest
@@ -42,10 +41,10 @@ class ImagedMomentController(val daoFactory: BasicDAOFactory)
 
   protected type IMDAO = ImagedMomentDAO[ImagedMoment]
 
-  // HACK. Assumes daoFactory is JPA
-  private[this] val jdbcRepository = new JdbcRepository(
-    daoFactory.asInstanceOf[JPADAOFactory].entityManagerFactory
-  )
+//  // HACK. Assumes daoFactory is JPA
+//  private[this] val jdbcRepository = new JdbcRepository(
+//    daoFactory.asInstanceOf[JPADAOFactory].entityManagerFactory
+//  )
 
   override def newDAO(): IMDAO = daoFactory.newImagedMomentDAO()
 
@@ -261,12 +260,9 @@ class ImagedMomentController(val daoFactory: BasicDAOFactory)
     * base on the current one
     * @param dao
     * @param sourceImagedMoment
-    * @param ex
     * @return
     */
-  def create(dao: DAO[_], sourceImagedMoment: ImagedMoment)(
-      implicit ex: ExecutionContext
-  ): ImagedMoment = {
+  def create(dao: DAO[_], sourceImagedMoment: ImagedMoment): ImagedMoment = {
     val imDao  = daoFactory.newImagedMomentDAO(dao)
     val irDao  = daoFactory.newImageReferenceDAO(dao)
     val adDao  = daoFactory.newCachedAncillaryDatumDAO(dao)

@@ -34,7 +34,7 @@ import org.mbari.vcr4j.time.Timecode
 import org.scalatra.{BadRequest, NotFound}
 
 import scala.concurrent.{Await, ExecutionContext, Future}
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 /**
   *

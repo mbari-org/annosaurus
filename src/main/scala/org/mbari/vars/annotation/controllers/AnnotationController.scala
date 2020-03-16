@@ -22,10 +22,9 @@ import java.util.UUID
 import java.util.concurrent.Executors
 
 import io.reactivex.subjects.Subject
-import org.mbari.vars.annotation.dao.jpa.{AnnotationImpl, ImagedMomentImpl, JPADAOFactory}
+import org.mbari.vars.annotation.dao.jpa.{AnnotationImpl, ImagedMomentImpl}
 import org.mbari.vars.annotation.dao.DAO
-import org.mbari.vars.annotation.dao.jdbc.JdbcRepository
-import org.mbari.vars.annotation.messaging.{AnnotationMessage, AnnotationPublisher, MessageBus}
+import org.mbari.vars.annotation.messaging.{AnnotationPublisher, MessageBus}
 import org.mbari.vars.annotation.model.simple.{ConcurrentRequest, MultiRequest}
 import org.mbari.vars.annotation.model.{Annotation, Observation}
 import org.mbari.vcr4j.time.Timecode
@@ -41,10 +40,10 @@ import scala.concurrent.{ExecutionContext, Future}
 class AnnotationController(daoFactory: BasicDAOFactory, bus: Subject[Any] = MessageBus.RxSubject) {
 
   // HACK Assumes where using JDADAPFactory!
-  private[this] val repository: JdbcRepository = {
-    val entityManagerFactory = daoFactory.asInstanceOf[JPADAOFactory].entityManagerFactory
-    new JdbcRepository(entityManagerFactory)
-  }
+//  private[this] val repository: JdbcRepository = {
+//    val entityManagerFactory = daoFactory.asInstanceOf[JPADAOFactory].entityManagerFactory
+//    new JdbcRepository(entityManagerFactory)
+//  }
 
   private[this] val imagedMomentController = new ImagedMomentController(daoFactory)
   private[this] val annotationPublisher    = new AnnotationPublisher(bus)
@@ -200,7 +199,6 @@ class AnnotationController(daoFactory: BasicDAOFactory, bus: Subject[Any] = Mess
       group: Option[String] = None,
       activity: Option[String] = None
   )(implicit ec: ExecutionContext): Future[Annotation] = {
-    val obsDao = daoFactory.newObservationDAO()
     val annotation = AnnotationImpl(
       videoReferenceUUID,
       concept,
@@ -213,11 +211,14 @@ class AnnotationController(daoFactory: BasicDAOFactory, bus: Subject[Any] = Mess
       group,
       activity
     )
-    val f = obsDao.runTransaction(d => create(d, annotation))
-    f.onComplete(_ => obsDao.close())
-    val rf = f.map(AnnotationImpl(_))
-    rf.foreach(annotationPublisher.publish) // publish new annotations
-    rf
+
+    bulkCreate(Seq(annotation)).map(_.head)
+
+//    val f = obsDao.runTransaction(d => create(d, annotation))
+//    f.onComplete(_ => obsDao.close())
+//    val rf = f.map(AnnotationImpl(_))
+//    rf.foreach(annotationPublisher.publish) // publish new annotations
+//    rf
   }
 
   /**
@@ -253,65 +254,65 @@ class AnnotationController(daoFactory: BasicDAOFactory, bus: Subject[Any] = Mess
 
   }
 
-  @deprecated(message = "Use ImagedMomentController.create instead", since = "2019-10-21")
-  private def create(dao: DAO[_], annotation: Annotation): Observation = {
-    val imDao  = daoFactory.newImagedMomentDAO(dao)
-    val obsDao = daoFactory.newObservationDAO(dao)
-    val assDao = daoFactory.newAssociationDAO(dao)
-    val irDao  = daoFactory.newImageReferenceDAO(dao)
-    val imagedMoment = ImagedMomentController.findOrCreateImagedMoment(
-      imDao,
-      annotation.videoReferenceUuid,
-      Option(annotation.timecode),
-      Option(annotation.recordedTimestamp),
-      Option(annotation.elapsedTime)
-    )
-    val observation = obsDao.newPersistentObject()
-    observation.concept = annotation.concept
-    observation.observer = annotation.observer
-    observation.observationDate = annotation.observationTimestamp
-    Option(annotation.duration).foreach(observation.duration = _)
-    Option(annotation.group).foreach(observation.group = _)
-    Option(annotation.activity).foreach(observation.activity = _)
-    obsDao.create(observation)
-    imagedMoment.addObservation(observation)
-
-    // Add associations
-    annotation
-      .associations
-      .foreach(a => {
-        val newA = assDao.newPersistentObject(
-          a.linkName,
-          Option(a.toConcept),
-          Option(a.linkValue),
-          Option(a.mimeType)
-        )
-        newA.uuid = a.uuid
-        observation.addAssociation(newA)
-      })
-
-    // Add imagereferences
-    annotation
-      .imageReferences
-      .foreach(i => {
-        irDao.findByURL(i.url) match {
-          case Some(v) => // Do nothing. It should already be attached to the imagedmoment
-          case None =>
-            val newI = irDao.newPersistentObject(
-              i.url,
-              Option(i.description),
-              Option(i.height),
-              Option(i.width),
-              Option(i.format)
-            )
-            newI.uuid = i.uuid
-            imagedMoment.addImageReference(newI)
-        }
-      })
-
-    annotationPublisher.publish(observation)
-    observation
-  }
+//  @deprecated(message = "Use ImagedMomentController.create instead", since = "2019-10-21")
+//  private def create(dao: DAO[_], annotation: Annotation): Observation = {
+//    val imDao  = daoFactory.newImagedMomentDAO(dao)
+//    val obsDao = daoFactory.newObservationDAO(dao)
+//    val assDao = daoFactory.newAssociationDAO(dao)
+//    val irDao  = daoFactory.newImageReferenceDAO(dao)
+//    val imagedMoment = ImagedMomentController.findOrCreateImagedMoment(
+//      imDao,
+//      annotation.videoReferenceUuid,
+//      Option(annotation.timecode),
+//      Option(annotation.recordedTimestamp),
+//      Option(annotation.elapsedTime)
+//    )
+//    val observation = obsDao.newPersistentObject()
+//    observation.concept = annotation.concept
+//    observation.observer = annotation.observer
+//    observation.observationDate = annotation.observationTimestamp
+//    Option(annotation.duration).foreach(observation.duration = _)
+//    Option(annotation.group).foreach(observation.group = _)
+//    Option(annotation.activity).foreach(observation.activity = _)
+//    obsDao.create(observation)
+//    imagedMoment.addObservation(observation)
+//
+//    // Add associations
+//    annotation
+//      .associations
+//      .foreach(a => {
+//        val newA = assDao.newPersistentObject(
+//          a.linkName,
+//          Option(a.toConcept),
+//          Option(a.linkValue),
+//          Option(a.mimeType)
+//        )
+//        newA.uuid = a.uuid
+//        observation.addAssociation(newA)
+//      })
+//
+//    // Add imagereferences
+//    annotation
+//      .imageReferences
+//      .foreach(i => {
+//        irDao.findByURL(i.url) match {
+//          case Some(v) => // Do nothing. It should already be attached to the imagedmoment
+//          case None =>
+//            val newI = irDao.newPersistentObject(
+//              i.url,
+//              Option(i.description),
+//              Option(i.height),
+//              Option(i.width),
+//              Option(i.format)
+//            )
+//            newI.uuid = i.uuid
+//            imagedMoment.addImageReference(newI)
+//        }
+//      })
+//
+//    annotationPublisher.publish(observation)
+//    observation
+//  }
 
   def update(
       uuid: UUID,
@@ -440,7 +441,6 @@ class AnnotationController(daoFactory: BasicDAOFactory, bus: Subject[Any] = Mess
   ): Seq[Observation] = {
 
     val obsDao = daoFactory.newObservationDAO(dao)
-    val imDao  = daoFactory.newImagedMomentDAO(dao)
     obsDao
       .findByUUID(uuid)
       .map(observation => {

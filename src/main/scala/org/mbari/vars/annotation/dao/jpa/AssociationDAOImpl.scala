@@ -21,11 +21,7 @@ import java.util.UUID
 import javax.persistence.EntityManager
 import org.mbari.vars.annotation.dao.AssociationDAO
 import org.mbari.vars.annotation.model.Association
-import org.mbari.vars.annotation.model.simple.{
-  ConceptAssociation,
-  ConceptAssociationRequest,
-  ConceptAssociationResponse
-}
+import org.mbari.vars.annotation.model.simple.{ConceptAssociation, ConceptAssociationRequest}
 
 import scala.jdk.CollectionConverters._
 

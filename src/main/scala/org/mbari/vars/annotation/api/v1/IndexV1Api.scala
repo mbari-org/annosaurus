@@ -22,7 +22,7 @@ import org.mbari.vars.annotation.controllers.IndexController
 import org.mbari.vars.annotation.dao.jpa.IndexImpl
 import org.scalatra.BadRequest
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 import scala.concurrent.ExecutionContext
 
 /**

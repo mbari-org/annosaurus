@@ -17,10 +17,10 @@
 package org.mbari.vars.annotation.model.simple
 
 import java.util
-import java.util.{UUID, List => JList}
+import java.util.{List => JList}
 
 import com.google.gson.annotations.Expose
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 /**
   * @author Brian Schlining

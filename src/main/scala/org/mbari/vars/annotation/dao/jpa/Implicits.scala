@@ -18,7 +18,7 @@ package org.mbari.vars.annotation.dao.jpa
 
 import javax.persistence.EntityManager
 
-import org.slf4j.LoggerFactory
+// import org.slf4j.LoggerFactory
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -30,7 +30,7 @@ import scala.concurrent.{ExecutionContext, Future}
   */
 object Implicits {
 
-  private[this] val log = LoggerFactory.getLogger(getClass)
+  // private[this] val log = LoggerFactory.getLogger(getClass)
 
   implicit class RichEntityManager(entityManager: EntityManager) {
     def runTransaction[R](fn: EntityManager => R)(implicit ec: ExecutionContext): Future[R] = {

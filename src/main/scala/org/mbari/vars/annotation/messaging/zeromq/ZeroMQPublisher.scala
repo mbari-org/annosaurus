@@ -21,13 +21,12 @@ import java.util.concurrent.{LinkedBlockingQueue, TimeUnit}
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.Subject
-import org.mbari.vars.annotation.{Constants, ZeroMQConfig}
-import org.mbari.vars.annotation.messaging.{AnnotationMessage, GenericMessage, MessageBus}
+import org.mbari.vars.annotation.ZeroMQConfig
+import org.mbari.vars.annotation.messaging.{GenericMessage, MessageBus}
 import org.slf4j.LoggerFactory
 import org.zeromq.{SocketType, ZContext}
 
 import scala.util.control.NonFatal
-import org.mbari.vars.annotation.messaging.JsonEncoders._
 
 /**
   * @author Brian Schlining

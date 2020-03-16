@@ -22,7 +22,7 @@ import org.mbari.vars.annotation.controllers.CachedVideoReferenceInfoController
 import org.mbari.vars.annotation.model.{StringArray, UUIDArray}
 import org.scalatra.{BadRequest, NoContent, NotFound}
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 import scala.concurrent.ExecutionContext
 
 /**

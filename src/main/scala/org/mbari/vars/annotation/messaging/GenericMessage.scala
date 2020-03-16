@@ -16,14 +16,8 @@
 
 package org.mbari.vars.annotation.messaging
 
-import java.util.UUID
-
-import org.mbari.vars.annotation.Constants
 import org.mbari.vars.annotation.model.simple.ExtendedAssociation
 import org.mbari.vars.annotation.model.{Annotation, Association}
-
-import scala.util.Try
-import scala.util.control.NonFatal
 
 /**
   * @author Brian Schlining

@@ -16,7 +16,6 @@
 
 package org.mbari.vars.annotation.controllers
 
-import java.io.Closeable
 import java.time.{Duration, Instant}
 import java.util.UUID
 
@@ -24,7 +23,6 @@ import io.reactivex.subjects.Subject
 import org.mbari.vars.annotation.dao.{NotFoundInDatastoreException, ObservationDAO}
 import org.mbari.vars.annotation.messaging.{AnnotationPublisher, MessageBus}
 import org.mbari.vars.annotation.model.Observation
-import org.mbari.vars.annotation.model.simple.ConcurrentRequest
 
 import scala.concurrent.{ExecutionContext, Future}
 

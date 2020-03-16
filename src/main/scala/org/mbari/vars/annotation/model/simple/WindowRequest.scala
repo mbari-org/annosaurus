@@ -22,7 +22,7 @@ import java.util.{UUID, List => JList}
 
 import com.google.gson.annotations.Expose
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 /**
   * @author Brian Schlining

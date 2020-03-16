@@ -23,7 +23,6 @@ import org.mbari.vars.annotation.dao.jpa.ImagedMomentImpl
 import org.mbari.vars.annotation.model.ImagedMoment
 import org.mbari.vars.annotation.model.simple.WindowRequest
 import org.mbari.vcr4j.time.Timecode
-import org.slf4j.LoggerFactory
 
 /**
   *

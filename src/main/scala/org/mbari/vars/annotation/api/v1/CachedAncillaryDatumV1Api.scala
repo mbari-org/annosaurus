@@ -23,8 +23,9 @@ import org.mbari.vars.annotation.controllers.CachedAncillaryDatumController
 import org.mbari.vars.annotation.model.simple.CachedAncillaryDatumBean
 import org.scalatra.{BadRequest, NotFound}
 
+import scala.collection.immutable.ArraySeq
 import scala.concurrent.ExecutionContext
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 /**
   * @author Brian Schlining
@@ -148,7 +149,7 @@ class CachedAncillaryDatumV1Api(controller: CachedAncillaryDatumController)(
         //log.info("Recieved >>> " + b)
         //log.info("Parse    <<< " + toJson(data))
         controller
-          .bulkCreateOrUpdate(data)
+          .bulkCreateOrUpdate(ArraySeq.unsafeWrapArray(data))
           .map(ds => toJson(ds.asJava))
       case _ =>
         halt(

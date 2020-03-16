@@ -27,7 +27,7 @@ import scala.util.Try
   * @since 2020-03-04T13:32:00
   */
 trait GenericPublisher[A] {
-  def publish(x: A)
+  def publish(x: A): Unit
   def publish(xs: Iterable[A]): Unit =
     for {
       x <- xs
