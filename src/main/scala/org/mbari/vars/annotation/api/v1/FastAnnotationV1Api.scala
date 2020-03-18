@@ -56,7 +56,7 @@ class FastAnnotationV1Api(daoFactory: JPADAOFactory)(implicit val executor: Exec
   get("/videoreference/:uuid") {
     val uuid = params
       .getAs[UUID]("uuid")
-      .getOrElse(halt(BadRequest(body = "A video reference 'uuid' parameter is required")))
+      .getOrElse(halt(BadRequest(toJson(ErrorMsg(400, "A video reference 'uuid' parameter is required")))))
     val limit   = params.getAs[Int]("limit")
     val offset  = params.getAs[Int]("offset")
     val addData = params.getAs[Boolean]("data").getOrElse(false)
@@ -69,7 +69,7 @@ class FastAnnotationV1Api(daoFactory: JPADAOFactory)(implicit val executor: Exec
   get("/images/videoreference/:uuid") {
     val uuid = params
       .getAs[UUID]("uuid")
-      .getOrElse(halt(BadRequest(body = "A video reference 'uuid' parameter is required")))
+      .getOrElse(halt(BadRequest(toJson(ErrorMsg(400, "A video reference 'uuid' parameter is required")))))
     val limit  = params.getAs[Int]("limit")
     val offset = params.getAs[Int]("offset")
     Future {
@@ -80,7 +80,7 @@ class FastAnnotationV1Api(daoFactory: JPADAOFactory)(implicit val executor: Exec
 
   get("/concept/:concept") {
     val concept =
-      params.get("concept").getOrElse(halt(BadRequest(body = "A 'concept' parameter is required")))
+      params.get("concept").getOrElse(halt(BadRequest(toJson(ErrorMsg(400, "A 'concept' parameter is required")))))
     val limit   = params.getAs[Int]("limit")
     val offset  = params.getAs[Int]("offset")
     val addData = params.getAs[Boolean]("data").getOrElse(false)
@@ -92,7 +92,7 @@ class FastAnnotationV1Api(daoFactory: JPADAOFactory)(implicit val executor: Exec
 
   get("/concept/images/:concept") {
     val concept =
-      params.get("concept").getOrElse(halt(BadRequest(body = "A 'concept' parameter is required")))
+      params.get("concept").getOrElse(halt(BadRequest(toJson(ErrorMsg(400, "A 'concept' parameter is required")))))
     val limit   = params.getAs[Int]("limit")
     val offset  = params.getAs[Int]("offset")
     val addData = params.getAs[Boolean]("data").getOrElse(false)
@@ -104,7 +104,7 @@ class FastAnnotationV1Api(daoFactory: JPADAOFactory)(implicit val executor: Exec
 
   get("/imagedmoments/concept/images/:concept") {
     val concept =
-      params.get("concept").getOrElse(halt(BadRequest(body = "A 'concept' parameter is required")))
+      params.get("concept").getOrElse(halt(BadRequest(toJson(ErrorMsg(400, "A 'concept' parameter is required")))))
     val limit  = params.getAs[Int]("limit")
     val offset = params.getAs[Int]("offset")
     Future {
@@ -117,10 +117,10 @@ class FastAnnotationV1Api(daoFactory: JPADAOFactory)(implicit val executor: Exec
   get("/details/:link_name/:link_value") {
     val linkName = params
       .get("link_name")
-      .getOrElse(halt(BadRequest(ErrorMsg(400, "A link_name parameter is required"))))
+      .getOrElse(halt(BadRequest(toJson(ErrorMsg(400, "A link_name parameter is required")))))
     val linkValue = params
       .get("link_value")
-      .getOrElse(halt(BadRequest(ErrorMsg(400, "A link_value parameter is required"))))
+      .getOrElse(halt(BadRequest(toJson(ErrorMsg(400, "A link_value parameter is required")))))
     val addData = params.getAs[Boolean]("data").getOrElse(false)
     Future {
       val annos = repository.findByLinkNameAndLinkValue(linkName, linkValue, addData).asJava
@@ -132,7 +132,7 @@ class FastAnnotationV1Api(daoFactory: JPADAOFactory)(implicit val executor: Exec
     validateRequest()
     val uuid = params
       .getAs[UUID]("uuid")
-      .getOrElse(halt(BadRequest(body = "A video reference 'uuid' parameter is required")))
+      .getOrElse(halt(BadRequest(toJson(ErrorMsg(400, "A video reference 'uuid' parameter is required")))))
     Future {
       val deleteCount = repository.deleteByVideoReferenceUuid(uuid)
       toJson(deleteCount)

@@ -43,11 +43,11 @@ class AssociationV1Api(controller: AssociationController)(implicit val executor:
   // Find an association
   get("/:uuid") {
     val uuid =
-      params.getAs[UUID]("uuid").getOrElse(halt(BadRequest("Please provide a 'uuid' parameter")))
+      params.getAs[UUID]("uuid").getOrElse(halt(BadRequest(toJson(ErrorMsg(400, "Please provide a 'uuid' parameter")))))
     controller
       .findByUUID(uuid)
       .map({
-        case None    => halt(NotFound(body = s"An Association with a UUID of $uuid was not found"))
+        case None    => halt(NotFound(toJson(ErrorMsg(400, s"An Association with a UUID of $uuid was not found"))))
         case Some(v) => toJson(v)
       })
   }
@@ -58,7 +58,8 @@ class AssociationV1Api(controller: AssociationController)(implicit val executor:
       .getAs[UUID]("video_reference_uuid")
       .getOrElse(halt(BadRequest(toJson(ErrorMsg(400, "Please provide a video-reference 'uuid'")))))
     val linkName =
-      params.get("link_name").getOrElse(halt(BadRequest("A 'link_name' parameter is required")))
+      params.get("link_name")
+        .getOrElse(halt(BadRequest(toJson(ErrorMsg(400, "A 'link_name' parameter is required")))))
     val concept = params.get("concept")
     controller
       .findByLinkNameAndVideoReferenceUUIDAndConcept(linkName, videoReferenceUUID, concept)
@@ -71,7 +72,8 @@ class AssociationV1Api(controller: AssociationController)(implicit val executor:
       .getAs[UUID]("observation_uuid")
       .getOrElse(halt(BadRequest(toJson(ErrorMsg(400, "Please provide an 'observation_uuid'")))))
     val linkName =
-      params.get("link_name").getOrElse(halt(BadRequest("A 'link_name' parameter is required")))
+      params.get("link_name")
+        .getOrElse(halt(BadRequest(toJson(ErrorMsg(400, "A 'link_name' parameter is required")))))
     val toConcept = params.get("to_concept").getOrElse(Association.TO_CONCEPT_SELF)
     val linkValue = params.get("link_value").getOrElse(Association.LINK_VALUE_NIL)
     val mimeType  = params.get("mime_type").getOrElse("text/plain")

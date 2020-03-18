@@ -21,6 +21,7 @@ import java.util.UUID
 
 import org.mbari.vars.annotation.controllers.ImageReferenceController
 import org.mbari.vars.annotation.dao.jpa.AnnotationImpl
+import org.mbari.vars.annotation.model.simple.ErrorMsg
 import org.scalatra.{BadRequest, NoContent, NotFound}
 
 import scala.concurrent.ExecutionContext
@@ -33,11 +34,11 @@ class ImageReferenceV1Api(controller: ImageReferenceController)(
 ) extends V1APIStack {
 
   get("/:uuid") {
-    val uuid = params.getAs[UUID]("uuid").getOrElse(halt(BadRequest("Please provide a UUID")))
+    val uuid = params.getAs[UUID]("uuid").getOrElse(halt(BadRequest(toJson(ErrorMsg(400, "Please provide a UUID")))))
     controller
       .findByUUID(uuid)
       .map({
-        case None    => halt(NotFound(body = s"An ImagedMoment with a UUID of $uuid was not found"))
+        case None    => halt(NotFound(toJson(ErrorMsg(404, s"An ImagedMoment with a UUID of $uuid was not found"))))
         case Some(v) => toJson(v)
       })
   }
@@ -46,7 +47,7 @@ class ImageReferenceV1Api(controller: ImageReferenceController)(
     validateRequest() // Apply API security
     val uuid = params
       .getAs[UUID]("uuid")
-      .getOrElse(halt(BadRequest(body = "A 'uuid' parameter is required")))
+      .getOrElse(halt(BadRequest(toJson(ErrorMsg(400, "A 'uuid' parameter is required")))))
     val url              = params.getAs[URL]("url")
     val format           = params.get("format")
     val width            = params.getAs[Int]("width_pixels")
@@ -65,12 +66,12 @@ class ImageReferenceV1Api(controller: ImageReferenceController)(
     validateRequest() // Apply API security
     val uuid = params
       .getAs[UUID]("uuid")
-      .getOrElse(halt(BadRequest(body = "A 'uuid' parameter is required")))
+      .getOrElse(halt(BadRequest(toJson(ErrorMsg(400, "A 'uuid' parameter is required")))))
     controller
       .delete(uuid)
       .map({
         case true  => halt(NoContent()) // Success
-        case false => halt(NotFound(s"Failed. No observation with UUID of $uuid was found."))
+        case false => halt(NotFound(toJson(ErrorMsg(404, s"Failed. No observation with UUID of $uuid was found."))))
       })
   }
 }

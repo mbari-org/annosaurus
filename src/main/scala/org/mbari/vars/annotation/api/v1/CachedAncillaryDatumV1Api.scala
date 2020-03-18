@@ -20,7 +20,7 @@ import java.time.Duration
 import java.util.UUID
 
 import org.mbari.vars.annotation.controllers.CachedAncillaryDatumController
-import org.mbari.vars.annotation.model.simple.CachedAncillaryDatumBean
+import org.mbari.vars.annotation.model.simple.{CachedAncillaryDatumBean, ErrorMsg}
 import org.scalatra.{BadRequest, NotFound}
 
 import scala.collection.immutable.ArraySeq
@@ -43,11 +43,11 @@ class CachedAncillaryDatumV1Api(controller: CachedAncillaryDatumController)(
   get("/:uuid") {
     val uuid = params
       .getAs[UUID]("uuid")
-      .getOrElse(halt(BadRequest("{\"error\": \"Please provide a ancillary data UUID\"}")))
+      .getOrElse(halt(BadRequest(toJson(ErrorMsg(400, "Please provide a ancillary data UUID")))))
     controller
       .findByUUID(uuid)
       .map({
-        case None    => halt(NotFound(body = s"An AncillaryDatum with a UUID of $uuid was not found"))
+        case None    => halt(NotFound(toJson(ErrorMsg(404, s"An AncillaryDatum with a UUID of $uuid was not found"))))
         case Some(v) => toJson(v)
       })
   }
@@ -55,7 +55,7 @@ class CachedAncillaryDatumV1Api(controller: CachedAncillaryDatumController)(
   get("/videoreference/:uuid") {
     val uuid = params
       .getAs[UUID]("uuid")
-      .getOrElse(halt(BadRequest("{\"error\": \"Please provide a video reference UUID\"}")))
+      .getOrElse(halt(BadRequest(toJson(ErrorMsg(400, "Please provide a video reference UUID")))))
     controller
       .findByVideoReferenceUUID(uuid)
       .map(_.asJava)
@@ -65,11 +65,11 @@ class CachedAncillaryDatumV1Api(controller: CachedAncillaryDatumController)(
   get("/imagedmoment/:uuid") {
     val uuid = params
       .getAs[UUID]("uuid")
-      .getOrElse(halt(BadRequest("{\"error\": \"Please provide an image reference UUID\"}")))
+      .getOrElse(halt(BadRequest(toJson(ErrorMsg(400, "Please provide an image reference UUID")))))
     controller
       .findByImagedMomentUUID(uuid)
       .map({
-        case None     => halt(NotFound(body = s"No imagereference with a uuid of $uuid was found"))
+        case None     => halt(NotFound(toJson(ErrorMsg(404, s"No imagereference with a uuid of $uuid was found"))))
         case Some(im) => toJson(im)
       })
   }
@@ -77,11 +77,11 @@ class CachedAncillaryDatumV1Api(controller: CachedAncillaryDatumController)(
   get("/observation/:uuid") {
     val uuid = params
       .getAs[UUID]("uuid")
-      .getOrElse(halt(BadRequest("{\"error\": \"Please provide an observation UUID\"}")))
+      .getOrElse(halt(BadRequest(toJson(ErrorMsg(400, "Please provide an observation UUID")))))
     controller
       .findByObservationUUID(uuid)
       .map({
-        case None     => halt(NotFound(body = s"No observation with a uuid of $uuid was found"))
+        case None     => halt(NotFound(toJson(ErrorMsg(404, s"No observation with a uuid of $uuid was found"))))
         case Some(im) => toJson(im)
       })
   }
@@ -90,16 +90,16 @@ class CachedAncillaryDatumV1Api(controller: CachedAncillaryDatumController)(
     validateRequest() // Apply API security
     val imagedMomentUuid = params
       .getAs[UUID]("imaged_moment_uuid")
-      .getOrElse(halt(BadRequest("An imaged_moment_uuid is required")))
+      .getOrElse(halt(BadRequest(toJson(ErrorMsg(400, "An imaged_moment_uuid is required")))))
     val latitude = params
       .getAs[Double]("latitude")
-      .getOrElse(halt(BadRequest("A latitude is required")))
+      .getOrElse(halt(BadRequest(toJson(ErrorMsg(400, "A latitude is required")))))
     val longitude = params
       .getAs[Double]("longitude")
-      .getOrElse(halt(BadRequest("A longitude is required")))
+      .getOrElse(halt(BadRequest(toJson(ErrorMsg(400, "A longitude is required")))))
     val depthMeters = params
       .getAs[Double]("depth_meters")
-      .getOrElse(halt(BadRequest("A depth_meters is required")))
+      .getOrElse(halt(BadRequest(toJson(ErrorMsg(400, "A depth_meters is required")))))
     val altitude          = params.getAs[Double]("altitude_meters")
     val crs               = params.get("crs")
     val salinity          = params.getAs[Double]("salinity")
@@ -153,7 +153,7 @@ class CachedAncillaryDatumV1Api(controller: CachedAncillaryDatumController)(
           .map(ds => toJson(ds.asJava))
       case _ =>
         halt(
-          BadRequest("Posts to /bulk only accept a JSON body (i.e. Content-Type: application/json)")
+          BadRequest(toJson(ErrorMsg(400, "Posts to /bulk only accept a JSON body (i.e. Content-Type: application/json)")))
         )
     }
   }
@@ -162,7 +162,7 @@ class CachedAncillaryDatumV1Api(controller: CachedAncillaryDatumController)(
     validateRequest()
     val uuid = params
       .getAs[UUID]("uuid")
-      .getOrElse(halt(BadRequest(body = "A video reference 'uuid' parameter is required")))
+      .getOrElse(halt(BadRequest(toJson(ErrorMsg(400, "A video reference 'uuid' parameter is required")))))
     val windowMillis = params.getAs[Int]("window").getOrElse(7500)
     request.getHeader("Content-Type") match {
       case "application/json" =>
@@ -172,9 +172,9 @@ class CachedAncillaryDatumV1Api(controller: CachedAncillaryDatumController)(
           .map(ds => toJson(ds.asJava))
       case _ =>
         halt(
-          BadRequest(
+          BadRequest(toJson(ErrorMsg(400,
             "Posts to /merge only accept a JSON body (i.e. Content-Type: application/json)"
-          )
+          )))
         )
     }
   }
@@ -183,7 +183,7 @@ class CachedAncillaryDatumV1Api(controller: CachedAncillaryDatumController)(
     validateRequest() // Apply API security
     val uuid = params
       .getAs[UUID]("uuid")
-      .getOrElse(halt(BadRequest(body = "A video reference 'uuid' parameter is required")))
+      .getOrElse(halt(BadRequest(toJson(ErrorMsg(400, "A video reference 'uuid' parameter is required")))))
     val latitude          = params.getAs[Double]("latitude")
     val longitude         = params.getAs[Double]("longitude")
     val depthMeters       = params.getAs[Double]("depth_meters")
@@ -225,7 +225,7 @@ class CachedAncillaryDatumV1Api(controller: CachedAncillaryDatumController)(
       )
       .map({
         case None =>
-          halt(NotFound(body = s"A CachedAncillaryDatum with uuid of $uuid was not found"))
+          halt(NotFound(toJson(ErrorMsg(404, s"A CachedAncillaryDatum with uuid of $uuid was not found"))))
         case Some(v) => toJson(v)
       })
   }
@@ -235,7 +235,7 @@ class CachedAncillaryDatumV1Api(controller: CachedAncillaryDatumController)(
     val uuid = params
       .getAs[UUID]("uuid")
       .getOrElse(
-        halt(BadRequest(body = "{\"error\": \"A video reference 'uuid' parameter is required\"}"))
+        halt(BadRequest(toJson(ErrorMsg(400, "A video reference 'uuid' parameter is required"))))
       )
     controller
       .deleteByVideoReferenceUuid(uuid)

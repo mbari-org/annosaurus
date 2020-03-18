@@ -20,6 +20,7 @@ import java.util.UUID
 
 import org.mbari.vars.annotation.controllers.IndexController
 import org.mbari.vars.annotation.dao.jpa.IndexImpl
+import org.mbari.vars.annotation.model.simple.ErrorMsg
 import org.scalatra.BadRequest
 
 import scala.jdk.CollectionConverters._
@@ -40,7 +41,7 @@ class IndexV1Api(controller: IndexController)(implicit val executor: ExecutionCo
   get("/videoreference/:uuid") {
     val uuid = params
       .getAs[UUID]("uuid")
-      .getOrElse(halt(BadRequest("Please provide a Video Reference UUID")))
+      .getOrElse(halt(BadRequest(toJson(ErrorMsg(400, "Please provide a Video Reference UUID")))))
     val limit  = params.getAs[Int]("limit")
     val offset = params.getAs[Int]("offset")
     controller

@@ -22,6 +22,7 @@ import java.util.UUID
 import org.mbari.vars.annotation.api.APIStack
 import org.mbari.vars.annotation.controllers.AnnotationController
 import org.mbari.vars.annotation.model.Annotation
+import org.mbari.vars.annotation.model.simple.ErrorMsg
 import org.mbari.vars.annotation.util.ResponseUtilities
 import org.scalatra.BadRequest
 
@@ -42,7 +43,7 @@ class AnnotationV2Api(controller: AnnotationController)(implicit val executor: E
   get("/videoreference/:uuid") {
     val uuid = params
       .getAs[UUID]("uuid")
-      .getOrElse(halt(BadRequest(body = "A video reference 'uuid' parameter is required")))
+      .getOrElse(halt(BadRequest(toJson(ErrorMsg(400, "A video reference 'uuid' parameter is required")))))
 
     // Optional params to filter between dates
     val startTimestamp = params.getAs[Instant]("start")

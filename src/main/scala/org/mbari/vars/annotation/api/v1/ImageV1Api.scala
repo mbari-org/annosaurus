@@ -42,13 +42,13 @@ class ImageV1Api(controller: ImageController)(implicit val executor: ExecutionCo
   get("/:uuid") {
     val uuid = params
       .getAs[UUID]("uuid")
-      .getOrElse(halt(BadRequest(ErrorMsg(400, "A 'uuid' parameter is required"))))
+      .getOrElse(halt(BadRequest(toJson(ErrorMsg(400, "A 'uuid' parameter is required")))))
     controller
       .findByUUID(uuid)
       .map({
         case None =>
           halt(
-            NotFound(ErrorMsg(404, s"an Image with an image_reference_uuid of $uuid was not found"))
+            NotFound(toJson(ErrorMsg(404, s"an Image with an image_reference_uuid of $uuid was not found")))
           )
         case Some(v) => toJson(v)
       })
@@ -57,7 +57,7 @@ class ImageV1Api(controller: ImageController)(implicit val executor: ExecutionCo
   get("/videoreference/:uuid") {
     val uuid = params
       .getAs[UUID]("uuid")
-      .getOrElse(halt(BadRequest(ErrorMsg(400, "A video reference 'uuid' parameter is required"))))
+      .getOrElse(halt(BadRequest(toJson(ErrorMsg(400, "A video reference 'uuid' parameter is required")))))
     val limit  = params.getAs[Int]("limit")
     val offset = params.getAs[Int]("offset")
     controller
@@ -69,7 +69,7 @@ class ImageV1Api(controller: ImageController)(implicit val executor: ExecutionCo
   get("/name/:name") {
     val name = params
       .get("name")
-      .getOrElse(halt(BadRequest(ErrorMsg(400, "An image name is required as part of the path"))))
+      .getOrElse(halt(BadRequest(toJson(ErrorMsg(400, "An image name is required as part of the path")))))
     controller
       .findByImageName(name)
       .map(_.asJava)
@@ -86,11 +86,11 @@ class ImageV1Api(controller: ImageController)(implicit val executor: ExecutionCo
 //       )))
     val url = params
       .getAs[URL]("url")
-      .getOrElse(halt(BadRequest(ErrorMsg(400, "Please provide a URL"))))
+      .getOrElse(halt(BadRequest(toJson(ErrorMsg(400, "Please provide a URL")))))
     controller
       .findByURL(url)
       .map({
-        case None    => halt(NotFound(body = s"an Image with a URL of $url was not found"))
+        case None    => halt(NotFound(toJson(ErrorMsg(404, "an Image with a URL of $url was not found"))))
         case Some(i) => toJson(i)
       })
   }
@@ -99,9 +99,9 @@ class ImageV1Api(controller: ImageController)(implicit val executor: ExecutionCo
     validateRequest() // Apply API security
     val videoReferenceUUID = params
       .getAs[UUID]("video_reference_uuid")
-      .getOrElse(halt(BadRequest(ErrorMsg(400, "A 'video_reference_uuid' parameter is required"))))
+      .getOrElse(halt(BadRequest(toJson(ErrorMsg(400, "A 'video_reference_uuid' parameter is required")))))
     val url =
-      params.getAs[URL]("url").getOrElse(halt(BadRequest(body = "A 'url' parameter is required")))
+      params.getAs[URL]("url").getOrElse(halt(BadRequest(toJson(ErrorMsg(400, "A 'url' parameter is required")))))
     val timecode     = params.getAs[Timecode]("timecode")
     val elapsedTime  = params.getAs[Duration]("elapsed_time_millis")
     val recordedDate = params.getAs[Instant]("recorded_timestamp")
@@ -109,10 +109,10 @@ class ImageV1Api(controller: ImageController)(implicit val executor: ExecutionCo
     if (timecode.isEmpty && elapsedTime.isEmpty && recordedDate.isEmpty) {
       halt(
         BadRequest(
-          ErrorMsg(
+          toJson(ErrorMsg(
             400,
             "An valid index of timecode, elapsed_time_millis, or recorded_timestamp is required"
-          )
+          ))
         )
       )
     }
@@ -140,7 +140,7 @@ class ImageV1Api(controller: ImageController)(implicit val executor: ExecutionCo
     validateRequest() // Apply API security
     val uuid = params
       .getAs[UUID]("uuid")
-      .getOrElse(halt(BadRequest(ErrorMsg(400, "A image reference 'uuid' parameter is required"))))
+      .getOrElse(halt(BadRequest(toJson(ErrorMsg(400, "A image reference 'uuid' parameter is required")))))
     val videoReferenceUUID = params.getAs[UUID]("video_reference_uuid")
     val url                = params.getAs[URL]("url")
     val timecode           = params.getAs[Timecode]("timecode")
@@ -166,7 +166,7 @@ class ImageV1Api(controller: ImageController)(implicit val executor: ExecutionCo
       .map({
         case None =>
           halt(
-            NotFound(ErrorMsg(404, s"an Image with an image_reference_uuid of $uuid was not found"))
+            NotFound(toJson(ErrorMsg(404, s"an Image with an image_reference_uuid of $uuid was not found")))
           )
         case Some(v) => toJson(v)
       })
