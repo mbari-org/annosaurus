@@ -48,22 +48,24 @@ class AssociationController(
   override def newDAO(): AssociationDAO[Association] = daoFactory.newAssociationDAO()
 
   def create(
-      observationUUID: UUID,
-      linkName: String,
-      toConcept: String,
-      linkValue: String,
-      mimeType: String
+              observationUuid: UUID,
+              linkName: String,
+              toConcept: String,
+              linkValue: String,
+              mimeType: String,
+              associationUuid: Option[UUID]  = None
   )(implicit ec: ExecutionContext): Future[Association] = {
     def fn(dao: ADAO): Association = {
       val obsDao = daoFactory.newObservationDAO(dao)
-      obsDao.findByUUID(observationUUID) match {
+      obsDao.findByUUID(observationUuid) match {
         case None =>
           throw new NotFoundInDatastoreException(
-            s"Observation with UUID of $observationUUID not found"
+            s"Observation with UUID of $observationUuid not found"
           )
         case Some(observation) =>
           val association =
             dao.newPersistentObject(linkName, Some(toConcept), Some(linkValue), Some(mimeType))
+          associationUuid.foreach(uuid => association.uuid = uuid)
           observation.addAssociation(association)
           associationPublisher.publish(association)
           association

@@ -77,7 +77,8 @@ class AssociationV1Api(controller: AssociationController)(implicit val executor:
     val toConcept = params.get("to_concept").getOrElse(Association.TO_CONCEPT_SELF)
     val linkValue = params.get("link_value").getOrElse(Association.LINK_VALUE_NIL)
     val mimeType  = params.get("mime_type").getOrElse("text/plain")
-    controller.create(uuid, linkName, toConcept, linkValue, mimeType).map(toJson)
+    val associationUuid = params.getAs[UUID]("association_uuid")
+    controller.create(uuid, linkName, toConcept, linkValue, mimeType, associationUuid).map(toJson)
   }
 
   put("/:uuid") {
