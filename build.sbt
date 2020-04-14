@@ -1,5 +1,5 @@
 val akkaVersion         = "2.4.7"
-val auth0Version        = "3.10.1"
+val auth0Version        = "3.10.2"
 val codecVersion        = "1.14"
 val configVersion       = "1.4.0"
 val derbyVersion        = "10.15.2.0"
@@ -18,13 +18,13 @@ val junitVersion        = "4.13"
 val logbackVersion      = "1.2.3"
 val oracleVersion       = "19.3.0.0"
 val postgresqlVersion   = "42.2.11"
-val rxjavaVersion       = "2.2.17"
+val rxjavaVersion       = "3.0.1"
 val scalatestVersion    = "3.1.1"
 val scalatraVersion     = "2.7.0"
 val scilubeVersion      = "2.0.7.jre11"
 val servletVersion      = "4.0.1"
 val slf4jVersion        = "1.7.30"
-val sqlserverVersion    = "8.2.1.jre11"
+val sqlserverVersion    = "8.2.2.jre11"
 val uuidgenVersion      = "0.1.3"
 val vcr4jVersion        = "4.0.2"
 val zeromqVersion       = "0.5.2"
@@ -106,7 +106,7 @@ lazy val annosaurus = (project in file("."))
       "com.typesafe"                                   % "config"                            % configVersion,
       "com.zaxxer"                                     % "HikariCP"                          % hikariVersion,
       "commons-codec"                                  % "commons-codec"                     % codecVersion,
-      "io.reactivex.rxjava2"                           % "rxjava"                            % rxjavaVersion,
+      "io.reactivex.rxjava3"                           % "rxjava"                            % rxjavaVersion,
       "javax.servlet"                                  % "javax.servlet-api"                 % servletVersion,
       "javax.transaction"                              % "jta"                               % jtaVersion,
       "junit"                                          % "junit"                             % junitVersion % "test",
