@@ -162,6 +162,17 @@ class ObservationController(
     exec(fn)
   }
 
+  def deleteDuration(uuid: UUID)(implicit ec: ExecutionContext): Future[Option[Observation]] = {
+    def fn(dao: ODAO): Option[Observation] =
+      dao
+        .findByUUID(uuid)
+        .map(obs => {
+          obs.duration = null
+          obs
+        })
+    exec(fn)
+  }
+
   def bulkDelete(uuids: Iterable[UUID])(implicit ec: ExecutionContext): Future[Boolean] = {
     def fn(dao: ODAO): Boolean =
       uuids.map(deleteFunction(dao, _)).toSeq.forall(b => b)

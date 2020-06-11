@@ -38,12 +38,16 @@ class ObservationV1Api(controller: ObservationController)(implicit val executor:
     extends V1APIStack {
 
   get("/:uuid") {
-    val uuid = params.getAs[UUID]("uuid").getOrElse(halt(BadRequest(toJson(ErrorMsg(400, "Please provide a UUID")))))
+    val uuid = params
+      .getAs[UUID]("uuid")
+      .getOrElse(halt(BadRequest(toJson(ErrorMsg(400, "Please provide a UUID")))))
     controller
       .findByUUID(uuid)
       .map({
         case None =>
-          halt(NotFound(toJson(ErrorMsg(404, "An ImagedMoment with a UUID of $uuid was not found"))))
+          halt(
+            NotFound(toJson(ErrorMsg(404, "An ImagedMoment with a UUID of $uuid was not found")))
+          )
         case Some(v) => toJson(v)
       })
   }
@@ -69,12 +73,20 @@ class ObservationV1Api(controller: ObservationController)(implicit val executor:
 
   get("/association/:uuid") {
     val uuid =
-      params.getAs[UUID]("uuid").getOrElse(halt(BadRequest(toJson(ErrorMsg(400, "Please provide an Association UUID")))))
+      params
+        .getAs[UUID]("uuid")
+        .getOrElse(halt(BadRequest(toJson(ErrorMsg(400, "Please provide an Association UUID")))))
     controller
       .findByAssociationUUID(uuid)
       .map({
         case None =>
-          halt(NotFound(toJson(ErrorMsg(404, s"No observation for association with uuid of ${uuid} was found"))))
+          halt(
+            NotFound(
+              toJson(
+                ErrorMsg(404, s"No observation for association with uuid of ${uuid} was found")
+              )
+            )
+          )
         case Some(obs) => toJson(obs)
       })
   }
@@ -98,7 +110,11 @@ class ObservationV1Api(controller: ObservationController)(implicit val executor:
 
   get("/concept/count/:concept") {
     val concept =
-      params.get("concept").getOrElse(halt(BadRequest(toJson(ErrorMsg(400, "Please provide a concept to search for")))))
+      params
+        .get("concept")
+        .getOrElse(
+          halt(BadRequest(toJson(ErrorMsg(400, "Please provide a concept to search for"))))
+        )
     controller
       .countByConcept(concept)
       .map(n => s"""{"concept":"$concept", "count":"$n"}""")
@@ -106,7 +122,11 @@ class ObservationV1Api(controller: ObservationController)(implicit val executor:
 
   get("/concept/images/count/:concept") {
     val concept =
-      params.get("concept").getOrElse(halt(BadRequest(toJson(ErrorMsg(400, "Please provide a concept to search for")))))
+      params
+        .get("concept")
+        .getOrElse(
+          halt(BadRequest(toJson(ErrorMsg(400, "Please provide a concept to search for"))))
+        )
     controller
       .countByConceptWithImages(concept)
       .map(n => s"""{"concept":"$concept", "count":"$n"}""")
@@ -150,9 +170,17 @@ class ObservationV1Api(controller: ObservationController)(implicit val executor:
 
   put("/concept/rename") {
     val oldConcept =
-      params.get("old").getOrElse(halt(BadRequest(toJson(ErrorMsg(400, "Please provide the concept being replaced")))))
+      params
+        .get("old")
+        .getOrElse(
+          halt(BadRequest(toJson(ErrorMsg(400, "Please provide the concept being replaced"))))
+        )
     val newConcept =
-      params.get("new").getOrElse(halt(BadRequest(toJson(ErrorMsg(400, "Please provide the replacement concept")))))
+      params
+        .get("new")
+        .getOrElse(
+          halt(BadRequest(toJson(ErrorMsg(400, "Please provide the replacement concept"))))
+        )
     controller
       .updateConcept(oldConcept, newConcept)
       .map(n =>
@@ -175,19 +203,41 @@ class ObservationV1Api(controller: ObservationController)(implicit val executor:
     controller
       .update(uuid, concept, observer, observationDate, duration, group, activity, imagedMomentUUID)
       .map({
-        case None      => halt(NotFound(toJson(ErrorMsg(404, s"Failed. No observation with UUID of $uuid was found."))))
+        case None =>
+          halt(
+            NotFound(toJson(ErrorMsg(404, s"Failed. No observation with UUID of $uuid was found.")))
+          )
         case Some(obs) => toJson(obs)
       })
   }
 
+  put("/delete/duration/:uuid") {
+    validateRequest() // Apply API security
+    val uuid = params
+      .getAs[UUID]("uuid")
+      .getOrElse(halt(BadRequest(toJson(ErrorMsg(400, "A uuid parameter is required")))))
+    controller.deleteDuration(uuid) map ({
+      case None =>
+        halt(
+          NotFound(toJson(ErrorMsg(404, s"Failed. No observation with UUID of $uuid was found.")))
+        )
+      case Some(obs) => toJson(obs)
+    })
+  }
+
   delete("/:uuid") {
     validateRequest() // Apply API security
-    val uuid = params.getAs[UUID]("uuid").getOrElse(halt(BadRequest(toJson(ErrorMsg(400, "Please provide a UUID")))))
+    val uuid = params
+      .getAs[UUID]("uuid")
+      .getOrElse(halt(BadRequest(toJson(ErrorMsg(400, "Please provide a UUID")))))
     controller
       .delete(uuid)
       .map({
-        case true  => halt(NoContent()) // Success!!
-        case false => halt(NotFound(toJson(ErrorMsg(404, s"Failed. No observation with UUID of $uuid was found."))))
+        case true => halt(NoContent()) // Success!!
+        case false =>
+          halt(
+            NotFound(toJson(ErrorMsg(404, s"Failed. No observation with UUID of $uuid was found.")))
+          )
       })
   }
 
@@ -204,7 +254,11 @@ class ObservationV1Api(controller: ObservationController)(implicit val executor:
           halt(BadRequest(toJson(ErrorMsg(400, "No observation UUIDs were provided as JSON"))))
         controller.bulkDelete(uuids)
       case _ =>
-        halt(BadRequest(toJson(ErrorMsg(400, "bulk delete only accepts JSON (Content-Type: application/json)"))))
+        halt(
+          BadRequest(
+            toJson(ErrorMsg(400, "bulk delete only accepts JSON (Content-Type: application/json)"))
+          )
+        )
     }
   }
 }
