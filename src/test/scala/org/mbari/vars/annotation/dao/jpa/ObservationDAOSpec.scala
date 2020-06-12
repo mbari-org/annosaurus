@@ -16,7 +16,7 @@
 
 package org.mbari.vars.annotation.dao.jpa
 
-import java.time.{ Duration, Instant }
+import java.time.{Duration, Instant}
 import java.util.UUID
 import java.util.concurrent.TimeUnit
 
@@ -26,29 +26,32 @@ import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
 import scala.concurrent.Await
-import scala.concurrent.duration.{ Duration => SDuration }
+import scala.concurrent.duration.{Duration => SDuration}
 import scala.concurrent.ExecutionContext.Implicits.global
 
 /**
- *
- *
- * @author Brian Schlining
- * @since 2016-06-28T08:44:00
- */
+  *
+  *
+  * @author Brian Schlining
+  * @since 2016-06-28T08:44:00
+  */
 class ObservationDAOSpec extends AnyFlatSpec with Matchers with BeforeAndAfterAll {
 
   private[this] val daoFactory = TestDAOFactory.Instance
 
-  private[this] val timeout = SDuration(2, TimeUnit.SECONDS)
-  private[this] val imDao = TestDAOFactory.Instance.newImagedMomentDAO()
-  private[this] val dao = TestDAOFactory.Instance.newObservationDAO(imDao)
+  private[this] val timeout            = SDuration(2, TimeUnit.SECONDS)
+  private[this] val imDao              = TestDAOFactory.Instance.newImagedMomentDAO()
+  private[this] val dao                = TestDAOFactory.Instance.newObservationDAO(imDao)
   private[this] val videoReferenceUUID = UUID.randomUUID()
-  private[this] val now = Instant.now()
-  private[this] val imagedMoment0 = ImagedMomentImpl(Some(videoReferenceUUID), Some(now), elapsedTime = Some(Duration.ofMinutes(1)))
+  private[this] val now                = Instant.now()
+  private[this] val imagedMoment0 =
+    ImagedMomentImpl(Some(videoReferenceUUID), Some(now), elapsedTime = Some(Duration.ofMinutes(1)))
   private[this] val concept = "Grimpoteuthis"
-  val newConcept = "Aegina"
-  private[this] val observation0 = ObservationImpl(concept, observationDate = Some(now), observer = Some("brian"))
-  private[this] val observation1 = ObservationImpl(concept, observationDate = Some(now), observer = Some("kyra"))
+  val newConcept            = "Aegina"
+  private[this] val observation0 =
+    ObservationImpl(concept, observationDate = Some(now), observer = Some("brian"))
+  private[this] val observation1 =
+    ObservationImpl(concept, observationDate = Some(now), observer = Some("kyra"))
 
   private type ODAO = ObservationDAO[ObservationImpl]
   def run[R](fn: ODAO => R): R = Await.result(dao.runTransaction(fn), timeout)
@@ -112,7 +115,7 @@ class ObservationDAOSpec extends AnyFlatSpec with Matchers with BeforeAndAfterAl
     obsCheck shouldBe empty
   }
 
-  protected override def afterAll(): Unit = {
+  override protected def afterAll(): Unit = {
     daoFactory.cleanup()
   }
 

@@ -29,11 +29,11 @@ import scala.concurrent.Await
 import scala.concurrent.duration.{Duration => SDuration}
 
 /**
- *
- *
- * @author Brian Schlining
- * @since 2016-09-09T10:18:00
- */
+  *
+  *
+  * @author Brian Schlining
+  * @since 2016-09-09T10:18:00
+  */
 class ImageReferenceV1ApiSpec extends WebApiStack {
 
   private[this] val timeout = SDuration(3000, TimeUnit.MILLISECONDS)
@@ -51,9 +51,10 @@ class ImageReferenceV1ApiSpec extends WebApiStack {
   "ImageReferenceV1Spec" should "find by uuid" in {
 
     // --- Create an imageref
-    val dao = daoFactory.newImageReferenceDAO()
+    val dao         = daoFactory.newImageReferenceDAO()
     val imageMoment = ImagedMomentImpl(Some(UUID.randomUUID()), Some(Instant.now()))
-    imageReference = ImageReferenceImpl(new URL("http://www.mbari.org/foo.png"), format = Some("image/png"))
+    imageReference =
+      ImageReferenceImpl(new URL("http://www.mbari.org/foo.png"), format = Some("image/png"))
     imageMoment.addImageReference(imageReference)
     val f = dao.runTransaction(d => d.create(imageReference))
     f.onComplete(t => dao.close())
@@ -72,27 +73,28 @@ class ImageReferenceV1ApiSpec extends WebApiStack {
   it should "update" in {
     put(
       s"$path/${imageReference.uuid}",
-      "url" -> "http://www.google.com/bar.jpg",
-      "format" -> "image/jpg",
-      "width_pixels" -> "1920",
+      "url"           -> "http://www.google.com/bar.jpg",
+      "format"        -> "image/jpg",
+      "width_pixels"  -> "1920",
       "height_pixels" -> "1080",
-      "description" -> "updated") {
-        status should be(200)
-        val ir = gson.fromJson(body, classOf[ImageReferenceImpl])
-        ir.uuid should be(imageReference.uuid)
-        ir.url should be(new URL("http://www.google.com/bar.jpg"))
-        ir.width should be(1920)
-        ir.height should be(1080)
-        ir.description should be("updated")
-      }
+      "description"   -> "updated"
+    ) {
+      status should be(200)
+      val ir = gson.fromJson(body, classOf[ImageReferenceImpl])
+      ir.uuid should be(imageReference.uuid)
+      ir.url should be(new URL("http://www.google.com/bar.jpg"))
+      ir.width should be(1920)
+      ir.height should be(1080)
+      ir.description should be("updated")
+    }
   }
 
   it should "update (move to new imagedmoment)" in {
 
     // --- Create a new imagedmoment and insert
-    val dao = daoFactory.newImagedMomentDAO()
+    val dao         = daoFactory.newImagedMomentDAO()
     val imageMoment = ImagedMomentImpl(Some(UUID.randomUUID()), Some(Instant.now()))
-    val f = dao.runTransaction(d => d.create(imageMoment))
+    val f           = dao.runTransaction(d => d.create(imageMoment))
     f.onComplete(t => dao.close())
     Await.result(f, timeout)
 
@@ -104,8 +106,8 @@ class ImageReferenceV1ApiSpec extends WebApiStack {
     }
 
     // --- Verify the move
-    val controller = new ImagedMomentController(daoFactory)
-    val f2 = controller.findByImageReferenceUUID(imageReference.uuid)
+    val controller   = new ImagedMomentController(daoFactory)
+    val f2           = controller.findByImageReferenceUUID(imageReference.uuid)
     val imagedMoment = Await.result(f2, timeout)
     imagedMoment should not be empty
     val im = imagedMoment.get

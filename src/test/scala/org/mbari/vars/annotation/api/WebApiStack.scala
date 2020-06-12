@@ -25,23 +25,21 @@ import org.scalatest.BeforeAndAfterAll
 import org.scalatra.test.scalatest.ScalatraFlatSpec
 
 import scala.concurrent.duration.Duration
-import scala.concurrent.{ Await, ExecutionContext }
+import scala.concurrent.{Await, ExecutionContext}
 
 /**
- *
- *
- * @author Brian Schlining
- * @since 2016-09-08T10:38:00
- */
+  *
+  *
+  * @author Brian Schlining
+  * @since 2016-09-08T10:38:00
+  */
 trait WebApiStack extends ScalatraFlatSpec with BeforeAndAfterAll {
 
-  protected[this] val gson = Constants.GSON
-  protected[this] val daoFactory = TestDAOFactory.Instance.asInstanceOf[BasicDAOFactory]
-  protected[this] implicit val executionContext = ExecutionContext.global
+  protected[this] val gson                      = Constants.GSON
+  protected[this] val daoFactory                = TestDAOFactory.Instance.asInstanceOf[BasicDAOFactory]
+  implicit protected[this] val executionContext = ExecutionContext.global
 
-
-
-  protected override def afterAll(): Unit = {
+  override protected def afterAll(): Unit = {
     val dao = daoFactory.newImagedMomentDAO()
 
     val f = dao.runTransaction(d => {

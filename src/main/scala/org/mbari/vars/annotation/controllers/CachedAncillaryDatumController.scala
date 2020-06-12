@@ -19,7 +19,7 @@ package org.mbari.vars.annotation.controllers
 import java.time.Duration
 import java.util.UUID
 
-import org.mbari.vars.annotation.dao.jpa.{BaseDAO, CachedAncillaryDatumImpl}
+import org.mbari.vars.annotation.dao.jpa.BaseDAO
 import org.mbari.vars.annotation.dao.{CachedAncillaryDatumDAO, NotFoundInDatastoreException}
 import org.mbari.vars.annotation.math.FastCollator
 import org.mbari.vars.annotation.model.{CachedAncillaryDatum, ImagedMoment}
@@ -36,7 +36,7 @@ class CachedAncillaryDatumController(val daoFactory: BasicDAOFactory)
     extends BaseController[CachedAncillaryDatum, CachedAncillaryDatumDAO[CachedAncillaryDatum]] {
 
   protected type ADDAO = CachedAncillaryDatumDAO[CachedAncillaryDatum]
-  private[this] val log = LoggerFactory.getLogger(getClass)
+  LoggerFactory.getLogger(getClass)
 
   override def newDAO(): CachedAncillaryDatumDAO[CachedAncillaryDatum] =
     daoFactory.newCachedAncillaryDatumDAO()

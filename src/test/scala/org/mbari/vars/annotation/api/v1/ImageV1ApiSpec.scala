@@ -25,11 +25,11 @@ import org.mbari.vars.annotation.controllers.ImageController
 import org.mbari.vars.annotation.model.simple.Image
 
 /**
- *
- *
- * @author Brian Schlining
- * @since 2016-09-12T14:38:00
- */
+  *
+  *
+  * @author Brian Schlining
+  * @since 2016-09-12T14:38:00
+  */
 class ImageV1ApiSpec extends WebApiStack {
 
   private[this] val imageV1Api = {
@@ -46,34 +46,36 @@ class ImageV1ApiSpec extends WebApiStack {
     post(
       path,
       "video_reference_uuid" -> UUID.randomUUID().toString,
-      "elapsed_time_millis" -> "12345",
-      "format" -> "image/jpg",
-      "url" -> "http://www.mbari.org/foo.jpg",
-      "width_pixels" -> "1920",
-      "height_pixels" -> "1080",
-      "description" -> "This is a test") {
-        status should be(200)
-        image = gson.fromJson(body, classOf[Image])
-        image.url should be(new URL("http://www.mbari.org/foo.jpg"))
-        image.format should be("image/jpg")
-        image.width should be(1920)
-        image.height should be(1080)
-        image.description should be("This is a test")
-        image.elapsedTime should be(Duration.ofMillis(12345))
-      }
+      "elapsed_time_millis"  -> "12345",
+      "format"               -> "image/jpg",
+      "url"                  -> "http://www.mbari.org/foo.jpg",
+      "width_pixels"         -> "1920",
+      "height_pixels"        -> "1080",
+      "description"          -> "This is a test"
+    ) {
+      status should be(200)
+      image = gson.fromJson(body, classOf[Image])
+      image.url should be(new URL("http://www.mbari.org/foo.jpg"))
+      image.format should be("image/jpg")
+      image.width should be(1920)
+      image.height should be(1080)
+      image.description should be("This is a test")
+      image.elapsedTime should be(Duration.ofMillis(12345))
+    }
   }
 
   it should "create with same index" in {
     post(
       path,
       "video_reference_uuid" -> image.videoReferenceUuid.toString,
-      "elapsed_time_millis" -> "12345",
-      "format" -> "image/png",
-      "url" -> "http://www.mbari.org/foo.png") {
-        status should be(200)
-        val im = gson.fromJson(body, classOf[Image])
-        image.imagedMomentUuid should be(im.imagedMomentUuid)
-      }
+      "elapsed_time_millis"  -> "12345",
+      "format"               -> "image/png",
+      "url"                  -> "http://www.mbari.org/foo.png"
+    ) {
+      status should be(200)
+      val im = gson.fromJson(body, classOf[Image])
+      image.imagedMomentUuid should be(im.imagedMomentUuid)
+    }
   }
 
   it should "find by videoreference" in {
@@ -105,31 +107,32 @@ class ImageV1ApiSpec extends WebApiStack {
   it should "find by name" in {
     val name = "foo.png"
     get(s"$path/name/$name") {
-      status should be (200)
+      status should be(200)
       val im = gson.fromJson(body, classOf[Array[Image]])
-      im.size should be (1)
-      im.head.url.toExternalForm.endsWith(name) should be (true)
+      im.size should be(1)
+      im.head.url.toExternalForm.endsWith(name) should be(true)
     }
   }
 
   it should "update" in {
     put(
       s"$path/${image.imageReferenceUuid}",
-      "url" -> "http://www.google.com/bar.jpg",
-      "elapsed_time_millis" -> "20345",
-      "recorded_timestamp" -> "1968-09-22T02:00:55Z",
-      "width_pixels" -> "4000",
-      "height_pixels" -> "2000",
-      "video_reference_uuid" -> UUID.randomUUID().toString) {
-        status should be(200)
-        val im = gson.fromJson(body, classOf[Image])
-        im.url should be(new URL("http://www.google.com/bar.jpg"))
-        im.elapsedTime should be(Duration.ofMillis(20345))
-        im.recordedTimestamp should be(Instant.parse("1968-09-22T02:00:55Z"))
-        im.width should be(4000)
-        im.height should be(2000)
-        im.videoReferenceUuid should not be (image.videoReferenceUuid)
-      }
+      "url"                  -> "http://www.google.com/bar.jpg",
+      "elapsed_time_millis"  -> "20345",
+      "recorded_timestamp"   -> "1968-09-22T02:00:55Z",
+      "width_pixels"         -> "4000",
+      "height_pixels"        -> "2000",
+      "video_reference_uuid" -> UUID.randomUUID().toString
+    ) {
+      status should be(200)
+      val im = gson.fromJson(body, classOf[Image])
+      im.url should be(new URL("http://www.google.com/bar.jpg"))
+      im.elapsedTime should be(Duration.ofMillis(20345))
+      im.recordedTimestamp should be(Instant.parse("1968-09-22T02:00:55Z"))
+      im.width should be(4000)
+      im.height should be(2000)
+      im.videoReferenceUuid should not be (image.videoReferenceUuid)
+    }
   }
 
 }

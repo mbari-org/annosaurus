@@ -16,36 +16,41 @@
 
 package org.mbari.vars.annotation.dao.jpa
 
-import java.time.{ Duration, Instant }
+import java.time.{Duration, Instant}
 import java.util.UUID
 import java.util.concurrent.TimeUnit
 
-import org.mbari.vars.annotation.dao.{ ImagedMomentDAO, IndexDAO }
+import org.mbari.vars.annotation.dao.{ImagedMomentDAO, IndexDAO}
 import org.mbari.vcr4j.time.Timecode
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
 import scala.concurrent.Await
-import scala.concurrent.duration.{ Duration => SDuration }
+import scala.concurrent.duration.{Duration => SDuration}
 import scala.concurrent.ExecutionContext.Implicits.global
 
 /**
- * @author Brian Schlining
- * @since 2019-02-08T09:18:00
- */
+  * @author Brian Schlining
+  * @since 2019-02-08T09:18:00
+  */
 class IndexDAOSpec extends AnyFlatSpec with Matchers with BeforeAndAfterAll {
 
   private type IMDAO = ImagedMomentDAO[ImagedMomentImpl]
-  private type IDAO = IndexDAO[IndexImpl]
-  private[this] val daoFactory = TestDAOFactory.Instance
-  private[this] val timeout = SDuration(2, TimeUnit.SECONDS)
-  private[this] val imDao = daoFactory.newImagedMomentDAO()
-  private[this] val dao = daoFactory.newIndexDAO(imDao)
+  private type IDAO  = IndexDAO[IndexImpl]
+  private[this] val daoFactory         = TestDAOFactory.Instance
+  private[this] val timeout            = SDuration(2, TimeUnit.SECONDS)
+  private[this] val imDao              = daoFactory.newImagedMomentDAO()
+  private[this] val dao                = daoFactory.newIndexDAO(imDao)
   private[this] val videoReferenceUUID = UUID.randomUUID()
-  private[this] val now = Instant.now()
-  private[this] val imagedMoment0 = ImagedMomentImpl(Some(videoReferenceUUID), Some(now), elapsedTime = Some(Duration.ofMinutes(1)))
-  private[this] val imagedMoment1 = ImagedMomentImpl(Some(videoReferenceUUID), Some(now.plusSeconds(60)), elapsedTime = Some(Duration.ofMinutes(5)))
+  private[this] val now                = Instant.now()
+  private[this] val imagedMoment0 =
+    ImagedMomentImpl(Some(videoReferenceUUID), Some(now), elapsedTime = Some(Duration.ofMinutes(1)))
+  private[this] val imagedMoment1 = ImagedMomentImpl(
+    Some(videoReferenceUUID),
+    Some(now.plusSeconds(60)),
+    elapsedTime = Some(Duration.ofMinutes(5))
+  )
 
   def runIm[R](fn: IMDAO => R): R = Await.result(imDao.runTransaction(fn), timeout)
 
@@ -69,7 +74,8 @@ class IndexDAOSpec extends AnyFlatSpec with Matchers with BeforeAndAfterAll {
   it should "update" in {
     val timecode = new Timecode(2345, 29.97)
     runId(d => {
-      val id = d.findByVideoReferenceUuid(videoReferenceUUID)
+      val id = d
+        .findByVideoReferenceUuid(videoReferenceUUID)
         .find(_.uuid == imagedMoment0.uuid)
       id shouldBe defined
       id.get.timecode = timecode
@@ -82,7 +88,7 @@ class IndexDAOSpec extends AnyFlatSpec with Matchers with BeforeAndAfterAll {
     imagedMoment.get.timecode.toString should be(timecode.toString)
   }
 
-  protected override def afterAll(): Unit = {
+  override protected def afterAll(): Unit = {
     daoFactory.cleanup()
   }
 

@@ -47,7 +47,10 @@ class CachedAncillaryDatumV1Api(controller: CachedAncillaryDatumController)(
     controller
       .findByUUID(uuid)
       .map({
-        case None    => halt(NotFound(toJson(ErrorMsg(404, s"An AncillaryDatum with a UUID of $uuid was not found"))))
+        case None =>
+          halt(
+            NotFound(toJson(ErrorMsg(404, s"An AncillaryDatum with a UUID of $uuid was not found")))
+          )
         case Some(v) => toJson(v)
       })
   }
@@ -69,7 +72,8 @@ class CachedAncillaryDatumV1Api(controller: CachedAncillaryDatumController)(
     controller
       .findByImagedMomentUUID(uuid)
       .map({
-        case None     => halt(NotFound(toJson(ErrorMsg(404, s"No imagereference with a uuid of $uuid was found"))))
+        case None =>
+          halt(NotFound(toJson(ErrorMsg(404, s"No imagereference with a uuid of $uuid was found"))))
         case Some(im) => toJson(im)
       })
   }
@@ -81,7 +85,8 @@ class CachedAncillaryDatumV1Api(controller: CachedAncillaryDatumController)(
     controller
       .findByObservationUUID(uuid)
       .map({
-        case None     => halt(NotFound(toJson(ErrorMsg(404, s"No observation with a uuid of $uuid was found"))))
+        case None =>
+          halt(NotFound(toJson(ErrorMsg(404, s"No observation with a uuid of $uuid was found"))))
         case Some(im) => toJson(im)
       })
   }
@@ -153,7 +158,14 @@ class CachedAncillaryDatumV1Api(controller: CachedAncillaryDatumController)(
           .map(ds => toJson(ds.asJava))
       case _ =>
         halt(
-          BadRequest(toJson(ErrorMsg(400, "Posts to /bulk only accept a JSON body (i.e. Content-Type: application/json)")))
+          BadRequest(
+            toJson(
+              ErrorMsg(
+                400,
+                "Posts to /bulk only accept a JSON body (i.e. Content-Type: application/json)"
+              )
+            )
+          )
         )
     }
   }
@@ -162,7 +174,9 @@ class CachedAncillaryDatumV1Api(controller: CachedAncillaryDatumController)(
     validateRequest()
     val uuid = params
       .getAs[UUID]("uuid")
-      .getOrElse(halt(BadRequest(toJson(ErrorMsg(400, "A video reference 'uuid' parameter is required")))))
+      .getOrElse(
+        halt(BadRequest(toJson(ErrorMsg(400, "A video reference 'uuid' parameter is required"))))
+      )
     val windowMillis = params.getAs[Int]("window").getOrElse(7500)
     request.getHeader("Content-Type") match {
       case "application/json" =>
@@ -172,9 +186,14 @@ class CachedAncillaryDatumV1Api(controller: CachedAncillaryDatumController)(
           .map(ds => toJson(ds.asJava))
       case _ =>
         halt(
-          BadRequest(toJson(ErrorMsg(400,
-            "Posts to /merge only accept a JSON body (i.e. Content-Type: application/json)"
-          )))
+          BadRequest(
+            toJson(
+              ErrorMsg(
+                400,
+                "Posts to /merge only accept a JSON body (i.e. Content-Type: application/json)"
+              )
+            )
+          )
         )
     }
   }
@@ -183,7 +202,9 @@ class CachedAncillaryDatumV1Api(controller: CachedAncillaryDatumController)(
     validateRequest() // Apply API security
     val uuid = params
       .getAs[UUID]("uuid")
-      .getOrElse(halt(BadRequest(toJson(ErrorMsg(400, "A video reference 'uuid' parameter is required")))))
+      .getOrElse(
+        halt(BadRequest(toJson(ErrorMsg(400, "A video reference 'uuid' parameter is required"))))
+      )
     val latitude          = params.getAs[Double]("latitude")
     val longitude         = params.getAs[Double]("longitude")
     val depthMeters       = params.getAs[Double]("depth_meters")
@@ -225,7 +246,11 @@ class CachedAncillaryDatumV1Api(controller: CachedAncillaryDatumController)(
       )
       .map({
         case None =>
-          halt(NotFound(toJson(ErrorMsg(404, s"A CachedAncillaryDatum with uuid of $uuid was not found"))))
+          halt(
+            NotFound(
+              toJson(ErrorMsg(404, s"A CachedAncillaryDatum with uuid of $uuid was not found"))
+            )
+          )
         case Some(v) => toJson(v)
       })
   }

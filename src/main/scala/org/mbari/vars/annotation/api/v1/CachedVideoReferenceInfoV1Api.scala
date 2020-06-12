@@ -37,8 +37,8 @@ class CachedVideoReferenceInfoV1Api(controller: CachedVideoReferenceInfoControll
 ) extends V1APIStack {
 
   get("/?") {
-    val limit  = params.getAs[Int]("limit")
-    val offset = params.getAs[Int]("offset")
+    params.getAs[Int]("limit")
+    params.getAs[Int]("offset")
     controller
       .findAll()
       .map(_.asJava)
@@ -46,14 +46,22 @@ class CachedVideoReferenceInfoV1Api(controller: CachedVideoReferenceInfoControll
   }
 
   get("/:uuid") {
-    val uuid   = params.getAs[UUID]("uuid").getOrElse(halt(BadRequest(toJson(ErrorMsg(400, "Please provide a UUID")))))
-    val limit  = params.getAs[Int]("limit")
-    val offset = params.getAs[Int]("offset")
+    val uuid = params
+      .getAs[UUID]("uuid")
+      .getOrElse(halt(BadRequest(toJson(ErrorMsg(400, "Please provide a UUID")))))
+    params.getAs[Int]("limit")
+    params.getAs[Int]("offset")
     controller
       .findByUUID(uuid)
       .map({
         case None =>
-          halt(NotFound(toJson(ErrorMsg(404, s"A CachedVideoReferenceInfo with a UUID of $uuid was not found"))))
+          halt(
+            NotFound(
+              toJson(
+                ErrorMsg(404, s"A CachedVideoReferenceInfo with a UUID of $uuid was not found")
+              )
+            )
+          )
         case Some(v) => toJson(v)
       })
   }
@@ -76,9 +84,14 @@ class CachedVideoReferenceInfoV1Api(controller: CachedVideoReferenceInfoControll
       .map({
         case None =>
           halt(
-            NotFound(toJson(ErrorMsg(404,
-              s"A CachedVideoReferenceInfo with a videoreference uuid of $uuid was not found"
-            )))
+            NotFound(
+              toJson(
+                ErrorMsg(
+                  404,
+                  s"A CachedVideoReferenceInfo with a videoreference uuid of $uuid was not found"
+                )
+              )
+            )
           )
         case Some(v) => toJson(v)
       })
@@ -108,7 +121,9 @@ class CachedVideoReferenceInfoV1Api(controller: CachedVideoReferenceInfoControll
   }
 
   get("/missioncontact/:name") {
-    val name = params.get("name").getOrElse(halt(BadRequest(toJson(ErrorMsg(400, "Please provide a mission contact")))))
+    val name = params
+      .get("name")
+      .getOrElse(halt(BadRequest(toJson(ErrorMsg(400, "Please provide a mission contact")))))
     controller
       .findByMissionContact(name)
       .map(_.asJava)
@@ -119,10 +134,14 @@ class CachedVideoReferenceInfoV1Api(controller: CachedVideoReferenceInfoControll
     validateRequest() // Apply API security
     val videoReferenceUUID = params
       .getAs[UUID]("video_reference_uuid")
-      .getOrElse(halt(BadRequest(toJson(ErrorMsg(400, "A 'video_reference_uuid' parameter is required")))))
+      .getOrElse(
+        halt(BadRequest(toJson(ErrorMsg(400, "A 'video_reference_uuid' parameter is required"))))
+      )
     val missionContact = params.get("mission_contact")
     val missionID =
-      params.get("mission_id").getOrElse(halt(BadRequest(toJson(ErrorMsg(400, "A 'mission_id' parameter is required")))))
+      params
+        .get("mission_id")
+        .getOrElse(halt(BadRequest(toJson(ErrorMsg(400, "A 'mission_id' parameter is required")))))
     val platformName = params
       .get("platform_name")
       .getOrElse(halt(BadRequest("A 'platform_name' parameter is required")))
@@ -143,7 +162,12 @@ class CachedVideoReferenceInfoV1Api(controller: CachedVideoReferenceInfoControll
     controller
       .update(uuid, videoReferenceUUID, platformName, missionID, missionContact)
       .map({
-        case None    => halt(NotFound(toJson(ErrorMsg(404, s"Failed. No VideoReferenceInfo with UUID of $uuid was found."))))
+        case None =>
+          halt(
+            NotFound(
+              toJson(ErrorMsg(404, s"Failed. No VideoReferenceInfo with UUID of $uuid was found."))
+            )
+          )
         case Some(v) => toJson(v)
       })
   }
@@ -156,8 +180,11 @@ class CachedVideoReferenceInfoV1Api(controller: CachedVideoReferenceInfoControll
     controller
       .delete(uuid)
       .map({
-        case true  => halt(NoContent()) // Success
-        case false => halt(NotFound(toJson(ErrorMsg(404, s"Failed. No observation with UUID of $uuid was found."))))
+        case true => halt(NoContent()) // Success
+        case false =>
+          halt(
+            NotFound(toJson(ErrorMsg(404, s"Failed. No observation with UUID of $uuid was found.")))
+          )
       })
   }
 

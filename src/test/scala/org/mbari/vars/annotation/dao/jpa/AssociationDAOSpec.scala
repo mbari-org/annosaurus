@@ -16,41 +16,45 @@
 
 package org.mbari.vars.annotation.dao.jpa
 
-import java.time.{ Duration, Instant }
+import java.time.{Duration, Instant}
 import java.util.UUID
 import java.util.concurrent.TimeUnit
 
-import org.mbari.vars.annotation.dao.{ AssociationDAO }
+import org.mbari.vars.annotation.dao.{AssociationDAO}
 import org.mbari.vars.annotation.model.Association
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
-import scala.concurrent.{ Await }
-import scala.concurrent.duration.{ Duration => SDuration }
+import scala.concurrent.{Await}
+import scala.concurrent.duration.{Duration => SDuration}
 import scala.concurrent.ExecutionContext.Implicits.global
 
 /**
- *
- *
- * @author Brian Schlining
- * @since 2016-06-28T09:49:00
- */
+  *
+  *
+  * @author Brian Schlining
+  * @since 2016-06-28T09:49:00
+  */
 class AssociationDAOSpec extends AnyFlatSpec with Matchers with BeforeAndAfterAll {
 
   private[this] val daoFactory = TestDAOFactory.Instance
 
-  private[this] val timeout = SDuration(2, TimeUnit.SECONDS)
-  private[this] val imDao = daoFactory.newImagedMomentDAO()
-  private[this] val obsDao = daoFactory.newObservationDAO(imDao)
-  private[this] val dao = daoFactory.newAssociationDAO(imDao)
+  private[this] val timeout            = SDuration(2, TimeUnit.SECONDS)
+  private[this] val imDao              = daoFactory.newImagedMomentDAO()
+  private[this] val obsDao             = daoFactory.newObservationDAO(imDao)
+  private[this] val dao                = daoFactory.newAssociationDAO(imDao)
   private[this] val videoReferenceUUID = UUID.randomUUID()
-  private[this] val now = Instant.now()
-  private[this] val imagedMoment0 = ImagedMomentImpl(Some(videoReferenceUUID), Some(now), elapsedTime = Some(Duration.ofMinutes(1)))
+  private[this] val now                = Instant.now()
+  private[this] val imagedMoment0 =
+    ImagedMomentImpl(Some(videoReferenceUUID), Some(now), elapsedTime = Some(Duration.ofMinutes(1)))
   private[this] val concept = "Grimpoteuthis"
-  private[this] val observation0 = ObservationImpl(concept, observationDate = Some(now), observer = Some("brian"))
-  private[this] val association0 = AssociationImpl("surface-color", Association.TO_CONCEPT_SELF, "red")
-  private[this] val association1 = AssociationImpl("image-quality", Association.TO_CONCEPT_SELF, "mega-awesome!!")
+  private[this] val observation0 =
+    ObservationImpl(concept, observationDate = Some(now), observer = Some("brian"))
+  private[this] val association0 =
+    AssociationImpl("surface-color", Association.TO_CONCEPT_SELF, "red")
+  private[this] val association1 =
+    AssociationImpl("image-quality", Association.TO_CONCEPT_SELF, "mega-awesome!!")
 
   private type ADAO = AssociationDAO[AssociationImpl]
   def run[R](fn: ADAO => R): R = Await.result(dao.runTransaction(fn), timeout)
@@ -104,18 +108,24 @@ class AssociationDAOSpec extends AnyFlatSpec with Matchers with BeforeAndAfterAl
   }
 
   it should "findByLinkNameAndVideoReferenceUUIDAndConcept when matches are present" in {
-    val ass = run(_.findByLinkNameAndVideoReferenceUUIDAndConcept(
-      "surface-color",
-      videoReferenceUUID,
-      Some("Grimpoteuthis")))
+    val ass = run(
+      _.findByLinkNameAndVideoReferenceUUIDAndConcept(
+        "surface-color",
+        videoReferenceUUID,
+        Some("Grimpoteuthis")
+      )
+    )
     ass.size should be(1)
   }
 
   it should "findByLinkNameAndVideoReferenceUUIDAndConcept when matches are absent" in {
-    val assNon = run(_.findByLinkNameAndVideoReferenceUUIDAndConcept(
-      "surface-color",
-      videoReferenceUUID,
-      Some("Nanomia")))
+    val assNon = run(
+      _.findByLinkNameAndVideoReferenceUUIDAndConcept(
+        "surface-color",
+        videoReferenceUUID,
+        Some("Nanomia")
+      )
+    )
     assNon.size should be(0)
   }
 
@@ -128,7 +138,7 @@ class AssociationDAOSpec extends AnyFlatSpec with Matchers with BeforeAndAfterAl
     assCheck shouldBe empty
   }
 
-  protected override def afterAll(): Unit = {
+  override protected def afterAll(): Unit = {
     daoFactory.cleanup()
   }
 

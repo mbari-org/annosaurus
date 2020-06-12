@@ -34,10 +34,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
   * @author Brian Schlining
   * @since 2017-11-09T15:19:00
   */
-class CachedAncillaryDatumControllerSpec
-    extends AnyFlatSpec
-    with Matchers
-    with BeforeAndAfterAll {
+class CachedAncillaryDatumControllerSpec extends AnyFlatSpec with Matchers with BeforeAndAfterAll {
 
   private[this] val daoFactory = TestDAOFactory.Instance
   private[this] val controller = new CachedAncillaryDatumController(
@@ -46,20 +43,19 @@ class CachedAncillaryDatumControllerSpec
   private[this] val imagedMomentController = new ImagedMomentController(
     daoFactory.asInstanceOf[BasicDAOFactory]
   )
-  private[this] val timeout = SDuration(200, TimeUnit.SECONDS)
-  private[this] val recordedDate = Instant.now()
+  private[this] val timeout            = SDuration(200, TimeUnit.SECONDS)
+  private[this] val recordedDate       = Instant.now()
   private[this] val videoReferenceUuid = UUID.randomUUID()
 
   private[this] val imagedMoments = {
 
     val dao = daoFactory.newImagedMomentDAO()
-    val ims = (0 until 4).map(
-      i =>
-        dao.newPersistentObject(
-          videoReferenceUuid,
-          elapsedTime = Some(Duration.ofMillis(1000 + i * 10 * 1000)),
-          recordedDate = Some(recordedDate.plusSeconds(10 * i))
-        )
+    val ims = (0 until 4).map(i =>
+      dao.newPersistentObject(
+        videoReferenceUuid,
+        elapsedTime = Some(Duration.ofMillis(1000 + i * 10 * 1000)),
+        recordedDate = Some(recordedDate.plusSeconds(10 * i))
+      )
     )
     exec(() => dao.runTransaction(d => ims.map(d.create)))
     ims
@@ -68,7 +64,7 @@ class CachedAncillaryDatumControllerSpec
   def exec[R](fn: () => Future[R]): R = Await.result(fn.apply(), timeout)
 
   "CacheAncillaryDatumController" should "create" in {
-    val im = imagedMoments.head
+    val im  = imagedMoments.head
     val cad = exec(() => controller.create(im.uuid, 36.3, -122.345, 1078))
     cad should not be (null)
     cad.uuid should not be (null)
@@ -105,12 +101,13 @@ class CachedAncillaryDatumControllerSpec
     // --- Remove
     val minEpochMillis = imagedMoments.map(_.recordedDate.toEpochMilli).min
 
-    val cads = imagedMoments.zipWithIndex
+    val cads = imagedMoments
+      .zipWithIndex
       .map({
         case (im, idx) =>
           //val ts = im.recordedDate.plusMillis(1000)
           val ts = Instant.ofEpochMilli(minEpochMillis + idx * 10 * 1000 + 1000)
-          val c = new CachedAncillaryDatumBean
+          val c  = new CachedAncillaryDatumBean
           c.recordedTimestamp = Some(ts)
           c.latitude = Some(90)
           c.longitude = Some(180)
@@ -123,14 +120,12 @@ class CachedAncillaryDatumControllerSpec
           c
       })
 
-    exec(
-      () => controller.merge(cads, videoReferenceUuid, Duration.ofMillis(15000))
-    )
+    exec(() => controller.merge(cads, videoReferenceUuid, Duration.ofMillis(15000)))
 
     imagedMoments.foreach(im => {
       val maybeMoment = exec(() => imagedMomentController.findByUUID(im.uuid))
       maybeMoment should not be None
-      val i = maybeMoment.get
+      val i  = maybeMoment.get
       val ad = i.ancillaryDatum
 //      println(im.recordedDate)
       ad.depthMeters should not be None
@@ -143,7 +138,7 @@ class CachedAncillaryDatumControllerSpec
 
   }
 
-  protected override def afterAll(): Unit = {
+  override protected def afterAll(): Unit = {
     daoFactory.cleanup()
   }
 

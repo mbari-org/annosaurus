@@ -19,9 +19,7 @@ package org.mbari.vars.annotation.api.v1
 import java.time.{Duration, Instant}
 import java.util.UUID
 
-import io.reactivex.subjects.Subject
 import org.mbari.vars.annotation.controllers.ObservationController
-import org.mbari.vars.annotation.messaging.MessageBus
 import org.mbari.vars.annotation.model.simple.{ErrorMsg, ObservationCount}
 import org.scalatra.{BadRequest, NoContent, NotFound}
 

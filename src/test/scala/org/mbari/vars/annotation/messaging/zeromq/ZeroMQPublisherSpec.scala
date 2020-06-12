@@ -28,17 +28,16 @@ import org.zeromq.{SocketType, ZContext}
 import zmq.ZMQ
 
 /**
- * @author Brian Schlining
- * @since 2020-02-03T09:27:00
- */
+  * @author Brian Schlining
+  * @since 2020-02-03T09:27:00
+  */
 class ZeroMQPublisherSpec extends AnyFlatSpec with Matchers with BeforeAndAfterAll {
 
   val context = new ZContext()
 
   "ZeroMQPublisher" should "publish annotations" in {
     val port = 9997
-    val mq = new ZeroMQPublisher("test", port, MessageBus.RxSubject)
-
+    val mq   = new ZeroMQPublisher("test", port, MessageBus.RxSubject)
 
     // Counts messages recieved
     @volatile
@@ -54,8 +53,8 @@ class ZeroMQPublisherSpec extends AnyFlatSpec with Matchers with BeforeAndAfterA
       subscriber.subscribe(mq.topic.getBytes(ZMQ.CHARSET))
 
       override def run(): Unit = {
-        while(ok) {
-          val address = subscriber.recvStr()
+        while (ok) {
+          val address  = subscriber.recvStr()
           val contents = subscriber.recvStr()
           println(s"$address : $contents")
           count = count + 1
@@ -72,18 +71,21 @@ class ZeroMQPublisherSpec extends AnyFlatSpec with Matchers with BeforeAndAfterA
     annotation.observationUuid = UUID.randomUUID()
     annotation.observationTimestamp = Instant.now()
     annotation.recordedTimestamp = Instant.now()
-    val thread = new Thread(() => MessageBus.RxSubject
-      .onNext(AnnotationMessage(annotation)))
+    val thread = new Thread(() =>
+      MessageBus
+        .RxSubject
+        .onNext(AnnotationMessage(annotation))
+    )
     thread.run()
     Thread.sleep(1000)
     mq.close()
-    count should be (1)
+    count should be(1)
 
   }
 
   it should "publish many annotations from multiple threads" in {
     val port = 9997
-    val mq = new ZeroMQPublisher("test", port, MessageBus.RxSubject)
+    val mq   = new ZeroMQPublisher("test", port, MessageBus.RxSubject)
 
     // Counts messages recieved
     @volatile
@@ -99,8 +101,8 @@ class ZeroMQPublisherSpec extends AnyFlatSpec with Matchers with BeforeAndAfterA
       subscriber.subscribe(mq.topic.getBytes(ZMQ.CHARSET))
 
       override def run(): Unit = {
-        while(ok) {
-          val address = subscriber.recvStr()
+        while (ok) {
+          val address  = subscriber.recvStr()
           val contents = subscriber.recvStr()
 //          println(s"$address : $contents")
           count = count + 1
@@ -125,13 +127,12 @@ class ZeroMQPublisherSpec extends AnyFlatSpec with Matchers with BeforeAndAfterA
     Thread.sleep(2000) // Give messages a chance to propagate
     ok = false
     mq.close()
-    count should be (1000)
+    count should be(1000)
   }
 
   it should "publish associations" in {
     val port = 9997
-    val mq = new ZeroMQPublisher("test", port, MessageBus.RxSubject)
-
+    val mq   = new ZeroMQPublisher("test", port, MessageBus.RxSubject)
 
     // Counts messages recieved
     @volatile
@@ -147,8 +148,8 @@ class ZeroMQPublisherSpec extends AnyFlatSpec with Matchers with BeforeAndAfterA
       subscriber.subscribe(mq.topic.getBytes(ZMQ.CHARSET))
 
       override def run(): Unit = {
-        while(ok) {
-          val address = subscriber.recvStr()
+        while (ok) {
+          val address  = subscriber.recvStr()
           val contents = subscriber.recvStr()
           println(s"$address : $contents")
           count = count + 1
@@ -165,12 +166,15 @@ class ZeroMQPublisherSpec extends AnyFlatSpec with Matchers with BeforeAndAfterA
     val association = AssociationImpl("test", "self", "foo", "text/plain")
     association.uuid = UUID.randomUUID()
     observation.addAssociation(association)
-    val thread = new Thread(() => MessageBus.RxSubject
-      .onNext(AssociationMessage(association)))
+    val thread = new Thread(() =>
+      MessageBus
+        .RxSubject
+        .onNext(AssociationMessage(association))
+    )
     thread.run()
     Thread.sleep(1000)
     mq.close()
-    count should be (1)
+    count should be(1)
 
   }
 

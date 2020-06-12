@@ -206,7 +206,9 @@ class AnnotationV1Api(controller: AnnotationController)(implicit val executor: E
   get("/imagereference/:uuid") {
     val uuid = params
       .getAs[UUID]("uuid")
-      .getOrElse(halt(BadRequest(toJson(ErrorMsg(400, "A image reference 'uuid' parameter is required")))))
+      .getOrElse(
+        halt(BadRequest(toJson(ErrorMsg(400, "A image reference 'uuid' parameter is required"))))
+      )
     controller
       .findByImageReferenceUUID(uuid)
       .map(_.asJava)
@@ -218,11 +220,17 @@ class AnnotationV1Api(controller: AnnotationController)(implicit val executor: E
     validateRequest() // Apply API security
     val videoReferenceUUID = params
       .getAs[UUID]("video_reference_uuid")
-      .getOrElse(halt(BadRequest(toJson(ErrorMsg(400, "A 'video_reference_uuid' parameter is required")))))
+      .getOrElse(
+        halt(BadRequest(toJson(ErrorMsg(400, "A 'video_reference_uuid' parameter is required"))))
+      )
     val concept =
-      params.get("concept").getOrElse(halt(BadRequest(toJson(ErrorMsg(400, "A 'concept' parameter is required")))))
+      params
+        .get("concept")
+        .getOrElse(halt(BadRequest(toJson(ErrorMsg(400, "A 'concept' parameter is required")))))
     val observer =
-      params.get("observer").getOrElse(halt(BadRequest(toJson(ErrorMsg(400, "An 'observer' parameter is required")))))
+      params
+        .get("observer")
+        .getOrElse(halt(BadRequest(toJson(ErrorMsg(400, "An 'observer' parameter is required")))))
     val observationDate = params.getAs[Instant]("observation_timestamp").getOrElse(Instant.now())
     val timecode        = params.getAs[Timecode]("timecode")
     val elapsedTime     = params.getAs[Duration]("elapsed_time_millis")
@@ -233,9 +241,14 @@ class AnnotationV1Api(controller: AnnotationController)(implicit val executor: E
 
     if (timecode.isEmpty && elapsedTime.isEmpty && recordedDate.isEmpty) {
       halt(
-        BadRequest(toJson(ErrorMsg(400,
-          "One or more of the following indices into the video are required: timecode, elapsed_time_millis, recorded_date"
-        )))
+        BadRequest(
+          toJson(
+            ErrorMsg(
+              400,
+              "One or more of the following indices into the video are required: timecode, elapsed_time_millis, recorded_date"
+            )
+          )
+        )
       )
     }
 
@@ -266,7 +279,14 @@ class AnnotationV1Api(controller: AnnotationController)(implicit val executor: E
           .map(annos => toJson(annos.asJava))
       case _ =>
         halt(
-          BadRequest(toJson(ErrorMsg(400, "Posts to /bulk only accept JSON body (i.e. Content-Type: application/json)")))
+          BadRequest(
+            toJson(
+              ErrorMsg(
+                400,
+                "Posts to /bulk only accept JSON body (i.e. Content-Type: application/json)"
+              )
+            )
+          )
         )
     }
   }
@@ -275,7 +295,9 @@ class AnnotationV1Api(controller: AnnotationController)(implicit val executor: E
     validateRequest() // Apply API security
     val uuid = params
       .getAs[UUID]("uuid")
-      .getOrElse(halt(BadRequest(toJson(ErrorMsg(400, "An observation 'uuid' parameter is required")))))
+      .getOrElse(
+        halt(BadRequest(toJson(ErrorMsg(400, "An observation 'uuid' parameter is required"))))
+      )
     val videoReferenceUUID = params.getAs[UUID]("video_reference_uuid")
     val concept            = params.get("concept")
     val observer           = params.get("observer")
@@ -303,7 +325,11 @@ class AnnotationV1Api(controller: AnnotationController)(implicit val executor: E
       )
       .map({
         case None =>
-          halt(NotFound(toJson(ErrorMsg(404, s"An annotation with observation_uuid of $uuid was not found"))))
+          halt(
+            NotFound(
+              toJson(ErrorMsg(404, s"An annotation with observation_uuid of $uuid was not found"))
+            )
+          )
         case Some(ann) => toJson(ann)
       }) // Convert to JSON
 
@@ -319,7 +345,14 @@ class AnnotationV1Api(controller: AnnotationController)(implicit val executor: E
           .map(annos => toJson(annos.asJava))
       case _ =>
         halt(
-          BadRequest(toJson(ErrorMsg(400, "Puts to /bulk only accept JSON body (i.e. Content-Type: application/json)")))
+          BadRequest(
+            toJson(
+              ErrorMsg(
+                400,
+                "Puts to /bulk only accept JSON body (i.e. Content-Type: application/json)"
+              )
+            )
+          )
         )
     }
   }
@@ -336,7 +369,14 @@ class AnnotationV1Api(controller: AnnotationController)(implicit val executor: E
           .map(annos => toJson(annos.asJava))
       case _ =>
         halt(
-          BadRequest(toJson(ErrorMsg(400, "Puts to tapetime only accept JSON body (i.e. Content-Type: application/json)")))
+          BadRequest(
+            toJson(
+              ErrorMsg(
+                400,
+                "Puts to tapetime only accept JSON body (i.e. Content-Type: application/json)"
+              )
+            )
+          )
         )
     }
   }

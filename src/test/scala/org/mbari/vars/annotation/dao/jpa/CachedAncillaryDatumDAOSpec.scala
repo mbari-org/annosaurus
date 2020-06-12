@@ -16,7 +16,7 @@
 
 package org.mbari.vars.annotation.dao.jpa
 
-import java.time.{ Duration, Instant }
+import java.time.{Duration, Instant}
 import java.util.UUID
 import java.util.concurrent.TimeUnit
 
@@ -26,27 +26,28 @@ import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
 import scala.concurrent.Await
-import scala.concurrent.duration.{ Duration => SDuration }
+import scala.concurrent.duration.{Duration => SDuration}
 import scala.concurrent.ExecutionContext.Implicits.global
 
 /**
- *
- *
- * @author Brian Schlining
- * @since 2016-06-28T15:39:00
- */
+  *
+  *
+  * @author Brian Schlining
+  * @since 2016-06-28T15:39:00
+  */
 class CachedAncillaryDatumDAOSpec extends AnyFlatSpec with Matchers with BeforeAndAfterAll {
 
   private[this] val daoFactory = TestDAOFactory.Instance
 
-  private[this] val timeout = SDuration(2, TimeUnit.SECONDS)
-  private[this] val imDao = daoFactory.newImagedMomentDAO()
-  private[this] val dao = daoFactory.newCachedAncillaryDatumDAO(imDao)
+  private[this] val timeout            = SDuration(2, TimeUnit.SECONDS)
+  private[this] val imDao              = daoFactory.newImagedMomentDAO()
+  private[this] val dao                = daoFactory.newCachedAncillaryDatumDAO(imDao)
   private[this] val videoReferenceUUID = UUID.randomUUID()
-  private[this] val now = Instant.now()
-  private[this] val imagedMoment0 = ImagedMomentImpl(Some(videoReferenceUUID), Some(now), elapsedTime = Some(Duration.ofMinutes(1)))
+  private[this] val now                = Instant.now()
+  private[this] val imagedMoment0 =
+    ImagedMomentImpl(Some(videoReferenceUUID), Some(now), elapsedTime = Some(Duration.ofMinutes(1)))
   private[this] val ancillaryDatum0 = CachedAncillaryDatumImpl(36.234, 122.0011, 666)
-  private[this] val newTemp = 3.2
+  private[this] val newTemp         = 3.2
 
   private type CADAO = CachedAncillaryDatumDAO[CachedAncillaryDatumImpl]
   def run[R](fn: CADAO => R): R = Await.result(dao.runTransaction(fn), timeout)
@@ -66,7 +67,7 @@ class CachedAncillaryDatumDAOSpec extends AnyFlatSpec with Matchers with BeforeA
 
     val datum = run(d => d.findByUUID(ancillaryDatum0.uuid)).head
     datum.temperatureCelsius should not be None
-    datum.temperatureCelsius.get should be(newTemp +- 0.000001D)
+    datum.temperatureCelsius.get should be(newTemp +- 0.000001d)
   }
 
   it should "findAll" in {
@@ -85,10 +86,9 @@ class CachedAncillaryDatumDAOSpec extends AnyFlatSpec with Matchers with BeforeA
     datCheck shouldBe empty
   }
 
-
   override protected def beforeAll(): Unit = daoFactory.cleanup()
 
-  protected override def afterAll(): Unit = {
+  override protected def afterAll(): Unit = {
     daoFactory.cleanup()
   }
 

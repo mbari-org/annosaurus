@@ -43,7 +43,9 @@ class AnnotationV2Api(controller: AnnotationController)(implicit val executor: E
   get("/videoreference/:uuid") {
     val uuid = params
       .getAs[UUID]("uuid")
-      .getOrElse(halt(BadRequest(toJson(ErrorMsg(400, "A video reference 'uuid' parameter is required")))))
+      .getOrElse(
+        halt(BadRequest(toJson(ErrorMsg(400, "A video reference 'uuid' parameter is required"))))
+      )
 
     // Optional params to filter between dates
     val startTimestamp = params.getAs[Instant]("start")

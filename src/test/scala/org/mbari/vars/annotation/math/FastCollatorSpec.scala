@@ -21,22 +21,22 @@ import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
 /**
- * @author Brian Schlining
- * @since 2018-05-31T11:33:00
- */
+  * @author Brian Schlining
+  * @since 2018-05-31T11:33:00
+  */
 class FastCollatorSpec extends AnyFlatSpec with Matchers with BeforeAndAfterAll {
 
   "FastCollator" should "collate" in {
 
     //outside -2, outside -1, inside - 2, inside -1, match, inside + 1, inside + 2, outside + 1, outside + 2
-    val a = Seq(8D, 9D, 13D, 14D, 15D, 16D, 17D, 21D, 22D)
-    val b = Seq(10D, 15D, 20D)
+    val a = Seq(8d, 9d, 13d, 14d, 15d, 16d, 17d, 21d, 22d)
+    val b = Seq(10d, 15d, 20d)
 
-    val f = FastCollator(a, b, 1D)
+    val f = FastCollator(a, b, 1d)
 
 //    println(f)
-    val expected = Seq(None, Some(10D), None, Some(15.0), Some(15.0),
-      Some(15.0), None, Some(20D), None)
+    val expected =
+      Seq(None, Some(10d), None, Some(15.0), Some(15.0), Some(15.0), None, Some(20d), None)
     for (i <- f.indices) {
       val (_, actual) = f(i)
       //println(actual + " -> " + expected(i))

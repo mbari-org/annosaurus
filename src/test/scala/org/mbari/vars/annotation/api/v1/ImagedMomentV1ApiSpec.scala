@@ -30,11 +30,11 @@ import scala.concurrent.Await
 import scala.concurrent.duration.{Duration => SDuration}
 
 /**
- *
- *
- * @author Brian Schlining
- * @since 2016-09-08T14:24:00
- */
+  *
+  *
+  * @author Brian Schlining
+  * @since 2016-09-08T14:24:00
+  */
 class ImagedMomentV1ApiSpec extends WebApiStack {
 
   private[this] val startTimestamp = Instant.now()
@@ -60,9 +60,15 @@ class ImagedMomentV1ApiSpec extends WebApiStack {
     annotation = {
       val controller = new AnnotationController(daoFactory)
       Await.result(
-        controller.create(UUID.randomUUID(), "Foo", "brian",
-          elapsedTime = Some(Duration.ofMillis(2000)), recordedDate = Some(Instant.now())),
-        SDuration(3000, TimeUnit.MILLISECONDS))
+        controller.create(
+          UUID.randomUUID(),
+          "Foo",
+          "brian",
+          elapsedTime = Some(Duration.ofMillis(2000)),
+          recordedDate = Some(Instant.now())
+        ),
+        SDuration(3000, TimeUnit.MILLISECONDS)
+      )
     }
 
     get(s"/v1/imagedmoments/${annotation.imagedMomentUuid}") {
@@ -103,15 +109,19 @@ class ImagedMomentV1ApiSpec extends WebApiStack {
   }
 
   it should "find by window reference" in {
-    val windowRequest = WindowRequest(Seq(annotation.videoReferenceUuid),
+    val windowRequest = WindowRequest(
+      Seq(annotation.videoReferenceUuid),
       annotation.imagedMomentUuid,
-      Duration.ofSeconds(10))
+      Duration.ofSeconds(10)
+    )
     val json = gson.toJson(windowRequest)
-    post(s"/v1/imagedmoments/windowrequest",
+    post(
+      s"/v1/imagedmoments/windowrequest",
       body = json,
-      headers = Map("Content-Type" -> "application/json")) {
+      headers = Map("Content-Type" -> "application/json")
+    ) {
 
-      status should be (200)
+      status should be(200)
       val im = gson.fromJson(body, classOf[Array[ImagedMomentImpl]]).toList
       im.size should be > 0
     }
@@ -127,13 +137,14 @@ class ImagedMomentV1ApiSpec extends WebApiStack {
   it should "update" in {
     put(
       s"/v1/imagedmoments/${annotation.imagedMomentUuid}",
-      "timecode" -> "01:23:45:12",
-      "elapsed_time_millis" -> "22222") {
-        status should be(200)
-        val im = gson.fromJson(body, classOf[ImagedMomentImpl])
-        im.elapsedTime should be(Duration.ofMillis(22222))
-        im.timecode.toString should be("01:23:45:12")
-      }
+      "timecode"            -> "01:23:45:12",
+      "elapsed_time_millis" -> "22222"
+    ) {
+      status should be(200)
+      val im = gson.fromJson(body, classOf[ImagedMomentImpl])
+      im.elapsedTime should be(Duration.ofMillis(22222))
+      im.timecode.toString should be("01:23:45:12")
+    }
   }
 
   it should "delete" in {

@@ -16,7 +16,7 @@
 
 package org.mbari.vars.annotation.api.v1
 
-import java.net.{URL, URLDecoder}
+import java.net.URL
 import java.time.{Duration, Instant}
 import java.util.UUID
 

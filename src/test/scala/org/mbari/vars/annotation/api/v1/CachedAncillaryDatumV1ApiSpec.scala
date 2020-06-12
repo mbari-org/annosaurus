@@ -29,11 +29,11 @@ import org.mbari.vars.annotation.model.simple.CachedAncillaryDatumBean
 import scala.collection.JavaConverters._
 
 /**
- *
- *
- * @author Brian Schlining
- * @since 2017-11-13T16:26:00
- */
+  *
+  *
+  * @author Brian Schlining
+  * @since 2017-11-13T16:26:00
+  */
 class CachedAncillaryDatumV1ApiSpec extends WebApiStack {
 
   private[this] val datumV1Api = {
@@ -46,10 +46,13 @@ class CachedAncillaryDatumV1ApiSpec extends WebApiStack {
 
   private[this] val imagedMoments = {
     val videoReferenceUuid = UUID.randomUUID()
-    val dao = daoFactory.newImagedMomentDAO()
-    val ims = (0 until 10).map(i => dao.newPersistentObject(
-      videoReferenceUuid,
-      elapsedTime = Some(Duration.ofMillis(math.round(math.random() * 10000L)))))
+    val dao                = daoFactory.newImagedMomentDAO()
+    val ims = (0 until 10).map(i =>
+      dao.newPersistentObject(
+        videoReferenceUuid,
+        elapsedTime = Some(Duration.ofMillis(math.round(math.random() * 10000L)))
+      )
+    )
     dao.runTransaction(d => {
       ims.foreach(dao.create)
     })
@@ -57,35 +60,38 @@ class CachedAncillaryDatumV1ApiSpec extends WebApiStack {
   }
 
   "CachedAncillaryDatumV1Api" should "create, then update" in {
-    val data = imagedMoments.map(im =>
-      {
-        val i: Float = (math.random() * 10F).floatValue()
-        val d = new CachedAncillaryDatumBean
-        d.imagedMomentUuid = im.uuid
-        d.latitude = Some(36 + i)
-        d.longitude = Some(-122 + i)
-        d.depthMeters = Some(100F * i)
-        d.oxygenMlL = Some(0.23F * i)
-        d.salinity = Some(35 + i)
-        d
-      })
+    val data = imagedMoments.map(im => {
+      val i: Float = (math.random() * 10f).floatValue()
+      val d        = new CachedAncillaryDatumBean
+      d.imagedMomentUuid = im.uuid
+      d.latitude = Some(36 + i)
+      d.longitude = Some(-122 + i)
+      d.depthMeters = Some(100f * i)
+      d.oxygenMlL = Some(0.23f * i)
+      d.salinity = Some(35 + i)
+      d
+    })
     val json = Constants.GSON.toJson(data.asJava)
 
     // --- Create
     post(
       s"$path/bulk",
       headers = Map("Content-Type" -> "application/json"),
-      body = json.getBytes(StandardCharsets.UTF_8)) {
-        status should be(200)
+      body = json.getBytes(StandardCharsets.UTF_8)
+    ) {
+      status should be(200)
 
-        // Note that if bulid create is successful it just sends back
-        // the exact same data you sent. So there will be no lastUpdated
-        // or uuid values set.
-        val persistedData = Constants.GSON
-          .fromJson(body, classOf[Array[CachedAncillaryDatumImpl]])
-          .toSeq
-        persistedData.size should be(imagedMoments.size)
-        persistedData.indices.foreach(i => {
+      // Note that if bulid create is successful it just sends back
+      // the exact same data you sent. So there will be no lastUpdated
+      // or uuid values set.
+      val persistedData = Constants
+        .GSON
+        .fromJson(body, classOf[Array[CachedAncillaryDatumImpl]])
+        .toSeq
+      persistedData.size should be(imagedMoments.size)
+      persistedData
+        .indices
+        .foreach(i => {
           val a = data(i)
           val b = persistedData(i)
 
@@ -97,7 +103,7 @@ class CachedAncillaryDatumV1ApiSpec extends WebApiStack {
           b.salinity.get should be(a.salinity.get)
           b.temperatureCelsius should be(None)
         })
-      }
+    }
 
     // --- Update
     data.foreach(d => {
@@ -109,14 +115,18 @@ class CachedAncillaryDatumV1ApiSpec extends WebApiStack {
     post(
       s"$path/bulk",
       headers = Map("Content-Type" -> "application/json"),
-      body = json2.getBytes(StandardCharsets.UTF_8)) {
-        status should be(200)
-        val persistedData = Constants.GSON
-          .fromJson(body, classOf[Array[CachedAncillaryDatumImpl]])
-          .toSeq
+      body = json2.getBytes(StandardCharsets.UTF_8)
+    ) {
+      status should be(200)
+      val persistedData = Constants
+        .GSON
+        .fromJson(body, classOf[Array[CachedAncillaryDatumImpl]])
+        .toSeq
 //        println(body)
-        persistedData.size should be(imagedMoments.size)
-        persistedData.indices.foreach(i => {
+      persistedData.size should be(imagedMoments.size)
+      persistedData
+        .indices
+        .foreach(i => {
           val a = data(i)
           val b = persistedData(i)
 
@@ -128,7 +138,7 @@ class CachedAncillaryDatumV1ApiSpec extends WebApiStack {
           b.salinity.get should be(14)
           b.temperatureCelsius should be(None)
         })
-      }
+    }
 
   }
 

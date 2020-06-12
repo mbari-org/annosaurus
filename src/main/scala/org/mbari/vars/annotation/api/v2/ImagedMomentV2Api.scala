@@ -57,7 +57,11 @@ class ImagedMomentV2Api(controller: ImagedMomentController)(implicit val executo
   get("/videoreferences/modified/:start") {
     val start = params
       .getAs[Instant]("start")
-      .getOrElse(halt(BadRequest(toJson(ErrorMsg(400, "Please provide a start date (yyyy-mm-ddThh:mm:ssZ)")))))
+      .getOrElse(
+        halt(
+          BadRequest(toJson(ErrorMsg(400, "Please provide a start date (yyyy-mm-ddThh:mm:ssZ)")))
+        )
+      )
     val end    = Instant.now()
     val limit  = params.getAs[Int]("limit")
     val offset = params.getAs[Int]("offset")
@@ -78,10 +82,16 @@ class ImagedMomentV2Api(controller: ImagedMomentController)(implicit val executo
   get("/videoreferences/modified/:start/:end") {
     val start = params
       .getAs[Instant]("start")
-      .getOrElse(halt(BadRequest(toJson(ErrorMsg(400, "Please provide a start date (yyyy-mm-ddThh:mm:ssZ)")))))
+      .getOrElse(
+        halt(
+          BadRequest(toJson(ErrorMsg(400, "Please provide a start date (yyyy-mm-ddThh:mm:ssZ)")))
+        )
+      )
     val end = params
       .getAs[Instant]("end")
-      .getOrElse(halt(BadRequest(toJson(ErrorMsg(400, "Please provide an end date (yyyy-mm-ddThh:mm:ssZ)")))))
+      .getOrElse(
+        halt(BadRequest(toJson(ErrorMsg(400, "Please provide an end date (yyyy-mm-ddThh:mm:ssZ)"))))
+      )
     val limit  = params.getAs[Int]("limit")
     val offset = params.getAs[Int]("offset")
     val (closeable, stream) =
@@ -101,7 +111,11 @@ class ImagedMomentV2Api(controller: ImagedMomentController)(implicit val executo
   get("/modified/:start") {
     val start = params
       .getAs[Instant]("start")
-      .getOrElse(halt(BadRequest(toJson(ErrorMsg(400, "Please provide a start date (yyyy-mm-ddThh:mm:ssZ)")))))
+      .getOrElse(
+        halt(
+          BadRequest(toJson(ErrorMsg(400, "Please provide a start date (yyyy-mm-ddThh:mm:ssZ)")))
+        )
+      )
     val end    = Instant.now()
     val limit  = params.getAs[Int]("limit")
     val offset = params.getAs[Int]("offset")
@@ -115,10 +129,16 @@ class ImagedMomentV2Api(controller: ImagedMomentController)(implicit val executo
   get("/modified/:start/:end") {
     val start = params
       .getAs[Instant]("start")
-      .getOrElse(halt(BadRequest(toJson(ErrorMsg(400, "Please provide a start date (yyyy-mm-ddThh:mm:ssZ)")))))
+      .getOrElse(
+        halt(
+          BadRequest(toJson(ErrorMsg(400, "Please provide a start date (yyyy-mm-ddThh:mm:ssZ)")))
+        )
+      )
     val end = params
       .getAs[Instant]("end")
-      .getOrElse(halt(BadRequest(toJson(ErrorMsg(400, "Please provide an end date (yyyy-mm-ddThh:mm:ssZ)")))))
+      .getOrElse(
+        halt(BadRequest(toJson(ErrorMsg(400, "Please provide an end date (yyyy-mm-ddThh:mm:ssZ)"))))
+      )
     val limit  = params.getAs[Int]("limit").orElse(Some(defaultLimit))
     val offset = params.getAs[Int]("offset")
 

@@ -21,7 +21,11 @@ import java.util.UUID
 import java.util.concurrent.TimeUnit
 
 import org.mbari.vars.annotation.Constants
-import org.mbari.vars.annotation.controllers.{AnnotationController, BasicDAOFactory, TestEntityFactory}
+import org.mbari.vars.annotation.controllers.{
+  AnnotationController,
+  BasicDAOFactory,
+  TestEntityFactory
+}
 import org.mbari.vars.annotation.dao.jpa.{AnnotationImpl, JPADAOFactory, TestDAOFactory}
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.flatspec.AnyFlatSpec
@@ -33,13 +37,13 @@ import scala.io.Source
 import scala.util.Random
 
 /**
- * @author Brian Schlining
- * @since 2019-10-22T15:02:00
- */
+  * @author Brian Schlining
+  * @since 2019-10-22T15:02:00
+  */
 class JdbcRepositorySpec extends AnyFlatSpec with Matchers with BeforeAndAfterAll {
 
-  private[this] val daoFactory = TestDAOFactory.Instance
-  private[this] val controller = new AnnotationController(daoFactory.asInstanceOf[BasicDAOFactory])
+  private[this] val daoFactory    = TestDAOFactory.Instance
+  private[this] val controller    = new AnnotationController(daoFactory.asInstanceOf[BasicDAOFactory])
   private[this] val entityFactory = new TestEntityFactory(daoFactory)
   // HACK Assumes where using JDADAPFactory!
   private[this] val repository: JdbcRepository = {
@@ -50,34 +54,35 @@ class JdbcRepositorySpec extends AnyFlatSpec with Matchers with BeforeAndAfterAl
 
   def exec[R](fn: () => Future[R]): R = Await.result(fn.apply(), timeout)
 
-  protected override def afterAll(): Unit = {
+  override protected def afterAll(): Unit = {
     daoFactory.cleanup()
   }
 
   "JdbcRepository" should "delete by videoReferenceUuid" in {
     // --- Create some annotations
     // Read data
-    val url = getClass.getResource("/json/annotation_full_dive.json").toURI
+    val url    = getClass.getResource("/json/annotation_full_dive.json").toURI
     val source = Source.fromFile(url, "UTF-8")
-    val json = source.getLines()
+    val json = source
+      .getLines()
       .mkString("\n")
     source.close()
 
     // Insert all annotations
     val annos = Constants.GSON.fromJson(json, classOf[Array[AnnotationImpl]])
     annos should not be null
-    annos.isEmpty should be (false)
+    annos.isEmpty should be(false)
     val newAnnos = exec(() => controller.bulkCreate(annos))
-    newAnnos.size should be (annos.size)
+    newAnnos.size should be(annos.size)
 
     // Delete them
     val videoReferenceUuid = newAnnos.head.videoReferenceUuid
-    val deleteCount = repository.deleteByVideoReferenceUuid(videoReferenceUuid)
+    val deleteCount        = repository.deleteByVideoReferenceUuid(videoReferenceUuid)
     println(Constants.GSON.toJson(deleteCount))
 
     // Verify that they are gone
     val foundAnnos = repository.findByVideoReferenceUuid(videoReferenceUuid)
-    foundAnnos should be (empty)
+    foundAnnos should be(empty)
   }
 
   override protected def beforeAll(): Unit = {

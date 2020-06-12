@@ -30,15 +30,15 @@ import scala.concurrent.Await
 import scala.concurrent.duration.{Duration => SDuration}
 
 /**
- *
- *
- * @author Brian Schlining
- * @since 2016-09-14T15:55:00
- */
+  *
+  *
+  * @author Brian Schlining
+  * @since 2016-09-14T15:55:00
+  */
 class CachedVideoReferenceInfoV1ApiSpec extends WebApiStack {
 
-  private[this] val timeout = SDuration(3000, TimeUnit.MILLISECONDS)
-  protected[this] override val gson = Constants.GSON
+  private[this] val timeout         = SDuration(3000, TimeUnit.MILLISECONDS)
+  override protected[this] val gson = Constants.GSON
 
   private[this] val videoinfoV1Api = {
     val controller = new CachedVideoReferenceInfoController(daoFactory)
@@ -59,18 +59,19 @@ class CachedVideoReferenceInfoV1ApiSpec extends WebApiStack {
       post(
         s"$path",
         "video_reference_uuid" -> UUID.randomUUID().toString,
-        "mission_contact" -> "brian",
-        "mission_id" -> i.toString,
-        "platform_name" -> s"Ventana_$i") {
+        "mission_contact"      -> "brian",
+        "mission_id"           -> i.toString,
+        "platform_name"        -> s"Ventana_$i"
+      ) {
 
-          status should be(200)
-          val vi = gson.fromJson(body, classOf[CachedVideoReferenceInfoImpl])
-          vi.videoReferenceUUID should not be (null)
-          vi.missionContact should be("brian")
-          vi.missionId should be(i.toString)
-          vi.platformName should be(s"Ventana_$i")
-          videoinfos += vi
-        }
+        status should be(200)
+        val vi = gson.fromJson(body, classOf[CachedVideoReferenceInfoImpl])
+        vi.videoReferenceUUID should not be (null)
+        vi.missionContact should be("brian")
+        vi.missionId should be(i.toString)
+        vi.platformName should be(s"Ventana_$i")
+        videoinfos += vi
+      }
     }
   }
 
@@ -81,7 +82,9 @@ class CachedVideoReferenceInfoV1ApiSpec extends WebApiStack {
       vis.size should be(n)
       vis.map(_.platformName) should contain theSameElementsAs videoinfos.map(_.platformName)
       vis.map(_.missionId) should contain theSameElementsAs videoinfos.map(_.missionId)
-      vis.map(_.videoReferenceUUID) should contain theSameElementsAs videoinfos.map(_.videoReferenceUUID)
+      vis.map(_.videoReferenceUUID) should contain theSameElementsAs videoinfos.map(
+        _.videoReferenceUUID
+      )
       vis.map(_.missionContact) should contain theSameElementsAs videoinfos.map(_.missionContact)
     }
   }
@@ -98,14 +101,17 @@ class CachedVideoReferenceInfoV1ApiSpec extends WebApiStack {
       val v = vis(i)
       put(
         s"$path/${v.uuid}",
-        "mission_contact" -> "schlin", "mission_id" -> ("xxx" + i), "platform_name" -> "Doc Ricketts") {
-          status should be(200)
-          val v2 = gson.fromJson(body, classOf[CachedVideoReferenceInfoImpl])
-          v2.videoReferenceUUID should be(v.videoReferenceUUID)
-          v2.missionContact should be("schlin")
-          v2.missionId should be(s"xxx$i")
-          v2.platformName should be("Doc Ricketts")
-        }
+        "mission_contact" -> "schlin",
+        "mission_id"      -> ("xxx" + i),
+        "platform_name"   -> "Doc Ricketts"
+      ) {
+        status should be(200)
+        val v2 = gson.fromJson(body, classOf[CachedVideoReferenceInfoImpl])
+        v2.videoReferenceUUID should be(v.videoReferenceUUID)
+        v2.missionContact should be("schlin")
+        v2.missionId should be(s"xxx$i")
+        v2.platformName should be("Doc Ricketts")
+      }
     }
   }
 
@@ -117,7 +123,7 @@ class CachedVideoReferenceInfoV1ApiSpec extends WebApiStack {
     }
   }
 
-  protected override def afterAll(): Unit = {
+  override protected def afterAll(): Unit = {
     super.afterAll()
     val dao = daoFactory.newCachedVideoReferenceInfoDAO()
 

@@ -20,7 +20,6 @@ import java.net.URL
 import java.util.UUID
 
 import org.mbari.vars.annotation.controllers.ImageReferenceController
-import org.mbari.vars.annotation.dao.jpa.AnnotationImpl
 import org.mbari.vars.annotation.model.simple.ErrorMsg
 import org.scalatra.{BadRequest, NoContent, NotFound}
 
@@ -34,11 +33,16 @@ class ImageReferenceV1Api(controller: ImageReferenceController)(
 ) extends V1APIStack {
 
   get("/:uuid") {
-    val uuid = params.getAs[UUID]("uuid").getOrElse(halt(BadRequest(toJson(ErrorMsg(400, "Please provide a UUID")))))
+    val uuid = params
+      .getAs[UUID]("uuid")
+      .getOrElse(halt(BadRequest(toJson(ErrorMsg(400, "Please provide a UUID")))))
     controller
       .findByUUID(uuid)
       .map({
-        case None    => halt(NotFound(toJson(ErrorMsg(404, s"An ImagedMoment with a UUID of $uuid was not found"))))
+        case None =>
+          halt(
+            NotFound(toJson(ErrorMsg(404, s"An ImagedMoment with a UUID of $uuid was not found")))
+          )
         case Some(v) => toJson(v)
       })
   }
@@ -70,8 +74,11 @@ class ImageReferenceV1Api(controller: ImageReferenceController)(
     controller
       .delete(uuid)
       .map({
-        case true  => halt(NoContent()) // Success
-        case false => halt(NotFound(toJson(ErrorMsg(404, s"Failed. No observation with UUID of $uuid was found."))))
+        case true => halt(NoContent()) // Success
+        case false =>
+          halt(
+            NotFound(toJson(ErrorMsg(404, s"Failed. No observation with UUID of $uuid was found.")))
+          )
       })
   }
 }

@@ -36,38 +36,41 @@ import scala.util.Random
 
 class ImagedMomentControllerSpec extends AnyFlatSpec with Matchers with BeforeAndAfterAll {
 
-  private[this] val daoFactory = TestDAOFactory.Instance
+  private[this] val daoFactory    = TestDAOFactory.Instance
   private[this] val entityFactory = new TestEntityFactory(daoFactory)
-  private[this] val controller = new ImagedMomentController(daoFactory.asInstanceOf[BasicDAOFactory])
-  private[this] val recordedDate = Instant.now()
-  private[this] val log = LoggerFactory.getLogger(getClass)
-  private[this] val timeout = SDuration(200, TimeUnit.SECONDS)
+  private[this] val controller = new ImagedMomentController(
+    daoFactory.asInstanceOf[BasicDAOFactory]
+  )
+  private[this] val recordedDate       = Instant.now()
+  private[this] val log                = LoggerFactory.getLogger(getClass)
+  private[this] val timeout            = SDuration(200, TimeUnit.SECONDS)
   private[this] val videoReferenceUuid = UUID.randomUUID()
 
   def exec[R](fn: () => Future[R]): R = Await.result(fn.apply(), timeout)
 
   "ImagedMomentController" should "create by recorded timestamp" in {
     val a = exec(() => controller.create(videoReferenceUuid, recordedDate = Some(recordedDate)))
-    a.recordedDate should be (recordedDate)
-    a.timecode should be (null)
-    a.elapsedTime should be (null)
-    a.videoReferenceUUID should be (videoReferenceUuid)
+    a.recordedDate should be(recordedDate)
+    a.timecode should be(null)
+    a.elapsedTime should be(null)
+    a.videoReferenceUUID should be(videoReferenceUuid)
   }
 
   it should "find by videoReferenceUuid and recordedDate" in {
-    val a = ImagedMomentController.findOrCreateImagedMoment(controller.newDAO(),
+    val a = ImagedMomentController.findOrCreateImagedMoment(
+      controller.newDAO(),
       videoReferenceUuid,
-      recordedDate = Some(recordedDate))
+      recordedDate = Some(recordedDate)
+    )
     a should not be (null)
     checkUuids(a)
   }
 
-
   it should "create one imagedmoment if multiple creates use the same recordedDate" in {
     val now = Instant.parse("2007-01-02T00:12:34.3456Z")
-    val a = exec(() => controller.create(videoReferenceUuid, recordedDate = Some(now)))
-    val b = exec(() => controller.create(videoReferenceUuid, recordedDate = Some(now)))
-    a.uuid should be (b.uuid)
+    val a   = exec(() => controller.create(videoReferenceUuid, recordedDate = Some(now)))
+    val b   = exec(() => controller.create(videoReferenceUuid, recordedDate = Some(now)))
+    a.uuid should be(b.uuid)
   }
 
   it should "create one imagedmoment if multiple creates use the same recordedDate parsed from a string" in {
@@ -82,19 +85,21 @@ class ImagedMomentControllerSpec extends AnyFlatSpec with Matchers with BeforeAn
 
     val a = exec(create)
     val b = exec(create)
-    a.uuid should be (b.uuid)
+    a.uuid should be(b.uuid)
   }
 
   it should "fail if trying to insert the same URL more than once" in {
     val videoReferenceUuid = UUID.randomUUID()
-    val url = new URL("http://www.mbari.org/foo/image.png")
-    val dao = daoFactory.newImagedMomentDAO()
+    val url                = new URL("http://www.mbari.org/foo/image.png")
+    val dao                = daoFactory.newImagedMomentDAO()
     assertThrows[Exception] {
       for (i <- 0 until 2) {
-        val source = entityFactory.createImagedMoment(1,
+        val source = entityFactory.createImagedMoment(
+          1,
           videoReferenceUuid = videoReferenceUuid,
           concept = "URL Test" + i,
-          recordedTimestamp = Instant.now().plus(Duration.ofSeconds(Random.nextInt())))
+          recordedTimestamp = Instant.now().plus(Duration.ofSeconds(Random.nextInt()))
+        )
         source.imageReferences.foreach(_.url = url)
         exec(() => dao.runTransaction(d => controller.create(d, source)))
       }
@@ -103,45 +108,47 @@ class ImagedMomentControllerSpec extends AnyFlatSpec with Matchers with BeforeAn
   }
 
   it should "create a single merged imagedmoment from ones with the same index" in {
-    val now =Instant.parse("2011-01-02T00:12:34.3456Z")
+    val now                = Instant.parse("2011-01-02T00:12:34.3456Z")
     val videoReferenceUuid = UUID.randomUUID()
-    val dao = daoFactory.newImagedMomentDAO()
+    val dao                = daoFactory.newImagedMomentDAO()
     for (i <- 0 to 2) {
-      val source = entityFactory.createImagedMoment(1,
+      val source = entityFactory.createImagedMoment(
+        1,
         videoReferenceUuid = videoReferenceUuid,
         concept = "Yo" + i,
-        recordedTimestamp = now)
+        recordedTimestamp = now
+      )
 //      println(source)
       exec(() => dao.runTransaction(d => controller.create(d, source)))
     }
     dao.close()
 
     val ims = exec(() => controller.findByVideoReferenceUUID(videoReferenceUuid))
-    ims.size should be (1)
+    ims.size should be(1)
 
   }
 
   it should "create a single imagedmoment with multiple observations" in {
-    val imagedMoment = entityFactory.createImagedMoment(1, concept = "Create test")
-    val imDao = daoFactory.newImagedMomentDAO()
+    val imagedMoment    = entityFactory.createImagedMoment(1, concept = "Create test")
+    val imDao           = daoFactory.newImagedMomentDAO()
     val newImagedMoment = controller.create(imDao, imagedMoment)
     //print(newImagedMoment)
     checkUuids(newImagedMoment)
-    newImagedMoment.observations.size should be (1)
-    newImagedMoment.observations.head.associations.size should be (1)
+    newImagedMoment.observations.size should be(1)
+    newImagedMoment.observations.head.associations.size should be(1)
   }
 
   it should "create multiple imagedmoments" in {
-    val now = Instant.now()
+    val now           = Instant.now()
     val imagedMoment0 = entityFactory.createImagedMoment(1, concept = "A", recordedTimestamp = now)
     val imagedMoment1 = entityFactory.createImagedMoment(1, concept = "B", recordedTimestamp = now)
-    val imDao = daoFactory.newImagedMomentDAO()
+    val imDao         = daoFactory.newImagedMomentDAO()
     val future = imDao.runTransaction(d => {
       controller.create(d, imagedMoment0) :: controller.create(d, imagedMoment1) :: Nil
     })
     val ims = exec(() => future)
     imDao.close()
-    ims.size should be (2)
+    ims.size should be(2)
     ims.foreach(checkUuids)
 //    print(ims)
   }
@@ -149,30 +156,33 @@ class ImagedMomentControllerSpec extends AnyFlatSpec with Matchers with BeforeAn
   it should "create multiple imagedMoments with the same videoreference" in {
     val videoReferenceUuid = UUID.randomUUID()
 
-
   }
 
   it should "delete by videoReferenceUuid" in {
     val videoReferenceUuid = UUID.randomUUID()
-    val now = Instant.now()
-    val n = 10
-    val ims = (1 to n).map(i => entityFactory.createImagedMoment(1,
+    val now                = Instant.now()
+    val n                  = 10
+    val ims = (1 to n).map(i =>
+      entityFactory.createImagedMoment(
+        1,
         videoReferenceUuid = videoReferenceUuid,
         concept = s"delete $i",
-        recordedTimestamp = now.plus(Duration.ofSeconds(i))))
-    ims.size should be (n)
+        recordedTimestamp = now.plus(Duration.ofSeconds(i))
+      )
+    )
+    ims.size should be(n)
 
     val newImagedMoments = exec(() => controller.create(ims))
-    newImagedMoments.size should be (n)
+    newImagedMoments.size should be(n)
     newImagedMoments.foreach(checkUuids)
     val sanityCount = exec(() => controller.findByVideoReferenceUUID(videoReferenceUuid))
-    sanityCount.size should be (n)
+    sanityCount.size should be(n)
 
     val deleteCount = exec(() => controller.deleteByVideoReferenceUUID(videoReferenceUuid))
-    deleteCount should be (newImagedMoments.size)
+    deleteCount should be(newImagedMoments.size)
 
     val remainingCount = exec(() => controller.findByVideoReferenceUUID(videoReferenceUuid))
-    remainingCount.isEmpty should be (true)
+    remainingCount.isEmpty should be(true)
 
   }
 
@@ -190,32 +200,27 @@ class ImagedMomentControllerSpec extends AnyFlatSpec with Matchers with BeforeAn
     Option(imagedMoment.ancillaryDatum).foreach(ad => ad.uuid should not be null)
   }
 
-
-
-
-
   it should "create one imagedmoment if multiple creates use the same elasped_time" in {
     val elapsedTime = Duration.ofMillis(123456)
-    val a = exec(() => controller.create(videoReferenceUuid, elapsedTime = Some(elapsedTime)))
-    val b = exec(() => controller.create(videoReferenceUuid, elapsedTime = Some(elapsedTime)))
-    a.uuid should be (b.uuid)
+    val a           = exec(() => controller.create(videoReferenceUuid, elapsedTime = Some(elapsedTime)))
+    val b           = exec(() => controller.create(videoReferenceUuid, elapsedTime = Some(elapsedTime)))
+    a.uuid should be(b.uuid)
   }
 
   it should "stream/find video_reference_uuids modified between dates" in {
-    val end = Instant.now()
-    val start = end.minus(Duration.ofMinutes(2))
+    val end                 = Instant.now()
+    val start               = end.minus(Duration.ofMinutes(2))
     val (closeable, stream) = controller.streamVideoReferenceUuidsBetweenUpdatedDates(start, end)
-    val uuids = stream.iterator()
+    val uuids = stream
+      .iterator()
       .asScala
       .toSeq
 
     uuids.size should not be 0
   }
 
-  protected override def afterAll(): Unit = {
+  override protected def afterAll(): Unit = {
     daoFactory.cleanup()
   }
 
 }
-
-

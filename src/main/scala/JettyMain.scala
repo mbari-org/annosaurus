@@ -23,7 +23,6 @@ import org.eclipse.jetty.webapp.WebAppContext
 import org.mbari.vars.annotation.Constants
 import org.mbari.vars.annotation.messaging.zeromq.ZeroMQPublisher
 import org.scalatra.servlet.ScalatraListener
-import org.slf4j.LoggerFactory
 
 object JettyMain {
 

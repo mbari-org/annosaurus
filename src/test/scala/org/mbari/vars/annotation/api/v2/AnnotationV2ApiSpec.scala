@@ -29,12 +29,11 @@ import scala.concurrent.duration.Duration
 
 class AnnotationV2ApiSpec extends WebApiStack {
 
-  private[this]val controller = new AnnotationController(daoFactory)
-  private[this] val annotationV2Api = new AnnotationV2Api(controller)
+  private[this] val controller         = new AnnotationController(daoFactory)
+  private[this] val annotationV2Api    = new AnnotationV2Api(controller)
   private[this] val videoReferenceUuid = UUID.randomUUID()
-  private[this] val startTimestamp = Instant.parse("2000-01-01T00:00:00Z")
-  private[this] val endTimestamp = Instant.parse("2000-02-01T00:00:00Z")
-
+  private[this] val startTimestamp     = Instant.parse("2000-01-01T00:00:00Z")
+  private[this] val endTimestamp       = Instant.parse("2000-02-01T00:00:00Z")
 
   addServlet(annotationV2Api, "/v2/annotations")
 
@@ -42,18 +41,23 @@ class AnnotationV2ApiSpec extends WebApiStack {
     super.beforeAll()
     val timeout = Duration(5, TimeUnit.SECONDS)
 
-    Await.result(controller.create(videoReferenceUuid,
-      "one",
-      "brian",
-      recordedDate = Some(startTimestamp)), timeout)
-    Await.result(controller.create(videoReferenceUuid,
-      "two",
-      "brian",
-      recordedDate = Some(endTimestamp)), timeout)
-    Await.result(controller.create(videoReferenceUuid,
-      "three",
-      "brian",
-      recordedDate = Some(Instant.parse("2019-01-01T00:00:00Z"))), timeout)
+    Await.result(
+      controller.create(videoReferenceUuid, "one", "brian", recordedDate = Some(startTimestamp)),
+      timeout
+    )
+    Await.result(
+      controller.create(videoReferenceUuid, "two", "brian", recordedDate = Some(endTimestamp)),
+      timeout
+    )
+    Await.result(
+      controller.create(
+        videoReferenceUuid,
+        "three",
+        "brian",
+        recordedDate = Some(Instant.parse("2019-01-01T00:00:00Z"))
+      ),
+      timeout
+    )
   }
 
   "AnnotationV2Api" should "find by videoReferenceUuid" in {
@@ -65,7 +69,9 @@ class AnnotationV2ApiSpec extends WebApiStack {
   }
 
   it should "find by videoReferenceUuid and timestamps" in {
-    get(s"/v2/annotations/videoreference/${videoReferenceUuid}?start=20000101T000000Z&end=20000201T000000Z") {
+    get(
+      s"/v2/annotations/videoreference/${videoReferenceUuid}?start=20000101T000000Z&end=20000201T000000Z"
+    ) {
       status should be(200)
       val xs = gson.fromJson(body, classOf[Array[AnnotationImpl]])
       xs.size should be(2)

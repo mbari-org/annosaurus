@@ -78,7 +78,7 @@ class BasicJwtService extends AuthorizationService {
         case None => false
         case Some(a) =>
           if (a.tokenType.equalsIgnoreCase("BEARER")) {
-            val jwt = verifier.verify(a.accessToken)
+            verifier.verify(a.accessToken)
             true
           }
           else false

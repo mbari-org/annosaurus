@@ -31,9 +31,9 @@ import scala.concurrent.Await
 import scala.concurrent.duration.{Duration => SDuration}
 
 /**
- * @author Brian Schlining
- * @since 2019-02-08T14:19:00
- */
+  * @author Brian Schlining
+  * @since 2019-02-08T14:19:00
+  */
 class IndexV1ApiSpec extends WebApiStack {
 
   private[this] val indexController = new IndexController(daoFactory)
@@ -67,8 +67,10 @@ class IndexV1ApiSpec extends WebApiStack {
           videoReferenceUuid,
           "Foo",
           "brian",
-          timecode = Some(new Timecode(i * 100, FrameRates.NTSC))),
-        timeout)
+          timecode = Some(new Timecode(i * 100, FrameRates.NTSC))
+        ),
+        timeout
+      )
     }
 
     get(s"/v1/index/videoreference/$videoReferenceUuid") {
@@ -83,26 +85,28 @@ class IndexV1ApiSpec extends WebApiStack {
   it should "bulkUpdateRecordedTimestamp" in {
 
     val now = Instant.now()
-    val indices = Await.result(indexController.findByVideoReferenceUUID(videoReferenceUuid), timeout)
+    val indices =
+      Await.result(indexController.findByVideoReferenceUUID(videoReferenceUuid), timeout)
     indices.foreach(_.recordedDate = now)
     val json = gson.toJson(indices.asJava)
 
     put(
       "/v1/index/tapetime",
       headers = Map("Content-Type" -> "application/json"),
-      body = json.getBytes(StandardCharsets.UTF_8)) {
+      body = json.getBytes(StandardCharsets.UTF_8)
+    ) {
 
-        status should be(200)
+      status should be(200)
 
-        val newIndices = gson.fromJson(body, classOf[Array[IndexImpl]])
-        newIndices.size should be(10)
-        for (i <- newIndices) {
-          i.recordedDate should not be null
-          i.timecode should not be null
-          i.recordedDate should be(now)
-        }
-
+      val newIndices = gson.fromJson(body, classOf[Array[IndexImpl]])
+      newIndices.size should be(10)
+      for (i <- newIndices) {
+        i.recordedDate should not be null
+        i.timecode should not be null
+        i.recordedDate should be(now)
       }
+
+    }
   }
 
 }

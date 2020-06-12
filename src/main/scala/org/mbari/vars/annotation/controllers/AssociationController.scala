@@ -48,12 +48,12 @@ class AssociationController(
   override def newDAO(): AssociationDAO[Association] = daoFactory.newAssociationDAO()
 
   def create(
-              observationUuid: UUID,
-              linkName: String,
-              toConcept: String,
-              linkValue: String,
-              mimeType: String,
-              associationUuid: Option[UUID]  = None
+      observationUuid: UUID,
+      linkName: String,
+      toConcept: String,
+      linkValue: String,
+      mimeType: String,
+      associationUuid: Option[UUID] = None
   )(implicit ec: ExecutionContext): Future[Association] = {
     def fn(dao: ADAO): Association = {
       val obsDao = daoFactory.newObservationDAO(dao)

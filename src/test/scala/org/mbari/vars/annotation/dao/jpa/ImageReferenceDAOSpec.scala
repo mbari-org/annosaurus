@@ -17,7 +17,7 @@
 package org.mbari.vars.annotation.dao.jpa
 
 import java.net.URL
-import java.time.{ Duration, Instant }
+import java.time.{Duration, Instant}
 import java.util.UUID
 import java.util.concurrent.TimeUnit
 
@@ -27,27 +27,32 @@ import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
 import scala.concurrent.Await
-import scala.concurrent.duration.{ Duration => SDuration }
+import scala.concurrent.duration.{Duration => SDuration}
 import scala.concurrent.ExecutionContext.Implicits.global
 
 /**
- *
- *
- * @author Brian Schlining
- * @since 2016-06-28T17:04:00
- */
+  *
+  *
+  * @author Brian Schlining
+  * @since 2016-06-28T17:04:00
+  */
 class ImageReferenceDAOSpec extends AnyFlatSpec with Matchers with BeforeAndAfterAll {
 
   private[this] val daoFactory = TestDAOFactory.Instance
 
-  private[this] val timeout = SDuration(2, TimeUnit.SECONDS)
-  private[this] val imDao = daoFactory.newImagedMomentDAO()
-  private[this] val dao = daoFactory.newImageReferenceDAO(imDao)
+  private[this] val timeout            = SDuration(2, TimeUnit.SECONDS)
+  private[this] val imDao              = daoFactory.newImagedMomentDAO()
+  private[this] val dao                = daoFactory.newImageReferenceDAO(imDao)
   private[this] val videoReferenceUUID = UUID.randomUUID()
-  private[this] val now = Instant.now()
-  private[this] val imagedMoment0 = ImagedMomentImpl(Some(videoReferenceUUID), Some(now), elapsedTime = Some(Duration.ofMinutes(1)))
-  private[this] val imageReference0 = ImageReferenceImpl(new URL("http://www.mbari.org/wp-content/uploads/2015/08/schlining_brian-180.jpg"))
-  private[this] val imageReference1 = ImageReferenceImpl(new URL("https://afleetinglance.files.wordpress.com/2012/07/zazen2.jpg"))
+  private[this] val now                = Instant.now()
+  private[this] val imagedMoment0 =
+    ImagedMomentImpl(Some(videoReferenceUUID), Some(now), elapsedTime = Some(Duration.ofMinutes(1)))
+  private[this] val imageReference0 = ImageReferenceImpl(
+    new URL("http://www.mbari.org/wp-content/uploads/2015/08/schlining_brian-180.jpg")
+  )
+  private[this] val imageReference1 = ImageReferenceImpl(
+    new URL("https://afleetinglance.files.wordpress.com/2012/07/zazen2.jpg")
+  )
   private[this] val newDescription = "A handsome fellow"
 
   private type IRDAO = ImageReferenceDAO[ImageReferenceImpl]
@@ -91,7 +96,7 @@ class ImageReferenceDAOSpec extends AnyFlatSpec with Matchers with BeforeAndAfte
     ir0 shouldBe empty
   }
 
-  protected override def afterAll(): Unit = {
+  override protected def afterAll(): Unit = {
     daoFactory.cleanup()
   }
 
