@@ -21,22 +21,30 @@ import java.time.{Duration, Instant}
 import java.util.UUID
 import java.util.concurrent.TimeUnit
 
+import org.mbari.vars.annotation.controllers.BasicDAOFactory
 import org.mbari.vars.annotation.Constants
 import org.mbari.vars.annotation.api.WebApiStack
 import org.mbari.vars.annotation.controllers.ObservationController
-import org.mbari.vars.annotation.dao.jpa.{AnnotationImpl, AssociationImpl, ImagedMomentImpl, ObservationImpl}
+import org.mbari.vars.annotation.dao.jpa.{
+  AnnotationImpl,
+  AssociationImpl,
+  ImagedMomentImpl,
+  ObservationImpl
+}
 import org.mbari.vars.annotation.model.Observation
 
 import scala.collection.JavaConverters._
 import scala.concurrent.Await
 import scala.concurrent.duration.{Duration => SDuration}
+import org.mbari.vars.annotation.controllers.AnnotationController
+import scala.concurrent.Future
 
 /**
- *
- *
- * @author Brian Schlining
- * @since 2016-09-13T14:31:00
- */
+  *
+  *
+  * @author Brian Schlining
+  * @since 2016-09-13T14:31:00
+  */
 class ObservationV1ApiSpec extends WebApiStack {
 
   private[this] val timeout = SDuration(3000, TimeUnit.MILLISECONDS)
@@ -46,21 +54,31 @@ class ObservationV1ApiSpec extends WebApiStack {
     new ObservationV1Api(controller)
   }
 
-  protected[this] override val gson = Constants.GSON_FOR_ANNOTATION
+  private[this] val annoController = new AnnotationController(
+    daoFactory.asInstanceOf[BasicDAOFactory]
+  )
+
+  override protected[this] val gson = Constants.GSON_FOR_ANNOTATION
 
   private[this] val path = "/v1/observations"
 
   addServlet(observationV1Api, path)
+
+  def exec[R](fn: () => Future[R]): R = Await.result(fn.apply(), timeout)
 
   var observation: Observation = _
 
   "ObservationV1Api" should "find by uuid" in {
 
     // --- create an observation
-    val dao = daoFactory.newObservationDAO()
+    val dao          = daoFactory.newObservationDAO()
     val imagedMoment = ImagedMomentImpl(Some(UUID.randomUUID()), Some(Instant.now()))
-    observation = ObservationImpl("rocketship", observer = Some("brian"), group = Some("ROV"),
-      activity = Some("transect"))
+    observation = ObservationImpl(
+      "rocketship",
+      observer = Some("brian"),
+      group = Some("ROV"),
+      activity = Some("transect")
+    )
     imagedMoment.addObservation(observation)
     val f = dao.runTransaction(d => d.create(observation))
     f.onComplete(_ => dao.close())
@@ -81,11 +99,15 @@ class ObservationV1ApiSpec extends WebApiStack {
 
   it should "find by videoreference" in {
     val dao = daoFactory.newObservationDAO()
-    val newObs = ObservationImpl("submarine", observer = Some("schlin"), group = Some("AUV"),
-      activity = Some("descent"))
+    val newObs = ObservationImpl(
+      "submarine",
+      observer = Some("schlin"),
+      group = Some("AUV"),
+      activity = Some("descent")
+    )
     val f = dao.runTransaction(d => {
       dao.findByUUID(observation.uuid) match {
-        case None => fail(s"Unable to find observation with uuid of ${observation.uuid}")
+        case None      => fail(s"Unable to find observation with uuid of ${observation.uuid}")
         case Some(obs) => obs.imagedMoment.addObservation(newObs)
       }
     })
@@ -100,12 +122,12 @@ class ObservationV1ApiSpec extends WebApiStack {
   }
 
   it should "find by association" in {
-    val dao = daoFactory.newObservationDAO()
-    val assDao = daoFactory.newAssociationDAO(dao)
+    val dao         = daoFactory.newObservationDAO()
+    val assDao      = daoFactory.newAssociationDAO(dao)
     val association = assDao.newPersistentObject("eating", Some("cake"))
     val f = dao.runTransaction(d => {
       dao.findByUUID(observation.uuid) match {
-        case None => fail(s"Unable to find observation with uuid of ${observation.uuid}")
+        case None      => fail(s"Unable to find observation with uuid of ${observation.uuid}")
         case Some(obs) => obs.addAssociation(association)
       }
     })
@@ -121,10 +143,14 @@ class ObservationV1ApiSpec extends WebApiStack {
 
   it should "find all names" in {
     // --- create another imagedmoment with a different video-reference uuid
-    val dao = daoFactory.newObservationDAO()
+    val dao          = daoFactory.newObservationDAO()
     val imagedMoment = ImagedMomentImpl(Some(UUID.randomUUID()), Some(Instant.now()))
-    val obs = ObservationImpl("squid", observer = Some("aine"), group = Some("Image:Benthic Rover"),
-      activity = Some("transit"))
+    val obs = ObservationImpl(
+      "squid",
+      observer = Some("aine"),
+      group = Some("Image:Benthic Rover"),
+      activity = Some("transit")
+    )
     imagedMoment.addObservation(obs)
     val f = dao.runTransaction(d => d.create(obs))
     f.onComplete(_ => dao.close())
@@ -151,16 +177,17 @@ class ObservationV1ApiSpec extends WebApiStack {
   it should "update" in {
     put(
       s"$path/${observation.uuid}",
-      "concept" -> "shoe",
+      "concept"         -> "shoe",
       "duration_millis" -> "3200",
-      "activity" -> "ascent") {
-        status should be(200)
-        val obs = gson.fromJson(body, classOf[ObservationImpl])
-        obs.concept should be("shoe")
-        obs.duration should be(Duration.ofMillis(3200))
-        obs.activity should be("ascent")
-        obs.uuid should be(observation.uuid)
-      }
+      "activity"        -> "ascent"
+    ) {
+      status should be(200)
+      val obs = gson.fromJson(body, classOf[ObservationImpl])
+      obs.concept should be("shoe")
+      obs.duration should be(Duration.ofMillis(3200))
+      obs.activity should be("ascent")
+      obs.uuid should be(observation.uuid)
+    }
   }
 
   it should "delete" in {
@@ -170,12 +197,20 @@ class ObservationV1ApiSpec extends WebApiStack {
   }
 
   it should "bulk delete" in {
-    val dao = daoFactory.newObservationDAO()
+    val dao          = daoFactory.newObservationDAO()
     val imagedMoment = ImagedMomentImpl(Some(UUID.randomUUID()), Some(Instant.now()))
-    val obs0 = ObservationImpl("rocketship", observer = Some("brian"), group = Some("ROV"),
-      activity = Some("transect"))
-    val obs1 = ObservationImpl("giant dragon", observer = Some("brian"), group = Some("AUV"),
-      activity = Some("transect"))
+    val obs0 = ObservationImpl(
+      "rocketship",
+      observer = Some("brian"),
+      group = Some("ROV"),
+      activity = Some("transect")
+    )
+    val obs1 = ObservationImpl(
+      "giant dragon",
+      observer = Some("brian"),
+      group = Some("AUV"),
+      activity = Some("transect")
+    )
     imagedMoment.addObservation(obs0)
     imagedMoment.addObservation(obs1)
     val f = dao.runTransaction(d => {
@@ -185,18 +220,45 @@ class ObservationV1ApiSpec extends WebApiStack {
     f.onComplete(t => dao.close())
     Await.result(f, timeout)
 
-    val annos = Seq(obs0, obs1).map(AnnotationImpl(_))
+    val annos = Seq(obs0, obs1)
+      .map(AnnotationImpl(_))
       .map(_.observationUuid)
       .asJava
-    val json = Constants.GSON_FOR_ANNOTATION
+    val json = Constants
+      .GSON_FOR_ANNOTATION
       .toJson(annos)
       .getBytes(StandardCharsets.UTF_8)
-    post(
-      s"$path/delete",
-      body = json,
-      headers = Map("Content-Type" -> "application/json")) {
-        status should be(200)
-      }
+    post(s"$path/delete", body = json, headers = Map("Content-Type" -> "application/json")) {
+      status should be(200)
+    }
+  }
+
+  it should "delete duration" in {
+    // create an annotation
+    val recordedDate = Instant.now()
+    val duration     = Duration.ofSeconds(5)
+    val a = exec(() =>
+      annoController
+        .create(
+          UUID.randomUUID(),
+          "Nanomia bijuga",
+          "brian",
+          recordedDate = Some(recordedDate),
+          duration = Some(Duration.ofSeconds(5))
+        )
+    )
+    a.concept should be("Nanomia bijuga")
+    a.observer should be("brian")
+    a.recordedTimestamp should be(recordedDate)
+    a.duration should be(duration)
+
+    put(s"$path/delete/duration/${a.observationUuid}") {
+      status should be(200)
+      val obs = gson.fromJson(body, classOf[ObservationImpl])
+      obs.concept should be(a.concept)
+      obs.uuid should be(a.observationUuid)
+      obs.duration should be(null)
+    }
   }
 
 }

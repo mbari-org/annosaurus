@@ -178,18 +178,21 @@ class AssociationV1ApiSpec extends WebApiStack {
   }
 
   it should "create with a defined association UUID" in {
+    val uuid = UUID.randomUUID()
     post(
       s"/v1/associations/",
       "observation_uuid" -> annotation.observationUuid.toString,
       "link_name"        -> "bounding box",
       "to_concept"       -> "cool thing",
-      "link_value"       -> "{" \ x \ ": 10}",
-      "association_uuid"
+      "link_value"       -> """{"x": 10}""",
+      "association_uuid" -> uuid.toString()
     ) {
       status should be(200)
       association = gson.fromJson(body, classOf[AssociationImpl])
-      association.linkName should be("color")
-      association.linkValue should be("red")
+      association.linkName should be("bounding box")
+      association.toConcept should be("cool thing")
+      association.linkValue should be("""{"x": 10}""")
+      association.uuid should be(uuid)
     }
   }
 
