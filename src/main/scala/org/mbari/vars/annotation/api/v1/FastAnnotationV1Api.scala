@@ -118,6 +118,7 @@ class FastAnnotationV1Api(daoFactory: JPADAOFactory)(implicit val executor: Exec
     val limit  = params.getAs[Int]("limit")
     val offset = params.getAs[Int]("offset")
     Future {
+      // TODO: Give this endpoint consistent ordering.
       val imagedMomentUuids =
         repository.findImagedMomentUuidsByConceptWithImages(concept, limit, offset).asJava
       toJson(imagedMomentUuids)
