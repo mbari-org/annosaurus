@@ -10,6 +10,29 @@ A web-service for creating image and video annotations.
 
 We're working on API documentation; [it's still incomplete](https://i.pinimg.com/originals/10/a0/cc/10a0cc1e941644f78ef777a946898148.jpg). You can view them in their _in-progress_ state on [swaggerhub](https://app.swaggerhub.com/apis/mbari/annosaurus/1.0.0-oas3)
 
+Here's an example of how to launch it using Docker:
+
+```bash
+docker run -d \
+    -p 8100:8080 \
+    -e AUTHENTICATION_SERVICE="org.mbari.vars.annotation.auth.BasicJwtService" \
+    -e BASICJWT_CLIENT_SECRET="xxxx" \
+    -e BASICJWT_SIGNING_SECRET="xxxx" \
+    -e DATABASE_ENVIRONMENT=production \
+    -e DATABASE_LOG_LEVEL=INFO \
+    -e HTTP_CONTEXT_PATH="/anno" \
+    -e LOGBACK_LEVEL=WARN \
+    -e ORG_MBARI_VARS_ANNOTATION_DATABASE_PRODUCTION_DRIVER="com.microsoft.sqlserver.jdbc.SQLServerDriver" \
+    -e ORG_MBARI_VARS_ANNOTATION_DATABASE_PRODUCTION_NAME=SQLServer \
+    -e ORG_MBARI_VARS_ANNOTATION_DATABASE_PRODUCTION_PASSWORD="xxx" \
+    -e ORG_MBARI_VARS_ANNOTATION_DATABASE_PRODUCTION_URL="jdbc:sqlserver://database.mbari.org:1433;databaseName=M3_ANNOTATIONS" \
+    -e ORG_MBARI_VARS_ANNOTATION_DATABASE_PRODUCTION_USER=dbuser \
+    --name=annosaurus \
+    --restart unless-stopped \
+    mbari/annosaurus
+
+```
+
 ## Overview
 
 MBARI is updating its [Video Annotation and Reference System](https://hohonuuli.github.io/vars/) for modern video workflows. The service in this repository is one component of our next generation system. _annosaurus_ stores and retrieves annotations for videos and images. It is designed to work as a programming-language agnostic API that can be accessed from any programming language. The goal of this project is to provide a data service that allows developers and scientists to easily build their own tools for annotating video and images collections.
