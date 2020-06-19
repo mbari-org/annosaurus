@@ -30,6 +30,7 @@ import org.mbari.vars.annotation.model.{Annotation, Observation}
 import org.mbari.vcr4j.time.Timecode
 
 import scala.concurrent.{ExecutionContext, Future}
+import org.mbari.vars.annotation.dao.jpa.UUIDSequence
 
 /**
   *
@@ -212,7 +213,14 @@ class AnnotationController(daoFactory: BasicDAOFactory, bus: Subject[Any] = Mess
       activity
     )
 
-    bulkCreate(Seq(annotation)).map(_.head)
+    // We need to assign a UUID first so that we can find the correct
+    //observation. This is only needed if more than one observation
+    // exists at the same timestamp
+    val observationUuid = UUIDSequence.newUuid()
+    annotation.observationUuid = observationUuid
+
+    bulkCreate(Seq(annotation))
+      .map(xs => xs.find(_.observationUuid == observationUuid).get)
 
 //    val f = obsDao.runTransaction(d => create(d, annotation))
 //    f.onComplete(_ => obsDao.close())

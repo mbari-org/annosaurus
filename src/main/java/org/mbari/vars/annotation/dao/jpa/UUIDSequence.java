@@ -38,10 +38,14 @@ public class UUIDSequence extends Sequence implements SessionCustomizer {
         super(name);
     }
 
+    public static UUID newUuid() {
+        return UUIDs.comb();
+    }
+
     @Override
     public Object getGeneratedValue(Accessor accessor,
             AbstractSession writeSession, String seqName) {
-        return UUIDs.comb().toString().toLowerCase();
+        return newUuid().toString().toLowerCase();
         //return UUIDs.uuidSequence().toString().toLowerCase();
     }
 
