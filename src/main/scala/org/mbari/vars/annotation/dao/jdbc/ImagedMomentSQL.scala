@@ -52,7 +52,7 @@ object ImagedMomentSQL {
 
   // TODO add ordering here
   val byConceptWithImages: String = SELECT_UUID + FROM +
-    " WHERE concept = ? AND ir.url IS NOT NULL ORDER BY im.recorded_timestamp, ir.uuid"
+    " WHERE concept = ? AND ir.url IS NOT NULL ORDER BY im.uuid"
 
   val byVideoReferenceUuid: String =
     SELECT_IMAGES + FROM + " WHERE im.video_reference_uuid = ? AND ir.url IS NOT NULL ORDER BY im.recorded_timestamp, image_reference_uuid"

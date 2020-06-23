@@ -35,12 +35,14 @@ import scala.concurrent.duration.{Duration => SDuration}
 import scala.concurrent.{Await, Future}
 import scala.io.Source
 import scala.util.Random
+import org.scalatest.funspec.AnyFunSpec
+import org.mbari.vars.annotation.model.Annotation
 
 /**
   * @author Brian Schlining
   * @since 2019-10-22T15:02:00
   */
-class JdbcRepositorySpec extends AnyFlatSpec with Matchers with BeforeAndAfterAll {
+class JdbcRepositorySpec extends AnyFunSpec with Matchers with BeforeAndAfterAll {
 
   private[this] val daoFactory    = TestDAOFactory.Instance
   private[this] val controller    = new AnnotationController(daoFactory.asInstanceOf[BasicDAOFactory])
@@ -58,9 +60,7 @@ class JdbcRepositorySpec extends AnyFlatSpec with Matchers with BeforeAndAfterAl
     daoFactory.cleanup()
   }
 
-  "JdbcRepository" should "delete by videoReferenceUuid" in {
-    // --- Create some annotations
-    // Read data
+  private def loadAnnos(): Seq[Annotation] = {
     val url    = getClass.getResource("/json/annotation_full_dive.json").toURI
     val source = Source.fromFile(url, "UTF-8")
     val json = source
@@ -74,15 +74,52 @@ class JdbcRepositorySpec extends AnyFlatSpec with Matchers with BeforeAndAfterAl
     annos.isEmpty should be(false)
     val newAnnos = exec(() => controller.bulkCreate(annos))
     newAnnos.size should be(annos.size)
+    newAnnos
+  }
 
-    // Delete them
-    val videoReferenceUuid = newAnnos.head.videoReferenceUuid
-    val deleteCount        = repository.deleteByVideoReferenceUuid(videoReferenceUuid)
-    println(Constants.GSON.toJson(deleteCount))
+  describe("JdbcRepository") {
+    describe("delete") {
+      it("should deleteByVideoReferenceUuid") {
+        val newAnnos = loadAnnos()
+        // Delete them
+        val videoReferenceUuid = newAnnos.head.videoReferenceUuid
+        val deleteCount        = repository.deleteByVideoReferenceUuid(videoReferenceUuid)
+        println(Constants.GSON.toJson(deleteCount))
 
-    // Verify that they are gone
-    val foundAnnos = repository.findByVideoReferenceUuid(videoReferenceUuid)
-    foundAnnos should be(empty)
+        // Verify that they are gone
+        val foundAnnos = repository.findByVideoReferenceUuid(videoReferenceUuid)
+        foundAnnos should be(empty)
+      }
+    }
+
+    describe("find") {
+
+      it("should findImagedMomentUuidsByConceptWithImages") {
+        val newAnnos           = loadAnnos()
+        val videoReferenceUuid = newAnnos.head.videoReferenceUuid
+
+        val n = repository.findImagedMomentUuidsByConceptWithImages("Myxoderma platyacanthum")
+        n.size should be(2)
+
+        val deleteCount = repository.deleteByVideoReferenceUuid(videoReferenceUuid)
+        deleteCount.observationCount should be(newAnnos.size)
+
+      }
+
+      it("should findImagesByVideoReferenceUuid") {
+        val newAnnos           = loadAnnos()
+        val videoReferenceUuid = newAnnos.head.videoReferenceUuid
+
+        val xs = repository.findImagesByVideoReferenceUuid(videoReferenceUuid)
+        xs.size should be(64)
+
+        val deleteCount = repository.deleteByVideoReferenceUuid(videoReferenceUuid)
+        deleteCount.observationCount should be(newAnnos.size)
+      }
+
+      it("should cleanup") {}
+
+    }
   }
 
   override protected def beforeAll(): Unit = {
