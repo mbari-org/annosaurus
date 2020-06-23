@@ -52,10 +52,10 @@ object ImagedMomentSQL {
 
   // TODO add ordering here
   val byConceptWithImages: String = SELECT_UUID + FROM +
-    " WHERE concept = ? AND ir.url IS NOT NULL ORDER BY im.recorded_timestamp"
+    " WHERE concept = ? AND ir.url IS NOT NULL ORDER BY im.recorded_timestamp, image_reference_uuid"
 
   val byVideoReferenceUuid: String =
-    SELECT_IMAGES + FROM + " WHERE im.video_reference_uuid = ? AND ir.url IS NOT NULL ORDER BY im.recorded_timestamp"
+    SELECT_IMAGES + FROM + " WHERE im.video_reference_uuid = ? AND ir.url IS NOT NULL ORDER BY im.recorded_timestamp, image_reference_uuid"
 
   val deleteByVideoReferenceUuid: String =
     "DELETE FROM imaged_moments WHERE video_reference_uuid = ?"
