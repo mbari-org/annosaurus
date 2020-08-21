@@ -111,6 +111,15 @@ class CachedVideoReferenceInfoV1ApiSpec extends WebApiStack {
         v2.missionContact should be("schlin")
         v2.missionId should be(s"xxx$i")
         v2.platformName should be("Doc Ricketts")
+
+        get(s"$path/${v.uuid}") {
+          status should be(200)
+          val v3 = gson.fromJson(body, classOf[CachedVideoReferenceInfoImpl])
+          v3.videoReferenceUUID should be(v2.videoReferenceUUID)
+          v3.missionContact should be(v2.missionContact)
+          v3.missionId should be(v2.missionId)
+          v3.platformName should be(v2.platformName)
+        }
       }
     }
   }
