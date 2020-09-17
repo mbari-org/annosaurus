@@ -87,6 +87,13 @@ object AnnotationSQL {
       |  observations obs ON obs.imaged_moment_uuid = im.uuid LEFT JOIN
       |  image_references ir ON ir.imaged_moment_uuid = im.uuid """.stripMargin
 
+  val FROM_WITH_IMAGES_AND_ASSOCIATIONS: String =
+    """ FROM
+      |  imaged_moments im RIGHT JOIN
+      |  observations obs ON obs.imaged_moment_uuid = im.uuid LEFT JOIN
+      |  image_references ir ON ir.imaged_moment_uuid = im.uuid RIGHT JOIN
+      |  associations ass ON ass.observation_uuid = obs.uuid""".stripMargin
+
   val ORDER: String = " ORDER BY obs.uuid"
 
   val all: String = SELECT + FROM + ORDER
@@ -112,5 +119,7 @@ object AnnotationSQL {
   val byMultiRequest: String = SELECT + FROM + " WHERE im.video_reference_uuid IN (?) " + ORDER
 
   val byImagedMomentUuids: String = SELECT + FROM + " WHERE im.uuid IN (?) " + ORDER
+
+  val byToConceptWithImages: String = SELECT + FROM_WITH_IMAGES_AND_ASSOCIATIONS + " WHERE ass.to_concept = ?"
 
 }

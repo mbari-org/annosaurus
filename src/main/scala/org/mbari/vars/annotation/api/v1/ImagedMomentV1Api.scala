@@ -80,6 +80,9 @@ class ImagedMomentV1Api(controller: ImagedMomentController)(implicit val executo
   }
 
   get("/concept/images/:name") {
+    // FIXME: This returns an imagedmoment for EACH image. If there are
+    // two images for a moment, you'll get the image moment twice
+    // This needs a distinct modifier
     val name = params
       .get("name")
       .getOrElse(halt(BadRequest(toJson(ErrorMsg(400, "Please provide a concept name")))))

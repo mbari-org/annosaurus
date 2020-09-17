@@ -244,6 +244,24 @@ class JdbcRepository(entityManagerFactory: EntityManagerFactory) {
     annotations
   }
 
+  def findByToConceptWithImages(
+     toConcept: String,
+     limit: Option[Int] = None,
+     offset: Option[Int] = None,
+     includeAncillaryData: Boolean = false): Seq[AnnotationExt] = {
+    implicit val entityManager: EntityManager = entityManagerFactory.createEntityManager()
+    val query1                                = entityManager.createNativeQuery(AnnotationSQL.byToConceptWithImages)
+    query1.setParameter(1, toConcept)
+    limit.foreach(query1.setMaxResults)
+    offset.foreach(query1.setFirstResult)
+    val r1          = query1.getResultList.asScala.toList
+    val annotations = AnnotationSQL.resultListToAnnotations(r1).distinct
+    executeQueryForAnnotations(annotations, includeAncillaryData)
+    if (includeAncillaryData) findAncillaryData(annotations)
+    entityManager.close()
+    annotations
+  }
+
   def findImagedMomentUuidsByConceptWithImages(
       concept: String,
       limit: Option[Int] = None,
