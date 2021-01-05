@@ -43,7 +43,6 @@ class FastAnnotationV1Api(daoFactory: JPADAOFactory)(implicit val executor: Exec
   get("/") {
     params.getAs[Int]("limit").orElse(Some(5000))
     params.getAs[Int]("offset")
-
   }
 
   get("/count") {
