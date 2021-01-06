@@ -16,10 +16,11 @@
 
 package org.mbari.vars.annotation.dao.jdbc
 
+import org.mbari.vars.annotation.model.simple.QueryConstraints
+
 import java.sql.Timestamp
 import java.time.Duration
 import java.util.UUID
-
 import org.mbari.vcr4j.time.Timecode
 
 /**
@@ -93,6 +94,13 @@ object AnnotationSQL {
       |  observations obs ON obs.imaged_moment_uuid = im.uuid LEFT JOIN
       |  image_references ir ON ir.imaged_moment_uuid = im.uuid RIGHT JOIN
       |  associations ass ON ass.observation_uuid = obs.uuid""".stripMargin
+
+  val FROM_WITH_ANCILLARY_DATA: String =
+    """ FROM
+      |  imaged_moments im RIGHT JOIN
+      |  observations obs ON obs.imaged_moment_uuid = im.uuid LEFT JOIN
+      |  ancillary_data ad ON ad.imaged_moment_uuid = im.uuid
+      |""".stripMargin
 
   val ORDER: String = " ORDER BY obs.uuid"
 

@@ -16,15 +16,17 @@
 
 package org.mbari.vars.annotation.api.v1
 
-import java.util.UUID
+import org.mbari.vars.annotation.Constants
 
+import java.util.UUID
 import org.mbari.vars.annotation.dao.jdbc.JdbcRepository
 import org.mbari.vars.annotation.dao.jpa.JPADAOFactory
-import org.mbari.vars.annotation.model.simple.{ConcurrentRequest, Count, ErrorMsg, MultiRequest}
+import org.mbari.vars.annotation.model.simple.{ConcurrentRequest, Count, ErrorMsg, MultiRequest, QueryConstraints, QueryConstraintsResponse}
 import org.scalatra.BadRequest
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.jdk.CollectionConverters._
+import scala.util.{Failure, Success, Try}
 
 /**
   * @author Brian Schlining
@@ -43,6 +45,35 @@ class FastAnnotationV1Api(daoFactory: JPADAOFactory)(implicit val executor: Exec
   get("/") {
     params.getAs[Int]("limit").orElse(Some(5000))
     params.getAs[Int]("offset")
+  }
+
+  post("/") {
+    val body = request.body
+    Try(Constants.GSON.fromJson(body, classOf[QueryConstraints])) match {
+      case Success(constraints) =>
+        Future {
+          val annos = repository.findByQueryConstraint(constraints)
+          val response = QueryConstraintsResponse(constraints, annos.toList.asJava)
+          toJson(response)
+        }
+      case Failure(exception) =>
+        halt(BadRequest(toJson(ErrorMsg(400, "valid query constraints are required"))))
+    }
+  }
+
+  post("/count") {
+    val body = request.body
+    Try(Constants.GSON.fromJson(body, classOf[QueryConstraints])) match {
+      case Success(constraints) =>
+        Future {
+          val n = repository.countByQueryConstraint(constraints)
+          val count = Count(n.toLong)
+          val response = QueryConstraintsResponse(constraints, count)
+          toJson(response)
+        }
+      case Failure(exception) =>
+        halt(BadRequest(toJson(ErrorMsg(400, "valid query constraints are required"))))
+    }
   }
 
   get("/count") {

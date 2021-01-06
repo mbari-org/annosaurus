@@ -69,6 +69,32 @@ object Constants {
 
   }
 
+  val GSON_CAMEL_CASE = {
+    val gsonBuilder = new GsonBuilder()
+      .setPrettyPrinting()
+      .excludeFieldsWithoutExposeAnnotation()
+      .setDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'")
+    Converters.registerInstant(gsonBuilder)
+
+    val durationType: Type = new TypeToken[Duration]() {}.getType
+    gsonBuilder.registerTypeAdapter(durationType, new DurationConverter)
+
+    val timecodeType: Type = new TypeToken[Timecode]() {}.getType
+    gsonBuilder.registerTypeAdapter(timecodeType, new TimecodeConverter)
+
+    val associationType: Type = new TypeToken[Association]() {}.getType
+    gsonBuilder.registerTypeAdapter(associationType, new AssociationCreator)
+
+    val imageReferenceType: Type = new TypeToken[ImageReference]() {}.getType
+    gsonBuilder.registerTypeAdapter(imageReferenceType, new ImageReferenceCreator)
+
+    gsonBuilder.registerTypeAdapter(classOf[Option[Any]], new OptionSerializer)
+
+    gsonBuilder.registerTypeAdapter(classOf[java.util.Collection[_]], new CollectionConverter)
+
+    gsonBuilder.create()
+  }
+
   val GSON_FOR_ANNOTATION: Gson = GSON
 
 }

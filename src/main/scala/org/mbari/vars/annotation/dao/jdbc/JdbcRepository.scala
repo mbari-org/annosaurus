@@ -19,10 +19,9 @@ package org.mbari.vars.annotation.dao.jdbc
 import java.sql.Timestamp
 import java.time.Instant
 import java.util.UUID
-
 import javax.persistence.{EntityManager, EntityManagerFactory, Query}
 import org.mbari.vars.annotation.model.Annotation
-import org.mbari.vars.annotation.model.simple.{ConcurrentRequest, DeleteCount, Image, MultiRequest}
+import org.mbari.vars.annotation.model.simple.{ConcurrentRequest, DeleteCount, Image, MultiRequest, QueryConstraints}
 import org.slf4j.LoggerFactory
 
 import scala.jdk.CollectionConverters._
@@ -73,6 +72,25 @@ class JdbcRepository(entityManagerFactory: EntityManagerFactory) {
 
   }
 
+  def findByQueryConstraint(constraints: QueryConstraints): Seq[AnnotationExt] = {
+    implicit val entityManager: EntityManager = entityManagerFactory.createEntityManager()
+    val query1 = QueryConstraints.toQuery(constraints, entityManager)
+
+    val r1          = query1.getResultList.asScala.toList
+    val annotations = AnnotationSQL.resultListToAnnotations(r1)
+    executeQueryForAnnotations(annotations, constraints.data)
+    entityManager.close()
+    annotations
+  }
+
+  def countByQueryConstraint(constraints: QueryConstraints): Int = {
+    implicit val entityManager: EntityManager = entityManagerFactory.createEntityManager()
+    val query = QueryConstraints.toCountQuery(constraints, entityManager)
+    val count = query.getResultList.get(0).asInstanceOf[Int]
+    entityManager.close()
+    count
+  }
+
   def findAll(
       limit: Option[Int] = Some(1000),
       offset: Option[Int] = None,
@@ -87,7 +105,7 @@ class JdbcRepository(entityManagerFactory: EntityManagerFactory) {
     val r1          = query1.getResultList.asScala.toList
     val annotations = AnnotationSQL.resultListToAnnotations(r1)
     executeQueryForAnnotations(annotations, includeAncillaryData)
-    if (includeAncillaryData) findAncillaryData(annotations)
+//    if (includeAncillaryData) findAncillaryData(annotations)
     entityManager.close()
     annotations
 
@@ -220,7 +238,7 @@ class JdbcRepository(entityManagerFactory: EntityManagerFactory) {
     val r1          = query1.getResultList.asScala.toList
     val annotations = AnnotationSQL.resultListToAnnotations(r1)
     executeQueryForAnnotations(annotations, includeAncillaryData)
-    if (includeAncillaryData) findAncillaryData(annotations)
+//    if (includeAncillaryData) findAncillaryData(annotations)
     entityManager.close()
     annotations
   }
@@ -239,7 +257,7 @@ class JdbcRepository(entityManagerFactory: EntityManagerFactory) {
     val r1          = query1.getResultList.asScala.toList
     val annotations = AnnotationSQL.resultListToAnnotations(r1).distinct
     executeQueryForAnnotations(annotations, includeAncillaryData)
-    if (includeAncillaryData) findAncillaryData(annotations)
+//    if (includeAncillaryData) findAncillaryData(annotations)
     entityManager.close()
     annotations
   }
@@ -257,7 +275,7 @@ class JdbcRepository(entityManagerFactory: EntityManagerFactory) {
     val r1          = query1.getResultList.asScala.toList
     val annotations = AnnotationSQL.resultListToAnnotations(r1).distinct
     executeQueryForAnnotations(annotations, includeAncillaryData)
-    if (includeAncillaryData) findAncillaryData(annotations)
+//    if (includeAncillaryData) findAncillaryData(annotations)
     entityManager.close()
     annotations
   }
@@ -338,6 +356,7 @@ class JdbcRepository(entityManagerFactory: EntityManagerFactory) {
       includeAncillaryData: Boolean = false
   )(implicit entityManager: EntityManager): Seq[AnnotationExt] = {
 
+    // lookup associations
     val observationUuids = annotations.map(_.observationUuid.toString).distinct
     for (obs <- observationUuids.grouped(200)) {
       val sql2         = inClause(AssociationSQL.byObservationUuids, obs)
@@ -347,6 +366,7 @@ class JdbcRepository(entityManagerFactory: EntityManagerFactory) {
       AssociationSQL.join(annotations, associations)
     }
 
+    // lookup imageMoments
     val imagedMomentUuids = annotations.map(_.imagedMomentUuid.toString).distinct
     for (im <- imagedMomentUuids.grouped(200)) {
       val sql3             = inClause(ImageReferenceSQL.byImagedMomentUuids, im)
