@@ -128,7 +128,7 @@ object QueryConstraints {
     * @param qc
     * @return
     */
-  private def toSql(qc: QueryConstraints): String = {
+  private def toFromWhereSql(qc: QueryConstraints): String = {
     import org.mbari.vars.annotation.dao.jdbc.AnnotationSQL._
 
     val sqlConstraints = List(
@@ -142,13 +142,20 @@ object QueryConstraints {
       qc.maxTimestamp.map(_ => "im.recorded_timestamp <= ?")
     ).flatten
 
-    SELECT + FROM_WITH_ANCILLARY_DATA + " WHERE " + sqlConstraints.mkString(" AND ") + ORDER
+    FROM_WITH_ANCILLARY_DATA + " WHERE " + sqlConstraints.mkString(" AND ")
+
+//    SELECT + FROM_WITH_ANCILLARY_DATA + " WHERE " + sqlConstraints.mkString(" AND ") + ORDER
+  }
+
+  private def toSql(qc: QueryConstraints): String = {
+    import org.mbari.vars.annotation.dao.jdbc.AnnotationSQL._
+    val fromWhere = toFromWhereSql(qc)
+    SELECT + fromWhere + ORDER
   }
 
   private def toCountSql(qc: QueryConstraints): String = {
-    val sql = toSql(qc)
+    val fromWhere = toFromWhereSql(qc)
     val select = "SELECT COUNT(DISTINCT obs.uuid)"
-    val fromWhere = sql.substring(sql.indexOf("FROM"))
     select + " " + fromWhere
   }
 
@@ -190,7 +197,7 @@ object QueryConstraints {
     // Bind the params in the correct order. This is the same order they are found in the SQL.
     // The flattened list excludes empty Options
     def params = List(qc.minLon, qc.maxLon, qc.minLat, qc.maxLat, qc.minTimestamp, qc.maxTimestamp).flatten
-    val query = entityManager.createNamedQuery(sql)
+    val query = entityManager.createNativeQuery(sql)
     for {
       i <- params.indices
     } {

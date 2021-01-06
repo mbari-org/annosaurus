@@ -22,7 +22,7 @@ package org.mbari.vars.annotation.dao.jdbc
   */
 object ObservationSQL {
 
-  val countAll: String = "SELECT COUNT(*) FROM observation"
+  val countAll: String = "SELECT COUNT(*) FROM observations"
 
   val deleteByVideoReferenceUuid: String =
     """ DELETE FROM observations WHERE EXISTS (
