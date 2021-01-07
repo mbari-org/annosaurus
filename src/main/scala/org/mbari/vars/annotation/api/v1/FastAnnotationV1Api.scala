@@ -49,7 +49,7 @@ class FastAnnotationV1Api(daoFactory: JPADAOFactory)(implicit val executor: Exec
 
   post("/") {
     val body = request.body
-    Try(Constants.GSON.fromJson(body, classOf[QueryConstraints])) match {
+    Try(QueryConstraints.fromJson(body)) match {
       case Success(constraints) =>
         Future {
           val annos = repository.findByQueryConstraint(constraints)
@@ -63,7 +63,7 @@ class FastAnnotationV1Api(daoFactory: JPADAOFactory)(implicit val executor: Exec
 
   post("/count") {
     val body = request.body
-    Try(Constants.GSON.fromJson(body, classOf[QueryConstraints])) match {
+    Try(QueryConstraints.fromJson(body)) match {
       case Success(constraints) =>
         Future {
           val n = repository.countByQueryConstraint(constraints)
