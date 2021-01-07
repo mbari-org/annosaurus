@@ -40,7 +40,11 @@ class QueryConstraintsSpec extends AnyFlatSpec with Matchers with BeforeAndAfter
   it should "serialize to/from more complicated json" in {
     val concepts = List("foo", "bar", "baz")
     val uuids = List(UUID.randomUUID(), UUID.randomUUID())
-    val qc = QueryConstraints(concepts, uuids, Some(0), Some(90), Some(-20), Some(20), Some(Instant.EPOCH), Some(Instant.now()))
+    val observers = List("brian", "schlin")
+    val groups = List("ROV", "AUV")
+    val activities = List("descent", "transect")
+    val qc = QueryConstraints(concepts, uuids, observers, groups, activities,
+      Some(0), Some(90), Some(-20), Some(20), Some(Instant.EPOCH), Some(Instant.now()))
     val json = gson.toJson(qc)
     println(json)
     val qc1 = QueryConstraints.fromJson(json)

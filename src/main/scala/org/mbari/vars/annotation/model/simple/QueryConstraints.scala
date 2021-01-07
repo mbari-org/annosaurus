@@ -42,6 +42,18 @@ class QueryConstraints {
   def conceptSeq(): List[String] = concepts.asScala.toList
 
   @Expose(serialize = true)
+  var observers: JList[String] = new util.ArrayList[String]()
+  def observerSeq(): List[String] = observers.asScala.toList
+
+  @Expose(serialize = true)
+  var groups: JList[String] = new util.ArrayList[String]()
+  def groupSeq(): List[String] = groups.asScala.toList
+
+  @Expose(serialize = true)
+  var activities: JList[String] = new util.ArrayList[String]()
+  def activitySeq(): List[String] = activities.asScala.toList
+
+  @Expose(serialize = true)
   var minLat: Option[Double] = Option.empty
 
   @Expose(serialize = true)
@@ -91,6 +103,9 @@ object QueryConstraints {
     */
   def apply(concepts: List[String] = Nil,
             videoReferenceUuids: List[UUID] = Nil,
+            observers: List[String] = Nil,
+            groups: List[String] = Nil,
+            activities: List[String] = Nil,
             minLat: Option[Double] = Option.empty,
             maxLat: Option[Double] = Option.empty,
             minLon: Option[Double] = Option.empty,
@@ -102,6 +117,9 @@ object QueryConstraints {
     val qc = new QueryConstraints
     qc.concepts = concepts.asJava
     qc.videoReferenceUuids = videoReferenceUuids.asJava
+    qc.observers = observers.asJava
+    qc.groups = groups.asJava
+    qc.activities = activities.asJava
     qc.minLat = minLat
     qc.maxLat = maxLat
     qc.minLon = minLon
@@ -134,6 +152,9 @@ object QueryConstraints {
     val sqlConstraints = List(
       if (qc.conceptSeq().nonEmpty) Some("obs.concept IN (A?)") else None,
       if (qc.videoReferenceUuidSeq().nonEmpty) Some("im.video_reference_uuid IN (B?)") else None,
+      if (qc.observerSeq().nonEmpty) Some("obs.observer IN (C?)") else None,
+      if (qc.groupSeq().nonEmpty) Some("obs.observation_group IN (D?)") else None,
+      if (qc.activitySeq().nonEmpty) Some("obs.activity IN (E?)") else None,
       qc.minLon.map(_ => "ad.longitude >= ?"),
       qc.maxLon.map(_ => "ad.longitude <= ?"),
       qc.minLat.map(_ => "ad.latitude >= ?"),
@@ -144,7 +165,6 @@ object QueryConstraints {
 
     FROM_WITH_ANCILLARY_DATA + " WHERE " + sqlConstraints.mkString(" AND ")
 
-//    SELECT + FROM_WITH_ANCILLARY_DATA + " WHERE " + sqlConstraints.mkString(" AND ") + ORDER
   }
 
   private def toSql(qc: QueryConstraints): String = {
@@ -178,21 +198,17 @@ object QueryConstraints {
   private def buildQuery(qc: QueryConstraints, entityManager: EntityManager, base: String): Query = {
 
     // JPA doesn't handle in clauses well. So this is a cludge
-    val sql = {
-
-      val a = if (!qc.concepts.isEmpty) {
-        val xs = qc.conceptSeq().mkString("('", "','", "')")
-        base.replace("(A?)", xs)
+    def replaceInClause[A](xs: Iterable[A], sql: String, target: String): String = if (xs.nonEmpty) {
+        val s = xs.mkString("('", "','", "')")
+        sql.replace(target, s)
       }
-      else base
+      else sql
 
-      if (!qc.videoReferenceUuids.isEmpty) {
-        val xs = qc.videoReferenceUuidSeq().mkString("('", "','", "')")
-        a.replace("(B?)", xs)
-      }
-      else a
-
-    }
+    val a = replaceInClause(qc.conceptSeq(), base, "(A?)")
+    val b = replaceInClause(qc.videoReferenceUuidSeq(), a, "(B?)")
+    val c = replaceInClause(qc.observerSeq(), b, "(C?)")
+    val d = replaceInClause(qc.groupSeq(), c, "(D?)")
+    val sql = replaceInClause(qc.activitySeq(), d, "(E?)")
 
     // Bind the params in the correct order. This is the same order they are found in the SQL.
     // The flattened list excludes empty Options
