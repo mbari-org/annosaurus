@@ -19,7 +19,10 @@
         </encoder>
     </appender>
 
+    <logger name="httpclient.wire.header" level="WARN" />
     <logger name="java.util.Date" level="WARN" />
+    <logger name="org.eclipse.jetty" level="WARN" />
+    <logger name="org.fusesource.scalate" level="WARN" />
     <logger name="org.mbari.vars.annotation.dao.jpa" level="WARN" />
 
     <root level="${LOGBACK_LEVEL}">

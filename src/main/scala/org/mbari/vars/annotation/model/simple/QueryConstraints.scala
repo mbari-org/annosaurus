@@ -19,6 +19,7 @@ package org.mbari.vars.annotation.model.simple
 import com.google.gson.annotations.Expose
 import org.mbari.vars.annotation.Constants
 
+import java.sql.Timestamp
 import java.time.Instant
 import java.util
 import java.util.{UUID, List => JList}
@@ -54,6 +55,12 @@ class QueryConstraints {
   def activitySeq(): List[String] = activities.asScala.toList
 
   @Expose(serialize = true)
+  var minDepth: Option[Double] = Option.empty
+
+  @Expose(serialize = true)
+  var maxDepth: Option[Double] = Option.empty
+
+  @Expose(serialize = true)
   var minLat: Option[Double] = Option.empty
 
   @Expose(serialize = true)
@@ -72,6 +79,12 @@ class QueryConstraints {
   var maxTimestamp: Option[Instant] = Option.empty
 
   @Expose(serialize = true)
+  var linkName: Option[String] = Option.empty
+
+  @Expose(serialize = true)
+  var linkValue: Option[String] = Option.empty
+
+  @Expose(serialize = true)
   var limit: Int = 5000
 
   @Expose(serialize = true)
@@ -88,15 +101,22 @@ class QueryConstraints {
 object QueryConstraints {
 
   /**
-    * Factory method for building QueryConstraints
+    *
     * @param concepts
     * @param videoReferenceUuids
+    * @param observers
+    * @param groups
+    * @param activities
+    * @param minDepth
+    * @param maxDepth
     * @param minLat
     * @param maxLat
     * @param minLon
     * @param maxLon
     * @param minTimestamp
     * @param maxTimestamp
+    * @param linkName
+    * @param linkValue
     * @param limit
     * @param offset
     * @return
@@ -106,12 +126,16 @@ object QueryConstraints {
             observers: List[String] = Nil,
             groups: List[String] = Nil,
             activities: List[String] = Nil,
+            minDepth: Option[Double] = Option.empty,
+            maxDepth: Option[Double] = Option.empty,
             minLat: Option[Double] = Option.empty,
             maxLat: Option[Double] = Option.empty,
             minLon: Option[Double] = Option.empty,
             maxLon: Option[Double] = Option.empty,
             minTimestamp: Option[Instant] = Option.empty,
             maxTimestamp: Option[Instant] = Option.empty,
+            linkName: Option[String] = Option.empty,
+            linkValue: Option[String] = Option.empty,
             limit: Int = 5000,
             offset: Int = 0) = {
     val qc = new QueryConstraints
@@ -120,12 +144,16 @@ object QueryConstraints {
     qc.observers = observers.asJava
     qc.groups = groups.asJava
     qc.activities = activities.asJava
+    qc.minDepth = minDepth
+    qc.maxDepth = maxDepth
     qc.minLat = minLat
     qc.maxLat = maxLat
     qc.minLon = minLon
     qc.maxLon = maxLon
     qc.minTimestamp = minTimestamp
     qc.maxTimestamp = maxTimestamp
+    qc.linkName = linkName
+    qc.linkValue = linkValue
     qc.limit = limit
     qc.offset = offset
     qc
@@ -150,17 +178,21 @@ object QueryConstraints {
     import org.mbari.vars.annotation.dao.jdbc.AnnotationSQL._
 
     val sqlConstraints = List(
-      if (qc.conceptSeq().nonEmpty) Some("obs.concept IN (A?)") else None,
+      if (qc.conceptSeq().nonEmpty) Some("(obs.concept IN (A?) OR ass.to_concept IN (A?))") else None,
       if (qc.videoReferenceUuidSeq().nonEmpty) Some("im.video_reference_uuid IN (B?)") else None,
       if (qc.observerSeq().nonEmpty) Some("obs.observer IN (C?)") else None,
       if (qc.groupSeq().nonEmpty) Some("obs.observation_group IN (D?)") else None,
       if (qc.activitySeq().nonEmpty) Some("obs.activity IN (E?)") else None,
+      qc.minDepth.map(_ => "ad.depth_meters >= ?"),
+      qc.maxDepth.map(_ => "ad.depth_meters < ?"),
       qc.minLon.map(_ => "ad.longitude >= ?"),
-      qc.maxLon.map(_ => "ad.longitude <= ?"),
+      qc.maxLon.map(_ => "ad.longitude < ?"),
       qc.minLat.map(_ => "ad.latitude >= ?"),
-      qc.maxLat.map(_ => "ad.latitude <= ?"),
+      qc.maxLat.map(_ => "ad.latitude < ?"),
       qc.minTimestamp.map(_ => "im.recorded_timestamp >= ?"),
-      qc.maxTimestamp.map(_ => "im.recorded_timestamp <= ?")
+      qc.maxTimestamp.map(_ => "im.recorded_timestamp < ?"),
+      qc.linkName.map(_ => "ass.link_name = ?"),
+      qc.linkValue.map(_ => "ass.link_value = ?")
     ).flatten
 
     FROM_WITH_ANCILLARY_DATA + " WHERE " + sqlConstraints.mkString(" AND ")
@@ -212,12 +244,22 @@ object QueryConstraints {
 
     // Bind the params in the correct order. This is the same order they are found in the SQL.
     // The flattened list excludes empty Options
-    def params = List(qc.minLon, qc.maxLon, qc.minLat, qc.maxLat, qc.minTimestamp, qc.maxTimestamp).flatten
+    def params = List(
+      qc.minDepth,
+      qc.maxDepth,
+      qc.minLon,
+      qc.maxLon,
+      qc.minLat,
+      qc.maxLat,
+      qc.minTimestamp.map(Timestamp.from),
+      qc.maxTimestamp.map(Timestamp.from),
+      qc.linkName,
+      qc.linkValue).flatten
     val query = entityManager.createNativeQuery(sql)
     for {
       i <- params.indices
     } {
-      query.setParameter(i, params(i))
+      query.setParameter(i + 1, params(i))
     }
     query.setMaxResults(qc.limit)
     query.setFirstResult(qc.offset)

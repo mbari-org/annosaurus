@@ -99,7 +99,8 @@ object AnnotationSQL {
     """ FROM
       |  imaged_moments im RIGHT JOIN
       |  observations obs ON obs.imaged_moment_uuid = im.uuid LEFT JOIN
-      |  ancillary_data ad ON ad.imaged_moment_uuid = im.uuid
+      |  ancillary_data ad ON ad.imaged_moment_uuid = im.uuid LEFT JOIN
+      |  associations ass ON ass.observation_uuid = obs.uuid
       |""".stripMargin
 
   val ORDER: String = " ORDER BY obs.uuid"
