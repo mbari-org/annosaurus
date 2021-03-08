@@ -169,6 +169,21 @@ class FastAnnotationV1Api(daoFactory: JPADAOFactory)(implicit val executor: Exec
     }
   }
 
+  get("/imagedmoments/toconcept/images/:concept") {
+    val concept =
+      params
+        .get("concept")
+        .getOrElse(halt(BadRequest(toJson(ErrorMsg(400, "A 'concept' parameter is required")))))
+    val limit  = params.getAs[Int]("limit")
+    val offset = params.getAs[Int]("offset")
+    Future {
+      // TODO: Give this endpoint consistent ordering.
+      val imagedMomentUuids =
+        repository.findImagedMomentUuidsByToConceptWithImages(concept, limit, offset).asJava
+      toJson(imagedMomentUuids)
+    }
+  }
+
   get("/details/:link_name/:link_value") {
     val linkName = params
       .get("link_name")

@@ -50,9 +50,20 @@ object ImagedMomentSQL {
       | image_references ir ON ir.imaged_moment_uuid = im.uuid
       |""".stripMargin
 
-  // TODO add ordering here
+  val FROM_WITH_IMAGES_AND_ASSOCIATIONS: String =
+    """ FROM
+      |  imaged_moments im LEFT JOIN
+      |  observations obs ON obs.imaged_moment_uuid = im.uuid LEFT JOIN
+      |  image_references ir ON ir.imaged_moment_uuid = im.uuid RIGHT JOIN
+      |  associations ass ON ass.observation_uuid = obs.uuid""".stripMargin
+
+
   val byConceptWithImages: String = SELECT_UUID + FROM +
     " WHERE concept = ? AND ir.url IS NOT NULL ORDER BY im.uuid"
+
+  val byToConceptWithImages: String = SELECT_UUID + 
+      FROM_WITH_IMAGES_AND_ASSOCIATIONS + 
+      " WHERE ass.to_concept = ? AND ir.url IS NOT NULL ORDER BY im.uuid"
 
   val byVideoReferenceUuid: String =
     SELECT_IMAGES + FROM + " WHERE im.video_reference_uuid = ? AND ir.url IS NOT NULL ORDER BY im.recorded_timestamp, image_reference_uuid"

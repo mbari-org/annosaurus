@@ -298,6 +298,24 @@ class JdbcRepository(entityManagerFactory: EntityManagerFactory) {
     uuids
   }
 
+  def findImagedMomentUuidsByToConceptWithImages(
+      toConcept: String,
+      limit: Option[Int] = None,
+      offset: Option[Int] = None
+  ): Seq[UUID] = {
+    implicit val entityManager: EntityManager = entityManagerFactory.createEntityManager()
+    val query                                 = entityManager.createNativeQuery(ImagedMomentSQL.byToConceptWithImages)
+    query.setParameter(1, toConcept)
+    limit.foreach(query.setMaxResults)
+    offset.foreach(query.setFirstResult)
+    val results = query.getResultList.asScala.toList
+    val uuids = results
+      .map(_.toString)
+      .map(UUID.fromString)
+    entityManager.close()
+    uuids
+  }
+
   def findImagesByVideoReferenceUuid(
       videoReferenceUuid: UUID,
       limit: Option[Int] = None,
