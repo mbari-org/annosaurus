@@ -31,10 +31,14 @@ object AssociationSQL {
       val a  = new AssociationExt
       a.uuid = UUID.fromString(xs(0).toString)
       a.observationUuid = UUID.fromString(xs(1).toString)
-      a.linkName = xs(2).toString
-      a.toConcept = xs(3).toString
-      a.linkValue = xs(4).toString
-      a.mimeType = xs(5).toString
+      Option(xs(2)).foreach(v => a.linkName = v.toString)
+      Option(xs(3)).foreach(v => a.toConcept = v.toString)
+      Option(xs(4)).foreach(v => a.linkValue = v.toString)
+      Option(xs(5)).foreach(v => a.mimeType = v.toString)
+      // a.linkName = xs(2).toString
+      // a.toConcept = xs(3).toString
+      // a.linkValue = xs(4).toString
+      // a.mimeType = xs(5).toString
       a.imagedMomentUuid = UUID.fromString(xs(6).toString)
       a
     }
