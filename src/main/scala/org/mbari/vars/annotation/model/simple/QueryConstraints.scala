@@ -227,6 +227,18 @@ object QueryConstraints {
     buildQuery(qc, entityManager, sql)
   }
 
+  private def toGeographicRangeSql(qc: QueryConstraints): String = {
+    val fromWhere = toFromWhereSql(qc) +
+      " AND ad.longitude IS NOT NULL AND ad.latitude IS NOT NULL AND ad.depth_meters IS NOT NULL"
+    val select = "SELECT min(ad.latitude), max(ad.latitude), min(ad.longitude), max(ad.longitude), min(ad.depth_meters), max(ad.depth_meters) "
+    select + " " + fromWhere
+  }
+
+  def toGeographicRangeQuery(qc: QueryConstraints, entityManager: EntityManager): Query = {
+    val sql = toGeographicRangeSql(qc)
+    buildQuery(qc, entityManager, sql)
+  }
+
   private def buildQuery(qc: QueryConstraints, entityManager: EntityManager, base: String): Query = {
 
     // JPA doesn't handle in clauses well. So this is a cludge

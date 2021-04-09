@@ -61,6 +61,24 @@ class FastAnnotationV1Api(daoFactory: JPADAOFactory)(implicit val executor: Exec
     }
   }
 
+  post("/georange") {
+    val body = request.body
+    Try(QueryConstraints.fromJson(body)) match {
+      case Success(constraints) =>
+        Future {
+          repository.findGeographicRangeByQueryConstraint(constraints) match {
+            case Some(range) =>
+              val response = QueryConstraintsResponse(constraints, range)
+              toJson(response)
+            case None =>
+              halt(BadRequest(toJson(ErrorMsg(404, "Range was not found for annotations matching your query"))))
+          }
+        }
+      case Failure(exception) =>
+        halt(BadRequest(toJson(ErrorMsg(400, "valid query constraints are required"))))
+    }
+  }
+
   post("/count") {
     val body = request.body
     Try(QueryConstraints.fromJson(body)) match {

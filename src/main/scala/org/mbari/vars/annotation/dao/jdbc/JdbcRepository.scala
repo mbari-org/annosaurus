@@ -20,7 +20,7 @@ import java.sql.Timestamp
 import java.time.Instant
 import java.util.UUID
 import javax.persistence.{EntityManager, EntityManagerFactory, Query}
-import org.mbari.vars.annotation.model.Annotation
+import org.mbari.vars.annotation.model.{Annotation, GeographicRange}
 import org.mbari.vars.annotation.model.simple.{ConcurrentRequest, DeleteCount, Image, MultiRequest, QueryConstraints}
 import org.slf4j.LoggerFactory
 
@@ -89,6 +89,23 @@ class JdbcRepository(entityManagerFactory: EntityManagerFactory) {
     val count = query.getResultList.get(0).asInstanceOf[Int]
     entityManager.close()
     count
+  }
+
+  def findGeographicRangeByQueryConstraint(constraints: QueryConstraints): Option[GeographicRange] = {
+    implicit val entityManager: EntityManager = entityManagerFactory.createEntityManager()
+    val query = QueryConstraints.toGeographicRangeQuery(constraints, entityManager)
+    // Queries return java.util.List[Array[Object]]
+    val count = query.getResultList.asScala.toList
+    if (count.nonEmpty) {
+      val head = count.head.asInstanceOf[Array[_]]
+      Some(GeographicRange(head(0).toString.toDouble,
+        head(1).toString.toDouble,
+        head(2).toString.toDouble,
+        head(3).toString.toDouble,
+        head(4).toString.toDouble,
+        head(5).toString.toDouble))
+    }
+    else None
   }
 
   def findAll(
