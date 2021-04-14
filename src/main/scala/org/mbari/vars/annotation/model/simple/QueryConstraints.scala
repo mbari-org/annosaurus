@@ -18,6 +18,7 @@ package org.mbari.vars.annotation.model.simple
 
 import com.google.gson.annotations.Expose
 import org.mbari.vars.annotation.Constants
+import org.mbari.vars.annotation.dao.jdbc.AnnotationSQL
 
 import java.sql.Timestamp
 import java.time.Instant
@@ -174,7 +175,7 @@ object QueryConstraints {
     * @param qc
     * @return
     */
-  private def toFromWhereSql(qc: QueryConstraints): String = {
+  def toFromWhereSql(qc: QueryConstraints): String = {
     import org.mbari.vars.annotation.dao.jdbc.AnnotationSQL._
 
     val sqlConstraints = List(
@@ -199,10 +200,11 @@ object QueryConstraints {
 
   }
 
-  private def toSql(qc: QueryConstraints): String = {
+
+  private def toSql(qc: QueryConstraints, selectStatement: String, order: String = AnnotationSQL.ORDER): String = {
     import org.mbari.vars.annotation.dao.jdbc.AnnotationSQL._
     val fromWhere = toFromWhereSql(qc)
-    SELECT + fromWhere + ORDER
+    selectStatement + fromWhere + order
   }
 
   private def toCountSql(qc: QueryConstraints): String = {
@@ -222,8 +224,8 @@ object QueryConstraints {
     * @param entityManager
     * @return
     */
-  def toQuery(qc: QueryConstraints, entityManager: EntityManager): Query = {
-    val sql = toSql(qc)
+  def toQuery(qc: QueryConstraints, entityManager: EntityManager, selectStatement: String = AnnotationSQL.SELECT): Query = {
+    val sql = toSql(qc, selectStatement, "")
     buildQuery(qc, entityManager, sql)
   }
 

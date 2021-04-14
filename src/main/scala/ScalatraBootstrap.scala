@@ -69,6 +69,7 @@ class ScalatraBootstrap extends LifeCycle {
     val imagedMomentV2Api = new ImagedMomentV2Api(imagedMomentController)
 
     val fastAnnotationV1Api = new FastAnnotationV1Api(JPADAOFactory)
+    val analysisV1Api = new AnalysisV1Api(JPADAOFactory)
 
     context.mount(ancillaryDatumV1Api, "/v1/ancillarydata")
     context.mount(annotationV1Api, "/v1/annotations")
@@ -82,6 +83,7 @@ class ScalatraBootstrap extends LifeCycle {
     context.mount(videoReferenceV1Api, "/v1/videoreferences")
 
     context.mount(fastAnnotationV1Api, "/v1/fast")
+    context.mount(analysisV1Api, "/v1/analysis")
 
     context.mount(annotationV2Api, "/v2/annotations")
     context.mount(imagedMomentV2Api, "/v2/imagedmoments")
