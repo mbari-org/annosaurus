@@ -31,7 +31,7 @@ class AnalysisRepository(entityManagerFactory: EntityManagerFactory) {
   def depthHistogram(constraints: QueryConstraints, binSizeMeters: Int = 50): DepthHistogram  = {
     val select = DepthHistogramSQL.selectFromBinSize(binSizeMeters)
     val entityManager: EntityManager = entityManagerFactory.createEntityManager()
-    val query = QueryConstraints.toQuery(constraints, entityManager, select)
+    val query = QueryConstraints.toQuery(constraints, entityManager, select, "")
     val results = query.getResultList.asScala.toList
     entityManager.close()
     val values = results.head

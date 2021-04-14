@@ -201,10 +201,10 @@ object QueryConstraints {
   }
 
 
-  private def toSql(qc: QueryConstraints, selectStatement: String, order: String = AnnotationSQL.ORDER): String = {
+  private def toSql(qc: QueryConstraints, selectStatement: String, orderStatement: String = AnnotationSQL.ORDER): String = {
     import org.mbari.vars.annotation.dao.jdbc.AnnotationSQL._
     val fromWhere = toFromWhereSql(qc)
-    selectStatement + fromWhere + order
+    selectStatement + fromWhere + orderStatement
   }
 
   private def toCountSql(qc: QueryConstraints): String = {
@@ -224,8 +224,11 @@ object QueryConstraints {
     * @param entityManager
     * @return
     */
-  def toQuery(qc: QueryConstraints, entityManager: EntityManager, selectStatement: String = AnnotationSQL.SELECT): Query = {
-    val sql = toSql(qc, selectStatement, "")
+  def toQuery(qc: QueryConstraints,
+              entityManager: EntityManager,
+              selectStatement: String = AnnotationSQL.SELECT,
+              orderStatment: String = AnnotationSQL.ORDER): Query = {
+    val sql = toSql(qc, selectStatement, orderStatment)
     buildQuery(qc, entityManager, sql)
   }
 
