@@ -44,7 +44,8 @@ class QueryConstraintsSpec extends AnyFlatSpec with Matchers with BeforeAndAfter
     val groups = List("ROV", "AUV")
     val activities = List("descent", "transect")
     val qc = QueryConstraints(concepts, uuids, observers, groups, activities,
-      Some(0), Some(90), Some(-20), Some(20), Some(Instant.EPOCH), Some(Instant.now()),
+      Some(0), Some(90), Some(-20), Some(20), Some(-20), Some(20),
+      Some(Instant.EPOCH),Some(Instant.now()),
       Some("eating"), Some("Aegina"))
     val json = gson.toJson(qc)
     println(json)
