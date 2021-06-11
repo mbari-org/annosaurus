@@ -21,12 +21,12 @@ val postgresqlVersion   = "42.2.19"
 val rxjavaVersion       = "3.0.12"
 val scalatestVersion    = "3.2.7"
 val scalatraVersion     = "2.7.1"
-val scilubeVersion      = "2.0.7.jre11"
+val scilubeVersion      = "3.0.0"
 val servletVersion      = "4.0.1"
 val slf4jVersion        = "1.8.0-beta4"
 val sqlserverVersion    = "9.2.1.jre11"
-val uuidgenVersion      = "0.1.3"
-val vcr4jVersion        = "4.0.2"
+val uuidgenVersion      = "0.1.4"
+val vcr4jVersion        = "4.4.1.jre11"
 val zeromqVersion       = "0.5.2"
 
 Global / onChangedBuildSource := ReloadOnSourceChanges
@@ -39,8 +39,8 @@ addCommandAlias(
 lazy val buildSettings = Seq(
   organization := "org.mbari.vars",
   version := "0.11.0",
-  scalaVersion in ThisBuild := "2.13.5",
-  crossScalaVersions := Seq("2.13.5"),
+  scalaVersion in ThisBuild := "2.13.6",
+  crossScalaVersions := Seq("2.13.6"),
   organizationName := "Monterey Bay Aquarium Research Institute",
   startYear := Some(2017),
   licenses += ("Apache-2.0", new URL(
@@ -62,8 +62,7 @@ lazy val consoleSettings = Seq(
 
 lazy val dependencySettings = Seq(
   resolvers ++= Seq(
-    Resolver.mavenLocal,
-    Resolver.bintrayRepo("hohonuuli", "maven")
+    Resolver.githubPackages("mbari-org", "maven")
   )
 )
 
@@ -152,7 +151,7 @@ lazy val annosaurus = (project in file("."))
       "org.scalatra"                                   %% "scalatra-scalatest"               % scalatraVersion,
       "org.scalatra"                                   %% "scalatra"                         % scalatraVersion,
       "org.slf4j"                                      % "log4j-over-slf4j"                  % slf4jVersion,
-      "scilube"                                        %% "scilube-core"                     % scilubeVersion,
+      "org.mbari.scilube"                                        %% "scilube"                     % scilubeVersion,
       //"net.sourceforge.jtds"     % "jtds"                           % jtdsVersion,
       "org.slf4j"  % "slf4j-api" % slf4jVersion,
       "org.zeromq" % "jeromq"    % zeromqVersion

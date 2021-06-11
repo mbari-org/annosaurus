@@ -16,7 +16,9 @@
 
 package org.mbari.vars.annotation.math
 
-import scilube.Matlib
+
+import org.mbari.scilube3.Matlib
+
 import Ordering.Double.IeeeOrdering
 
 /**
