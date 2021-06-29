@@ -56,7 +56,8 @@ object AnnotationSQL {
         .map(Duration.ofMillis)
         .foreach(v => a.duration = v)
       Option(xs(9)).foreach(v => a.group = v.toString)
-      a.observationTimestamp = xs(10).asInstanceOf[Timestamp].toInstant
+      Option(xs(10)).foreach(v => a.observationTimestamp = v.asInstanceOf[Timestamp].toInstant)
+      // a.observationTimestamp = xs(10).asInstanceOf[Timestamp].toInstant
       a.observer = xs(11).toString
       a
     }
