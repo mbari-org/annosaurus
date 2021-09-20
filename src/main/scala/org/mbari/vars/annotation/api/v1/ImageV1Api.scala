@@ -130,10 +130,11 @@ class ImageV1Api(controller: ImageController)(implicit val executor: ExecutionCo
       )
     }
 
-    val format      = params.get("format")
-    val width       = params.getAs[Int]("width_pixels")
-    val height      = params.getAs[Int]("height_pixels")
-    val description = params.get("description")
+    val format             = params.get("format")
+    val width              = params.getAs[Int]("width_pixels")
+    val height             = params.getAs[Int]("height_pixels")
+    val description        = params.get("description")
+    val imageReferenceUUID = params.getAs[UUID]("image_reference_uuid")
     controller
       .create(
         videoReferenceUUID,
@@ -144,7 +145,8 @@ class ImageV1Api(controller: ImageController)(implicit val executor: ExecutionCo
         format,
         width,
         height,
-        description
+        description,
+        imageReferenceUUID
       )
       .map(toJson)
   }
