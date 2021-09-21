@@ -74,7 +74,8 @@ class ImageController(daoFactory: BasicDAOFactory) {
       format: Option[String],
       width: Option[Int],
       height: Option[Int],
-      description: Option[String]
+      description: Option[String],
+      imageReferenceUUID: Option[UUID]
   )(implicit ec: ExecutionContext): Future[Image] = {
 
     val imDao = daoFactory.newImagedMomentDAO()
@@ -83,6 +84,7 @@ class ImageController(daoFactory: BasicDAOFactory) {
       val imagedMoment = ImagedMomentController
         .findOrCreateImagedMoment(imDao, videoReferenceUUID, timecode, recordedDate, elapsedTime)
       val imageReference = irDao.newPersistentObject(url, description, height, width, format)
+      imageReferenceUUID.foreach(uuid => imageReference.uuid = uuid)
       irDao.create(imageReference)
       imagedMoment.addImageReference(imageReference)
       imageReference
