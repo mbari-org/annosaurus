@@ -96,6 +96,31 @@ class ImageControllerSpec extends AnyFlatSpec with Matchers with BeforeAndAfterA
 
   }
 
+  it should "create using image_reference_uuid" in {
+    val uuid = UUID.randomUUID()
+    val url = new URL("http://www.mbari.org/foo_im.png")
+    val a = exec(() =>
+      controller.create(
+        videoReferenceUuid,
+        url,
+        recordedDate = Some(recordedDate),
+        format = Some("image/png"),
+        width = Some(1920),
+        height = Some(1080),
+        description = None,
+        imageReferenceUUID = Some(uuid)
+      )
+    )
+    a.imageReferenceUuid should be(uuid)
+
+    val c = exec(() => controller.findByImageName("foo_im.png"))
+    c.size should be(1)
+    val i = c.head
+    i.url should be(url)
+    i.imageReferenceUuid should be(uuid)
+    
+  }
+
   override protected def afterAll(): Unit = {
     daoFactory.cleanup()
   }
