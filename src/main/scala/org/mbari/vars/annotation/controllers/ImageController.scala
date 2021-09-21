@@ -71,11 +71,11 @@ class ImageController(daoFactory: BasicDAOFactory) {
       timecode: Option[Timecode] = None,
       elapsedTime: Option[Duration] = None,
       recordedDate: Option[Instant] = None,
-      format: Option[String],
-      width: Option[Int],
-      height: Option[Int],
-      description: Option[String],
-      imageReferenceUUID: Option[UUID]
+      format: Option[String] = None,
+      width: Option[Int] = None,
+      height: Option[Int] = None,
+      description: Option[String] = None,
+      imageReferenceUUID: Option[UUID] = None
   )(implicit ec: ExecutionContext): Future[Image] = {
 
     val imDao = daoFactory.newImagedMomentDAO()
