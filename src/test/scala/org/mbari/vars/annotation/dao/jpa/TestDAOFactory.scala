@@ -32,6 +32,8 @@ import scala.concurrent.duration.Duration
 object TestDAOFactory {
 
   val TestProperties = Map(
+    "eclipselink.logging.level.sql"     -> "FINE",    
+    "eclipselink.logging.parameters" -> "true",
     "eclipselink.logging.level"                                 -> "INFO",
     "javax.persistence.schema-generation.scripts.action"        -> "drop-and-create",
     "javax.persistence.schema-generation.scripts.create-target" -> "target/test-database-create.ddl",

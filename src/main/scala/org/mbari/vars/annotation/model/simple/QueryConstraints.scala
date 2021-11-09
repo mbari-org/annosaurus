@@ -201,7 +201,7 @@ object QueryConstraints {
       if (qc.observerSeq().nonEmpty) Some("obs.observer IN (C?)") else None,
       if (qc.groupSeq().nonEmpty) Some("obs.observation_group IN (D?)") else None,
       if (qc.activitySeq().nonEmpty) Some("obs.activity IN (E?)") else None,
-      if (qc.missionContactSeq().nonEmpty) Some("obs.mission_contact IN (F?)") else None,
+      if (qc.missionContactSeq().nonEmpty) Some("vri.mission_contact IN (F?)") else None,
       qc.minDepth.map(_ => "ad.depth_meters >= ?"),
       qc.maxDepth.map(_ => "ad.depth_meters < ?"),
       qc.minLon.map(_ => "ad.longitude >= ?"),

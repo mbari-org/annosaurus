@@ -96,7 +96,7 @@ object AnnotationSQL {
       |  imaged_moments im RIGHT JOIN
       |  observations obs ON obs.imaged_moment_uuid = im.uuid LEFT JOIN
       |  image_references ir ON ir.imaged_moment_uuid = im.uuid RIGHT JOIN
-      |  associations ass ON ass.observation_uuid = obs.uuidLEFT JOIN
+      |  associations ass ON ass.observation_uuid = obs.uuid LEFT JOIN
       |  video_reference_information vri ON vri.video_reference_uuid = im.video_reference_uuid""".stripMargin
 
   val FROM_WITH_ANCILLARY_DATA: String =
@@ -104,7 +104,7 @@ object AnnotationSQL {
       |  imaged_moments im RIGHT JOIN
       |  observations obs ON obs.imaged_moment_uuid = im.uuid LEFT JOIN
       |  ancillary_data ad ON ad.imaged_moment_uuid = im.uuid LEFT JOIN
-      |  associations ass ON ass.observation_uuid = obs.uuidLEFT JOIN
+      |  associations ass ON ass.observation_uuid = obs.uuid LEFT JOIN
       |  video_reference_information vri ON vri.video_reference_uuid = im.video_reference_uuid
       |""".stripMargin
 
