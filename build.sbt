@@ -21,7 +21,7 @@ val postgresqlVersion   = "42.3.1"
 val rxjavaVersion       = "3.1.2"
 val scalatestVersion    = "3.2.10"
 val scalatraVersion     = "2.8.2"
-val scilubeVersion      = "3.0.0"
+val scilubeVersion      = "3.0.1"
 val servletVersion      = "4.0.1"
 val slf4jVersion        = "2.0.0-alpha5"
 val sqlserverVersion    = "9.4.0.jre11"
@@ -35,7 +35,6 @@ lazy val buildSettings = Seq(
   organization := "org.mbari.vars",
   version := "0.11.1",
   scalaVersion in ThisBuild := "2.13.7",
-  crossScalaVersions := Seq("2.13.7"),
   organizationName := "Monterey Bay Aquarium Research Institute",
   startYear := Some(2017),
   licenses += ("Apache-2.0", new URL(
@@ -134,15 +133,15 @@ lazy val annosaurus = (project in file("."))
       "org.eclipse.persistence"                        % "org.eclipse.persistence.extension" % eclipselinkVersion,
       "org.eclipse.persistence"                        % "org.eclipse.persistence.jpa"       % eclipselinkVersion,
       "org.fusesource.jansi"                           % "jansi"                             % jansiVersion % "runtime",
-      "org.json4s"                                     %% "json4s-jackson"                   % jsonVersion,
+      ("org.json4s"                                     %% "json4s-jackson"                   % jsonVersion).cross(CrossVersion.for3Use2_13),
       "org.mbari.uuid"                                 % "uuid-gen"                          % uuidgenVersion,
       "org.mbari.vcr4j"                                % "vcr4j-core"                        % vcr4jVersion,
       "org.postgresql"                                 % "postgresql"                        % postgresqlVersion,
-      "org.scalatest"                                  %% "scalatest"                        % scalatestVersion % "test",
-      "org.scalatra"                                   %% "scalatra-json"                    % scalatraVersion,
-      "org.scalatra"                                   %% "scalatra-scalate"                 % scalatraVersion,
-      "org.scalatra"                                   %% "scalatra-scalatest"               % scalatraVersion,
-      "org.scalatra"                                   %% "scalatra"                         % scalatraVersion,
+      ("org.scalatest"                                  %% "scalatest"                        % scalatestVersion).cross(CrossVersion.for3Use2_13) % "test",
+      ("org.scalatra"                                   %% "scalatra-json"                    % scalatraVersion).cross(CrossVersion.for3Use2_13),
+      ("org.scalatra"                                   %% "scalatra-scalate"                 % scalatraVersion).cross(CrossVersion.for3Use2_13),
+      ("org.scalatra"                                   %% "scalatra-scalatest"               % scalatraVersion).cross(CrossVersion.for3Use2_13),
+      ("org.scalatra"                                   %% "scalatra"                         % scalatraVersion).cross(CrossVersion.for3Use2_13),
       "org.slf4j"                                      % "log4j-over-slf4j"                  % slf4jVersion,
       "org.mbari.scilube"                                        %% "scilube"                     % scilubeVersion,
       //"net.sourceforge.jtds"     % "jtds"                           % jtdsVersion,
