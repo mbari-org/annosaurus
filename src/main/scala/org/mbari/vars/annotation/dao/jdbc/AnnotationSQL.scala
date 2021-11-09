@@ -81,27 +81,31 @@ object AnnotationSQL {
   val FROM: String =
     """ FROM
       |  imaged_moments im RIGHT JOIN
-      |  observations obs ON obs.imaged_moment_uuid = im.uuid """.stripMargin
+      |  observations obs ON obs.imaged_moment_uuid = im.uuid LEFT JOIN
+      |  video_reference_information vri ON vri.video_reference_uuid = im.video_reference_uuid""".stripMargin
 
   val FROM_WITH_IMAGES: String =
     """ FROM
       |  imaged_moments im RIGHT JOIN
       |  observations obs ON obs.imaged_moment_uuid = im.uuid LEFT JOIN
-      |  image_references ir ON ir.imaged_moment_uuid = im.uuid """.stripMargin
+      |  image_references ir ON ir.imaged_moment_uuid = im.uuid LEFT JOIN
+      |  video_reference_information vri ON vri.video_reference_uuid = im.video_reference_uuid""".stripMargin
 
   val FROM_WITH_IMAGES_AND_ASSOCIATIONS: String =
     """ FROM
       |  imaged_moments im RIGHT JOIN
       |  observations obs ON obs.imaged_moment_uuid = im.uuid LEFT JOIN
       |  image_references ir ON ir.imaged_moment_uuid = im.uuid RIGHT JOIN
-      |  associations ass ON ass.observation_uuid = obs.uuid""".stripMargin
+      |  associations ass ON ass.observation_uuid = obs.uuidLEFT JOIN
+      |  video_reference_information vri ON vri.video_reference_uuid = im.video_reference_uuid""".stripMargin
 
   val FROM_WITH_ANCILLARY_DATA: String =
     """ FROM
       |  imaged_moments im RIGHT JOIN
       |  observations obs ON obs.imaged_moment_uuid = im.uuid LEFT JOIN
       |  ancillary_data ad ON ad.imaged_moment_uuid = im.uuid LEFT JOIN
-      |  associations ass ON ass.observation_uuid = obs.uuid
+      |  associations ass ON ass.observation_uuid = obs.uuidLEFT JOIN
+      |  video_reference_information vri ON vri.video_reference_uuid = im.video_reference_uuid
       |""".stripMargin
 
   val ORDER: String = " ORDER BY obs.uuid"

@@ -97,6 +97,16 @@ class QueryConstraints {
   @Expose(serialize = true)
   var data: Boolean = false
 
+  @Expose(serialize = true)
+  var missionContacts: JList[String] = new util.ArrayList[String]()
+  def missionContactSeq(): List[String] = missionContacts.asScala.toList
+
+  @Expose(serialize = true)
+  var platformName: Option[String] = Option.empty
+
+  @Expose(serialize = true)
+  var missionId: Option[String] = Option.empty
+
 }
 
 object QueryConstraints {
@@ -118,6 +128,7 @@ object QueryConstraints {
     * @param maxTimestamp
     * @param linkName
     * @param linkValue
+    * @param missionContact
     * @param limit
     * @param offset
     * @return
@@ -137,6 +148,9 @@ object QueryConstraints {
             maxTimestamp: Option[Instant] = Option.empty,
             linkName: Option[String] = Option.empty,
             linkValue: Option[String] = Option.empty,
+            missionContacts: List[String] = Nil,
+            platformName: Option[String] = Option.empty,
+            missionId: Option[String] = Option.empty,
             limit: Int = 5000,
             offset: Int = 0) = {
     val qc = new QueryConstraints
@@ -155,6 +169,9 @@ object QueryConstraints {
     qc.maxTimestamp = maxTimestamp
     qc.linkName = linkName
     qc.linkValue = linkValue
+    qc.missionContacts = missionContacts.asJava
+    qc.platformName = platformName
+    qc.missionId = missionId
     qc.limit = limit
     qc.offset = offset
     qc
@@ -184,6 +201,7 @@ object QueryConstraints {
       if (qc.observerSeq().nonEmpty) Some("obs.observer IN (C?)") else None,
       if (qc.groupSeq().nonEmpty) Some("obs.observation_group IN (D?)") else None,
       if (qc.activitySeq().nonEmpty) Some("obs.activity IN (E?)") else None,
+      if (qc.missionContactSeq().nonEmpty) Some("obs.mission_contact IN (F?)") else None,
       qc.minDepth.map(_ => "ad.depth_meters >= ?"),
       qc.maxDepth.map(_ => "ad.depth_meters < ?"),
       qc.minLon.map(_ => "ad.longitude >= ?"),
@@ -193,7 +211,9 @@ object QueryConstraints {
       qc.minTimestamp.map(_ => "im.recorded_timestamp >= ?"),
       qc.maxTimestamp.map(_ => "im.recorded_timestamp < ?"),
       qc.linkName.map(_ => "ass.link_name = ?"),
-      qc.linkValue.map(_ => "ass.link_value = ?")
+      qc.linkValue.map(_ => "ass.link_value = ?"),
+      qc.platformName.map(_ => "vri.platform_name = ?"),
+      qc.missionId.map(_ => "vri.mission_id = ?")
     ).flatten
 
     FROM_WITH_ANCILLARY_DATA + " WHERE " + sqlConstraints.mkString(" AND ")
@@ -201,8 +221,10 @@ object QueryConstraints {
   }
 
 
-  private def toSql(qc: QueryConstraints, selectStatement: String, orderStatement: String = AnnotationSQL.ORDER): String = {
-    import org.mbari.vars.annotation.dao.jdbc.AnnotationSQL._
+  private def toSql(qc: QueryConstraints, 
+      selectStatement: String, 
+      orderStatement: String = AnnotationSQL.ORDER): String = {
+    // import org.mbari.vars.annotation.dao.jdbc.AnnotationSQL._
     val fromWhere = toFromWhereSql(qc)
     selectStatement + fromWhere + orderStatement
   }
@@ -257,7 +279,8 @@ object QueryConstraints {
     val b = replaceInClause(qc.videoReferenceUuidSeq(), a, "(B?)")
     val c = replaceInClause(qc.observerSeq(), b, "(C?)")
     val d = replaceInClause(qc.groupSeq(), c, "(D?)")
-    val sql = replaceInClause(qc.activitySeq(), d, "(E?)")
+    val e = replaceInClause(qc.activitySeq(), d, "(E?)")
+    val sql = replaceInClause(qc.missionContactSeq(), e, "(F?)")
 
     // Bind the params in the correct order. This is the same order they are found in the SQL.
     // The flattened list excludes empty Options
@@ -271,7 +294,9 @@ object QueryConstraints {
       qc.minTimestamp.map(Timestamp.from),
       qc.maxTimestamp.map(Timestamp.from),
       qc.linkName,
-      qc.linkValue).flatten
+      qc.linkValue,
+      qc.platformName,
+      qc.missionId).flatten
     val query = entityManager.createNativeQuery(sql)
     for {
       i <- params.indices
