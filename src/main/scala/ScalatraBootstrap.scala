@@ -25,6 +25,7 @@ import org.scalatra.LifeCycle
 import org.slf4j.LoggerFactory
 
 import scala.concurrent.ExecutionContext
+import org.mbari.vars.annotation.api.HealthApi
 
 /**
   *
@@ -69,21 +70,21 @@ class ScalatraBootstrap extends LifeCycle {
     val imagedMomentV2Api = new ImagedMomentV2Api(imagedMomentController)
 
     val fastAnnotationV1Api = new FastAnnotationV1Api(JPADAOFactory)
-    val analysisV1Api = new AnalysisV1Api(JPADAOFactory)
+    val analysisV1Api       = new AnalysisV1Api(JPADAOFactory)
 
     context.mount(ancillaryDatumV1Api, "/v1/ancillarydata")
+    context.mount(analysisV1Api, "/v1/analysis")
     context.mount(annotationV1Api, "/v1/annotations")
     context.mount(associationV1Api, "/v1/associations")
     context.mount(authorizationV1Api, "/v1/auth")
+    context.mount(fastAnnotationV1Api, "/v1/fast")
     context.mount(imagedMomentV1Api, "/v1/imagedmoments")
     context.mount(imageReferenceV1Api, "/v1/imagereferences")
     context.mount(imageV1Api, "/v1/images")
     context.mount(indexV1Api, "/v1/index")
+    context.mount(new HealthApi, "/health")
     context.mount(observationV1Api, "/v1/observations")
     context.mount(videoReferenceV1Api, "/v1/videoreferences")
-
-    context.mount(fastAnnotationV1Api, "/v1/fast")
-    context.mount(analysisV1Api, "/v1/analysis")
 
     context.mount(annotationV2Api, "/v2/annotations")
     context.mount(imagedMomentV2Api, "/v2/imagedmoments")

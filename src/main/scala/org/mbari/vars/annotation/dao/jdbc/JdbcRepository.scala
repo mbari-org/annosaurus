@@ -21,7 +21,13 @@ import java.time.Instant
 import java.util.UUID
 import javax.persistence.{EntityManager, EntityManagerFactory, Query}
 import org.mbari.vars.annotation.model.{Annotation, GeographicRange}
-import org.mbari.vars.annotation.model.simple.{ConcurrentRequest, DeleteCount, Image, MultiRequest, QueryConstraints}
+import org.mbari.vars.annotation.model.simple.{
+  ConcurrentRequest,
+  DeleteCount,
+  Image,
+  MultiRequest,
+  QueryConstraints
+}
 import org.slf4j.LoggerFactory
 
 import scala.jdk.CollectionConverters._
@@ -74,7 +80,7 @@ class JdbcRepository(entityManagerFactory: EntityManagerFactory) {
 
   def findByQueryConstraint(constraints: QueryConstraints): Seq[AnnotationExt] = {
     implicit val entityManager: EntityManager = entityManagerFactory.createEntityManager()
-    val query1 = QueryConstraints.toQuery(constraints, entityManager)
+    val query1                                = QueryConstraints.toQuery(constraints, entityManager)
 
     val r1          = query1.getResultList.asScala.toList
     val annotations = AnnotationSQL.resultListToAnnotations(r1)
@@ -85,25 +91,31 @@ class JdbcRepository(entityManagerFactory: EntityManagerFactory) {
 
   def countByQueryConstraint(constraints: QueryConstraints): Int = {
     implicit val entityManager: EntityManager = entityManagerFactory.createEntityManager()
-    val query = QueryConstraints.toCountQuery(constraints, entityManager)
-    val count = query.getResultList.get(0).asInstanceOf[Int]
+    val query                                 = QueryConstraints.toCountQuery(constraints, entityManager)
+    val count                                 = query.getResultList.get(0).asInstanceOf[Int]
     entityManager.close()
     count
   }
 
-  def findGeographicRangeByQueryConstraint(constraints: QueryConstraints): Option[GeographicRange] = {
+  def findGeographicRangeByQueryConstraint(
+      constraints: QueryConstraints
+  ): Option[GeographicRange] = {
     implicit val entityManager: EntityManager = entityManagerFactory.createEntityManager()
-    val query = QueryConstraints.toGeographicRangeQuery(constraints, entityManager)
+    val query                                 = QueryConstraints.toGeographicRangeQuery(constraints, entityManager)
     // Queries return java.util.List[Array[Object]]
     val count = query.getResultList.asScala.toList
     if (count.nonEmpty) {
       val head = count.head.asInstanceOf[Array[_]]
-      Some(GeographicRange(head(0).toString.toDouble,
-        head(1).toString.toDouble,
-        head(2).toString.toDouble,
-        head(3).toString.toDouble,
-        head(4).toString.toDouble,
-        head(5).toString.toDouble))
+      Some(
+        GeographicRange(
+          head(0).toString.toDouble,
+          head(1).toString.toDouble,
+          head(2).toString.toDouble,
+          head(3).toString.toDouble,
+          head(4).toString.toDouble,
+          head(5).toString.toDouble
+        )
+      )
     }
     else None
   }
@@ -280,10 +292,11 @@ class JdbcRepository(entityManagerFactory: EntityManagerFactory) {
   }
 
   def findByToConceptWithImages(
-     toConcept: String,
-     limit: Option[Int] = None,
-     offset: Option[Int] = None,
-     includeAncillaryData: Boolean = false): Seq[AnnotationExt] = {
+      toConcept: String,
+      limit: Option[Int] = None,
+      offset: Option[Int] = None,
+      includeAncillaryData: Boolean = false
+  ): Seq[AnnotationExt] = {
     implicit val entityManager: EntityManager = entityManagerFactory.createEntityManager()
     val query1                                = entityManager.createNativeQuery(AnnotationSQL.byToConceptWithImages)
     query1.setParameter(1, toConcept)

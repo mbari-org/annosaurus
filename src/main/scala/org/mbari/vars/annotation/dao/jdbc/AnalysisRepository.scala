@@ -16,25 +16,25 @@
 
 package org.mbari.vars.annotation.dao.jdbc
 
-import org.mbari.vars.annotation.model.simple.{DepthHistogram, QueryConstraints}
+import org.mbari.vars.annotation.model.simple.{DepthHistogram, QueryConstraints, TimeHistogram}
 import org.slf4j.LoggerFactory
 
 import javax.persistence.{EntityManager, EntityManagerFactory}
 import scala.jdk.CollectionConverters._
-
-
+import java.time.Instant
 
 class AnalysisRepository(entityManagerFactory: EntityManagerFactory) {
 
   private[this] val log = LoggerFactory.getLogger(getClass)
 
-  def depthHistogram(constraints: QueryConstraints, binSizeMeters: Int = 50): DepthHistogram  = {
-    val select = DepthHistogramSQL.selectFromBinSize(binSizeMeters)
+  def depthHistogram(constraints: QueryConstraints, binSizeMeters: Int = 50): DepthHistogram = {
+    val select                       = DepthHistogramSQL.selectFromBinSize(binSizeMeters)
     val entityManager: EntityManager = entityManagerFactory.createEntityManager()
-    val query = QueryConstraints.toQuery(constraints, entityManager, select, "")
-    val results = query.getResultList.asScala.toList
+    val query                        = QueryConstraints.toQuery(constraints, entityManager, select, "")
+    val results                      = query.getResultList.asScala.toList
     entityManager.close()
-    val values = results.head
+    val values = results
+      .head
       .asInstanceOf[Array[Object]]
       .map(s => s.toString.toInt)
     val binsMin = (0 until DepthHistogramSQL.MaxDepth by binSizeMeters).toArray
@@ -42,12 +42,36 @@ class AnalysisRepository(entityManagerFactory: EntityManagerFactory) {
     DepthHistogram(binsMin, binsMax, values)
   }
 
-}
+  def timeHistogram(constraints: QueryConstraints, binSizeDays: Int = 30): TimeHistogram = {
+    val now                          = Instant.now()
+    val select                       = TimeHistogramSQL.selectFromBinSize(now, binSizeDays)
+    val entityManager: EntityManager = entityManagerFactory.createEntityManager()
+    val query                        = QueryConstraints.toQuery(constraints, entityManager, select, "")
+    val results                      = query.getResultList.asScala.toList
+    entityManager.close()
+    val values = results
+      .head
+      .asInstanceOf[Array[Object]]
+      .map(s => s.toString.toInt)
+      .toIndexedSeq
 
+    val intervalMillis = binSizeDays * 24 * 60 * 60 * 1000L
+    val binsMin =
+      (TimeHistogramSQL.MinTime.getEpochSecond until now.getEpochSecond by intervalMillis)
+        .map(Instant.ofEpochSecond(_, 0))
+
+    val binsMax = binsMin
+      .map(_.plusMillis(intervalMillis))
+
+    TimeHistogram(binsMin, binsMax, values)
+
+  }
+
+}
 
 object DepthHistogramSQL {
 
-  val MaxDepth: Int  = 4000
+  val MaxDepth: Int = 4000
 
   def selectFromBinSize(binSizeMeters: Int = 50): String = {
     val xs = for (i <- 0 until MaxDepth by binSizeMeters) yield {
@@ -60,4 +84,36 @@ object DepthHistogramSQL {
        |""".stripMargin
   }
 
+}
+
+object TimeHistogramSQL {
+
+  val MinTime = Instant.parse("1987-01-01T00:00:00Z")
+
+  def selectFromBinSize(maxInstant: Instant, binSizeDays: Int = 30): String = {
+    val intervalMillis = binSizeDays * 24 * 60 * 60 * 1000L
+    val start          = MinTime.toEpochMilli
+    val end            = maxInstant.toEpochMilli()
+    val xs = for (i <- start to end by intervalMillis) yield {
+      val j     = i + start
+      val date0 = new java.sql.Date(j)
+      val date1 = new java.sql.Date(j + intervalMillis)
+      s"COUNT(CASE WHEN im.recorded_timestamp >= '$date0' AND ad.recorded_timestamp < '$date1' THEN 1 END) AS [$i-$j]"
+    }
+
+    s"""SELECT
+       |  ${xs.mkString(",\n  ")}
+       |""".stripMargin
+  }
+
+  // def selectFromBinSize(binSizeDays: Int = 30): String = {
+  //   val xs = for (i <- 0 until 365 by binSizeDays) yield {
+  //     val j = i + binSizeDays
+  //     s"COUNT(CASE WHEN ad.time_utc >= '$MinTime' AND ad.time_utc < '$j' THEN 1 END) AS [$i-$j]"
+  //   }
+
+  //   s"""SELECT
+  //      |  ${xs.mkString(",\n  ")}
+  //      |""".stripMargin
+  // }
 }

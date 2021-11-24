@@ -6,6 +6,6 @@ addSbtPlugin("com.typesafe.sbt"  % "sbt-git"                      % "1.0.1")
 addSbtPlugin("de.heikoseeberger" % "sbt-header"                   % "5.6.0")
 addSbtPlugin("org.scalameta"     % "sbt-scalafmt"                 % "2.4.2")
 addSbtPlugin("org.xerial.sbt"    % "sbt-pack"                     % "0.13")
-addSbtPlugin("com.codecommit"    % "sbt-github-packages" % "0.5.3")
+addSbtPlugin("com.codecommit"    % "sbt-github-packages"          % "0.5.3")
 
 resolvers += Resolver.sonatypeRepo("releases")

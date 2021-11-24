@@ -41,12 +41,14 @@ class GeographicRange {
 }
 
 object GeographicRange {
-  def apply(minLatitude: Double,
-            maxLatitude: Double,
-            minLongitude: Double,
-            maxLongitude: Double,
-            minDepthMeters: Double,
-            maxDepthMeters: Double): GeographicRange = {
+  def apply(
+      minLatitude: Double,
+      maxLatitude: Double,
+      minLongitude: Double,
+      maxLongitude: Double,
+      minDepthMeters: Double,
+      maxDepthMeters: Double
+  ): GeographicRange = {
     val gr = new GeographicRange()
     gr.minLatitude = minLatitude
     gr.maxLatitude = maxLatitude
@@ -57,5 +59,6 @@ object GeographicRange {
     gr
   }
 
-  val Empty: GeographicRange = apply(Double.NaN, Double.NaN, Double.NaN, Double.NaN, Double.NaN, Double.NaN)
+  val Empty: GeographicRange =
+    apply(Double.NaN, Double.NaN, Double.NaN, Double.NaN, Double.NaN, Double.NaN)
 }

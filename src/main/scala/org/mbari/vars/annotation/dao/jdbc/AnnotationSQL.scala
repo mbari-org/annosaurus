@@ -130,6 +130,7 @@ object AnnotationSQL {
 
   val byImagedMomentUuids: String = SELECT + FROM + " WHERE im.uuid IN (?) " + ORDER
 
-  val byToConceptWithImages: String = SELECT + FROM_WITH_IMAGES_AND_ASSOCIATIONS + " WHERE ass.to_concept = ?" + ORDER
+  val byToConceptWithImages: String =
+    SELECT + FROM_WITH_IMAGES_AND_ASSOCIATIONS + " WHERE ass.to_concept = ?" + ORDER
 
 }

@@ -25,7 +25,7 @@ import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success, Try}
 
 class AnalysisV1Api(daoFactory: JPADAOFactory)(implicit val executor: ExecutionContext)
-  extends V1APIStack {
+    extends V1APIStack {
 
   before() {
     contentType = "application/json"
@@ -35,20 +35,33 @@ class AnalysisV1Api(daoFactory: JPADAOFactory)(implicit val executor: ExecutionC
   private[this] val repository = new AnalysisRepository(daoFactory.entityManagerFactory)
 
   post("/histogram/depth") {
-    val body = request.body
+    val body          = request.body
     val binSizeMeters = params.getAs[Int]("size").getOrElse(50)
     Try(QueryConstraints.fromJson(body)) match {
       case Success(constraints) =>
         Future {
-          val hist = repository.depthHistogram(constraints, binSizeMeters)
+          val hist     = repository.depthHistogram(constraints, binSizeMeters)
           val response = QueryConstraintsResponse(constraints, hist)
           toJson(response)
         }
-      case Failure(e) =>
+      case Failure(_) =>
         halt(BadRequest(toJson(ErrorMsg(400, "valid query constraints are required"))))
     }
   }
 
-
+  post("/histogram/time") {
+    val body        = request.body
+    val binSizeDays = params.getAs[Int]("size").getOrElse(30)
+    Try(QueryConstraints.fromJson(body)) match {
+      case Success(constraints) =>
+        Future {
+          val hist     = repository.timeHistogram(constraints, binSizeDays)
+          val response = QueryConstraintsResponse(constraints, hist)
+          toJson(response)
+        }
+      case Failure(_) =>
+        halt(BadRequest(toJson(ErrorMsg(400, "valid query constraints are required"))))
+    }
+  }
 
 }

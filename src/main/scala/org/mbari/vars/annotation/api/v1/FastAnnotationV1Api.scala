@@ -21,7 +21,14 @@ import org.mbari.vars.annotation.Constants
 import java.util.UUID
 import org.mbari.vars.annotation.dao.jdbc.JdbcRepository
 import org.mbari.vars.annotation.dao.jpa.JPADAOFactory
-import org.mbari.vars.annotation.model.simple.{ConcurrentRequest, Count, ErrorMsg, MultiRequest, QueryConstraints, QueryConstraintsResponse}
+import org.mbari.vars.annotation.model.simple.{
+  ConcurrentRequest,
+  Count,
+  ErrorMsg,
+  MultiRequest,
+  QueryConstraints,
+  QueryConstraintsResponse
+}
 import org.scalatra.BadRequest
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -52,7 +59,7 @@ class FastAnnotationV1Api(daoFactory: JPADAOFactory)(implicit val executor: Exec
     Try(QueryConstraints.fromJson(body)) match {
       case Success(constraints) =>
         Future {
-          val annos = repository.findByQueryConstraint(constraints)
+          val annos    = repository.findByQueryConstraint(constraints)
           val response = QueryConstraintsResponse(constraints, annos.toList.asJava)
           toJson(response)
         }
@@ -71,7 +78,11 @@ class FastAnnotationV1Api(daoFactory: JPADAOFactory)(implicit val executor: Exec
               val response = QueryConstraintsResponse(constraints, range)
               toJson(response)
             case None =>
-              halt(BadRequest(toJson(ErrorMsg(404, "Range was not found for annotations matching your query"))))
+              halt(
+                BadRequest(
+                  toJson(ErrorMsg(404, "Range was not found for annotations matching your query"))
+                )
+              )
           }
         }
       case Failure(exception) =>
@@ -84,8 +95,8 @@ class FastAnnotationV1Api(daoFactory: JPADAOFactory)(implicit val executor: Exec
     Try(QueryConstraints.fromJson(body)) match {
       case Success(constraints) =>
         Future {
-          val n = repository.countByQueryConstraint(constraints)
-          val count = Count(n.toLong)
+          val n        = repository.countByQueryConstraint(constraints)
+          val count    = Count(n.toLong)
           val response = QueryConstraintsResponse(constraints, count)
           toJson(response)
         }

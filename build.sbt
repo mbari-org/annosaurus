@@ -1,5 +1,6 @@
 val akkaVersion         = "2.4.7"
 val auth0Version        = "3.17.0"
+val circeVersion        = "0.14.1"
 val codecVersion        = "1.15"
 val configVersion       = "1.4.1"
 val derbyVersion        = "10.15.2.0"
@@ -125,6 +126,9 @@ lazy val annosaurus = (project in file("."))
       "com.typesafe"                                   % "config"                            % configVersion,
       "com.zaxxer"                                     % "HikariCP"                          % hikariVersion,
       "commons-codec"                                  % "commons-codec"                     % codecVersion,
+      "io.circe"                                       %% "circe-core"                       % circeVersion,
+      "io.circe"                                       %% "circe-generic"                    % circeVersion,
+      "io.circe"                                       %% "circe-parser"                     % circeVersion,
       "io.reactivex.rxjava3"                           % "rxjava"                            % rxjavaVersion,
       "javax.servlet"                                  % "javax.servlet-api"                 % servletVersion,
       "javax.transaction"                              % "jta"                               % jtaVersion,
@@ -151,7 +155,7 @@ lazy val annosaurus = (project in file("."))
       "org.scalatra"                                   %% "scalatra-scalatest"               % scalatraVersion,
       "org.scalatra"                                   %% "scalatra"                         % scalatraVersion,
       "org.slf4j"                                      % "log4j-over-slf4j"                  % slf4jVersion,
-      "org.mbari.scilube"                                        %% "scilube"                     % scilubeVersion,
+      "org.mbari.scilube"                              %% "scilube"                          % scilubeVersion,
       //"net.sourceforge.jtds"     % "jtds"                           % jtdsVersion,
       "org.slf4j"  % "slf4j-api" % slf4jVersion,
       "org.zeromq" % "jeromq"    % zeromqVersion

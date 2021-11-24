@@ -98,7 +98,7 @@ class ImageControllerSpec extends AnyFlatSpec with Matchers with BeforeAndAfterA
 
   it should "create using image_reference_uuid" in {
     val uuid = UUID.randomUUID()
-    val url = new URL("http://www.mbari.org/foo_im.png")
+    val url  = new URL("http://www.mbari.org/foo_im.png")
     val a = exec(() =>
       controller.create(
         videoReferenceUuid,
@@ -118,7 +118,7 @@ class ImageControllerSpec extends AnyFlatSpec with Matchers with BeforeAndAfterA
     val i = c.head
     i.url should be(url)
     i.imageReferenceUuid should be(uuid)
-    
+
   }
 
   override protected def afterAll(): Unit = {
