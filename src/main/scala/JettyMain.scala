@@ -31,6 +31,13 @@ object JettyMain {
 
   def main(args: Array[String]) = {
     System.setProperty("user.timezone", "UTC")
+    val s = """                                                
+      |   __ _ _ __  _ __   ___  ___  __ _ _   _ _ __ _   _ ___ 
+      |  / _` | '_ \| '_ \ / _ \/ __|/ _` | | | | '__| | | / __|
+      | | (_| | | | | | | | (_) \__ \ (_| | |_| | |  | |_| \__ \
+      |  \__,_|_| |_|_| |_|\___/|___/\__,_|\__,_|_|   \__,_|___/""".stripMargin
+    println(s)
+
     val server: Server = new Server
 
     val conf = Constants.AppConfig.httpConfig
