@@ -52,6 +52,6 @@ object CirceCodecs {
 
   private val printer = Printer.noSpaces.copy(dropNullValues = true)
 
-  def print[T : Encoder](t: T): String = printer.print(t.asJson)
+  def print[T: Encoder](t: T): String = printer.print(t.asJson)
 
 }

@@ -25,6 +25,9 @@ target/
 
 # vscode
 .vscode/
+.history/
 .metals/
 .bloop/
+.bsp/
 project/metals.sbt
+project/project/
