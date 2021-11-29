@@ -85,7 +85,7 @@ lazy val optionSettings = Seq(
     "-Ywarn-unused:privates",  // Warn if a private member is unused.
     "-Ywarn-value-discard"     // Warn when non-Unit expression results are unused.
   ),
-  javacOptions ++= Seq("-target", "11", "-source", "11"),
+  javacOptions ++= Seq("-target", "17", "-source", "17"),
   updateOptions := updateOptions.value.withCachedResolution(true)
 )
 

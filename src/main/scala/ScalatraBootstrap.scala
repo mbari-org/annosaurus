@@ -25,7 +25,7 @@ import org.scalatra.LifeCycle
 import org.slf4j.LoggerFactory
 
 import scala.concurrent.ExecutionContext
-import org.mbari.vars.annotation.api.HealthApi
+import org.mbari.vars.annotation.api.v1.HealthApi
 
 /**
   *
@@ -82,7 +82,7 @@ class ScalatraBootstrap extends LifeCycle {
     context.mount(imageReferenceV1Api, "/v1/imagereferences")
     context.mount(imageV1Api, "/v1/images")
     context.mount(indexV1Api, "/v1/index")
-    context.mount(new HealthApi, "/health")
+    context.mount(new HealthApi, "/v1/health")
     context.mount(observationV1Api, "/v1/observations")
     context.mount(videoReferenceV1Api, "/v1/videoreferences")
 

@@ -1,3 +1,4 @@
+import org.slf4j.LoggerFactory
 /*
  * Copyright 2017 Monterey Bay Aquarium Research Institute
  *
@@ -42,10 +43,12 @@ object JettyMain {
 
     val conf = Constants.AppConfig.httpConfig
 
-    println("Starting Annosaurus on " + conf.port)
+    LoggerFactory.getLogger(getClass)
+      .atInfo
+      .log("Starting Jetty server on port {}", conf.port)
     ZeroMQPublisher.log(zmq)
 
-    server.setStopTimeout(conf.stopTimeout)
+    server.setStopTimeout(conf.stopTimeout.toLong)
     //server setDumpAfterStart true
     server.setStopAtShutdown(true)
 
@@ -55,7 +58,7 @@ object JettyMain {
 
     val connector = new NetworkTrafficServerConnector(server, new HttpConnectionFactory(httpConfig))
     connector.setPort(conf.port)
-    connector.setIdleTimeout(conf.connectorIdleTimeout)
+    connector.setIdleTimeout(conf.connectorIdleTimeout.toLong)
     server.addConnector(connector)
 
     val webApp = new WebAppContext
