@@ -34,7 +34,7 @@ Global / onChangedBuildSource := ReloadOnSourceChanges
 
 lazy val buildSettings = Seq(
   organization := "org.mbari.vars",
-  version := "0.12.1",
+  version := "0.12.2",
   scalaVersion in ThisBuild := "2.13.7",
   organizationName := "Monterey Bay Aquarium Research Institute",
   startYear := Some(2017),
