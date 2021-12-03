@@ -29,7 +29,6 @@ class AnalysisV1Api(daoFactory: JPADAOFactory)(implicit val executor: ExecutionC
 
   before() {
     contentType = "application/json"
-    response.headers.set("Access-Control-Allow-Origin", "*")
   }
 
   private[this] val repository = new AnalysisRepository(daoFactory.entityManagerFactory)

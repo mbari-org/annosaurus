@@ -47,7 +47,6 @@ class AnnotationV1Api(controller: AnnotationController)(implicit val executor: E
 
   before() {
     contentType = "application/json"
-    response.headers.set("Access-Control-Allow-Origin", "*")
   }
 
   get("/:uuid") {

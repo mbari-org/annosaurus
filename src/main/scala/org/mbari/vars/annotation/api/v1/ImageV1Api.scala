@@ -36,7 +36,6 @@ class ImageV1Api(controller: ImageController)(implicit val executor: ExecutionCo
 
   before() {
     contentType = "application/json"
-    response.headers.set("Access-Control-Allow-Origin", "*")
   }
 
   get("/:uuid") {

@@ -35,7 +35,6 @@ class IndexV1Api(controller: IndexController)(implicit val executor: ExecutionCo
 
   before() {
     contentType = "application/json"
-    response.headers.set("Access-Control-Allow-Origin", "*")
   }
 
   get("/videoreference/:uuid") {

@@ -26,7 +26,6 @@ class HealthApi extends ScalatraServlet {
 
   before() {
     contentType = "application/json"
-    response.headers.set("Access-Control-Allow-Origin", "*")
   }
 
   get("/") {

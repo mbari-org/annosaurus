@@ -44,7 +44,6 @@ class FastAnnotationV1Api(daoFactory: JPADAOFactory)(implicit val executor: Exec
 
   before() {
     contentType = "application/json"
-    response.headers.set("Access-Control-Allow-Origin", "*")
   }
 
   private[this] val repository = new JdbcRepository(daoFactory.entityManagerFactory)

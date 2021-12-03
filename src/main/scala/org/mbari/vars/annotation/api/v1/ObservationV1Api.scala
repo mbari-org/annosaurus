@@ -35,6 +35,10 @@ import scala.jdk.CollectionConverters._
 class ObservationV1Api(controller: ObservationController)(implicit val executor: ExecutionContext)
     extends V1APIStack {
 
+  before() {
+    contentType = "application/json"
+  }
+
   get("/:uuid") {
     val uuid = params
       .getAs[UUID]("uuid")

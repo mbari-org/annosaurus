@@ -37,7 +37,6 @@ class CachedAncillaryDatumV1Api(controller: CachedAncillaryDatumController)(
 
   before() {
     contentType = "application/json"
-    response.headers.set("Access-Control-Allow-Origin", "*")
   }
 
   get("/:uuid") {

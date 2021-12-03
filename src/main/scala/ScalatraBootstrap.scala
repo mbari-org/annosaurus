@@ -26,6 +26,7 @@ import org.slf4j.LoggerFactory
 
 import scala.concurrent.ExecutionContext
 import org.mbari.vars.annotation.api.v1.HealthApi
+import org.mbari.vars.annotation.AppConfig
 
 /**
   *
@@ -39,7 +40,11 @@ class ScalatraBootstrap extends LifeCycle {
 
   override def init(context: ServletContext): Unit = {
 
-    log.info("STARTING UP NOW")
+    LoggerFactory.getLogger(getClass).info(s"Mounting ${AppConfig.Name} Servlets")
+    // Optional because * is the default
+    context.setInitParameter("org.scalatra.cors.allowedOrigins", "*")
+    // Disables cookies, but required because browsers will not allow passing credentials to wildcard domains
+    context.setInitParameter("org.scalatra.cors.allowCredentials", "false")
 
     implicit val executionContext: ExecutionContext =
       ExecutionContext.fromExecutor(Executors.newWorkStealingPool())

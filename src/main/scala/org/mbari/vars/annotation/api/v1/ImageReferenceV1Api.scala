@@ -32,6 +32,10 @@ class ImageReferenceV1Api(controller: ImageReferenceController)(
     implicit val executor: ExecutionContext
 ) extends V1APIStack {
 
+  before() {
+    contentType = "application/json"
+  }
+
   get("/:uuid") {
     val uuid = params
       .getAs[UUID]("uuid")

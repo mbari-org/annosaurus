@@ -40,7 +40,6 @@ class ImagedMomentV1Api(controller: ImagedMomentController)(implicit val executo
 
   before() {
     contentType = "application/json"
-    response.headers.set("Access-Control-Allow-Origin", "*")
   }
 
   get("/") {

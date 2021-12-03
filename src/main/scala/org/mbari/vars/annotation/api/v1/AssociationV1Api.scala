@@ -37,7 +37,6 @@ class AssociationV1Api(controller: AssociationController)(implicit val executor:
 
   before() {
     contentType = "application/json"
-    response.headers.set("Access-Control-Allow-Origin", "*")
   }
 
   // Find an association

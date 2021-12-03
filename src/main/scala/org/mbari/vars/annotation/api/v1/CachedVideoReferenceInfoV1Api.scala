@@ -36,6 +36,10 @@ class CachedVideoReferenceInfoV1Api(controller: CachedVideoReferenceInfoControll
     implicit val executor: ExecutionContext
 ) extends V1APIStack {
 
+  before() {
+    contentType = "application/json"
+  }
+
   get("/?") {
     params.getAs[Int]("limit")
     params.getAs[Int]("offset")
