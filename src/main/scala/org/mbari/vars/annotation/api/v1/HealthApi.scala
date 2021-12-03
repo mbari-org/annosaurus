@@ -24,6 +24,11 @@ import org.mbari.vars.annotation.model.simple.CirceCodecs._
 
 class HealthApi extends ScalatraServlet {
 
+  before() {
+    contentType = "application/json"
+    response.headers.set("Access-Control-Allow-Origin", "*")
+  }
+
   get("/") {
     CirceCodecs.print(HealthStatus.default)
   }
