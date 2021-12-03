@@ -76,3 +76,10 @@ class AppConfig(config: Config) {
     }
 
 }
+
+object AppConfig {
+  val Name: String = "annosaurus"
+
+  val Version: String = Try(getClass.getPackage.getImplementationVersion).getOrElse("0.0.0")
+
+}

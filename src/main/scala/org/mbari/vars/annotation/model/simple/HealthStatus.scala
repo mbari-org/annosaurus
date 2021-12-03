@@ -16,13 +16,16 @@
 
 package org.mbari.vars.annotation.model.simple
 
+import org.mbari.vars.annotation.AppConfig
+
 final case class HealthStatus(
     jdkVersion: String,
     availableProcessors: Int,
     freeMemory: Long,
     maxMemory: Long,
     totalMemory: Long,
-    application: String = "annosaurus"
+    application: String = AppConfig.Name,
+    version: String = AppConfig.Version
 )
 
 object HealthStatus {
