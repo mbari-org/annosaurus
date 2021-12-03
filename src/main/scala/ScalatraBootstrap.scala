@@ -36,8 +36,6 @@ import org.mbari.vars.annotation.AppConfig
   */
 class ScalatraBootstrap extends LifeCycle {
 
-  private[this] val log = LoggerFactory.getLogger(getClass)
-
   override def init(context: ServletContext): Unit = {
 
     LoggerFactory.getLogger(getClass).info(s"Mounting ${AppConfig.Name} Servlets")
