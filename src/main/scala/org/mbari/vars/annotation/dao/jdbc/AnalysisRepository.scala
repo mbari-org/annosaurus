@@ -98,7 +98,7 @@ object TimeHistogramSQL {
       val j     = i + start
       val date0 = new java.sql.Date(j)
       val date1 = new java.sql.Date(j + intervalMillis)
-      s"COUNT(CASE WHEN im.recorded_timestamp >= '$date0' AND ad.recorded_timestamp < '$date1' THEN 1 END) AS [$i-$j]"
+      s"COUNT(CASE WHEN im.recorded_timestamp >= '$date0' AND im.recorded_timestamp < '$date1' THEN 1 END) AS [$i-$j]"
     }
 
     s"""SELECT
