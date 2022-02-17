@@ -24,5 +24,5 @@ sbt pack && \
 # docker buildx build --load -t mbari/annosaurus:${VCS_REF} -t mbari/annosaurus:latest .
 
 
-sbt pack && \
-    docker build -t mbari/annosaurus:latest
+# sbt pack && \
+#     docker build -t mbari/annosaurus:latest
