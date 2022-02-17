@@ -69,12 +69,19 @@ object AssociationSQL {
       |  im.uuid AS imaged_moment_uuid
     """.stripMargin
 
-  val FROM: String =
-    """ FROM
-      |  associations ass LEFT JOIN
-      |  observations obs ON ass.observation_uuid = obs.uuid LEFT JOIN
-      |  imaged_moments im ON obs.imaged_moment_uuid = im.uuid
-    """.stripMargin
+    // LEFT JOIN Performance is TERRIBLE  on Derby
+  // val FROM: String =
+  //   """ FROM
+  //     |  associations ass LEFT JOIN
+  //     |  observations obs ON ass.observation_uuid = obs.uuid LEFT JOIN
+  //     |  imaged_moments im ON obs.imaged_moment_uuid = im.uuid
+  //   """.stripMargin
+
+  val FROM: String = 
+    """FROM 
+      |  imaged_moments im RIGHT JOIN
+      |  observations obs ON obs.imaged_moment_uuid = im.uuid RIGHT JOIN
+      |  associations ass ON ass.observation_uuid = obs.uuid""".stripMargin
 
   val ORDER: String = " ORDER BY ass.uuid"
 
