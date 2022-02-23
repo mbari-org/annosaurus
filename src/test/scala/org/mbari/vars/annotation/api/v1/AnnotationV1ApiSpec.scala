@@ -142,6 +142,22 @@ class AnnotationV1ApiSpec extends WebApiStack {
     }
   }
 
+  // it should "update recorded_timestamp" in {
+  //   put(
+  //     s"/v1/annotations/${annotation.observationUuid}",
+  //     "recorded_timestamp"         -> "20190831T230708.510000Z",
+  //   ) {
+  //     status should be(200)
+  //     val a = gson.fromJson(body, classOf[AnnotationImpl])
+  //     a.concept should be("Aegina")
+  //     a.observer should be(annotation.observer)
+  //     a.elapsedTime should be(annotation.elapsedTime)
+  //     a.timecode should be(null)
+  //     a.duration should be(Duration.ofMillis(2500))
+  //     a.recordedTimestamp should be(Instant.parse("2019-08-31T23:07:08.51Z"))
+  //   }
+  // }
+
   it should "update with same VideoReferenceUuid" in {
     put(
       s"/v1/annotations/${annotation.observationUuid}",
