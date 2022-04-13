@@ -176,7 +176,7 @@ class CachedAncillaryDatumV1Api(controller: CachedAncillaryDatumController)(
       .getOrElse(
         halt(BadRequest(toJson(ErrorMsg(400, "A video reference 'uuid' parameter is required"))))
       )
-    val windowMillis = params.getAs[Int]("window").getOrElse(7500)
+    val windowMillis = params.getAs[Long]("window").getOrElse(7500L)
     request.getHeader("Content-Type") match {
       case "application/json" =>
         val data = fromJson(request.body, classOf[Array[CachedAncillaryDatumBean]])
