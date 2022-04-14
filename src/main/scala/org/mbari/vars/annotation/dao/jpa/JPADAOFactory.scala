@@ -96,8 +96,9 @@ class JPADAOFactoryImpl(val entityManagerFactory: EntityManagerFactory) extends 
 
 object JPADAOFactory extends JPADAOFactory {
 
+
   lazy val entityManagerFactory = {
-    val config      = ConfigFactory.load()
+    val config = ConfigFactory.load()
     val environment = config.getString("database.environment")
     val nodeName =
       if (environment.equalsIgnoreCase("production"))
@@ -106,4 +107,6 @@ object JPADAOFactory extends JPADAOFactory {
 
     EntityManagerFactories(nodeName)
   }
+
+
 }

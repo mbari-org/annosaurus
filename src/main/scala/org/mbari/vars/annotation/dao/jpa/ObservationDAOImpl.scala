@@ -91,7 +91,7 @@ class ObservationDAOImpl(entityManager: EntityManager)
       endTimestamp: Instant
   ): Int = {
     val query = entityManager.createNamedQuery("Observation.countByVideoReferenceUUIDAndTimestamps")
-    query.setParameter(1, UUIDConverter.uuidToString(uuid))
+    query.setParameter(1, uuid.toString().toLowerCase())
     query.setParameter(2, Timestamp.from(startTimestamp))
     query.setParameter(3, Timestamp.from(endTimestamp))
     query.getSingleResult.asInstanceOf[Int]
@@ -180,7 +180,7 @@ class ObservationDAOImpl(entityManager: EntityManager)
 
   override def findAllConceptsByVideoReferenceUUID(uuid: UUID): Seq[String] = {
     val query = entityManager.createNamedQuery("Observation.findAllNamesByVideoReferenceUUID")
-    query.setParameter(1, UUIDConverter.uuidToString(uuid))
+    query.setParameter(1, uuid.toString().toLowerCase())
     query
       .getResultList
       .asScala
@@ -212,7 +212,7 @@ class ObservationDAOImpl(entityManager: EntityManager)
 
   override def countByVideoReferenceUUID(uuid: UUID): Int = {
     val query = entityManager.createNamedQuery("Observation.countByVideoReferenceUUID")
-    query.setParameter(1, UUIDConverter.uuidToString(uuid))
+    query.setParameter(1, uuid.toString().toLowerCase())
     query
       .getResultList
       .asScala

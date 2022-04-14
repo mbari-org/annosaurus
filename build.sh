@@ -29,7 +29,7 @@ fi
  
 
 # For M1 use:
-# docker buildx build --load -t mbari/annosaurus:${VCS_REF} -t mbari/annosaurus:latest .
+# docker buildx build --load  -t mbari/annosaurus:latest .
 
 
 # sbt pack && \
