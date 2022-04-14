@@ -21,8 +21,8 @@ import javax.persistence.Converter;
 import java.util.UUID;
 
 /**
- * Most databases can accept a UUID param in the form of a String. However,
- * the postgres jdbc driver does not. This converter conditional transforms a 
+ * Some databases, like SQL Server, can accept a UUID param in the form of a String. 
+ * However, the postgres jdbc driver does not. This converter conditional transforms a 
  * UUID to based on the database name (See reference.conf for allowed names)
  * @author Brian Schlining
  * @since 2016-05-12
