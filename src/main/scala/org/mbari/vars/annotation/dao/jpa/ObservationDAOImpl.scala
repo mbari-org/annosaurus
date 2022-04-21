@@ -180,7 +180,13 @@ class ObservationDAOImpl(entityManager: EntityManager)
 
   override def findAllConceptsByVideoReferenceUUID(uuid: UUID): Seq[String] = {
     val query = entityManager.createNamedQuery("Observation.findAllNamesByVideoReferenceUUID")
-    query.setParameter(1, uuid.toString().toLowerCase())
+    if (DatabaseProductName.isPostgres()) {
+      query.setParameter(1, uuid)
+    }
+    else {
+      query.setParameter(1, uuid.toString().toLowerCase())
+    }
+    
     query
       .getResultList
       .asScala
@@ -194,8 +200,7 @@ class ObservationDAOImpl(entityManager: EntityManager)
     query
       .getResultList
       .asScala
-      .map(_.asInstanceOf[Number])
-      .map(_.intValue())
+      .map(_.toString().toInt)
       .head
   }
 

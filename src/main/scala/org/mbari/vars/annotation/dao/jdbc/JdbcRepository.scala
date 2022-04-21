@@ -99,7 +99,8 @@ class JdbcRepository(entityManagerFactory: EntityManagerFactory) {
   def countByQueryConstraint(constraints: QueryConstraints): Int = {
     implicit val entityManager: EntityManager = entityManagerFactory.createEntityManager()
     val query                                 = QueryConstraints.toCountQuery(constraints, entityManager)
-    val count                                 = query.getResultList.get(0).asInstanceOf[Int]
+    // Postgresql returns a Long, Everything else returns an Int
+    val count                                 = query.getResultList.get(0).toString().toInt
     entityManager.close()
     count
   }
@@ -371,7 +372,12 @@ class JdbcRepository(entityManagerFactory: EntityManagerFactory) {
   ): Seq[Image] = {
     implicit val entityManager: EntityManager = entityManagerFactory.createEntityManager()
     val query                                 = entityManager.createNativeQuery(ImagedMomentSQL.byVideoReferenceUuid)
-    query.setParameter(1, videoReferenceUuid.toString)
+    if (DatabaseProductName.isPostgres()) {
+      query.setParameter(1, videoReferenceUuid)  
+    }
+    else {
+      query.setParameter(1, videoReferenceUuid.toString)
+    }
     limit.foreach(query.setMaxResults)
     offset.foreach(query.setFirstResult)
     val results = query.getResultList.asScala.toList

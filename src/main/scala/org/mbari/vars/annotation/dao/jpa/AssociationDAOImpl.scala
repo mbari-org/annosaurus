@@ -173,7 +173,7 @@ class AssociationDAOImpl(entityManager: EntityManager)
     query
       .getResultList
       .asScala
-      .map(_.asInstanceOf[Long])
+      .map(_.toString().toLong)
       .head
 
   }

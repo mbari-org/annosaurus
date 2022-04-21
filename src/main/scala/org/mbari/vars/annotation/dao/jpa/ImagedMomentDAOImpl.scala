@@ -138,7 +138,7 @@ class ImagedMomentDAOImpl(entityManager: EntityManager)
     query
       .getResultList
       .asScala
-      .map(_.asInstanceOf[Int])
+      .map(_.toString().toInt)
       .head
   }
 
@@ -162,8 +162,8 @@ class ImagedMomentDAOImpl(entityManager: EntityManager)
       .asScala
       .map(_.asInstanceOf[Array[Object]])
       .map(xs => {
-        val uuid  = UUID.fromString(xs(0).asInstanceOf[String])
-        val count = xs(1).asInstanceOf[Number].intValue()
+        val uuid  = UUID.fromString(xs(0).toString())
+        val count = xs(1).toString().toInt
         uuid -> count
       })
       .toMap
@@ -175,7 +175,7 @@ class ImagedMomentDAOImpl(entityManager: EntityManager)
     query
       .getResultList
       .asScala
-      .map(_.asInstanceOf[Int])
+      .map(_.toString().toInt)
       .head
   }
 
@@ -199,7 +199,7 @@ class ImagedMomentDAOImpl(entityManager: EntityManager)
     query
       .getResultList
       .asScala
-      .map(_.asInstanceOf[Int])
+      .map(_.toString().toInt)
       .head
   }
 
@@ -210,7 +210,7 @@ class ImagedMomentDAOImpl(entityManager: EntityManager)
     query
       .getResultList
       .asScala
-      .map(_.asInstanceOf[Int])
+      .map(_.toString().toInt)
       .head
   }
 
@@ -228,11 +228,16 @@ class ImagedMomentDAOImpl(entityManager: EntityManager)
 
   override def countByVideoReferenceUUID(uuid: UUID): Int = {
     val query = entityManager.createNamedQuery("ImagedMoment.countByVideoReferenceUUID")
-    query.setParameter(1, uuid.toString)
+    if (DatabaseProductName.isPostgres()) {
+      query.setParameter(1, uuid)
+    } 
+    else {
+      query.setParameter(1, uuid.toString)
+    }
     query
       .getResultList
       .asScala
-      .map(_.asInstanceOf[Int])
+      .map(_.toString().toInt)
       .head
   }
 
