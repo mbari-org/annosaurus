@@ -77,7 +77,12 @@ class AssociationDAOImpl(entityManager: EntityManager)
     // HACK We are experiencing performance issues with the JPQL query. This
     // version is native SQL. Faster, but type casting is not pretty
     val query = entityManager.createNamedQuery("Association.findByLinkNameAndVideoReference")
-    query.setParameter(1, videoReferenceUUID.toString)
+    if (DatabaseProductName.isPostgres()) {
+      query.setParameter(1, videoReferenceUUID)
+    }
+    else {
+      query.setParameter(1, videoReferenceUUID.toString)
+    }
     query.setParameter(2, linkName)
     // Concept -> Association map
     val tuples = query
@@ -92,7 +97,8 @@ class AssociationDAOImpl(entityManager: EntityManager)
             Option(obj(4).asInstanceOf[String]),
             Option(obj(5).asInstanceOf[String])
           )
-          ass.uuid = UUID.fromString(obj(1).asInstanceOf[String])
+
+          ass.uuid = UUID.fromString(obj(1).toString)
           ass
         }
       )
@@ -135,8 +141,8 @@ class AssociationDAOImpl(entityManager: EntityManager)
       .map(obj => obj.asInstanceOf[Array[Object]])
       .map(obj => {
 //        obj.foreach(println)
-        val uuid               = UUID.fromString(obj(0).asInstanceOf[String])
-        val videoReferenceUuid = UUID.fromString(obj(1).asInstanceOf[String])
+        val uuid               = UUID.fromString(obj(0).toString())
+        val videoReferenceUuid = UUID.fromString(obj(1).toString())
         val conept             = obj(2).asInstanceOf[String]
         val linkName           = obj(3).asInstanceOf[String]
         val toConcept          = obj(4).asInstanceOf[String]
@@ -160,14 +166,14 @@ class AssociationDAOImpl(entityManager: EntityManager)
   ): Iterable[AssociationImpl] =
     findByNamedQuery("Association.findAll", limit = limit, offset = offset)
 
-  override def countByToConcept(toConcept: String): Int = {
+  override def countByToConcept(toConcept: String): Long = {
     //val query = entityManager.createNativeQuery("Association.countByToConcept")
     val query = entityManager.createNamedQuery("Association.countByToConcept")
     query.setParameter(1, toConcept)
     query
       .getResultList
       .asScala
-      .map(_.asInstanceOf[Int])
+      .map(_.asInstanceOf[Long])
       .head
 
   }

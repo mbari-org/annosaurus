@@ -30,14 +30,14 @@ import java.util.UUID;
 @Converter(autoApply = true)
 public class UUIDConverter implements AttributeConverter<UUID, Object> {
 
-    private static final String databaseProductName = DatabaseProductName.name();
+
 
     @Override
     public Object convertToDatabaseColumn(UUID uuid) {
         if (uuid == null) {
           return null;
         }
-        else if (databaseProductName.equalsIgnoreCase("postgresql")) {
+        else if (DatabaseProductName.isPostgres()) {
           return uuid;
         }
         return uuid.toString().toLowerCase();

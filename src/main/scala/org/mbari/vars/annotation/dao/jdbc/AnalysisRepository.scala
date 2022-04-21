@@ -78,7 +78,7 @@ object DepthHistogramSQL {
   def selectFromBinSize(binSizeMeters: Int = 50): String = {
     val xs = for (i <- 0 until MaxDepth by binSizeMeters) yield {
       val j = i + binSizeMeters
-      s"COUNT(CASE WHEN ad.depth_meters >= $i AND ad.depth_meters < $j THEN 1 END) AS [$i-$j]"
+      s"COUNT(CASE WHEN ad.depth_meters >= $i AND ad.depth_meters < $j THEN 1 END) AS \"$i-$j\""
     }
 
     s"""SELECT
@@ -100,7 +100,7 @@ object TimeHistogramSQL {
       val j = i + intervalMillis
       val date0 = new java.sql.Date(i)
       val date1 = new java.sql.Date(j)
-      s"COUNT(CASE WHEN im.recorded_timestamp >= '$date0' AND im.recorded_timestamp < '$date1' THEN 1 END) AS [$i-$j]"
+      s"COUNT(CASE WHEN im.recorded_timestamp >= '$date0' AND im.recorded_timestamp < '$date1' THEN 1 END) AS \"$i-$j\""
     }
 
     s"""SELECT

@@ -212,7 +212,13 @@ class ObservationDAOImpl(entityManager: EntityManager)
 
   override def countByVideoReferenceUUID(uuid: UUID): Int = {
     val query = entityManager.createNamedQuery("Observation.countByVideoReferenceUUID")
-    query.setParameter(1, uuid.toString().toLowerCase())
+    // Postgres handles UUIDs natively
+    if (DatabaseProductName.isPostgres()) {
+      query.setParameter(1, uuid)
+    }
+    else {
+      query.setParameter(1, uuid.toString().toLowerCase())
+    }
     query
       .getResultList
       .asScala

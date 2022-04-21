@@ -102,6 +102,11 @@ class ObservationDAOSpec extends AnyFlatSpec with Matchers with BeforeAndAfterAl
     names should contain allOf (concept, newConcept)
   }
 
+  it should "countByVideoReferenceUUID" in {
+    val count = run(_.countByVideoReferenceUUID(imagedMoment0.videoReferenceUUID))
+    count should be >= 2
+  }
+
   it should "deleteByUUID" in {
     run(_.deleteByUUID(observation0.uuid))
     val obs = run(_.findByUUID(observation0.uuid))

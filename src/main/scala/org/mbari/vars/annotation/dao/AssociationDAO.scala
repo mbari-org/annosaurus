@@ -52,7 +52,7 @@ trait AssociationDAO[T <: Association] extends DAO[T] {
       request: ConceptAssociationRequest
   ): Iterable[ConceptAssociation]
 
-  def countByToConcept(toConcept: String): Int
+  def countByToConcept(toConcept: String): Long
 
   def updateToConcept(oldToConcept: String, newToConcept: String): Int
 

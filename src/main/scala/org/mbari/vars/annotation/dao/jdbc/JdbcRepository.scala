@@ -20,6 +20,7 @@ import java.sql.Timestamp
 import java.time.Instant
 import java.util.UUID
 import javax.persistence.{EntityManager, EntityManagerFactory, Query}
+import org.mbari.vars.annotation.dao.jpa.DatabaseProductName
 import org.mbari.vars.annotation.model.{Annotation, GeographicRange}
 import org.mbari.vars.annotation.model.simple.{
   ConcurrentRequest,
@@ -56,7 +57,13 @@ class JdbcRepository(entityManagerFactory: EntityManagerFactory) {
       ObservationSQL.deleteByVideoReferenceUuid,
       ImagedMomentSQL.deleteByVideoReferenceUuid
     ).map(entityManager.createNativeQuery)
-    queries.foreach(_.setParameter(1, videoReferenceUuid.toString))
+    queries.foreach(q => {
+      if (DatabaseProductName.isPostgres()) {
+        q.setParameter(1, videoReferenceUuid)
+      } else {
+        q.setParameter(1, videoReferenceUuid.toString)
+      }
+    })
     var deleteCount = DeleteCount(videoReferenceUuid)
     try {
       val counts = queries.map(_.executeUpdate())
@@ -165,7 +172,12 @@ class JdbcRepository(entityManagerFactory: EntityManagerFactory) {
     )
 
     queries.foreach(q => {
-      q.setParameter(1, videoReferenceUuid.toString)
+      if (DatabaseProductName.isPostgres()) {
+        q.setParameter(1, videoReferenceUuid)
+      }
+      else {
+        q.setParameter(1, videoReferenceUuid.toString)
+      }
     })
 
     val annos =
@@ -191,6 +203,12 @@ class JdbcRepository(entityManagerFactory: EntityManagerFactory) {
     )
 
     queries.foreach(q => {
+      if (DatabaseProductName.isPostgres()) {
+        q.setParameter(1, videoReferenceUuid)
+      }
+      else {
+        q.setParameter(1, videoReferenceUuid.toString)
+      }
       q.setParameter(1, videoReferenceUuid.toString)
       q.setParameter(2, Timestamp.from(startTimestamp))
       q.setParameter(3, Timestamp.from(endTimestamp))

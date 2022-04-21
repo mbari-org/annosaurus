@@ -163,8 +163,8 @@ class AssociationController(
     exec(fn).map(ca => ConceptAssociationResponse(request, ca.toSeq))
   }
 
-  def countByToConcept(concept: String)(implicit ec: ExecutionContext): Future[Int] = {
-    def fn(dao: ADAO): Int = dao.countByToConcept(concept)
+  def countByToConcept(concept: String)(implicit ec: ExecutionContext): Future[Long] = {
+    def fn(dao: ADAO): Long = dao.countByToConcept(concept)
     exec(fn)
   }
 
