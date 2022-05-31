@@ -115,6 +115,10 @@ import scala.collection.mutable
     new NamedNativeQuery(
       name = "ImagedMoment.countByVideoReferenceUUID",
       query = "SELECT COUNT(*) FROM imaged_moments WHERE video_reference_uuid = ?1"
+    ),
+    new NamedNativeQuery(
+      name = "ImagedMoment.countAll",
+      query = "SELECT COUNT(*) FROM imaged_moments"
     )
   )
 )
@@ -123,6 +127,19 @@ import scala.collection.mutable
     new NamedQuery(
       name = "ImagedMoment.findAll",
       query = "SELECT i FROM ImagedMoment i ORDER BY i.uuid"
+    ),
+    new NamedQuery(
+      name = "ImagedMoment.findWithImages",
+      query = "SELECT i FROM ImagedMoment i " +
+        "LEFT JOIN i.javaImageReferences ir " +
+        "WHERE ir.url IS NOT NULL"
+    ),
+    new NamedQuery(
+      name = "ImagedMoment.findWithBoundingBoxes",
+      query = "SELECT i FROM ImagedMoment i " + 
+        "INNER JOIN i.javaObservations o " +
+        "INNER JOIN o.javaAssociations a " +
+        "WHERE a.linkName = 'bounding box'"
     ),
     new NamedQuery(
       name = "ImagedMoment.findByConcept",

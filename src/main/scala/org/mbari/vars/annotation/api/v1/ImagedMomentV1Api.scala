@@ -51,6 +51,30 @@ class ImagedMomentV1Api(controller: ImagedMomentController)(implicit val executo
       .map(toJson)
   }
 
+  get("/count/all") {
+    controller
+      .countAll()
+      .map(toJson)
+  }
+
+  get("/find/images") {
+    val limit  = params.getAs[Int]("limit").orElse(Some(100))
+    val offset = params.getAs[Int]("offset").orElse(Some(0))
+    controller
+      .findWithImages(limit, offset)
+      .map(_.asJava)
+      .map(toJson)
+  }
+
+  get("/find/boundingboxes") {
+    val limit  = params.getAs[Int]("limit").orElse(Some(100))
+    val offset = params.getAs[Int]("offset").orElse(Some(0))
+    controller
+      .findWithBoundingBoxes(limit, offset)
+      .map(_.asJava)
+      .map(toJson)
+  }
+
   get("/:uuid") {
     val uuid = params
       .getAs[UUID]("uuid")
