@@ -121,6 +121,12 @@ import scala.collection.mutable
       query = "SELECT COUNT(*) FROM imaged_moments"
     ),
     new NamedNativeQuery(
+      name = "ImagedMoment.countWithImages",
+      query = "SELECT COUNT(*) FROM imaged_moments i " + 
+        "INNER JOIN image_references ir ON ir.imaged_moment_uuid = i.uuid " +
+        "WHERE ir.url IS NOT NULL"
+    ),
+    new NamedNativeQuery(
       name = "ImagedMoment.countByLinkName",
       query = "SELECT COUNT(*) FROM imaged_moments i " + 
         "INNER JOIN observations o ON o.imaged_moment_uuid = i.uuid " +
