@@ -63,10 +63,20 @@ class ImagedMomentController(val daoFactory: BasicDAOFactory)
   ): Future[Iterable[ImagedMoment]] =
     exec(d => d.findWithImages(limit, offset))
   
-  def findWithBoundingBoxes(limit: Option[Int] = None, offset: Option[Int] = None)(
+  def countWithImages()(
+      implicit ec: ExecutionContext
+  ): Future[Int] =
+    exec(d => d.countWithImages())
+  
+  def findByLinkName(linkName: String, limit: Option[Int] = None, offset: Option[Int] = None)(
       implicit ec: ExecutionContext
   ): Future[Iterable[ImagedMoment]] =
-    exec(d => d.findWithBoundingBoxes(limit, offset))
+    exec(d => d.findByLinkName(linkName, limit, offset))
+  
+  def countByLinkName(linkName: String)(
+      implicit ec: ExecutionContext
+  ): Future[Int] = 
+    exec(d => d.countByLinkName(linkName))
 
   def findAllVideoReferenceUUIDs(limit: Option[Int] = None, offset: Option[Int] = None)(
       implicit ec: ExecutionContext

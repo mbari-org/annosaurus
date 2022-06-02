@@ -22,7 +22,7 @@ import java.util.UUID
 import org.mbari.vars.annotation.controllers.ImagedMomentController
 import org.mbari.vars.annotation.dao.jpa.AnnotationImpl
 import org.mbari.vars.annotation.model.ImagedMoment
-import org.mbari.vars.annotation.model.simple.{ErrorMsg, ObservationCount, WindowRequest}
+import org.mbari.vars.annotation.model.simple.{ErrorMsg, ObservationCount, WindowRequest, Count}
 import org.mbari.vcr4j.time.Timecode
 import org.scalatra.{BadRequest, NoContent, NotFound}
 
@@ -54,7 +54,9 @@ class ImagedMomentV1Api(controller: ImagedMomentController)(implicit val executo
   get("/count/all") {
     controller
       .countAll()
-      .map(toJson)
+      .map(_.toLong)
+      .map(Count(_))
+      .map(toJson(_))
   }
 
   get("/find/images") {
@@ -66,13 +68,36 @@ class ImagedMomentV1Api(controller: ImagedMomentController)(implicit val executo
       .map(toJson)
   }
 
-  get("/find/boundingboxes") {
+  get("/count/images") {
+    controller
+      .countWithImages()
+      .map(_.toLong)
+      .map(Count(_))
+      .map(toJson(_))
+  }
+
+  get("/find/linkname/:linkname") {
+    val linkName = params
+      .get("linkname")
+      .getOrElse(halt(BadRequest(toJson(ErrorMsg(400, "Please provide a link name")))))
     val limit  = params.getAs[Int]("limit").orElse(Some(100))
     val offset = params.getAs[Int]("offset").orElse(Some(0))
     controller
-      .findWithBoundingBoxes(limit, offset)
+      .findByLinkName(linkName, limit, offset)
       .map(_.asJava)
       .map(toJson)
+  }
+
+  get("/count/linkname/:linkname") {
+    val linkName = params
+      .get("linkname")
+      .getOrElse(halt(BadRequest(toJson(ErrorMsg(400, "Please provide a link name")))))
+    
+    controller
+      .countByLinkName(linkName)
+      .map(_.toLong)
+      .map(Count(_))
+      .map(toJson(_))
   }
 
   get("/:uuid") {

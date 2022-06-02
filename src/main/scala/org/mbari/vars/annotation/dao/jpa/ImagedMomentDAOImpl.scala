@@ -308,11 +308,37 @@ class ImagedMomentDAOImpl(entityManager: EntityManager)
   ): Iterable[ImagedMomentImpl] =
     findByNamedQuery("ImagedMoment.findWithImages", limit = limit, offset = offset)
 
-  override def findWithBoundingBoxes(
+  override def countWithImages(): Int =
+    entityManager.createNamedQuery("ImagedMoment.countWithImages")
+      .getResultList
+      .asScala
+      .map(_.toString().toInt)
+      .head
+
+  override def findByLinkName(
+    linkName: String,
     limit: Option[Int], 
     offset: Option[Int]
   ): Iterable[ImagedMomentImpl] =
-    findByNamedQuery("ImagedMoment.findWithBoundingBoxes", limit = limit, offset = offset)
+    findByNamedQuery(
+      "ImagedMoment.findByLinkName", 
+      Map("linkName" -> linkName), 
+      limit = limit, offset = offset
+    )
+  
+  override def countByLinkName(
+    linkName: String
+  ): Int = {
+    val query = entityManager.createNamedQuery("ImagedMoment.countByLinkName")
+
+    query.setParameter(1, linkName)
+
+    query
+      .getResultList
+      .asScala
+      .map(_.toString().toInt)
+      .head
+  }
 
   override def findByVideoReferenceUUIDAndElapsedTime(
       uuid: UUID,

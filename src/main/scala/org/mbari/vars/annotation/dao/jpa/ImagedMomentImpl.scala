@@ -119,6 +119,13 @@ import scala.collection.mutable
     new NamedNativeQuery(
       name = "ImagedMoment.countAll",
       query = "SELECT COUNT(*) FROM imaged_moments"
+    ),
+    new NamedNativeQuery(
+      name = "ImagedMoment.countByLinkName",
+      query = "SELECT COUNT(*) FROM imaged_moments i " + 
+        "INNER JOIN observations o ON o.imaged_moment_uuid = i.uuid " +
+        "INNER JOIN associations a ON a.observation_uuid = o.uuid " +
+        "WHERE a.link_name = ?1"
     )
   )
 )
@@ -135,11 +142,11 @@ import scala.collection.mutable
         "WHERE ir.url IS NOT NULL"
     ),
     new NamedQuery(
-      name = "ImagedMoment.findWithBoundingBoxes",
+      name = "ImagedMoment.findByLinkName",
       query = "SELECT i FROM ImagedMoment i " + 
         "INNER JOIN i.javaObservations o " +
         "INNER JOIN o.javaAssociations a " +
-        "WHERE a.linkName = 'bounding box'"
+        "WHERE a.linkName = :linkName"
     ),
     new NamedQuery(
       name = "ImagedMoment.findByConcept",

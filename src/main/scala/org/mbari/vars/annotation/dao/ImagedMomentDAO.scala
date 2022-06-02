@@ -80,8 +80,12 @@ trait ImagedMomentDAO[T <: ImagedMoment] extends DAO[T] {
   ): java.util.stream.Stream[UUID]
 
   def countAll(): Int
+
+  def countWithImages(): Int
   def findWithImages(limit: Option[Int], offset: Option[Int]): Iterable[T]
-  def findWithBoundingBoxes(limit: Option[Int], offset: Option[Int]): Iterable[T]
+
+  def countByLinkName(linkName: String): Int
+  def findByLinkName(linkName: String, limit: Option[Int], offset: Option[Int]): Iterable[T]
 
   def countByConcept(concept: String): Int
   def findByConcept(concept: String, limit: Option[Int], offset: Option[Int]): Iterable[T]
