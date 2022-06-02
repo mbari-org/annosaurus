@@ -17,14 +17,15 @@
 package org.mbari.vars.annotation.api.v1
 
 import java.time.{Duration, Instant}
+import java.net.URL
 import java.util.UUID
 import java.util.concurrent.TimeUnit
 
 import org.mbari.vars.annotation.api.WebApiStack
-import org.mbari.vars.annotation.controllers.{AnnotationController, ImagedMomentController}
+import org.mbari.vars.annotation.controllers.{AnnotationController, ImagedMomentController, ImageController, AssociationController}
 import org.mbari.vars.annotation.dao.jpa.ImagedMomentImpl
 import org.mbari.vars.annotation.model.Annotation
-import org.mbari.vars.annotation.model.simple.WindowRequest
+import org.mbari.vars.annotation.model.simple.{WindowRequest, Count}
 
 import scala.concurrent.Await
 import scala.concurrent.duration.{Duration => SDuration}
@@ -134,6 +135,14 @@ class ImagedMomentV1ApiSpec extends WebApiStack {
     }
   }
 
+  it should "count all imagedmoments" in {
+    get("/v1/imagedmoments/count/all") {
+      status should be(200)
+      val count = gson.fromJson(body, classOf[Count])
+      count.count.toInt should be > 0
+    }
+  }
+
   it should "update" in {
     put(
       s"/v1/imagedmoments/${annotation.imagedMomentUuid}",
@@ -151,6 +160,111 @@ class ImagedMomentV1ApiSpec extends WebApiStack {
     delete(s"/v1/imagedmoments/${annotation.imagedMomentUuid}") {
       status should be(204)
     }
+  }
+
+  it should "count and find with images" in {
+
+    val imageController = new ImageController(daoFactory)
+    
+    // Create some images at the same recorded date (will map to same imaged moment)
+    // Make sure they have different UUIDs
+    val recordedDate = Some(Instant.now())
+    val numImages = 10
+    val videoReferenceUUID = UUID.randomUUID()
+    val images = (1 to numImages).map { i =>
+      Await.result(
+        imageController.create(
+          videoReferenceUUID,
+          new URL(s"http://foo.bar/image-${i}.png"),
+          recordedDate = recordedDate
+        ),
+        SDuration(3000, TimeUnit.MILLISECONDS)
+      )
+    }
+
+    val targetImagedMomentUUID = images.head.imagedMomentUuid
+
+    // Check imaged moment count = 1
+    get("/v1/imagedmoments/count/images") {
+      status should be(200)
+      val count = gson.fromJson(body, classOf[Count])
+      count.count.toInt should be(1)
+    }
+
+    // Find imaged moment, check imaged moment UUID and image URLs match
+    get("/v1/imagedmoments/find/images") {
+      status should be(200)
+      val im = gson.fromJson(body, classOf[Array[ImagedMomentImpl]]).toList
+      im.size should be > 0
+      val i = im.head
+      i.uuid should be(targetImagedMomentUUID)
+      
+      // Check # of images matches
+      i.imageReferences.size should be(numImages)
+    }
+
+  }
+
+  it should "count and find by link name" in {
+
+    val linkName = "foo"
+    val toConcept = "self"
+    val linkValue = "bar"
+
+    val annotation = {
+      val annotationController = new AnnotationController(daoFactory)
+      Await.result(
+        annotationController.create(
+          UUID.randomUUID(),  // video reference UUID
+          "Bar",
+          "kbarnard",
+          elapsedTime = Some(Duration.ofMillis(42)),
+          recordedDate = Some(Instant.now())
+        ),
+        SDuration(3000, TimeUnit.MILLISECONDS)
+      )
+    }
+
+    val association = {
+      val associationController = new AssociationController(daoFactory)
+      Await.result(
+        associationController.create(
+          annotation.observationUuid,
+          linkName,
+          toConcept,
+          linkValue,
+          "text/plain"
+        ),
+        SDuration(3000, TimeUnit.MILLISECONDS)
+      )
+    }
+
+    // Check count > 0 for given link name
+    get(s"/v1/imagedmoments/count/linkname/${linkName}") {
+      status should be(200)
+      val count = gson.fromJson(body, classOf[Count])
+      count.count.toInt should be > 0
+    }
+
+    // Find imaged moment, check UUID and link name match
+    get(s"/v1/imagedmoments/find/linkname/${linkName}") {
+      status should be(200)
+
+      val im = gson.fromJson(body, classOf[Array[ImagedMomentImpl]]).toList
+      im.size should be > 0
+      
+      val i = im.head
+      i.uuid should be(annotation.imagedMomentUuid)
+
+      // Pull out the association
+      val o = i.observations.head
+      val a = o.associations.head
+
+      a.uuid should be(association.uuid)
+      a.linkName should be(linkName)
+      a.linkValue should be(linkValue)
+    }
+
   }
 
 }

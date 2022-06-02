@@ -115,6 +115,23 @@ import scala.collection.mutable
     new NamedNativeQuery(
       name = "ImagedMoment.countByVideoReferenceUUID",
       query = "SELECT COUNT(*) FROM imaged_moments WHERE video_reference_uuid = ?1"
+    ),
+    new NamedNativeQuery(
+      name = "ImagedMoment.countAll",
+      query = "SELECT COUNT(*) FROM imaged_moments"
+    ),
+    new NamedNativeQuery(
+      name = "ImagedMoment.countWithImages",
+      query = "SELECT COUNT(DISTINCT i.uuid) FROM imaged_moments i " + 
+        "INNER JOIN image_references ir ON ir.imaged_moment_uuid = i.uuid " +
+        "WHERE ir.url IS NOT NULL"
+    ),
+    new NamedNativeQuery(
+      name = "ImagedMoment.countByLinkName",
+      query = "SELECT COUNT(DISTINCT i.uuid) FROM imaged_moments i " + 
+        "INNER JOIN observations o ON o.imaged_moment_uuid = i.uuid " +
+        "INNER JOIN associations a ON a.observation_uuid = o.uuid " +
+        "WHERE a.link_name = ?1"
     )
   )
 )
@@ -123,6 +140,19 @@ import scala.collection.mutable
     new NamedQuery(
       name = "ImagedMoment.findAll",
       query = "SELECT i FROM ImagedMoment i ORDER BY i.uuid"
+    ),
+    new NamedQuery(
+      name = "ImagedMoment.findWithImages",
+      query = "SELECT i FROM ImagedMoment i " +
+        "LEFT JOIN i.javaImageReferences ir " +
+        "WHERE ir.url IS NOT NULL"
+    ),
+    new NamedQuery(
+      name = "ImagedMoment.findByLinkName",
+      query = "SELECT i FROM ImagedMoment i " + 
+        "INNER JOIN i.javaObservations o " +
+        "INNER JOIN o.javaAssociations a " +
+        "WHERE a.linkName = :linkName"
     ),
     new NamedQuery(
       name = "ImagedMoment.findByConcept",
