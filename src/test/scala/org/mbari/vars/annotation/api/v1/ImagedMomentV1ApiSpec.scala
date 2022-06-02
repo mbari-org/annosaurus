@@ -164,38 +164,43 @@ class ImagedMomentV1ApiSpec extends WebApiStack {
 
   it should "count and find with images" in {
 
+    val imageController = new ImageController(daoFactory)
+    
+    // Create some images at the same recorded date (will map to same imaged moment)
+    // Make sure they have different UUIDs
     val recordedDate = Some(Instant.now())
-    val url = new URL("http://foo.bar/image.png")
-
-    val image = {
-      val imageController = new ImageController(daoFactory)
+    val numImages = 10
+    val videoReferenceUUID = UUID.randomUUID()
+    val images = (1 to numImages).map { i =>
       Await.result(
         imageController.create(
-          UUID.randomUUID(), // video reference UUID
-          url,
+          videoReferenceUUID,
+          new URL(s"http://foo.bar/image-${i}.png"),
           recordedDate = recordedDate
         ),
         SDuration(3000, TimeUnit.MILLISECONDS)
       )
     }
 
-    val targetImagedMomentUUID = image.imagedMomentUuid
+    val targetImagedMomentUUID = images.head.imagedMomentUuid
 
-    // Check count > 0
+    // Check imaged moment count = 1
     get("/v1/imagedmoments/count/images") {
       status should be(200)
       val count = gson.fromJson(body, classOf[Count])
-      count.count.toInt should be > 0
+      count.count.toInt should be(1)
     }
 
-    // Find imaged moment, check UUID and image reference URL match
+    // Find imaged moment, check imaged moment UUID and image URLs match
     get("/v1/imagedmoments/find/images") {
       status should be(200)
       val im = gson.fromJson(body, classOf[Array[ImagedMomentImpl]]).toList
       im.size should be > 0
       val i = im.head
       i.uuid should be(targetImagedMomentUUID)
-      i.imageReferences.head.url should be(url)
+      
+      // Check # of images matches
+      i.imageReferences.size should be(numImages)
     }
 
   }
