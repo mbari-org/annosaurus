@@ -8,7 +8,8 @@ extra_css:
 
 plugins:
   - search
-  - mermaid2
+  - mermaid2:
+    version: 9.1.4
 
 markdown_extensions:
   - footnotes
