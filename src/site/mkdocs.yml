@@ -18,5 +18,9 @@ markdown_extensions:
 
 nav:
   - Home: index.md
-  - How-To - Security Handshake: howto/security_handshake.md
+  - 'How-to':
+    - 'Security Handshake': howto/security_handshake.md
+    - 'Fetch Annotations': howto/fetch_annotations.md
+  - About:
+    - 'GitHub': "https://github.com/mbari-media-management/annosaurus"
   - MBARI Docs: "https://docs.mbari.org"

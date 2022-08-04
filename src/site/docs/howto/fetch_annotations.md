@@ -2,6 +2,10 @@
 
 There are a number of endpoints for fetching annotations. The recommended way to fetch annotations is to use the `GET /anno/v1/fast` endpoints.
 
+By default, he endpoints below do no include the ancillary data for each annotation. To include the ancillary data, add the `?data=grue` query parameter to the URL.
+
+```bash
+
 ## Fetch by video
 
 Get all annotations for a single video. You will need the `video_reference_uuid` from your video asset manager.
