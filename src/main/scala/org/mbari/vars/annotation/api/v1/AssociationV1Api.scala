@@ -136,7 +136,7 @@ class AssociationV1Api(controller: AssociationController)(implicit val executor:
       case "application/json" =>
         val uuids = fromJson(request.body, classOf[Array[UUID]])
         if (uuids == null || uuids.isEmpty)
-          halt(BadRequest(toJson(ErrorMsg(404, "No observation UUIDs were provided as JSON"))))
+          halt(BadRequest(toJson(ErrorMsg(404, "No association UUIDs were provided as JSON"))))
         controller.bulkDelete(uuids)
       case _ =>
         halt(
