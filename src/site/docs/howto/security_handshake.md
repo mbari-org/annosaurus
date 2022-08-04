@@ -4,7 +4,7 @@ All endpoints that can mutate the database require a header of `Authorization: B
 
 ```text
 POST  http://myserver.org/anno/v1/auth
-Authorization: APIKEY foobar
+Authorization: APIKEY <your_api_key>
 ```
 
 Example using curl:
