@@ -39,6 +39,10 @@ MBARI is updating its [Video Annotation and Reference System](https://hohonuuli.
 
 This service stands on its own and does not require any other video annotations services. Out-of-the-box it provides an in-memory database suitable for testing and development. For production use, a external database is required. Setup for your own database is very straightforward.
 
+## How-To
+
+- [Security Handshake](src/site/docs/howto/security_handshake.md)
+
 ## Data Model
 
 ### Class Diagram
