@@ -1,6 +1,6 @@
-# annosaurus
+# [annosaurus](https://github.com/mbari-media-management/annosaurus)
 
-![MBARI logo](assets/images/mbari-logo.png)
+![MBARI logo](assets/images/logo-mbari-3b.png)
 
 ## Overview
 
