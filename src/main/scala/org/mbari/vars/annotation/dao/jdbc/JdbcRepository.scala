@@ -58,7 +58,7 @@ class JdbcRepository(entityManagerFactory: EntityManagerFactory) {
       ImagedMomentSQL.deleteByVideoReferenceUuid
     ).map(entityManager.createNativeQuery)
     queries.foreach(q => {
-      if (DatabaseProductName.isPostgres()) {
+      if (DatabaseProductName.isPostgreSQL()) {
         q.setParameter(1, videoReferenceUuid)
       } else {
         q.setParameter(1, videoReferenceUuid.toString)
@@ -173,7 +173,7 @@ class JdbcRepository(entityManagerFactory: EntityManagerFactory) {
     )
 
     queries.foreach(q => {
-      if (DatabaseProductName.isPostgres()) {
+      if (DatabaseProductName.isPostgreSQL()) {
         q.setParameter(1, videoReferenceUuid)
       }
       else {
@@ -204,7 +204,7 @@ class JdbcRepository(entityManagerFactory: EntityManagerFactory) {
     )
 
     queries.foreach(q => {
-      if (DatabaseProductName.isPostgres()) {
+      if (DatabaseProductName.isPostgreSQL()) {
         q.setParameter(1, videoReferenceUuid)
       }
       else {
@@ -372,7 +372,7 @@ class JdbcRepository(entityManagerFactory: EntityManagerFactory) {
   ): Seq[Image] = {
     implicit val entityManager: EntityManager = entityManagerFactory.createEntityManager()
     val query                                 = entityManager.createNativeQuery(ImagedMomentSQL.byVideoReferenceUuid)
-    if (DatabaseProductName.isPostgres()) {
+    if (DatabaseProductName.isPostgreSQL()) {
       query.setParameter(1, videoReferenceUuid)  
     }
     else {

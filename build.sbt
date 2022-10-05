@@ -26,6 +26,7 @@ val scilubeVersion      = "3.0.1"
 val servletVersion      = "4.0.1"
 val slf4jVersion        = "2.0.3"
 val sqlserverVersion    = "9.4.0.jre11"
+val testcontainersScalaVersion = "0.40.10"
 val uuidgenVersion      = "0.1.4"
 val vcr4jVersion        = "4.4.1.jre11"
 val zeromqVersion       = "0.5.2"
@@ -95,8 +96,10 @@ lazy val annosaurus = (project in file("."))
   )
   // .enablePlugins(EclipseLinkStaticWeaver)
   // .settings(staticWeaverLogLevel := 0)
+  .configs(IntegrationTest)
   .settings(appSettings)
   .settings(
+    Defaults.itSettings, // for integration tests
     // Set version based on git tag. I use "0.0.0" format (no leading "v", which is the default)
     // Use `show gitCurrentTags` in sbt to update/see the tags
     git.gitTagToVersionNumber := { tag: String =>
@@ -108,6 +111,9 @@ lazy val annosaurus = (project in file("."))
       "ch.qos.logback"                                 % "logback-classic"                   % logbackVersion,
       "ch.qos.logback"                                 % "logback-core"                      % logbackVersion,
       "com.auth0"                                      % "java-jwt"                          % auth0Version,
+      "com.dimafeng" %% "testcontainers-scala-scalatest" % testcontainersScalaVersion % "it",
+      "com.dimafeng" %% "testcontainers-scala-postgresql" % testcontainersScalaVersion % "it",
+      "com.dimafeng" %% "testcontainers-scala-mssqlserver" % testcontainersScalaVersion % "it",
       "com.fatboyindustrial.gson-javatime-serialisers" % "gson-javatime-serialisers"         % gsonJavatimeVersion,
       "com.google.code.gson"                           % "gson"                              % gsonVersion,
       "com.h2database"                                 % "h2"                                % h2Version % "test",
@@ -122,16 +128,16 @@ lazy val annosaurus = (project in file("."))
       "io.reactivex.rxjava3"                           % "rxjava"                            % rxjavaVersion,
       "javax.servlet"                                  % "javax.servlet-api"                 % servletVersion,
       "javax.transaction"                              % "jta"                               % jtaVersion,
-      "junit"                                          % "junit"                             % junitVersion % "test",
+      "junit"                                          % "junit"                             % junitVersion % "it,test",
       "net.bull.javamelody"                            % "javamelody-core"                   % javamelodyVersion,
       "org.apache.derby"                               % "derby"                             % derbyVersion, //          % "test",
       "org.apache.derby"                               % "derbyclient"                       % derbyVersion, //          % "test",
       "org.apache.derby"                               % "derbynet"                          % derbyVersion, //          % "test",
       "org.apache.derby"                               % "derbyshared"                       % derbyVersion,
       "org.apache.derby"                               % "derbytools"                        % derbyVersion,
-      "org.eclipse.jetty"                              % "jetty-server"                      % jettyVersion % "compile;test",
-      "org.eclipse.jetty"                              % "jetty-servlets"                    % jettyVersion % "compile;test",
-      "org.eclipse.jetty"                              % "jetty-webapp"                      % jettyVersion % "compile;test",
+      "org.eclipse.jetty"                              % "jetty-server"                      % jettyVersion % "compile,it,test",
+      "org.eclipse.jetty"                              % "jetty-servlets"                    % jettyVersion % "compile,it,test",
+      "org.eclipse.jetty"                              % "jetty-webapp"                      % jettyVersion % "compile,it,test",
       "org.eclipse.persistence"                        % "org.eclipse.persistence.extension" % eclipselinkVersion,
       "org.eclipse.persistence"                        % "org.eclipse.persistence.jpa"       % eclipselinkVersion,
       "org.fusesource.jansi"                           % "jansi"                             % jansiVersion % "runtime",
@@ -139,12 +145,13 @@ lazy val annosaurus = (project in file("."))
       "org.mbari.uuid"                                 % "uuid-gen"                          % uuidgenVersion,
       "org.mbari.vcr4j"                                % "vcr4j-core"                        % vcr4jVersion,
       "org.postgresql"                                 % "postgresql"                        % postgresqlVersion,
-      ("org.scalatest"                                  %% "scalatest"                        % scalatestVersion).cross(CrossVersion.for3Use2_13) % "test",
+      ("org.scalatest"                                  %% "scalatest"                        % scalatestVersion).cross(CrossVersion.for3Use2_13) % "it,test",
       ("org.scalatra"                                   %% "scalatra-json"                    % scalatraVersion).cross(CrossVersion.for3Use2_13),
       ("org.scalatra"                                   %% "scalatra-scalate"                 % scalatraVersion).cross(CrossVersion.for3Use2_13),
       ("org.scalatra"                                   %% "scalatra-scalatest"               % scalatraVersion).cross(CrossVersion.for3Use2_13),
       ("org.scalatra"                                   %% "scalatra"                         % scalatraVersion).cross(CrossVersion.for3Use2_13),
       "org.slf4j"                                      % "log4j-over-slf4j"                  % slf4jVersion,
+      "org.slf4j"                                      % "jul-to-slf4j"                  % slf4jVersion,
       "org.mbari.scilube"                              %% "scilube"                          % scilubeVersion,
       //"net.sourceforge.jtds"     % "jtds"                           % jtdsVersion,
       "org.slf4j"  % "slf4j-api" % slf4jVersion,

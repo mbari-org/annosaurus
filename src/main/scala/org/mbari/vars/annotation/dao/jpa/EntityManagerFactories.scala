@@ -17,9 +17,9 @@
 package org.mbari.vars.annotation.dao.jpa
 
 import javax.persistence.{EntityManagerFactory, Persistence}
-
 import com.typesafe.config.ConfigFactory
 import org.eclipse.persistence.config.PersistenceUnitProperties
+import org.slf4j.LoggerFactory
 
 import scala.jdk.CollectionConverters._
 
@@ -34,6 +34,8 @@ import scala.jdk.CollectionConverters._
   * @since 2016-05-05T17:29:00
   */
 object EntityManagerFactories {
+
+  private[this] val log = LoggerFactory.getLogger(getClass)
 
   private lazy val config = ConfigFactory.load()
 
@@ -51,7 +53,17 @@ object EntityManagerFactories {
 
   def apply(properties: Map[String, String]): EntityManagerFactory = {
     val props = properties ++ PRODUCTION_PROPS
-    Persistence.createEntityManagerFactory("annosaurus", props.asJava)
+    val emf = Persistence.createEntityManagerFactory("annosaurus", props.asJava)
+    if (log.isDebugEnabled()) {
+      val props = emf.getProperties
+        .asScala
+        .map(a => s"${a._1} : ${a._2}")
+        .toList
+        .sorted
+        .mkString("\n")
+      log.debug(s"EntityManager Properties:\n${props}")
+    }
+    emf
   }
 
   def apply(

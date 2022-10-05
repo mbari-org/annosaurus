@@ -106,6 +106,17 @@ object H2TestDAOFactory extends SpecDAOFactory {
 
 }
 
+object PostgresTestDAOFactory extends SpecDAOFactory {
+  
+  override def testProps(): Map[String,String] = 
+    TestDAOFactory.TestProperties ++
+      Map(
+        "eclipselink.target-database" -> TargetDatabase.PostgreSQL,
+        "javax.persistence.database-product-name" -> TargetDatabase.PostgreSQL
+      )
+
+}
+
 object DevelopmentTestDAOFactory extends SpecDAOFactory {
 
   val productName = config.getString("org.mbari.vars.annotation.database.development.name")

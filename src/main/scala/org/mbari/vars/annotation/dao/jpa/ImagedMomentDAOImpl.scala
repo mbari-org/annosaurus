@@ -228,7 +228,7 @@ class ImagedMomentDAOImpl(entityManager: EntityManager)
 
   override def countByVideoReferenceUUID(uuid: UUID): Int = {
     val query = entityManager.createNamedQuery("ImagedMoment.countByVideoReferenceUUID")
-    if (DatabaseProductName.isPostgres()) {
+    if (DatabaseProductName.isPostgreSQL()) {
       query.setParameter(1, uuid)
     } 
     else {

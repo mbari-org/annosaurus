@@ -40,8 +40,12 @@ import org.eclipse.jetty.webapp.WebAppContext
 import org.mbari.vars.annotation.Constants
 import org.mbari.vars.annotation.messaging.zeromq.ZeroMQPublisher
 import org.scalatra.servlet.ScalatraListener
+import org.slf4j.bridge.SLF4JBridgeHandler
 
 object JettyMain {
+
+  SLF4JBridgeHandler.removeHandlersForRootLogger()
+  SLF4JBridgeHandler.install()
 
   // hold on to messaging objects so they don't get GC'd
   private[this] val zmq = ZeroMQPublisher.autowire(Constants.AppConfig.zeroMQConfig)

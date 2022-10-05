@@ -22,6 +22,11 @@ public class DatabaseProductName {
 
   private static String name;
 
+  public static String POSTGRESQL = "PostgreSQL";
+  public static String SQLSERVER = "SQLServer";
+  public static String DERBY = "Derby";
+  public static String ORACLE = "Oracle";
+
   public static String name() {
     if (name == null) {
       var config = ConfigFactory.load();
@@ -34,8 +39,36 @@ public class DatabaseProductName {
     return name;
   }
 
-  public static boolean isPostgres() {
-    return name().equalsIgnoreCase("postgresql");
+  public static void usePostgreSQL() {
+    name = POSTGRESQL;
+  }
+
+  public static void useSQLServer() {
+    name = SQLSERVER;
+  }
+
+  public static void useDerby() {
+    name = DERBY;
+  }
+
+  public static void useOracle() {
+    name = ORACLE;
+  }
+
+  public static boolean isPostgreSQL() {
+    return name().equalsIgnoreCase(POSTGRESQL);
+  }
+
+  public static boolean isSQLServer() {
+    return name().equalsIgnoreCase(SQLSERVER);
+  }
+
+  public static boolean isDerby() {
+    return name().equalsIgnoreCase(DERBY);
+  }
+
+  public static boolean isOracle() {
+    return name().toLowerCase().startsWith(ORACLE.toLowerCase());
   }
   
 }
