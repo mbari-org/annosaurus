@@ -54,14 +54,14 @@ object EntityManagerFactories {
   def apply(properties: Map[String, String]): EntityManagerFactory = {
     val props = properties ++ PRODUCTION_PROPS
     val emf = Persistence.createEntityManagerFactory("annosaurus", props.asJava)
-    if (log.isDebugEnabled()) {
+    if (log.isInfoEnabled()) {
       val props = emf.getProperties
         .asScala
         .map(a => s"${a._1} : ${a._2}")
         .toList
         .sorted
         .mkString("\n")
-      log.debug(s"EntityManager Properties:\n${props}")
+      log.info(s"EntityManager Properties:\n${props}")
     }
     emf
   }

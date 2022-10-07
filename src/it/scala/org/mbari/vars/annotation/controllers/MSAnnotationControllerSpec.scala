@@ -54,6 +54,7 @@ class MSAnnotationControllerSpec
 
   private[this] val controller = new AnnotationController(daoFactory)
   private[this] val timeout    = SDuration(200, TimeUnit.SECONDS)
+  private[this] val videoReferenceUuid = UUID.randomUUID()
 
   def exec[R](fn: () => Future[R]): R = Await.result(fn.apply(), timeout)
 
@@ -61,14 +62,26 @@ class MSAnnotationControllerSpec
     Class.forName(container.driverClassName)
     val connection = DriverManager.getConnection(jdbcUrl, container.username, container.password)
     connection should not be null
+    connection.close()
   }
 
   it should "configure database" in {
-    val src        = getClass().getResource("/sqlserver.ddl")
-    val sql        = Source.fromURL(src).mkString
+    val src = getClass().getResource("/sqlserver.ddl")
+    val sql = Source.fromURL(src).mkString
     val connection = DriverManager.getConnection(jdbcUrl, container.username, container.password)
-    val statement  = connection.createStatement()
-    statement.execute(sql)
+
+    // setup tables
+    TestUtil.runDdl(sql, connection)
+
+    // make sure the tables were created. We just check a count in one of them
+    val statement = connection.createStatement()
+    val rs = statement.executeQuery("SELECT COUNT(*) FROM observations")
+    rs should not be (null)
+    while (rs.next()) {
+      rs.getInt(1) should be(0)
+    }
+    statement.close()
+
     connection.close()
   }
 
@@ -76,14 +89,34 @@ class MSAnnotationControllerSpec
     val recordedDate = Instant.now()
     val a = exec(() =>
       controller
-        .create(UUID.randomUUID(), "Nanomia bijuga", "brian", recordedDate = Some(recordedDate))
+        .create(videoReferenceUuid, "Nanomia bijuga", "brian", recordedDate = Some(recordedDate))
     )
     a.concept should be("Nanomia bijuga")
     a.observer should be("brian")
     a.recordedTimestamp should be(recordedDate)
+    a.videoReferenceUuid should be(videoReferenceUuid)
   }
 
-  it should "update" in {}
+  it should "update" in {
+    val xs = exec(() => controller.findByVideoReferenceUUID(videoReferenceUuid))
+    xs.size should be(1)
+    val a = xs.head
+    val opt = exec(() => controller.update(a.observationUuid, concept = Some("Pandalus")))
+    opt should not be empty
+    val b = opt.get
+    b.concept should be("Pandalus")
+    val ys = exec(() => controller.findByVideoReferenceUUID(videoReferenceUuid))
+    ys.size should be(1)
+    val c = ys.head
+    c.concept should be("Pandalus")
+  }
 
-  it should "delete" in {}
+  it should "delete" in {
+    val xs = exec(() => controller.findByVideoReferenceUUID(videoReferenceUuid))
+    xs.size should be(1)
+    val a = xs.head
+    exec(() => controller.delete(a.observationUuid))
+    val ys = exec(() => controller.findByVideoReferenceUUID(videoReferenceUuid))
+    ys should be(empty)
+  }
 }

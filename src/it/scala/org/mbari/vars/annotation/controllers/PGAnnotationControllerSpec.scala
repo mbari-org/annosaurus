@@ -68,14 +68,26 @@ class PGAnnotationControllerSpec
     Class.forName(container.driverClassName)
     val connection = DriverManager.getConnection(jdbcUrl, container.username, container.password)
     connection should not be null
+    connection.close()
   }
 
   it should "configure database" in {
     val src        = getClass().getResource("/postgres.ddl")
     val sql        = Source.fromURL(src).mkString
     val connection = DriverManager.getConnection(jdbcUrl, container.username, container.password)
-    val statement  = connection.createStatement()
-    statement.execute(sql)
+
+    // setup tables
+    TestUtil.runDdl(sql, connection)
+
+    // make sure the tables were created. We just check a count in one of them
+    val statement = connection.createStatement()
+    val rs = statement.executeQuery("SELECT COUNT(*) FROM observations")
+    rs should not be (null)
+    while (rs.next()) {
+      rs.getInt(1) should be (0)
+    }
+    statement.close()
+
     connection.close()
   }
 

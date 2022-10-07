@@ -211,10 +211,10 @@ create or replace function uuid(_text character varying) returns uuid language s
 create cast (character varying as uuid) with function uuid(character varying) as assignment;
 
 -- FIX To allow cast of smallint to boolean for database migration
-CREATE OR REPLACE FUNCTION boolean1(i smallint) RETURNS boolean AS $$
-    BEGIN
-            RETURN (i::smallint)::int::bool;
-    END;
-$$ LANGUAGE plpgsql;
-
-CREATE CAST (smallint AS boolean) WITH FUNCTION boolean1(smallint) AS ASSIGNMENT;
+-- CREATE OR REPLACE FUNCTION boolean1(i smallint) RETURNS boolean AS $$
+--     BEGIN
+--             RETURN (i::smallint)::int::bool;
+--     END;
+-- $$ LANGUAGE plpgsql;
+--
+-- CREATE CAST (smallint AS boolean) WITH FUNCTION boolean1(smallint) AS ASSIGNMENT;

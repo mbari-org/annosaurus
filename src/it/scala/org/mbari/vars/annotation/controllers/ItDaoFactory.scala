@@ -1,9 +1,12 @@
 package org.mbari.vars.annotation.controllers
 
 import org.mbari.vars.annotation.dao.jpa.JPADAOFactory
+
+import java.net.URL
 import scala.concurrent.Await
 import java.util.concurrent.TimeUnit
 import scala.concurrent.duration.Duration
+import scala.io.Source
 
 trait ItDaoFactory extends JPADAOFactory {
   val TestProperties: Map[String, String] = Map(
