@@ -91,10 +91,11 @@ class ObservationDAOImpl(entityManager: EntityManager)
       endTimestamp: Instant
   ): Int = {
     val query = entityManager.createNamedQuery("Observation.countByVideoReferenceUUIDAndTimestamps")
-    query.setParameter(1, uuid.toString().toLowerCase())
-    query.setParameter(2, Timestamp.from(startTimestamp))
-    query.setParameter(3, Timestamp.from(endTimestamp))
-    query.getSingleResult.asInstanceOf[Int]
+    setUuidParameter(query, 1, uuid)
+    // query.setParameter(1, uuid.toString().toLowerCase())
+      .setParameter(2, Timestamp.from(startTimestamp))
+      .setParameter(3, Timestamp.from(endTimestamp))
+      .getSingleResult.asInstanceOf[Int]
   }
 
   override def streamByConcurrentRequest(
@@ -255,8 +256,10 @@ class ObservationDAOImpl(entityManager: EntityManager)
 
   override def changeImageMoment(imagedMomentUuid: UUID, observationUuid: UUID): Int = {
     val query = entityManager.createNamedQuery("Observation.updateImagedMomentUUID")
-    query.setParameter(1, imagedMomentUuid.toString)
-    query.setParameter(2, observationUuid.toString)
+    setUuidParameter(query, 1, imagedMomentUuid)
+    setUuidParameter(query, 2, observationUuid)
+    // query.setParameter(1, imagedMomentUuid.toString)
+    // query.setParameter(2, observationUuid.toString)
     query.executeUpdate()
   }
 

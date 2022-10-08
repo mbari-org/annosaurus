@@ -77,12 +77,13 @@ class AssociationDAOImpl(entityManager: EntityManager)
     // HACK We are experiencing performance issues with the JPQL query. This
     // version is native SQL. Faster, but type casting is not pretty
     val query = entityManager.createNamedQuery("Association.findByLinkNameAndVideoReference")
-    if (DatabaseProductName.isPostgreSQL()) {
-      query.setParameter(1, videoReferenceUUID)
-    }
-    else {
-      query.setParameter(1, videoReferenceUUID.toString)
-    }
+    // if (DatabaseProductName.isPostgreSQL()) {
+    //   query.setParameter(1, videoReferenceUUID)
+    // }
+    // else {
+    //   query.setParameter(1, videoReferenceUUID.toString)
+    // }
+    setUuidParameter(query, 1, videoReferenceUUID)
     query.setParameter(2, linkName)
     // Concept -> Association map
     val tuples = query

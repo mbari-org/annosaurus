@@ -27,6 +27,7 @@ import scala.jdk.CollectionConverters._
 import scala.concurrent.{ExecutionContext, Future}
 import scala.reflect.ClassTag
 import scala.reflect.classTag
+import javax.persistence.Query
 
 /**
   *
@@ -127,6 +128,15 @@ abstract class BaseDAO[B <: PersistentObject: ClassTag](val entityManager: Entit
 
   def close(): Unit = if (entityManager.isOpen) {
     entityManager.close()
+  }
+
+  def setUuidParameter(query: Query, position: Int, uuid: UUID): Query = {
+    if (DatabaseProductName.isPostgreSQL()) {
+      query.setParameter(position, uuid)
+    }
+    else {
+      query.setParameter(position, uuid.toString.toLowerCase())
+    }
   }
 
 }

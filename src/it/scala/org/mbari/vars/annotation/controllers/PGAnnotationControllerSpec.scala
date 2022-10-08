@@ -6,7 +6,7 @@ import org.scalatest.matchers.should.Matchers
 import org.scalatest.BeforeAndAfterAll
 import com.dimafeng.testcontainers.PostgreSQLContainer
 import org.eclipse.persistence.config.TargetDatabase
-import org.mbari.vars.annotation.dao.jpa.EntityManagerFactories
+import org.mbari.vars.annotation.dao.jpa.{DatabaseProductName, EntityManagerFactories, ImagedMomentDAOImpl}
 
 import java.sql.DriverManager
 import java.time.Instant
@@ -18,7 +18,8 @@ import scala.io.Source
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.{Duration => SDuration}
 import org.slf4j.bridge.SLF4JBridgeHandler
-import org.mbari.vars.annotation.dao.jpa.DatabaseProductName
+
+import java.time.temporal.ChronoUnit
 
 class PGAnnotationControllerSpec
     extends AnyFlatSpec
@@ -33,7 +34,7 @@ class PGAnnotationControllerSpec
   override val container: PostgreSQLContainer = PostgreSQLContainer("postgres:14")
   container.start()
 
-  val jdbcUrl = s"${container.jdbcUrl}?sslmode=disable&stringType=unspecified&autoReconnect=true"
+  val jdbcUrl = s"${container.jdbcUrl}?sslmode=disable&stringType=unspecified&autoReconnect=true&TC_REUSABLE=true"
 
   val daoFactory: BasicDAOFactory = new ItDaoFactory {
     override def testProps(): Map[String, String] =
@@ -54,9 +55,10 @@ class PGAnnotationControllerSpec
     }
   }.asInstanceOf[BasicDAOFactory]
 
-  private[this] val controller = new AnnotationController(daoFactory)
+  private[this] val annotationController = new AnnotationController(daoFactory)
   private[this] val timeout    = SDuration(200, TimeUnit.SECONDS)
   private[this] val videoReferenceUuid = UUID.randomUUID()
+  private[this] val recordedDate = Instant.now()
 
   def exec[R](fn: () => Future[R]): R = Await.result(fn.apply(), timeout)
 
@@ -92,9 +94,9 @@ class PGAnnotationControllerSpec
   }
 
   it should "create" in {
-    val recordedDate = Instant.now()
+
     val a = exec(() =>
-      controller
+      annotationController
         .create(videoReferenceUuid, "Nanomia bijuga", "brian", recordedDate = Some(recordedDate))
     )
     a.concept should be("Nanomia bijuga")
@@ -103,26 +105,37 @@ class PGAnnotationControllerSpec
     a.videoReferenceUuid should be (videoReferenceUuid)
   }
 
+  it should "find" in {
+    //  ImagedMoment.findByVideoReferenceUUIDAndRecordedDate
+    val dao = daoFactory.newImagedMomentDAO()
+    val opt = dao.findByVideoReferenceUUIDAndIndex(videoReferenceUuid, recordedDate = Some(recordedDate));
+    opt should not be (empty)
+    val im = opt.get
+    im.recordedDate.truncatedTo(ChronoUnit.SECONDS) should be (recordedDate.truncatedTo(ChronoUnit.SECONDS))
+    im.videoReferenceUUID should be (videoReferenceUuid)
+
+  }
+
   it should "update" in {
-    val xs = exec(() => controller.findByVideoReferenceUUID(videoReferenceUuid))
+    val xs = exec(() => annotationController.findByVideoReferenceUUID(videoReferenceUuid))
     xs.size should be (1)
     val a = xs.head
-    val opt = exec(() => controller.update(a.observationUuid, concept = Some("Pandalus")))
+    val opt = exec(() => annotationController.update(a.observationUuid, concept = Some("Pandalus")))
     opt should not be empty
     val b = opt.get
     b.concept should be ("Pandalus")
-    val ys = exec(() => controller.findByVideoReferenceUUID(videoReferenceUuid))
+    val ys = exec(() => annotationController.findByVideoReferenceUUID(videoReferenceUuid))
     ys.size should be(1)
     val c = ys.head
     c.concept should be("Pandalus")
   }
 
   it should "delete" in {
-    val xs = exec(() => controller.findByVideoReferenceUUID(videoReferenceUuid))
+    val xs = exec(() => annotationController.findByVideoReferenceUUID(videoReferenceUuid))
     xs.size should be(1)
     val a = xs.head
-    exec(() => controller.delete(a.observationUuid))
-    val ys = exec(() => controller.findByVideoReferenceUUID(videoReferenceUuid))
+    exec(() => annotationController.delete(a.observationUuid))
+    val ys = exec(() => annotationController.findByVideoReferenceUUID(videoReferenceUuid))
     ys should be (empty)
   }
 }
