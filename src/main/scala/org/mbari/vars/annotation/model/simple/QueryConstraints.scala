@@ -139,6 +139,7 @@ object QueryConstraints {
             observers: List[String] = Nil,
             groups: List[String] = Nil,
             activities: List[String] = Nil,
+            toConcepts: List[String] = Nil,
             minDepth: Option[Double] = Option.empty,
             maxDepth: Option[Double] = Option.empty,
             minLat: Option[Double] = Option.empty,
