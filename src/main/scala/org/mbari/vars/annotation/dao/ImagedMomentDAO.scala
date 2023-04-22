@@ -114,6 +114,7 @@ trait ImagedMomentDAO[T <: ImagedMoment] extends DAO[T] {
       offset: Option[Int] = None
   ): java.util.stream.Stream[T]
   def countByVideoReferenceUUID(uUID: UUID): Int
+  def countByVideoReferenceUUIDWithImages(uUID: UUID): Int
 
   def findWithImageReferences(videoReferenceUUID: UUID): Iterable[T]
   def findByImageReferenceUUID(imageReferenceUUID: UUID): Option[T]
