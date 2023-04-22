@@ -28,7 +28,7 @@ val slf4jVersion        = "2.0.7"
 val sqlserverVersion    = "9.4.0.jre11"
 val testcontainersScalaVersion = "0.40.15"
 val uuidgenVersion      = "0.1.4"
-val vcr4jVersion        = "5.2.0"
+val vcr4jVersion        = "4.4.1.jre11"
 val zeromqVersion       = "0.5.3"
 
 Global / onChangedBuildSource := ReloadOnSourceChanges
