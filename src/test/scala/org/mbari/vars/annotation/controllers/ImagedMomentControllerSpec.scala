@@ -219,6 +219,19 @@ class ImagedMomentControllerSpec extends AnyFlatSpec with Matchers with BeforeAn
     uuids.size should not be 0
   }
 
+  it should "count imagedmoments with images" in {
+    val videoReferenceUuid = UUID.randomUUID();
+    val imagedMoments = List(entityFactory.createImagedMoment(4, videoReferenceUuid, "foo"),  entityFactory.createImagedMoment(2, videoReferenceUuid, "bar"))
+    val dao = daoFactory.newImagedMomentDAO()
+    exec(() => dao.runTransaction(d => imagedMoments.foreach(i => d.create(i))))
+    dao.close()
+    val n = exec(() => controller.countByVideoReferenceUUIDWithImages(videoReferenceUuid))
+    imagedMoments(0).imageReferences.size should be (4)
+    imagedMoments(1).imageReferences.size should be (2)
+    n should be (2)
+  }
+
+
   override protected def afterAll(): Unit = {
     daoFactory.cleanup()
   }

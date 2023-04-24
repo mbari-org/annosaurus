@@ -76,6 +76,17 @@ class ImagedMomentV1Api(controller: ImagedMomentController)(implicit val executo
       .map(toJson(_))
   }
 
+  get("/count/images/:video_reference_uuid") {
+    val videoReferenceUuid = params
+      .getAs[UUID]("video_reference_uuid")
+      .getOrElse(halt(BadRequest(toJson(ErrorMsg(400, "Please provide a video_reference_uuid")))))
+    controller
+      .countByVideoReferenceUUIDWithImages(videoReferenceUuid)
+      .map(_.toLong)
+      .map(Count(_))
+      .map(toJson(_))
+  }
+
   get("/find/linkname/:linkname") {
     val linkName = params
       .get("linkname")

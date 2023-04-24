@@ -57,6 +57,11 @@ class ImagedMomentController(val daoFactory: BasicDAOFactory)
       implicit ec: ExecutionContext
   ): Future[Int] =
     exec(d => d.countAll())
+
+  def countByVideoReferenceUUIDWithImages(videoReferenceUUID: UUID)(
+      implicit ec: ExecutionContext
+  ): Future[Int] =
+    exec(d => d.countByVideoReferenceUUIDWithImages(videoReferenceUUID))
   
   def findWithImages(limit: Option[Int] = None, offset: Option[Int] = None)(
       implicit ec: ExecutionContext
