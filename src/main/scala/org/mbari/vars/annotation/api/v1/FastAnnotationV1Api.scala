@@ -140,6 +140,19 @@ class FastAnnotationV1Api(daoFactory: JPADAOFactory)(implicit val executor: Exec
     }
   }
 
+  get("/images/count/videoreference/:uuid") {
+    val uuid = params
+      .getAs[UUID]("uuid")
+      .getOrElse(
+        halt(BadRequest(toJson(ErrorMsg(400, "A video reference 'uuid' parameter is required"))))
+      )
+    Future {
+      val n = repository.countImagesByVideoReferenceUuid(uuid)
+      val count = Count(n)
+      toJson(count)
+    }
+  }
+
   get("/concept/:concept") {
     val concept =
       params
