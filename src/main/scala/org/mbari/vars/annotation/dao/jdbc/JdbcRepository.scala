@@ -60,7 +60,8 @@ class JdbcRepository(entityManagerFactory: EntityManagerFactory) {
     queries.foreach(q => {
       if (DatabaseProductName.isPostgreSQL()) {
         q.setParameter(1, videoReferenceUuid)
-      } else {
+      }
+      else {
         q.setParameter(1, videoReferenceUuid.toString)
       }
     })
@@ -100,7 +101,7 @@ class JdbcRepository(entityManagerFactory: EntityManagerFactory) {
     implicit val entityManager: EntityManager = entityManagerFactory.createEntityManager()
     val query                                 = QueryConstraints.toCountQuery(constraints, entityManager)
     // Postgresql returns a Long, Everything else returns an Int
-    val count                                 = query.getResultList.get(0).toString().toInt
+    val count = query.getResultList.get(0).toString().toInt
     entityManager.close()
     count
   }
@@ -152,6 +153,20 @@ class JdbcRepository(entityManagerFactory: EntityManagerFactory) {
     implicit val entityManager: EntityManager = entityManagerFactory.createEntityManager()
     val query                                 = entityManager.createNativeQuery(ObservationSQL.countAll)
     val count                                 = query.getSingleResult.asInstanceOf[Int].toLong
+    entityManager.close()
+    count
+  }
+
+  def countImagesByVideoReferenceUuid(videoReferenceUuid: UUID): Long = {
+    implicit val entityManager: EntityManager = entityManagerFactory.createEntityManager()
+    val query                                 = entityManager.createNativeQuery(ImageReferenceSQL.countByVideoReferenceUuid)
+    if (DatabaseProductName.isPostgreSQL()) {
+      query.setParameter(1, videoReferenceUuid)
+    }
+    else {
+      query.setParameter(1, videoReferenceUuid.toString())
+    }
+    val count = query.getSingleResult.asInstanceOf[Int].toLong
     entityManager.close()
     count
   }
@@ -373,7 +388,7 @@ class JdbcRepository(entityManagerFactory: EntityManagerFactory) {
     implicit val entityManager: EntityManager = entityManagerFactory.createEntityManager()
     val query                                 = entityManager.createNativeQuery(ImagedMomentSQL.byVideoReferenceUuid)
     if (DatabaseProductName.isPostgreSQL()) {
-      query.setParameter(1, videoReferenceUuid)  
+      query.setParameter(1, videoReferenceUuid)
     }
     else {
       query.setParameter(1, videoReferenceUuid.toString)

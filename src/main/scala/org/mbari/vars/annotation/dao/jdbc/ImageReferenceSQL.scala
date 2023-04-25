@@ -44,6 +44,8 @@ object ImageReferenceSQL {
 
   val byVideoReferenceUuid: String = SELECT + FROM + " WHERE im.video_reference_uuid = ?" + ORDER
 
+  val countByVideoReferenceUuid: String = "SELECT COUNT(DISTINCT ir.uuid) " + FROM + " WHERE im.video_reference_uuid = ?"
+
   val byVideoReferenceUuidBetweenDates: String = SELECT + FROM +
     " WHERE im.video_reference_uuid = ? AND im.recorded_timestamp BETWEEN ? AND ? " + ORDER
 

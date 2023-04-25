@@ -117,9 +117,20 @@ class JdbcRepositorySpec extends AnyFunSpec with Matchers with BeforeAndAfterAll
         deleteCount.observationCount should be(newAnnos.size)
       }
 
-      it("should cleanup") {}
+      
 
     }
+  }
+
+  describe("count") {
+    it("should countImagesByVideoReferenceUuid") {
+        val newAnnos           = loadAnnos()
+        val videoReferenceUuid = newAnnos.head.videoReferenceUuid
+        val xs = repository.countImagesByVideoReferenceUuid(videoReferenceUuid)
+        xs should be (62)
+        val deleteCount = repository.deleteByVideoReferenceUuid(videoReferenceUuid)
+        deleteCount.observationCount should be(newAnnos.size)
+      }
   }
 
   override protected def beforeAll(): Unit = {
