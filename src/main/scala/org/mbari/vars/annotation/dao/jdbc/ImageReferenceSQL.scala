@@ -24,7 +24,7 @@ import org.mbari.vars.annotation.model.Annotation
 
 object ImageReferenceSQL {
   val SELECT: String =
-    """ SELECT
+    """ SELECT DISTINCT
       |  ir.uuid AS image_reference_uuid,
       |  ir.description,
       |  ir.format,

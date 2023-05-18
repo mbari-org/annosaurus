@@ -29,7 +29,7 @@ object ImagedMomentSQL {
   val SELECT_UUID: String = "SELECT DISTINCT im.uuid "
 
   val SELECT_IMAGES: String =
-    """SELECT
+    """SELECT DISTINCT
       |  im.uuid AS imaged_moment_uuid,
       |  im.video_reference_uuid,
       |  im.elapsed_time_millis,
