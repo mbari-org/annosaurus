@@ -1,4 +1,4 @@
-FROM openjdk:17
+FROM eclipse-temurin:17
 
 # Build-time metadata as defined at http://label-schema.org
 ARG BUILD_DATE

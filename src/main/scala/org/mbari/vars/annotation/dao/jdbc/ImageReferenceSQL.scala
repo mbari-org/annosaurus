@@ -24,7 +24,7 @@ import org.mbari.vars.annotation.model.Annotation
 
 object ImageReferenceSQL {
   val SELECT: String =
-    """ SELECT
+    """ SELECT DISTINCT
       |  ir.uuid AS image_reference_uuid,
       |  ir.description,
       |  ir.format,
@@ -43,6 +43,8 @@ object ImageReferenceSQL {
   val ORDER: String = " ORDER BY ir.uuid"
 
   val byVideoReferenceUuid: String = SELECT + FROM + " WHERE im.video_reference_uuid = ?" + ORDER
+
+  val countByVideoReferenceUuid: String = "SELECT COUNT(DISTINCT ir.uuid) " + FROM + " WHERE im.video_reference_uuid = ?"
 
   val byVideoReferenceUuidBetweenDates: String = SELECT + FROM +
     " WHERE im.video_reference_uuid = ? AND im.recorded_timestamp BETWEEN ? AND ? " + ORDER

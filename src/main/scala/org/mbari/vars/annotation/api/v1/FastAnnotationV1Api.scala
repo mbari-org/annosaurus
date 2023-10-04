@@ -34,6 +34,7 @@ import org.scalatra.BadRequest
 import scala.concurrent.{ExecutionContext, Future}
 import scala.jdk.CollectionConverters._
 import scala.util.{Failure, Success, Try}
+import org.scalatra.InternalServerError
 
 /**
   * @author Brian Schlining
@@ -138,6 +139,22 @@ class FastAnnotationV1Api(daoFactory: JPADAOFactory)(implicit val executor: Exec
       val images = repository.findImagesByVideoReferenceUuid(uuid, limit, offset).asJava
       toJson(images)
     }
+  }
+
+  get("/images/count/videoreference/:uuid") {
+    val uuid = params
+      .getAs[UUID]("uuid")
+      .getOrElse(
+        halt(BadRequest(toJson(ErrorMsg(400, "A video reference 'uuid' parameter is required"))))
+      )
+    Future {
+      val n = repository.countImagesByVideoReferenceUuid(uuid)
+      val count = Count(n)
+      toJson(count)
+    } .recover({
+      case e: Exception =>
+        halt(InternalServerError(toJson(ErrorMsg(500, e.getMessage))))
+    })
   }
 
   get("/concept/:concept") {

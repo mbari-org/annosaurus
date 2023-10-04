@@ -117,6 +117,12 @@ import scala.collection.mutable
       query = "SELECT COUNT(*) FROM imaged_moments WHERE video_reference_uuid = ?1"
     ),
     new NamedNativeQuery(
+      name = "ImagedMoment.countByVideoReferenceUUIDWithImages",
+      query = "SELECT COUNT(DISTINCT i.uuid) FROM imaged_moments i " + 
+        "INNER JOIN image_references ir ON ir.imaged_moment_uuid = i.uuid " +
+        "WHERE ir.url IS NOT NULL AND video_reference_uuid = ?1"
+    ),
+    new NamedNativeQuery(
       name = "ImagedMoment.countAll",
       query = "SELECT COUNT(*) FROM imaged_moments"
     ),

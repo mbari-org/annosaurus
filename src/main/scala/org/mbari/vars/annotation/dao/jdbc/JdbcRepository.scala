@@ -33,6 +33,7 @@ import org.slf4j.LoggerFactory
 
 import scala.jdk.CollectionConverters._
 import scala.util.control.NonFatal
+import scala.util.Try
 
 /**
   * Database access (read-only) provider that uses SQL for fast lookups. WHY?
@@ -60,7 +61,8 @@ class JdbcRepository(entityManagerFactory: EntityManagerFactory) {
     queries.foreach(q => {
       if (DatabaseProductName.isPostgreSQL()) {
         q.setParameter(1, videoReferenceUuid)
-      } else {
+      }
+      else {
         q.setParameter(1, videoReferenceUuid.toString)
       }
     })
@@ -100,7 +102,7 @@ class JdbcRepository(entityManagerFactory: EntityManagerFactory) {
     implicit val entityManager: EntityManager = entityManagerFactory.createEntityManager()
     val query                                 = QueryConstraints.toCountQuery(constraints, entityManager)
     // Postgresql returns a Long, Everything else returns an Int
-    val count                                 = query.getResultList.get(0).toString().toInt
+    val count = query.getResultList.get(0).toString().toInt
     entityManager.close()
     count
   }
@@ -152,6 +154,23 @@ class JdbcRepository(entityManagerFactory: EntityManagerFactory) {
     implicit val entityManager: EntityManager = entityManagerFactory.createEntityManager()
     val query                                 = entityManager.createNativeQuery(ObservationSQL.countAll)
     val count                                 = query.getSingleResult.asInstanceOf[Int].toLong
+    entityManager.close()
+    count
+  }
+
+  def countImagesByVideoReferenceUuid(videoReferenceUuid: UUID): Long = {
+    implicit val entityManager: EntityManager = entityManagerFactory.createEntityManager()
+    val query                                 = entityManager.createNativeQuery(ImageReferenceSQL.countByVideoReferenceUuid)
+    if (DatabaseProductName.isPostgreSQL()) {
+      query.setParameter(1, videoReferenceUuid)
+    }
+    else {
+      query.setParameter(1, videoReferenceUuid.toString())
+    }
+    val result = query.getSingleResult
+    // SQL Server returns Int, Postgresql returns Long
+    val count = Try(result.asInstanceOf[Int].toLong)
+        .getOrElse(result.asInstanceOf[Long])
     entityManager.close()
     count
   }
@@ -373,7 +392,7 @@ class JdbcRepository(entityManagerFactory: EntityManagerFactory) {
     implicit val entityManager: EntityManager = entityManagerFactory.createEntityManager()
     val query                                 = entityManager.createNativeQuery(ImagedMomentSQL.byVideoReferenceUuid)
     if (DatabaseProductName.isPostgreSQL()) {
-      query.setParameter(1, videoReferenceUuid)  
+      query.setParameter(1, videoReferenceUuid)
     }
     else {
       query.setParameter(1, videoReferenceUuid.toString)
