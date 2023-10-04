@@ -34,6 +34,7 @@ import org.scalatra.BadRequest
 import scala.concurrent.{ExecutionContext, Future}
 import scala.jdk.CollectionConverters._
 import scala.util.{Failure, Success, Try}
+import org.scalatra.InternalServerError
 
 /**
   * @author Brian Schlining
@@ -150,7 +151,10 @@ class FastAnnotationV1Api(daoFactory: JPADAOFactory)(implicit val executor: Exec
       val n = repository.countImagesByVideoReferenceUuid(uuid)
       val count = Count(n)
       toJson(count)
-    }
+    } .recover({
+      case e: Exception =>
+        halt(InternalServerError(toJson(ErrorMsg(500, e.getMessage))))
+    })
   }
 
   get("/concept/:concept") {

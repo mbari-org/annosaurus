@@ -33,6 +33,7 @@ import org.slf4j.LoggerFactory
 
 import scala.jdk.CollectionConverters._
 import scala.util.control.NonFatal
+import scala.util.Try
 
 /**
   * Database access (read-only) provider that uses SQL for fast lookups. WHY?
@@ -166,7 +167,10 @@ class JdbcRepository(entityManagerFactory: EntityManagerFactory) {
     else {
       query.setParameter(1, videoReferenceUuid.toString())
     }
-    val count = query.getSingleResult.asInstanceOf[Int].toLong
+    val result = query.getSingleResult
+    // SQL Server returns Int, Postgresql returns Long
+    val count = Try(result.asInstanceOf[Int].toLong)
+        .getOrElse(result.asInstanceOf[Long])
     entityManager.close()
     count
   }
