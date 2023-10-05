@@ -29,9 +29,9 @@ import org.mbari.vars.annotation.model.{CachedAncillaryDatum, ImagedMoment}
 class CachedAncillaryDatumBean extends CachedAncillaryDatum {
 
   @Expose(serialize = true)
-  override var uuid: UUID = _
+  var uuid: UUID = _
 
-  override var imagedMoment: ImagedMoment = _
+  var imagedMoment: ImagedMoment = _
 
   @Expose(serialize = true)
   var imagedMomentUuid: UUID = _
@@ -40,60 +40,60 @@ class CachedAncillaryDatumBean extends CachedAncillaryDatum {
   var recordedTimestamp: Option[Instant] = None
 
   @Expose(serialize = true)
-  override var latitude: Option[Double] = None
+  var latitude: Option[Double] = None
 
   @Expose(serialize = true)
-  override var longitude: Option[Double] = None
+  var longitude: Option[Double] = None
 
   @Expose(serialize = true)
-  override var depthMeters: Option[Double] = None
+  var depthMeters: Option[Double] = None
 
   @Expose(serialize = true)
-  override var altitude: Option[Double] = None
+  var altitude: Option[Double] = None
 
   /**
     * Coordinate Reference System for latitude and longitude
     */
   @Expose(serialize = true)
-  override var crs: String = _
+  var crs: String = _
 
   @Expose(serialize = true)
-  override var salinity: Option[Double] = None
+  var salinity: Option[Double] = None
 
   @Expose(serialize = true)
-  override var temperatureCelsius: Option[Double] = None
+  var temperatureCelsius: Option[Double] = None
 
   @Expose(serialize = true)
-  override var oxygenMlL: Option[Double] = None
+  var oxygenMlL: Option[Double] = None
 
   @Expose(serialize = true)
-  override var pressureDbar: Option[Double] = None
+  var pressureDbar: Option[Double] = None
 
   @Expose(serialize = true)
-  override var lightTransmission: Option[Double] = None
+  var lightTransmission: Option[Double] = None
 
   @Expose(serialize = true)
-  override var x: Option[Double] = None
+  var x: Option[Double] = None
 
   @Expose(serialize = true)
-  override var y: Option[Double] = None
+  var y: Option[Double] = None
 
   @Expose(serialize = true)
-  override var z: Option[Double] = None
+  var z: Option[Double] = None
 
   @Expose(serialize = true)
-  override var posePositionUnits: String = _
+  var posePositionUnits: String = _
 
   @Expose(serialize = true)
-  override var phi: Option[Double] = None
+  var phi: Option[Double] = None
 
   @Expose(serialize = true)
-  override var theta: Option[Double] = None
+  var theta: Option[Double] = None
 
   @Expose(serialize = true)
-  override var psi: Option[Double] = None
+  var psi: Option[Double] = None
 
-  override val lastUpdated: Option[Instant] = None
+  val lastUpdated: Option[Instant] = None
 
   override def primaryKey = Option(uuid)
 

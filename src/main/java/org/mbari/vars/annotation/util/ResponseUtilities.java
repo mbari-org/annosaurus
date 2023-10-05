@@ -16,8 +16,7 @@
 
 package org.mbari.vars.annotation.util;
 
-import io.reactivex.Observable;
-
+import io.reactivex.rxjava3.core.Observable;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;

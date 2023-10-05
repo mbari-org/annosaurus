@@ -21,7 +21,7 @@ import java.time.{Duration, Instant}
 import java.util.UUID
 import java.util.concurrent.Executors
 
-import io.reactivex.subjects.Subject
+import io.reactivex.rxjava3.subjects.Subject
 import org.mbari.vars.annotation.dao.jpa.{AnnotationImpl, ImagedMomentImpl}
 import org.mbari.vars.annotation.dao.DAO
 import org.mbari.vars.annotation.messaging.{AnnotationPublisher, MessageBus}

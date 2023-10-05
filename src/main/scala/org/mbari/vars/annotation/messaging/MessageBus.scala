@@ -16,7 +16,8 @@
 
 package org.mbari.vars.annotation.messaging
 
-import io.reactivex.subjects.{PublishSubject, Subject}
+
+import io.reactivex.rxjava3.subjects.{PublishSubject, Subject}
 import org.slf4j.LoggerFactory
 
 /**

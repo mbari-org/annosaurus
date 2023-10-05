@@ -19,7 +19,7 @@ package org.mbari.vars.annotation.controllers
 import java.time.{Duration, Instant}
 import java.util.UUID
 
-import io.reactivex.subjects.Subject
+import io.reactivex.rxjava3.subjects.Subject
 import org.mbari.vars.annotation.dao.{NotFoundInDatastoreException, ObservationDAO}
 import org.mbari.vars.annotation.messaging.{AnnotationPublisher, MessageBus}
 import org.mbari.vars.annotation.model.Observation

@@ -18,9 +18,9 @@ package org.mbari.vars.annotation.messaging.zeromq
 
 import java.util.concurrent.{LinkedBlockingQueue, TimeUnit}
 
-import io.reactivex.disposables.Disposable
-import io.reactivex.schedulers.Schedulers
-import io.reactivex.subjects.Subject
+import io.reactivex.rxjava3.disposables.Disposable
+import io.reactivex.rxjava3.schedulers.Schedulers
+import io.reactivex.rxjava3.subjects.Subject
 import org.mbari.vars.annotation.ZeroMQConfig
 import org.mbari.vars.annotation.messaging.{GenericMessage, MessageBus}
 import org.slf4j.LoggerFactory

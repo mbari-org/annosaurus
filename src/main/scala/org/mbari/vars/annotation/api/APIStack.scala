@@ -32,6 +32,7 @@ import org.slf4j.LoggerFactory
 import scala.concurrent.duration.{Duration => SDuration}
 import scala.concurrent.{Await, Future}
 import scala.util.Try
+import java.time
 
 /**
   * All Api classes should mixin this trait. It defines the common traits used by all implementations
@@ -54,7 +55,7 @@ abstract class APIStack extends ScalatraServlet with ApiAuthenticationSupport wi
 
   //protected[this] implicit val jsonFormats: Formats = DefaultFormats ++ JavaTypesSerializers.all
 
-  implicit protected val stringToUUID = new TypeConverter[String, UUID] {
+  given stringToUUID: TypeConverter[String, UUID] = new TypeConverter[String, UUID] {
     override def apply(s: String): Option[UUID] = Try(UUID.fromString(s)).toOption
   }
 
@@ -68,7 +69,7 @@ abstract class APIStack extends ScalatraServlet with ApiAuthenticationSupport wi
   //   }
   // }
 
-  implicit protected val stringToInstant = new TypeConverter[String, Instant] {
+  given stringToInstant: TypeConverter[String, Instant] = new TypeConverter[String, Instant] {
     override def apply(s: String): Option[Instant] = {
       val try1 = Try(Instant.from(compactTimeFormatter.parse(s))).toOption
       val try2 = try1 match {
@@ -87,19 +88,19 @@ abstract class APIStack extends ScalatraServlet with ApiAuthenticationSupport wi
     }
   }
 
-  implicit protected val stringToDuration = new TypeConverter[String, Duration] {
+  given stringToDuration: TypeConverter[String, time.Duration] = new TypeConverter[String, Duration] {
     override def apply(s: String): Option[Duration] = Try(Duration.ofMillis(s.toLong)).toOption
   }
 
-  implicit protected val stringToURI = new TypeConverter[String, URI] {
+  given stringToURI: TypeConverter[String, URI] = new TypeConverter[String, URI] {
     override def apply(s: String): Option[URI] = Try(URI.create(s)).toOption
   }
 
-  implicit protected val stringToURL = new TypeConverter[String, URL] {
+  given stringToURL: TypeConverter[String, URL] = new TypeConverter[String, URL] {
     override def apply(s: String): Option[URL] = Try(new URL(s)).toOption
   }
 
-  implicit protected val stringToTimecode = new TypeConverter[String, Timecode] {
+  given stringToTimecode: TypeConverter[String, Timecode] = new TypeConverter[String, Timecode] {
     override def apply(s: String): Option[Timecode] = Try(new Timecode(s)).toOption
   }
 

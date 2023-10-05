@@ -41,6 +41,7 @@ import org.mbari.vars.annotation.Constants
 import org.mbari.vars.annotation.messaging.zeromq.ZeroMQPublisher
 import org.scalatra.servlet.ScalatraListener
 import org.slf4j.bridge.SLF4JBridgeHandler
+import java.util.{List => JList}
 
 object JettyMain {
 

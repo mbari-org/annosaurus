@@ -16,7 +16,7 @@
 
 package org.mbari.vars.annotation.messaging
 
-import io.reactivex.subjects.Subject
+import io.reactivex.rxjava3.subjects.Subject
 import org.mbari.vars.annotation.dao.jpa.AnnotationImpl
 import org.mbari.vars.annotation.model.{Annotation, Association, Observation}
 
