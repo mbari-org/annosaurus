@@ -35,7 +35,7 @@ object CirceCodecs {
 
   implicit val urlDecoder: Decoder[URL] = Decoder
     .decodeString
-    .emapTry(str => Try(new URL(str)))
+    .emapTry(str => Try(URI.create(str).toURL()))
   implicit val urlEncoder: Encoder[URL] = Encoder
     .encodeString
     .contramap(_.toString)

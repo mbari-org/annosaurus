@@ -51,23 +51,23 @@ class IndexImpl extends ImagedMoment with JPAPersistentObject {
   @SerializedName(value = "video_reference_uuid")
   @Column(name = "video_reference_uuid", nullable = true, columnDefinition = "CHAR(36)")
   @Convert(converter = classOf[UUIDConverter])
-  override var videoReferenceUUID: UUID = _
+  var videoReferenceUUID: UUID = _
 
   @Expose(serialize = true)
   @Column(name = "elapsed_time_millis", nullable = true)
   @Convert(converter = classOf[DurationConverter])
-  override var elapsedTime: Duration = _
+  var elapsedTime: Duration = _
 
   @Expose(serialize = true)
   @Column(name = "recorded_timestamp", nullable = true)
   @Temporal(value = TemporalType.TIMESTAMP)
   @Convert(converter = classOf[InstantConverter])
-  override var recordedDate: Instant = _
+  var recordedDate: Instant = _
 
   @Expose(serialize = true)
   @Column(name = "timecode", nullable = true)
   @Convert(converter = classOf[TimecodeConverter])
-  override var timecode: Timecode = _
+  var timecode: Timecode = _
 
   //  @Expose(serialize = true)
   //  @SerializedName(value = "ancillary_data")
@@ -104,7 +104,7 @@ class IndexImpl extends ImagedMoment with JPAPersistentObject {
   override def imageReferences: Iterable[ImageReference] = ???
 
   @Transient
-  override var ancillaryDatum: CachedAncillaryDatum = _
+  var ancillaryDatum: CachedAncillaryDatum = _
 
   override def primaryKey: Option[UUID] = ???
 }

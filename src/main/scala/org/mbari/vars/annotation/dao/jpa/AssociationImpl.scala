@@ -82,11 +82,11 @@ class AssociationImpl extends Association with JPAPersistentObject {
 
   @Expose(serialize = true)
   @Column(name = "link_name", length = 128, nullable = false)
-  override var linkName: String = _
+  var linkName: String = _
 
   @Expose(serialize = true)
   @Column(name = "link_value", length = 1024, nullable = true)
-  override var linkValue: String = _
+  var linkValue: String = _
 
   @Expose(serialize = false)
   @ManyToOne(
@@ -95,18 +95,18 @@ class AssociationImpl extends Association with JPAPersistentObject {
     targetEntity = classOf[ObservationImpl]
   )
   @JoinColumn(name = "observation_uuid", nullable = false, columnDefinition = "CHAR(36)")
-  override var observation: Observation = _
+  var observation: Observation = _
 
   @Expose(serialize = true)
   @Column(name = "to_concept", length = 128, nullable = true)
-  override var toConcept: String = _
+  var toConcept: String = _
 
   /**
     * The mime-type of the linkValue
     */
   @Expose(serialize = true)
   @Column(name = "mime_type", length = 64, nullable = false)
-  override var mimeType: String = "text/plain"
+  var mimeType: String = "text/plain"
 
   override def toString: String = Association.asString(this)
 

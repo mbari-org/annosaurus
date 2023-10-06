@@ -60,12 +60,12 @@ class ImageReferenceImpl extends ImageReference with JPAPersistentObject {
 
   @Expose(serialize = true)
   @Column(name = "description", length = 256, nullable = true)
-  override var description: String = _
+  var description: String = _
 
   @Expose(serialize = true)
   @Column(name = "url", unique = true, length = 1024, nullable = false)
   @Convert(converter = classOf[URLConverter])
-  override var url: URL = _
+  var url: URL = _
 
   @ManyToOne(
     cascade = Array(CascadeType.PERSIST, CascadeType.DETACH),
@@ -77,21 +77,21 @@ class ImageReferenceImpl extends ImageReference with JPAPersistentObject {
     nullable = false,
     columnDefinition = "CHAR(36)"
   )
-  override var imagedMoment: ImagedMoment = _
+  var imagedMoment: ImagedMoment = _
 
   @Expose(serialize = true)
   @SerializedName(value = "height_pixels")
   @Column(name = "height_pixels", nullable = true)
-  override var height: Int = _
+  var height: Int = _
 
   @Expose(serialize = true)
   @SerializedName(value = "width_pixels")
   @Column(name = "width_pixels", nullable = true)
-  override var width: Int = _
+  var width: Int = _
 
   @Expose(serialize = true)
   @Column(name = "format", length = 64, nullable = true)
-  override var format: String = _
+  var format: String = _
 }
 
 object ImageReferenceImpl {

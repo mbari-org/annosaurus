@@ -67,31 +67,31 @@ class CachedAncillaryDatumImpl extends CachedAncillaryDatum with JPAPersistentOb
 
   @Expose(serialize = true)
   @Column(name = "coordinate_reference_system", length = 32, nullable = true)
-  override var crs: String = _
+  var crs: String = _
 
   @Expose(serialize = true)
   @Column(name = "oxygen_ml_per_l", nullable = true)
   @Convert(converter = classOf[DoubleOptionConverter])
-  override var oxygenMlL: Option[Double] = None
+  var oxygenMlL: Option[Double] = None
 
   @Expose(serialize = true)
   @Column(name = "depth_meters", nullable = true)
   @Convert(converter = classOf[DoubleOptionConverter])
-  override var depthMeters: Option[Double] = None
+  var depthMeters: Option[Double] = None
 
   @Expose(serialize = true)
   @Column(name = "z", nullable = true)
   @Convert(converter = classOf[DoubleOptionConverter])
-  override var z: Option[Double] = None
+  var z: Option[Double] = None
 
   @Expose(serialize = true)
   @Column(name = "xyz_position_units", nullable = true)
-  override var posePositionUnits: String = _
+  var posePositionUnits: String = _
 
   @Expose(serialize = true)
   @Column(name = "latitude", nullable = true)
   @Convert(converter = classOf[DoubleOptionConverter])
-  override var latitude: Option[Double] = None
+  var latitude: Option[Double] = None
 
   @Expose(serialize = false)
   @OneToOne(
@@ -101,62 +101,62 @@ class CachedAncillaryDatumImpl extends CachedAncillaryDatum with JPAPersistentOb
     targetEntity = classOf[ImagedMomentImpl]
   )
   @JoinColumn(name = "imaged_moment_uuid", nullable = false, columnDefinition = "CHAR(36)")
-  override var imagedMoment: ImagedMoment = _
+  var imagedMoment: ImagedMoment = _
 
   @Expose(serialize = true)
   @Column(name = "y", nullable = true)
   @Convert(converter = classOf[DoubleOptionConverter])
-  override var y: Option[Double] = None
+  var y: Option[Double] = None
 
   @Expose(serialize = true)
   @Column(name = "temperature_celsius", nullable = true)
   @Convert(converter = classOf[DoubleOptionConverter])
-  override var temperatureCelsius: Option[Double] = None
+  var temperatureCelsius: Option[Double] = None
 
   @Expose(serialize = true)
   @Column(name = "x", nullable = true)
   @Convert(converter = classOf[DoubleOptionConverter])
-  override var x: Option[Double] = None
+  var x: Option[Double] = None
 
   @Expose(serialize = true)
   @Column(name = "theta", nullable = true)
   @Convert(converter = classOf[DoubleOptionConverter])
-  override var theta: Option[Double] = None
+  var theta: Option[Double] = None
 
   @Expose(serialize = true)
   @Column(name = "longitude", nullable = true)
   @Convert(converter = classOf[DoubleOptionConverter])
-  override var longitude: Option[Double] = None
+  var longitude: Option[Double] = None
 
   @Expose(serialize = true)
   @Column(name = "phi", nullable = true)
   @Convert(converter = classOf[DoubleOptionConverter])
-  override var phi: Option[Double] = None
+  var phi: Option[Double] = None
 
   @Expose(serialize = true)
   @Column(name = "psi", nullable = true)
   @Convert(converter = classOf[DoubleOptionConverter])
-  override var psi: Option[Double] = None
+  var psi: Option[Double] = None
 
   @Expose(serialize = true)
   @Column(name = "pressure_dbar", nullable = true)
   @Convert(converter = classOf[DoubleOptionConverter])
-  override var pressureDbar: Option[Double] = None
+  var pressureDbar: Option[Double] = None
 
   @Expose(serialize = true)
   @Column(name = "salinity", nullable = true)
   @Convert(converter = classOf[DoubleOptionConverter])
-  override var salinity: Option[Double] = None
+  var salinity: Option[Double] = None
 
   @Expose(serialize = true)
   @Column(name = "altitude", nullable = true)
   @Convert(converter = classOf[DoubleOptionConverter])
-  override var altitude: Option[Double] = None
+  var altitude: Option[Double] = None
 
   @Expose(serialize = true)
   @Column(name = "light_transmission", nullable = true)
   @Convert(converter = classOf[DoubleOptionConverter])
-  override var lightTransmission: Option[Double] = None
+  var lightTransmission: Option[Double] = None
 }
 
 object CachedAncillaryDatumImpl {

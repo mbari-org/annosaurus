@@ -35,9 +35,9 @@ import scala.concurrent.{Await, ExecutionContext}
   */
 trait WebApiStack extends ScalatraFlatSpec with BeforeAndAfterAll {
 
-  protected[this] val gson                      = Constants.GSON
-  protected[this] val daoFactory                = TestDAOFactory.Instance.asInstanceOf[BasicDAOFactory]
-  implicit protected[this] val executionContext = ExecutionContext.global
+  protected val gson                      = Constants.GSON
+  protected val daoFactory                = TestDAOFactory.Instance.asInstanceOf[BasicDAOFactory]
+  implicit val executionContext: ExecutionContext = ExecutionContext.global
 
   override protected def afterAll(): Unit = {
     val dao = daoFactory.newImagedMomentDAO()

@@ -16,9 +16,11 @@
 
 package org.mbari.vars.annotation.gson
 
-import java.lang.reflect.{ParameterizedType, Type}
+import java.lang.reflect.Type
+import scala.reflect.ClassTag
 
 import com.google.gson._
+import java.lang.reflect.ParameterizedType
 
 /**
   * @author Brian Schlining
@@ -26,10 +28,13 @@ import com.google.gson._
   */
 class OptionSerializer extends JsonSerializer[Option[Any]] with JsonDeserializer[Option[Any]] {
 
-  private def innerType(outerType: Type) = outerType match {
-    case pt: ParameterizedType => pt.getActualTypeArguments()(0)
-    case _                     => throw new UnsupportedOperationException(outerType.toString)
-  }
+
+  private def innerType(outerType: Type) = 
+    outerType match {
+      case pt: ParameterizedType => pt.getActualTypeArguments()(0)
+      case _                     => throw new UnsupportedOperationException("Expected ParameterizedType")
+    }
+  
 
   override def serialize(
       src: Option[Any],

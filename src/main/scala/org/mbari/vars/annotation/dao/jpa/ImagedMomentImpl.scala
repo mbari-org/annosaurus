@@ -236,18 +236,18 @@ class ImagedMomentImpl extends ImagedMoment with JPAPersistentObject {
   @Expose(serialize = true)
   @Column(name = "elapsed_time_millis", nullable = true)
   @Convert(converter = classOf[DurationConverter])
-  override var elapsedTime: Duration = _
+  var elapsedTime: Duration = _
 
   @Expose(serialize = true)
   @Column(name = "recorded_timestamp", nullable = true)
   @Temporal(value = TemporalType.TIMESTAMP)
   @Convert(converter = classOf[InstantConverter])
-  override var recordedDate: Instant = _
+  var recordedDate: Instant = _
 
   @Expose(serialize = true)
   @Column(name = "timecode", nullable = true)
   @Convert(converter = classOf[TimecodeConverter])
-  override var timecode: Timecode = _
+  var timecode: Timecode = _
 
   @Expose(serialize = true)
   @SerializedName(value = "video_reference_uuid")
@@ -257,7 +257,7 @@ class ImagedMomentImpl extends ImagedMoment with JPAPersistentObject {
     columnDefinition = "CHAR(36)"
   )
   @Convert(converter = classOf[UUIDConverter])
-  override var videoReferenceUUID: UUID = _
+  var videoReferenceUUID: UUID = _
 
   @Expose(serialize = true)
   @SerializedName(value = "observations")

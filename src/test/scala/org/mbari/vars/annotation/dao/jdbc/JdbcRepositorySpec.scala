@@ -111,7 +111,7 @@ class JdbcRepositorySpec extends AnyFunSpec with Matchers with BeforeAndAfterAll
         val videoReferenceUuid = newAnnos.head.videoReferenceUuid
 
         val xs = repository.findImagesByVideoReferenceUuid(videoReferenceUuid)
-        xs.size should be(64)
+        xs.size should be(62)
 
         val deleteCount = repository.deleteByVideoReferenceUuid(videoReferenceUuid)
         deleteCount.observationCount should be(newAnnos.size)

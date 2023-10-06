@@ -96,11 +96,11 @@ class CachedVideoReferenceInfoImpl extends CachedVideoReferenceInfo with JPAPers
     */
   @Expose(serialize = true)
   @Column(name = "mission_contact", nullable = true, length = 64)
-  override var missionContact: String = _
+  var missionContact: String = _
 
   @Expose(serialize = true)
   @Column(name = "platform_name", nullable = false, length = 64)
-  override var platformName: String = _
+  var platformName: String = _
 
   @Expose(serialize = true)
   @SerializedName(value = "video_reference_uuid")
@@ -111,11 +111,11 @@ class CachedVideoReferenceInfoImpl extends CachedVideoReferenceInfo with JPAPers
     columnDefinition = "CHAR(36)"
   )
   @Convert(converter = classOf[UUIDConverter])
-  override var videoReferenceUUID: UUID = _
+  var videoReferenceUUID: UUID = _
 
   @Expose(serialize = true)
   @Column(name = "mission_id", nullable = false, length = 256)
-  override var missionId: String = _
+  var missionId: String = _
 
 }
 

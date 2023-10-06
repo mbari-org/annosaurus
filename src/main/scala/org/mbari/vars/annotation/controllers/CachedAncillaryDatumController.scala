@@ -279,17 +279,17 @@ class CachedAncillaryDatumController(val daoFactory: BasicDAOFactory)
 
       val usefulData = data.filter(_.recordedTimestamp.isDefined)
 
-      def imagedMomentToMillis(im: ImagedMoment) = im.recordedDate.toEpochMilli
+      def imagedMomentToMillis(im: ImagedMoment) = im.recordedDate.toEpochMilli.toDouble
 
       def datumToMillis(cd: CachedAncillaryDatumBean) =
-        cd.recordedTimestamp.map(_.toEpochMilli).getOrElse(-1L)
+        cd.recordedTimestamp.map(_.toEpochMilli).getOrElse(-1L).toDouble
 
       val mergedData = FastCollator(
         imagedMoments,
         imagedMomentToMillis,
         usefulData,
         datumToMillis,
-        tolerance.toMillis
+        tolerance.toMillis.toDouble
       )
 
       for {

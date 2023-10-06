@@ -143,13 +143,13 @@ class ObservationImpl extends Observation with JPAPersistentObject {
 
   @Expose(serialize = true)
   @Column(name = "concept", length = 256)
-  override var concept: String = _
+  var concept: String = _
 
   @Expose(serialize = true)
   @SerializedName(value = "duration_millis")
   @Column(name = "duration_millis", nullable = true)
   @Convert(converter = classOf[DurationConverter])
-  override var duration: Duration = _
+  var duration: Duration = _
 
   @ManyToOne(
     cascade = Array(CascadeType.PERSIST, CascadeType.DETACH),
@@ -157,26 +157,26 @@ class ObservationImpl extends Observation with JPAPersistentObject {
     targetEntity = classOf[ImagedMomentImpl]
   )
   @JoinColumn(name = "imaged_moment_uuid", nullable = false, columnDefinition = "CHAR(36)")
-  override var imagedMoment: ImagedMoment = _
+  var imagedMoment: ImagedMoment = _
 
   @Expose(serialize = true)
   @SerializedName(value = "observation_timestamp")
   @Column(name = "observation_timestamp", nullable = false)
   @Temporal(value = TemporalType.TIMESTAMP)
   @Convert(converter = classOf[InstantConverter])
-  override var observationDate: Instant = Instant.now()
+  var observationDate: Instant = Instant.now()
 
   @Expose(serialize = true)
   @Column(name = "observer", length = 128, nullable = true)
-  override var observer: String = _
+  var observer: String = _
 
   @Expose(serialize = true)
   @Column(name = "observation_group", nullable = true, length = 128)
-  override var group: String = _
+  var group: String = _
 
   @Expose(serialize = true)
   @Column(name = "activity", nullable = true, length = 128)
-  override var activity: String = _
+  var activity: String = _
 
   @Expose(serialize = true)
   @SerializedName(value = "associations")

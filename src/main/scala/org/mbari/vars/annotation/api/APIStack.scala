@@ -55,7 +55,7 @@ abstract class APIStack extends ScalatraServlet with ApiAuthenticationSupport wi
 
   //protected[this] implicit val jsonFormats: Formats = DefaultFormats ++ JavaTypesSerializers.all
 
-  given stringToUUID: TypeConverter[String, UUID] = new TypeConverter[String, UUID] {
+  implicit val stringToUUID: TypeConverter[String, UUID] = new TypeConverter[String, UUID] {
     override def apply(s: String): Option[UUID] = Try(UUID.fromString(s)).toOption
   }
 
@@ -69,7 +69,7 @@ abstract class APIStack extends ScalatraServlet with ApiAuthenticationSupport wi
   //   }
   // }
 
-  given stringToInstant: TypeConverter[String, Instant] = new TypeConverter[String, Instant] {
+  implicit val stringToInstant: TypeConverter[String, Instant] = new TypeConverter[String, Instant] {
     override def apply(s: String): Option[Instant] = {
       val try1 = Try(Instant.from(compactTimeFormatter.parse(s))).toOption
       val try2 = try1 match {
@@ -88,19 +88,19 @@ abstract class APIStack extends ScalatraServlet with ApiAuthenticationSupport wi
     }
   }
 
-  given stringToDuration: TypeConverter[String, time.Duration] = new TypeConverter[String, Duration] {
+  implicit val stringToDuration: TypeConverter[String, time.Duration] = new TypeConverter[String, Duration] {
     override def apply(s: String): Option[Duration] = Try(Duration.ofMillis(s.toLong)).toOption
   }
 
-  given stringToURI: TypeConverter[String, URI] = new TypeConverter[String, URI] {
+  implicit val stringToURI: TypeConverter[String, URI] = new TypeConverter[String, URI] {
     override def apply(s: String): Option[URI] = Try(URI.create(s)).toOption
   }
 
-  given stringToURL: TypeConverter[String, URL] = new TypeConverter[String, URL] {
-    override def apply(s: String): Option[URL] = Try(new URL(s)).toOption
+  implicit val stringToURL: TypeConverter[String, URL] = new TypeConverter[String, URL] {
+    override def apply(s: String): Option[URL] = Try(URI.create(s).toURL()).toOption
   }
 
-  given stringToTimecode: TypeConverter[String, Timecode] = new TypeConverter[String, Timecode] {
+  implicit val stringToTimecode: TypeConverter[String, Timecode] = new TypeConverter[String, Timecode] {
     override def apply(s: String): Option[Timecode] = Try(new Timecode(s)).toOption
   }
 

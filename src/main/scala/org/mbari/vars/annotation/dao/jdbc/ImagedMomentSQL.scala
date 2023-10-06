@@ -23,6 +23,7 @@ import java.util.UUID
 
 import org.mbari.vars.annotation.model.simple.Image
 import org.mbari.vcr4j.time.Timecode
+import java.net.URI
 
 object ImagedMomentSQL {
 
@@ -94,7 +95,7 @@ object ImagedMomentSQL {
       Option(xs(6)).foreach(v => i.format = v.toString)
       Option(xs(7)).foreach(v => i.height = v.asInstanceOf[Number].intValue())
       Option(xs(8)).foreach(v => i.width = v.asInstanceOf[Number].intValue())
-      i.url = new URL(xs(9).toString)
+      i.url = URI.create(xs(9).toString).toURL
       i.imageReferenceUuid = UUID.fromString(xs(10).toString)
       i
     }

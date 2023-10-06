@@ -21,6 +21,7 @@ import java.util.UUID
 
 import org.mbari.vars.annotation.dao.jpa.AnnotationImpl
 import org.mbari.vars.annotation.model.Annotation
+import java.net.URI
 
 object ImageReferenceSQL {
   val SELECT: String =
@@ -84,7 +85,7 @@ object ImageReferenceSQL {
       Option(xs(3))
         .map(_.asInstanceOf[Number].intValue())
         .foreach(v => i.height = v)
-      i.url = new URL(xs(4).toString)
+      i.url = URI.create(xs(4).toString).toURL
       Option(xs(5))
         .map(_.asInstanceOf[Number].intValue())
         .foreach(v => i.width = v)
