@@ -74,6 +74,6 @@ object Dependencies {
   lazy val typesafeConfig = "com.typesafe"    % "config"     % "1.4.2"
   lazy val uuidgen        = "org.mbari.uuid"  % "uuid-gen"   % "0.1.4"
   lazy val vcr4jCore      = "org.mbari.vcr4j" % "vcr4j-core" % "5.2.0"
-  lazy val zeromq         = "org.zeromq"      % "jeromq"     % "0.5.3"
+  lazy val zeromq         = "org.zeromq"      % "jeromq"     % "0.5.4"
 
 }
