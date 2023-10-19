@@ -20,7 +20,7 @@ import java.sql.Timestamp
 import java.time.Instant
 import java.util.UUID
 
-import javax.persistence.EntityManager
+import jakarta.persistence.EntityManager
 import org.mbari.vars.annotation.model.simple.CachedAncillaryDatumBean
 import org.slf4j.LoggerFactory
 

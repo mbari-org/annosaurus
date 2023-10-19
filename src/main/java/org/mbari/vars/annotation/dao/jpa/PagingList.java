@@ -19,8 +19,8 @@ package org.mbari.vars.annotation.dao.jpa;
 import java.util.AbstractList;
 import java.util.List;
 
-import javax.persistence.Parameter;
-import javax.persistence.TypedQuery;
+import jakarta.persistence.Parameter;
+import jakarta.persistence.TypedQuery;
 
 import org.eclipse.persistence.jpa.JpaHelper;
 import org.eclipse.persistence.jpa.JpaQuery;

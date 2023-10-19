@@ -16,7 +16,7 @@
 
 package org.mbari.vars.annotation.dao.jpa
 
-import javax.persistence.{CascadeType, JoinColumn, _}
+import jakarta.persistence.{CascadeType, JoinColumn, _}
 
 import com.google.gson.annotations.Expose
 import org.mbari.vars.annotation.model.{CachedAncillaryDatum, ImagedMoment}

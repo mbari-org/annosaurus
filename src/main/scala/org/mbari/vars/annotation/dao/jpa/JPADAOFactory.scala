@@ -16,7 +16,7 @@
 
 package org.mbari.vars.annotation.dao.jpa
 
-import javax.persistence.{EntityManager, EntityManagerFactory}
+import jakarta.persistence.{EntityManager, EntityManagerFactory}
 
 import com.typesafe.config.ConfigFactory
 import org.mbari.vars.annotation.dao.{DAO, ImagedMomentDAO, ObservationDAO, _}

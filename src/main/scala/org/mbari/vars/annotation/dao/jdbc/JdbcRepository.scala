@@ -19,7 +19,7 @@ package org.mbari.vars.annotation.dao.jdbc
 import java.sql.Timestamp
 import java.time.Instant
 import java.util.UUID
-import javax.persistence.{EntityManager, EntityManagerFactory, Query}
+import jakarta.persistence.{EntityManager, EntityManagerFactory, Query}
 import org.mbari.vars.annotation.dao.jpa.DatabaseProductName
 import org.mbari.vars.annotation.model.{Annotation, GeographicRange}
 import org.mbari.vars.annotation.model.simple.{

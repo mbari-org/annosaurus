@@ -24,7 +24,7 @@ import java.sql.Timestamp
 import java.time.Instant
 import java.util
 import java.util.{UUID, List => JList}
-import javax.persistence.{EntityManager, Query}
+import jakarta.persistence.{EntityManager, Query}
 import scala.jdk.CollectionConverters._
 
 class QueryConstraints {

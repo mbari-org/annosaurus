@@ -16,7 +16,7 @@
 
 package org.mbari.vars.annotation.auth
 
-import javax.servlet.http.HttpServletRequest
+import jakarta.servlet.http.HttpServletRequest
 
 /**
   * AuthorizationServices are used to validate requests, especially those that

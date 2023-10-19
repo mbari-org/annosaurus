@@ -17,7 +17,7 @@
 package org.mbari.vars.annotation.dao.jpa
 
 import java.util.UUID
-import javax.persistence.EntityManager
+import jakarta.persistence.EntityManager
 
 import org.mbari.vars.annotation.dao.CachedAncillaryDatumDAO
 import org.mbari.vars.annotation.model.CachedAncillaryDatum

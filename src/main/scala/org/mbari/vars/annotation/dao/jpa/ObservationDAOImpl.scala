@@ -20,7 +20,7 @@ import java.sql.Timestamp
 import java.time.{Duration, Instant}
 import java.util.{stream, UUID}
 
-import javax.persistence.EntityManager
+import jakarta.persistence.EntityManager
 import org.mbari.vars.annotation.dao.ObservationDAO
 import org.mbari.vars.annotation.model.simple.{ConcurrentRequest, MultiRequest}
 

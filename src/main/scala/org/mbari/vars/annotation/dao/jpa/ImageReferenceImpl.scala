@@ -17,7 +17,7 @@
 package org.mbari.vars.annotation.dao.jpa
 
 import java.net.URL
-import javax.persistence._
+import jakarta.persistence._
 
 import com.google.gson.annotations.{Expose, SerializedName}
 import org.mbari.vars.annotation.model.{ImageReference, ImagedMoment}

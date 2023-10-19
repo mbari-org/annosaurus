@@ -17,8 +17,8 @@
 package org.mbari.vars.annotation.util;
 
 import io.reactivex.rxjava3.core.Observable;
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.ServletOutputStream;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.function.Function;

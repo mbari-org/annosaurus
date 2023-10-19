@@ -21,7 +21,7 @@ import java.time.{Duration, Instant}
 import java.util.function.Function
 import java.util.{stream, UUID}
 
-import javax.persistence.EntityManager
+import jakarta.persistence.EntityManager
 import org.mbari.vars.annotation.dao.ImagedMomentDAO
 import org.mbari.vars.annotation.model.ImagedMoment
 import org.mbari.vars.annotation.model.simple.WindowRequest

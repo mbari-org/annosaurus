@@ -19,7 +19,7 @@ package org.mbari.vars.annotation.dao.jdbc
 import org.mbari.vars.annotation.model.simple.{DepthHistogram, QueryConstraints, TimeHistogram}
 import org.slf4j.LoggerFactory
 
-import javax.persistence.{EntityManager, EntityManagerFactory}
+import jakarta.persistence.{EntityManager, EntityManagerFactory}
 import scala.jdk.CollectionConverters._
 import java.time.Instant
 

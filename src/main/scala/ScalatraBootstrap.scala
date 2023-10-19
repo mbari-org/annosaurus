@@ -16,7 +16,7 @@
 
 import java.util.concurrent.Executors
 
-import javax.servlet.ServletContext
+import jakarta.servlet.ServletContext
 import org.mbari.vars.annotation.api.v1._
 import org.mbari.vars.annotation.api.v2._
 import org.mbari.vars.annotation.controllers._

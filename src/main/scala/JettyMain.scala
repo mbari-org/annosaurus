@@ -37,6 +37,8 @@ import net.bull.javamelody.{MonitoringFilter, Parameter, ReportServlet, SessionL
 import org.eclipse.jetty.server._
 import org.eclipse.jetty.servlet.FilterHolder
 import org.eclipse.jetty.webapp.WebAppContext
+// import org.eclipse.jetty.ee10.servlet.FilterHolder  // Jetty 12
+// import org.eclipse.jetty.ee10.webapp.WebAppContext  // Jetty 12
 import org.mbari.vars.annotation.Constants
 import org.mbari.vars.annotation.messaging.zeromq.ZeroMQPublisher
 import org.scalatra.servlet.ScalatraListener
@@ -84,20 +86,22 @@ object JettyMain {
 
     val webApp = new WebAppContext
     webApp.setContextPath(conf.contextPath)
-    webApp.setResourceBase(conf.webapp)
-    webApp.setEventListeners(Array(new ScalatraListener))
+    // webApp.setResourceBase(conf.webapp)
+    // webApp.setEventListeners(Array(new ScalatraListener))
+    webApp.setEventListeners(java.util.List.of(new ScalatraListener))
 
     // Add JavaMelody for monitoring
     webApp.addServlet(classOf[ReportServlet], "/monitoring")
     webApp.addEventListener(new SessionListener)
-    val monitoringFilter = new FilterHolder(new MonitoringFilter())
-    monitoringFilter.setInitParameter(Parameter.APPLICATION_NAME.getCode, conf.webapp)
-    monitoringFilter.setInitParameter("authorized-users", "adminz:Cranchiidae")
-    webApp.addFilter(
-      monitoringFilter,
-      "/*",
-      java.util.EnumSet.of(DispatcherType.REQUEST, DispatcherType.ASYNC)
-    )
+    // val monitoringFilter = new FilterHolder(new MonitoringFilter())
+    // monitoringFilter.setInitParameter(Parameter.APPLICATION_NAME.getCode, conf.webapp)
+    // monitoringFilter.setInitParameter("authorized-users", "adminz:Cranchiidae")
+
+    // webApp.addFilter(
+    //   monitoringFilter,
+    //   "/*",
+    //   java.util.EnumSet.of(DispatcherType.REQUEST, DispatcherType.ASYNC)
+    // )
 
     server.setHandler(webApp)
 

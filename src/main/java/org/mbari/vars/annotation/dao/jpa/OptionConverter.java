@@ -18,8 +18,8 @@ package org.mbari.vars.annotation.dao.jpa;
 
 import scala.Option;
 
-import javax.persistence.AttributeConverter;
-import javax.persistence.Converter;
+import jakarta.persistence.AttributeConverter;
+import jakarta.persistence.Converter;
 
 /**
  * @author Brian Schlining

@@ -16,7 +16,7 @@
 
 package org.mbari.vars.annotation.dao.jpa
 
-import javax.persistence.EntityManagerFactory
+import jakarta.persistence.EntityManagerFactory
 
 import com.typesafe.config.ConfigFactory
 
@@ -42,8 +42,8 @@ object DevelopmentDAOFactory extends JPADAOFactory {
     "eclipselink.logging.thread"                          -> "false",
     "eclipselink.logging.timestamp"                       -> "false",
     "eclipselink.target-database"                         -> productName,
-    "javax.persistence.database-product-name"             -> productName,
-    "javax.persistence.schema-generation.database.action" -> "create"
+    "jakarta.persistence.database-product-name"             -> productName,
+    "jakarta.persistence.schema-generation.database.action" -> "create"
   )
 
   lazy val entityManagerFactory: EntityManagerFactory = {

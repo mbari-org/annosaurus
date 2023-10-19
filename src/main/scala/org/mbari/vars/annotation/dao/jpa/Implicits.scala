@@ -16,7 +16,7 @@
 
 package org.mbari.vars.annotation.dao.jpa
 
-import javax.persistence.EntityManager
+import jakarta.persistence.EntityManager
 
 // import org.slf4j.LoggerFactory
 

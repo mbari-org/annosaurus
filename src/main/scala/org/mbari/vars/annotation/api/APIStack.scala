@@ -22,7 +22,7 @@ import java.time.{Duration, Instant}
 import java.util.UUID
 import java.util.concurrent.TimeUnit
 
-import javax.servlet.http.HttpServletResponse
+import jakarta.servlet.http.HttpServletResponse
 import org.mbari.vars.annotation.Constants
 import org.mbari.vcr4j.time.Timecode
 import org.scalatra.util.conversion.TypeConverter

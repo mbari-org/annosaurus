@@ -17,7 +17,7 @@
 package org.mbari.vars.annotation.dao.jpa
 
 import java.util.concurrent.TimeUnit
-import javax.persistence.EntityManagerFactory
+import jakarta.persistence.EntityManagerFactory
 
 import com.typesafe.config.ConfigFactory
 import org.eclipse.persistence.config.TargetDatabase
@@ -35,9 +35,9 @@ object TestDAOFactory {
     "eclipselink.logging.level.sql"                             -> "FINE",
     "eclipselink.logging.parameters"                            -> "true",
     "eclipselink.logging.level"                                 -> "INFO",
-    "javax.persistence.schema-generation.scripts.action"        -> "drop-and-create",
-    "javax.persistence.schema-generation.scripts.create-target" -> "target/test-database-create.ddl",
-    "javax.persistence.schema-generation.scripts.drop-target"   -> "target/test-database-drop.ddl"
+    "jakarta.persistence.schema-generation.scripts.action"        -> "drop-and-create",
+    "jakarta.persistence.schema-generation.scripts.create-target" -> "target/test-database-create.ddl",
+    "jakarta.persistence.schema-generation.scripts.drop-target"   -> "target/test-database-drop.ddl"
   )
 
   //val Instance: SpecDAOFactory = DerbyTestDAOFactory.asInstanceOf[SpecDAOFactory]
@@ -74,7 +74,7 @@ object DerbyTestDAOFactory extends SpecDAOFactory {
     TestDAOFactory.TestProperties ++
       Map(
         "eclipselink.target-database"             -> TargetDatabase.Derby,
-        "javax.persistence.database-product-name" -> TargetDatabase.Derby
+        "jakarta.persistence.database-product-name" -> TargetDatabase.Derby
       )
 
   lazy val entityManagerFactory: EntityManagerFactory = {
@@ -93,7 +93,7 @@ object H2TestDAOFactory extends SpecDAOFactory {
     TestDAOFactory.TestProperties ++
       Map(
         "eclipselink.target-database"             -> TargetDatabase.Derby,
-        "javax.persistence.database-product-name" -> TargetDatabase.Derby
+        "jakarta.persistence.database-product-name" -> TargetDatabase.Derby
       )
 
   lazy val entityManagerFactory: EntityManagerFactory = {
@@ -114,7 +114,7 @@ object DevelopmentTestDAOFactory extends SpecDAOFactory {
     TestDAOFactory.TestProperties ++
       Map(
         "eclipselink.target-database"             -> productName,
-        "javax.persistence.database-product-name" -> productName
+        "jakarta.persistence.database-product-name" -> productName
       )
 
   lazy val entityManagerFactory: EntityManagerFactory = {

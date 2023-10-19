@@ -20,7 +20,7 @@ import java.time.{Duration, Instant}
 import java.util.UUID
 
 import com.google.gson.annotations.{Expose, SerializedName}
-import javax.persistence._
+import jakarta.persistence._
 import org.mbari.vars.annotation.Constants
 import org.mbari.vars.annotation.model.{
   CachedAncillaryDatum,

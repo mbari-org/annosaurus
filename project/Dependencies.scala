@@ -1,7 +1,7 @@
 import sbt._
 object Dependencies {
 
-  lazy val auth0 = "com.auth0" % "java-jwt" % "3.19.4"
+  lazy val auth0 = "com.auth0" % "java-jwt" % "4.4.0"
 
   val circeVersion      = "0.14.6"
   lazy val circeCore    = "io.circe" %% "circe-core" % circeVersion
@@ -17,7 +17,7 @@ object Dependencies {
   lazy val derbyShared = "org.apache.derby" % "derbyshared" % derbyVersion
   lazy val derbyTools  = "org.apache.derby" % "derbytools" % derbyVersion
 
-  val eclipselinkVersion = "2.7.13"
+  val eclipselinkVersion = "4.0.2"
   lazy val eclipselinkExtension =
     "org.eclipse.persistence" % "org.eclipse.persistence.extension" % eclipselinkVersion
   lazy val eclipselinkJpa =
@@ -26,18 +26,23 @@ object Dependencies {
   lazy val fatboyGson =
     "com.fatboyindustrial.gson-javatime-serialisers" % "gson-javatime-serialisers" % "1.1.2"
   lazy val gson             = "com.google.code.gson" % "gson"              % "2.10.1"
-  lazy val h2               = "com.h2database"       % "h2"                % "1.4.200"
+  lazy val h2               = "com.h2database"       % "h2"                % "2.2.224"
   lazy val hikariCp         = "com.zaxxer"           % "HikariCP"          % "5.0.1"
-  lazy val jansi            = "org.fusesource.jansi" % "jansi"             % "2.4.0"
+  lazy val jansi            = "org.fusesource.jansi" % "jansi"             % "2.4.1"
   lazy val javaxServlet     = "javax.servlet"        % "javax.servlet-api" % "4.0.1"
   lazy val javaxTransaction = "javax.transaction"    % "jta"               % "1.1"
 
-  val jettyVersion       = "9.4.52.v20230823"
+  // val jettyVersion       = "12.0.2"
+  // lazy val jettyServer   = "org.eclipse.jetty" % "jetty-server" % jettyVersion
+  // lazy val jettyServlets = "org.eclipse.jetty.ee10" % "jetty-ee10-servlets" % jettyVersion
+  // lazy val jettyWebapp   = "org.eclipse.jetty.ee10" % "jetty-ee10-webapp" % jettyVersion
+
+  val jettyVersion       = "11.0.17"
   lazy val jettyServer   = "org.eclipse.jetty" % "jetty-server" % jettyVersion
   lazy val jettyServlets = "org.eclipse.jetty" % "jetty-servlets" % jettyVersion
   lazy val jettyWebapp   = "org.eclipse.jetty" % "jetty-webapp" % jettyVersion
 
-  lazy val jmelody       = "net.bull.javamelody" % "javamelody-core" % "1.94.0"
+  lazy val jmelody       = "net.bull.javamelody" % "javamelody-core" % "2.0.1"
   lazy val json4sJackson = "org.json4s"          %% "json4s-jackson" % "4.0.6"
   lazy val junit         = "junit"               % "junit"           % "4.13.2"
 
@@ -45,16 +50,16 @@ object Dependencies {
   lazy val logbackClassic = "ch.qos.logback" % "logback-classic" % logbackVersion
   lazy val logbackCore    = "ch.qos.logback" % "logback-core" % logbackVersion
 
-  lazy val mssqlserver      = "com.microsoft.sqlserver" % "mssql-jdbc" % "9.4.0.jre11"
+  lazy val mssqlserver      = "com.microsoft.sqlserver" % "mssql-jdbc" % "12.4.1.jre11"
   lazy val oracle           = "com.oracle.ojdbc"        % "ojdbc8"     % "19.3.0.0"
   lazy val postgresql       = "org.postgresql"          % "postgresql" % "42.6.0"
   lazy val rxJava3          = "io.reactivex.rxjava3"    % "rxjava"     % "3.1.8"
   lazy val scalatest = "org.scalatest"           %% "scalatest" % "3.2.17"
 
-  val scalatraVersion        = "3.0.0-M5-javax"
-  lazy val scalatra          = "org.scalatra" %% "scalatra" % scalatraVersion
-  lazy val scalatraJson      = "org.scalatra" %% "scalatra-json" % scalatraVersion
-  lazy val scalatraScalatest = "org.scalatra" %% "scalatra-scalatest" % scalatraVersion
+  val scalatraVersion        = "3.0.0"
+  lazy val scalatra          = "org.scalatra" %% "scalatra-jakarta" % scalatraVersion
+  lazy val scalatraJson      = "org.scalatra" %% "scalatra-json-jakarta" % scalatraVersion
+  lazy val scalatraScalatest = "org.scalatra" %% "scalatra-scalatest-jakarta" % scalatraVersion
 
   lazy val scilube = "org.mbari.scilube" %% "scilube" % "3.0.1"
 
@@ -71,7 +76,7 @@ object Dependencies {
   lazy val testcontainersSqlserver =
     "com.dimafeng" %% "testcontainers-scala-mssqlserver" % testcontainersScalaVersion
 
-  lazy val typesafeConfig = "com.typesafe"    % "config"     % "1.4.2"
+  lazy val typesafeConfig = "com.typesafe"    % "config"     % "1.4.3"
   lazy val uuidgen        = "org.mbari.uuid"  % "uuid-gen"   % "0.1.4"
   lazy val vcr4jCore      = "org.mbari.vcr4j" % "vcr4j-core" % "5.2.0"
   lazy val zeromq         = "org.zeromq"      % "jeromq"     % "0.5.4"
