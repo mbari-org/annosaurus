@@ -39,6 +39,7 @@ object EntityManagerFactories {
 
   private lazy val config = ConfigFactory.load()
 
+  // <property name="eclipselink.weaving" value="static"/>
   val PRODUCTION_PROPS = Map(
     "eclipselink.connection-pool.default.initial"         -> "2",
     "eclipselink.connection-pool.default.max"             -> "16",
@@ -47,7 +48,9 @@ object EntityManagerFactories {
     "eclipselink.logging.session"                         -> "false",
     "eclipselink.logging.thread"                          -> "false",
     "eclipselink.logging.timestamp"                       -> "false",
+    "eclipselink.weaving"                                 -> "static",
     "jakarta.persistence.schema-generation.database.action" -> "create",
+    "jakarta.persistence.sharedCache.mode"                  -> "ENABLE_SELECTIVE",
     PersistenceUnitProperties.SESSION_CUSTOMIZER          -> "org.mbari.vars.annotation.dao.jpa.UUIDSequence"
   )
 
