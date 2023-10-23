@@ -2,66 +2,58 @@ import Dependencies._
 
 Global / onChangedBuildSource := ReloadOnSourceChanges
 
-lazy val buildSettings = Seq(
-  organization := "org.mbari.vars",
-  scalaVersion in ThisBuild := "2.13.12",
-  organizationName := "Monterey Bay Aquarium Research Institute",
-  startYear := Some(2017),
-  licenses += ("Apache-2.0", new URL(
-    "https://www.apache.org/licenses/LICENSE-2.0.txt"
-  ))
+ThisBuild / javacOptions ++= Seq("-target", "17", "-source", "17")
+ThisBuild / licenses         := Seq("Apache-2.0" -> url("http://www.apache.org/licenses/LICENSE-2.0"))
+ThisBuild / organization     := "org.mbari.vars"
+ThisBuild / organizationName := "Monterey Bay Aquarium Research Institute"
+ThisBuild / resolvers ++= Seq(Resolver.githubPackages("mbari-org", "maven"))
+ThisBuild / scalaVersion     := "2.13.12"
+ThisBuild / scalacOptions ++= Seq(
+  "-deprecation",  // Emit warning and location for usages of deprecated APIs.
+  "-encoding",
+  "UTF-8",         // yes, this is 2 args. Specify character encoding used by source files.
+  "-explaintypes", // Explain type errors in more detail.
+  "-feature",      // Emit warning and location for usages of features that should be imported explicitly.
+  "-language:existentials",
+  "-language:higherKinds",
+  "-language:implicitConversions",
+  "-unchecked"
 )
+ThisBuild / startYear        := Some(2017)
+ThisBuild / updateOptions := updateOptions.value.withCachedResolution(true)
+ThisBuild / versionScheme    := Some("semver-spec")
 
-lazy val dependencySettings = Seq(
-  resolvers ++= Seq(
-    Resolver.githubPackages("mbari-org", "maven")
-  )
-)
+Test / parallelExecution     := false
+Test / testOptions += Tests.Argument(TestFrameworks.MUnit, "-b")
 
-lazy val optionSettings = Seq(
-  scalacOptions ++= Seq(
-    "-deprecation", // Emit warning and location for usages of deprecated APIs.
-    "-encoding",
-    "UTF-8",         // yes, this is 2 args. Specify character encoding used by source files.
-    "-explaintypes", // Explain type errors in more detail.
-    "-feature",      // Emit warning and location for usages of features that should be imported explicitly.
-    "-language:existentials",
-    "-language:higherKinds",
-    "-language:implicitConversions",
-    "-unchecked",
-   ),
-  javacOptions ++= Seq("-target", "17", "-source", "17"),
-  updateOptions := updateOptions.value.withCachedResolution(true)
-)
 
-lazy val appSettings = buildSettings ++
-  dependencySettings ++
-  optionSettings ++ Seq(
-  fork := true
-)
-
-lazy val apps = Map("jetty-main" -> "JettyMain") // for sbt-pack
 
 lazy val annosaurus = (project in file("annosaurus"))
   .enablePlugins(
-    AutomateHeaderPlugin, 
-    GitBranchPrompt, 
+    AutomateHeaderPlugin,
+    GitBranchPrompt,
     GitVersioning,
-    EclipseLinkStaticWeaver
-    // JettyPlugin, 
-    // PackPlugin
+    EclipseLinkStaticWeaver,
+    JavaAppPackaging
   )
-  // .enablePlugins(EclipseLinkStaticWeaver)
   // .settings(staticWeaverLogLevel := 0)
-  .settings(appSettings)
   .settings(
     // Set version based on git tag. I use "0.0.0" format (no leading "v", which is the default)
     // Use `show gitCurrentTags` in sbt to update/see the tags
+    // https://stackoverflow.com/questions/22772812/using-sbt-native-packager-how-can-i-simply-prepend-a-directory-to-my-bash-scrip
+    bashScriptExtraDefines ++= Seq(
+      """addJava "-Dconfig.file=${app_home}/../conf/application.conf"""",
+      """addJava "-Dlogback.configurationFile=${app_home}/../conf/logback.xml""""
+    ),
+    batScriptExtraDefines ++= Seq(
+      """call :add_java "-Dconfig.file=%APP_HOME%\conf\application.conf"""",
+      """call :add_java "-Dlogback.configurationFile=%APP_HOME%\conf\logback.xml""""
+    ),
     git.gitTagToVersionNumber := { tag: String =>
-      if(tag matches "[0-9]+\\..*") Some(tag)
+      if (tag matches "[0-9]+\\..*") Some(tag)
       else None
     },
-    git.useGitDescribe := true,
+    git.useGitDescribe        := true,
     libraryDependencies ++= Seq(
       auth0,
       circeCore,
@@ -77,9 +69,9 @@ lazy val annosaurus = (project in file("annosaurus"))
       eclipselinkJpa,
       fatboyGson,
       gson,
-      h2 % Test,
+      h2                % Test,
       hikariCp,
-      jansi % Runtime,
+      jansi             % Runtime,
       javaxServlet,
       javaxTransaction,
       jettyServer,
@@ -87,13 +79,13 @@ lazy val annosaurus = (project in file("annosaurus"))
       jettyWebapp,
       jmelody,
       json4sJackson,
-      junit % Test,
+      junit             % Test,
       logbackClassic,
       mssqlserver,
       oracle,
       postgresql,
       rxJava3,
-      scalatest % Test,
+      scalatest         % Test,
       scalatra,
       scalatraJson,
       scalatraScalatest % Test,
@@ -114,19 +106,7 @@ lazy val annosaurus = (project in file("annosaurus"))
     )
 //    mainClass in assembly := Some("JettyMain")
   )
-  // .settings( // config sbt-pack
-  //   packMain := apps,
-  //   packExtraClasspath := apps
-  //     .keys
-  //     .map(k => k -> Seq("${PROG_HOME}/conf"))
-  //     .toMap,
-  //   packJvmOpts := apps
-  //     .keys
-  //     .map(k => k -> Seq("-Duser.timezone=UTC", "-Xmx4g"))
-  //     .toMap,
-  //   packDuplicateJarStrategy := "latest",
-  //   packJarNameConvention := "original"
-  // )
+
 
 // Aliases
 addCommandAlias("cleanall", ";clean;clean-files")
@@ -136,7 +116,6 @@ lazy val annosaurusIt = (project in file("annosaurus-it"))
   .enablePlugins(
     AutomateHeaderPlugin
   )
-  .settings(appSettings)
   .settings(
     libraryDependencies ++= Seq(
       junit % Test,
@@ -149,11 +128,10 @@ lazy val annosaurusItOracle = (project in file("annosaurus-it-oracle"))
   .enablePlugins(
     AutomateHeaderPlugin
   )
-  .settings(appSettings)
   .settings(
     libraryDependencies ++= Seq(
-      junit % Test,
-      scalatest % Test,
+      junit                   % Test,
+      scalatest               % Test,
       testcontainersScalatest % Test
     )
   )
@@ -163,13 +141,12 @@ lazy val annosaurusItPostgres = (project in file("annosaurus-it-postgres"))
   .enablePlugins(
     AutomateHeaderPlugin
   )
-  .settings(appSettings)
   .settings(
     libraryDependencies ++= Seq(
-      junit % Test,
-      scalatest % Test,
+      junit                    % Test,
+      scalatest                % Test,
       testcontainersPostgresql % Test,
-      testcontainersScalatest % Test
+      testcontainersScalatest  % Test
     )
   )
 
@@ -178,12 +155,12 @@ lazy val annosaurusItSqlserver = (project in file("annosaurus-it-sqlserver"))
   .enablePlugins(
     AutomateHeaderPlugin
   )
-  .settings(appSettings)
   .settings(
     libraryDependencies ++= Seq(
-      junit % Test,
-      scalatest % Test,
+      junit                   % Test,
+      scalatest               % Test,
       testcontainersScalatest % Test,
       testcontainersSqlserver % Test
     )
   )
+

@@ -18,8 +18,8 @@ ENV APP_HOME /opt/annosaurus
 
 RUN mkdir -p ${APP_HOME}
 
-COPY target/pack/ ${APP_HOME}/
+COPY annosaurus/target/universal/stage/ ${APP_HOME}/
 
 EXPOSE 8080
 
-ENTRYPOINT $APP_HOME/bin/jetty-main
+ENTRYPOINT $APP_HOME/bin/annosaurus

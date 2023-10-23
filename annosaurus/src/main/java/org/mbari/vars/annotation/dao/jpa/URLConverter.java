@@ -21,6 +21,7 @@ import org.slf4j.LoggerFactory;
 
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URI;
@@ -45,6 +46,8 @@ public class URLConverter implements AttributeConverter<URL, String> {
         if (s != null) {
             try {
                 // url = URI.create(s).toURL(); // This causes tests to fail
+                // var t = java.net.URLEncoder.encode(s, "UTF-8");
+                // url = URI.create(t).toURL();
                 url = new URL(s);
             }
             catch (MalformedURLException e) {
