@@ -42,7 +42,7 @@ lazy val appSettings = buildSettings ++
 
 lazy val apps = Map("jetty-main" -> "JettyMain") // for sbt-pack
 
-lazy val annosaurus = (project in file("."))
+lazy val annosaurus = (project in file("annosaurus"))
   .enablePlugins(
     AutomateHeaderPlugin, 
     GitBranchPrompt, 
@@ -53,10 +53,8 @@ lazy val annosaurus = (project in file("."))
   )
   // .enablePlugins(EclipseLinkStaticWeaver)
   // .settings(staticWeaverLogLevel := 0)
-  .configs(IntegrationTest)
   .settings(appSettings)
   .settings(
-    Defaults.itSettings, // for integration tests
     // Set version based on git tag. I use "0.0.0" format (no leading "v", which is the default)
     // Use `show gitCurrentTags` in sbt to update/see the tags
     git.gitTagToVersionNumber := { tag: String =>
@@ -81,7 +79,7 @@ lazy val annosaurus = (project in file("."))
       gson,
       h2 % Test,
       hikariCp,
-      jansi % "runtime",
+      jansi % Runtime,
       javaxServlet,
       javaxTransaction,
       jettyServer,
@@ -89,23 +87,20 @@ lazy val annosaurus = (project in file("."))
       jettyWebapp,
       jmelody,
       json4sJackson,
-      junit % "it,test",
+      junit % Test,
       logbackClassic,
       mssqlserver,
       oracle,
       postgresql,
       rxJava3,
-      scalatest % "it,test",
+      scalatest % Test,
       scalatra,
       scalatraJson,
-      scalatraScalatest % "it,test",
+      scalatraScalatest % Test,
       scilube,
       slf4j,
       slf4jJul,
       slf4jLog4j,
-      testcontainersPostgresql,
-      testcontainersScalatest,
-      testcontainersSqlserver,
       typesafeConfig,
       uuidgen,
       vcr4jCore,
@@ -135,3 +130,60 @@ lazy val annosaurus = (project in file("."))
 
 // Aliases
 addCommandAlias("cleanall", ";clean;clean-files")
+
+lazy val annosaurusIt = (project in file("annosaurus-it"))
+  .dependsOn(annosaurus)
+  .enablePlugins(
+    AutomateHeaderPlugin
+  )
+  .settings(appSettings)
+  .settings(
+    libraryDependencies ++= Seq(
+      junit % Test,
+      slf4j
+    )
+  )
+
+lazy val annosaurusItOracle = (project in file("annosaurus-it-oracle"))
+  .dependsOn(annosaurusIt)
+  .enablePlugins(
+    AutomateHeaderPlugin
+  )
+  .settings(appSettings)
+  .settings(
+    libraryDependencies ++= Seq(
+      junit % Test,
+      scalatest % Test,
+      testcontainersScalatest % Test
+    )
+  )
+
+lazy val annosaurusItPostgres = (project in file("annosaurus-it-postgres"))
+  .dependsOn(annosaurusIt)
+  .enablePlugins(
+    AutomateHeaderPlugin
+  )
+  .settings(appSettings)
+  .settings(
+    libraryDependencies ++= Seq(
+      junit % Test,
+      scalatest % Test,
+      testcontainersPostgresql % Test,
+      testcontainersScalatest % Test
+    )
+  )
+
+lazy val annosaurusItSqlserver = (project in file("annosaurus-it-sqlserver"))
+  .dependsOn(annosaurusIt)
+  .enablePlugins(
+    AutomateHeaderPlugin
+  )
+  .settings(appSettings)
+  .settings(
+    libraryDependencies ++= Seq(
+      junit % Test,
+      scalatest % Test,
+      testcontainersScalatest % Test,
+      testcontainersSqlserver % Test
+    )
+  )
