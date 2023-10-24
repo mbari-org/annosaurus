@@ -27,7 +27,6 @@ Test / parallelExecution     := false
 Test / testOptions += Tests.Argument(TestFrameworks.MUnit, "-b")
 
 
-
 lazy val annosaurus = (project in file("annosaurus"))
   .enablePlugins(
     AutomateHeaderPlugin,
@@ -131,7 +130,9 @@ lazy val annosaurusItOracle = (project in file("annosaurus-it-oracle"))
   .settings(
     libraryDependencies ++= Seq(
       junit                   % Test,
+      munit                   % Test,
       scalatest               % Test,
+      testcontainersMunit     % Test,
       testcontainersScalatest % Test
     )
   )
@@ -144,7 +145,9 @@ lazy val annosaurusItPostgres = (project in file("annosaurus-it-postgres"))
   .settings(
     libraryDependencies ++= Seq(
       junit                    % Test,
+      munit                    % Test,
       scalatest                % Test,
+      testcontainersMunit      % Test,
       testcontainersPostgresql % Test,
       testcontainersScalatest  % Test
     )
@@ -158,7 +161,9 @@ lazy val annosaurusItSqlserver = (project in file("annosaurus-it-sqlserver"))
   .settings(
     libraryDependencies ++= Seq(
       junit                   % Test,
+      munit                   % Test,
       scalatest               % Test,
+      testcontainersMunit     % Test,
       testcontainersScalatest % Test,
       testcontainersSqlserver % Test
     )

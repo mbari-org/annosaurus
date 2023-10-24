@@ -51,6 +51,7 @@ object Dependencies {
   lazy val logbackCore    = "ch.qos.logback" % "logback-core" % logbackVersion
 
   lazy val mssqlserver      = "com.microsoft.sqlserver" % "mssql-jdbc" % "12.4.1.jre11"
+  lazy val munit            = "org.scalameta" %% "munit" % "1.0.0-M10"
   lazy val oracle           = "com.oracle.ojdbc"        % "ojdbc8"     % "19.3.0.0"
   lazy val postgresql       = "org.postgresql"          % "postgresql" % "42.6.0"
   lazy val rxJava3          = "io.reactivex.rxjava3"    % "rxjava"     % "3.1.8"
@@ -73,6 +74,8 @@ object Dependencies {
     "com.dimafeng" %% "testcontainers-scala-postgresql" % testcontainersScalaVersion
   lazy val testcontainersScalatest =
     "com.dimafeng" %% "testcontainers-scala-scalatest" % testcontainersScalaVersion
+  lazy val testcontainersMunit =
+    "com.dimafeng" %% "testcontainers-scala-munit" % testcontainersScalaVersion
   lazy val testcontainersSqlserver =
     "com.dimafeng" %% "testcontainers-scala-mssqlserver" % testcontainersScalaVersion
 

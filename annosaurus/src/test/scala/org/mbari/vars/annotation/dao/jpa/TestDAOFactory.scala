@@ -83,6 +83,7 @@ object DerbyTestDAOFactory extends SpecDAOFactory {
     val url      = config.getString("org.mbari.vars.annotation.database.derby.url")
     val user     = config.getString("org.mbari.vars.annotation.database.derby.user")
     val password = config.getString("org.mbari.vars.annotation.database.derby.password")
+    Class.forName(driver)
     EntityManagerFactories(url, user, password, driver, testProps())
   }
 
