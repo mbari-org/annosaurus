@@ -146,7 +146,7 @@ lazy val annosaurus = (project in file("."))
       "org.postgresql"                                 % "postgresql"                        % postgresqlVersion,
       ("org.scalatest"                                  %% "scalatest"                        % scalatestVersion).cross(CrossVersion.for3Use2_13) % "it,test",
       ("org.scalatra"                                   %% "scalatra-json"                    % scalatraVersion).cross(CrossVersion.for3Use2_13),
-      ("org.scalatra"                                   %% "scalatra-scalate"                 % scalatraVersion).cross(CrossVersion.for3Use2_13),
+      // ("org.scalatra"                                   %% "scalatra-scalate"                 % scalatraVersion).cross(CrossVersion.for3Use2_13),
       ("org.scalatra"                                   %% "scalatra-scalatest"               % scalatraVersion).cross(CrossVersion.for3Use2_13),
       ("org.scalatra"                                   %% "scalatra"                         % scalatraVersion).cross(CrossVersion.for3Use2_13),
       "org.slf4j"                                      % "log4j-over-slf4j"                  % slf4jVersion,
