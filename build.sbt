@@ -23,8 +23,9 @@ ThisBuild / startYear        := Some(2017)
 ThisBuild / updateOptions := updateOptions.value.withCachedResolution(true)
 ThisBuild / versionScheme    := Some("semver-spec")
 
-Test / parallelExecution     := false
-Test / testOptions += Tests.Argument(TestFrameworks.MUnit, "-b")
+ThisBuild / Test / fork := true
+ThisBuild / Test / parallelExecution     := false
+ThisBuild / Test / testOptions += Tests.Argument(TestFrameworks.MUnit, "-b")
 
 
 lazy val annosaurus = (project in file("annosaurus"))

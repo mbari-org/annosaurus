@@ -10,7 +10,7 @@ object Dependencies {
 
   lazy val commonsCodec = "commons-codec" % "commons-codec" % "1.16.0"
 
-  val derbyVersion     = "10.16.1.1"
+  val derbyVersion     = "10.17.1.0"
   lazy val derby       = "org.apache.derby" % "derby" % derbyVersion //          % "test"
   lazy val derbyClient = "org.apache.derby" % "derbyclient" % derbyVersion //          % "test"
   lazy val derbyNet    = "org.apache.derby" % "derbynet" % derbyVersion //          % "test"
@@ -27,7 +27,7 @@ object Dependencies {
     "com.fatboyindustrial.gson-javatime-serialisers" % "gson-javatime-serialisers" % "1.1.2"
   lazy val gson             = "com.google.code.gson" % "gson"              % "2.10.1"
   lazy val h2               = "com.h2database"       % "h2"                % "2.2.224"
-  lazy val hikariCp         = "com.zaxxer"           % "HikariCP"          % "5.0.1"
+  lazy val hikariCp         = "com.zaxxer"           % "HikariCP"          % "5.1.0"
   lazy val jansi            = "org.fusesource.jansi" % "jansi"             % "2.4.1"
   lazy val javaxServlet     = "javax.servlet"        % "javax.servlet-api" % "4.0.1"
   lazy val javaxTransaction = "javax.transaction"    % "jta"               % "1.1"
@@ -37,7 +37,7 @@ object Dependencies {
   // lazy val jettyServlets = "org.eclipse.jetty.ee10" % "jetty-ee10-servlets" % jettyVersion
   // lazy val jettyWebapp   = "org.eclipse.jetty.ee10" % "jetty-ee10-webapp" % jettyVersion
 
-  val jettyVersion       = "11.0.17"
+  val jettyVersion       = "11.0.18"
   lazy val jettyServer   = "org.eclipse.jetty" % "jetty-server" % jettyVersion
   lazy val jettyServlets = "org.eclipse.jetty" % "jetty-servlets" % jettyVersion
   lazy val jettyWebapp   = "org.eclipse.jetty" % "jetty-webapp" % jettyVersion
@@ -50,10 +50,10 @@ object Dependencies {
   lazy val logbackClassic = "ch.qos.logback" % "logback-classic" % logbackVersion
   lazy val logbackCore    = "ch.qos.logback" % "logback-core" % logbackVersion
 
-  lazy val mssqlserver      = "com.microsoft.sqlserver" % "mssql-jdbc" % "12.4.1.jre11"
+  lazy val mssqlserver      = "com.microsoft.sqlserver" % "mssql-jdbc" % "12.4.2.jre11"
   lazy val munit            = "org.scalameta" %% "munit" % "1.0.0-M10"
   lazy val oracle           = "com.oracle.ojdbc"        % "ojdbc8"     % "19.3.0.0"
-  lazy val postgresql       = "org.postgresql"          % "postgresql" % "42.6.0"
+  lazy val postgresql       = "org.postgresql"          % "postgresql" % "42.7.0"
   lazy val rxJava3          = "io.reactivex.rxjava3"    % "rxjava"     % "3.1.8"
   lazy val scalatest = "org.scalatest"           %% "scalatest" % "3.2.17"
 

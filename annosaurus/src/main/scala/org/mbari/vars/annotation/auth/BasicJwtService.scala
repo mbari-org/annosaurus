@@ -27,6 +27,7 @@ import com.google.gson.{FieldNamingPolicy, GsonBuilder}
 import com.typesafe.config.ConfigFactory
 
 import scala.util.control.NonFatal
+import java.time.Duration
 
 /**
   * To use this authentication. The client and server should both have a shared
@@ -48,7 +49,7 @@ import scala.util.control.NonFatal
   * @author Brian Schlining
   * @since 2017-01-18T16:42:00
   */
-class BasicJwtService extends AuthorizationService {
+class BasicJwtService(tokenDuration: Duration = Duration.ofDays(1)) extends AuthorizationService {
 
   private[this] val config        = ConfigFactory.load()
   private[this] val issuer        = config.getString("basicjwt.issuer")
@@ -106,9 +107,9 @@ class BasicJwtService extends AuthorizationService {
       .filter(_.accessToken == apiKey)
       .map(a => {
         val now      = Instant.now()
-        val tomorrow = now.plus(1, ChronoUnit.DAYS)
+        val expires  = now.plus(tokenDuration)
         val iat      = Date.from(now)
-        val exp      = Date.from(tomorrow)
+        val exp      = Date.from(expires)
 
         JWT
           .create()

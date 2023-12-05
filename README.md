@@ -1,4 +1,4 @@
-![MBARI logo](src/site/images/logo-mbari-3b.png)
+![MBARI logo](annosaurus/src/site/images/logo-mbari-3b.png)
 
 # annosaurus
 
