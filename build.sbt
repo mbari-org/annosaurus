@@ -91,7 +91,6 @@ lazy val annosaurus = (project in file("."))
     AutomateHeaderPlugin, 
     GitBranchPrompt, 
     GitVersioning,
-    JettyPlugin, 
     PackPlugin
   )
   // .enablePlugins(EclipseLinkStaticWeaver)
