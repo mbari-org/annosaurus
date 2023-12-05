@@ -119,7 +119,8 @@ lazy val integrationTests = (project in file("it"))
   )
   .settings(
     libraryDependencies ++= Seq(
-      junit % Test,
+      junit,
+      munit,
       slf4j
     )
   )

@@ -14,25 +14,40 @@
  * limitations under the License.
  */
 
-package org.mbari.vars.annotation.controllers
-
-
 import org.slf4j.LoggerFactory
 
 import java.sql.Connection
 import scala.io.Source
 
-object TestUtil {
+object TestUtils {
+
+  val Timeout        = duration.Duration(3, TimeUnit.SECONDS)
+  val Digest         = MessageDigest.getInstance("SHA-512")
+  private val random = Random
 
   private val log = LoggerFactory.getLogger(getClass)
 
   def runDdl(ddl: String, connection: Connection): Unit = {
     val statement = connection.createStatement();
-    ddl.split(";").foreach(sql => {
-      log.warn(s"Running:\n$sql")
-      statement.execute(sql)
-    })
+    ddl
+      .split(";")
+      .foreach(sql => {
+        log.warn(s"Running:\n$sql")
+        statement.execute(sql)
+      })
     statement.close()
+  }
+
+  def build(numIm: Int, numObs: Int, numAssoc: Int, numIr: Int): Seq[VideoSequence] = {
+    val imDao   = daoFactory.newImagedMomentDAO()
+    val obsDao  = daoFactory.newObservationDAO(imDao)
+    val assDao  = daoFactory.newAssociationDAO(imDao)
+    val dataDao = daoFactory.newCachedAncillaryDatumDAO(imDao)
+    val irDao   = daoFactory.newImageReferenceDAO(imDao)
+    for (imIdx <- 0 until numIm) {
+      val im = imDao.new
+    }
+
   }
 
 }
