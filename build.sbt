@@ -82,6 +82,7 @@ lazy val annosaurus = (project in file("annosaurus"))
       junit             % Test,
       logbackClassic,
       mssqlserver,
+      munit             % Test,
       oracle,
       postgresql,
       rxJava3,
@@ -111,7 +112,7 @@ lazy val annosaurus = (project in file("annosaurus"))
 // Aliases
 addCommandAlias("cleanall", ";clean;clean-files")
 
-lazy val annosaurusIt = (project in file("annosaurus-it"))
+lazy val integrationTests = (project in file("it"))
   .dependsOn(annosaurus)
   .enablePlugins(
     AutomateHeaderPlugin
@@ -123,7 +124,7 @@ lazy val annosaurusIt = (project in file("annosaurus-it"))
     )
   )
 
-lazy val annosaurusItOracle = (project in file("annosaurus-it-oracle"))
+lazy val itOracle = (project in file("it-oracle"))
   .dependsOn(annosaurusIt)
   .enablePlugins(
     AutomateHeaderPlugin
@@ -138,7 +139,7 @@ lazy val annosaurusItOracle = (project in file("annosaurus-it-oracle"))
     )
   )
 
-lazy val annosaurusItPostgres = (project in file("annosaurus-it-postgres"))
+lazy val itPostgres = (project in file("it-postgres"))
   .dependsOn(annosaurusIt)
   .enablePlugins(
     AutomateHeaderPlugin
@@ -154,7 +155,7 @@ lazy val annosaurusItPostgres = (project in file("annosaurus-it-postgres"))
     )
   )
 
-lazy val annosaurusItSqlserver = (project in file("annosaurus-it-sqlserver"))
+lazy val itSqlserver = (project in file("it-sqlserver"))
   .dependsOn(annosaurusIt)
   .enablePlugins(
     AutomateHeaderPlugin
