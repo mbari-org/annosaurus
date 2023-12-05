@@ -14,20 +14,25 @@
  * limitations under the License.
  */
 
-package org.mbari.vars.annosaurus.controllers
+package org.mbari.vars.annotation.etc.jdk
 
-import org.mbari.vars.annotation.repository.jpa.BaseDAOSuite
-import org.mbari.vars.annotation.dao.jpa.JPADAOFactory
-import org.mbari.vars.annotation.controllers.AssociationController
-import org.mbari.vars.annotation.controllers.BasicDAOFactory
+import scala.util.Random
+
+object Strings {
+
+    private val chars  = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 "
+    private val random = new Random
+
+    def random(length: Int): String = {
 
 
-trait AssociationControllerITSuite extends BaseDAOSuite {
+        val randomString = new StringBuilder
+        for (_ <- 1 to length) {
+            val randomIndex = random.nextInt(chars.length)
+            randomString.append(chars.charAt(randomIndex))
+        }
 
-    implicit val df: JPADAOFactory = daoFactory
+        randomString.toString()
+    }
 
-    override def beforeAll(): Unit = daoFactory.beforeAll()
-    override def afterAll(): Unit  = daoFactory.afterAll()
-
-    lazy val controller = new AssociationController(daoFactory.asInstanceOf[BasicDAOFactory])
 }

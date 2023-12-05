@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 MBARI
+ * Copyright 2017 Monterey Bay Aquarium Research Institute
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,14 +14,16 @@
  * limitations under the License.
  */
 
-package org.mbari.vampiresquid.repository.jpa
+package org.mbari.vars.annotation.repository.jpa
 
-import org.mbari.vampiresquid.repository.{DAO, VideoDAO}
+import org.mbari.vars.annotation.dao.DAO
 
 import java.util.concurrent.TimeUnit
 import scala.concurrent.{Await, Future}
-import scala.concurrent.duration.Duration as SDuration
+import scala.concurrent.duration.{Duration => SDuration}
 import scala.concurrent.ExecutionContext.Implicits.global
+import org.mbari.annosaurus.repository.jpa.SpecDAOFactory
+import org.mbari.annosaurus.repository.jpa.TestDAOFactory
 
 trait BaseDAOSuite extends munit.FunSuite {
 

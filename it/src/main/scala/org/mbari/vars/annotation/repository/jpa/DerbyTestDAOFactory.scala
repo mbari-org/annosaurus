@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 MBARI
+ * Copyright 2017 Monterey Bay Aquarium Research Institute
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,8 @@
 package org.mbari.annosaurus.repository.jpa
 
 import jakarta.persistence.EntityManagerFactory
+import org.eclipse.persistence.config.TargetDatabase
+import org.mbari.vars.annotation.dao.jpa.EntityManagerFactories
 
 object DerbyTestDAOFactory extends SpecDAOFactory {
 

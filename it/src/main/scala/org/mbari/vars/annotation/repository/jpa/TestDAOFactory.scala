@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 MBARI
+ * Copyright 2017 Monterey Bay Aquarium Research Institute
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,8 @@ import com.typesafe.config.ConfigFactory
 
 import scala.concurrent.Await
 import scala.concurrent.duration.Duration
+import org.mbari.vars.annotation.dao.jpa.JPADAOFactory
+import org.mbari.vars.annotation.dao.jpa.EntityManagerFactories
 
 /**
  * @author
@@ -52,7 +54,7 @@ trait SpecDAOFactory extends JPADAOFactory {
     def cleanup(): Unit = {
 
         import scala.concurrent.ExecutionContext.Implicits.global
-        val dao = newVideoSequenceDAO()
+        val dao = newImagedMomentDAO()
 
         val f = dao.runTransaction { d => 
             val all = dao.findAll()

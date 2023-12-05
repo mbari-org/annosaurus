@@ -125,50 +125,50 @@ lazy val integrationTests = (project in file("it"))
     )
   )
 
-lazy val itOracle = (project in file("it-oracle"))
-  .dependsOn(annosaurusIt)
-  .enablePlugins(
-    AutomateHeaderPlugin
-  )
-  .settings(
-    libraryDependencies ++= Seq(
-      junit                   % Test,
-      munit                   % Test,
-      scalatest               % Test,
-      testcontainersMunit     % Test,
-      testcontainersScalatest % Test
-    )
-  )
+// lazy val itOracle = (project in file("it-oracle"))
+//   .dependsOn(integrationTests)
+//   .enablePlugins(
+//     AutomateHeaderPlugin
+//   )
+//   .settings(
+//     libraryDependencies ++= Seq(
+//       junit                   % Test,
+//       munit                   % Test,
+//       scalatest               % Test,
+//       testcontainersMunit     % Test,
+//       testcontainersScalatest % Test
+//     )
+//   )
 
-lazy val itPostgres = (project in file("it-postgres"))
-  .dependsOn(annosaurusIt)
-  .enablePlugins(
-    AutomateHeaderPlugin
-  )
-  .settings(
-    libraryDependencies ++= Seq(
-      junit                    % Test,
-      munit                    % Test,
-      scalatest                % Test,
-      testcontainersMunit      % Test,
-      testcontainersPostgresql % Test,
-      testcontainersScalatest  % Test
-    )
-  )
+// lazy val itPostgres = (project in file("it-postgres"))
+//   .dependsOn(integrationTests)
+//   .enablePlugins(
+//     AutomateHeaderPlugin
+//   )
+//   .settings(
+//     libraryDependencies ++= Seq(
+//       junit                    % Test,
+//       munit                    % Test,
+//       scalatest                % Test,
+//       testcontainersMunit      % Test,
+//       testcontainersPostgresql % Test,
+//       testcontainersScalatest  % Test
+//     )
+//   )
 
-lazy val itSqlserver = (project in file("it-sqlserver"))
-  .dependsOn(annosaurusIt)
-  .enablePlugins(
-    AutomateHeaderPlugin
-  )
-  .settings(
-    libraryDependencies ++= Seq(
-      junit                   % Test,
-      munit                   % Test,
-      scalatest               % Test,
-      testcontainersMunit     % Test,
-      testcontainersScalatest % Test,
-      testcontainersSqlserver % Test
-    )
-  )
+// lazy val itSqlserver = (project in file("it-sqlserver"))
+//   .dependsOn(integrationTests)
+//   .enablePlugins(
+//     AutomateHeaderPlugin
+//   )
+//   .settings(
+//     libraryDependencies ++= Seq(
+//       junit                   % Test,
+//       munit                   % Test,
+//       scalatest               % Test,
+//       testcontainersMunit     % Test,
+//       testcontainersScalatest % Test,
+//       testcontainersSqlserver % Test
+//     )
+//   )
 

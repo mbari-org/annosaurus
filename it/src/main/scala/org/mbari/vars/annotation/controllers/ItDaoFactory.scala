@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 
-package org.mbari.vars.annotation.controllers
-
 import org.mbari.vars.annotation.dao.jpa.JPADAOFactory
 
 import java.net.URL

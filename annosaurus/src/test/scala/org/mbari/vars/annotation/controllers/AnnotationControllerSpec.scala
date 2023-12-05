@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+package org.mbari.vars.annotation.controllers
 
 import java.nio.charset.StandardCharsets
 import java.time.{Duration, Instant}
