@@ -14,20 +14,39 @@
  * limitations under the License.
  */
 
-package org.mbari.vars.annosaurus.controllers
+package org.mbari.vars.annotation.controllers
 
+import org.mbari.vars.annotation.AssertUtils
 import org.mbari.vars.annotation.repository.jpa.BaseDAOSuite
 import org.mbari.vars.annotation.dao.jpa.JPADAOFactory
-import org.mbari.vars.annotation.controllers.AssociationController
-import org.mbari.vars.annotation.controllers.BasicDAOFactory
 
+import scala.concurrent.ExecutionContext
 
 trait AssociationControllerITSuite extends BaseDAOSuite {
 
-    implicit val df: JPADAOFactory = daoFactory
+    implicit val df: JPADAOFactory    = daoFactory
+    implicit val ec: ExecutionContext = ExecutionContext.global
 
     override def beforeAll(): Unit = daoFactory.beforeAll()
     override def afterAll(): Unit  = daoFactory.afterAll()
 
     lazy val controller = new AssociationController(daoFactory.asInstanceOf[BasicDAOFactory])
+
+    test("bulkUpdate") {
+        val x               = TestUtils.create(1, 1, 8, 0).head
+        val associations    = x.observations.flatMap(_.associations)
+        associations.foreach(_.linkName = "foobarbazbin")
+        val newAssociations = exec(controller.bulkUpdate(associations))
+        val ax              = associations.toSeq.sortBy(_.uuid)
+        val bx              = newAssociations.toSeq.sortBy(_.uuid)
+        ax.zip(bx).foreach(p => AssertUtils.assertSameAssociation(p._1, p._2))
+
+        // sanity check
+        val dao = daoFactory.newAssociationDAO()
+        bx.foreach { b =>
+            val opt = exec(dao.runTransaction(d => d.findByUUID(b.uuid)))
+            assert(opt.isDefined)
+            AssertUtils.assertSameAssociation(b, opt.get)
+        }
+    }
 }

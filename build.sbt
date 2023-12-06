@@ -121,6 +121,7 @@ lazy val integrationTests = (project in file("it"))
     libraryDependencies ++= Seq(
       junit,
       munit,
+      scalatraScalatest,
       slf4j
     )
   )

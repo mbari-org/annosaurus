@@ -14,18 +14,16 @@
  * limitations under the License.
  */
 
-package org.mbari.vars.annotation.etc.jdk
+package org.mbari.vars.annotation.domain
 
-import scala.util.Random
+import org.mbari.vars.annotation.dao.jpa.AssociationImpl
 
-object Strings {
+import java.util.UUID
 
-    private val chars  = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
-    private val random = new Random
-
-    def random(length: Int): String = {
-        val xs = for (_ <- 0 until length) yield chars.charAt(random.nextInt(chars.length))
-        new String(xs.toArray)
+case class Association(uuid: UUID, link_name: String, to_concept: String, link_value: String, mime_type: String) {
+    def toEntity: AssociationImpl = {
+        val a = AssociationImpl(link_name, to_concept, link_value, mime_type)
+        a.uuid = uuid
+        a
     }
-
 }

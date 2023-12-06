@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package org.mbari.annosaurus.repository.jpa
+package org.mbari.vars.annotation.repository.jpa
 
 import jakarta.persistence.EntityManagerFactory
 import org.eclipse.persistence.config.TargetDatabase
 import org.mbari.vars.annotation.dao.jpa.EntityManagerFactories
 
-object DerbyTestDAOFactory extends SpecDAOFactory {
+object DerbyTestDAOFactory extends TestDAOFactory {
 
     override def testProps(): Map[String, String] =
         TestDAOFactory.TestProperties ++

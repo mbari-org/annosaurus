@@ -19,39 +19,45 @@ package org.mbari.vars.annotation.model.simple
 import io.circe._
 import io.circe.syntax._
 import io.circe.generic.semiauto._
+import org.mbari.vars.annotation.domain.Association
+
 import java.net.URI
 import java.net.URL
 import org.mbari.vars.annotation.util.HexUtil
+
 import scala.util.Try
 
 object CirceCodecs {
-  implicit val byteArrayEncoder: Encoder[Array[Byte]] = new Encoder[Array[Byte]] {
-    final def apply(xs: Array[Byte]): Json =
-      Json.fromString(HexUtil.toHex(xs))
-  }
-  implicit val byteArrayDecoder: Decoder[Array[Byte]] = Decoder
-    .decodeString
-    .emapTry(str => Try(HexUtil.fromHex(str)))
+    implicit val byteArrayEncoder: Encoder[Array[Byte]] = new Encoder[Array[Byte]] {
+        final def apply(xs: Array[Byte]): Json =
+            Json.fromString(HexUtil.toHex(xs))
+    }
+    implicit val byteArrayDecoder: Decoder[Array[Byte]] = Decoder
+        .decodeString
+        .emapTry(str => Try(HexUtil.fromHex(str)))
 
-  implicit val urlDecoder: Decoder[URL] = Decoder
-    .decodeString
-    .emapTry(str => Try(new URL(str)))
-  implicit val urlEncoder: Encoder[URL] = Encoder
-    .encodeString
-    .contramap(_.toString)
+    implicit val urlDecoder: Decoder[URL] = Decoder
+        .decodeString
+        .emapTry(str => Try(new URL(str)))
+    implicit val urlEncoder: Encoder[URL] = Encoder
+        .encodeString
+        .contramap(_.toString)
 
-  implicit val uriDecoder: Decoder[URI] = Decoder
-    .decodeString
-    .emapTry(s => Try(URI.create(s)))
-  implicit val uriEncoder: Encoder[URI] = Encoder
-    .encodeString
-    .contramap[URI](_.toString)
+    implicit val uriDecoder: Decoder[URI] = Decoder
+        .decodeString
+        .emapTry(s => Try(URI.create(s)))
+    implicit val uriEncoder: Encoder[URI] = Encoder
+        .encodeString
+        .contramap[URI](_.toString)
 
-  implicit val healthStatusDecoder: Decoder[HealthStatus] = deriveDecoder
-  implicit val healthStatusEncoder: Encoder[HealthStatus] = deriveEncoder
+    implicit val healthStatusDecoder: Decoder[HealthStatus] = deriveDecoder
+    implicit val healthStatusEncoder: Encoder[HealthStatus] = deriveEncoder
 
-  private val printer = Printer.noSpaces.copy(dropNullValues = true)
+    implicit val associationDecoder: Decoder[Association] = deriveDecoder
+    implicit val associationEncoder: Encoder[Association] = deriveEncoder
 
-  def print[T: Encoder](t: T): String = printer.print(t.asJson)
+    private val printer = Printer.noSpaces.copy(dropNullValues = true)
+
+    def print[T: Encoder](t: T): String = printer.print(t.asJson)
 
 }

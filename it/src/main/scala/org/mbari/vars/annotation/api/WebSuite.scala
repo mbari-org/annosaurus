@@ -14,18 +14,19 @@
  * limitations under the License.
  */
 
-package org.mbari.vars.annotation.etc.jdk
+package org.mbari.vars.annotation.api
 
-import scala.util.Random
+import org.mbari.vars.annotation.repository.jpa.BaseDAOSuite
+import org.scalatest.BeforeAndAfterAll
+import org.scalatra.test.{EmbeddedJettyContainer, HttpComponentsClient}
 
-object Strings {
+trait WebSuite extends BaseDAOSuite with EmbeddedJettyContainer with HttpComponentsClient {
+    override def beforeAll(): Unit = {
+        start()
+    }
 
-    private val chars  = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
-    private val random = new Random
-
-    def random(length: Int): String = {
-        val xs = for (_ <- 0 until length) yield chars.charAt(random.nextInt(chars.length))
-        new String(xs.toArray)
+    override def afterAll(): Unit = {
+        stop()
     }
 
 }

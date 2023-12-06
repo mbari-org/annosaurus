@@ -14,18 +14,9 @@
  * limitations under the License.
  */
 
-package org.mbari.vars.annotation.etc.jdk
+package org.mbari.vars.annotation.controllers
+import org.mbari.vars.annotation.repository.jpa.{DerbyTestDAOFactory, TestDAOFactory}
 
-import scala.util.Random
-
-object Strings {
-
-    private val chars  = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
-    private val random = new Random
-
-    def random(length: Int): String = {
-        val xs = for (_ <- 0 until length) yield chars.charAt(random.nextInt(chars.length))
-        new String(xs.toArray)
-    }
-
+class DerbyAssociationControllerSuite extends AssociationControllerITSuite {
+    override def daoFactory: TestDAOFactory = DerbyTestDAOFactory
 }

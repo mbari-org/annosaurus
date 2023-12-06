@@ -14,39 +14,19 @@
  * limitations under the License.
  */
 
-package org.mbari.annosaurus.repository.jpa
+package org.mbari.vars.annotation.repository.jpa
 
 import java.util.concurrent.TimeUnit
-import com.typesafe.config.ConfigFactory
+import com.typesafe.config.{Config, ConfigFactory}
 
 import scala.concurrent.Await
 import scala.concurrent.duration.Duration
 import org.mbari.vars.annotation.dao.jpa.JPADAOFactory
 import org.mbari.vars.annotation.dao.jpa.EntityManagerFactories
 
-/**
- * @author
- *   Brian Schlining
- * @since 2017-03-06T11:44:00
- */
-object TestDAOFactory {
+trait TestDAOFactory extends JPADAOFactory {
 
-    val TestProperties = EntityManagerFactories.PRODUCTION_PROPS ++ Map(
-        "eclipselink.logging.level.sql"                             -> "FINE",
-        "eclipselink.logging.level"                                 -> "INFO",
-        "eclipselink.logging.parameters"                            -> "true",
-        "jakarta.persistence.schema-generation.database.action"     -> "create",
-        "jakarta.persistence.schema-generation.scripts.action"        -> "drop-and-create",
-        "jakarta.persistence.schema-generation.scripts.create-target" -> "target/test-database-create.ddl",
-        "jakarta.persistence.schema-generation.scripts.drop-target"   -> "target/test-database-drop.ddl"
-    )
-
-    val Instance: SpecDAOFactory = DerbyTestDAOFactory
-}
-
-trait SpecDAOFactory extends JPADAOFactory {
-
-    lazy val config = ConfigFactory.load()
+    lazy val config: Config = ConfigFactory.load()
 
     def beforeAll(): Unit = ()
     def afterAll(): Unit  = ()
@@ -65,4 +45,16 @@ trait SpecDAOFactory extends JPADAOFactory {
     }
 
     def testProps(): Map[String, String]
+}
+
+object TestDAOFactory {
+    val TestProperties = EntityManagerFactories.PRODUCTION_PROPS ++ Map(
+        "eclipselink.logging.level.sql" -> "FINE",
+        "eclipselink.logging.level" -> "INFO",
+        "eclipselink.logging.parameters" -> "true",
+        "jakarta.persistence.schema-generation.database.action" -> "create",
+        "jakarta.persistence.schema-generation.scripts.action" -> "drop-and-create",
+        "jakarta.persistence.schema-generation.scripts.create-target" -> "target/test-database-create.ddl",
+        "jakarta.persistence.schema-generation.scripts.drop-target" -> "target/test-database-drop.ddl"
+    )
 }

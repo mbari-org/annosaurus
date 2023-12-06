@@ -16,16 +16,12 @@
 
 package org.mbari.vars.annotation.etc.jdk
 
-import scala.util.Random
 
-object Strings {
+class StringsSuite extends munit.FunSuite {
 
-    private val chars  = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
-    private val random = new Random
-
-    def random(length: Int): String = {
-        val xs = for (_ <- 0 until length) yield chars.charAt(random.nextInt(chars.length))
-        new String(xs.toArray)
+    test("random") {
+        val a = Strings.random(5)
+        assertEquals(a.length, 5)
     }
 
 }

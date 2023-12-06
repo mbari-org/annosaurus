@@ -22,12 +22,11 @@ import java.util.concurrent.TimeUnit
 import scala.concurrent.{Await, Future}
 import scala.concurrent.duration.{Duration => SDuration}
 import scala.concurrent.ExecutionContext.Implicits.global
-import org.mbari.annosaurus.repository.jpa.SpecDAOFactory
-import org.mbari.annosaurus.repository.jpa.TestDAOFactory
+
 
 trait BaseDAOSuite extends munit.FunSuite {
 
-    def daoFactory: SpecDAOFactory
+    def daoFactory: TestDAOFactory
     private val timeout = SDuration(2, TimeUnit.SECONDS)
 
     def exec[T](future: Future[T]): T = Await.result(future, timeout)
@@ -40,7 +39,3 @@ trait BaseDAOSuite extends munit.FunSuite {
         daoFactory.cleanup()
 }
 
-trait DAOSuite extends BaseDAOSuite {
-
-    implicit val daoFactory: SpecDAOFactory = TestDAOFactory.Instance
-}

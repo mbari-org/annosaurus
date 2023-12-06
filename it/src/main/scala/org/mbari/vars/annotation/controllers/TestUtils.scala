@@ -14,20 +14,31 @@
  * limitations under the License.
  */
 
+package org.mbari.vars.annotation.controllers
+
+import org.mbari.scilube3.ocean.Ocean
 import org.slf4j.LoggerFactory
 
 import java.sql.Connection
-import scala.io.Source
 import scala.concurrent.duration
 import java.util.concurrent.TimeUnit
 import java.security.MessageDigest
 import scala.util.Random
-import org.mbari.vars.annotation.dao.jpa.JPADAOFactory
+import org.mbari.vars.annotation.dao.jpa.{
+    AssociationImpl,
+    CachedAncillaryDatumImpl,
+    ImageReferenceImpl,
+    ImagedMomentImpl,
+    JPADAOFactory,
+    ObservationImpl
+}
+
 import java.util.UUID
 import java.time.Instant
 import java.time.Duration
-import org.mbari.vars.annotation.model.ImagedMoment
 import org.mbari.vars.annotation.etc.jdk.Strings
+import org.mbari.vcr4j.time.{FrameRates, Timecode}
+
 import java.net.URI
 
 object TestUtils {
@@ -49,58 +60,105 @@ object TestUtils {
         statement.close()
     }
 
-    def build(numIm: Int, numObs: Int, numAssoc: Int, numIr: Int, data: Boolean = false)(implicit
-        daoFactory: JPADAOFactory
-    ): Seq[ImagedMoment] = {
-        val imDao              = daoFactory.newImagedMomentDAO()
-        val obsDao             = daoFactory.newObservationDAO(imDao)
-        val assDao             = daoFactory.newAssociationDAO(imDao)
-        val dataDao            = daoFactory.newCachedAncillaryDatumDAO(imDao)
-        val irDao              = daoFactory.newImageReferenceDAO(imDao)
-        val dDao = daoFactory.newCachedAncillaryDatumDAO(imDao)
-        val videoReferenceUuid = UUID.randomUUID()
+    def build(
+        nImagedMoments: Int = 1,
+        nObservations: Int = 0,
+        nAssociations: Int = 0,
+        nImageReferences: Int = 0,
+        includeData: Boolean = false
+    ): Seq[ImagedMomentImpl] = {
         val startDate          = Instant.now()
-        val xs = for (imIdx <- 0 until numIm) yield {
-            val et           = random.nextInt()
-            val elaspedTime  = Duration.ofMillis(et)
-            val recordedDate = startDate.plusMillis(et)
-            val im           = imDao.newPersistentObject(
+        val videoReferenceUuid = UUID.randomUUID()
+        for (_ <- 0 until nImagedMoments)
+            yield randomImagedMoment(
+                nObservations,
+                nAssociations,
+                nImageReferences,
+                includeData,
                 videoReferenceUuid,
-                None,
-                Some(elaspedTime),
-                Some(recordedDate)
+                startDate
             )
-            val conceptLength = random.nextInt(30) + 2
-            for (obsIdx <- 0 until numObs) {
-                val obs = obsDao.newPersistentObject(Strings.random(conceptLength), Strings.random(10), Instant.now(), Some(Strings.random(6)))
-                im.addObservation(obs)
-                for (assocIdx <- 0 until numAssoc) {
-                  val linkName = Strings.random(random.nextInt(30) + 2)
-                  val linkValue = Strings.random(random.nextInt(254) + 2)
-                  val toConcept = Strings.random(random.nextInt(30) + 2)
-                  val ass = assDao.newPersistentObject(linkName, Some(toConcept), Some(linkValue))
-                  obs.addAssociation(ass)
-                }
-            }
-            for (irIdx <- 0 until numIr) {
-              val url = URI.create(s"http://www.foo.bar/${Strings.random(10)}/image_$irIdx.png").toURL
-              val description = Strings.random(128)
-              val width = random.nextInt(1440) + 480
-              val height = math.round(width * 0.5625).toInt
-              val ir = irDao.newPersistentObject(url, Some(description), Some(width), Some(height), Some("image/png"))
-              im.addImageReference(ir)
-            }
-            if (data) {
-              // TODO generate a complete 
-              val d = dDao.newPersistentObject(random.nextDouble(), random.nextDouble(), random.nextDouble())
+    }
 
-            }
-
-            im
-        } 
-
-        imDao.close();
+    def create(
+                 nImagedMoments: Int = 1,
+                 nObservations: Int = 0,
+                 nAssociations: Int = 0,
+                 nImageReferences: Int = 0,
+                 includeData: Boolean = false
+             )(implicit daoFactory: JPADAOFactory): Seq[ImagedMomentImpl] = {
+        val dao = daoFactory.newImagedMomentDAO()
+        val xs = build(nImagedMoments, nObservations, nAssociations, nImageReferences, includeData)
+        xs.foreach(e => dao.create(e))
         xs
+    }
+
+    def randomImagedMoment(
+        nObservations: Int = 0,
+        nAssociations: Int = 0,
+        nImageReferences: Int = 0,
+        includeData: Boolean = false,
+        videoReferenceUuid: UUID = UUID.randomUUID(),
+        startDate: Instant = Instant.now()
+    ): ImagedMomentImpl = {
+        val et           = random.nextInt()
+        val elapsedTime  = Duration.ofMillis(et)
+        val recordedDate = Some(startDate.plusMillis(et))
+        val timecode     =
+            if (random.nextBoolean())
+                Some(new Timecode(random.nextInt(10000).toDouble, FrameRates.NTSC))
+            else None
+        val imagedMoment =
+            ImagedMomentImpl(Some(videoReferenceUuid), recordedDate, timecode, Some(elapsedTime))
+        for (_ <- 0 until nObservations)
+            imagedMoment.addObservation(randomObservation(nAssociations))
+        for (_ <- 0 until nImageReferences) imagedMoment.addImageReference(randomImageReference())
+        if (includeData) imagedMoment.ancillaryDatum = randomData()
+        imagedMoment
+    }
+
+    def randomObservation(nAssociations: Int = 0): ObservationImpl = {
+        //        val obs = obsDao.newPersistentObject(Strings.random(conceptLength), Strings.random(10), Instant.now(), Some(Strings.random(6)))
+        val concept         = Strings.random(random.nextInt(128))
+        val duration        =
+            if (random.nextBoolean()) Some(Duration.ofMillis(random.nextInt(5000))) else None
+        val observationDate = Some(Instant.now())
+        val observer        = if (random.nextBoolean()) Some(Strings.random(32)) else None
+        val group           = if (random.nextBoolean()) Some(Strings.random(32)) else None
+        val activity        = if (random.nextBoolean()) Some(Strings.random(32)) else None
+        val obs             = ObservationImpl(concept, duration, observationDate, observer, group, activity)
+        for (_ <- 0 until nAssociations) {
+            obs.addAssociation(randomAssociation())
+        }
+        obs
+    }
+
+    def randomAssociation(): AssociationImpl = {
+        val linkName  = Strings.random(random.nextInt(30) + 2)
+        val linkValue = Strings.random(random.nextInt(254) + 2)
+        val toConcept = Strings.random(random.nextInt(30) + 2)
+        AssociationImpl(linkName, toConcept, linkValue)
+    }
+
+    def randomImageReference(): ImageReferenceImpl = {
+        val url         = URI
+            .create(s"http://www.foo.bar/${Strings.random(10)}/image_${random.nextInt}.png")
+            .toURL
+        val description = Strings.random(128)
+        val width       = random.nextInt(1440) + 480
+        val height      = math.round(width * 0.5625).toInt
+        ImageReferenceImpl(url, Some(width), Some(height), Some("image/png"), Some(description))
+    }
+
+    def randomData(): CachedAncillaryDatumImpl = {
+        val lat      = (random.nextInt(18000) / 100d) - 90.0
+        val lon      = (random.nextInt(36000) / 100d) - 180.0
+        val pressure = random.nextInt(20000) / 10f
+        val depth    = Ocean.depth(pressure.toDouble, lat).toFloat
+        val salinity = random.nextInt(3600) / 100f
+        val temp     = random.nextInt(1500) / 100f
+        val oxygen   = random.nextFloat()
+        CachedAncillaryDatumImpl(lat, lon, depth, salinity, temp, pressure, oxygen)
     }
 
 }
