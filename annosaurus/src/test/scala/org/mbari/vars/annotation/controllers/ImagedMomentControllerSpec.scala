@@ -21,7 +21,7 @@ import java.time.{Duration, Instant}
 import java.util.UUID
 import java.util.concurrent.TimeUnit
 
-import org.mbari.vars.annotation.dao.jpa.{TestDAOFactory}
+import org.mbari.vars.annotation.repository.jpa.TestDAOFactory
 import org.mbari.vars.annotation.model.ImagedMoment
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.flatspec.AnyFlatSpec

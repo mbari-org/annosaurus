@@ -16,8 +16,8 @@
 
 package org.mbari.vars.annotation
 
-import org.mbari.vars.annotation.dao.DAOFactory
-import org.mbari.vars.annotation.model.{CachedVideoReferenceInfo, _}
+import org.mbari.vars.annotation.repository.DAOFactory
+import org.mbari.vars.annotation.model._
 
 /**
   *

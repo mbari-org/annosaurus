@@ -23,7 +23,7 @@ import java.util.concurrent.TimeUnit
 
 import org.mbari.vars.annotation.api.WebApiStack
 import org.mbari.vars.annotation.controllers.{AnnotationController, IndexController}
-import org.mbari.vars.annotation.dao.jpa.IndexEntity
+import org.mbari.vars.annotation.repository.jpa.IndexEntity
 import org.mbari.vcr4j.time.{FrameRates, Timecode}
 
 import scala.collection.JavaConverters._

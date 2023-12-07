@@ -19,7 +19,7 @@ package org.mbari.vars.annotation.controllers
 import java.util.UUID
 
 import org.mbari.vars.annotation.PersistentObject
-import org.mbari.vars.annotation.dao.DAO
+import org.mbari.vars.annotation.repository.DAO
 
 import scala.concurrent.{ExecutionContext, Future}
 

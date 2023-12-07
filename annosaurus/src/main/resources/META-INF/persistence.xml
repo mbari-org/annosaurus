@@ -5,24 +5,24 @@
         <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
         <!-- <shared-cache-mode>NONE</shared-cache-mode> -->
         <!-- Converters -->
-        <class>org.mbari.vars.annotation.dao.jpa.DurationConverter</class>
-        <class>org.mbari.vars.annotation.dao.jpa.InstantConverter</class>
-        <class>org.mbari.vars.annotation.dao.jpa.OptionConverter</class>
-        <class>org.mbari.vars.annotation.dao.jpa.FloatOptionConverter</class>
-        <class>org.mbari.vars.annotation.dao.jpa.DoubleOptionConverter</class>
-        <class>org.mbari.vars.annotation.dao.jpa.URIConverter</class>
-        <class>org.mbari.vars.annotation.dao.jpa.URLConverter</class>
-        <class>org.mbari.vars.annotation.dao.jpa.UUIDConverter</class>
-        <class>org.mbari.vars.annotation.dao.jpa.TimecodeConverter</class>
+        <class>org.mbari.vars.annotation.repository.jpa.DurationConverter</class>
+        <class>org.mbari.vars.annotation.repository.jpa.InstantConverter</class>
+        <class>org.mbari.vars.annotation.repository.jpa.OptionConverter</class>
+        <class>org.mbari.vars.annotation.repository.jpa.FloatOptionConverter</class>
+        <class>org.mbari.vars.annotation.repository.jpa.DoubleOptionConverter</class>
+        <class>org.mbari.vars.annotation.repository.jpa.URIConverter</class>
+        <class>org.mbari.vars.annotation.repository.jpa.URLConverter</class>
+        <class>org.mbari.vars.annotation.repository.jpa.UUIDConverter</class>
+        <class>org.mbari.vars.annotation.repository.jpa.TimecodeConverter</class>
 
         <!-- Entities -->
-        <class>org.mbari.vars.annotation.dao.jpa.ImagedMomentEntity</class>
-        <class>org.mbari.vars.annotation.dao.jpa.ObservationEntity</class>
-        <class>org.mbari.vars.annotation.dao.jpa.AssociationEntity</class>
-        <class>org.mbari.vars.annotation.dao.jpa.ImageReferenceEntity</class>
-        <class>org.mbari.vars.annotation.dao.jpa.CachedAncillaryDatumEntity</class>
-        <class>org.mbari.vars.annotation.dao.jpa.CachedVideoReferenceInfoEntity</class>
-        <class>org.mbari.vars.annotation.dao.jpa.IndexEntity</class>
+        <class>org.mbari.vars.annotation.repository.jpa.ImagedMomentEntity</class>
+        <class>org.mbari.vars.annotation.repository.jpa.ObservationEntity</class>
+        <class>org.mbari.vars.annotation.repository.jpa.AssociationEntity</class>
+        <class>org.mbari.vars.annotation.repository.jpa.ImageReferenceEntity</class>
+        <class>org.mbari.vars.annotation.repository.jpa.CachedAncillaryDatumEntity</class>
+        <class>org.mbari.vars.annotation.repository.jpa.CachedVideoReferenceInfoEntity</class>
+        <class>org.mbari.vars.annotation.repository.jpa.IndexEntity</class>
 
         <properties>
             <property name="eclipselink.logging.level" value="INFO" />

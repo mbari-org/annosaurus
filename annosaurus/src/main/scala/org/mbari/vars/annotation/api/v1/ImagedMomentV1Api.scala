@@ -20,7 +20,7 @@ import java.time.{Duration, Instant}
 import java.util.UUID
 
 import org.mbari.vars.annotation.controllers.ImagedMomentController
-import org.mbari.vars.annotation.dao.jpa.AnnotationImpl
+import org.mbari.vars.annotation.repository.jpa.AnnotationImpl
 import org.mbari.vars.annotation.model.ImagedMoment
 import org.mbari.vars.annotation.model.simple.{ErrorMsg, ObservationCount, WindowRequest, Count}
 import org.mbari.vcr4j.time.Timecode

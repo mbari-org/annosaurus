@@ -22,7 +22,7 @@ import java.util.concurrent.TimeUnit
 import java.time.Instant
 import scala.concurrent.duration.{Duration => SDuration}
 import scala.concurrent.ExecutionContext.Implicits.global
-import org.mbari.vars.annotation.dao.jpa.{TestDAOFactory}
+import org.mbari.vars.annotation.repository.jpa.TestDAOFactory
 import java.{util => ju}
 import scala.concurrent.Await
 import scala.concurrent.Future

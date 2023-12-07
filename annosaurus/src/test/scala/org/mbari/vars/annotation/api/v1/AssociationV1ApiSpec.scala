@@ -29,7 +29,7 @@ import org.mbari.vars.annotation.controllers.{
   BasicDAOFactory,
   ObservationController
 }
-import org.mbari.vars.annotation.dao.jpa.AssociationEntity
+import org.mbari.vars.annotation.repository.jpa.AssociationEntity
 import org.mbari.vars.annotation.model.simple.{
   ConceptAssociationRequest,
   ConceptAssociationResponse

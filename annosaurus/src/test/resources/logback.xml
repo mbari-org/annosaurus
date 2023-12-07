@@ -16,7 +16,7 @@
 
   <logger name="java.util.Date" level="WARN" />
     <logger name="org.eclipse.jetty.server" level="WARN" />
-    <logger name="org.mbari.vars.annotation.dao.jpa" level="WARN" />
+    <logger name="org.mbari.vars.annotation.repository.jpa" level="WARN" />
     <logger name="org.mbari.vars.annotation.controllers" level="WARN" />
     <logger name="org.eclipse.jetty.util.log" level="WARN" />
     <logger name="httpclient.wire.header" level="WARN" />

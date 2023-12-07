@@ -19,7 +19,7 @@ package org.mbari.vars.annotation.controllers
 import java.util.UUID
 
 import io.reactivex.rxjava3.subjects.Subject
-import org.mbari.vars.annotation.dao.{AssociationDAO, NotFoundInDatastoreException}
+import org.mbari.vars.annotation.repository.{AssociationDAO, NotFoundInDatastoreException}
 import org.mbari.vars.annotation.messaging.{AssociationPublisher, MessageBus}
 import org.mbari.vars.annotation.model.Association
 import org.mbari.vars.annotation.model.simple.{

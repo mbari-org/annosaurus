@@ -18,7 +18,7 @@ package org.mbari.vars.annotation.controllers
 
 import org.mbari.vars.annotation.AssertUtils
 import org.mbari.vars.annotation.repository.jpa.BaseDAOSuite
-import org.mbari.vars.annotation.dao.jpa.JPADAOFactory
+import org.mbari.vars.annotation.repository.jpa.JPADAOFactory
 
 import scala.concurrent.ExecutionContext
 

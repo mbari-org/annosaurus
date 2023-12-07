@@ -19,7 +19,7 @@ package org.mbari.vars.annotation.controllers
 import java.net.URL
 import java.util.UUID
 
-import org.mbari.vars.annotation.dao.{ImageReferenceDAO, NotFoundInDatastoreException}
+import org.mbari.vars.annotation.repository.{ImageReferenceDAO, NotFoundInDatastoreException}
 import org.mbari.vars.annotation.model.ImageReference
 
 import scala.concurrent.{ExecutionContext, Future}

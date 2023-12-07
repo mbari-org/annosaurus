@@ -24,7 +24,7 @@ import scala.concurrent.duration
 import java.util.concurrent.TimeUnit
 import java.security.MessageDigest
 import scala.util.Random
-import org.mbari.vars.annotation.dao.jpa.{
+import org.mbari.vars.annotation.repository.jpa.{
     AssociationEntity,
     CachedAncillaryDatumEntity,
     ImageReferenceEntity,

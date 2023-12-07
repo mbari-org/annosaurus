@@ -19,7 +19,7 @@ package org.mbari.vars.annotation.controllers
 import java.time.Instant
 import java.util.UUID
 
-import org.mbari.vars.annotation.dao.IndexDAO
+import org.mbari.vars.annotation.repository.IndexDAO
 import org.mbari.vars.annotation.model.ImagedMoment
 
 import scala.concurrent.{ExecutionContext, Future}

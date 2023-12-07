@@ -20,7 +20,7 @@ import java.time.Instant
 import java.util.UUID
 import java.util.concurrent.TimeUnit
 
-import org.mbari.vars.annotation.dao.jpa.{
+import org.mbari.vars.annotation.repository.jpa.{
   AnnotationImpl,
   AssociationEntity,
   ImagedMomentEntity,

@@ -18,7 +18,7 @@ package org.mbari.vars.annotation.api.v1
 
 import org.scalatest.matchers.should.Matchers
 import org.mbari.vars.annotation.Constants
-import org.mbari.vars.annotation.dao.jpa.IndexEntity
+import org.mbari.vars.annotation.repository.jpa.IndexEntity
 import org.scalatest.flatspec.AnyFlatSpec
 
 class GsonSpec extends AnyFlatSpec with Matchers {

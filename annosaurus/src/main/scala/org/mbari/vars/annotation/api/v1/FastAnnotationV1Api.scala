@@ -19,8 +19,8 @@ package org.mbari.vars.annotation.api.v1
 import org.mbari.vars.annotation.Constants
 
 import java.util.UUID
-import org.mbari.vars.annotation.dao.jdbc.JdbcRepository
-import org.mbari.vars.annotation.dao.jpa.JPADAOFactory
+import org.mbari.vars.annotation.repository.jdbc.JdbcRepository
+import org.mbari.vars.annotation.repository.jpa.JPADAOFactory
 import org.mbari.vars.annotation.model.simple.{
   ConcurrentRequest,
   Count,

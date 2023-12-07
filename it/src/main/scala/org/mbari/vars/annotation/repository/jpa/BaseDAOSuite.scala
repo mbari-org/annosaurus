@@ -16,7 +16,7 @@
 
 package org.mbari.vars.annotation.repository.jpa
 
-import org.mbari.vars.annotation.dao.DAO
+import org.mbari.vars.annotation.repository.DAO
 
 import java.util.concurrent.TimeUnit
 import scala.concurrent.{Await, Future}

@@ -25,7 +25,7 @@ import org.mbari.vars.annotation.controllers.BasicDAOFactory
 import org.mbari.vars.annotation.Constants
 import org.mbari.vars.annotation.api.WebApiStack
 import org.mbari.vars.annotation.controllers.ObservationController
-import org.mbari.vars.annotation.dao.jpa.{
+import org.mbari.vars.annotation.repository.jpa.{
   AnnotationImpl,
   AssociationEntity,
   ImagedMomentEntity,

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import org.mbari.vars.annotation.dao.jpa.JPADAOFactory
+import org.mbari.vars.annotation.repository.jpa.JPADAOFactory
 
 import java.net.URL
 import java.util.concurrent.TimeUnit

@@ -22,7 +22,7 @@ import java.util.concurrent.TimeUnit
 
 import org.mbari.vars.annotation.api.WebApiStack
 import org.mbari.vars.annotation.controllers.AnnotationController
-import org.mbari.vars.annotation.dao.jpa.AnnotationImpl
+import org.mbari.vars.annotation.repository.jpa.AnnotationImpl
 
 import scala.concurrent.Await
 import scala.concurrent.duration.Duration

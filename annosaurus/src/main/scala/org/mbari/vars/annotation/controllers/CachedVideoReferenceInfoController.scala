@@ -18,7 +18,7 @@ package org.mbari.vars.annotation.controllers
 
 import java.util.UUID
 
-import org.mbari.vars.annotation.dao.CachedVideoReferenceInfoDAO
+import org.mbari.vars.annotation.repository.CachedVideoReferenceInfoDAO
 import org.mbari.vars.annotation.model.CachedVideoReferenceInfo
 
 import scala.concurrent.{ExecutionContext, Future}

@@ -23,7 +23,7 @@ import java.util.concurrent.TimeUnit
 
 import org.mbari.vars.annotation.api.WebApiStack
 import org.mbari.vars.annotation.controllers.{AnnotationController, ImagedMomentController, ImageController, AssociationController}
-import org.mbari.vars.annotation.dao.jpa.ImagedMomentEntity
+import org.mbari.vars.annotation.repository.jpa.ImagedMomentEntity
 import org.mbari.vars.annotation.model.Annotation
 import org.mbari.vars.annotation.model.simple.{WindowRequest, Count}
 

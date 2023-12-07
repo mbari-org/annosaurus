@@ -20,7 +20,7 @@ import java.util.concurrent.TimeUnit
 
 import org.mbari.vars.annotation.Constants
 import org.mbari.vars.annotation.controllers._
-import org.mbari.vars.annotation.dao.jpa.TestDAOFactory
+import org.mbari.vars.annotation.repository.jpa.TestDAOFactory
 import org.scalatest.BeforeAndAfterAll
 import org.scalatra.test.scalatest.ScalatraFlatSpec
 

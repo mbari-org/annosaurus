@@ -17,7 +17,7 @@
 package org.mbari.vars.annotation.gson;
 
 import com.google.gson.InstanceCreator;
-import org.mbari.vars.annotation.dao.jpa.ImageReferenceEntity;
+import org.mbari.vars.annotation.repository.jpa.ImageReferenceEntity;
 import org.mbari.vars.annotation.model.ImageReference;
 
 import java.lang.reflect.Type;

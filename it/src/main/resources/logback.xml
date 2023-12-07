@@ -22,7 +22,7 @@
   <logger name="org.eclipse.jetty.util.log" level="WARN" />
   <logger name="org.eclipse.jetty" level="WARN" />
   <logger name="org.mbari.vars.annotation.controllers" level="WARN" />
-  <logger name="org.mbari.vars.annotation.dao.jpa" level="DEBUG" />
+  <logger name="org.mbari.vars.annotation.repository.jpa" level="DEBUG" />
   <logger name="org.testcontainers" level="INFO" />
 
   <root level="${LOGBACK_LEVEL}">

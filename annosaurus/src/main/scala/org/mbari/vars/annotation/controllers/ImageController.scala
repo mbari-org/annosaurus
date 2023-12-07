@@ -20,7 +20,7 @@ import java.net.URL
 import java.time.{Duration, Instant}
 import java.util.UUID
 
-import org.mbari.vars.annotation.dao.ImagedMomentDAO
+import org.mbari.vars.annotation.repository.ImagedMomentDAO
 import org.mbari.vars.annotation.model.{ImageReference, ImagedMoment}
 import org.mbari.vars.annotation.model.simple.Image
 import org.mbari.vcr4j.time.Timecode

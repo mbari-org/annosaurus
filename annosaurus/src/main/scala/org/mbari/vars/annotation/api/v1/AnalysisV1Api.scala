@@ -16,8 +16,8 @@
 
 package org.mbari.vars.annotation.api.v1
 
-import org.mbari.vars.annotation.dao.jdbc.AnalysisRepository
-import org.mbari.vars.annotation.dao.jpa.JPADAOFactory
+import org.mbari.vars.annotation.repository.jdbc.AnalysisRepository
+import org.mbari.vars.annotation.repository.jpa.JPADAOFactory
 import org.mbari.vars.annotation.model.simple.{ErrorMsg, QueryConstraints, QueryConstraintsResponse}
 import org.scalatra.BadRequest
 

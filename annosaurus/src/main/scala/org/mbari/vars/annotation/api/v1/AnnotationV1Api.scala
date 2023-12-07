@@ -20,7 +20,7 @@ import java.time.{Duration, Instant}
 import java.util.UUID
 
 import org.mbari.vars.annotation.controllers.AnnotationController
-import org.mbari.vars.annotation.dao.jpa.AnnotationImpl
+import org.mbari.vars.annotation.repository.jpa.AnnotationImpl
 import org.mbari.vars.annotation.model.Annotation
 import org.mbari.vars.annotation.model.simple.{
   ConcurrentRequest,

@@ -22,15 +22,15 @@ import java.util.UUID
 import java.util.concurrent.Executors
 
 import io.reactivex.rxjava3.subjects.Subject
-import org.mbari.vars.annotation.dao.jpa.{AnnotationImpl, ImagedMomentEntity}
-import org.mbari.vars.annotation.dao.DAO
+import org.mbari.vars.annotation.repository.jpa.{AnnotationImpl, ImagedMomentEntity}
+import org.mbari.vars.annotation.repository.DAO
 import org.mbari.vars.annotation.messaging.{AnnotationPublisher, MessageBus}
 import org.mbari.vars.annotation.model.simple.{ConcurrentRequest, MultiRequest}
 import org.mbari.vars.annotation.model.{Annotation, Observation}
 import org.mbari.vcr4j.time.Timecode
 
 import scala.concurrent.{ExecutionContext, Future}
-import org.mbari.vars.annotation.dao.jpa.UUIDSequence
+import org.mbari.vars.annotation.repository.jpa.UUIDSequence
 
 /**
   *

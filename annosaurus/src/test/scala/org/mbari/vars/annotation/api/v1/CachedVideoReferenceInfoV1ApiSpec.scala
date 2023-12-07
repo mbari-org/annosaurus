@@ -22,7 +22,7 @@ import java.util.concurrent.TimeUnit
 import org.mbari.vars.annotation.Constants
 import org.mbari.vars.annotation.api.WebApiStack
 import org.mbari.vars.annotation.controllers.CachedVideoReferenceInfoController
-import org.mbari.vars.annotation.dao.jpa.CachedVideoReferenceInfoEntity
+import org.mbari.vars.annotation.repository.jpa.CachedVideoReferenceInfoEntity
 import org.mbari.vars.annotation.model.CachedVideoReferenceInfo
 
 import scala.collection.mutable

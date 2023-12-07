@@ -16,7 +16,7 @@
 
 package org.mbari.vars.annotation.domain
 
-import org.mbari.vars.annotation.dao.jpa.AssociationEntity
+import org.mbari.vars.annotation.repository.jpa.AssociationEntity
 
 import java.util.UUID
 

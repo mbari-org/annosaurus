@@ -21,8 +21,8 @@ import com.typesafe.config.{Config, ConfigFactory}
 
 import scala.concurrent.Await
 import scala.concurrent.duration.Duration
-import org.mbari.vars.annotation.dao.jpa.JPADAOFactory
-import org.mbari.vars.annotation.dao.jpa.EntityManagerFactories
+import org.mbari.vars.annotation.repository.jpa.JPADAOFactory
+import org.mbari.vars.annotation.repository.jpa.EntityManagerFactories
 
 trait TestDAOFactory extends JPADAOFactory {
 

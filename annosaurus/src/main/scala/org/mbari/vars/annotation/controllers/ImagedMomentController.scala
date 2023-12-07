@@ -22,7 +22,7 @@ import java.util.UUID
 //
 //import org.mbari.vars.annotation.dao.jdbc.JdbcRepository
 //import org.mbari.vars.annotation.dao.jpa.JPADAOFactory
-import org.mbari.vars.annotation.dao.{DAO, ImagedMomentDAO, NotFoundInDatastoreException}
+import org.mbari.vars.annotation.repository.{DAO, ImagedMomentDAO, NotFoundInDatastoreException}
 import org.mbari.vars.annotation.model.ImagedMoment
 import org.mbari.vars.annotation.model.simple.WindowRequest
 import org.mbari.vcr4j.time.Timecode

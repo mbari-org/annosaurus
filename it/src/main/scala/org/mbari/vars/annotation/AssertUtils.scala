@@ -16,7 +16,7 @@
 
 package org.mbari.vars.annotation
 
-import org.mbari.vars.annotation.dao.jpa.{ImageReferenceEntity, ImagedMomentEntity, ObservationEntity}
+import org.mbari.vars.annotation.repository.jpa.{ImageReferenceEntity, ImagedMomentEntity, ObservationEntity}
 import org.junit.Assert._
 import org.mbari.vars.annotation.model.{Association, CachedAncillaryDatum, ImageReference, Observation}
 

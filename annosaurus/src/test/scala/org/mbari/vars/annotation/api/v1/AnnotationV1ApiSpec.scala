@@ -24,7 +24,7 @@ import java.util.UUID
 import org.mbari.vars.annotation.Constants
 import org.mbari.vars.annotation.api.WebApiStack
 import org.mbari.vars.annotation.controllers.AnnotationController
-import org.mbari.vars.annotation.dao.jpa.{AnnotationImpl, AssociationEntity, ImageReferenceEntity}
+import org.mbari.vars.annotation.repository.jpa.{AnnotationImpl, AssociationEntity, ImageReferenceEntity}
 import org.mbari.vars.annotation.model.Annotation
 import org.mbari.vars.annotation.model.simple.{
   ConcurrentRequest,
