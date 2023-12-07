@@ -24,19 +24,13 @@ import scala.concurrent.duration
 import java.util.concurrent.TimeUnit
 import java.security.MessageDigest
 import scala.util.Random
-import org.mbari.vars.annotation.repository.jpa.{
-    AssociationEntity,
-    CachedAncillaryDatumEntity,
-    ImageReferenceEntity,
-    ImagedMomentEntity,
-    JPADAOFactory,
-    ObservationEntity
-}
+import org.mbari.vars.annotation.repository.jpa.JPADAOFactory
 
 import java.util.UUID
 import java.time.Instant
 import java.time.Duration
 import org.mbari.vars.annotation.etc.jdk.Strings
+import org.mbari.vars.annotation.repository.jpa.entity.{AssociationEntity, CachedAncillaryDatumEntity, ImageReferenceEntity, ImagedMomentEntity, ObservationEntity}
 import org.mbari.vcr4j.time.{FrameRates, Timecode}
 
 import java.net.URI

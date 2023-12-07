@@ -23,7 +23,7 @@ import java.util.concurrent.TimeUnit
 
 import org.mbari.vars.annotation.api.WebApiStack
 import org.mbari.vars.annotation.controllers.{ImageReferenceController, ImagedMomentController}
-import org.mbari.vars.annotation.repository.jpa.{ImageReferenceEntity, ImagedMomentEntity}
+import org.mbari.vars.annotation.repository.jpa.entity.{ImageReferenceEntity, ImagedMomentEntity}
 
 import scala.concurrent.Await
 import scala.concurrent.duration.{Duration => SDuration}

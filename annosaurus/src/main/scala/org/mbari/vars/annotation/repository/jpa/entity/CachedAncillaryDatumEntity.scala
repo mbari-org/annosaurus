@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package org.mbari.vars.annotation.repository.jpa
-
-import jakarta.persistence.{CascadeType, JoinColumn, _}
+package org.mbari.vars.annotation.repository.jpa.entity
 
 import com.google.gson.annotations.Expose
+import jakarta.persistence._
 import org.mbari.vars.annotation.model.{CachedAncillaryDatum, ImagedMoment}
+import org.mbari.vars.annotation.repository.jpa.{DoubleOptionConverter, JPAPersistentObject, TransactionLogger}
 
 /**
   *

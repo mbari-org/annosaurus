@@ -17,9 +17,8 @@
 package org.mbari.vars.annotation.repository
 
 import java.net.URL
-
-import org.mbari.vars.annotation.repository.jpa.ImageReferenceEntity
 import org.mbari.vars.annotation.model.ImageReference
+import org.mbari.vars.annotation.repository.jpa.entity.ImageReferenceEntity
 
 /**
   *

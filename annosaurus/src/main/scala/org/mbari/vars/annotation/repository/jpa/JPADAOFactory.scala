@@ -17,9 +17,9 @@
 package org.mbari.vars.annotation.repository.jpa
 
 import jakarta.persistence.{EntityManager, EntityManagerFactory}
-
 import com.typesafe.config.ConfigFactory
 import org.mbari.vars.annotation.repository._
+import org.mbari.vars.annotation.repository.jpa.entity.{AssociationEntity, CachedAncillaryDatumEntity, CachedVideoReferenceInfoEntity, ImageReferenceEntity, ImagedMomentEntity, IndexEntity, ObservationEntity}
 
 /**
   *

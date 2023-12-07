@@ -14,21 +14,17 @@
  * limitations under the License.
  */
 
-package org.mbari.vars.annotation.repository.jpa
-
-import java.time.{Duration, Instant}
-import java.util.UUID
+package org.mbari.vars.annotation.repository.jpa.entity
 
 import com.google.gson.annotations.{Expose, SerializedName}
 import jakarta.persistence._
 import org.mbari.vars.annotation.Constants
-import org.mbari.vars.annotation.model.{
-  CachedAncillaryDatum,
-  ImageReference,
-  ImagedMoment,
-  Observation
-}
+import org.mbari.vars.annotation.model.{CachedAncillaryDatum, ImageReference, ImagedMoment, Observation}
+import org.mbari.vars.annotation.repository.jpa._
 import org.mbari.vcr4j.time.Timecode
+
+import java.time.{Duration, Instant}
+import java.util.UUID
 
 /**
   * @author Brian Schlining

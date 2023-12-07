@@ -29,12 +29,12 @@ import org.mbari.vars.annotation.controllers.{
   BasicDAOFactory,
   ObservationController
 }
-import org.mbari.vars.annotation.repository.jpa.AssociationEntity
 import org.mbari.vars.annotation.model.simple.{
   ConceptAssociationRequest,
   ConceptAssociationResponse
 }
 import org.mbari.vars.annotation.model.{Annotation, Association}
+import org.mbari.vars.annotation.repository.jpa.entity.AssociationEntity
 
 import scala.concurrent.Await
 import scala.concurrent.duration.{Duration => SDuration}

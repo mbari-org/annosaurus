@@ -14,17 +14,16 @@
  * limitations under the License.
  */
 
-package org.mbari.vars.annotation.repository.jpa
-
-import java.time.{Duration, Instant}
-
-import jakarta.persistence._
-import java.util.{ArrayList => JArrayList, List => JList}
+package org.mbari.vars.annotation.repository.jpa.entity
 
 import com.google.gson.annotations.{Expose, SerializedName}
-
-import scala.jdk.CollectionConverters._
+import jakarta.persistence._
 import org.mbari.vars.annotation.model.{Association, ImagedMoment, Observation}
+import org.mbari.vars.annotation.repository.jpa.{DurationConverter, InstantConverter, JPAPersistentObject, TransactionLogger}
+
+import java.time.{Duration, Instant}
+import java.util.{ArrayList => JArrayList, List => JList}
+import scala.jdk.CollectionConverters._
 
 /**
   *

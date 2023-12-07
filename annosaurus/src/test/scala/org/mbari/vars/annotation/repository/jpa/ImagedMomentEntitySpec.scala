@@ -18,8 +18,8 @@ package org.mbari.vars.annotation.repository.jpa
 
 import java.time.{Duration, Instant}
 import java.util.UUID
-
 import org.mbari.vars.annotation.Constants
+import org.mbari.vars.annotation.repository.jpa.entity.{AssociationEntity, ImagedMomentEntity, ObservationEntity}
 import org.mbari.vcr4j.time.{FrameRates, Timecode}
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.flatspec.AnyFlatSpec

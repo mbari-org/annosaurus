@@ -16,9 +16,9 @@
 
 package org.mbari.vars.annotation.repository.jdbc
 
-import java.util.UUID
+import org.mbari.vars.annotation.repository.jpa.entity.AssociationEntity
 
-import org.mbari.vars.annotation.repository.jpa.AssociationEntity
+import java.util.UUID
 
 /**
   * @author Brian Schlining

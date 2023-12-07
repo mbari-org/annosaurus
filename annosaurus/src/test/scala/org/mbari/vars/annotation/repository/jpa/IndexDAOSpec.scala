@@ -16,10 +16,11 @@
 
 package org.mbari.vars.annotation.repository.jpa
 
+import org.mbari.vars.annotation.repository.jpa.entity.{ImagedMomentEntity, IndexEntity}
+
 import java.time.{Duration, Instant}
 import java.util.UUID
 import java.util.concurrent.TimeUnit
-
 import org.mbari.vars.annotation.repository.{ImagedMomentDAO, IndexDAO}
 import org.mbari.vcr4j.time.Timecode
 import org.scalatest.BeforeAndAfterAll

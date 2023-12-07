@@ -19,8 +19,9 @@ package org.mbari.vars.annotation.messaging.zeromq
 import java.time.Instant
 import java.util.UUID
 
-import org.mbari.vars.annotation.repository.jpa.{AnnotationImpl, AssociationEntity, ObservationEntity}
+import org.mbari.vars.annotation.repository.jpa.AnnotationImpl
 import org.mbari.vars.annotation.messaging.{AnnotationMessage, AssociationMessage, MessageBus}
+import org.mbari.vars.annotation.repository.jpa.entity.{AssociationEntity, ObservationEntity}
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers

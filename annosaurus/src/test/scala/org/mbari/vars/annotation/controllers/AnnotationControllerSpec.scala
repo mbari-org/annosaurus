@@ -24,12 +24,12 @@ import java.util.concurrent.TimeUnit
 import org.mbari.vars.annotation.Constants
 import org.mbari.vars.annotation.repository.jpa.{
   AnnotationImpl,
-  AssociationEntity,
   SpecDAOFactory,
   TestDAOFactory
 }
 import org.mbari.vars.annotation.model.Annotation
 import org.mbari.vars.annotation.model.simple.{ConcurrentRequest, MultiRequest}
+import org.mbari.vars.annotation.repository.jpa.entity.AssociationEntity
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers

@@ -14,27 +14,19 @@
  * limitations under the License.
  */
 
-package org.mbari.vars.annotation.repository.jpa
-
-import java.time.{Duration, Instant}
-import java.util.UUID
-
-import jakarta.persistence.{Convert, Index, _}
-import java.util.{ArrayList => JArrayList, List => JList}
+package org.mbari.vars.annotation.repository.jpa.entity
 
 import com.google.gson.annotations.{Expose, SerializedName}
+import jakarta.persistence._
 import org.mbari.vars.annotation.Constants
-import org.mbari.vars.annotation.model.{
-  Annotation,
-  CachedAncillaryDatum,
-  ImageReference,
-  ImagedMoment,
-  Observation
-}
+import org.mbari.vars.annotation.model._
+import org.mbari.vars.annotation.repository.jpa._
 import org.mbari.vcr4j.time.Timecode
 
-import scala.jdk.CollectionConverters._
+import java.time.{Duration, Instant}
+import java.util.{UUID, ArrayList => JArrayList, List => JList}
 import scala.collection.mutable
+import scala.jdk.CollectionConverters._
 
 /**
   *

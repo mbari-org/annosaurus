@@ -17,10 +17,10 @@
 package org.mbari.vars.annotation.repository.jpa
 
 import java.util.UUID
-
 import jakarta.persistence.EntityManager
 import org.mbari.vars.annotation.repository.IndexDAO
 import org.mbari.vars.annotation.model.ImagedMoment
+import org.mbari.vars.annotation.repository.jpa.entity.IndexEntity
 
 /**
   * @author Brian Schlining

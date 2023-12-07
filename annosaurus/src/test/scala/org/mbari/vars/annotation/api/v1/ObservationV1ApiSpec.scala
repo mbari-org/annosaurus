@@ -25,18 +25,14 @@ import org.mbari.vars.annotation.controllers.BasicDAOFactory
 import org.mbari.vars.annotation.Constants
 import org.mbari.vars.annotation.api.WebApiStack
 import org.mbari.vars.annotation.controllers.ObservationController
-import org.mbari.vars.annotation.repository.jpa.{
-  AnnotationImpl,
-  AssociationEntity,
-  ImagedMomentEntity,
-  ObservationEntity
-}
+import org.mbari.vars.annotation.repository.jpa.AnnotationImpl
 import org.mbari.vars.annotation.model.Observation
 
 import scala.collection.JavaConverters._
 import scala.concurrent.Await
 import scala.concurrent.duration.{Duration => SDuration}
 import org.mbari.vars.annotation.controllers.AnnotationController
+import org.mbari.vars.annotation.repository.jpa.entity.{AssociationEntity, ImagedMomentEntity, ObservationEntity}
 import scala.concurrent.Future
 
 /**

@@ -23,8 +23,8 @@ import java.util.UUID
 import org.mbari.vars.annotation.Constants
 import org.mbari.vars.annotation.api.WebApiStack
 import org.mbari.vars.annotation.controllers.CachedAncillaryDatumController
-import org.mbari.vars.annotation.repository.jpa.CachedAncillaryDatumEntity
 import org.mbari.vars.annotation.model.simple.CachedAncillaryDatumBean
+import org.mbari.vars.annotation.repository.jpa.entity.CachedAncillaryDatumEntity
 
 import scala.collection.JavaConverters._
 

@@ -26,11 +26,11 @@ import org.mbari.vars.annotation.controllers.AnnotationController
 import org.mbari.vars.annotation.controllers.TestEntityFactory
 import org.mbari.vars.annotation.repository.ImagedMomentDAO
 import org.mbari.vars.annotation.repository.jpa.AnnotationImpl
-import org.mbari.vars.annotation.repository.jpa.ImagedMomentEntity
 import org.mbari.vars.annotation.repository.jpa.JPADAOFactory
 import org.mbari.vars.annotation.repository.jpa.TestDAOFactory
 import org.mbari.vars.annotation.model.simple.QueryConstraints
 import org.mbari.vars.annotation.model.simple.QueryConstraintsResponse
+import org.mbari.vars.annotation.repository.jpa.entity.ImagedMomentEntity
 import scala.concurrent.Await
 import scala.concurrent.duration.Duration
 import scala.jdk.CollectionConverters._

@@ -18,10 +18,9 @@ package org.mbari.vars.annotation.repository
 
 import java.time.{Duration, Instant}
 import java.util.UUID
-
-import org.mbari.vars.annotation.repository.jpa.ImagedMomentEntity
 import org.mbari.vars.annotation.model.ImagedMoment
 import org.mbari.vars.annotation.model.simple.WindowRequest
+import org.mbari.vars.annotation.repository.jpa.entity.ImagedMomentEntity
 import org.mbari.vcr4j.time.Timecode
 
 /**

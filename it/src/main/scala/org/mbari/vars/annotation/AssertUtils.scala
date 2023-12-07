@@ -16,9 +16,9 @@
 
 package org.mbari.vars.annotation
 
-import org.mbari.vars.annotation.repository.jpa.{ImageReferenceEntity, ImagedMomentEntity, ObservationEntity}
 import org.junit.Assert._
 import org.mbari.vars.annotation.model.{Association, CachedAncillaryDatum, ImageReference, Observation}
+import org.mbari.vars.annotation.repository.jpa.entity.{ImageReferenceEntity, ImagedMomentEntity, ObservationEntity}
 
 object AssertUtils {
 

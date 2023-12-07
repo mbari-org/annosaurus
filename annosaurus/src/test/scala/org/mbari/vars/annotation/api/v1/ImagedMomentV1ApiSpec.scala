@@ -23,9 +23,9 @@ import java.util.concurrent.TimeUnit
 
 import org.mbari.vars.annotation.api.WebApiStack
 import org.mbari.vars.annotation.controllers.{AnnotationController, ImagedMomentController, ImageController, AssociationController}
-import org.mbari.vars.annotation.repository.jpa.ImagedMomentEntity
 import org.mbari.vars.annotation.model.Annotation
 import org.mbari.vars.annotation.model.simple.{WindowRequest, Count}
+import org.mbari.vars.annotation.repository.jpa.entity.ImagedMomentEntity
 
 import scala.concurrent.Await
 import scala.concurrent.duration.{Duration => SDuration}

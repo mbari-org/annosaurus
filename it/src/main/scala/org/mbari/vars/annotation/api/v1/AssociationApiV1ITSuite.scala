@@ -19,7 +19,8 @@ package org.mbari.vars.annotation.api.v1
 import org.mbari.vars.annotation.Constants
 import org.mbari.vars.annotation.api.WebSuite
 import org.mbari.vars.annotation.controllers.{AssociationController, BasicDAOFactory, TestUtils}
-import org.mbari.vars.annotation.repository.jpa.{AssociationEntity, JPADAOFactory}
+import org.mbari.vars.annotation.repository.jpa.JPADAOFactory
+import org.mbari.vars.annotation.repository.jpa.entity.AssociationEntity
 
 import scala.concurrent.ExecutionContext
 

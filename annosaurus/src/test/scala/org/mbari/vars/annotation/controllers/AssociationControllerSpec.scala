@@ -22,12 +22,10 @@ import java.util.concurrent.TimeUnit
 
 import org.mbari.vars.annotation.repository.jpa.{
   AnnotationImpl,
-  AssociationEntity,
-  ImagedMomentEntity,
-  ObservationEntity,
   TestDAOFactory
 }
 import org.mbari.vars.annotation.model.simple.ConceptAssociationRequest
+import org.mbari.vars.annotation.repository.jpa.entity.{AssociationEntity, ImagedMomentEntity, ObservationEntity}
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers

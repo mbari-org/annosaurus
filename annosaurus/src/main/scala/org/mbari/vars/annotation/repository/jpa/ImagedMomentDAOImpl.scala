@@ -19,12 +19,12 @@ package org.mbari.vars.annotation.repository.jpa
 import java.sql.Timestamp
 import java.time.{Duration, Instant}
 import java.util.function.Function
-import java.util.{stream, UUID}
-
+import java.util.{UUID, stream}
 import jakarta.persistence.EntityManager
 import org.mbari.vars.annotation.repository.ImagedMomentDAO
 import org.mbari.vars.annotation.model.ImagedMoment
 import org.mbari.vars.annotation.model.simple.WindowRequest
+import org.mbari.vars.annotation.repository.jpa.entity.ImagedMomentEntity
 import org.mbari.vcr4j.time.Timecode
 
 import scala.jdk.CollectionConverters._

@@ -16,8 +16,7 @@
 
 package org.mbari.vars.annotation.domain
 
-import org.mbari.vars.annotation.repository.jpa.AssociationEntity
-
+import org.mbari.vars.annotation.repository.jpa.entity.AssociationEntity
 import java.util.UUID
 
 case class Association(uuid: UUID, link_name: String, to_concept: String, link_value: String, mime_type: String) {

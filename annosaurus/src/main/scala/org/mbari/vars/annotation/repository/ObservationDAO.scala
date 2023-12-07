@@ -18,10 +18,9 @@ package org.mbari.vars.annotation.repository
 
 import java.util.UUID
 import java.time.{Duration, Instant}
-
-import org.mbari.vars.annotation.repository.jpa.ObservationEntity
 import org.mbari.vars.annotation.model.Observation
 import org.mbari.vars.annotation.model.simple.{ConcurrentRequest, MultiRequest}
+import org.mbari.vars.annotation.repository.jpa.entity.ObservationEntity
 
 /**
   *

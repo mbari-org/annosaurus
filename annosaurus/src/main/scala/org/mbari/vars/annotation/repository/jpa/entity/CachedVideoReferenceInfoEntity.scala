@@ -14,13 +14,14 @@
  * limitations under the License.
  */
 
-package org.mbari.vars.annotation.repository.jpa
-
-import java.util.UUID
-import jakarta.persistence._
+package org.mbari.vars.annotation.repository.jpa.entity
 
 import com.google.gson.annotations.{Expose, SerializedName}
+import jakarta.persistence._
 import org.mbari.vars.annotation.model.CachedVideoReferenceInfo
+import org.mbari.vars.annotation.repository.jpa.{JPAPersistentObject, TransactionLogger, UUIDConverter}
+
+import java.util.UUID
 
 /**
   * idx_video_reference_uuid_vri

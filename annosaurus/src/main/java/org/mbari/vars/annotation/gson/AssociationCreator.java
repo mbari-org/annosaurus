@@ -17,7 +17,7 @@
 package org.mbari.vars.annotation.gson;
 
 import com.google.gson.InstanceCreator;
-import org.mbari.vars.annotation.repository.jpa.AssociationEntity;
+import org.mbari.vars.annotation.repository.jpa.entity.AssociationEntity;
 import org.mbari.vars.annotation.model.Association;
 
 import java.lang.reflect.Type;

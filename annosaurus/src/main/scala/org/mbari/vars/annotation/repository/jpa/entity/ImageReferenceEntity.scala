@@ -14,13 +14,14 @@
  * limitations under the License.
  */
 
-package org.mbari.vars.annotation.repository.jpa
-
-import java.net.URL
-import jakarta.persistence._
+package org.mbari.vars.annotation.repository.jpa.entity
 
 import com.google.gson.annotations.{Expose, SerializedName}
+import jakarta.persistence._
 import org.mbari.vars.annotation.model.{ImageReference, ImagedMoment}
+import org.mbari.vars.annotation.repository.jpa.{JPAPersistentObject, TransactionLogger, URLConverter}
+
+import java.net.URL
 
 /**
   *

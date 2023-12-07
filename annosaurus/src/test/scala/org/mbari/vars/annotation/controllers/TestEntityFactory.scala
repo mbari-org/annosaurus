@@ -22,9 +22,9 @@ import java.util.UUID
 
 import org.mbari.vars.annotation.repository.jpa.JPADAOFactory
 import org.mbari.vars.annotation.model.ImagedMoment
+import org.mbari.vars.annotation.repository.jpa.entity.ImagedMomentEntity
 
 import scala.util.Random
-import org.mbari.vars.annotation.repository.jpa.ImagedMomentEntity
 
 /**
   * @author Brian Schlining

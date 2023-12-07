@@ -17,9 +17,9 @@
 package org.mbari.vars.annotation.repository.jpa
 
 import java.net.URL
-
 import jakarta.persistence.EntityManager
 import org.mbari.vars.annotation.repository.ImageReferenceDAO
+import org.mbari.vars.annotation.repository.jpa.entity.ImageReferenceEntity
 
 /**
   *

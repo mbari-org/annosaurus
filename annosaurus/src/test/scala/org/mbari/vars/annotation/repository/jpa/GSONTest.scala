@@ -19,9 +19,9 @@ package org.mbari.vars.annotation.repository.jpa
 import java.net.URL
 import java.time.Instant
 import java.util.UUID
-
 import org.mbari.vars.annotation.Constants
 import org.mbari.vars.annotation.model.simple.CachedAncillaryDatumBean
+import org.mbari.vars.annotation.repository.jpa.entity.{AssociationEntity, CachedAncillaryDatumEntity, ImageReferenceEntity, ImagedMomentEntity, ObservationEntity}
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 

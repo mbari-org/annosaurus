@@ -16,13 +16,13 @@
         <class>org.mbari.vars.annotation.repository.jpa.TimecodeConverter</class>
 
         <!-- Entities -->
-        <class>org.mbari.vars.annotation.repository.jpa.ImagedMomentEntity</class>
-        <class>org.mbari.vars.annotation.repository.jpa.ObservationEntity</class>
-        <class>org.mbari.vars.annotation.repository.jpa.AssociationEntity</class>
-        <class>org.mbari.vars.annotation.repository.jpa.ImageReferenceEntity</class>
-        <class>org.mbari.vars.annotation.repository.jpa.CachedAncillaryDatumEntity</class>
-        <class>org.mbari.vars.annotation.repository.jpa.CachedVideoReferenceInfoEntity</class>
-        <class>org.mbari.vars.annotation.repository.jpa.IndexEntity</class>
+        <class>org.mbari.vars.annotation.repository.jpa.entity.ImagedMomentEntity</class>
+        <class>org.mbari.vars.annotation.repository.jpa.entity.ObservationEntity</class>
+        <class>org.mbari.vars.annotation.repository.jpa.entity.AssociationEntity</class>
+        <class>org.mbari.vars.annotation.repository.jpa.entity.ImageReferenceEntity</class>
+        <class>org.mbari.vars.annotation.repository.jpa.entity.CachedAncillaryDatumEntity</class>
+        <class>org.mbari.vars.annotation.repository.jpa.entity.CachedVideoReferenceInfoEntity</class>
+        <class>org.mbari.vars.annotation.repository.jpa.entity.IndexEntity</class>
 
         <properties>
             <property name="eclipselink.logging.level" value="INFO" />

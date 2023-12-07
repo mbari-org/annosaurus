@@ -19,9 +19,9 @@ package org.mbari.vars.annotation.repository.jpa
 import java.time.{Duration, Instant}
 import java.util.UUID
 import java.util.concurrent.TimeUnit
-
 import org.mbari.vars.annotation.repository.ImagedMomentDAO
 import org.mbari.vars.annotation.model.simple.WindowRequest
+import org.mbari.vars.annotation.repository.jpa.entity.ImagedMomentEntity
 import org.mbari.vcr4j.time.Timecode
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.flatspec.AnyFlatSpec

@@ -19,8 +19,8 @@ package org.mbari.vars.annotation.api.v1
 import java.util.UUID
 
 import org.mbari.vars.annotation.controllers.IndexController
-import org.mbari.vars.annotation.repository.jpa.IndexEntity
 import org.mbari.vars.annotation.model.simple.ErrorMsg
+import org.mbari.vars.annotation.repository.jpa.entity.IndexEntity
 import org.scalatra.BadRequest
 
 import scala.jdk.CollectionConverters._

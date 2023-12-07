@@ -20,8 +20,8 @@ import java.net.URL
 import java.time.{Duration, Instant}
 import java.util.UUID
 import java.util.concurrent.TimeUnit
-
 import org.mbari.vars.annotation.repository.ImageReferenceDAO
+import org.mbari.vars.annotation.repository.jpa.entity.{ImageReferenceEntity, ImagedMomentEntity}
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
