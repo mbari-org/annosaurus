@@ -19,7 +19,7 @@ package org.mbari.vars.annotation.api.v1
 import java.util.UUID
 
 import org.mbari.vars.annotation.controllers.IndexController
-import org.mbari.vars.annotation.dao.jpa.IndexImpl
+import org.mbari.vars.annotation.dao.jpa.IndexEntity
 import org.mbari.vars.annotation.model.simple.ErrorMsg
 import org.scalatra.BadRequest
 
@@ -53,7 +53,7 @@ class IndexV1Api(controller: IndexController)(implicit val executor: ExecutionCo
     validateRequest()
     request.getHeader("Content-Type") match {
       case "application/json" =>
-        val indices = fromJson(request.body, classOf[Array[IndexImpl]])
+        val indices = fromJson(request.body, classOf[Array[IndexEntity]])
         controller
           .bulkUpdateRecordedTimestamps(indices)
           .map(_.asJava)

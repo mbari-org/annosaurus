@@ -16,13 +16,13 @@
         <class>org.mbari.vars.annotation.dao.jpa.TimecodeConverter</class>
 
         <!-- Entities -->
-        <class>org.mbari.vars.annotation.dao.jpa.ImagedMomentImpl</class>
-        <class>org.mbari.vars.annotation.dao.jpa.ObservationImpl</class>
-        <class>org.mbari.vars.annotation.dao.jpa.AssociationImpl</class>
-        <class>org.mbari.vars.annotation.dao.jpa.ImageReferenceImpl</class>
-        <class>org.mbari.vars.annotation.dao.jpa.CachedAncillaryDatumImpl</class>
-        <class>org.mbari.vars.annotation.dao.jpa.CachedVideoReferenceInfoImpl</class>
-        <class>org.mbari.vars.annotation.dao.jpa.IndexImpl</class>
+        <class>org.mbari.vars.annotation.dao.jpa.ImagedMomentEntity</class>
+        <class>org.mbari.vars.annotation.dao.jpa.ObservationEntity</class>
+        <class>org.mbari.vars.annotation.dao.jpa.AssociationEntity</class>
+        <class>org.mbari.vars.annotation.dao.jpa.ImageReferenceEntity</class>
+        <class>org.mbari.vars.annotation.dao.jpa.CachedAncillaryDatumEntity</class>
+        <class>org.mbari.vars.annotation.dao.jpa.CachedVideoReferenceInfoEntity</class>
+        <class>org.mbari.vars.annotation.dao.jpa.IndexEntity</class>
 
         <properties>
             <property name="eclipselink.logging.level" value="INFO" />

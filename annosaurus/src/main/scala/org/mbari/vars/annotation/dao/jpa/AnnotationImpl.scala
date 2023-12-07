@@ -73,28 +73,28 @@ class AnnotationImpl extends Annotation {
 
   @Expose(serialize = true)
   @SerializedName(value = "associations")
-  var javaAssociations: JList[AssociationImpl] =
-    new JArrayList[AssociationImpl]()
+  var javaAssociations: JList[AssociationEntity] =
+    new JArrayList[AssociationEntity]()
   def associations: Seq[Association] = javaAssociations.asScala.toSeq
   def associations_=(as: Seq[Association]): Unit = {
     javaAssociations = as
       .map({
-        case a: AssociationImpl => a
-        case v: Association     => AssociationImpl(v)
+        case a: AssociationEntity => a
+        case v: Association     => AssociationEntity(v)
       })
       .asJava
   }
 
   @Expose(serialize = true)
   @SerializedName(value = "image_references")
-  var javaImageReferences: JList[ImageReferenceImpl] =
-    new JArrayList[ImageReferenceImpl]()
+  var javaImageReferences: JList[ImageReferenceEntity] =
+    new JArrayList[ImageReferenceEntity]()
   def imageReferences: Seq[ImageReference] = javaImageReferences.asScala.toSeq
   def imageReferences_=(irs: Seq[ImageReference]): Unit = {
     javaImageReferences = irs
       .map({
-        case i: ImageReferenceImpl => i
-        case v: ImageReference     => ImageReferenceImpl(v)
+        case i: ImageReferenceEntity => i
+        case v: ImageReference     => ImageReferenceEntity(v)
       })
       .asJava
   }

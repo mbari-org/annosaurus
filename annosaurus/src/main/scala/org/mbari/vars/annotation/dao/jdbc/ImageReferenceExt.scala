@@ -18,12 +18,12 @@ package org.mbari.vars.annotation.dao.jdbc
 
 import java.util.UUID
 
-import org.mbari.vars.annotation.dao.jpa.ImageReferenceImpl
+import org.mbari.vars.annotation.dao.jpa.ImageReferenceEntity
 
 /**
   * @author Brian Schlining
   * @since 2019-10-22T14:37:00
   */
-class ImageReferenceExt extends ImageReferenceImpl {
+class ImageReferenceExt extends ImageReferenceEntity {
   var imagedMomentUuid: UUID = _
 }

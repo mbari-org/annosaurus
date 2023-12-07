@@ -16,13 +16,13 @@
 
 package org.mbari.vars.annotation
 
-import org.mbari.vars.annotation.dao.jpa.{ImageReferenceImpl, ImagedMomentImpl, ObservationImpl}
+import org.mbari.vars.annotation.dao.jpa.{ImageReferenceEntity, ImagedMomentEntity, ObservationEntity}
 import org.junit.Assert._
 import org.mbari.vars.annotation.model.{Association, CachedAncillaryDatum, ImageReference, Observation}
 
 object AssertUtils {
 
-    def assertSameImagedMoment(a: ImagedMomentImpl, b: ImagedMomentImpl, cascade: Boolean = true): Unit = {
+    def assertSameImagedMoment(a: ImagedMomentEntity, b: ImagedMomentEntity, cascade: Boolean = true): Unit = {
         if (a == null && b == null) {
             // do nothing
         }

@@ -26,7 +26,7 @@ import org.mbari.vars.annotation.controllers.AnnotationController
 import org.mbari.vars.annotation.controllers.TestEntityFactory
 import org.mbari.vars.annotation.dao.ImagedMomentDAO
 import org.mbari.vars.annotation.dao.jpa.AnnotationImpl
-import org.mbari.vars.annotation.dao.jpa.ImagedMomentImpl
+import org.mbari.vars.annotation.dao.jpa.ImagedMomentEntity
 import org.mbari.vars.annotation.dao.jpa.JPADAOFactory
 import org.mbari.vars.annotation.dao.jpa.TestDAOFactory
 import org.mbari.vars.annotation.model.simple.QueryConstraints
@@ -42,7 +42,7 @@ class FastAnnotationV1ApiSpec extends WebApiStack {
   private val api           = new FastAnnotationV1Api(jpaDaoFactory)
   private val entityFactory = new TestEntityFactory(jpaDaoFactory)
 
-  private type IMDAO = ImagedMomentDAO[ImagedMomentImpl]
+  private type IMDAO = ImagedMomentDAO[ImagedMomentEntity]
   private val dao               = jpaDaoFactory.newImagedMomentDAO()
   private[this] val timeout     = Duration(2, TimeUnit.SECONDS)
   def run[R](fn: IMDAO => R): R = Await.result(dao.runTransaction(fn), timeout)

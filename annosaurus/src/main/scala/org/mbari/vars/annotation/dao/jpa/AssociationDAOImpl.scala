@@ -32,18 +32,18 @@ import scala.jdk.CollectionConverters._
   * @since 2016-06-17T17:11:00
   */
 class AssociationDAOImpl(entityManager: EntityManager)
-    extends BaseDAO[AssociationImpl](entityManager)
-    with AssociationDAO[AssociationImpl] {
+    extends BaseDAO[AssociationEntity](entityManager)
+    with AssociationDAO[AssociationEntity] {
 
-  override def newPersistentObject(): AssociationImpl = new AssociationImpl
+  override def newPersistentObject(): AssociationEntity = new AssociationEntity
 
   override def newPersistentObject(
       linkName: String,
       toConcept: Option[String],
       linkValue: Option[String],
       mimeType: Option[String]
-  ): AssociationImpl = {
-    val a = new AssociationImpl
+  ): AssociationEntity = {
+    val a = new AssociationEntity
     a.linkName = linkName
     toConcept.foreach(a.toConcept = _)
     linkValue.foreach(a.linkValue = _)
@@ -51,10 +51,10 @@ class AssociationDAOImpl(entityManager: EntityManager)
     a
   }
 
-  override def newPersistentObject(association: Association): AssociationImpl =
-    AssociationImpl(association)
+  override def newPersistentObject(association: Association): AssociationEntity =
+    AssociationEntity(association)
 
-  override def findByLinkName(linkName: String): Iterable[AssociationImpl] =
+  override def findByLinkName(linkName: String): Iterable[AssociationEntity] =
     findByNamedQuery("Association.findByLinkName", Map("linkName" -> linkName))
 
   //  override def findByLinkNameAndVideoReferenceUUID(linkName: String, videoReferenceUUID: UUID): Iterable[AssociationImpl] =
@@ -65,7 +65,7 @@ class AssociationDAOImpl(entityManager: EntityManager)
   override def findByLinkNameAndVideoReferenceUUID(
       linkName: String,
       videoReferenceUUID: UUID
-  ): Iterable[AssociationImpl] = {
+  ): Iterable[AssociationEntity] = {
     findByLinkNameAndVideoReferenceUUIDAndConcept(linkName, videoReferenceUUID, None)
   }
 
@@ -73,7 +73,7 @@ class AssociationDAOImpl(entityManager: EntityManager)
       linkName: String,
       videoReferenceUUID: UUID,
       concept: Option[String] = None
-  ): Iterable[AssociationImpl] = {
+  ): Iterable[AssociationEntity] = {
     // HACK We are experiencing performance issues with the JPQL query. This
     // version is native SQL. Faster, but type casting is not pretty
     val query = entityManager.createNamedQuery("Association.findByLinkNameAndVideoReference")
@@ -164,7 +164,7 @@ class AssociationDAOImpl(entityManager: EntityManager)
   override def findAll(
       limit: Option[Int] = None,
       offset: Option[Int] = None
-  ): Iterable[AssociationImpl] =
+  ): Iterable[AssociationEntity] =
     findByNamedQuery("Association.findAll", limit = limit, offset = offset)
 
   override def countByToConcept(toConcept: String): Long = {

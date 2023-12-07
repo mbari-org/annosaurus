@@ -22,7 +22,7 @@ import java.util.UUID
 import java.util.concurrent.Executors
 
 import io.reactivex.rxjava3.subjects.Subject
-import org.mbari.vars.annotation.dao.jpa.{AnnotationImpl, ImagedMomentImpl}
+import org.mbari.vars.annotation.dao.jpa.{AnnotationImpl, ImagedMomentEntity}
 import org.mbari.vars.annotation.dao.DAO
 import org.mbari.vars.annotation.messaging.{AnnotationPublisher, MessageBus}
 import org.mbari.vars.annotation.model.simple.{ConcurrentRequest, MultiRequest}
@@ -246,7 +246,7 @@ class AnnotationController(daoFactory: BasicDAOFactory, bus: Subject[Any] = Mess
 
     val obsDao = daoFactory.newObservationDAO()
 
-    val imagedMoments = ImagedMomentImpl(annotations.toSeq)
+    val imagedMoments = ImagedMomentEntity(annotations.toSeq)
     val futures = imagedMoments
       .grouped(50)
       .map(imagedMoments => {

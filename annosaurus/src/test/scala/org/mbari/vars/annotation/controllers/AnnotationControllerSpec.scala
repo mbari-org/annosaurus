@@ -24,7 +24,7 @@ import java.util.concurrent.TimeUnit
 import org.mbari.vars.annotation.Constants
 import org.mbari.vars.annotation.dao.jpa.{
   AnnotationImpl,
-  AssociationImpl,
+  AssociationEntity,
   SpecDAOFactory,
   TestDAOFactory
 }

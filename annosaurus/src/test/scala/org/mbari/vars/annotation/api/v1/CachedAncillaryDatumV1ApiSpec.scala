@@ -23,7 +23,7 @@ import java.util.UUID
 import org.mbari.vars.annotation.Constants
 import org.mbari.vars.annotation.api.WebApiStack
 import org.mbari.vars.annotation.controllers.CachedAncillaryDatumController
-import org.mbari.vars.annotation.dao.jpa.CachedAncillaryDatumImpl
+import org.mbari.vars.annotation.dao.jpa.CachedAncillaryDatumEntity
 import org.mbari.vars.annotation.model.simple.CachedAncillaryDatumBean
 
 import scala.collection.JavaConverters._
@@ -86,7 +86,7 @@ class CachedAncillaryDatumV1ApiSpec extends WebApiStack {
       // or uuid values set.
       val persistedData = Constants
         .GSON
-        .fromJson(body, classOf[Array[CachedAncillaryDatumImpl]])
+        .fromJson(body, classOf[Array[CachedAncillaryDatumEntity]])
         .toSeq
       persistedData.size should be(imagedMoments.size)
       persistedData
@@ -120,7 +120,7 @@ class CachedAncillaryDatumV1ApiSpec extends WebApiStack {
       status should be(200)
       val persistedData = Constants
         .GSON
-        .fromJson(body, classOf[Array[CachedAncillaryDatumImpl]])
+        .fromJson(body, classOf[Array[CachedAncillaryDatumEntity]])
         .toSeq
 //        println(body)
       persistedData.size should be(imagedMoments.size)

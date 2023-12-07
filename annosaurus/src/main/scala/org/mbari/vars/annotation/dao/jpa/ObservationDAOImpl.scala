@@ -33,10 +33,10 @@ import scala.jdk.CollectionConverters._
   * @since 2016-06-17T17:10:00
   */
 class ObservationDAOImpl(entityManager: EntityManager)
-    extends BaseDAO[ObservationImpl](entityManager)
-    with ObservationDAO[ObservationImpl] {
+    extends BaseDAO[ObservationEntity](entityManager)
+    with ObservationDAO[ObservationEntity] {
 
-  override def newPersistentObject(): ObservationImpl = new ObservationImpl
+  override def newPersistentObject(): ObservationEntity = new ObservationEntity
 
   override def newPersistentObject(
       concept: String,
@@ -44,7 +44,7 @@ class ObservationDAOImpl(entityManager: EntityManager)
       observationDate: Instant = Instant.now(),
       group: Option[String] = None,
       duration: Option[Duration] = None
-  ): ObservationImpl = {
+  ): ObservationEntity = {
 
     val observation = newPersistentObject()
     observation.concept = concept
@@ -59,14 +59,14 @@ class ObservationDAOImpl(entityManager: EntityManager)
       uuid: UUID,
       limit: Option[Int] = None,
       offset: Option[Int] = None
-  ): Iterable[ObservationImpl] =
+  ): Iterable[ObservationEntity] =
     findByNamedQuery("Observation.findByVideoReferenceUUID", Map("uuid" -> uuid), limit, offset)
 
   override def streamByVideoReferenceUUID(
       uuid: UUID,
       limit: Option[Int],
       offset: Option[Int]
-  ): stream.Stream[ObservationImpl] =
+  ): stream.Stream[ObservationEntity] =
     streamByNamedQuery("Observation.findByVideoReferenceUUID", Map("uuid" -> uuid), limit, offset)
 
   override def streamByVideoReferenceUUIDAndTimestamps(
@@ -75,7 +75,7 @@ class ObservationDAOImpl(entityManager: EntityManager)
       endTimestamp: Instant,
       limit: Option[Int],
       offset: Option[Int]
-  ): stream.Stream[ObservationImpl] = {
+  ): stream.Stream[ObservationEntity] = {
 
     streamByNamedQuery(
       "Observation.findByVideoReferenceUUIDAndTimestamps",
@@ -102,7 +102,7 @@ class ObservationDAOImpl(entityManager: EntityManager)
       request: ConcurrentRequest,
       limit: Option[Int],
       offset: Option[Int]
-  ): stream.Stream[ObservationImpl] = {
+  ): stream.Stream[ObservationEntity] = {
     streamByNamedQuery(
       "Observation.findByConcurrentRequest",
       Map(
@@ -127,7 +127,7 @@ class ObservationDAOImpl(entityManager: EntityManager)
       request: MultiRequest,
       limit: Option[Int],
       offset: Option[Int]
-  ): stream.Stream[ObservationImpl] = {
+  ): stream.Stream[ObservationEntity] = {
     streamByNamedQuery(
       "Observation.findByMultiRequest",
       Map("uuids" -> request.videoReferenceUuids),
@@ -176,7 +176,7 @@ class ObservationDAOImpl(entityManager: EntityManager)
   override def findAll(
       limit: Option[Int] = None,
       offset: Option[Int] = None
-  ): Iterable[ObservationImpl] =
+  ): Iterable[ObservationEntity] =
     findByNamedQuery("Observation.findAll", limit = limit, offset = offset)
 
   override def findAllConceptsByVideoReferenceUUID(uuid: UUID): Seq[String] = {

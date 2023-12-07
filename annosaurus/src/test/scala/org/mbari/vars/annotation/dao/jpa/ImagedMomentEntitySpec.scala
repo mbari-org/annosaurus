@@ -25,38 +25,38 @@ import org.scalatest.BeforeAndAfterAll
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
-class ImagedMomentImplSpec extends AnyFlatSpec with Matchers with BeforeAndAfterAll {
+class ImagedMomentEntitySpec extends AnyFlatSpec with Matchers with BeforeAndAfterAll {
 
   "ImagedMomentImpl" should "round trip to/from annotations" in {
     val now                = Instant.now()
     val videoReferenceUuid = UUID.randomUUID()
 
-    val imagedMoment0 = ImagedMomentImpl(Some(videoReferenceUuid), recordedDate = Some(now))
-    val observation0  = ObservationImpl("zero")
+    val imagedMoment0 = ImagedMomentEntity(Some(videoReferenceUuid), recordedDate = Some(now))
+    val observation0  = ObservationEntity("zero")
     imagedMoment0.addObservation(observation0)
 
-    val imagedMoment1 = ImagedMomentImpl(
+    val imagedMoment1 = ImagedMomentEntity(
       Some(videoReferenceUuid),
       recordedDate = Some(now.plusSeconds(60)),
       elapsedTime = Some(Duration.ofMinutes(1))
     )
-    val observation1 = ObservationImpl("one", group = Some("ROV"))
+    val observation1 = ObservationEntity("one", group = Some("ROV"))
     imagedMoment1.addObservation(observation1)
 
     val imagedMoment2 =
-      ImagedMomentImpl(Some(videoReferenceUuid), elapsedTime = Some(Duration.ofMinutes(2)))
-    val observation2 = ObservationImpl("two", activity = Some("transect"))
+      ImagedMomentEntity(Some(videoReferenceUuid), elapsedTime = Some(Duration.ofMinutes(2)))
+    val observation2 = ObservationEntity("two", activity = Some("transect"))
     observation2.uuid = UUID.randomUUID()
     imagedMoment2.addObservation(observation2)
-    val association2 = AssociationImpl("foo", linkValue = Some("bar"))
+    val association2 = AssociationEntity("foo", linkValue = Some("bar"))
     observation2.addAssociation(association2)
 
-    val imagedMoment3 = ImagedMomentImpl(
+    val imagedMoment3 = ImagedMomentEntity(
       Some(videoReferenceUuid),
       timecode = Some(new Timecode("01:23:45:21", FrameRates.NTSC))
     )
-    val observation3 = ObservationImpl("three", duration = Some(Duration.ofSeconds(10)))
-    val observation4 = ObservationImpl("four", activity = Some("descent"))
+    val observation3 = ObservationEntity("three", duration = Some(Duration.ofSeconds(10)))
+    val observation4 = ObservationEntity("four", activity = Some("descent"))
     imagedMoment3.addObservation(observation3)
     imagedMoment3.addObservation(observation4)
 
@@ -65,7 +65,7 @@ class ImagedMomentImplSpec extends AnyFlatSpec with Matchers with BeforeAndAfter
     val annos = xs.flatMap(o => AnnotationImpl(o))
     annos.size should be(5)
 //    println(annos)
-    val ims = ImagedMomentImpl(annos)
+    val ims = ImagedMomentEntity(annos)
 
 //    print(ims)
     ims.size should be(4)
@@ -98,7 +98,7 @@ class ImagedMomentImplSpec extends AnyFlatSpec with Matchers with BeforeAndAfter
         |]""".stripMargin
 
     val annotations   = Constants.GSON.fromJson(json, classOf[Array[AnnotationImpl]])
-    val imagedMoments = ImagedMomentImpl(annotations)
+    val imagedMoments = ImagedMomentEntity(annotations)
     imagedMoments should have size (1)
     val im = imagedMoments.head
     im.videoReferenceUUID should be(UUID.fromString("a9f75399-9bc5-4ff3-934c-0bd72ba4dccb"))

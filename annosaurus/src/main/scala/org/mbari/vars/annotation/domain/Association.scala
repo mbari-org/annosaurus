@@ -16,13 +16,13 @@
 
 package org.mbari.vars.annotation.domain
 
-import org.mbari.vars.annotation.dao.jpa.AssociationImpl
+import org.mbari.vars.annotation.dao.jpa.AssociationEntity
 
 import java.util.UUID
 
 case class Association(uuid: UUID, link_name: String, to_concept: String, link_value: String, mime_type: String) {
-    def toEntity: AssociationImpl = {
-        val a = AssociationImpl(link_name, to_concept, link_value, mime_type)
+    def toEntity: AssociationEntity = {
+        val a = AssociationEntity(link_name, to_concept, link_value, mime_type)
         a.uuid = uuid
         a
     }

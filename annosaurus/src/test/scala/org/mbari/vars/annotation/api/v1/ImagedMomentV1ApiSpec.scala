@@ -23,7 +23,7 @@ import java.util.concurrent.TimeUnit
 
 import org.mbari.vars.annotation.api.WebApiStack
 import org.mbari.vars.annotation.controllers.{AnnotationController, ImagedMomentController, ImageController, AssociationController}
-import org.mbari.vars.annotation.dao.jpa.ImagedMomentImpl
+import org.mbari.vars.annotation.dao.jpa.ImagedMomentEntity
 import org.mbari.vars.annotation.model.Annotation
 import org.mbari.vars.annotation.model.simple.{WindowRequest, Count}
 
@@ -74,7 +74,7 @@ class ImagedMomentV1ApiSpec extends WebApiStack {
 
     get(s"/v1/imagedmoments/${annotation.imagedMomentUuid}") {
       status should be(200)
-      val im = gson.fromJson(body, classOf[ImagedMomentImpl])
+      val im = gson.fromJson(body, classOf[ImagedMomentEntity])
       im.elapsedTime should be(annotation.elapsedTime)
       im.videoReferenceUUID should be(annotation.videoReferenceUuid)
       im.uuid should be(annotation.imagedMomentUuid)
@@ -93,7 +93,7 @@ class ImagedMomentV1ApiSpec extends WebApiStack {
   it should "find by videoreference" in {
     get(s"/v1/imagedmoments/videoreference/${annotation.videoReferenceUuid}") {
       status should be(200)
-      val im = gson.fromJson(body, classOf[Array[ImagedMomentImpl]]).toList
+      val im = gson.fromJson(body, classOf[Array[ImagedMomentEntity]]).toList
       im.size should be(1)
       val i = im.head
       i.videoReferenceUUID should be(annotation.videoReferenceUuid)
@@ -104,7 +104,7 @@ class ImagedMomentV1ApiSpec extends WebApiStack {
   it should "find last updated imagedmoments between timestamps" in {
     get(s"/v1/imagedmoments/modified/$startTimestamp/${Instant.now()}") {
       status should be(200)
-      val im = gson.fromJson(body, classOf[Array[ImagedMomentImpl]]).toList
+      val im = gson.fromJson(body, classOf[Array[ImagedMomentEntity]]).toList
       im.size should be > 0
     }
   }
@@ -123,7 +123,7 @@ class ImagedMomentV1ApiSpec extends WebApiStack {
     ) {
 
       status should be(200)
-      val im = gson.fromJson(body, classOf[Array[ImagedMomentImpl]]).toList
+      val im = gson.fromJson(body, classOf[Array[ImagedMomentEntity]]).toList
       im.size should be > 0
     }
   }
@@ -150,7 +150,7 @@ class ImagedMomentV1ApiSpec extends WebApiStack {
       "elapsed_time_millis" -> "22222"
     ) {
       status should be(200)
-      val im = gson.fromJson(body, classOf[ImagedMomentImpl])
+      val im = gson.fromJson(body, classOf[ImagedMomentEntity])
       im.elapsedTime should be(Duration.ofMillis(22222))
       im.timecode.toString should be("01:23:45:12")
     }
@@ -194,7 +194,7 @@ class ImagedMomentV1ApiSpec extends WebApiStack {
     // Find imaged moment, check imaged moment UUID and image URLs match
     get("/v1/imagedmoments/find/images") {
       status should be(200)
-      val im = gson.fromJson(body, classOf[Array[ImagedMomentImpl]]).toList
+      val im = gson.fromJson(body, classOf[Array[ImagedMomentEntity]]).toList
       im.size should be > 0
       val i = im.head
       i.uuid should be(targetImagedMomentUUID)
@@ -250,7 +250,7 @@ class ImagedMomentV1ApiSpec extends WebApiStack {
     get(s"/v1/imagedmoments/find/linkname/${linkName}") {
       status should be(200)
 
-      val im = gson.fromJson(body, classOf[Array[ImagedMomentImpl]]).toList
+      val im = gson.fromJson(body, classOf[Array[ImagedMomentEntity]]).toList
       im.size should be > 0
       
       val i = im.head

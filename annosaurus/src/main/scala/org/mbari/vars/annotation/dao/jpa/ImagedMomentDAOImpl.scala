@@ -36,18 +36,18 @@ import scala.jdk.CollectionConverters._
   * @since 2016-06-17T16:34:00
   */
 class ImagedMomentDAOImpl(entityManager: EntityManager)
-    extends BaseDAO[ImagedMomentImpl](entityManager)
-    with ImagedMomentDAO[ImagedMomentImpl] {
+    extends BaseDAO[ImagedMomentEntity](entityManager)
+    with ImagedMomentDAO[ImagedMomentEntity] {
 
-  override def newPersistentObject(): ImagedMomentImpl = new ImagedMomentImpl
+  override def newPersistentObject(): ImagedMomentEntity = new ImagedMomentEntity
 
   override def newPersistentObject(
       videoReferenceUUID: UUID,
       timecode: Option[Timecode] = None,
       elapsedTime: Option[Duration] = None,
       recordedDate: Option[Instant] = None
-  ): ImagedMomentImpl = {
-    val imagedMoment = new ImagedMomentImpl
+  ): ImagedMomentEntity = {
+    val imagedMoment = new ImagedMomentEntity
     imagedMoment.videoReferenceUUID = videoReferenceUUID
     timecode.foreach(imagedMoment.timecode = _)
     elapsedTime.foreach(imagedMoment.elapsedTime = _)
@@ -55,15 +55,15 @@ class ImagedMomentDAOImpl(entityManager: EntityManager)
     imagedMoment
   }
 
-  override def newPersistentObject(imagedMoment: ImagedMoment): ImagedMomentImpl =
-    ImagedMomentImpl(imagedMoment)
+  override def newPersistentObject(imagedMoment: ImagedMoment): ImagedMomentEntity =
+    ImagedMomentEntity(imagedMoment)
 
   override def findBetweenUpdatedDates(
       start: Instant,
       end: Instant,
       limit: Option[Int] = None,
       offset: Option[Int] = None
-  ): Iterable[ImagedMomentImpl] = {
+  ): Iterable[ImagedMomentEntity] = {
 
     val startTimestamp = Timestamp.from(start)
     val endTimestamp   = Timestamp.from(end)
@@ -81,7 +81,7 @@ class ImagedMomentDAOImpl(entityManager: EntityManager)
       end: Instant,
       limit: Option[Int] = None,
       offset: Option[Int] = None
-  ): java.util.stream.Stream[ImagedMomentImpl] = {
+  ): java.util.stream.Stream[ImagedMomentEntity] = {
 
     val startTimestamp = Timestamp.from(start)
     val endTimestamp   = Timestamp.from(end)
@@ -100,7 +100,7 @@ class ImagedMomentDAOImpl(entityManager: EntityManager)
       endTimestamp: Instant,
       limit: Option[Int],
       offset: Option[Int]
-  ): java.util.stream.Stream[ImagedMomentImpl] = {
+  ): java.util.stream.Stream[ImagedMomentEntity] = {
 
     streamByNamedQuery(
       "ImagedMoment.findByVideoReferenceUUIDAndTimestamps",
@@ -183,14 +183,14 @@ class ImagedMomentDAOImpl(entityManager: EntityManager)
       concept: String,
       limit: Option[Int],
       offset: Option[Int]
-  ): Iterable[ImagedMomentImpl] =
+  ): Iterable[ImagedMomentEntity] =
     findByNamedQuery("ImagedMoment.findByConcept", Map("concept" -> concept), limit, offset)
 
   override def streamByConcept(
       concept: String,
       limit: Option[Int],
       offset: Option[Int]
-  ): stream.Stream[ImagedMomentImpl] =
+  ): stream.Stream[ImagedMomentEntity] =
     streamByNamedQuery("ImagedMoment.findByConcept", Map("concept" -> concept), limit, offset)
 
   override def countByConceptWithImages(concept: String): Int = {
@@ -218,7 +218,7 @@ class ImagedMomentDAOImpl(entityManager: EntityManager)
       concept: String,
       limit: Option[Int],
       offset: Option[Int]
-  ): Iterable[ImagedMomentImpl] =
+  ): Iterable[ImagedMomentEntity] =
     findByNamedQuery(
       "ImagedMoment.findByConceptWithImages",
       Map("concept" -> concept),
@@ -256,20 +256,20 @@ class ImagedMomentDAOImpl(entityManager: EntityManager)
       uuid: UUID,
       limit: Option[Int],
       offset: Option[Int]
-  ): Iterable[ImagedMomentImpl] =
+  ): Iterable[ImagedMomentEntity] =
     findByNamedQuery("ImagedMoment.findByVideoReferenceUUID", Map("uuid" -> uuid), limit, offset)
 
   override def streamByVideoReferenceUUID(
       uuid: UUID,
       limit: Option[Int],
       offset: Option[Int]
-  ): java.util.stream.Stream[ImagedMomentImpl] =
+  ): java.util.stream.Stream[ImagedMomentEntity] =
     streamByNamedQuery("ImagedMoment.findByVideoReferenceUUID", Map("uuid" -> uuid), limit, offset)
 
-  override def findWithImageReferences(videoReferenceUUID: UUID): Iterable[ImagedMomentImpl] =
+  override def findWithImageReferences(videoReferenceUUID: UUID): Iterable[ImagedMomentEntity] =
     findByNamedQuery("ImagedMoment.findWithImageReferences", Map("uuid" -> videoReferenceUUID))
 
-  override def findByImageReferenceUUID(imageReferenceUUID: UUID): Option[ImagedMomentImpl] =
+  override def findByImageReferenceUUID(imageReferenceUUID: UUID): Option[ImagedMomentEntity] =
     findByNamedQuery("ImagedMoment.findByImageReferenceUUID", Map("uuid" -> imageReferenceUUID)).headOption
 
   //  override def findByUUID(primaryKey: UUID): Option[ImagedMomentImpl] =
@@ -279,7 +279,7 @@ class ImagedMomentDAOImpl(entityManager: EntityManager)
       windowRequest: WindowRequest,
       limit: Option[Int] = None,
       offset: Option[Int] = None
-  ): Iterable[ImagedMomentImpl] = {
+  ): Iterable[ImagedMomentEntity] = {
 
     findByUUID(windowRequest.imagedMomentUuid) match {
       case None => Nil
@@ -303,7 +303,7 @@ class ImagedMomentDAOImpl(entityManager: EntityManager)
   override def findAll(
       limit: Option[Int] = None,
       offset: Option[Int] = None
-  ): Iterable[ImagedMomentImpl] =
+  ): Iterable[ImagedMomentEntity] =
     findByNamedQuery("ImagedMoment.findAll", limit = limit, offset = offset)
   
   override def countAll(): Int =
@@ -316,7 +316,7 @@ class ImagedMomentDAOImpl(entityManager: EntityManager)
   override def findWithImages(
     limit: Option[Int], 
     offset: Option[Int]
-  ): Iterable[ImagedMomentImpl] =
+  ): Iterable[ImagedMomentEntity] =
     findByNamedQuery("ImagedMoment.findWithImages", limit = limit, offset = offset)
 
   override def countWithImages(): Int =
@@ -330,7 +330,7 @@ class ImagedMomentDAOImpl(entityManager: EntityManager)
     linkName: String,
     limit: Option[Int], 
     offset: Option[Int]
-  ): Iterable[ImagedMomentImpl] =
+  ): Iterable[ImagedMomentEntity] =
     findByNamedQuery(
       "ImagedMoment.findByLinkName", 
       Map("linkName" -> linkName), 
@@ -354,7 +354,7 @@ class ImagedMomentDAOImpl(entityManager: EntityManager)
   override def findByVideoReferenceUUIDAndElapsedTime(
       uuid: UUID,
       elapsedTime: Duration
-  ): Option[ImagedMomentImpl] =
+  ): Option[ImagedMomentEntity] =
     findByNamedQuery(
       "ImagedMoment.findByVideoReferenceUUIDAndElapsedTime",
       Map("elapsedTime" -> elapsedTime, "uuid" -> uuid)
@@ -363,7 +363,7 @@ class ImagedMomentDAOImpl(entityManager: EntityManager)
   override def findByVideoReferenceUUIDAndTimecode(
       uuid: UUID,
       timecode: Timecode
-  ): Option[ImagedMomentImpl] =
+  ): Option[ImagedMomentEntity] =
     findByNamedQuery(
       "ImagedMoment.findByVideoReferenceUUIDAndTimecode",
       Map("timecode" -> timecode, "uuid" -> uuid)
@@ -372,13 +372,13 @@ class ImagedMomentDAOImpl(entityManager: EntityManager)
   override def findByVideoReferenceUUIDAndRecordedDate(
       uuid: UUID,
       recordedDate: Instant
-  ): Option[ImagedMomentImpl] =
+  ): Option[ImagedMomentEntity] =
     findByNamedQuery(
       "ImagedMoment.findByVideoReferenceUUIDAndRecordedDate",
       Map("recordedDate" -> recordedDate, "uuid" -> uuid)
     ).headOption
 
-  override def findByObservationUUID(uuid: UUID): Option[ImagedMomentImpl] =
+  override def findByObservationUUID(uuid: UUID): Option[ImagedMomentEntity] =
     findByNamedQuery("ImagedMoment.findByObservationUUID", Map("uuid" -> uuid)).headOption
 
   override def updateRecordedTimestampByObservationUuid(

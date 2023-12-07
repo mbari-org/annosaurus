@@ -78,7 +78,7 @@ import org.mbari.vars.annotation.model.{Association, Observation}
     )
   )
 )
-class AssociationImpl extends Association with JPAPersistentObject {
+class AssociationEntity extends Association with JPAPersistentObject {
 
   @Expose(serialize = true)
   @Column(name = "link_name", length = 128, nullable = false)
@@ -92,7 +92,7 @@ class AssociationImpl extends Association with JPAPersistentObject {
   @ManyToOne(
     cascade = Array(CascadeType.PERSIST, CascadeType.DETACH),
     optional = false,
-    targetEntity = classOf[ObservationImpl]
+    targetEntity = classOf[ObservationEntity]
   )
   @JoinColumn(name = "observation_uuid", nullable = false, columnDefinition = "CHAR(36)")
   var observation: Observation = _
@@ -112,10 +112,10 @@ class AssociationImpl extends Association with JPAPersistentObject {
 
 }
 
-object AssociationImpl {
+object AssociationEntity {
 
-  def apply(linkName: String, toConcept: String, linkValue: String): AssociationImpl = {
-    val a = new AssociationImpl
+  def apply(linkName: String, toConcept: String, linkValue: String): AssociationEntity = {
+    val a = new AssociationEntity
     a.linkName = linkName
     a.toConcept = toConcept
     a.linkValue = linkValue
@@ -127,8 +127,8 @@ object AssociationImpl {
       toConcept: String,
       linkValue: String,
       mimetype: String
-  ): AssociationImpl = {
-    val a = new AssociationImpl
+  ): AssociationEntity = {
+    val a = new AssociationEntity
     a.linkName = linkName
     a.toConcept = toConcept
     a.linkValue = linkValue
@@ -140,16 +140,16 @@ object AssociationImpl {
       linkName: String,
       toConcept: Option[String] = None,
       linkValue: Option[String] = None
-  ): AssociationImpl = {
-    val a = new AssociationImpl
+  ): AssociationEntity = {
+    val a = new AssociationEntity
     a.linkName = linkName
     toConcept.foreach(a.toConcept = _)
     linkValue.foreach(a.linkValue = _)
     a
   }
 
-  def apply(v: Association): AssociationImpl = {
-    val a = new AssociationImpl
+  def apply(v: Association): AssociationEntity = {
+    val a = new AssociationEntity
     a.linkName = v.linkName
     a.toConcept = v.toConcept
     a.linkValue = v.linkValue

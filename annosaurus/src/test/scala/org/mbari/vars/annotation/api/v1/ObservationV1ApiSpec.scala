@@ -27,9 +27,9 @@ import org.mbari.vars.annotation.api.WebApiStack
 import org.mbari.vars.annotation.controllers.ObservationController
 import org.mbari.vars.annotation.dao.jpa.{
   AnnotationImpl,
-  AssociationImpl,
-  ImagedMomentImpl,
-  ObservationImpl
+  AssociationEntity,
+  ImagedMomentEntity,
+  ObservationEntity
 }
 import org.mbari.vars.annotation.model.Observation
 
@@ -72,8 +72,8 @@ class ObservationV1ApiSpec extends WebApiStack {
 
     // --- create an observation
     val dao          = daoFactory.newObservationDAO()
-    val imagedMoment = ImagedMomentImpl(Some(UUID.randomUUID()), Some(Instant.now()))
-    observation = ObservationImpl(
+    val imagedMoment = ImagedMomentEntity(Some(UUID.randomUUID()), Some(Instant.now()))
+    observation = ObservationEntity(
       "rocketship",
       observer = Some("brian"),
       group = Some("ROV"),
@@ -87,7 +87,7 @@ class ObservationV1ApiSpec extends WebApiStack {
     // --- find it via the web api
     get(s"$path/${observation.uuid}") {
       status should be(200)
-      val obs = gson.fromJson(body, classOf[ObservationImpl])
+      val obs = gson.fromJson(body, classOf[ObservationEntity])
       obs.observer should be("brian")
       obs.group should be("ROV")
       obs.activity should be("transect")
@@ -99,7 +99,7 @@ class ObservationV1ApiSpec extends WebApiStack {
 
   it should "find by videoreference" in {
     val dao = daoFactory.newObservationDAO()
-    val newObs = ObservationImpl(
+    val newObs = ObservationEntity(
       "submarine",
       observer = Some("schlin"),
       group = Some("AUV"),
@@ -116,7 +116,7 @@ class ObservationV1ApiSpec extends WebApiStack {
 
     get(s"$path/videoreference/${observation.imagedMoment.videoReferenceUUID}") {
       status should be(200)
-      val obs = gson.fromJson(body, classOf[Array[ObservationImpl]])
+      val obs = gson.fromJson(body, classOf[Array[ObservationEntity]])
       obs.size should be(2)
     }
   }
@@ -136,7 +136,7 @@ class ObservationV1ApiSpec extends WebApiStack {
 
     get(s"$path/association/${association.uuid}") {
       status should be(200)
-      val obs = gson.fromJson(body, classOf[AssociationImpl])
+      val obs = gson.fromJson(body, classOf[AssociationEntity])
       obs.uuid should be(observation.uuid)
     }
   }
@@ -144,8 +144,8 @@ class ObservationV1ApiSpec extends WebApiStack {
   it should "find all names" in {
     // --- create another imagedmoment with a different video-reference uuid
     val dao          = daoFactory.newObservationDAO()
-    val imagedMoment = ImagedMomentImpl(Some(UUID.randomUUID()), Some(Instant.now()))
-    val obs = ObservationImpl(
+    val imagedMoment = ImagedMomentEntity(Some(UUID.randomUUID()), Some(Instant.now()))
+    val obs = ObservationEntity(
       "squid",
       observer = Some("aine"),
       group = Some("Image:Benthic Rover"),
@@ -182,7 +182,7 @@ class ObservationV1ApiSpec extends WebApiStack {
       "activity"        -> "ascent"
     ) {
       status should be(200)
-      val obs = gson.fromJson(body, classOf[ObservationImpl])
+      val obs = gson.fromJson(body, classOf[ObservationEntity])
       obs.concept should be("shoe")
       obs.duration should be(Duration.ofMillis(3200))
       obs.activity should be("ascent")
@@ -198,14 +198,14 @@ class ObservationV1ApiSpec extends WebApiStack {
 
   it should "bulk delete" in {
     val dao          = daoFactory.newObservationDAO()
-    val imagedMoment = ImagedMomentImpl(Some(UUID.randomUUID()), Some(Instant.now()))
-    val obs0 = ObservationImpl(
+    val imagedMoment = ImagedMomentEntity(Some(UUID.randomUUID()), Some(Instant.now()))
+    val obs0 = ObservationEntity(
       "rocketship",
       observer = Some("brian"),
       group = Some("ROV"),
       activity = Some("transect")
     )
-    val obs1 = ObservationImpl(
+    val obs1 = ObservationEntity(
       "giant dragon",
       observer = Some("brian"),
       group = Some("AUV"),
@@ -254,7 +254,7 @@ class ObservationV1ApiSpec extends WebApiStack {
 
     put(s"$path/delete/duration/${a.observationUuid}") {
       status should be(200)
-      val obs = gson.fromJson(body, classOf[ObservationImpl])
+      val obs = gson.fromJson(body, classOf[ObservationEntity])
       obs.concept should be(a.concept)
       obs.uuid should be(a.observationUuid)
       obs.duration should be(null)

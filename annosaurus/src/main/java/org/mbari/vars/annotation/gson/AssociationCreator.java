@@ -17,7 +17,7 @@
 package org.mbari.vars.annotation.gson;
 
 import com.google.gson.InstanceCreator;
-import org.mbari.vars.annotation.dao.jpa.AssociationImpl;
+import org.mbari.vars.annotation.dao.jpa.AssociationEntity;
 import org.mbari.vars.annotation.model.Association;
 
 import java.lang.reflect.Type;
@@ -29,6 +29,6 @@ import java.lang.reflect.Type;
 public class AssociationCreator implements InstanceCreator<Association> {
     @Override
     public Association createInstance(Type type) {
-        return new AssociationImpl();
+        return new AssociationEntity();
     }
 }

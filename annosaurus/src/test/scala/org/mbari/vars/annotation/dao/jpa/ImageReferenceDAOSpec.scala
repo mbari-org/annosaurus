@@ -46,16 +46,16 @@ class ImageReferenceDAOSpec extends AnyFlatSpec with Matchers with BeforeAndAfte
   private[this] val videoReferenceUUID = UUID.randomUUID()
   private[this] val now                = Instant.now()
   private[this] val imagedMoment0 =
-    ImagedMomentImpl(Some(videoReferenceUUID), Some(now), elapsedTime = Some(Duration.ofMinutes(1)))
-  private[this] val imageReference0 = ImageReferenceImpl(
+    ImagedMomentEntity(Some(videoReferenceUUID), Some(now), elapsedTime = Some(Duration.ofMinutes(1)))
+  private[this] val imageReference0 = ImageReferenceEntity(
     new URL("http://www.mbari.org/wp-content/uploads/2015/08/schlining_brian-180.jpg")
   )
-  private[this] val imageReference1 = ImageReferenceImpl(
+  private[this] val imageReference1 = ImageReferenceEntity(
     new URL("https://afleetinglance.files.wordpress.com/2012/07/zazen2.jpg")
   )
   private[this] val newDescription = "A handsome fellow"
 
-  private type IRDAO = ImageReferenceDAO[ImageReferenceImpl]
+  private type IRDAO = ImageReferenceDAO[ImageReferenceEntity]
   def run[R](fn: IRDAO => R): R = Await.result(dao.runTransaction(fn), timeout)
 
   "ImageReferenceDAOImpl" should "create" in {

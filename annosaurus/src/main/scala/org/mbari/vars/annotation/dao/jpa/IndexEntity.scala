@@ -45,7 +45,7 @@ import org.mbari.vcr4j.time.Timecode
     )
   )
 )
-class IndexImpl extends ImagedMoment with JPAPersistentObject {
+class IndexEntity extends ImagedMoment with JPAPersistentObject {
 
   @Expose(serialize = true)
   @SerializedName(value = "video_reference_uuid")

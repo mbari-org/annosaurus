@@ -45,15 +45,15 @@ class ObservationDAOSpec extends AnyFlatSpec with Matchers with BeforeAndAfterAl
   private[this] val videoReferenceUUID = UUID.randomUUID()
   private[this] val now                = Instant.now()
   private[this] val imagedMoment0 =
-    ImagedMomentImpl(Some(videoReferenceUUID), Some(now), elapsedTime = Some(Duration.ofMinutes(1)))
+    ImagedMomentEntity(Some(videoReferenceUUID), Some(now), elapsedTime = Some(Duration.ofMinutes(1)))
   private[this] val concept = "Grimpoteuthis"
   val newConcept            = "Aegina"
   private[this] val observation0 =
-    ObservationImpl(concept, observationDate = Some(now), observer = Some("brian"))
+    ObservationEntity(concept, observationDate = Some(now), observer = Some("brian"))
   private[this] val observation1 =
-    ObservationImpl(concept, observationDate = Some(now), observer = Some("kyra"))
+    ObservationEntity(concept, observationDate = Some(now), observer = Some("kyra"))
 
-  private type ODAO = ObservationDAO[ObservationImpl]
+  private type ODAO = ObservationDAO[ObservationEntity]
   def run[R](fn: ODAO => R): R = Await.result(dao.runTransaction(fn), timeout)
 
   "ObservationDAOImpl" should "create" in {

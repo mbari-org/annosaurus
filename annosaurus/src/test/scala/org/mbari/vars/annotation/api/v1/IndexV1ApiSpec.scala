@@ -23,7 +23,7 @@ import java.util.concurrent.TimeUnit
 
 import org.mbari.vars.annotation.api.WebApiStack
 import org.mbari.vars.annotation.controllers.{AnnotationController, IndexController}
-import org.mbari.vars.annotation.dao.jpa.IndexImpl
+import org.mbari.vars.annotation.dao.jpa.IndexEntity
 import org.mbari.vcr4j.time.{FrameRates, Timecode}
 
 import scala.collection.JavaConverters._
@@ -75,7 +75,7 @@ class IndexV1ApiSpec extends WebApiStack {
 
     get(s"/v1/index/videoreference/$videoReferenceUuid") {
       status should be(200)
-      val ids = gson.fromJson(body, classOf[Array[IndexImpl]])
+      val ids = gson.fromJson(body, classOf[Array[IndexEntity]])
       ids.size should be(10)
 //      println(body)
     }
@@ -98,7 +98,7 @@ class IndexV1ApiSpec extends WebApiStack {
 
       status should be(200)
 
-      val newIndices = gson.fromJson(body, classOf[Array[IndexImpl]])
+      val newIndices = gson.fromJson(body, classOf[Array[IndexEntity]])
       newIndices.size should be(10)
       for (i <- newIndices) {
         i.recordedDate should not be null

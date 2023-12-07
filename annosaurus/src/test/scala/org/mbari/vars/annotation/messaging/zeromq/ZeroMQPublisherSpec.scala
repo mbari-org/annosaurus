@@ -19,7 +19,7 @@ package org.mbari.vars.annotation.messaging.zeromq
 import java.time.Instant
 import java.util.UUID
 
-import org.mbari.vars.annotation.dao.jpa.{AnnotationImpl, AssociationImpl, ObservationImpl}
+import org.mbari.vars.annotation.dao.jpa.{AnnotationImpl, AssociationEntity, ObservationEntity}
 import org.mbari.vars.annotation.messaging.{AnnotationMessage, AssociationMessage, MessageBus}
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.flatspec.AnyFlatSpec
@@ -161,9 +161,9 @@ class ZeroMQPublisherSpec extends AnyFlatSpec with Matchers with BeforeAndAfterA
     Thread.sleep(200) // Give the thread above time to get set up.
 
     // Publish association
-    val observation = ObservationImpl("foo")
+    val observation = ObservationEntity("foo")
     observation.uuid = UUID.randomUUID()
-    val association = AssociationImpl("test", "self", "foo", "text/plain")
+    val association = AssociationEntity("test", "self", "foo", "text/plain")
     association.uuid = UUID.randomUUID()
     observation.addAssociation(association)
     val thread = new Thread(() =>

@@ -46,7 +46,7 @@ class GSONTest extends AnyFlatSpec with Matchers {
   it should "round trip annotation json" in {
     val annotation =
       AnnotationImpl(UUID.randomUUID(), "Foo", "brian", recordedDate = Option(Instant.now))
-    val imageReference = ImageReferenceImpl(new URL("http://www.bob.com/uncle.jpg"))
+    val imageReference = ImageReferenceEntity(new URL("http://www.bob.com/uncle.jpg"))
     annotation.imageReferences = Seq(imageReference)
     val json  = Constants.GSON.toJson(annotation)
     val annos = Constants.GSON.fromJson(json, classOf[AnnotationImpl])
@@ -58,16 +58,16 @@ class GSONTest extends AnyFlatSpec with Matchers {
   }
 
   it should "round trip an imaged moment to/from json" in {
-    val imagedMoment   = ImagedMomentImpl(Option(UUID.randomUUID()), Option(Instant.now()))
-    val imageReference = ImageReferenceImpl(new URL("http://www.boo.org/booya.png"))
-    val observation    = ObservationImpl("Nanomia", observer = Some("brian"))
-    val association    = AssociationImpl("eating", "trump", "nil")
+    val imagedMoment   = ImagedMomentEntity(Option(UUID.randomUUID()), Option(Instant.now()))
+    val imageReference = ImageReferenceEntity(new URL("http://www.boo.org/booya.png"))
+    val observation    = ObservationEntity("Nanomia", observer = Some("brian"))
+    val association    = AssociationEntity("eating", "trump", "nil")
     imagedMoment.addImageReference(imageReference)
     imagedMoment.addObservation(observation)
     observation.addAssociation(association)
 
     val json = Constants.GSON.toJson(imagedMoment)
-    val im0  = Constants.GSON.fromJson(json, classOf[ImagedMomentImpl])
+    val im0  = Constants.GSON.fromJson(json, classOf[ImagedMomentEntity])
     im0 should not be null
     im0.observations.size should be(1)
     im0.observations.head.concept should be(observation.concept)
@@ -78,9 +78,9 @@ class GSONTest extends AnyFlatSpec with Matchers {
   }
 
   it should "round trip an ancillary datum to/from json" in {
-    val datum  = CachedAncillaryDatumImpl(36, -122, 1000, 35.234f, 13f, 1003f, 3.4f)
+    val datum  = CachedAncillaryDatumEntity(36, -122, 1000, 35.234f, 13f, 1003f, 3.4f)
     val json   = Constants.GSON.toJson(datum)
-    val datum0 = Constants.GSON.fromJson(json, classOf[CachedAncillaryDatumImpl])
+    val datum0 = Constants.GSON.fromJson(json, classOf[CachedAncillaryDatumEntity])
     datum0.latitude should not be None
     datum0.latitude.get should be(datum.latitude.get)
     datum0.longitude.get should be(datum.longitude.get)

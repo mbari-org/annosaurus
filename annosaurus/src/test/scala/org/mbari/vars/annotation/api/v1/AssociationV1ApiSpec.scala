@@ -29,7 +29,7 @@ import org.mbari.vars.annotation.controllers.{
   BasicDAOFactory,
   ObservationController
 }
-import org.mbari.vars.annotation.dao.jpa.AssociationImpl
+import org.mbari.vars.annotation.dao.jpa.AssociationEntity
 import org.mbari.vars.annotation.model.simple.{
   ConceptAssociationRequest,
   ConceptAssociationResponse
@@ -78,7 +78,7 @@ class AssociationV1ApiSpec extends WebApiStack {
       "link_value"       -> "red"
     ) {
       status should be(200)
-      association = gson.fromJson(body, classOf[AssociationImpl])
+      association = gson.fromJson(body, classOf[AssociationEntity])
       association.linkName should be("color")
       association.linkValue should be("red")
     }
@@ -87,7 +87,7 @@ class AssociationV1ApiSpec extends WebApiStack {
   it should "find by uuid" in {
     get(s"/v1/associations/${association.uuid}") {
       status should be(200)
-      val a = gson.fromJson(body, classOf[AssociationImpl])
+      val a = gson.fromJson(body, classOf[AssociationEntity])
       a.uuid should be(association.uuid)
       a.linkName should be(association.linkName)
       a.toConcept should be(association.toConcept)
@@ -130,7 +130,7 @@ class AssociationV1ApiSpec extends WebApiStack {
     }
     get(s"/v1/associations/${annotation.videoReferenceUuid}/eating") {
       status should be(200)
-      val links = gson.fromJson(body, classOf[Array[AssociationImpl]]).toList
+      val links = gson.fromJson(body, classOf[Array[AssociationEntity]]).toList
       links.size should be(2)
     }
 
@@ -143,7 +143,7 @@ class AssociationV1ApiSpec extends WebApiStack {
       "link_value" -> "blue"
     ) {
       status should be(200)
-      val a = gson.fromJson(body, classOf[AssociationImpl])
+      val a = gson.fromJson(body, classOf[AssociationEntity])
       a.linkName should be("surface-color")
       a.linkValue should be("blue")
     }
@@ -164,7 +164,7 @@ class AssociationV1ApiSpec extends WebApiStack {
       "observation_uuid" -> newAnno.observationUuid.toString
     ) {
       status should be(200)
-      val a = gson.fromJson(body, classOf[AssociationImpl])
+      val a = gson.fromJson(body, classOf[AssociationEntity])
       a.uuid should be(association.uuid)
 
       val observationController =
@@ -197,7 +197,7 @@ class AssociationV1ApiSpec extends WebApiStack {
       "association_uuid" -> uuid.toString()
     ) {
       status should be(200)
-      association = gson.fromJson(body, classOf[AssociationImpl])
+      association = gson.fromJson(body, classOf[AssociationEntity])
       association.linkName should be("bounding box")
       association.toConcept should be("cool thing")
       association.linkValue should be("""{"x": 10}""")

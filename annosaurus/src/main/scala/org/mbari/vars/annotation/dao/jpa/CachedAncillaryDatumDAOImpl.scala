@@ -29,10 +29,10 @@ import org.mbari.vars.annotation.model.CachedAncillaryDatum
   * @since 2016-06-17T17:12:00
   */
 class CachedAncillaryDatumDAOImpl(entityManager: EntityManager)
-    extends BaseDAO[CachedAncillaryDatumImpl](entityManager)
-    with CachedAncillaryDatumDAO[CachedAncillaryDatumImpl] {
+    extends BaseDAO[CachedAncillaryDatumEntity](entityManager)
+    with CachedAncillaryDatumDAO[CachedAncillaryDatumEntity] {
 
-  override def newPersistentObject(): CachedAncillaryDatumImpl = new CachedAncillaryDatumImpl
+  override def newPersistentObject(): CachedAncillaryDatumEntity = new CachedAncillaryDatumEntity
 
   def newPersistentObject(
       latitude: Double,
@@ -54,7 +54,7 @@ class CachedAncillaryDatumDAOImpl(entityManager: EntityManager)
       psi: Option[Double] = None
   ): CachedAncillaryDatum = {
 
-    val cad = new CachedAncillaryDatumImpl()
+    val cad = new CachedAncillaryDatumEntity()
     cad.latitude = Some(latitude)
     cad.longitude = Some(longitude)
     cad.depthMeters = Some(depthMeters)
@@ -75,12 +75,12 @@ class CachedAncillaryDatumDAOImpl(entityManager: EntityManager)
   }
 
   override def newPersistentObject(datum: CachedAncillaryDatum): CachedAncillaryDatum =
-    CachedAncillaryDatumImpl(datum)
+    CachedAncillaryDatumEntity(datum)
 
   override def findAll(
       limit: Option[Int] = None,
       offset: Option[Int] = None
-  ): Iterable[CachedAncillaryDatumImpl] =
+  ): Iterable[CachedAncillaryDatumEntity] =
     findByNamedQuery("AncillaryDatum.findAll", limit = limit, offset = offset)
 
   override def findByObservationUUID(observationUuid: UUID): Option[CachedAncillaryDatum] =

@@ -231,7 +231,7 @@ import scala.collection.mutable
     )
   )
 )
-class ImagedMomentImpl extends ImagedMoment with JPAPersistentObject {
+class ImagedMomentEntity extends ImagedMoment with JPAPersistentObject {
 
   @Expose(serialize = true)
   @Column(name = "elapsed_time_millis", nullable = true)
@@ -262,17 +262,17 @@ class ImagedMomentImpl extends ImagedMoment with JPAPersistentObject {
   @Expose(serialize = true)
   @SerializedName(value = "observations")
   @OneToMany(
-    targetEntity = classOf[ObservationImpl],
+    targetEntity = classOf[ObservationEntity],
     cascade = Array(CascadeType.ALL),
     fetch = FetchType.EAGER,
     mappedBy = "imagedMoment",
     orphanRemoval = true
   )
-  var javaObservations: JList[ObservationImpl] =
-    new JArrayList[ObservationImpl]
+  var javaObservations: JList[ObservationEntity] =
+    new JArrayList[ObservationEntity]
 
   override def addObservation(observation: Observation): Unit = {
-    javaObservations.add(observation.asInstanceOf[ObservationImpl])
+    javaObservations.add(observation.asInstanceOf[ObservationEntity])
     observation.imagedMoment = this
   }
 
@@ -286,17 +286,17 @@ class ImagedMomentImpl extends ImagedMoment with JPAPersistentObject {
   @Expose(serialize = true)
   @SerializedName(value = "image_references")
   @OneToMany(
-    targetEntity = classOf[ImageReferenceImpl],
+    targetEntity = classOf[ImageReferenceEntity],
     cascade = Array(CascadeType.ALL),
     fetch = FetchType.LAZY,
     mappedBy = "imagedMoment",
     orphanRemoval = true
   )
-  protected var javaImageReferences: JList[ImageReferenceImpl] =
-    new JArrayList[ImageReferenceImpl]
+  protected var javaImageReferences: JList[ImageReferenceEntity] =
+    new JArrayList[ImageReferenceEntity]
 
   override def addImageReference(imageReference: ImageReference): Unit = {
-    javaImageReferences.add(imageReference.asInstanceOf[ImageReferenceImpl])
+    javaImageReferences.add(imageReference.asInstanceOf[ImageReferenceEntity])
     imageReference.imagedMoment = this
   }
 
@@ -315,7 +315,7 @@ class ImagedMomentImpl extends ImagedMoment with JPAPersistentObject {
     cascade = Array(CascadeType.ALL),
     optional = true,
     fetch = FetchType.LAZY,
-    targetEntity = classOf[CachedAncillaryDatumImpl]
+    targetEntity = classOf[CachedAncillaryDatumEntity]
   )
   protected var _ancillaryDatum: CachedAncillaryDatum = _
 
@@ -329,16 +329,16 @@ class ImagedMomentImpl extends ImagedMoment with JPAPersistentObject {
   override def toString: String = Constants.GSON.toJson(this)
 }
 
-object ImagedMomentImpl {
+object ImagedMomentEntity {
 
   def apply(
       videoReferenceUUID: Option[UUID] = None,
       recordedDate: Option[Instant] = None,
       timecode: Option[Timecode] = None,
       elapsedTime: Option[Duration] = None
-  ): ImagedMomentImpl = {
+  ): ImagedMomentEntity = {
 
-    val im = new ImagedMomentImpl
+    val im = new ImagedMomentEntity
     videoReferenceUUID.foreach(im.videoReferenceUUID = _)
     recordedDate.foreach(im.recordedDate = _)
     timecode.foreach(im.timecode = _)
@@ -346,7 +346,7 @@ object ImagedMomentImpl {
     im
   }
 
-  def apply(imagedMoment: ImagedMoment): ImagedMomentImpl = {
+  def apply(imagedMoment: ImagedMoment): ImagedMomentEntity = {
     val newImagedMoment = apply(
       Option(imagedMoment.videoReferenceUUID),
       Option(imagedMoment.recordedDate),
@@ -355,11 +355,11 @@ object ImagedMomentImpl {
     )
     newImagedMoment.uuid = imagedMoment.uuid
     Option(imagedMoment.ancillaryDatum)
-      .foreach(ad => newImagedMoment.ancillaryDatum = CachedAncillaryDatumImpl(ad))
-    imagedMoment.observations.foreach(obs => newImagedMoment.addObservation(ObservationImpl(obs)))
+      .foreach(ad => newImagedMoment.ancillaryDatum = CachedAncillaryDatumEntity(ad))
+    imagedMoment.observations.foreach(obs => newImagedMoment.addObservation(ObservationEntity(obs)))
     imagedMoment
       .imageReferences
-      .foreach(ir => newImagedMoment.addImageReference(ImageReferenceImpl(ir)))
+      .foreach(ir => newImagedMoment.addImageReference(ImageReferenceEntity(ir)))
     newImagedMoment
   }
 
@@ -368,8 +368,8 @@ object ImagedMomentImpl {
     * @param annotations
     * @return
     */
-  def apply(annotations: Seq[Annotation]): Seq[ImagedMomentImpl] = {
-    val moments = new mutable.ArrayBuffer[ImagedMomentImpl]()
+  def apply(annotations: Seq[Annotation]): Seq[ImagedMomentEntity] = {
+    val moments = new mutable.ArrayBuffer[ImagedMomentEntity]()
     // -- 1st pass create moments
     for (a <- annotations) {
 
@@ -383,7 +383,7 @@ object ImagedMomentImpl {
             || (a.timecode != null && i.timecode == a.timecode)
         )
         .getOrElse {
-          val i = ImagedMomentImpl(
+          val i = ImagedMomentEntity(
             Some(a.videoReferenceUuid),
             Option(a.recordedTimestamp),
             Option(a.timecode),
@@ -395,7 +395,7 @@ object ImagedMomentImpl {
         }
 
       // Add the observation
-      val o = ObservationImpl(
+      val o = ObservationEntity(
         a.concept,
         Option(a.duration),
         Option(a.observationTimestamp),

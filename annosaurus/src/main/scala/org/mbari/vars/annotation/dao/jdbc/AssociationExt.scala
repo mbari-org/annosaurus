@@ -18,13 +18,13 @@ package org.mbari.vars.annotation.dao.jdbc
 
 import java.util.UUID
 
-import org.mbari.vars.annotation.dao.jpa.AssociationImpl
+import org.mbari.vars.annotation.dao.jpa.AssociationEntity
 
 /**
   * @author Brian Schlining
   * @since 2019-10-22T14:35:00
   */
-class AssociationExt extends AssociationImpl {
+class AssociationExt extends AssociationEntity {
   //  @Expose(serialize = true)
   var observationUuid: UUID  = _
   var imagedMomentUuid: UUID = _

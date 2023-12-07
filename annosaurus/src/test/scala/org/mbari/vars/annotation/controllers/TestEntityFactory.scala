@@ -24,7 +24,7 @@ import org.mbari.vars.annotation.dao.jpa.JPADAOFactory
 import org.mbari.vars.annotation.model.ImagedMoment
 
 import scala.util.Random
-import org.mbari.vars.annotation.dao.jpa.ImagedMomentImpl
+import org.mbari.vars.annotation.dao.jpa.ImagedMomentEntity
 
 /**
   * @author Brian Schlining
@@ -37,7 +37,7 @@ class TestEntityFactory(daoFactory: JPADAOFactory) {
       videoReferenceUuid: UUID = UUID.randomUUID(),
       concept: String = "foo",
       recordedTimestamp: Instant = Instant.now()
-  ): ImagedMomentImpl = {
+  ): ImagedMomentEntity = {
 
     val imDao   = daoFactory.newImagedMomentDAO()
     val obsDao  = daoFactory.newObservationDAO(imDao)

@@ -17,7 +17,7 @@
 package org.mbari.vars.annotation.gson;
 
 import com.google.gson.InstanceCreator;
-import org.mbari.vars.annotation.dao.jpa.ImageReferenceImpl;
+import org.mbari.vars.annotation.dao.jpa.ImageReferenceEntity;
 import org.mbari.vars.annotation.model.ImageReference;
 
 import java.lang.reflect.Type;
@@ -29,6 +29,6 @@ import java.lang.reflect.Type;
 public class ImageReferenceCreator implements InstanceCreator<ImageReference> {
     @Override
     public ImageReference createInstance(Type type) {
-        return new ImageReferenceImpl();
+        return new ImageReferenceEntity();
     }
 }

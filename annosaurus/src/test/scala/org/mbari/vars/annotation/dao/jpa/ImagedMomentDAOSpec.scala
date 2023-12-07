@@ -46,14 +46,14 @@ class ImagedMomentDAOSpec extends AnyFlatSpec with Matchers with BeforeAndAfterA
   private[this] val videoReferenceUUID = UUID.randomUUID()
   private[this] val now                = Instant.now()
   private[this] val imagedMoment0 =
-    ImagedMomentImpl(Some(videoReferenceUUID), Some(now), elapsedTime = Some(Duration.ofMinutes(1)))
-  private[this] val imagedMoment1 = ImagedMomentImpl(
+    ImagedMomentEntity(Some(videoReferenceUUID), Some(now), elapsedTime = Some(Duration.ofMinutes(1)))
+  private[this] val imagedMoment1 = ImagedMomentEntity(
     Some(videoReferenceUUID),
     Some(now.plusSeconds(60)),
     elapsedTime = Some(Duration.ofMinutes(5))
   )
 
-  private type IMDAO = ImagedMomentDAO[ImagedMomentImpl]
+  private type IMDAO = ImagedMomentDAO[ImagedMomentEntity]
   def run[R](fn: IMDAO => R): R = Await.result(dao.runTransaction(fn), timeout)
 
   "ImagedMomentDAOImpl" should "create" in {

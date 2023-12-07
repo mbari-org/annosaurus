@@ -22,9 +22,9 @@ import java.util.concurrent.TimeUnit
 
 import org.mbari.vars.annotation.dao.jpa.{
   AnnotationImpl,
-  AssociationImpl,
-  ImagedMomentImpl,
-  ObservationImpl,
+  AssociationEntity,
+  ImagedMomentEntity,
+  ObservationEntity,
   TestDAOFactory
 }
 import org.mbari.vars.annotation.model.simple.ConceptAssociationRequest
@@ -60,10 +60,10 @@ class AssociationControllerSpec extends AnyFlatSpec with Matchers with BeforeAnd
       uuid <- uuids
       i    <- 0 until 5
     } yield {
-      val im  = ImagedMomentImpl(recordedDate = Some(recordedDate), videoReferenceUUID = Some(uuid))
-      val obs = ObservationImpl("Cyclops", observer = Some("brian"))
+      val im  = ImagedMomentEntity(recordedDate = Some(recordedDate), videoReferenceUUID = Some(uuid))
+      val obs = ObservationEntity("Cyclops", observer = Some("brian"))
       im.addObservation(obs)
-      val ass = AssociationImpl(s"foo-$i", "self", s"$i")
+      val ass = AssociationEntity(s"foo-$i", "self", s"$i")
       obs.addAssociation(ass)
       AnnotationImpl(obs)
     }

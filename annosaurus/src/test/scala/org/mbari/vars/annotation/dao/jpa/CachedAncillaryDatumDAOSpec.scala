@@ -45,11 +45,11 @@ class CachedAncillaryDatumDAOSpec extends AnyFlatSpec with Matchers with BeforeA
   private[this] val videoReferenceUUID = UUID.randomUUID()
   private[this] val now                = Instant.now()
   private[this] val imagedMoment0 =
-    ImagedMomentImpl(Some(videoReferenceUUID), Some(now), elapsedTime = Some(Duration.ofMinutes(1)))
-  private[this] val ancillaryDatum0 = CachedAncillaryDatumImpl(36.234, 122.0011, 666)
+    ImagedMomentEntity(Some(videoReferenceUUID), Some(now), elapsedTime = Some(Duration.ofMinutes(1)))
+  private[this] val ancillaryDatum0 = CachedAncillaryDatumEntity(36.234, 122.0011, 666)
   private[this] val newTemp         = 3.2
 
-  private type CADAO = CachedAncillaryDatumDAO[CachedAncillaryDatumImpl]
+  private type CADAO = CachedAncillaryDatumDAO[CachedAncillaryDatumEntity]
   def run[R](fn: CADAO => R): R = Await.result(dao.runTransaction(fn), timeout)
 
   "CachedAncillaryDatumDAOImpl" should "create" in {

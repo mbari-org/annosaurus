@@ -29,30 +29,30 @@ import scala.jdk.CollectionConverters._
   * @since 2016-06-17T17:15:00
   */
 class CachedVideoReferenceInfoDAOImpl(entityManager: EntityManager)
-    extends BaseDAO[CachedVideoReferenceInfoImpl](entityManager)
-    with CachedVideoReferenceInfoDAO[CachedVideoReferenceInfoImpl] {
+    extends BaseDAO[CachedVideoReferenceInfoEntity](entityManager)
+    with CachedVideoReferenceInfoDAO[CachedVideoReferenceInfoEntity] {
 
-  override def newPersistentObject(): CachedVideoReferenceInfoImpl =
-    new CachedVideoReferenceInfoImpl
+  override def newPersistentObject(): CachedVideoReferenceInfoEntity =
+    new CachedVideoReferenceInfoEntity
 
   override def findByMissionContact(
       missionContact: String
-  ): Iterable[CachedVideoReferenceInfoImpl] =
+  ): Iterable[CachedVideoReferenceInfoEntity] =
     findByNamedQuery("VideoReferenceInfo.findByMissionContact", Map("contact" -> missionContact))
 
-  override def findByPlatformName(platformName: String): Iterable[CachedVideoReferenceInfoImpl] =
+  override def findByPlatformName(platformName: String): Iterable[CachedVideoReferenceInfoEntity] =
     findByNamedQuery("VideoReferenceInfo.findByPlatformName", Map("name" -> platformName))
 
-  override def findByMissionID(missionID: String): Iterable[CachedVideoReferenceInfoImpl] =
+  override def findByMissionID(missionID: String): Iterable[CachedVideoReferenceInfoEntity] =
     findByNamedQuery("VideoReferenceInfo.findByMissionID", Map("id" -> missionID))
 
-  override def findByVideoReferenceUUID(uuid: UUID): Option[CachedVideoReferenceInfoImpl] =
+  override def findByVideoReferenceUUID(uuid: UUID): Option[CachedVideoReferenceInfoEntity] =
     findByNamedQuery("VideoReferenceInfo.findByVideoReferenceUUID", Map("uuid" -> uuid)).headOption
 
   override def findAll(
       limit: Option[Int] = None,
       offset: Option[Int] = None
-  ): Iterable[CachedVideoReferenceInfoImpl] =
+  ): Iterable[CachedVideoReferenceInfoEntity] =
     findByNamedQuery("VideoReferenceInfo.findAll", limit = limit, offset = offset)
 
   override def findAllVideoReferenceUUIDs(): Iterable[UUID] =

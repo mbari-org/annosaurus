@@ -19,7 +19,7 @@ package org.mbari.vars.annotation.api.v1
 import org.mbari.vars.annotation.Constants
 import org.mbari.vars.annotation.api.WebSuite
 import org.mbari.vars.annotation.controllers.{AssociationController, BasicDAOFactory, TestUtils}
-import org.mbari.vars.annotation.dao.jpa.{AssociationImpl, JPADAOFactory}
+import org.mbari.vars.annotation.dao.jpa.{AssociationEntity, JPADAOFactory}
 
 import scala.concurrent.ExecutionContext
 
@@ -59,7 +59,7 @@ trait AssociationApiV1ITSuite extends WebSuite {
             headers = Map("Content-Type" -> "application/json", "Accept" -> "application/json")
         ) {
             assertEquals(status, 200)
-            val bx = gson.fromJson(body, classOf[Array[AssociationImpl]])
+            val bx = gson.fromJson(body, classOf[Array[AssociationEntity]])
             bx.foreach(b => assertEquals(b.linkName, linkName))
         }
 

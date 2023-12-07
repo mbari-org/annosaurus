@@ -23,7 +23,7 @@ import java.util.concurrent.TimeUnit
 
 import org.mbari.vars.annotation.api.WebApiStack
 import org.mbari.vars.annotation.controllers.{ImageReferenceController, ImagedMomentController}
-import org.mbari.vars.annotation.dao.jpa.{ImageReferenceImpl, ImagedMomentImpl}
+import org.mbari.vars.annotation.dao.jpa.{ImageReferenceEntity, ImagedMomentEntity}
 
 import scala.concurrent.Await
 import scala.concurrent.duration.{Duration => SDuration}
@@ -46,15 +46,15 @@ class ImageReferenceV1ApiSpec extends WebApiStack {
   private[this] val path = "/v1/imagereferences"
   addServlet(imageReferenceV1Api, path)
 
-  var imageReference: ImageReferenceImpl = _
+  var imageReference: ImageReferenceEntity = _
 
   "ImageReferenceV1Spec" should "find by uuid" in {
 
     // --- Create an imageref
     val dao         = daoFactory.newImageReferenceDAO()
-    val imageMoment = ImagedMomentImpl(Some(UUID.randomUUID()), Some(Instant.now()))
+    val imageMoment = ImagedMomentEntity(Some(UUID.randomUUID()), Some(Instant.now()))
     imageReference =
-      ImageReferenceImpl(new URL("http://www.mbari.org/foo.png"), format = Some("image/png"))
+      ImageReferenceEntity(new URL("http://www.mbari.org/foo.png"), format = Some("image/png"))
     imageMoment.addImageReference(imageReference)
     val f = dao.runTransaction(d => d.create(imageReference))
     f.onComplete(t => dao.close())
@@ -63,7 +63,7 @@ class ImageReferenceV1ApiSpec extends WebApiStack {
     // --- find it via the web api
     get(s"$path/${imageReference.uuid}") {
       status should be(200)
-      val ir = gson.fromJson(body, classOf[ImageReferenceImpl])
+      val ir = gson.fromJson(body, classOf[ImageReferenceEntity])
       ir.uuid should be(imageReference.uuid)
       ir.url should be(imageReference.url)
     }
@@ -80,7 +80,7 @@ class ImageReferenceV1ApiSpec extends WebApiStack {
       "description"   -> "updated"
     ) {
       status should be(200)
-      val ir = gson.fromJson(body, classOf[ImageReferenceImpl])
+      val ir = gson.fromJson(body, classOf[ImageReferenceEntity])
       ir.uuid should be(imageReference.uuid)
       ir.url should be(new URL("http://www.google.com/bar.jpg"))
       ir.width should be(1920)
@@ -93,7 +93,7 @@ class ImageReferenceV1ApiSpec extends WebApiStack {
 
     // --- Create a new imagedmoment and insert
     val dao         = daoFactory.newImagedMomentDAO()
-    val imageMoment = ImagedMomentImpl(Some(UUID.randomUUID()), Some(Instant.now()))
+    val imageMoment = ImagedMomentEntity(Some(UUID.randomUUID()), Some(Instant.now()))
     val f           = dao.runTransaction(d => d.create(imageMoment))
     f.onComplete(t => dao.close())
     Await.result(f, timeout)
@@ -101,7 +101,7 @@ class ImageReferenceV1ApiSpec extends WebApiStack {
     // --- Move imagereference to a new imagedmoment
     put(s"$path/${imageReference.uuid}", "imaged_moment_uuid" -> imageMoment.uuid.toString) {
       status should be(200)
-      val ir = gson.fromJson(body, classOf[ImageReferenceImpl])
+      val ir = gson.fromJson(body, classOf[ImageReferenceEntity])
       ir.uuid should be(imageReference.uuid)
     }
 

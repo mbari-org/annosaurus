@@ -89,7 +89,7 @@ import org.mbari.vars.annotation.model.CachedVideoReferenceInfo
     )
   )
 )
-class CachedVideoReferenceInfoImpl extends CachedVideoReferenceInfo with JPAPersistentObject {
+class CachedVideoReferenceInfoEntity extends CachedVideoReferenceInfo with JPAPersistentObject {
 
   /**
     * typically this will be the chief scientist
@@ -119,15 +119,15 @@ class CachedVideoReferenceInfoImpl extends CachedVideoReferenceInfo with JPAPers
 
 }
 
-object CachedVideoReferenceInfoImpl {
+object CachedVideoReferenceInfoEntity {
   def apply(
       videoReferenceUUID: UUID,
       missionID: String,
       platformName: String,
       missionContact: Option[String] = None
-  ): CachedVideoReferenceInfoImpl = {
+  ): CachedVideoReferenceInfoEntity = {
 
-    val d = new CachedVideoReferenceInfoImpl
+    val d = new CachedVideoReferenceInfoEntity
     d.videoReferenceUUID = videoReferenceUUID
     d.missionId = missionID
     d.platformName = platformName

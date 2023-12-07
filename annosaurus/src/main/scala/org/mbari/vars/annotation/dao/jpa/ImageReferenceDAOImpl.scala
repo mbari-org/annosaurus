@@ -28,10 +28,10 @@ import org.mbari.vars.annotation.dao.ImageReferenceDAO
   * @since 2016-06-17T17:17:00
   */
 class ImageReferenceDAOImpl(entityManager: EntityManager)
-    extends BaseDAO[ImageReferenceImpl](entityManager)
-    with ImageReferenceDAO[ImageReferenceImpl] {
+    extends BaseDAO[ImageReferenceEntity](entityManager)
+    with ImageReferenceDAO[ImageReferenceEntity] {
 
-  override def newPersistentObject(): ImageReferenceImpl = new ImageReferenceImpl
+  override def newPersistentObject(): ImageReferenceEntity = new ImageReferenceEntity
 
   override def newPersistentObject(
       url: URL,
@@ -39,7 +39,7 @@ class ImageReferenceDAOImpl(entityManager: EntityManager)
       heightPixels: Option[Int] = None,
       widthPixels: Option[Int] = None,
       format: Option[String] = None
-  ): ImageReferenceImpl = {
+  ): ImageReferenceEntity = {
     val imageReference = newPersistentObject()
     imageReference.url = url
     description.foreach(imageReference.description = _)
@@ -52,13 +52,13 @@ class ImageReferenceDAOImpl(entityManager: EntityManager)
   override def findAll(
       limit: Option[Int] = None,
       offset: Option[Int] = None
-  ): Iterable[ImageReferenceImpl] =
+  ): Iterable[ImageReferenceEntity] =
     findByNamedQuery("ImageReference.findAll", limit = limit, offset = offset)
 
-  override def findByURL(url: URL): Option[ImageReferenceImpl] =
+  override def findByURL(url: URL): Option[ImageReferenceEntity] =
     findByNamedQuery("ImageReference.findByURL", Map("url" -> url)).headOption
 
-  override def findByImageName(name: String): Seq[ImageReferenceImpl] =
+  override def findByImageName(name: String): Seq[ImageReferenceEntity] =
     findByNamedQuery("ImageReference.findByImageName", Map("name" -> s"%$name%"))
 
 }

@@ -24,7 +24,7 @@ import java.util.UUID
 import org.mbari.vars.annotation.Constants
 import org.mbari.vars.annotation.api.WebApiStack
 import org.mbari.vars.annotation.controllers.AnnotationController
-import org.mbari.vars.annotation.dao.jpa.{AnnotationImpl, AssociationImpl, ImageReferenceImpl}
+import org.mbari.vars.annotation.dao.jpa.{AnnotationImpl, AssociationEntity, ImageReferenceEntity}
 import org.mbari.vars.annotation.model.Annotation
 import org.mbari.vars.annotation.model.simple.{
   ConcurrentRequest,
@@ -219,7 +219,7 @@ class AnnotationV1ApiSpec extends WebApiStack {
   val anno0 = {
     val a0 =
       AnnotationImpl(UUID.randomUUID(), "Nanomia bijuga", "brian", recordedDate = recordedDate)
-    val ir = ImageReferenceImpl(new URL("http://www.foo.bar/woot.png"), Option(1920), Option(1080))
+    val ir = ImageReferenceEntity(new URL("http://www.foo.bar/woot.png"), Option(1920), Option(1080))
     a0.imageReferences = Seq(ir)
     a0
   }
@@ -246,9 +246,9 @@ class AnnotationV1ApiSpec extends WebApiStack {
   val uuid2 = UUID.randomUUID()
   val anno1 = {
     val a0 = AnnotationImpl(uuid2, "Nanomia bijuga", "brian", recordedDate = recordedDate)
-    val as = AssociationImpl("linkname", "toconcept", "linkvalue")
+    val as = AssociationEntity("linkname", "toconcept", "linkvalue")
     val ir =
-      ImageReferenceImpl(new URL("http://www.foo.bar/wootty.png"), Option(1920), Option(1080))
+      ImageReferenceEntity(new URL("http://www.foo.bar/wootty.png"), Option(1920), Option(1080))
     a0.imageReferences = Seq(ir)
     a0.associations = Seq(as)
     a0

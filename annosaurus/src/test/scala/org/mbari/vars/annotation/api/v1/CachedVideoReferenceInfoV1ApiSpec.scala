@@ -22,7 +22,7 @@ import java.util.concurrent.TimeUnit
 import org.mbari.vars.annotation.Constants
 import org.mbari.vars.annotation.api.WebApiStack
 import org.mbari.vars.annotation.controllers.CachedVideoReferenceInfoController
-import org.mbari.vars.annotation.dao.jpa.CachedVideoReferenceInfoImpl
+import org.mbari.vars.annotation.dao.jpa.CachedVideoReferenceInfoEntity
 import org.mbari.vars.annotation.model.CachedVideoReferenceInfo
 
 import scala.collection.mutable
@@ -65,7 +65,7 @@ class CachedVideoReferenceInfoV1ApiSpec extends WebApiStack {
       ) {
 
         status should be(200)
-        val vi = gson.fromJson(body, classOf[CachedVideoReferenceInfoImpl])
+        val vi = gson.fromJson(body, classOf[CachedVideoReferenceInfoEntity])
         vi.videoReferenceUUID should not be (null)
         vi.missionContact should be("brian")
         vi.missionId should be(i.toString)
@@ -78,7 +78,7 @@ class CachedVideoReferenceInfoV1ApiSpec extends WebApiStack {
   it should "find all" in {
     get(path + "/") {
       status should be(200)
-      val vis = gson.fromJson(body, classOf[Array[CachedVideoReferenceInfoImpl]])
+      val vis = gson.fromJson(body, classOf[Array[CachedVideoReferenceInfoEntity]])
       vis.size should be(n)
       vis.map(_.platformName) should contain theSameElementsAs videoinfos.map(_.platformName)
       vis.map(_.missionId) should contain theSameElementsAs videoinfos.map(_.missionId)
@@ -90,10 +90,10 @@ class CachedVideoReferenceInfoV1ApiSpec extends WebApiStack {
   }
 
   it should "update" in {
-    var vis: Array[CachedVideoReferenceInfoImpl] = Array.empty
+    var vis: Array[CachedVideoReferenceInfoEntity] = Array.empty
     get(path + "/") {
       status should be(200)
-      vis = gson.fromJson(body, classOf[Array[CachedVideoReferenceInfoImpl]])
+      vis = gson.fromJson(body, classOf[Array[CachedVideoReferenceInfoEntity]])
       vis.size should be(n)
     }
 
@@ -106,7 +106,7 @@ class CachedVideoReferenceInfoV1ApiSpec extends WebApiStack {
         "platform_name"   -> "Doc Ricketts"
       ) {
         status should be(200)
-        val v2 = gson.fromJson(body, classOf[CachedVideoReferenceInfoImpl])
+        val v2 = gson.fromJson(body, classOf[CachedVideoReferenceInfoEntity])
         v2.videoReferenceUUID should be(v.videoReferenceUUID)
         v2.missionContact should be("schlin")
         v2.missionId should be(s"xxx$i")
@@ -114,7 +114,7 @@ class CachedVideoReferenceInfoV1ApiSpec extends WebApiStack {
 
         get(s"$path/${v.uuid}") {
           status should be(200)
-          val v3 = gson.fromJson(body, classOf[CachedVideoReferenceInfoImpl])
+          val v3 = gson.fromJson(body, classOf[CachedVideoReferenceInfoEntity])
           v3.videoReferenceUUID should be(v2.videoReferenceUUID)
           v3.missionContact should be(v2.missionContact)
           v3.missionId should be(v2.missionId)

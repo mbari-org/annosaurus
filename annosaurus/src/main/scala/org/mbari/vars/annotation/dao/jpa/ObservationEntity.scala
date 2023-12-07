@@ -139,7 +139,7 @@ import org.mbari.vars.annotation.model.{Association, ImagedMoment, Observation}
     )
   )
 )
-class ObservationImpl extends Observation with JPAPersistentObject {
+class ObservationEntity extends Observation with JPAPersistentObject {
 
   @Expose(serialize = true)
   @Column(name = "concept", length = 256)
@@ -154,7 +154,7 @@ class ObservationImpl extends Observation with JPAPersistentObject {
   @ManyToOne(
     cascade = Array(CascadeType.PERSIST, CascadeType.DETACH),
     optional = false,
-    targetEntity = classOf[ImagedMomentImpl]
+    targetEntity = classOf[ImagedMomentEntity]
   )
   @JoinColumn(name = "imaged_moment_uuid", nullable = false, columnDefinition = "CHAR(36)")
   var imagedMoment: ImagedMoment = _
@@ -181,15 +181,15 @@ class ObservationImpl extends Observation with JPAPersistentObject {
   @Expose(serialize = true)
   @SerializedName(value = "associations")
   @OneToMany(
-    targetEntity = classOf[AssociationImpl],
+    targetEntity = classOf[AssociationEntity],
     cascade = Array(CascadeType.ALL),
     fetch = FetchType.EAGER,
     mappedBy = "observation"
   )
-  protected var javaAssociations: JList[AssociationImpl] = new JArrayList[AssociationImpl]
+  protected var javaAssociations: JList[AssociationEntity] = new JArrayList[AssociationEntity]
 
   override def addAssociation(association: Association): Unit = {
-    javaAssociations.add(association.asInstanceOf[AssociationImpl])
+    javaAssociations.add(association.asInstanceOf[AssociationEntity])
     association.observation = this
   }
 
@@ -202,7 +202,7 @@ class ObservationImpl extends Observation with JPAPersistentObject {
 
 }
 
-object ObservationImpl {
+object ObservationEntity {
 
   def apply(
       concept: String,
@@ -211,8 +211,8 @@ object ObservationImpl {
       observer: Option[String] = None,
       group: Option[String] = None,
       activity: Option[String] = None
-  ): ObservationImpl = {
-    val obs = new ObservationImpl
+  ): ObservationEntity = {
+    val obs = new ObservationEntity
     obs.concept = concept
     duration.foreach(obs.duration = _)
     observationDate.foreach(obs.observationDate = _)
@@ -222,7 +222,7 @@ object ObservationImpl {
     obs
   }
 
-  def apply(observation: Observation): ObservationImpl = {
+  def apply(observation: Observation): ObservationEntity = {
     val newObservation = apply(
       observation.concept,
       Option(observation.duration),
@@ -232,7 +232,7 @@ object ObservationImpl {
       Option(observation.activity)
     )
     newObservation.uuid = observation.uuid
-    observation.associations.foreach(a => newObservation.addAssociation(AssociationImpl(a)))
+    observation.associations.foreach(a => newObservation.addAssociation(AssociationEntity(a)))
     newObservation
   }
 

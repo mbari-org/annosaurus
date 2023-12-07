@@ -56,7 +56,7 @@ import org.mbari.vars.annotation.model.{ImageReference, ImagedMoment}
     )
   )
 )
-class ImageReferenceImpl extends ImageReference with JPAPersistentObject {
+class ImageReferenceEntity extends ImageReference with JPAPersistentObject {
 
   @Expose(serialize = true)
   @Column(name = "description", length = 256, nullable = true)
@@ -70,7 +70,7 @@ class ImageReferenceImpl extends ImageReference with JPAPersistentObject {
   @ManyToOne(
     cascade = Array(CascadeType.PERSIST, CascadeType.DETACH),
     optional = false,
-    targetEntity = classOf[ImagedMomentImpl]
+    targetEntity = classOf[ImagedMomentEntity]
   )
   @JoinColumn(
     name = "imaged_moment_uuid",
@@ -94,7 +94,7 @@ class ImageReferenceImpl extends ImageReference with JPAPersistentObject {
   var format: String = _
 }
 
-object ImageReferenceImpl {
+object ImageReferenceEntity {
 
   def apply(
       url: URL,
@@ -102,8 +102,8 @@ object ImageReferenceImpl {
       height: Option[Int] = None,
       format: Option[String] = None,
       description: Option[String] = None
-  ): ImageReferenceImpl = {
-    val i = new ImageReferenceImpl()
+  ): ImageReferenceEntity = {
+    val i = new ImageReferenceEntity()
     i.url = url
     width.foreach(i.width = _)
     height.foreach(i.height = _)
@@ -112,8 +112,8 @@ object ImageReferenceImpl {
     i
   }
 
-  def apply(v: ImageReference): ImageReferenceImpl = {
-    val i = new ImageReferenceImpl
+  def apply(v: ImageReference): ImageReferenceEntity = {
+    val i = new ImageReferenceEntity
     i.url = v.url
     i.description = v.description
     i.width = v.width

@@ -18,8 +18,8 @@ package org.mbari.vars.annotation.dao.jdbc
 
 import java.util.UUID
 
-import org.mbari.vars.annotation.dao.jpa.CachedAncillaryDatumImpl
+import org.mbari.vars.annotation.dao.jpa.CachedAncillaryDatumEntity
 
-class AncillaryDatumExt extends CachedAncillaryDatumImpl {
+class AncillaryDatumExt extends CachedAncillaryDatumEntity {
   var imagedMomentUuid: UUID = _
 }

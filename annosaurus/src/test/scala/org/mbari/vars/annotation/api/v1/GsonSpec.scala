@@ -18,7 +18,7 @@ package org.mbari.vars.annotation.api.v1
 
 import org.scalatest.matchers.should.Matchers
 import org.mbari.vars.annotation.Constants
-import org.mbari.vars.annotation.dao.jpa.IndexImpl
+import org.mbari.vars.annotation.dao.jpa.IndexEntity
 import org.scalatest.flatspec.AnyFlatSpec
 
 class GsonSpec extends AnyFlatSpec with Matchers {
@@ -26,7 +26,7 @@ class GsonSpec extends AnyFlatSpec with Matchers {
   "Gson" should "parse pythons isodate" in {
     val date = "2019-08-31T23:07:08.510000+00:00"
     val json = s"""{ "recorded_date": "$date"}"""
-    val parsed = Constants.GSON.fromJson(json, classOf[IndexImpl])
+    val parsed = Constants.GSON.fromJson(json, classOf[IndexEntity])
     println(parsed)
     json should not be (null)
   }

@@ -63,7 +63,7 @@ import org.mbari.vars.annotation.model.{CachedAncillaryDatum, ImagedMoment}
     )
   )
 )
-class CachedAncillaryDatumImpl extends CachedAncillaryDatum with JPAPersistentObject {
+class CachedAncillaryDatumEntity extends CachedAncillaryDatum with JPAPersistentObject {
 
   @Expose(serialize = true)
   @Column(name = "coordinate_reference_system", length = 32, nullable = true)
@@ -98,7 +98,7 @@ class CachedAncillaryDatumImpl extends CachedAncillaryDatum with JPAPersistentOb
     cascade = Array(CascadeType.PERSIST, CascadeType.DETACH),
     optional = false,
     fetch = FetchType.LAZY,
-    targetEntity = classOf[ImagedMomentImpl]
+    targetEntity = classOf[ImagedMomentEntity]
   )
   @JoinColumn(name = "imaged_moment_uuid", nullable = false, columnDefinition = "CHAR(36)")
   var imagedMoment: ImagedMoment = _
@@ -159,13 +159,13 @@ class CachedAncillaryDatumImpl extends CachedAncillaryDatum with JPAPersistentOb
   var lightTransmission: Option[Double] = None
 }
 
-object CachedAncillaryDatumImpl {
+object CachedAncillaryDatumEntity {
 
-  def apply(datum: CachedAncillaryDatum): CachedAncillaryDatumImpl = {
+  def apply(datum: CachedAncillaryDatum): CachedAncillaryDatumEntity = {
     datum match {
-      case c: CachedAncillaryDatumImpl => c
+      case c: CachedAncillaryDatumEntity => c
       case c =>
-        val d = new CachedAncillaryDatumImpl
+        val d = new CachedAncillaryDatumEntity
         d.uuid = c.uuid
         d.imagedMoment = c.imagedMoment
         d.latitude = c.latitude
@@ -196,8 +196,8 @@ object CachedAncillaryDatumImpl {
     * @param depthMeters
     * @return
     */
-  def apply(latitude: Double, longitude: Double, depthMeters: Float): CachedAncillaryDatumImpl = {
-    val d = new CachedAncillaryDatumImpl
+  def apply(latitude: Double, longitude: Double, depthMeters: Float): CachedAncillaryDatumEntity = {
+    val d = new CachedAncillaryDatumEntity
     d.latitude = Option(latitude)
     d.longitude = Option(longitude)
     d.depthMeters = Option(depthMeters)
@@ -213,7 +213,7 @@ object CachedAncillaryDatumImpl {
       pressureDbar: Float,
       oxygenMlL: Float,
       crs: String = "CRS:84"
-  ): CachedAncillaryDatumImpl = {
+  ): CachedAncillaryDatumEntity = {
     val d = apply(latitude, longitude, depthMeters)
     d.salinity = Option(salinity)
     d.temperatureCelsius = Option(temperatureCelsius)

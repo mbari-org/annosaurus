@@ -47,16 +47,16 @@ class AssociationDAOSpec extends AnyFlatSpec with Matchers with BeforeAndAfterAl
   private[this] val videoReferenceUUID = UUID.randomUUID()
   private[this] val now                = Instant.now()
   private[this] val imagedMoment0 =
-    ImagedMomentImpl(Some(videoReferenceUUID), Some(now), elapsedTime = Some(Duration.ofMinutes(1)))
+    ImagedMomentEntity(Some(videoReferenceUUID), Some(now), elapsedTime = Some(Duration.ofMinutes(1)))
   private[this] val concept = "Grimpoteuthis"
   private[this] val observation0 =
-    ObservationImpl(concept, observationDate = Some(now), observer = Some("brian"))
+    ObservationEntity(concept, observationDate = Some(now), observer = Some("brian"))
   private[this] val association0 =
-    AssociationImpl("surface-color", Association.TO_CONCEPT_SELF, "red")
+    AssociationEntity("surface-color", Association.TO_CONCEPT_SELF, "red")
   private[this] val association1 =
-    AssociationImpl("image-quality", Association.TO_CONCEPT_SELF, "mega-awesome!!")
+    AssociationEntity("image-quality", Association.TO_CONCEPT_SELF, "mega-awesome!!")
 
-  private type ADAO = AssociationDAO[AssociationImpl]
+  private type ADAO = AssociationDAO[AssociationEntity]
   def run[R](fn: ADAO => R): R = Await.result(dao.runTransaction(fn), timeout)
 
   "AssociationDAOImpl" should "create" in {
