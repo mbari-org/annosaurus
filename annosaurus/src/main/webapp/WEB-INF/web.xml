@@ -16,14 +16,14 @@
         <url-pattern>/ui/*</url-pattern>
     </servlet-mapping>
 
-    <filter>
+    <!-- <filter>
         <filter-name>javamelody</filter-name>
         <filter-class>net.bull.javamelody.MonitoringFilter</filter-class>
         <init-param>
             <param-name>authorized-users</param-name>
             <param-value>adminz:Cranchiidae</param-value>
         </init-param>
-    </filter>
+    </filter> -->
 
     <!--
     <filter>

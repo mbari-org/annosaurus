@@ -9,7 +9,7 @@ SCRIPT_DIR="$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 echo "Working directory is $SCRIPT_DIR"
 cd $SCRIPT_DIR
 
-sbt pack
+sbt stage
 
 ARCH=$(uname -m)
 if [[ $ARCH == 'arm64' ]]; then
@@ -18,7 +18,8 @@ if [[ $ARCH == 'arm64' ]]; then
       --platform linux/amd64,linux/arm64 \
       -t mbari/annosaurus:${VCS_REF} \
       -t mbari/annosaurus:latest \
-      --push .
+      --push . && \
+    docker pull mbari/annosaurus:${VCS_REF}
 else
     docker build --build-arg BUILD_DATE=$BUILD_DATE \
                  --build-arg VCS_REF=$VCS_REF \

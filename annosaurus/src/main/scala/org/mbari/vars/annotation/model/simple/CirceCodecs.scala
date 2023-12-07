@@ -20,6 +20,7 @@ import io.circe._
 import io.circe.syntax._
 import io.circe.generic.semiauto._
 import org.mbari.vars.annotation.domain.Association
+import org.mbari.vars.annotation.auth.AuthorizationSnakeCase
 
 import java.net.URI
 import java.net.URL
@@ -56,8 +57,39 @@ object CirceCodecs {
     implicit val associationDecoder: Decoder[Association] = deriveDecoder
     implicit val associationEncoder: Encoder[Association] = deriveEncoder
 
+    implicit val authorizationSCDecoder: Decoder[AuthorizationSnakeCase] = deriveDecoder
+    implicit val authorizationSCEncoder: Encoder[AuthorizationSnakeCase] = deriveEncoder
+
     private val printer = Printer.noSpaces.copy(dropNullValues = true)
 
     def print[T: Encoder](t: T): String = printer.print(t.asJson)
+
+    // Scala 3
+    // private val printer = Printer.noSpaces.copy(dropNullValues = true)
+
+    // /**
+    //  * Convert a circe Json object to a JSON string
+    //  *
+    //  * @param value
+    //  *   Any value with an implicit circe coder in scope
+    //  */
+    // extension (json: Json) def stringify: String = printer.print(json)
+
+    // /**
+    //  * Convert an object to a JSON string
+    //  *
+    //  * @param value
+    //  *   Any value with an implicit circe coder in scope
+    //  */
+    // extension [T: Encoder](value: T) def stringify: String = Encoder[T].apply(value).stringify
+
+    // extension [T: Decoder](jsonString: String) def toJson: Either[ParsingFailure, Json] = parser.parse(jsonString);
+
+    // extension (jsonString: String)
+    //     def reify[T: Decoder]: Either[Error, T] =
+    //         for
+    //             json   <- jsonString.toJson
+    //             result <- Decoder[T].apply(json.hcursor)
+    //         yield result
 
 }

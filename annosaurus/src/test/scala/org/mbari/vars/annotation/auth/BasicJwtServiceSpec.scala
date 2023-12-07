@@ -22,28 +22,45 @@ import jakarta.servlet.http.HttpServletRequest
 import com.typesafe.config.ConfigFactory
 import java.time.Duration
 
+import org.mbari.vars.annotation.model.simple.CirceCodecs._
+import org.mbari.vars.annotation.Constants
+import io.circe.parser._
+import org.mbari.vars.annotation.model.simple.CirceCodecs._
+
 class BasicJwtServiceSpec extends AnyFunSpec with Matchers {
 
 
   val config = ConfigFactory.load()
   val apikey = config.getString("basicjwt.client.secret")
+  val gson = Constants.GSON
+
 
   describe("BasicJwtService") {
     it("should authorize") {
       val service = new BasicJwtService()
-      val auth = service.requestAuthorization(new MockJwtHttpServletRequest("APIKEY", apikey))
-      auth.isDefined shouldBe true
+      val opt = service.requestAuthorization(new MockJwtHttpServletRequest("APIKEY", apikey))
+      opt.isDefined shouldBe true
+      decode[AuthorizationSnakeCase](opt.get) match {
+        case Left(_) => fail("Failed to decode authorization: " + opt.get)
+        case Right(auth) => 
+          service.isValid(Some(auth.toAuthorization)) shouldBe true
+      }
     }
 
     it ("should fail on expired tokens") {
       val service = new BasicJwtService(Duration.ofSeconds(1))
-      val auth = service.requestAuthorization(new MockJwtHttpServletRequest("APIKEY", apikey))
-      auth.isDefined shouldBe true
-      // println(auth.get)
-      val newRequest = new MockJwtHttpServletRequest("Bearer", auth.get)
-      service.validateAuthorization(newRequest) shouldBe true
-      Thread.sleep(1000)
-      service.validateAuthorization(newRequest) shouldBe false
+      val opt = service.requestAuthorization(new MockJwtHttpServletRequest("APIKEY", apikey))
+      opt.isDefined shouldBe true
+      decode[AuthorizationSnakeCase](opt.get) match {
+        case Left(_) => fail("Failed to decode authorization: " + opt.get)
+        case Right(authSc) => 
+          val auth = authSc.toAuthorization
+          val newRequest = new MockJwtHttpServletRequest("Bearer", auth.accessToken)
+          service.validateAuthorization(newRequest) shouldBe true
+          Thread.sleep(1000)
+          service.validateAuthorization(newRequest) shouldBe false
+      }
+      
     }
   }
 

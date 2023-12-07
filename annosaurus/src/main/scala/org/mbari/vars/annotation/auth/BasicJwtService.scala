@@ -51,6 +51,8 @@ import java.time.Duration
   */
 class BasicJwtService(tokenDuration: Duration = Duration.ofDays(1)) extends AuthorizationService {
 
+  def this() = this(Duration.ofDays(1))
+
   private[this] val config        = ConfigFactory.load()
   private[this] val issuer        = config.getString("basicjwt.issuer")
   private[this] val apiKey        = config.getString("basicjwt.client.secret")
@@ -72,7 +74,7 @@ class BasicJwtService(tokenDuration: Duration = Duration.ofDays(1)) extends Auth
       .map(parseAuthHeader)
   }
 
-  private def isValid(auth: Option[Authorization]): Boolean = {
+  def isValid(auth: Option[Authorization]): Boolean = {
     //println("RUNNING JWT with auth = " + auth.getOrElse("NONE"))
     try {
       auth match {

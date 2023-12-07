@@ -15,6 +15,7 @@
  */
 
 import org.slf4j.LoggerFactory
+import org.eclipse.jetty.servlet.DefaultServlet
 /*
  * Copyright 2017 Monterey Bay Aquarium Research Institute
  *
@@ -33,7 +34,7 @@ import org.slf4j.LoggerFactory
 
 class JettyMain {}
 import javax.servlet.DispatcherType
-import net.bull.javamelody.{MonitoringFilter, Parameter, ReportServlet, SessionListener}
+// import net.bull.javamelody.{MonitoringFilter, Parameter, ReportServlet, SessionListener}
 import org.eclipse.jetty.server._
 import org.eclipse.jetty.servlet.FilterHolder
 import org.eclipse.jetty.webapp.WebAppContext
@@ -53,7 +54,7 @@ object JettyMain {
   // hold on to messaging objects so they don't get GC'd
   private[this] val zmq = ZeroMQPublisher.autowire(Constants.AppConfig.zeroMQConfig)
 
-  def main(args: Array[String]) = {
+  def main(args: Array[String]): Unit = {
     System.setProperty("user.timezone", "UTC")
     val s = """                                                
       |   __ _ _ __  _ __   ___  ___  __ _ _   _ _ __ _   _ ___ 
@@ -62,7 +63,6 @@ object JettyMain {
       |  \__,_|_| |_|_| |_|\___/|___/\__,_|\__,_|_|   \__,_|___/""".stripMargin
     println(s)
 
-    val server: Server = new Server
 
     val conf = Constants.AppConfig.httpConfig
 
@@ -71,40 +71,52 @@ object JettyMain {
       .log("Starting Jetty server on port {}", conf.port)
     ZeroMQPublisher.log(zmq)
 
-    server.setStopTimeout(conf.stopTimeout.toLong)
-    //server setDumpAfterStart true
+    val server: Server = new Server(conf.port)
     server.setStopAtShutdown(true)
-
-    val httpConfig = new HttpConfiguration()
-    httpConfig.setSendDateHeader(true)
-    httpConfig.setSendServerVersion(false)
-
-    val connector = new NetworkTrafficServerConnector(server, new HttpConnectionFactory(httpConfig))
-    connector.setPort(conf.port)
-    connector.setIdleTimeout(conf.connectorIdleTimeout.toLong)
-    server.addConnector(connector)
-
-    val webApp = new WebAppContext
-    webApp.setContextPath(conf.contextPath)
-    // webApp.setResourceBase(conf.webapp)
-    // webApp.setEventListeners(Array(new ScalatraListener))
-    webApp.setEventListeners(java.util.List.of(new ScalatraListener))
-
-    // Add JavaMelody for monitoring
-    webApp.addServlet(classOf[ReportServlet], "/monitoring")
-    webApp.addEventListener(new SessionListener)
-    // val monitoringFilter = new FilterHolder(new MonitoringFilter())
-    // monitoringFilter.setInitParameter(Parameter.APPLICATION_NAME.getCode, conf.webapp)
-    // monitoringFilter.setInitParameter("authorized-users", "adminz:Cranchiidae")
-
-    // webApp.addFilter(
-    //   monitoringFilter,
-    //   "/*",
-    //   java.util.EnumSet.of(DispatcherType.REQUEST, DispatcherType.ASYNC)
-    // )
-
-    server.setHandler(webApp)
-
+    val context: WebAppContext = new WebAppContext()
+    context.setContextPath(conf.contextPath)
+    context.setResourceBase("src/main/webapp")
+    context.addEventListener(new ScalatraListener)
+    context.addServlet(classOf[DefaultServlet], "/")
+    server.setHandler(context)
     server.start()
+    server.join()
+
+
+    // server.setStopTimeout(conf.stopTimeout.toLong)
+    // server.setStopAtShutdown(true)
+
+    // val httpConfig = new HttpConfiguration()
+    // httpConfig.setSendDateHeader(true)
+    // httpConfig.setSendServerVersion(false)
+
+    // val connector = new NetworkTrafficServerConnector(server, new HttpConnectionFactory(httpConfig))
+    // connector.setPort(conf.port)
+    // connector.setIdleTimeout(conf.connectorIdleTimeout.toLong)
+    // server.addConnector(connector)
+
+    // val webApp = new WebAppContext
+    // webApp.setContextPath(conf.contextPath)
+    // webApp.setResourceBase("src/main/webapp")
+    // // webApp.setResourceBase(conf.webapp)
+    // // webApp.setEventListeners(Array(new ScalatraListener))
+    // webApp.setEventListeners(java.util.List.of(new ScalatraListener))
+
+    // // Add JavaMelody for monitoring
+    // // webApp.addServlet(classOf[ReportServlet], "/monitoring")
+    // // webApp.addEventListener(new SessionListener)
+    // // val monitoringFilter = new FilterHolder(new MonitoringFilter())
+    // // monitoringFilter.setInitParameter(Parameter.APPLICATION_NAME.getCode, conf.webapp)
+    // // monitoringFilter.setInitParameter("authorized-users", "adminz:Cranchiidae")
+
+    // // webApp.addFilter(
+    // //   monitoringFilter,
+    // //   "/*",
+    // //   java.util.EnumSet.of(DispatcherType.REQUEST, DispatcherType.ASYNC)
+    // // )
+
+    // server.setHandler(webApp)
+
+    // server.start()
   }
 }

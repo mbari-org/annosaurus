@@ -21,3 +21,8 @@ package org.mbari.vars.annotation.auth
   * @since 2017-01-18T16:32:00
   */
 case class Authorization(tokenType: String, accessToken: String)
+
+
+case class AuthorizationSnakeCase(token_type: String, access_token: String) {
+  lazy val toAuthorization: Authorization = Authorization(token_type, access_token)
+}

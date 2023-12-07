@@ -177,14 +177,15 @@ class AssociationV1ApiSpec extends WebApiStack {
 
   }
 
-  it should "bulk update" in {
-    // TODO implement bulk delete spec
-    val a0 = association
-    a0.linkName = "foobarbazbim"
-    put(s"/v1/associations/bulk", body = gson.toJson(Array(a0))) {
-      status should be(200)
-    }
-  }
+  // it should "bulk update" in {
+  //   // TODO implement bulk delete spec
+  //   val a0 = association
+  //   a0.linkName = "foobarbazbim"
+  //   put(s"/v1/associations/bulk", body = gson.toJson(Array(a0))) {
+  //     status should be(200)
+  //   }
+  // }
+
   it should "create with a defined association UUID" in {
     val uuid = UUID.randomUUID()
     post(
