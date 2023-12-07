@@ -8,6 +8,7 @@ ThisBuild / organization     := "org.mbari.vars"
 ThisBuild / organizationName := "Monterey Bay Aquarium Research Institute"
 ThisBuild / resolvers ++= Seq(Resolver.githubPackages("mbari-org", "maven"))
 ThisBuild / scalaVersion     := "2.13.12"
+// ThisBuild / scalaVersion     := "3.3.1" // Fails. See https://github.com/lampepfl/dotty/issues/17069#issuecomment-1763053572
 ThisBuild / scalacOptions ++= Seq(
   "-deprecation",  // Emit warning and location for usages of deprecated APIs.
   "-encoding",
