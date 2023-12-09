@@ -40,8 +40,8 @@ import org.eclipse.jetty.servlet.FilterHolder
 import org.eclipse.jetty.webapp.WebAppContext
 // import org.eclipse.jetty.ee10.servlet.FilterHolder  // Jetty 12
 // import org.eclipse.jetty.ee10.webapp.WebAppContext  // Jetty 12
-import org.mbari.vars.annotation.Constants
-import org.mbari.vars.annotation.messaging.zeromq.ZeroMQPublisher
+import org.mbari.annosaurus.Constants
+import org.mbari.annosaurus.etc.zeromq.ZeroMQPublisher
 import org.scalatra.servlet.ScalatraListener
 import org.slf4j.bridge.SLF4JBridgeHandler
 import java.util.{List => JList}

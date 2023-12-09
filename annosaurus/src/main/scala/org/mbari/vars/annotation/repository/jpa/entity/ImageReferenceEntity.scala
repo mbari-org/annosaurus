@@ -18,8 +18,9 @@ package org.mbari.vars.annotation.repository.jpa.entity
 
 import com.google.gson.annotations.{Expose, SerializedName}
 import jakarta.persistence._
-import org.mbari.vars.annotation.model.{ImageReference, ImagedMoment}
-import org.mbari.vars.annotation.repository.jpa.{JPAPersistentObject, TransactionLogger, URLConverter}
+import org.mbari.annosaurus.model.{ImageReference, ImagedMoment}
+import org.mbari.annosaurus.repository.jpa.{TransactionLogger, URLConverter}
+import org.mbari.vars.annotation.repository.jpa.JPAPersistentObject
 
 import java.net.URL
 

@@ -17,16 +17,16 @@
 import java.util.concurrent.Executors
 
 import jakarta.servlet.ServletContext
-import org.mbari.vars.annotation.api.v1._
-import org.mbari.vars.annotation.api.v2._
-import org.mbari.vars.annotation.controllers._
+import org.mbari.annosaurus.api.v1._
+import org.mbari.annosaurus.api.v2._
+import org.mbari.annosaurus.controllers._
 import org.mbari.vars.annotation.repository.jpa.JPADAOFactory
 import org.scalatra.LifeCycle
 import org.slf4j.LoggerFactory
 
 import scala.concurrent.ExecutionContext
-import org.mbari.vars.annotation.api.v1.HealthApi
-import org.mbari.vars.annotation.AppConfig
+//import org.mbari.vars.annotation.api.v1.HealthApi
+import org.mbari.annosaurus.AppConfig
 
 /**
   *

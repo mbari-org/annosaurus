@@ -16,12 +16,11 @@
 
 package org.mbari.vars.annotation.repository.jdbc
 
-import java.net.URL
 import java.sql.Timestamp
 import java.time.Duration
 import java.util.UUID
 
-import org.mbari.vars.annotation.model.simple.Image
+import org.mbari.annosaurus.model.simple.Image
 import org.mbari.vcr4j.time.Timecode
 import java.net.URI
 

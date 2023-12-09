@@ -16,7 +16,7 @@
 
 package org.mbari.vars.annotation.repository.jdbc
 
-import org.mbari.vars.annotation.model.simple.{DepthHistogram, QueryConstraints, TimeHistogram}
+import org.mbari.annosaurus.model.simple.{DepthHistogram, QueryConstraints, TimeHistogram}
 import org.slf4j.LoggerFactory
 
 import jakarta.persistence.{EntityManager, EntityManagerFactory}

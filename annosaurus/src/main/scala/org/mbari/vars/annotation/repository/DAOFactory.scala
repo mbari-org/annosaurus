@@ -16,7 +16,7 @@
 
 package org.mbari.vars.annotation.repository
 
-import org.mbari.vars.annotation.model._
+import org.mbari.annosaurus.model.{Association, CachedAncillaryDatum, CachedVideoReferenceInfo, ImageReference, ImagedMoment, Observation}
 
 /**
   *

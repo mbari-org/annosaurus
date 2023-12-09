@@ -16,10 +16,10 @@
 
 package org.mbari.vars.annotation.repository
 
+import org.mbari.annosaurus.model.Observation
 import java.util.UUID
 import java.time.{Duration, Instant}
-import org.mbari.vars.annotation.model.Observation
-import org.mbari.vars.annotation.model.simple.{ConcurrentRequest, MultiRequest}
+import org.mbari.annosaurus.model.simple.{ConcurrentRequest, MultiRequest}
 import org.mbari.vars.annotation.repository.jpa.entity.ObservationEntity
 
 /**

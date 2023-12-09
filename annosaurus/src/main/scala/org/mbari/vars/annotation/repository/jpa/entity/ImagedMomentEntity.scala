@@ -18,8 +18,9 @@ package org.mbari.vars.annotation.repository.jpa.entity
 
 import com.google.gson.annotations.{Expose, SerializedName}
 import jakarta.persistence._
-import org.mbari.vars.annotation.Constants
-import org.mbari.vars.annotation.model._
+import org.mbari.annosaurus.Constants
+import org.mbari.annosaurus.model.{Annotation, CachedAncillaryDatum, ImageReference, ImagedMoment, Observation}
+import org.mbari.annosaurus.repository.jpa.{DurationConverter, InstantConverter, TimecodeConverter, TransactionLogger, UUIDConverter}
 import org.mbari.vars.annotation.repository.jpa._
 import org.mbari.vcr4j.time.Timecode
 

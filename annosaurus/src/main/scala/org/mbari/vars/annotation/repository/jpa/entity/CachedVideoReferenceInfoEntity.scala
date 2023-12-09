@@ -18,8 +18,9 @@ package org.mbari.vars.annotation.repository.jpa.entity
 
 import com.google.gson.annotations.{Expose, SerializedName}
 import jakarta.persistence._
-import org.mbari.vars.annotation.model.CachedVideoReferenceInfo
-import org.mbari.vars.annotation.repository.jpa.{JPAPersistentObject, TransactionLogger, UUIDConverter}
+import org.mbari.annosaurus.model.CachedVideoReferenceInfo
+import org.mbari.annosaurus.repository.jpa.{TransactionLogger, UUIDConverter}
+import org.mbari.vars.annotation.repository.jpa.JPAPersistentObject
 
 import java.util.UUID
 

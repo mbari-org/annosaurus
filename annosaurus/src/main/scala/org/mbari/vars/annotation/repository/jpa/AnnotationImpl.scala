@@ -19,7 +19,7 @@ package org.mbari.vars.annotation.repository.jpa
 import java.time.{Duration, Instant}
 import java.util.{UUID, ArrayList => JArrayList, List => JList}
 import com.google.gson.annotations.{Expose, SerializedName}
-import org.mbari.vars.annotation.model._
+import org.mbari.annosaurus.model.{Association, Annotation, ImageReference, ImagedMoment, Observation}
 import org.mbari.vars.annotation.repository.jpa.entity.{AssociationEntity, ImageReferenceEntity}
 import org.mbari.vcr4j.time.Timecode
 

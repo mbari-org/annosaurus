@@ -18,8 +18,10 @@ package org.mbari.vars.annotation.repository.jpa.entity
 
 import com.google.gson.annotations.{Expose, SerializedName}
 import jakarta.persistence._
-import org.mbari.vars.annotation.model.{Association, ImagedMoment, Observation}
-import org.mbari.vars.annotation.repository.jpa.{DurationConverter, InstantConverter, JPAPersistentObject, TransactionLogger}
+import org.mbari.annosaurus.model.{ImagedMoment, Observation}
+import org.mbari.annosaurus.model.Association
+import org.mbari.annosaurus.repository.jpa.{DurationConverter, InstantConverter, TransactionLogger}
+import org.mbari.vars.annotation.repository.jpa.JPAPersistentObject
 
 import java.time.{Duration, Instant}
 import java.util.{ArrayList => JArrayList, List => JList}

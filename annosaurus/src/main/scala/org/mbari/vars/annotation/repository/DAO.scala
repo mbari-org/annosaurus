@@ -16,9 +16,8 @@
 
 package org.mbari.vars.annotation.repository
 
+import org.mbari.annosaurus.PersistentObject
 import java.util.UUID
-
-import org.mbari.vars.annotation.PersistentObject
 
 import scala.concurrent.{ExecutionContext, Future}
 

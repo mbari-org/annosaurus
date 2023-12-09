@@ -16,7 +16,7 @@
 
 package org.mbari.vars.annotation.repository.jdbc
 
-import org.mbari.vars.annotation.model.simple.QueryConstraints
+import org.mbari.annosaurus.model.simple.QueryConstraints
 
 import java.sql.Timestamp
 import java.time.Duration

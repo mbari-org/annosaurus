@@ -19,8 +19,8 @@ package org.mbari.vars.annotation.repository.jpa
 import java.util.UUID
 import jakarta.persistence.EntityManager
 import org.mbari.vars.annotation.repository.AssociationDAO
-import org.mbari.vars.annotation.model.Association
-import org.mbari.vars.annotation.model.simple.{ConceptAssociation, ConceptAssociationRequest}
+import org.mbari.annosaurus.model.Association
+import org.mbari.annosaurus.model.simple.{ConceptAssociation, ConceptAssociationRequest}
 import org.mbari.vars.annotation.repository.jpa.entity.AssociationEntity
 
 import scala.jdk.CollectionConverters._

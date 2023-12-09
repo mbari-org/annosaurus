@@ -18,9 +18,9 @@ package org.mbari.vars.annotation.repository.jpa
 
 import java.util.UUID
 import jakarta.persistence._
-
 import com.google.gson.annotations.Expose
-import org.mbari.vars.annotation.PersistentObject
+import org.mbari.annosaurus.PersistentObject
+import org.mbari.annosaurus.repository.jpa.UUIDConverter
 
 /**
   * Mixin that supports the UUID fields

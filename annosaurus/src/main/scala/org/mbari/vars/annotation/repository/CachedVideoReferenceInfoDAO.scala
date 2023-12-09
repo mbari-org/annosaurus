@@ -16,9 +16,9 @@
 
 package org.mbari.vars.annotation.repository
 
-import java.util.UUID
+import org.mbari.annosaurus.model.CachedVideoReferenceInfo
 
-import org.mbari.vars.annotation.model.CachedVideoReferenceInfo
+import java.util.UUID
 
 /**
   *

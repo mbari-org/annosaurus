@@ -21,9 +21,9 @@ import java.time.{Duration, Instant}
 import java.util.function.Function
 import java.util.{UUID, stream}
 import jakarta.persistence.EntityManager
+import org.mbari.annosaurus.model.ImagedMoment
 import org.mbari.vars.annotation.repository.ImagedMomentDAO
-import org.mbari.vars.annotation.model.ImagedMoment
-import org.mbari.vars.annotation.model.simple.WindowRequest
+import org.mbari.annosaurus.model.simple.WindowRequest
 import org.mbari.vars.annotation.repository.jpa.entity.ImagedMomentEntity
 import org.mbari.vcr4j.time.Timecode
 

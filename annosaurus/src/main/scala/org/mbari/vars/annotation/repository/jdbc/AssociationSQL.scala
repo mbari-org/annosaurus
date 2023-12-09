@@ -19,7 +19,7 @@ package org.mbari.vars.annotation.repository.jdbc
 import java.util.UUID
 
 import org.mbari.vars.annotation.repository.jpa.AnnotationImpl
-import org.mbari.vars.annotation.model.Annotation
+import org.mbari.annosaurus.model.Annotation
 
 object AssociationSQL {
 

@@ -18,8 +18,9 @@ package org.mbari.vars.annotation.repository.jpa.entity
 
 import com.google.gson.annotations.Expose
 import jakarta.persistence._
-import org.mbari.vars.annotation.model.{CachedAncillaryDatum, ImagedMoment}
-import org.mbari.vars.annotation.repository.jpa.{DoubleOptionConverter, JPAPersistentObject, TransactionLogger}
+import org.mbari.annosaurus.model.{CachedAncillaryDatum, ImagedMoment}
+import org.mbari.annosaurus.repository.jpa.{DoubleOptionConverter, TransactionLogger}
+import org.mbari.vars.annotation.repository.jpa.JPAPersistentObject
 
 /**
   *

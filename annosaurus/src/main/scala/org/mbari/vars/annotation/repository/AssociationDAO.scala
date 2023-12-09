@@ -18,8 +18,8 @@ package org.mbari.vars.annotation.repository
 
 import java.util.UUID
 
-import org.mbari.vars.annotation.model.Association
-import org.mbari.vars.annotation.model.simple.{ConceptAssociation, ConceptAssociationRequest}
+import org.mbari.annosaurus.model.Association
+import org.mbari.annosaurus.model.simple.{ConceptAssociation, ConceptAssociationRequest}
 
 /**
   *

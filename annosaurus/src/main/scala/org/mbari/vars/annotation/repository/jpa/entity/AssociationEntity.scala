@@ -18,8 +18,9 @@ package org.mbari.vars.annotation.repository.jpa.entity
 
 import com.google.gson.annotations.Expose
 import jakarta.persistence._
-import org.mbari.vars.annotation.model.{Association, Observation}
-import org.mbari.vars.annotation.repository.jpa.{JPAPersistentObject, TransactionLogger}
+import org.mbari.annosaurus.model._
+import org.mbari.annosaurus.repository.jpa.TransactionLogger
+import org.mbari.vars.annotation.repository.jpa.JPAPersistentObject
 
 /**
   *

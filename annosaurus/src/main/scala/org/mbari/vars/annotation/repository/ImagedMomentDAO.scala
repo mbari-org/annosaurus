@@ -16,10 +16,10 @@
 
 package org.mbari.vars.annotation.repository
 
+import org.mbari.annosaurus.model.ImagedMoment
 import java.time.{Duration, Instant}
 import java.util.UUID
-import org.mbari.vars.annotation.model.ImagedMoment
-import org.mbari.vars.annotation.model.simple.WindowRequest
+import org.mbari.annosaurus.model.simple.WindowRequest
 import org.mbari.vars.annotation.repository.jpa.entity.ImagedMomentEntity
 import org.mbari.vcr4j.time.Timecode
 

@@ -5,15 +5,15 @@
         <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
         <!-- <shared-cache-mode>NONE</shared-cache-mode> -->
         <!-- Converters -->
-        <class>org.mbari.vars.annotation.repository.jpa.DurationConverter</class>
-        <class>org.mbari.vars.annotation.repository.jpa.InstantConverter</class>
-        <class>org.mbari.vars.annotation.repository.jpa.OptionConverter</class>
-        <class>org.mbari.vars.annotation.repository.jpa.FloatOptionConverter</class>
-        <class>org.mbari.vars.annotation.repository.jpa.DoubleOptionConverter</class>
-        <class>org.mbari.vars.annotation.repository.jpa.URIConverter</class>
-        <class>org.mbari.vars.annotation.repository.jpa.URLConverter</class>
-        <class>org.mbari.vars.annotation.repository.jpa.UUIDConverter</class>
-        <class>org.mbari.vars.annotation.repository.jpa.TimecodeConverter</class>
+        <class>org.mbari.annosaurus.repository.jpa.DurationConverter</class>
+        <class>org.mbari.annosaurus.repository.jpa.InstantConverter</class>
+        <class>org.mbari.annosaurus.repository.jpa.OptionConverter</class>
+        <class>org.mbari.annosaurus.repository.jpa.FloatOptionConverter</class>
+        <class>org.mbari.annosaurus.repository.jpa.DoubleOptionConverter</class>
+        <class>org.mbari.annosaurus.repository.jpa.URIConverter</class>
+        <class>org.mbari.annosaurus.repository.jpa.URLConverter</class>
+        <class>org.mbari.annosaurus.repository.jpa.UUIDConverter</class>
+        <class>org.mbari.annosaurus.repository.jpa.TimecodeConverter</class>
 
         <!-- Entities -->
         <class>org.mbari.vars.annotation.repository.jpa.entity.ImagedMomentEntity</class>

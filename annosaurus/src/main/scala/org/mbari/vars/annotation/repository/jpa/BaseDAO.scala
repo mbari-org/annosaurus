@@ -17,9 +17,7 @@
 package org.mbari.vars.annotation.repository.jpa
 
 import java.util.UUID
-
 import jakarta.persistence.EntityManager
-import org.mbari.vars.annotation.PersistentObject
 import org.mbari.vars.annotation.repository.DAO
 import org.slf4j.LoggerFactory
 
@@ -28,6 +26,8 @@ import scala.concurrent.{ExecutionContext, Future}
 import scala.reflect.ClassTag
 import scala.reflect.classTag
 import jakarta.persistence.Query
+import org.mbari.annosaurus.PersistentObject
+import org.mbari.annosaurus.repository.jpa.DatabaseProductName
 
 /**
   *

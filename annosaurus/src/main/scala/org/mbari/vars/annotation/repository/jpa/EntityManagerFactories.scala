@@ -52,7 +52,7 @@ object EntityManagerFactories {
     "jakarta.persistence.schema-generation.database.action" -> "none", //create,none
     "jakarta.persistence.sharedCache.mode"                  -> "ENABLE_SELECTIVE",
     
-    PersistenceUnitProperties.SESSION_CUSTOMIZER          -> "org.mbari.vars.annotation.repository.jpa.UUIDSequence"
+    PersistenceUnitProperties.SESSION_CUSTOMIZER          -> "org.mbari.annosaurus.repository.jpa.UUIDSequence"
   )
 
   def apply(properties: Map[String, String]): EntityManagerFactory = {

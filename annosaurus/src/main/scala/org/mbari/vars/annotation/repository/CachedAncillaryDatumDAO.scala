@@ -16,9 +16,9 @@
 
 package org.mbari.vars.annotation.repository
 
-import java.util.UUID
+import org.mbari.annosaurus.model.CachedAncillaryDatum
 
-import org.mbari.vars.annotation.model.CachedAncillaryDatum
+import java.util.UUID
 
 /**
   *

@@ -21,7 +21,7 @@ import java.time.{Duration, Instant}
 import java.util.{UUID, stream}
 import jakarta.persistence.EntityManager
 import org.mbari.vars.annotation.repository.ObservationDAO
-import org.mbari.vars.annotation.model.simple.{ConcurrentRequest, MultiRequest}
+import org.mbari.annosaurus.model.simple.{ConcurrentRequest, MultiRequest}
 import org.mbari.vars.annotation.repository.jpa.entity.ObservationEntity
 
 import scala.jdk.CollectionConverters._

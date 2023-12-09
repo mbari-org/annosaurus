@@ -20,15 +20,16 @@ import java.sql.Timestamp
 import java.time.Instant
 import java.util.UUID
 import jakarta.persistence.{EntityManager, EntityManagerFactory, Query}
-import org.mbari.vars.annotation.repository.jpa.DatabaseProductName
-import org.mbari.vars.annotation.model.{Annotation, GeographicRange}
-import org.mbari.vars.annotation.model.simple.{
+import org.mbari.annosaurus.model.GeographicRange
+import org.mbari.annosaurus.model.Annotation
+import org.mbari.annosaurus.model.simple.{
   ConcurrentRequest,
   DeleteCount,
   Image,
   MultiRequest,
   QueryConstraints
 }
+import org.mbari.annosaurus.repository.jpa.DatabaseProductName
 import org.slf4j.LoggerFactory
 
 import scala.jdk.CollectionConverters._
