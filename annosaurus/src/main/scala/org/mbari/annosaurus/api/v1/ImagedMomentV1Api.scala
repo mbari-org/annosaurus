@@ -21,7 +21,7 @@ import java.time.{Duration, Instant}
 import java.util.UUID
 
 import org.mbari.annosaurus.controllers.ImagedMomentController
-import org.mbari.vars.annotation.repository.jpa.AnnotationImpl
+import org.mbari.annosaurus.repository.jpa.AnnotationImpl
 import org.mbari.annosaurus.model.simple.{ErrorMsg, ObservationCount, WindowRequest, Count}
 import org.mbari.vcr4j.time.Timecode
 import org.scalatra.{BadRequest, NoContent, NotFound}

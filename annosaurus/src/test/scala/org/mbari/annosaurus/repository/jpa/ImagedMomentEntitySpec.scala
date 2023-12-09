@@ -17,8 +17,7 @@
 package org.mbari.annosaurus.repository.jpa
 
 import org.mbari.annosaurus.Constants
-import org.mbari.vars.annotation.repository.jpa.AnnotationImpl
-import org.mbari.vars.annotation.repository.jpa.entity.{AssociationEntity, ImagedMomentEntity, ObservationEntity}
+import org.mbari.annosaurus.repository.jpa.entity.{AssociationEntity, ImagedMomentEntity, ObservationEntity}
 import org.mbari.vcr4j.time.{FrameRates, Timecode}
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.flatspec.AnyFlatSpec

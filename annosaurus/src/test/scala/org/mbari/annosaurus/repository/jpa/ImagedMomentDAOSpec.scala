@@ -17,8 +17,8 @@
 package org.mbari.annosaurus.repository.jpa
 
 import org.mbari.annosaurus.model.simple.WindowRequest
-import org.mbari.vars.annotation.repository.ImagedMomentDAO
-import org.mbari.vars.annotation.repository.jpa.entity.ImagedMomentEntity
+import org.mbari.annosaurus.repository.ImagedMomentDAO
+import org.mbari.annosaurus.repository.jpa.entity.ImagedMomentEntity
 import org.mbari.vcr4j.time.Timecode
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.flatspec.AnyFlatSpec

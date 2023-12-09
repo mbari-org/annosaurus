@@ -17,7 +17,7 @@
 package org.mbari.annosaurus.etc.gson;
 
 import com.google.gson.InstanceCreator;
-import org.mbari.vars.annotation.repository.jpa.entity.ImageReferenceEntity;
+import org.mbari.annosaurus.repository.jpa.entity.ImageReferenceEntity;
 import org.mbari.annosaurus.model.ImageReference;
 
 import java.lang.reflect.Type;

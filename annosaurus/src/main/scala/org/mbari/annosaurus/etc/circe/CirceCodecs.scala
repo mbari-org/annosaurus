@@ -20,9 +20,9 @@ import io.circe._
 import io.circe.generic.semiauto._
 import io.circe.syntax._
 import org.mbari.annosaurus.model.simple.HealthStatus
+import org.mbari.annosaurus.util.HexUtil
 import org.mbari.vars.annotation.auth.AuthorizationSnakeCase
 import org.mbari.vars.annotation.domain.Association
-import org.mbari.vars.annotation.util.HexUtil
 
 import java.net.{URI, URL}
 import scala.util.Try

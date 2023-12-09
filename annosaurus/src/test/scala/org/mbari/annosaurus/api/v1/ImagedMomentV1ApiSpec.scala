@@ -20,7 +20,7 @@ import org.mbari.annosaurus.api.WebApiStack
 import org.mbari.annosaurus.controllers.{AnnotationController, AssociationController, ImageController, ImagedMomentController}
 import org.mbari.annosaurus.model.Annotation
 import org.mbari.annosaurus.model.simple.{Count, WindowRequest}
-import org.mbari.vars.annotation.repository.jpa.entity.ImagedMomentEntity
+import org.mbari.annosaurus.repository.jpa.entity.ImagedMomentEntity
 
 import java.net.URL
 import java.time.{Duration, Instant}

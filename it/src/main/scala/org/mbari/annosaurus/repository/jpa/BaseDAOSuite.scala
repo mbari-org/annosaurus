@@ -16,8 +16,7 @@
 
 package org.mbari.annosaurus.repository.jpa
 
-import org.mbari.vars.annotation.repository.DAO
-
+import org.mbari.annosaurus.repository.DAO
 import java.util.concurrent.TimeUnit
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.concurrent.duration.{Duration => SDuration}

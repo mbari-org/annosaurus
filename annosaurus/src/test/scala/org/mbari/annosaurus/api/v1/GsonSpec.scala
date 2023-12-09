@@ -17,7 +17,7 @@
 package org.mbari.annosaurus.api.v1
 
 import org.mbari.annosaurus.Constants
-import org.mbari.vars.annotation.repository.jpa.entity.IndexEntity
+import org.mbari.annosaurus.repository.jpa.entity.IndexEntity
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 

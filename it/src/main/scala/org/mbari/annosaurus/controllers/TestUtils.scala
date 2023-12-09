@@ -17,9 +17,10 @@
 package org.mbari.annosaurus.controllers
 
 import org.mbari.annosaurus.etc.jdk.Strings
+import org.mbari.annosaurus.repository.jpa.entity.{AssociationEntity, CachedAncillaryDatumEntity, ImageReferenceEntity, ImagedMomentEntity, ObservationEntity}
 import org.mbari.scilube3.ocean.Ocean
-import org.mbari.vars.annotation.repository.jpa.JPADAOFactory
-import org.mbari.vars.annotation.repository.jpa.entity._
+import org.mbari.annosaurus.repository.jpa.JPADAOFactory
+import org.mbari.annosaurus.repository.jpa.entity._
 import org.mbari.vcr4j.time.{FrameRates, Timecode}
 import org.slf4j.LoggerFactory
 

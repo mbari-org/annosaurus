@@ -16,8 +16,8 @@
 
 package org.mbari.annosaurus.api.v1
 
-import org.mbari.vars.annotation.repository.jdbc.AnalysisRepository
-import org.mbari.vars.annotation.repository.jpa.JPADAOFactory
+import org.mbari.annosaurus.repository.jdbc.AnalysisRepository
+import org.mbari.annosaurus.repository.jpa.JPADAOFactory
 import org.mbari.annosaurus.model.simple.{ErrorMsg, QueryConstraints, QueryConstraintsResponse}
 import org.scalatra.BadRequest
 

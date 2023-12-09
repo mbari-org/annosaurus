@@ -18,7 +18,7 @@ package org.mbari.annosaurus.controllers
 
 import org.mbari.annosaurus.AssertUtils
 import org.mbari.annosaurus.repository.jpa.BaseDAOSuite
-import org.mbari.vars.annotation.repository.jpa.JPADAOFactory
+import org.mbari.annosaurus.repository.jpa.JPADAOFactory
 
 import scala.concurrent.ExecutionContext
 

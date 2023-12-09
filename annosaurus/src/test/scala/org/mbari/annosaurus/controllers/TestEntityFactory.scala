@@ -16,8 +16,8 @@
 
 package org.mbari.annosaurus.controllers
 
-import org.mbari.vars.annotation.repository.jpa.JPADAOFactory
-import org.mbari.vars.annotation.repository.jpa.entity.ImagedMomentEntity
+import org.mbari.annosaurus.repository.jpa.entity.ImagedMomentEntity
+import org.mbari.annosaurus.repository.jpa.JPADAOFactory
 
 import java.net.URL
 import java.time.Instant

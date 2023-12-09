@@ -18,7 +18,7 @@ package org.mbari.annosaurus
 
 import org.junit.Assert._
 import org.mbari.annosaurus.model.{Association, CachedAncillaryDatum, ImageReference, Observation}
-import org.mbari.vars.annotation.repository.jpa.entity.ImagedMomentEntity
+import org.mbari.annosaurus.repository.jpa.entity.ImagedMomentEntity
 
 object AssertUtils {
 

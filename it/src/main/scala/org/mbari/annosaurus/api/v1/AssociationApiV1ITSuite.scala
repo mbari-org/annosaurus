@@ -19,8 +19,8 @@ package org.mbari.annosaurus.api.v1
 import org.mbari.annosaurus.Constants
 import org.mbari.annosaurus.api.WebSuite
 import org.mbari.annosaurus.controllers.{AssociationController, BasicDAOFactory, TestUtils}
-import org.mbari.vars.annotation.repository.jpa.JPADAOFactory
-import org.mbari.vars.annotation.repository.jpa.entity.AssociationEntity
+import org.mbari.annosaurus.repository.jpa.entity.AssociationEntity
+import org.mbari.annosaurus.repository.jpa.JPADAOFactory
 
 import scala.concurrent.ExecutionContext
 

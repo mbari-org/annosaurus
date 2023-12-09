@@ -23,8 +23,8 @@ import java.util.UUID
 //import org.mbari.vars.annotation.dao.jdbc.JdbcRepository
 //import org.mbari.vars.annotation.dao.jpa.JPADAOFactory
 import org.mbari.annosaurus.model.ImagedMoment
-import org.mbari.vars.annotation.repository.{DAO, ImagedMomentDAO, NotFoundInDatastoreException}
 import org.mbari.annosaurus.model.simple.WindowRequest
+import org.mbari.annosaurus.repository.{DAO, ImagedMomentDAO, NotFoundInDatastoreException}
 import org.mbari.vcr4j.time.Timecode
 import org.slf4j.LoggerFactory
 

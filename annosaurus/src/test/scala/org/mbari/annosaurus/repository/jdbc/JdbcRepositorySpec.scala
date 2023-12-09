@@ -20,8 +20,7 @@ import org.mbari.annosaurus.Constants
 import org.mbari.annosaurus.controllers.{AnnotationController, BasicDAOFactory, TestEntityFactory}
 import org.mbari.annosaurus.model.Annotation
 import org.mbari.annosaurus.repository.jpa.TestDAOFactory
-import org.mbari.vars.annotation.repository.jdbc.JdbcRepository
-import org.mbari.vars.annotation.repository.jpa.{AnnotationImpl, JPADAOFactory}
+import org.mbari.annosaurus.repository.jpa.{AnnotationImpl, JPADAOFactory}
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers

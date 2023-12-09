@@ -17,8 +17,8 @@
 package org.mbari.annosaurus.repository.jpa
 
 import org.mbari.annosaurus.model.Association
-import org.mbari.vars.annotation.repository.AssociationDAO
-import org.mbari.vars.annotation.repository.jpa.entity.{AssociationEntity, ImagedMomentEntity, ObservationEntity}
+import org.mbari.annosaurus.repository.AssociationDAO
+import org.mbari.annosaurus.repository.jpa.entity.{AssociationEntity, ImagedMomentEntity, ObservationEntity}
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers

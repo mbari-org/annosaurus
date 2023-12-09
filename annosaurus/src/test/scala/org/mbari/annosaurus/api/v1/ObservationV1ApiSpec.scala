@@ -20,8 +20,8 @@ import org.mbari.annosaurus.Constants
 import org.mbari.annosaurus.api.WebApiStack
 import org.mbari.annosaurus.controllers.{AnnotationController, BasicDAOFactory, ObservationController}
 import org.mbari.annosaurus.model.Observation
-import org.mbari.vars.annotation.repository.jpa.AnnotationImpl
-import org.mbari.vars.annotation.repository.jpa.entity.{AssociationEntity, ImagedMomentEntity, ObservationEntity}
+import org.mbari.annosaurus.repository.jpa.entity.{AssociationEntity, ImagedMomentEntity, ObservationEntity}
+import org.mbari.annosaurus.repository.jpa.AnnotationImpl
 
 import java.nio.charset.StandardCharsets
 import java.time.{Duration, Instant}

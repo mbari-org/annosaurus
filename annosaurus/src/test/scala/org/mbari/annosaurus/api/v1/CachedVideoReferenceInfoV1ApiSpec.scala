@@ -20,7 +20,7 @@ import org.mbari.annosaurus.Constants
 import org.mbari.annosaurus.api.WebApiStack
 import org.mbari.annosaurus.controllers.CachedVideoReferenceInfoController
 import org.mbari.annosaurus.model.CachedVideoReferenceInfo
-import org.mbari.vars.annotation.repository.jpa.entity.CachedVideoReferenceInfoEntity
+import org.mbari.annosaurus.repository.jpa.entity.CachedVideoReferenceInfoEntity
 
 import java.util.UUID
 import java.util.concurrent.TimeUnit

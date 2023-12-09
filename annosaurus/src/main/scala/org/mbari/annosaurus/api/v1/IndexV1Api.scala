@@ -20,7 +20,7 @@ import java.util.UUID
 
 import org.mbari.annosaurus.controllers.IndexController
 import org.mbari.annosaurus.model.simple.ErrorMsg
-import org.mbari.vars.annotation.repository.jpa.entity.IndexEntity
+import org.mbari.annosaurus.repository.jpa.entity.IndexEntity
 import org.scalatra.BadRequest
 
 import scala.jdk.CollectionConverters._

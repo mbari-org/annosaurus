@@ -20,9 +20,9 @@ import org.mbari.annosaurus.Constants
 import org.mbari.annosaurus.api.WebApiStack
 import org.mbari.annosaurus.controllers.{AnnotationController, TestEntityFactory}
 import org.mbari.annosaurus.model.simple.{QueryConstraints, QueryConstraintsResponse}
-import org.mbari.vars.annotation.repository.ImagedMomentDAO
-import org.mbari.vars.annotation.repository.jpa.{AnnotationImpl, JPADAOFactory}
-import org.mbari.vars.annotation.repository.jpa.entity.ImagedMomentEntity
+import org.mbari.annosaurus.repository.jpa.entity.ImagedMomentEntity
+import org.mbari.annosaurus.repository.ImagedMomentDAO
+import org.mbari.annosaurus.repository.jpa.{AnnotationImpl, JPADAOFactory}
 
 import java.nio.charset.StandardCharsets
 import java.util.concurrent.TimeUnit

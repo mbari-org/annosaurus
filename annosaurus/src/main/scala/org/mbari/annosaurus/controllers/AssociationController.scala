@@ -20,13 +20,13 @@ import java.util.UUID
 
 import io.reactivex.rxjava3.subjects.Subject
 import org.mbari.annosaurus.messaging.{AssociationPublisher, MessageBus}
-import org.mbari.vars.annotation.repository.{AssociationDAO, NotFoundInDatastoreException}
 import org.mbari.annosaurus.model.Association
 import org.mbari.annosaurus.model.simple.{
   ConceptAssociation,
   ConceptAssociationRequest,
   ConceptAssociationResponse
 }
+import org.mbari.annosaurus.repository.{AssociationDAO, NotFoundInDatastoreException}
 
 import scala.concurrent.{ExecutionContext, Future}
 

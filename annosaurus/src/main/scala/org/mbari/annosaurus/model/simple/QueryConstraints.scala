@@ -17,7 +17,7 @@
 package org.mbari.annosaurus.model.simple
 
 import com.google.gson.annotations.Expose
-import org.mbari.vars.annotation.repository.jdbc.AnnotationSQL
+import org.mbari.annosaurus.repository.jdbc.AnnotationSQL
 
 import java.sql.Timestamp
 import java.time.Instant
@@ -196,7 +196,7 @@ object QueryConstraints {
     * @return
     */
   def toFromWhereSql(qc: QueryConstraints): String = {
-    import org.mbari.vars.annotation.repository.jdbc.AnnotationSQL._
+    import org.mbari.annosaurus.repository.jdbc.AnnotationSQL._
 
     val sqlConstraints = List(
       if (qc.conceptSeq().nonEmpty) Some("(obs.concept IN (A?) OR ass.to_concept IN (A?))")

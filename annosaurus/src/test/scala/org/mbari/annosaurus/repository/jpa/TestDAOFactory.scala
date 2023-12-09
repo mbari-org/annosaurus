@@ -19,7 +19,6 @@ package org.mbari.annosaurus.repository.jpa
 import com.typesafe.config.ConfigFactory
 import jakarta.persistence.EntityManagerFactory
 import org.eclipse.persistence.config.TargetDatabase
-import org.mbari.vars.annotation.repository.jpa.{EntityManagerFactories, JPADAOFactory}
 
 import java.util.concurrent.TimeUnit
 import scala.concurrent.Await

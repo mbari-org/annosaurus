@@ -21,8 +21,8 @@ import org.mbari.annosaurus.api.WebApiStack
 import org.mbari.annosaurus.controllers.AnnotationController
 import org.mbari.annosaurus.model.Annotation
 import org.mbari.annosaurus.model.simple.{ConcurrentRequest, ConcurrentRequestCount, MultiRequest}
-import org.mbari.vars.annotation.repository.jpa.AnnotationImpl
-import org.mbari.vars.annotation.repository.jpa.entity.{AssociationEntity, ImageReferenceEntity}
+import org.mbari.annosaurus.repository.jpa.entity.{AssociationEntity, ImageReferenceEntity}
+import org.mbari.annosaurus.repository.jpa.AnnotationImpl
 import org.mbari.vcr4j.time.Timecode
 
 import java.net.URL

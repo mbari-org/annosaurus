@@ -17,10 +17,9 @@
 package org.mbari.annosaurus.controllers
 
 import org.mbari.annosaurus.model.ImagedMoment
+import org.mbari.annosaurus.repository.IndexDAO
 import java.time.Instant
 import java.util.UUID
-
-import org.mbari.vars.annotation.repository.IndexDAO
 
 import scala.concurrent.{ExecutionContext, Future}
 

@@ -21,9 +21,9 @@ import org.mbari.annosaurus.util.FastCollator
 import java.time.Duration
 import java.util.UUID
 
-import org.mbari.vars.annotation.repository.jpa.BaseDAO
-import org.mbari.vars.annotation.repository.{CachedAncillaryDatumDAO, NotFoundInDatastoreException}
+import org.mbari.annosaurus.repository.jpa.BaseDAO
 import org.mbari.annosaurus.model.simple.CachedAncillaryDatumBean
+import org.mbari.annosaurus.repository.{CachedAncillaryDatumDAO, NotFoundInDatastoreException}
 import org.slf4j.LoggerFactory
 
 import scala.concurrent.{ExecutionContext, Future}

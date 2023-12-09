@@ -16,7 +16,7 @@
 
 package org.mbari.annosaurus.controllers
 
-import org.mbari.vars.annotation.repository.jpa.JPADAOFactory
+import org.mbari.annosaurus.repository.jpa.JPADAOFactory
 
 import java.util.concurrent.TimeUnit
 import scala.concurrent.Await

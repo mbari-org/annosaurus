@@ -18,7 +18,7 @@ package org.mbari.annosaurus.api.v1
 
 import org.mbari.annosaurus.api.WebApiStack
 import org.mbari.annosaurus.controllers.{ImageReferenceController, ImagedMomentController}
-import org.mbari.vars.annotation.repository.jpa.entity.{ImageReferenceEntity, ImagedMomentEntity}
+import org.mbari.annosaurus.repository.jpa.entity.{ImageReferenceEntity, ImagedMomentEntity}
 
 import java.net.URL
 import java.time.Instant

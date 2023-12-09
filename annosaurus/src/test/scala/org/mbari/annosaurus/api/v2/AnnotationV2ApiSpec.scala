@@ -18,7 +18,7 @@ package org.mbari.annosaurus.api.v2
 
 import org.mbari.annosaurus.api.WebApiStack
 import org.mbari.annosaurus.controllers.AnnotationController
-import org.mbari.vars.annotation.repository.jpa.AnnotationImpl
+import org.mbari.annosaurus.repository.jpa.AnnotationImpl
 
 import java.time.Instant
 import java.util.UUID

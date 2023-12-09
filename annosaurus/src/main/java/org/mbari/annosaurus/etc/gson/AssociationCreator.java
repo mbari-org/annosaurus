@@ -17,7 +17,7 @@
 package org.mbari.annosaurus.etc.gson;
 
 import com.google.gson.InstanceCreator;
-import org.mbari.vars.annotation.repository.jpa.entity.AssociationEntity;
+import org.mbari.annosaurus.repository.jpa.entity.AssociationEntity;
 import org.mbari.annosaurus.model.Association;
 
 import java.lang.reflect.Type;

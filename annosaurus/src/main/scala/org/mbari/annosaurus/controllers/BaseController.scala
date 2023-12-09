@@ -17,8 +17,8 @@
 package org.mbari.annosaurus.controllers
 
 import org.mbari.annosaurus.PersistentObject
+import org.mbari.annosaurus.repository.DAO
 import java.util.UUID
-import org.mbari.vars.annotation.repository.DAO
 
 import scala.concurrent.{ExecutionContext, Future}
 

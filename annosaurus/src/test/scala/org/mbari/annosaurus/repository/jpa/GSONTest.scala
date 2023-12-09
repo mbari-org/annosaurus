@@ -18,8 +18,7 @@ package org.mbari.annosaurus.repository.jpa
 
 import org.mbari.annosaurus.Constants
 import org.mbari.annosaurus.model.simple.CachedAncillaryDatumBean
-import org.mbari.vars.annotation.repository.jpa.AnnotationImpl
-import org.mbari.vars.annotation.repository.jpa.entity._
+import org.mbari.annosaurus.repository.jpa.entity.{AssociationEntity, CachedAncillaryDatumEntity, ImageReferenceEntity, ImagedMomentEntity, ObservationEntity}
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 

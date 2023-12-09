@@ -17,10 +17,10 @@
 package org.mbari.annosaurus.controllers
 
 import org.mbari.annosaurus.model.{ImageReference, ImagedMoment}
+import org.mbari.annosaurus.repository.{ImageReferenceDAO, NotFoundInDatastoreException}
 
 import java.net.URL
 import java.util.UUID
-import org.mbari.vars.annotation.repository.{ImageReferenceDAO, NotFoundInDatastoreException}
 
 import scala.concurrent.{ExecutionContext, Future}
 

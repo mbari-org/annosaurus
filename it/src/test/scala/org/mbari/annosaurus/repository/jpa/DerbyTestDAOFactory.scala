@@ -18,7 +18,6 @@ package org.mbari.annosaurus.repository.jpa
 
 import jakarta.persistence.EntityManagerFactory
 import org.eclipse.persistence.config.TargetDatabase
-import org.mbari.vars.annotation.repository.jpa.EntityManagerFactories
 
 object DerbyTestDAOFactory extends TestDAOFactory {
 

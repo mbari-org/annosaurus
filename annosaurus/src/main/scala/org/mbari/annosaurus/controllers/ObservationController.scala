@@ -21,7 +21,7 @@ import java.util.UUID
 import io.reactivex.rxjava3.subjects.Subject
 import org.mbari.annosaurus.messaging.{AnnotationPublisher, MessageBus}
 import org.mbari.annosaurus.model.{ImagedMoment, Observation}
-import org.mbari.vars.annotation.repository.{NotFoundInDatastoreException, ObservationDAO}
+import org.mbari.annosaurus.repository.{NotFoundInDatastoreException, ObservationDAO}
 
 import scala.concurrent.{ExecutionContext, Future}
 

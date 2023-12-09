@@ -16,8 +16,8 @@
 
 package org.mbari.annosaurus.repository.jpa
 
-import org.mbari.vars.annotation.repository.jpa.entity.{ImagedMomentEntity, IndexEntity}
-import org.mbari.vars.annotation.repository.{ImagedMomentDAO, IndexDAO}
+import org.mbari.annosaurus.repository.{ImagedMomentDAO, IndexDAO}
+import org.mbari.annosaurus.repository.jpa.entity.{ImagedMomentEntity, IndexEntity}
 import org.mbari.vcr4j.time.Timecode
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.flatspec.AnyFlatSpec

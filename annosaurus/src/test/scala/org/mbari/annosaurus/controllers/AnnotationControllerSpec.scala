@@ -20,7 +20,7 @@ import org.mbari.annosaurus.Constants
 import org.mbari.annosaurus.model.Annotation
 import org.mbari.annosaurus.model.simple.{ConcurrentRequest, MultiRequest}
 import org.mbari.annosaurus.repository.jpa.TestDAOFactory
-import org.mbari.vars.annotation.repository.jpa.AnnotationImpl
+import org.mbari.annosaurus.repository.jpa.AnnotationImpl
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers

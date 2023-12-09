@@ -17,9 +17,8 @@
 package org.mbari.annosaurus.controllers
 
 import org.mbari.annosaurus.model.CachedVideoReferenceInfo
+import org.mbari.annosaurus.repository.CachedVideoReferenceInfoDAO
 import java.util.UUID
-
-import org.mbari.vars.annotation.repository.CachedVideoReferenceInfoDAO
 
 import scala.concurrent.{ExecutionContext, Future}
 

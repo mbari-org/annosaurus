@@ -17,8 +17,8 @@
 package org.mbari.annosaurus.etc.zeromq
 
 import org.mbari.annosaurus.messaging.{AnnotationMessage, AssociationMessage, MessageBus}
-import org.mbari.vars.annotation.repository.jpa.AnnotationImpl
-import org.mbari.vars.annotation.repository.jpa.entity.{AssociationEntity, ObservationEntity}
+import org.mbari.annosaurus.repository.jpa.entity.{AssociationEntity, ObservationEntity}
+import org.mbari.annosaurus.repository.jpa.AnnotationImpl
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers

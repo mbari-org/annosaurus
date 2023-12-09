@@ -17,7 +17,7 @@
 package org.mbari.annosaurus
 
 import org.mbari.annosaurus.model.{CachedAncillaryDatum, CachedVideoReferenceInfo, ImageReference, ImagedMoment, Observation}
-import org.mbari.vars.annotation.repository.DAOFactory
+import org.mbari.annosaurus.repository.jpa.DAOFactory
 import org.mbari.annosaurus.model._
 
 /**

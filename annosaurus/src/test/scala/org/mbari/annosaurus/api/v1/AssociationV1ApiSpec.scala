@@ -21,7 +21,7 @@ import org.mbari.annosaurus.api.WebApiStack
 import org.mbari.annosaurus.controllers.{AnnotationController, AssociationController, BasicDAOFactory, ObservationController}
 import org.mbari.annosaurus.model.simple.{ConceptAssociationRequest, ConceptAssociationResponse}
 import org.mbari.annosaurus.model.{Annotation, Association}
-import org.mbari.vars.annotation.repository.jpa.entity.AssociationEntity
+import org.mbari.annosaurus.repository.jpa.entity.AssociationEntity
 
 import java.nio.charset.StandardCharsets
 import java.time.Duration

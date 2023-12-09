@@ -19,7 +19,7 @@ package org.mbari.annosaurus.messaging
 import io.reactivex.rxjava3.subjects.Subject
 import org.mbari.annosaurus.model.Observation
 import org.mbari.annosaurus.model.{Annotation, Association}
-import org.mbari.vars.annotation.repository.jpa.AnnotationImpl
+import org.mbari.annosaurus.repository.jpa.AnnotationImpl
 
 import scala.util.Try
 

@@ -20,9 +20,8 @@ import org.mbari.annosaurus.model.{ImageReference, ImagedMoment}
 import java.net.URL
 import java.time.{Duration, Instant}
 import java.util.UUID
-
-import org.mbari.vars.annotation.repository.ImagedMomentDAO
 import org.mbari.annosaurus.model.simple.Image
+import org.mbari.annosaurus.repository.ImagedMomentDAO
 import org.mbari.vcr4j.time.Timecode
 
 import scala.concurrent.{ExecutionContext, Future}

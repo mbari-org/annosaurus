@@ -18,7 +18,7 @@ package org.mbari.annosaurus.api.v1
 
 import org.mbari.annosaurus.api.WebApiStack
 import org.mbari.annosaurus.controllers.{AnnotationController, IndexController}
-import org.mbari.vars.annotation.repository.jpa.entity.IndexEntity
+import org.mbari.annosaurus.repository.jpa.entity.IndexEntity
 import org.mbari.vcr4j.time.{FrameRates, Timecode}
 
 import java.nio.charset.StandardCharsets

@@ -17,12 +17,12 @@
 package org.mbari.annosaurus.repository.jpa
 
 import com.typesafe.config.{Config, ConfigFactory}
-import org.mbari.vars.annotation.repository.jpa.JPADAOFactory
+import org.mbari.annosaurus.repository.jpa.JPADAOFactory
 
 import java.util.concurrent.TimeUnit
 import scala.concurrent.Await
 import scala.concurrent.duration.Duration
-import org.mbari.vars.annotation.repository.jpa.EntityManagerFactories
+import org.mbari.annosaurus.repository.jpa.EntityManagerFactories
 
 trait TestDAOFactory extends JPADAOFactory {
 

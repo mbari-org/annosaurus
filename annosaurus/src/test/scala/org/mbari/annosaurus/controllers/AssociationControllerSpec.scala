@@ -18,8 +18,8 @@ package org.mbari.annosaurus.controllers
 
 import org.mbari.annosaurus.model.simple.ConceptAssociationRequest
 import org.mbari.annosaurus.repository.jpa.TestDAOFactory
-import org.mbari.vars.annotation.repository.jpa.entity.{AssociationEntity, ImagedMomentEntity, ObservationEntity}
-import org.mbari.vars.annotation.repository.jpa.AnnotationImpl
+import org.mbari.annosaurus.repository.jpa.entity.{AssociationEntity, ImagedMomentEntity, ObservationEntity}
+import org.mbari.annosaurus.repository.jpa.AnnotationImpl
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers

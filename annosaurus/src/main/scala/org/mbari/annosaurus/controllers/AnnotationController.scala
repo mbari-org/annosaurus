@@ -24,14 +24,15 @@ import java.util.concurrent.Executors
 import io.reactivex.rxjava3.subjects.Subject
 import org.mbari.annosaurus.messaging.{AnnotationPublisher, MessageBus}
 import org.mbari.annosaurus.model.{Annotation, Observation}
-import org.mbari.vars.annotation.repository.jpa.AnnotationImpl
-import org.mbari.vars.annotation.repository.DAO
+import org.mbari.annosaurus.repository.jpa.AnnotationImpl
 import org.mbari.annosaurus.model.simple.{ConcurrentRequest, MultiRequest}
+import org.mbari.annosaurus.repository.DAO
 import org.mbari.annosaurus.repository.jpa.UUIDSequence
+import org.mbari.annosaurus.repository.jpa.entity.ImagedMomentEntity
 import org.mbari.vcr4j.time.Timecode
+import org.mbari.annosaurus.repository.jpa.Implicits._
 
 import scala.concurrent.{ExecutionContext, Future}
-import org.mbari.vars.annotation.repository.jpa.entity.ImagedMomentEntity
 
 /**
   *

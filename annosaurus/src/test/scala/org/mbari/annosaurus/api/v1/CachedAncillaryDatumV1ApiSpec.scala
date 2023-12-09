@@ -20,7 +20,7 @@ import org.mbari.annosaurus.Constants
 import org.mbari.annosaurus.api.WebApiStack
 import org.mbari.annosaurus.controllers.CachedAncillaryDatumController
 import org.mbari.annosaurus.model.simple.CachedAncillaryDatumBean
-import org.mbari.vars.annotation.repository.jpa.entity.CachedAncillaryDatumEntity
+import org.mbari.annosaurus.repository.jpa.entity.CachedAncillaryDatumEntity
 
 import java.nio.charset.StandardCharsets
 import java.time.Duration
