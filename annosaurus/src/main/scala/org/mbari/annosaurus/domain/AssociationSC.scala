@@ -19,10 +19,17 @@ package org.mbari.vars.annotation.domain
 import org.mbari.annosaurus.repository.jpa.entity.AssociationEntity
 import java.util.UUID
 
-case class Association(uuid: UUID, link_name: String, to_concept: String, link_value: String, mime_type: String) {
+case class AssociationSC(uuid: UUID, link_name: String, to_concept: String, link_value: String, mime_type: String) {
+    
     def toEntity: AssociationEntity = {
         val a = AssociationEntity(link_name, to_concept, link_value, mime_type)
         a.uuid = uuid
         a
     }
+
+    def linkName:String = link_name
+    def toConcept:String = to_concept
+    def linkValue:String = link_value
+    def mimeType:String = mime_type
 }
+

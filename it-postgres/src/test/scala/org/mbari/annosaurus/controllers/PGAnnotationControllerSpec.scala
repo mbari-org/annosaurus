@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.mbari.vars.annotation.controllers
+package org.mbari.annosaurus.controllers
 
 import org.scalatest.flatspec.AnyFlatSpec
 import com.dimafeng.testcontainers.ForAllTestContainer
@@ -22,7 +22,7 @@ import org.scalatest.matchers.should.Matchers
 import org.scalatest.BeforeAndAfterAll
 import com.dimafeng.testcontainers.PostgreSQLContainer
 import org.eclipse.persistence.config.TargetDatabase
-import org.mbari.vars.annotation.dao.jpa.{DatabaseProductName, EntityManagerFactories, ImagedMomentDAOImpl}
+import org.mbari.annosaurus.dao.jpa.{DatabaseProductName, EntityManagerFactories, ImagedMomentDAOImpl}
 
 import java.sql.DriverManager
 import java.time.Instant

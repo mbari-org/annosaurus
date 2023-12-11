@@ -39,12 +39,12 @@ class AppConfig(config: Config) {
         Try(config.getString("authentication.service"))
             .getOrElse("org.mbari.vars.annotation.auth.NoopAuthService")
 
-    lazy val basicJwtConfig: Option[BasicJwtConfig] =
+    lazy val basicJwtConfig: Option[JwtParams] =
         try {
             val issuer        = config.getString("basicjwt.issuer")
             val clientSecret  = config.getString("basicjwt.client.secret")
             val signingSecret = config.getString("basicjwt.signing.secret")
-            Some(BasicJwtConfig(issuer, clientSecret, signingSecret))
+            Some(JwtParams(issuer, clientSecret, signingSecret))
         }
         catch {
             case NonFatal(e) => None

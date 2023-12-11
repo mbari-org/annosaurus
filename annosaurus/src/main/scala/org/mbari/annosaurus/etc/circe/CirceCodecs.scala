@@ -22,7 +22,7 @@ import io.circe.syntax._
 import org.mbari.annosaurus.model.simple.HealthStatus
 import org.mbari.annosaurus.util.HexUtil
 import org.mbari.vars.annotation.auth.AuthorizationSnakeCase
-import org.mbari.vars.annotation.domain.Association
+import org.mbari.vars.annotation.domain.AssociationSC
 
 import java.net.{URI, URL}
 import scala.util.Try
@@ -53,8 +53,8 @@ object CirceCodecs {
     implicit val healthStatusDecoder: Decoder[HealthStatus] = deriveDecoder
     implicit val healthStatusEncoder: Encoder[HealthStatus] = deriveEncoder
 
-    implicit val associationDecoder: Decoder[Association] = deriveDecoder
-    implicit val associationEncoder: Encoder[Association] = deriveEncoder
+    implicit val associationDecoder: Decoder[AssociationSC] = deriveDecoder
+    implicit val associationEncoder: Encoder[AssociationSC] = deriveEncoder
 
     implicit val authorizationSCDecoder: Decoder[AuthorizationSnakeCase] = deriveDecoder
     implicit val authorizationSCEncoder: Encoder[AuthorizationSnakeCase] = deriveEncoder

@@ -20,7 +20,7 @@ import java.util.UUID
 
 import org.mbari.annosaurus.controllers.AssociationController
 import org.mbari.annosaurus.model.Association
-import org.mbari.vars.annotation.domain.{Association => SAssociation}
+import org.mbari.vars.annotation.domain.{AssociationSC => SAssociation}
 import org.mbari.annosaurus.model.simple.{ConceptAssociationRequest, ErrorMsg}
 import org.scalatra.{BadRequest, NoContent, NotFound}
 import io.circe._

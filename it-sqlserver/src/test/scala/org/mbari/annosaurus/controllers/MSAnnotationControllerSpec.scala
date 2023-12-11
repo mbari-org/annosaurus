@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package org.mbari.vars.annotation.controllers
+package org.mbari.annosaurus.controllers
 
 import org.scalatest.flatspec.AnyFlatSpec
 import com.dimafeng.testcontainers.{ForAllTestContainer, MSSQLServerContainer}
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.BeforeAndAfterAll
 import org.eclipse.persistence.config.TargetDatabase
-import org.mbari.vars.annotation.dao.jpa.{DatabaseProductName, EntityManagerFactories}
+import org.mbari.annosaurus.dao.jpa.{DatabaseProductName, EntityManagerFactories}
 
 import java.sql.DriverManager
 import java.time.Instant

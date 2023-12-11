@@ -16,4 +16,4 @@
 
 package org.mbari.annosaurus
 
-case class BasicJwtConfig(issuer: String, clientSecret: String, signingSecret: String)
+case class JwtParams(issuer: String, clientSecret: String, signingSecret: String)
