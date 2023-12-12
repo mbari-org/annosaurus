@@ -16,7 +16,7 @@
 
 package org.mbari.annosaurus.repository.jdbc
 
-import org.mbari.annosaurus.model.Annotation
+import org.mbari.annosaurus.model.MutableAnnotation
 
 import java.util.UUID
 
@@ -110,7 +110,7 @@ object AncillaryDatumSQL {
       | )
       |""".stripMargin
 
-    def join(annotations: Seq[AnnotationExt], data: Seq[AncillaryDatumExt]): Seq[Annotation] = {
+    def join(annotations: Seq[MutableAnnotationExt], data: Seq[AncillaryDatumExt]): Seq[MutableAnnotation] = {
         for {
             d <- data
         } {

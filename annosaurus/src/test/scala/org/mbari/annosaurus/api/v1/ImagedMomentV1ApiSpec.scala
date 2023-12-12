@@ -18,7 +18,7 @@ package org.mbari.annosaurus.api.v1
 
 import org.mbari.annosaurus.api.WebApiStack
 import org.mbari.annosaurus.controllers.{AnnotationController, AssociationController, ImageController, ImagedMomentController}
-import org.mbari.annosaurus.model.Annotation
+import org.mbari.annosaurus.model.MutableAnnotation
 import org.mbari.annosaurus.model.simple.{Count, WindowRequest}
 import org.mbari.annosaurus.repository.jpa.entity.ImagedMomentEntity
 
@@ -53,7 +53,7 @@ class ImagedMomentV1ApiSpec extends WebApiStack {
     }
   }
 
-  var annotation: Annotation = _
+  var annotation: MutableAnnotation = _
 
   it should "find by uuid" in {
 

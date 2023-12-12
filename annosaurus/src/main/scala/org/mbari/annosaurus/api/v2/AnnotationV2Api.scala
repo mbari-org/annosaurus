@@ -21,7 +21,7 @@ import java.util.UUID
 
 import org.mbari.vars.annotation.api.APIStack
 import org.mbari.annosaurus.controllers.AnnotationController
-import org.mbari.annosaurus.model.Annotation
+import org.mbari.annosaurus.model.MutableAnnotation
 import org.mbari.annosaurus.model.simple.ErrorMsg
 import org.mbari.annosaurus.util.ResponseUtilities
 import org.scalatra.BadRequest
@@ -63,7 +63,7 @@ class AnnotationV2Api(controller: AnnotationController)(implicit val executor: E
       controller.streamByVideoReferenceUUID(uuid, limit, offset)
     }
 
-    ResponseUtilities.sendStreamedResponse(response, stream, (a: Annotation) => toJson(a))
+    ResponseUtilities.sendStreamedResponse(response, stream, (a: MutableAnnotation) => toJson(a))
     closeable.close()
     ()
   }

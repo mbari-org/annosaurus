@@ -21,7 +21,7 @@ import java.time.{Duration, Instant}
 import java.util.UUID
 
 import org.mbari.annosaurus.controllers.ImagedMomentController
-import org.mbari.annosaurus.repository.jpa.AnnotationImpl
+import org.mbari.annosaurus.repository.jpa.MutableAnnotationImpl
 import org.mbari.annosaurus.model.simple.{ErrorMsg, ObservationCount, WindowRequest, Count}
 import org.mbari.vcr4j.time.Timecode
 import org.scalatra.{BadRequest, NoContent, NotFound}
@@ -360,7 +360,7 @@ class ImagedMomentV1Api(controller: ImagedMomentController)(implicit val executo
     val uuid =
       params
         .getAs[UUID]("uuid")
-        .getOrElse(halt(BadRequest(toJson(ErrorMsg(400, "Please provide an Observation UUID")))))
+        .getOrElse(halt(BadRequest(toJson(ErrorMsg(400, "Please provide an MutableObservation UUID")))))
     controller
       .findByObservationUUID(uuid)
       .map({
@@ -422,7 +422,7 @@ class ImagedMomentV1Api(controller: ImagedMomentController)(implicit val executo
     validateRequest()
     request.getHeader("Content-Type") match {
       case "application/json" =>
-        val annotations = fromJson(request.body, classOf[Array[AnnotationImpl]])
+        val annotations = fromJson(request.body, classOf[Array[MutableAnnotationImpl]])
         var n           = 0
         for { a <- annotations } {
           if (a.observationUuid != null && a.recordedTimestamp != null) {

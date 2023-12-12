@@ -19,7 +19,7 @@ package org.mbari.annosaurus.controllers
 import org.mbari.annosaurus.model.simple.ConceptAssociationRequest
 import org.mbari.annosaurus.repository.jpa.TestDAOFactory
 import org.mbari.annosaurus.repository.jpa.entity.{AssociationEntity, ImagedMomentEntity, ObservationEntity}
-import org.mbari.annosaurus.repository.jpa.AnnotationImpl
+import org.mbari.annosaurus.repository.jpa.MutableAnnotationImpl
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
@@ -60,7 +60,7 @@ class AssociationControllerSpec extends AnyFlatSpec with Matchers with BeforeAnd
       im.addObservation(obs)
       val ass = AssociationEntity(s"foo-$i", "self", s"$i")
       obs.addAssociation(ass)
-      AnnotationImpl(obs)
+      MutableAnnotationImpl(obs)
     }
     val annotations = exec(() => annotationController.bulkCreate(as))
     annotations.size should be(25)

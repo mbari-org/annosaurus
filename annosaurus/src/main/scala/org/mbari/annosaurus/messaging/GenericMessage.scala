@@ -17,7 +17,7 @@
 package org.mbari.annosaurus.messaging
 
 import org.mbari.annosaurus.model.simple.ExtendedAssociation
-import org.mbari.annosaurus.model.{Annotation, Association}
+import org.mbari.annosaurus.model.{MutableAnnotation, Association}
 
 /**
   * @author Brian Schlining
@@ -32,7 +32,7 @@ sealed trait GenericMessage[+A] {
   * Send when a new annotation is created or an existing one is updated
   * @param content
   */
-case class AnnotationMessage(content: Annotation) extends GenericMessage[Annotation] {
+case class AnnotationMessage(content: MutableAnnotation) extends GenericMessage[MutableAnnotation] {
 
   override def hashCode(): Int =
     this.content.observationUuid.hashCode() +

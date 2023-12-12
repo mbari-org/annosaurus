@@ -17,10 +17,10 @@
 package org.mbari.annosaurus.controllers
 
 import org.mbari.annosaurus.Constants
-import org.mbari.annosaurus.model.Annotation
+import org.mbari.annosaurus.model.MutableAnnotation
 import org.mbari.annosaurus.model.simple.{ConcurrentRequest, MultiRequest}
 import org.mbari.annosaurus.repository.jpa.TestDAOFactory
-import org.mbari.annosaurus.repository.jpa.AnnotationImpl
+import org.mbari.annosaurus.repository.jpa.MutableAnnotationImpl
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
@@ -255,7 +255,7 @@ class AnnotationControllerSpec extends AnyFlatSpec with Matchers with BeforeAndA
     val videoReferenceUuid = UUID.randomUUID()
     val now                = Instant.now()
     val annos = (0 until 4).map(i =>
-      AnnotationImpl(
+      MutableAnnotationImpl(
         videoReferenceUuid,
         "concept" + i,
         "brian",
@@ -278,7 +278,7 @@ class AnnotationControllerSpec extends AnyFlatSpec with Matchers with BeforeAndA
         now.plus(Duration.ofSeconds(Random.nextInt(10000)))
       )
     )
-    val annos    = imagedMoments.flatMap(i => AnnotationImpl(i))
+    val annos    = imagedMoments.flatMap(i => MutableAnnotationImpl(i))
     val newAnnos = exec(() => controller.bulkCreate(annos))
     newAnnos.size should be(3)
     newAnnos.foreach(checkUuids)
@@ -302,7 +302,7 @@ class AnnotationControllerSpec extends AnyFlatSpec with Matchers with BeforeAndA
     source.close()
 
     // --- Insert all annotations
-    val annos = Constants.GSON.fromJson(json, classOf[Array[AnnotationImpl]])
+    val annos = Constants.GSON.fromJson(json, classOf[Array[MutableAnnotationImpl]])
     annos should not be null
     annos.isEmpty should be(false)
     val newAnnos = exec(() => controller.bulkCreate(annos))
@@ -342,7 +342,7 @@ class AnnotationControllerSpec extends AnyFlatSpec with Matchers with BeforeAndA
 
   }
 
-  def checkUuids(a: Annotation): Unit = {
+  def checkUuids(a: MutableAnnotation): Unit = {
     a.imagedMomentUuid should not be null
     a.imageReferences.foreach(_.uuid should not be null)
     a.associations.foreach(_.uuid should not be null)

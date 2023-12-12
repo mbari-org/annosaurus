@@ -18,8 +18,8 @@ package org.mbari.annosaurus.repository.jdbc
 
 import java.util.UUID
 import java.net.URI
-import org.mbari.annosaurus.repository.jpa.AnnotationImpl
-import org.mbari.annosaurus.model.Annotation
+import org.mbari.annosaurus.repository.jpa.MutableAnnotationImpl
+import org.mbari.annosaurus.model.MutableAnnotation
 
 object ImageReferenceSQL {
     val SELECT: String =
@@ -93,7 +93,7 @@ object ImageReferenceSQL {
         }
     }
 
-    def join(annotations: Seq[AnnotationImpl], images: Seq[ImageReferenceExt]): Seq[Annotation] = {
+    def join(annotations: Seq[MutableAnnotationImpl], images: Seq[ImageReferenceExt]): Seq[MutableAnnotation] = {
         for {
             i <- images
         } {

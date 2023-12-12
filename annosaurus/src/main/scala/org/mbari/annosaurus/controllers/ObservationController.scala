@@ -20,7 +20,7 @@ import java.time.{Duration, Instant}
 import java.util.UUID
 import io.reactivex.rxjava3.subjects.Subject
 import org.mbari.annosaurus.messaging.{AnnotationPublisher, MessageBus}
-import org.mbari.annosaurus.model.{ImagedMoment, Observation}
+import org.mbari.annosaurus.model.{ImagedMoment, MutableObservation}
 import org.mbari.annosaurus.repository.{NotFoundInDatastoreException, ObservationDAO}
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -34,9 +34,9 @@ import scala.concurrent.{ExecutionContext, Future}
 class ObservationController(
     val daoFactory: BasicDAOFactory,
     bus: Subject[Any] = MessageBus.RxSubject
-) extends BaseController[Observation, ObservationDAO[Observation]] {
+) extends BaseController[MutableObservation, ObservationDAO[MutableObservation]] {
 
-  type ODAO = ObservationDAO[Observation]
+  type ODAO = ObservationDAO[MutableObservation]
 
   private[this] val annotationPublisher = new AnnotationPublisher(bus)
 
@@ -49,9 +49,9 @@ class ObservationController(
       observationDate: Instant = Instant.now(),
       duration: Option[Duration] = None,
       group: Option[String] = None
-  )(implicit ec: ExecutionContext): Future[Observation] = {
+  )(implicit ec: ExecutionContext): Future[MutableObservation] = {
 
-    def fn(dao: ODAO): Observation = {
+    def fn(dao: ODAO): MutableObservation = {
       val imDao = daoFactory.newImagedMomentDAO(dao)
       imDao.findByUUID(imagedMomentUUID) match {
         case None =>
@@ -79,9 +79,9 @@ class ObservationController(
       group: Option[String] = None,
       activity: Option[String] = None,
       imagedMomentUUID: Option[UUID] = None
-  )(implicit ec: ExecutionContext): Future[Option[Observation]] = {
+  )(implicit ec: ExecutionContext): Future[Option[MutableObservation]] = {
 
-    def fn(dao: ODAO): Option[Observation] = {
+    def fn(dao: ODAO): Option[MutableObservation] = {
       // --- 1. Does uuid exist?
       val observation = dao.findByUUID(uuid)
 
@@ -134,15 +134,15 @@ class ObservationController(
 
   def findByVideoReferenceUUID(uuid: UUID, limit: Option[Int] = None, offset: Option[Int] = None)(
       implicit ec: ExecutionContext
-  ): Future[Iterable[Observation]] = {
-    def fn(dao: ODAO): Iterable[Observation] = dao.findByVideoReferenceUUID(uuid, limit, offset)
+  ): Future[Iterable[MutableObservation]] = {
+    def fn(dao: ODAO): Iterable[MutableObservation] = dao.findByVideoReferenceUUID(uuid, limit, offset)
     exec(fn)
   }
 
   def findByAssociationUUID(
       uuid: UUID
-  )(implicit ec: ExecutionContext): Future[Option[Observation]] = {
-    def fn(dao: ODAO): Option[Observation] = {
+  )(implicit ec: ExecutionContext): Future[Option[MutableObservation]] = {
+    def fn(dao: ODAO): Option[MutableObservation] = {
       val adao = daoFactory.newAssociationDAO(dao)
       adao.findByUUID(uuid).map(_.observation)
     }
@@ -161,8 +161,8 @@ class ObservationController(
     exec(fn)
   }
 
-  def deleteDuration(uuid: UUID)(implicit ec: ExecutionContext): Future[Option[Observation]] = {
-    def fn(dao: ODAO): Option[Observation] =
+  def deleteDuration(uuid: UUID)(implicit ec: ExecutionContext): Future[Option[MutableObservation]] = {
+    def fn(dao: ODAO): Option[MutableObservation] =
       dao
         .findByUUID(uuid)
         .map(obs => {

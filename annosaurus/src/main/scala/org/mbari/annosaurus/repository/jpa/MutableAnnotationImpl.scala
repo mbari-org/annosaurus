@@ -19,7 +19,7 @@ package org.mbari.annosaurus.repository.jpa
 import java.time.{Duration, Instant}
 import java.util.{UUID, ArrayList => JArrayList, List => JList}
 import com.google.gson.annotations.{Expose, SerializedName}
-import org.mbari.annosaurus.model.{Association, Annotation, ImageReference, ImagedMoment, Observation}
+import org.mbari.annosaurus.model.{Association, MutableAnnotation, ImageReference, ImagedMoment, MutableObservation}
 import org.mbari.annosaurus.repository.jpa.entity.{AssociationEntity, ImageReferenceEntity}
 import org.mbari.vcr4j.time.Timecode
 
@@ -31,7 +31,7 @@ import scala.jdk.CollectionConverters._
   * @author Brian Schlining
   * @since 2016-07-12T10:00:00
   */
-class AnnotationImpl extends Annotation {
+class MutableAnnotationImpl extends MutableAnnotation {
 
   @Expose(serialize = true)
   var observationUuid: UUID = _
@@ -100,13 +100,13 @@ class AnnotationImpl extends Annotation {
   }
 
   override def toString =
-    s"AnnotationImpl($concept, $observer, $observationTimestamp)"
+    s"MutableAnnotationImpl($concept, $observer, $observationTimestamp)"
 }
 
-object AnnotationImpl {
+object MutableAnnotationImpl {
 
-  def apply(observation: Observation): AnnotationImpl = {
-    val a = new AnnotationImpl
+  def apply(observation: MutableObservation): MutableAnnotationImpl = {
+    val a = new MutableAnnotationImpl
     a.observationUuid = observation.uuid
     a.concept = observation.concept
     a.observer = observation.observer
@@ -124,7 +124,7 @@ object AnnotationImpl {
     a
   }
 
-  def apply(imagedMoment: ImagedMoment): Iterable[AnnotationImpl] = {
+  def apply(imagedMoment: ImagedMoment): Iterable[MutableAnnotationImpl] = {
     imagedMoment
       .observations
       .map(apply)
@@ -141,9 +141,9 @@ object AnnotationImpl {
       duration: Option[Duration] = None,
       group: Option[String] = None,
       activity: Option[String] = None
-  ): AnnotationImpl = {
+  ): MutableAnnotationImpl = {
 
-    val annotation = new AnnotationImpl
+    val annotation = new MutableAnnotationImpl
     annotation.videoReferenceUuid = videoReferenceUUID
     annotation.concept = concept
     annotation.observer = observer

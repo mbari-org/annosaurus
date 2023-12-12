@@ -20,8 +20,8 @@ import java.time.{Duration, Instant}
 import java.util.UUID
 
 import org.mbari.annosaurus.controllers.AnnotationController
-import org.mbari.annosaurus.repository.jpa.AnnotationImpl
-import org.mbari.annosaurus.model.Annotation
+import org.mbari.annosaurus.repository.jpa.MutableAnnotationImpl
+import org.mbari.annosaurus.model.MutableAnnotation
 import org.mbari.annosaurus.model.simple.{
   ConcurrentRequest,
   ConcurrentRequestCount,
@@ -104,7 +104,7 @@ class AnnotationV1Api(controller: AnnotationController)(implicit val executor: E
         val concurrentRequest = fromJson(b, classOf[ConcurrentRequest])
         val (closeable, stream) =
           controller.streamByConcurrentRequest(concurrentRequest, limit, offset)
-        ResponseUtilities.sendStreamedResponse(response, stream, (a: Annotation) => toJson(a))
+        ResponseUtilities.sendStreamedResponse(response, stream, (a: MutableAnnotation) => toJson(a))
         closeable.close()
         ()
       case _ =>
@@ -152,7 +152,7 @@ class AnnotationV1Api(controller: AnnotationController)(implicit val executor: E
         val offset              = params.getAs[Int]("offset")
         val multiRequest        = fromJson(b, classOf[MultiRequest])
         val (closeable, stream) = controller.streamByMultiRequest(multiRequest, limit, offset)
-        ResponseUtilities.sendStreamedResponse(response, stream, (a: Annotation) => toJson(a))
+        ResponseUtilities.sendStreamedResponse(response, stream, (a: MutableAnnotation) => toJson(a))
         closeable.close()
         ()
       case _ =>
@@ -196,7 +196,7 @@ class AnnotationV1Api(controller: AnnotationController)(implicit val executor: E
        """.stripMargin
     log.debug(msg)
 
-    def fn(limit: Int, offset: Int): Future[Iterable[Annotation]] =
+    def fn(limit: Int, offset: Int): Future[Iterable[MutableAnnotation]] =
       controller.findByVideoReferenceUUID(uuid, Some(limit), Some(offset))
 
     autoPage(response, start, end, pageSize, fn, timeout)
@@ -272,7 +272,7 @@ class AnnotationV1Api(controller: AnnotationController)(implicit val executor: E
     validateRequest()
     request.getHeader("Content-Type") match {
       case "application/json" =>
-        val annotations = fromJson(request.body, classOf[Array[AnnotationImpl]])
+        val annotations = fromJson(request.body, classOf[Array[MutableAnnotationImpl]])
         controller
           .bulkCreate(annotations)
           .map(annos => toJson(annos.asJava))
@@ -338,7 +338,7 @@ class AnnotationV1Api(controller: AnnotationController)(implicit val executor: E
     validateRequest()
     request.getHeader("Content-Type") match {
       case "application/json" =>
-        val annotations = fromJson(request.body, classOf[Array[AnnotationImpl]])
+        val annotations = fromJson(request.body, classOf[Array[MutableAnnotationImpl]])
         controller
           .bulkUpdate(annotations)
           .map(annos => toJson(annos.asJava))
@@ -362,7 +362,7 @@ class AnnotationV1Api(controller: AnnotationController)(implicit val executor: E
     validateRequest()
     request.getHeader("Content-Type") match {
       case "application/json" =>
-        val annotations = fromJson(request.body, classOf[Array[AnnotationImpl]])
+        val annotations = fromJson(request.body, classOf[Array[MutableAnnotationImpl]])
         controller
           .bulkUpdateRecordedTimestampOnly(annotations)
           .map(annos => toJson(annos.asJava))

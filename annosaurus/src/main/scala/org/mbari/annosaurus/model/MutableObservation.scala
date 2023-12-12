@@ -24,7 +24,7 @@ import java.util.UUID
   *   Brian Schlining
   * @since 2016-06-15T16:53:00
   */
-trait Observation extends PersistentObject {
+trait MutableObservation extends PersistentObject {
 
     var uuid: UUID
     var imagedMoment: ImagedMoment

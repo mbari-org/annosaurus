@@ -263,17 +263,17 @@ class ImagedMomentEntity extends ImagedMoment with JPAPersistentObject {
   var javaObservations: JList[ObservationEntity] =
     new JArrayList[ObservationEntity]
 
-  override def addObservation(observation: Observation): Unit = {
+  override def addObservation(observation: MutableObservation): Unit = {
     javaObservations.add(observation.asInstanceOf[ObservationEntity])
     observation.imagedMoment = this
   }
 
-  override def removeObservation(observation: Observation): Unit = {
+  override def removeObservation(observation: MutableObservation): Unit = {
     javaObservations.remove(observation)
     observation.imagedMoment = null
   }
 
-  override def observations: Iterable[Observation] = javaObservations.asScala
+  override def observations: Iterable[MutableObservation] = javaObservations.asScala
 
   @Expose(serialize = true)
   @SerializedName(value = "image_references")
@@ -360,7 +360,7 @@ object ImagedMomentEntity {
     * @param annotations
     * @return
     */
-  def apply(annotations: Seq[Annotation]): Seq[ImagedMomentEntity] = {
+  def apply(annotations: Seq[MutableAnnotation]): Seq[ImagedMomentEntity] = {
     val moments = new mutable.ArrayBuffer[ImagedMomentEntity]()
     // -- 1st pass create moments
     for (a <- annotations) {

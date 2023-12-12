@@ -60,7 +60,7 @@ class AssociationController(
       obsDao.findByUUID(observationUuid) match {
         case None =>
           throw new NotFoundInDatastoreException(
-            s"Observation with UUID of $observationUuid not found"
+            s"MutableObservation with UUID of $observationUuid not found"
           )
         case Some(observation) =>
           val association =

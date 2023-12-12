@@ -48,9 +48,9 @@ trait ImagedMoment extends PersistentObject {
     var recordedDate: Instant
     var elapsedTime: Duration
     def lastUpdated: Option[Instant]
-    def addObservation(observation: Observation): Unit
-    def removeObservation(observation: Observation): Unit
-    def observations: Iterable[Observation]
+    def addObservation(observation: MutableObservation): Unit
+    def removeObservation(observation: MutableObservation): Unit
+    def observations: Iterable[MutableObservation]
     def addImageReference(imageReference: ImageReference): Unit
     def removeImageReference(imageReference: ImageReference): Unit
     def imageReferences: Iterable[ImageReference]

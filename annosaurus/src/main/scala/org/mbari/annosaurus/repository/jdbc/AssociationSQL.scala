@@ -17,8 +17,8 @@
 package org.mbari.annosaurus.repository.jdbc
 
 import java.util.UUID
-import org.mbari.annosaurus.repository.jpa.AnnotationImpl
-import org.mbari.annosaurus.model.Annotation
+import org.mbari.annosaurus.repository.jpa.MutableAnnotationImpl
+import org.mbari.annosaurus.model.MutableAnnotation
 
 object AssociationSQL {
 
@@ -44,9 +44,9 @@ object AssociationSQL {
     }
 
     def join(
-        annotations: Seq[AnnotationImpl],
-        associations: Seq[AssociationExt]
-    ): Seq[Annotation] = {
+                annotations: Seq[MutableAnnotationImpl],
+                associations: Seq[AssociationExt]
+    ): Seq[MutableAnnotation] = {
         for {
             a <- associations
         } {

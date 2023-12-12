@@ -18,7 +18,7 @@ package org.mbari.annosaurus.etc.zeromq
 
 import org.mbari.annosaurus.messaging.{AnnotationMessage, AssociationMessage, MessageBus}
 import org.mbari.annosaurus.repository.jpa.entity.{AssociationEntity, ObservationEntity}
-import org.mbari.annosaurus.repository.jpa.AnnotationImpl
+import org.mbari.annosaurus.repository.jpa.MutableAnnotationImpl
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
@@ -67,7 +67,7 @@ class ZeroMQPublisherSpec extends AnyFlatSpec with Matchers with BeforeAndAfterA
     Thread.sleep(200) // Give the thread above time to get set up.
 
     // Publish annotations
-    val annotation = new AnnotationImpl
+    val annotation = new MutableAnnotationImpl
     annotation.concept = "foo"
     annotation.observationUuid = UUID.randomUUID()
     annotation.observationTimestamp = Instant.now()
@@ -115,7 +115,7 @@ class ZeroMQPublisherSpec extends AnyFlatSpec with Matchers with BeforeAndAfterA
 
     // Publish annotations
     for (i <- 0 until 1000) {
-      val annotation = new AnnotationImpl
+      val annotation = new MutableAnnotationImpl
       annotation.concept = "bar" + i
       annotation.observationUuid = UUID.randomUUID()
       annotation.recordedTimestamp = Instant.now()

@@ -19,9 +19,9 @@ package org.mbari.annosaurus.api.v1
 import org.mbari.annosaurus.Constants
 import org.mbari.annosaurus.api.WebApiStack
 import org.mbari.annosaurus.controllers.{AnnotationController, BasicDAOFactory, ObservationController}
-import org.mbari.annosaurus.model.Observation
+import org.mbari.annosaurus.model.MutableObservation
 import org.mbari.annosaurus.repository.jpa.entity.{AssociationEntity, ImagedMomentEntity, ObservationEntity}
-import org.mbari.annosaurus.repository.jpa.AnnotationImpl
+import org.mbari.annosaurus.repository.jpa.MutableAnnotationImpl
 
 import java.nio.charset.StandardCharsets
 import java.time.{Duration, Instant}
@@ -58,7 +58,7 @@ class ObservationV1ApiSpec extends WebApiStack {
 
   def exec[R](fn: () => Future[R]): R = Await.result(fn.apply(), timeout)
 
-  var observation: Observation = _
+  var observation: MutableObservation = _
 
   "ObservationV1Api" should "find by uuid" in {
 
@@ -213,7 +213,7 @@ class ObservationV1ApiSpec extends WebApiStack {
     Await.result(f, timeout)
 
     val annos = Seq(obs0, obs1)
-      .map(AnnotationImpl(_))
+      .map(MutableAnnotationImpl(_))
       .map(_.observationUuid)
       .asJava
     val json = Constants

@@ -16,7 +16,7 @@
 
 package org.mbari.annosaurus.model.simple
 
-import org.mbari.annosaurus.model.Observation
+import org.mbari.annosaurus.model.MutableObservation
 
 import java.time.{Duration, Instant}
 import java.util.UUID
@@ -40,7 +40,7 @@ case class SimpleObservation(
 
 object SimpleObservation {
 
-  def apply(obs: Observation): SimpleObservation =
+  def apply(obs: MutableObservation): SimpleObservation =
     new SimpleObservation(
       obs.uuid,
       obs.concept,

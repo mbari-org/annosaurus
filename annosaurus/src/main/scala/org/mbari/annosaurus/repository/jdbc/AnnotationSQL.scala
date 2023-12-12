@@ -25,12 +25,12 @@ import org.mbari.vcr4j.time.Timecode
   */
 object AnnotationSQL {
 
-    def resultListToAnnotations(rows: List[_]): Seq[AnnotationExt] = {
+    def resultListToAnnotations(rows: List[_]): Seq[MutableAnnotationExt] = {
         for {
             row <- rows
         } yield {
             val xs = row.asInstanceOf[Array[Object]]
-            val a  = new AnnotationExt
+            val a  = new MutableAnnotationExt
             a.imagedMomentUuid = UUID.fromString(xs(0).toString)
             a.videoReferenceUuid = UUID.fromString(xs(1).toString)
             Option(xs(2))

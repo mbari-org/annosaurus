@@ -19,7 +19,7 @@ package org.mbari.annosaurus.repository.jpa.entity
 import com.google.gson.annotations.{Expose, SerializedName}
 import jakarta.persistence._
 import org.mbari.annosaurus.Constants
-import org.mbari.annosaurus.model.{CachedAncillaryDatum, ImageReference, ImagedMoment, Observation}
+import org.mbari.annosaurus.model.{CachedAncillaryDatum, ImageReference, ImagedMoment, MutableObservation}
 import org.mbari.annosaurus.repository.jpa._
 import org.mbari.vcr4j.time.Timecode
 
@@ -85,12 +85,12 @@ class IndexEntity extends ImagedMoment with JPAPersistentObject {
   override def toString: String = Constants.GSON.toJson(this)
 
   /* --- IGNORE these methods below --- */
-  override def addObservation(observation: Observation): Unit = ???
+  override def addObservation(observation: MutableObservation): Unit = ???
 
-  override def removeObservation(observation: Observation): Unit = ???
+  override def removeObservation(observation: MutableObservation): Unit = ???
 
   @Expose(serialize = false)
-  override def observations: Iterable[Observation] = ???
+  override def observations: Iterable[MutableObservation] = ???
 
   override def addImageReference(imageReference: ImageReference): Unit = ???
 

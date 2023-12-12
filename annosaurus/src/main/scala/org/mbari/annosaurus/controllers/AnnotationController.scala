@@ -23,8 +23,8 @@ import java.util.concurrent.Executors
 
 import io.reactivex.rxjava3.subjects.Subject
 import org.mbari.annosaurus.messaging.{AnnotationPublisher, MessageBus}
-import org.mbari.annosaurus.model.{Annotation, Observation}
-import org.mbari.annosaurus.repository.jpa.AnnotationImpl
+import org.mbari.annosaurus.model.{MutableAnnotation, MutableObservation}
+import org.mbari.annosaurus.repository.jpa.MutableAnnotationImpl
 import org.mbari.annosaurus.model.simple.{ConcurrentRequest, MultiRequest}
 import org.mbari.annosaurus.repository.DAO
 import org.mbari.annosaurus.repository.jpa.UUIDSequence
@@ -54,11 +54,11 @@ class AnnotationController(daoFactory: BasicDAOFactory, bus: Subject[Any] = Mess
   // Executor to throttle bulk inserts
   //private[this] val bulkExecutionContext: ExecutionContext = ExecutionContext.fromExecutor(Executors.newFixedThreadPool(1))
 
-  def findByUUID(uuid: UUID)(implicit ec: ExecutionContext): Future[Option[Annotation]] = {
+  def findByUUID(uuid: UUID)(implicit ec: ExecutionContext): Future[Option[MutableAnnotation]] = {
     val obsDao = daoFactory.newObservationDAO()
     val f      = obsDao.runTransaction(d => obsDao.findByUUID(uuid))
     f.onComplete(_ => obsDao.close())
-    f.map(_.map(AnnotationImpl(_)))
+    f.map(_.map(MutableAnnotationImpl(_)))
   }
 
   def countByVideoReferenceUuid(uuid: UUID)(implicit ec: ExecutionContext): Future[Int] = {
@@ -69,10 +69,10 @@ class AnnotationController(daoFactory: BasicDAOFactory, bus: Subject[Any] = Mess
   }
 
   /*
-      This searches for the ImagedMoments but returns an Annotation view. Keep in mind
+      This searches for the ImagedMoments but returns an MutableAnnotation view. Keep in mind
       that each ImagedMoment may contain more than one observations. The limit and
-      offset are for the ImagedMoments, and each may contain more than one Observation
-      (i.e. Annotation). So this call will appear to return more rows than limit and offest
+      offset are for the ImagedMoments, and each may contain more than one MutableObservation
+      (i.e. MutableAnnotation). So this call will appear to return more rows than limit and offest
       specify.
    */
   def findByVideoReferenceUUID(
@@ -80,12 +80,12 @@ class AnnotationController(daoFactory: BasicDAOFactory, bus: Subject[Any] = Mess
       limit: Option[Int] = None,
       offset: Option[Int] = None,
       includedAncillaryData: Boolean = false
-  )(implicit ec: ExecutionContext): Future[Seq[Annotation]] = {
+  )(implicit ec: ExecutionContext): Future[Seq[MutableAnnotation]] = {
 
     val dao = daoFactory.newObservationDAO()
     val f   = dao.runTransaction(d => d.findByVideoReferenceUUID(videoReferenceUUID, limit, offset))
     f.onComplete(_ => dao.close())
-    f.map(_.map(AnnotationImpl(_)).toSeq)
+    f.map(_.map(MutableAnnotationImpl(_)).toSeq)
   }
 
   /**
@@ -100,13 +100,13 @@ class AnnotationController(daoFactory: BasicDAOFactory, bus: Subject[Any] = Mess
       videoReferenceUuid: UUID,
       limit: Option[Int] = None,
       offset: Option[Int] = None
-  ): (Closeable, java.util.stream.Stream[Annotation]) = {
+  ): (Closeable, java.util.stream.Stream[MutableAnnotation]) = {
     val dao = daoFactory.newObservationDAO()
     (
       () => dao.close(),
       dao
         .streamByVideoReferenceUUID(videoReferenceUuid, limit, offset)
-        .map(obs => AnnotationImpl(obs))
+        .map(obs => MutableAnnotationImpl(obs))
     )
   }
 
@@ -116,11 +116,11 @@ class AnnotationController(daoFactory: BasicDAOFactory, bus: Subject[Any] = Mess
       endTimestamp: Instant,
       limit: Option[Int] = None,
       offset: Option[Int] = None
-  ): (Closeable, java.util.stream.Stream[Annotation]) = {
+  ): (Closeable, java.util.stream.Stream[MutableAnnotation]) = {
 //    val dao = daoFactory.newImagedMomentDAO()
 //    (() => dao.close(),
 //      dao.streamByVideoReferenceUUIDAndTimestamps(videoReferenceUuid, startTimestamp, endTimestamp, limit, offset)
-//        .flatMap(im => im.javaObservations.stream().map(obs => AnnotationImpl(obs))))
+//        .flatMap(im => im.javaObservations.stream().map(obs => MutableAnnotationImpl(obs))))
     val dao = daoFactory.newObservationDAO()
     (
       () => dao.close(),
@@ -132,7 +132,7 @@ class AnnotationController(daoFactory: BasicDAOFactory, bus: Subject[Any] = Mess
           limit,
           offset
         )
-        .map(obs => AnnotationImpl(obs))
+        .map(obs => MutableAnnotationImpl(obs))
     )
   }
 
@@ -140,11 +140,11 @@ class AnnotationController(daoFactory: BasicDAOFactory, bus: Subject[Any] = Mess
       request: ConcurrentRequest,
       limit: Option[Int],
       offset: Option[Int]
-  ): (Closeable, java.util.stream.Stream[Annotation]) = {
+  ): (Closeable, java.util.stream.Stream[MutableAnnotation]) = {
     val dao = daoFactory.newObservationDAO()
     (
       () => dao.close(),
-      dao.streamByConcurrentRequest(request, limit, offset).map(obs => AnnotationImpl(obs))
+      dao.streamByConcurrentRequest(request, limit, offset).map(obs => MutableAnnotationImpl(obs))
     )
   }
 
@@ -161,11 +161,11 @@ class AnnotationController(daoFactory: BasicDAOFactory, bus: Subject[Any] = Mess
       request: MultiRequest,
       limit: Option[Int],
       offset: Option[Int]
-  ): (Closeable, java.util.stream.Stream[Annotation]) = {
+  ): (Closeable, java.util.stream.Stream[MutableAnnotation]) = {
     val dao = daoFactory.newObservationDAO()
     (
       () => dao.close(),
-      dao.streamByMultiRequest(request, limit, offset).map(obs => AnnotationImpl(obs))
+      dao.streamByMultiRequest(request, limit, offset).map(obs => MutableAnnotationImpl(obs))
     )
   }
 
@@ -178,7 +178,7 @@ class AnnotationController(daoFactory: BasicDAOFactory, bus: Subject[Any] = Mess
 
   def findByImageReferenceUUID(
       imageReferenceUUID: UUID
-  )(implicit ec: ExecutionContext): Future[Iterable[Annotation]] = {
+  )(implicit ec: ExecutionContext): Future[Iterable[MutableAnnotation]] = {
 
     val imDao = daoFactory.newImagedMomentDAO()
     val f     = imDao.runTransaction(d => d.findByImageReferenceUUID(imageReferenceUUID))
@@ -187,7 +187,7 @@ class AnnotationController(daoFactory: BasicDAOFactory, bus: Subject[Any] = Mess
         case None     => Nil
         case Some(im) => im.observations
       })
-      .map(obs => obs.map(AnnotationImpl(_)))
+      .map(obs => obs.map(MutableAnnotationImpl(_)))
   }
 
   def create(
@@ -201,8 +201,8 @@ class AnnotationController(daoFactory: BasicDAOFactory, bus: Subject[Any] = Mess
       duration: Option[Duration] = None,
       group: Option[String] = None,
       activity: Option[String] = None
-  )(implicit ec: ExecutionContext): Future[Annotation] = {
-    val annotation = AnnotationImpl(
+  )(implicit ec: ExecutionContext): Future[MutableAnnotation] = {
+    val annotation = MutableAnnotationImpl(
       videoReferenceUUID,
       concept,
       observer,
@@ -226,7 +226,7 @@ class AnnotationController(daoFactory: BasicDAOFactory, bus: Subject[Any] = Mess
 
 //    val f = obsDao.runTransaction(d => create(d, annotation))
 //    f.onComplete(_ => obsDao.close())
-//    val rf = f.map(AnnotationImpl(_))
+//    val rf = f.map(MutableAnnotationImpl(_))
 //    rf.foreach(annotationPublisher.publish) // publish new annotations
 //    rf
   }
@@ -237,7 +237,7 @@ class AnnotationController(daoFactory: BasicDAOFactory, bus: Subject[Any] = Mess
     * @return The newly created annotations along with any existing ones that share
     *         the same imagedMoment
     */
-  def bulkCreate(annotations: Iterable[Annotation]): Future[Seq[AnnotationImpl]] = {
+  def bulkCreate(annotations: Iterable[MutableAnnotation]): Future[Seq[MutableAnnotationImpl]] = {
 
     // We're inserting the annotations using a fixed thread executor
     // grouping them into 50 annotation chunks (ie. 50 annotations per
@@ -254,7 +254,7 @@ class AnnotationController(daoFactory: BasicDAOFactory, bus: Subject[Any] = Mess
       .map(imagedMoments => {
         val f =
           obsDao.runTransaction(d => imagedMoments.map(i => imagedMomentController.create(d, i)))
-        f.map(imagedMomentList => imagedMomentList.flatMap(i => AnnotationImpl(i)))
+        f.map(imagedMomentList => imagedMomentList.flatMap(i => MutableAnnotationImpl(i)))
       })
     val future = Future.sequence(futures)
     future.onComplete(_ => obsDao.close())
@@ -265,7 +265,7 @@ class AnnotationController(daoFactory: BasicDAOFactory, bus: Subject[Any] = Mess
   }
 
 //  @deprecated(message = "Use ImagedMomentController.create instead", since = "2019-10-21")
-//  private def create(dao: DAO[_], annotation: Annotation): Observation = {
+//  private def create(dao: DAO[_], annotation: MutableAnnotation): MutableObservation = {
 //    val imDao  = daoFactory.newImagedMomentDAO(dao)
 //    val obsDao = daoFactory.newObservationDAO(dao)
 //    val assDao = daoFactory.newAssociationDAO(dao)
@@ -336,7 +336,7 @@ class AnnotationController(daoFactory: BasicDAOFactory, bus: Subject[Any] = Mess
       duration: Option[Duration] = None,
       group: Option[String] = None,
       activity: Option[String] = None
-  )(implicit ec: ExecutionContext): Future[Option[Annotation]] = {
+  )(implicit ec: ExecutionContext): Future[Option[MutableAnnotation]] = {
 
     // We have to do this in 2 transactions. The first makes all the changes. The second to
     // retrieve them. We have to do this because we may make a SQL call to move an observaton
@@ -363,7 +363,7 @@ class AnnotationController(daoFactory: BasicDAOFactory, bus: Subject[Any] = Mess
 
     val g = f.flatMap(opt => {
       val dao1 = daoFactory.newObservationDAO()
-      val ff   = dao1.runTransaction(d => d.findByUUID(uuid).map(AnnotationImpl(_)))
+      val ff   = dao1.runTransaction(d => d.findByUUID(uuid).map(MutableAnnotationImpl(_)))
       ff.onComplete(_ => dao1.close())
       ff
     })
@@ -374,8 +374,8 @@ class AnnotationController(daoFactory: BasicDAOFactory, bus: Subject[Any] = Mess
   }
 
   def bulkUpdate(
-      annotations: Iterable[Annotation]
-  )(implicit ec: ExecutionContext): Future[Iterable[AnnotationImpl]] = {
+      annotations: Iterable[MutableAnnotation]
+  )(implicit ec: ExecutionContext): Future[Iterable[MutableAnnotationImpl]] = {
     val dao = daoFactory.newObservationDAO()
     // We have to do this in 2 transactions. The first makes all the changes. The second to
     // retrieve them. We have to do this because we may make a SQL call to move an observaton
@@ -404,7 +404,7 @@ class AnnotationController(daoFactory: BasicDAOFactory, bus: Subject[Any] = Mess
     val g = f.flatMap(obs => {
       val dao1 = daoFactory.newObservationDAO()
       val ff =
-        dao1.runTransaction(d => obs.flatMap(o => d.findByUUID(o.uuid).map(AnnotationImpl(_))))
+        dao1.runTransaction(d => obs.flatMap(o => d.findByUUID(o.uuid).map(MutableAnnotationImpl(_))))
       ff.onComplete(_ => dao1.close())
       ff.foreach(annotationPublisher.publish)
       ff
@@ -413,8 +413,8 @@ class AnnotationController(daoFactory: BasicDAOFactory, bus: Subject[Any] = Mess
   }
 
   def bulkUpdateRecordedTimestampOnly(
-      annotations: Iterable[Annotation]
-  )(implicit ec: ExecutionContext): Future[Iterable[AnnotationImpl]] = {
+      annotations: Iterable[MutableAnnotation]
+  )(implicit ec: ExecutionContext): Future[Iterable[MutableAnnotationImpl]] = {
     val dao = daoFactory.newObservationDAO()
     val f = dao.runTransaction(d => {
       annotations.flatMap(a => {
@@ -426,7 +426,7 @@ class AnnotationController(daoFactory: BasicDAOFactory, bus: Subject[Any] = Mess
     val g = f.flatMap(obs => {
       val dao1 = daoFactory.newObservationDAO()
       val ff =
-        dao1.runTransaction(d => obs.flatMap(o => d.findByUUID(o.uuid).map(AnnotationImpl(_))))
+        dao1.runTransaction(d => obs.flatMap(o => d.findByUUID(o.uuid).map(MutableAnnotationImpl(_))))
       ff.onComplete(_ => dao1.close())
       ff
     })
@@ -448,7 +448,7 @@ class AnnotationController(daoFactory: BasicDAOFactory, bus: Subject[Any] = Mess
       dao: DAO[_],
       uuid: UUID,
       recordedTimestampOpt: Option[Instant]
-  ): Seq[Observation] = {
+  ): Seq[MutableObservation] = {
 
     val obsDao = daoFactory.newObservationDAO(dao)
     obsDao
@@ -504,7 +504,7 @@ class AnnotationController(daoFactory: BasicDAOFactory, bus: Subject[Any] = Mess
       duration: Option[Duration] = None,
       group: Option[String] = None,
       activity: Option[String] = None
-  ): Option[Observation] = {
+  ): Option[MutableObservation] = {
     val obsDao      = daoFactory.newObservationDAO(dao)
     val imDao       = daoFactory.newImagedMomentDAO(dao)
     val observation = obsDao.findByUUID(uuid)

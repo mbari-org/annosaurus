@@ -17,20 +17,20 @@
 package org.mbari.annosaurus.repository.jdbc
 
 import com.google.gson.annotations.Expose
-import org.mbari.annosaurus.repository.jpa.AnnotationImpl
+import org.mbari.annosaurus.repository.jpa.MutableAnnotationImpl
 
 /**
   * @author Brian Schlining
   * @since 2019-10-22T14:34:00
   */
-class AnnotationExt extends AnnotationImpl {
+class MutableAnnotationExt extends MutableAnnotationImpl {
   @Expose(serialize = true)
   var ancillaryData: AncillaryDatumExt = _
 
   override def equals(obj: Any): Boolean = {
-    if (!obj.isInstanceOf[AnnotationExt]) false
+    if (!obj.isInstanceOf[MutableAnnotationExt]) false
     else {
-      val other: AnnotationExt = obj.asInstanceOf[AnnotationExt]
+      val other: MutableAnnotationExt = obj.asInstanceOf[MutableAnnotationExt]
       other.observationUuid != null &&
       this.observationUuid != null &&
       other.observationUuid == this.observationUuid

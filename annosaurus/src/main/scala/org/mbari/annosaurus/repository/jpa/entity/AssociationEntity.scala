@@ -95,7 +95,7 @@ class AssociationEntity extends Association with JPAPersistentObject {
     targetEntity = classOf[ObservationEntity]
   )
   @JoinColumn(name = "observation_uuid", nullable = false, columnDefinition = "CHAR(36)")
-  var observation: Observation = _
+  var observation: MutableObservation = _
 
   @Expose(serialize = true)
   @Column(name = "to_concept", length = 128, nullable = true)

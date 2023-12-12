@@ -28,7 +28,7 @@ import java.util.UUID
 trait Association extends PersistentObject {
 
     var uuid: UUID
-    var observation: Observation
+    var observation: MutableObservation
     var linkName: String
     var toConcept: String
     var linkValue: String

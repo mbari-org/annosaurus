@@ -25,7 +25,7 @@ import java.util.UUID
   *   Brian Schlining
   * @since 2017-09-20T15:58:00
   */
-trait Annotation {
+trait MutableAnnotation {
 
     var observationUuid: UUID
     var concept: String

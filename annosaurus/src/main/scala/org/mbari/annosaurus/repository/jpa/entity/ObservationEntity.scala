@@ -18,7 +18,7 @@ package org.mbari.annosaurus.repository.jpa.entity
 
 import com.google.gson.annotations.{Expose, SerializedName}
 import jakarta.persistence._
-import org.mbari.annosaurus.model.{Association, ImagedMoment, Observation}
+import org.mbari.annosaurus.model.{Association, ImagedMoment, MutableObservation}
 import org.mbari.annosaurus.repository.jpa.{DurationConverter, InstantConverter, JPAPersistentObject, TransactionLogger}
 
 import java.time.{Duration, Instant}
@@ -45,45 +45,45 @@ import scala.jdk.CollectionConverters._
 @NamedNativeQueries(
   Array(
     new NamedNativeQuery(
-      name = "Observation.findAllNames",
+      name = "MutableObservation.findAllNames",
       query = "SELECT DISTINCT concept FROM observations ORDER BY concept"
     ),
     new NamedNativeQuery(
-      name = "Observation.findAllGroups",
+      name = "MutableObservation.findAllGroups",
       query = "SELECT DISTINCT observation_group FROM observations ORDER BY observation_group"
     ),
     new NamedNativeQuery(
-      name = "Observation.findAllNamesByVideoReferenceUUID",
+      name = "MutableObservation.findAllNamesByVideoReferenceUUID",
       query =
         "SELECT DISTINCT concept FROM imaged_moments LEFT JOIN observations ON observations.imaged_moment_uuid = imaged_moments.uuid WHERE imaged_moments.video_reference_uuid = ?1 ORDER BY concept"
     ),
     new NamedNativeQuery(
-      name = "Observation.findAllActivities",
+      name = "MutableObservation.findAllActivities",
       query = "SELECT DISTINCT activity FROM observations ORDER BY activity"
     ),
     new NamedNativeQuery(
-      name = "Observation.countByVideoReferenceUUID",
+      name = "MutableObservation.countByVideoReferenceUUID",
       query =
         "SELECT COUNT(obs.uuid) FROM observations obs RIGHT JOIN imaged_moments im ON obs.imaged_moment_uuid = im.uuid " +
           "WHERE im.video_reference_uuid = ?1"
     ),
     new NamedNativeQuery(
-      name = "Observation.countByVideoReferenceUUIDAndTimestamps",
+      name = "MutableObservation.countByVideoReferenceUUIDAndTimestamps",
       query =
         "SELECT COUNT(obs.uuid) FROM observations obs RIGHT JOIN imaged_moments im ON obs.imaged_moment_uuid = im.uuid " +
           "WHERE im.uuid = ?1 AND im.recorded_timestamp BETWEEN ?2 AND ?3"
     ),
     new NamedNativeQuery(
-      name = "Observation.countAllByVideoReferenceUUIDs",
+      name = "MutableObservation.countAllByVideoReferenceUUIDs",
       query =
         "SELECT im.video_reference_uuid, COUNT(obs.uuid) as n FROM observations obs RIGHT JOIN imaged_moments im ON im.uuid = obs.imaged_moment_uuid GROUP BY im.video_reference_uuid ORDER BY n"
     ),
     new NamedNativeQuery(
-      name = "Observation.countByConcept",
+      name = "MutableObservation.countByConcept",
       query = "SELECT COUNT(*) FROM observations WHERE concept = ?1"
     ),
     new NamedNativeQuery(
-      name = "Observation.countByConceptWithImages",
+      name = "MutableObservation.countByConceptWithImages",
       query = "SELECT COUNT(*) FROM (" +
         "SELECT DISTINCT obs.uuid FROM observations obs " +
         "LEFT JOIN imaged_moments im ON obs.imaged_moment_uuid = im.uuid " +
@@ -91,11 +91,11 @@ import scala.jdk.CollectionConverters._
         "WHERE obs.uuid IS NOT NULL AND obs.concept = ?1 AND ir.url IS NOT NULL) foo"
     ),
     new NamedNativeQuery(
-      name = "Observation.updateConcept",
+      name = "MutableObservation.updateConcept",
       query = "UPDATE observations SET concept = ?1 WHERE concept = ?2"
     ),
     new NamedNativeQuery(
-      name = "Observation.updateImagedMomentUUID",
+      name = "MutableObservation.updateImagedMomentUUID",
       query = "UPDATE observations SET imaged_moment_uuid = ?1 WHERE uuid = ?2"
     )
   )
@@ -103,42 +103,42 @@ import scala.jdk.CollectionConverters._
 @NamedQueries(
   Array(
     new NamedQuery(
-      name = "Observation.findAll",
-      query = "SELECT o FROM Observation o ORDER BY o.uuid"
+      name = "MutableObservation.findAll",
+      query = "SELECT o FROM MutableObservation o ORDER BY o.uuid"
     ),
     new NamedQuery(
-      name = "Observation.findByMultiRequest",
+      name = "MutableObservation.findByMultiRequest",
       query =
-        "SELECT o FROM Observation o LEFT JOIN o.imagedMoment i WHERE i.videoReferenceUUID IN :uuids ORDER BY o.uuid"
+        "SELECT o FROM MutableObservation o LEFT JOIN o.imagedMoment i WHERE i.videoReferenceUUID IN :uuids ORDER BY o.uuid"
     ),
     new NamedQuery(
-      name = "Observation.countByMultiRequest",
+      name = "MutableObservation.countByMultiRequest",
       query =
-        "SELECT COUNT(o.uuid) FROM Observation o LEFT JOIN o.imagedMoment i WHERE i.videoReferenceUUID IN :uuids"
+        "SELECT COUNT(o.uuid) FROM MutableObservation o LEFT JOIN o.imagedMoment i WHERE i.videoReferenceUUID IN :uuids"
     ),
     new NamedQuery(
-      name = "Observation.findByConcurrentRequest",
+      name = "MutableObservation.findByConcurrentRequest",
       query =
-        "SELECT o FROM Observation o LEFT JOIN o.imagedMoment i WHERE i.videoReferenceUUID IN :uuids AND i.recordedDate BETWEEN :start AND :end ORDER BY o.uuid"
+        "SELECT o FROM MutableObservation o LEFT JOIN o.imagedMoment i WHERE i.videoReferenceUUID IN :uuids AND i.recordedDate BETWEEN :start AND :end ORDER BY o.uuid"
     ),
     new NamedQuery(
-      name = "Observation.countByConcurrentRequest",
+      name = "MutableObservation.countByConcurrentRequest",
       query =
-        "SELECT COUNT(o.uuid) FROM Observation o LEFT JOIN o.imagedMoment i WHERE i.videoReferenceUUID IN :uuids AND i.recordedDate BETWEEN :start AND :end"
+        "SELECT COUNT(o.uuid) FROM MutableObservation o LEFT JOIN o.imagedMoment i WHERE i.videoReferenceUUID IN :uuids AND i.recordedDate BETWEEN :start AND :end"
     ),
     new NamedQuery(
-      name = "Observation.findByVideoReferenceUUID",
+      name = "MutableObservation.findByVideoReferenceUUID",
       query =
-        "SELECT o FROM Observation o LEFT JOIN o.imagedMoment i WHERE i.videoReferenceUUID = :uuid ORDER BY o.uuid"
+        "SELECT o FROM MutableObservation o LEFT JOIN o.imagedMoment i WHERE i.videoReferenceUUID = :uuid ORDER BY o.uuid"
     ),
     new NamedQuery(
-      name = "Observation.findByVideoReferenceUUIDAndTimestamps",
+      name = "MutableObservation.findByVideoReferenceUUIDAndTimestamps",
       query =
-        "SELECT o FROM Observation o LEFT JOIN o.imagedMoment i WHERE i.videoReferenceUUID = :uuid AND i.recordedDate BETWEEN :start AND :end ORDER BY i.recordedDate"
+        "SELECT o FROM MutableObservation o LEFT JOIN o.imagedMoment i WHERE i.videoReferenceUUID = :uuid AND i.recordedDate BETWEEN :start AND :end ORDER BY i.recordedDate"
     )
   )
 )
-class ObservationEntity extends Observation with JPAPersistentObject {
+class ObservationEntity extends MutableObservation with JPAPersistentObject {
 
   @Expose(serialize = true)
   @Column(name = "concept", length = 256)
@@ -221,7 +221,7 @@ object ObservationEntity {
     obs
   }
 
-  def apply(observation: Observation): ObservationEntity = {
+  def apply(observation: MutableObservation): ObservationEntity = {
     val newObservation = apply(
       observation.concept,
       Option(observation.duration),

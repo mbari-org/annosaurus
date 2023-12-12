@@ -22,7 +22,7 @@ import org.mbari.annosaurus.controllers.{AnnotationController, TestEntityFactory
 import org.mbari.annosaurus.model.simple.{QueryConstraints, QueryConstraintsResponse}
 import org.mbari.annosaurus.repository.jpa.entity.ImagedMomentEntity
 import org.mbari.annosaurus.repository.ImagedMomentDAO
-import org.mbari.annosaurus.repository.jpa.{AnnotationImpl, JPADAOFactory}
+import org.mbari.annosaurus.repository.jpa.{MutableAnnotationImpl, JPADAOFactory}
 
 import java.nio.charset.StandardCharsets
 import java.util.concurrent.TimeUnit
@@ -46,7 +46,7 @@ class FastAnnotationV1ApiSpec extends WebApiStack {
 
   private val videoReferenceUuid = UUID.randomUUID()
 
-  class ConcreteQCR extends QueryConstraintsResponse[JList[AnnotationImpl]]
+  class ConcreteQCR extends QueryConstraintsResponse[JList[MutableAnnotationImpl]]
 
   "FastAnnotationV1Api" should "set up correctly" in {
 

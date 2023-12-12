@@ -16,7 +16,7 @@
 
 package org.mbari.annosaurus.repository
 
-import org.mbari.annosaurus.model.Observation
+import org.mbari.annosaurus.model.MutableObservation
 import org.mbari.annosaurus.model.simple.{ConcurrentRequest, MultiRequest}
 import org.mbari.annosaurus.repository.jpa.entity.ObservationEntity
 
@@ -27,7 +27,7 @@ import java.util.UUID
   *   Brian Schlining
   * @since 2016-06-17T16:10:00
   */
-trait ObservationDAO[T <: Observation] extends DAO[T] {
+trait ObservationDAO[T <: MutableObservation] extends DAO[T] {
 
     def newPersistentObject(
         concept: String,

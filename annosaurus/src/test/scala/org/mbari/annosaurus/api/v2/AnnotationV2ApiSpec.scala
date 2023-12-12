@@ -18,7 +18,7 @@ package org.mbari.annosaurus.api.v2
 
 import org.mbari.annosaurus.api.WebApiStack
 import org.mbari.annosaurus.controllers.AnnotationController
-import org.mbari.annosaurus.repository.jpa.AnnotationImpl
+import org.mbari.annosaurus.repository.jpa.MutableAnnotationImpl
 
 import java.time.Instant
 import java.util.UUID
@@ -62,7 +62,7 @@ class AnnotationV2ApiSpec extends WebApiStack {
   "AnnotationV2Api" should "find by videoReferenceUuid" in {
     get(s"/v2/annotations/videoreference/${videoReferenceUuid}") {
       status should be(200)
-      val xs = gson.fromJson(body, classOf[Array[AnnotationImpl]])
+      val xs = gson.fromJson(body, classOf[Array[MutableAnnotationImpl]])
       xs.size should be(3)
     }
   }
@@ -72,7 +72,7 @@ class AnnotationV2ApiSpec extends WebApiStack {
       s"/v2/annotations/videoreference/${videoReferenceUuid}?start=20000101T000000Z&end=20000201T000000Z"
     ) {
       status should be(200)
-      val xs = gson.fromJson(body, classOf[Array[AnnotationImpl]])
+      val xs = gson.fromJson(body, classOf[Array[MutableAnnotationImpl]])
       xs.size should be(2)
     }
   }

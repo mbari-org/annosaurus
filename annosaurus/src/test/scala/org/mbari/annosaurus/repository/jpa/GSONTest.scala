@@ -36,7 +36,7 @@ class GSONTest extends AnyFlatSpec with Matchers {
   "GSON" should "convert to an annotation with image references" in {
     val src         = getClass.getResource("/json/annotation_single.json")
     val json        = Source.fromFile(src.toURI, "UTF-8").mkString
-    val annotations = Constants.GSON.fromJson(json, classOf[Array[AnnotationImpl]])
+    val annotations = Constants.GSON.fromJson(json, classOf[Array[MutableAnnotationImpl]])
 
     annotations.size should be(1)
     annotations.head.imageReferences.size should be(2)
@@ -45,11 +45,11 @@ class GSONTest extends AnyFlatSpec with Matchers {
 
   it should "round trip annotation json" in {
     val annotation =
-      AnnotationImpl(UUID.randomUUID(), "Foo", "brian", recordedDate = Option(Instant.now))
+      MutableAnnotationImpl(UUID.randomUUID(), "Foo", "brian", recordedDate = Option(Instant.now))
     val imageReference = ImageReferenceEntity(new URL("http://www.bob.com/uncle.jpg"))
     annotation.imageReferences = Seq(imageReference)
     val json  = Constants.GSON.toJson(annotation)
-    val annos = Constants.GSON.fromJson(json, classOf[AnnotationImpl])
+    val annos = Constants.GSON.fromJson(json, classOf[MutableAnnotationImpl])
     annos.imageReferences.size should be(1)
     // annos.imageReferences.head should be (isInstanceOf[ImageReferenceImpl])
     println(annos.imageReferences.head.getClass())

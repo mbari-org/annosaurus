@@ -63,7 +63,7 @@ class ImagedMomentEntitySpec extends AnyFlatSpec with Matchers with BeforeAndAft
 
     val xs = Seq(imagedMoment0, imagedMoment1, imagedMoment2, imagedMoment3)
 
-    val annos = xs.flatMap(o => AnnotationImpl(o))
+    val annos = xs.flatMap(o => MutableAnnotationImpl(o))
     annos.size should be(5)
 //    println(annos)
     val ims = ImagedMomentEntity(annos)
@@ -98,7 +98,7 @@ class ImagedMomentEntitySpec extends AnyFlatSpec with Matchers with BeforeAndAft
         |  }
         |]""".stripMargin
 
-    val annotations   = Constants.GSON.fromJson(json, classOf[Array[AnnotationImpl]])
+    val annotations   = Constants.GSON.fromJson(json, classOf[Array[MutableAnnotationImpl]])
     val imagedMoments = ImagedMomentEntity(annotations)
     imagedMoments should have size (1)
     val im = imagedMoments.head

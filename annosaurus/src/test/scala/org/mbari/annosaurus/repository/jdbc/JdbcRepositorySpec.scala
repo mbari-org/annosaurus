@@ -18,9 +18,9 @@ package org.mbari.annosaurus.repository.jdbc
 
 import org.mbari.annosaurus.Constants
 import org.mbari.annosaurus.controllers.{AnnotationController, BasicDAOFactory, TestEntityFactory}
-import org.mbari.annosaurus.model.Annotation
+import org.mbari.annosaurus.model.MutableAnnotation
 import org.mbari.annosaurus.repository.jpa.TestDAOFactory
-import org.mbari.annosaurus.repository.jpa.{AnnotationImpl, JPADAOFactory}
+import org.mbari.annosaurus.repository.jpa.{MutableAnnotationImpl, JPADAOFactory}
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
@@ -52,7 +52,7 @@ class JdbcRepositorySpec extends AnyFunSpec with Matchers with BeforeAndAfterAll
     daoFactory.cleanup()
   }
 
-  private def loadAnnos(): Seq[Annotation] = {
+  private def loadAnnos(): Seq[MutableAnnotation] = {
     val url    = getClass.getResource("/json/annotation_full_dive.json").toURI
     val source = Source.fromFile(url, "UTF-8")
     val json = source
@@ -61,7 +61,7 @@ class JdbcRepositorySpec extends AnyFunSpec with Matchers with BeforeAndAfterAll
     source.close()
 
     // Insert all annotations
-    val annos = Constants.GSON.fromJson(json, classOf[Array[AnnotationImpl]])
+    val annos = Constants.GSON.fromJson(json, classOf[Array[MutableAnnotationImpl]])
     annos should not be null
     annos.isEmpty should be(false)
     val newAnnos = exec(() => controller.bulkCreate(annos))
