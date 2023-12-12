@@ -16,7 +16,7 @@
 
 package org.mbari.annosaurus.repository
 
-import org.mbari.annosaurus.model.ImagedMoment
+import org.mbari.annosaurus.model.MutableImagedMoment
 
 import java.util.UUID
 
@@ -26,12 +26,12 @@ import java.util.UUID
   *   Brian Schlining
   * @since 2019-02-08T08:53:00
   */
-trait IndexDAO[T <: ImagedMoment] extends DAO[T] {
+trait IndexDAO[T <: MutableImagedMoment] extends DAO[T] {
 
     def findByVideoReferenceUuid(
         videoReferenceUuid: UUID,
         limit: Option[Int] = None,
         offset: Option[Int] = None
-    ): Iterable[ImagedMoment]
+    ): Iterable[MutableImagedMoment]
 
 }

@@ -20,18 +20,18 @@ import java.time.Instant
 import java.util.UUID
 
 import com.google.gson.annotations.Expose
-import org.mbari.annosaurus.model.{CachedAncillaryDatum, ImagedMoment}
+import org.mbari.annosaurus.model.{MutableCachedAncillaryDatum, MutableImagedMoment}
 
 /**
   * @author Brian Schlining
   * @since 2017-11-09T12:55:00
   */
-class CachedAncillaryDatumBean extends CachedAncillaryDatum {
+class CachedAncillaryDatumBean extends MutableCachedAncillaryDatum {
 
   @Expose(serialize = true)
   var uuid: UUID = _
 
-  var imagedMoment: ImagedMoment = _
+  var imagedMoment: MutableImagedMoment = _
 
   @Expose(serialize = true)
   var imagedMomentUuid: UUID = _
@@ -101,7 +101,7 @@ class CachedAncillaryDatumBean extends CachedAncillaryDatum {
 
 object CachedAncillaryDatumBean {
 
-  def apply(datum: CachedAncillaryDatum): CachedAncillaryDatumBean = {
+  def apply(datum: MutableCachedAncillaryDatum): CachedAncillaryDatumBean = {
     datum match {
       case c: CachedAncillaryDatumBean => c
       case c =>

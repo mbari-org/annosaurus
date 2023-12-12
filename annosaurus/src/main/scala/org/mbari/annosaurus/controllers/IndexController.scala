@@ -16,7 +16,7 @@
 
 package org.mbari.annosaurus.controllers
 
-import org.mbari.annosaurus.model.ImagedMoment
+import org.mbari.annosaurus.model.MutableImagedMoment
 import org.mbari.annosaurus.repository.IndexDAO
 import java.time.Instant
 import java.util.UUID
@@ -28,15 +28,15 @@ import scala.concurrent.{ExecutionContext, Future}
   * @since 2019-02-08T11:00:00
   */
 class IndexController(val daoFactory: BasicDAOFactory)
-    extends BaseController[ImagedMoment, IndexDAO[ImagedMoment]] {
+    extends BaseController[MutableImagedMoment, IndexDAO[MutableImagedMoment]] {
 
-  protected type IDDAO = IndexDAO[ImagedMoment]
+  protected type IDDAO = IndexDAO[MutableImagedMoment]
 
-  override def newDAO(): IndexDAO[ImagedMoment] = daoFactory.newIndexDAO()
+  override def newDAO(): IndexDAO[MutableImagedMoment] = daoFactory.newIndexDAO()
 
   def findByVideoReferenceUUID(uuid: UUID, limit: Option[Int] = None, offset: Option[Int] = None)(
       implicit ec: ExecutionContext
-  ): Future[Iterable[ImagedMoment]] =
+  ): Future[Iterable[MutableImagedMoment]] =
     exec(d => d.findByVideoReferenceUuid(uuid, limit, offset))
 
   /**
@@ -49,8 +49,8 @@ class IndexController(val daoFactory: BasicDAOFactory)
     */
   def updateRecordedTimestamps(videoReferenceUuid: UUID, newStartTimestamp: Instant)(
       implicit ec: ExecutionContext
-  ): Future[Iterable[ImagedMoment]] = {
-    def fn(dao: IDDAO): Iterable[ImagedMoment] = {
+  ): Future[Iterable[MutableImagedMoment]] = {
+    def fn(dao: IDDAO): Iterable[MutableImagedMoment] = {
       dao
         .findByVideoReferenceUuid(videoReferenceUuid)
         .map(im => {
@@ -67,9 +67,9 @@ class IndexController(val daoFactory: BasicDAOFactory)
   }
 
   def bulkUpdateRecordedTimestamps(
-      imagedMoments: Iterable[ImagedMoment]
-  )(implicit ec: ExecutionContext): Future[Iterable[ImagedMoment]] = {
-    def fn(dao: IDDAO): Iterable[ImagedMoment] = {
+      imagedMoments: Iterable[MutableImagedMoment]
+  )(implicit ec: ExecutionContext): Future[Iterable[MutableImagedMoment]] = {
+    def fn(dao: IDDAO): Iterable[MutableImagedMoment] = {
       (for (im <- imagedMoments) yield {
         dao
           .findByUUID(im.uuid)

@@ -16,7 +16,7 @@
 
 package org.mbari.annosaurus.controllers
 
-import org.mbari.annosaurus.model.{CachedAncillaryDatum, ImagedMoment}
+import org.mbari.annosaurus.model.{MutableCachedAncillaryDatum, MutableImagedMoment}
 import org.mbari.annosaurus.util.FastCollator
 import java.time.Duration
 import java.util.UUID
@@ -33,12 +33,12 @@ import scala.concurrent.{ExecutionContext, Future}
   * @since 2017-05-01T10:53:00
   */
 class CachedAncillaryDatumController(val daoFactory: BasicDAOFactory)
-    extends BaseController[CachedAncillaryDatum, CachedAncillaryDatumDAO[CachedAncillaryDatum]] {
+    extends BaseController[MutableCachedAncillaryDatum, CachedAncillaryDatumDAO[MutableCachedAncillaryDatum]] {
 
-  protected type ADDAO = CachedAncillaryDatumDAO[CachedAncillaryDatum]
+  protected type ADDAO = CachedAncillaryDatumDAO[MutableCachedAncillaryDatum]
   LoggerFactory.getLogger(getClass)
 
-  override def newDAO(): CachedAncillaryDatumDAO[CachedAncillaryDatum] =
+  override def newDAO(): CachedAncillaryDatumDAO[MutableCachedAncillaryDatum] =
     daoFactory.newCachedAncillaryDatumDAO()
 
   def create(
@@ -60,9 +60,9 @@ class CachedAncillaryDatumController(val daoFactory: BasicDAOFactory)
       phi: Option[Double] = None,
       theta: Option[Double] = None,
       psi: Option[Double] = None
-  )(implicit ec: ExecutionContext): Future[CachedAncillaryDatum] = {
+  )(implicit ec: ExecutionContext): Future[MutableCachedAncillaryDatum] = {
 
-    def fn(dao: ADDAO): CachedAncillaryDatum = {
+    def fn(dao: ADDAO): MutableCachedAncillaryDatum = {
       val imDao = daoFactory.newImagedMomentDAO(dao)
       imDao.findByUUID(imagedMomentUuid) match {
         case None =>
@@ -104,10 +104,10 @@ class CachedAncillaryDatumController(val daoFactory: BasicDAOFactory)
     exec(fn)
   }
 
-  def create(imagedMomentUuid: UUID, datum: CachedAncillaryDatum)(
+  def create(imagedMomentUuid: UUID, datum: MutableCachedAncillaryDatum)(
       implicit ec: ExecutionContext
-  ): Future[CachedAncillaryDatum] = {
-    def fn(dao: ADDAO): CachedAncillaryDatum = {
+  ): Future[MutableCachedAncillaryDatum] = {
+    def fn(dao: ADDAO): MutableCachedAncillaryDatum = {
       val imDao = daoFactory.newImagedMomentDAO(dao)
       imDao.findByUUID(imagedMomentUuid) match {
         case None =>
@@ -132,7 +132,7 @@ class CachedAncillaryDatumController(val daoFactory: BasicDAOFactory)
 
   def create(
       datum: CachedAncillaryDatumBean
-  )(implicit ec: ExecutionContext): Future[CachedAncillaryDatum] =
+  )(implicit ec: ExecutionContext): Future[MutableCachedAncillaryDatum] =
     create(datum.imagedMomentUuid, datum)
 
   def update(
@@ -154,9 +154,9 @@ class CachedAncillaryDatumController(val daoFactory: BasicDAOFactory)
       phi: Option[Double] = None,
       theta: Option[Double] = None,
       psi: Option[Double] = None
-  )(implicit ec: ExecutionContext): Future[Option[CachedAncillaryDatum]] = {
+  )(implicit ec: ExecutionContext): Future[Option[MutableCachedAncillaryDatum]] = {
 
-    def fn(dao: ADDAO): Option[CachedAncillaryDatum] = {
+    def fn(dao: ADDAO): Option[MutableCachedAncillaryDatum] = {
       dao
         .findByUUID(uuid)
         .map(cad => {
@@ -200,24 +200,24 @@ class CachedAncillaryDatumController(val daoFactory: BasicDAOFactory)
 
   def findByObservationUUID(
       uuid: UUID
-  )(implicit ec: ExecutionContext): Future[Option[CachedAncillaryDatum]] = {
-    def fn(dao: ADDAO): Option[CachedAncillaryDatum] = dao.findByObservationUUID(uuid)
+  )(implicit ec: ExecutionContext): Future[Option[MutableCachedAncillaryDatum]] = {
+    def fn(dao: ADDAO): Option[MutableCachedAncillaryDatum] = dao.findByObservationUUID(uuid)
 
     exec(fn)
   }
 
   def findByImagedMomentUUID(
       uuid: UUID
-  )(implicit ec: ExecutionContext): Future[Option[CachedAncillaryDatum]] = {
-    def fn(dao: ADDAO): Option[CachedAncillaryDatum] = dao.findByImagedMomentUUID(uuid)
+  )(implicit ec: ExecutionContext): Future[Option[MutableCachedAncillaryDatum]] = {
+    def fn(dao: ADDAO): Option[MutableCachedAncillaryDatum] = dao.findByImagedMomentUUID(uuid)
 
     exec(fn)
   }
 
   def bulkCreateOrUpdate(
       data: Seq[CachedAncillaryDatumBean]
-  )(implicit ec: ExecutionContext): Future[Seq[CachedAncillaryDatum]] = {
-    def fn(dao: ADDAO): Seq[CachedAncillaryDatum] = {
+  )(implicit ec: ExecutionContext): Future[Seq[MutableCachedAncillaryDatum]] = {
+    def fn(dao: ADDAO): Seq[MutableCachedAncillaryDatum] = {
       val fastDao = new FastAncillaryDataController(dao.asInstanceOf[BaseDAO[_]].entityManager)
       fastDao.createOrUpdate(data)
       data
@@ -245,7 +245,7 @@ class CachedAncillaryDatumController(val daoFactory: BasicDAOFactory)
     * @param im The moment whose ancillary data is being updated
     * @return The CachedAncillaryDatum.
     */
-  private def createOrUpdate(d: CachedAncillaryDatum, im: ImagedMoment): CachedAncillaryDatum = {
+  private def createOrUpdate(d: MutableCachedAncillaryDatum, im: MutableImagedMoment): MutableCachedAncillaryDatum = {
     require(d != null, "A null CachedAncillaryDatum argument is not allowed")
     require(im != null, "A null ImagedMoment argument is not allowed")
     require(
@@ -268,9 +268,9 @@ class CachedAncillaryDatumController(val daoFactory: BasicDAOFactory)
       data: Iterable[CachedAncillaryDatumBean],
       videoReferenceUuid: UUID,
       tolerance: Duration = Duration.ofMillis(7500)
-  )(implicit ec: ExecutionContext): Future[Seq[CachedAncillaryDatum]] = {
+  )(implicit ec: ExecutionContext): Future[Seq[MutableCachedAncillaryDatum]] = {
 
-    def fn(dao: ADDAO): Seq[CachedAncillaryDatum] = {
+    def fn(dao: ADDAO): Seq[MutableCachedAncillaryDatum] = {
       val imDao = daoFactory.newImagedMomentDAO(dao)
       val imagedMoments = imDao
         .findByVideoReferenceUUID(videoReferenceUuid)
@@ -278,7 +278,7 @@ class CachedAncillaryDatumController(val daoFactory: BasicDAOFactory)
 
       val usefulData = data.filter(_.recordedTimestamp.isDefined)
 
-      def imagedMomentToMillis(im: ImagedMoment) = im.recordedDate.toEpochMilli.toDouble
+      def imagedMomentToMillis(im: MutableImagedMoment) = im.recordedDate.toEpochMilli.toDouble
 
       def datumToMillis(cd: CachedAncillaryDatumBean) =
         cd.recordedTimestamp.map(_.toEpochMilli).getOrElse(-1L).toDouble
@@ -311,7 +311,7 @@ class CachedAncillaryDatumController(val daoFactory: BasicDAOFactory)
     exec(fn)
   }
 
-  private def updateValues(a: CachedAncillaryDatum, b: CachedAncillaryDatum): Unit = {
+  private def updateValues(a: MutableCachedAncillaryDatum, b: MutableCachedAncillaryDatum): Unit = {
     require(a != null && b != null, "Null arguments are not allowed")
     a.altitude = b.altitude
     a.depthMeters = b.depthMeters

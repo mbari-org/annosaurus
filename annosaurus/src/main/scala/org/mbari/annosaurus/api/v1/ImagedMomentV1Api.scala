@@ -16,7 +16,7 @@
 
 package org.mbari.annosaurus.api.v1
 
-import org.mbari.annosaurus.model.ImagedMoment
+import org.mbari.annosaurus.model.MutableImagedMoment
 import java.time.{Duration, Instant}
 import java.util.UUID
 
@@ -197,7 +197,7 @@ class ImagedMomentV1Api(controller: ImagedMomentController)(implicit val executo
       case None    => Await.result(controller.countByVideoReferenceUuid(uuid), timeout)
     }
 
-    def fn(limit: Int, offset: Int): Future[Iterable[ImagedMoment]] =
+    def fn(limit: Int, offset: Int): Future[Iterable[MutableImagedMoment]] =
       controller.findByVideoReferenceUUID(uuid, Some(limit), Some(offset))
 
     autoPage(response, start, end, pageSize, fn, timeout)

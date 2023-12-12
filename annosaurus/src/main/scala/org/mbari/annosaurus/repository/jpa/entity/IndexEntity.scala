@@ -19,7 +19,7 @@ package org.mbari.annosaurus.repository.jpa.entity
 import com.google.gson.annotations.{Expose, SerializedName}
 import jakarta.persistence._
 import org.mbari.annosaurus.Constants
-import org.mbari.annosaurus.model.{CachedAncillaryDatum, MutableImageReference, ImagedMoment, MutableObservation}
+import org.mbari.annosaurus.model.{MutableCachedAncillaryDatum, MutableImageReference, MutableImagedMoment, MutableObservation}
 import org.mbari.annosaurus.repository.jpa._
 import org.mbari.vcr4j.time.Timecode
 
@@ -41,7 +41,7 @@ import java.util.UUID
     )
   )
 )
-class IndexEntity extends ImagedMoment with JPAPersistentObject {
+class IndexEntity extends MutableImagedMoment with JPAPersistentObject {
 
   @Expose(serialize = true)
   @SerializedName(value = "video_reference_uuid")
@@ -100,7 +100,7 @@ class IndexEntity extends ImagedMoment with JPAPersistentObject {
   override def imageReferences: Iterable[MutableImageReference] = ???
 
   @Transient
-  var ancillaryDatum: CachedAncillaryDatum = _
+  var ancillaryDatum: MutableCachedAncillaryDatum = _
 
   override def primaryKey: Option[UUID] = ???
 }

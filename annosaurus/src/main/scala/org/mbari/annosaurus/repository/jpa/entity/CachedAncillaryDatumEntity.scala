@@ -18,7 +18,7 @@ package org.mbari.annosaurus.repository.jpa.entity
 
 import com.google.gson.annotations.Expose
 import jakarta.persistence._
-import org.mbari.annosaurus.model.{CachedAncillaryDatum, ImagedMoment}
+import org.mbari.annosaurus.model.{MutableCachedAncillaryDatum, MutableImagedMoment}
 import org.mbari.annosaurus.repository.jpa.{DoubleOptionConverter, JPAPersistentObject, TransactionLogger}
 
 /**
@@ -63,7 +63,7 @@ import org.mbari.annosaurus.repository.jpa.{DoubleOptionConverter, JPAPersistent
     )
   )
 )
-class CachedAncillaryDatumEntity extends CachedAncillaryDatum with JPAPersistentObject {
+class CachedAncillaryDatumEntity extends MutableCachedAncillaryDatum with JPAPersistentObject {
 
   @Expose(serialize = true)
   @Column(name = "coordinate_reference_system", length = 32, nullable = true)
@@ -101,7 +101,7 @@ class CachedAncillaryDatumEntity extends CachedAncillaryDatum with JPAPersistent
     targetEntity = classOf[ImagedMomentEntity]
   )
   @JoinColumn(name = "imaged_moment_uuid", nullable = false, columnDefinition = "CHAR(36)")
-  var imagedMoment: ImagedMoment = _
+  var imagedMoment: MutableImagedMoment = _
 
   @Expose(serialize = true)
   @Column(name = "y", nullable = true)
@@ -161,7 +161,7 @@ class CachedAncillaryDatumEntity extends CachedAncillaryDatum with JPAPersistent
 
 object CachedAncillaryDatumEntity {
 
-  def apply(datum: CachedAncillaryDatum): CachedAncillaryDatumEntity = {
+  def apply(datum: MutableCachedAncillaryDatum): CachedAncillaryDatumEntity = {
     datum match {
       case c: CachedAncillaryDatumEntity => c
       case c =>

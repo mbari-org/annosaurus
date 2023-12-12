@@ -16,7 +16,7 @@
 
 package org.mbari.annosaurus.controllers
 
-import org.mbari.annosaurus.model.ImagedMoment
+import org.mbari.annosaurus.model.MutableImagedMoment
 import org.mbari.annosaurus.repository.jpa.TestDAOFactory
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.flatspec.AnyFlatSpec
@@ -76,7 +76,7 @@ class ImagedMomentControllerSpec extends AnyFlatSpec with Matchers with BeforeAn
 
     val s = "2019-09-22T01:23:45.6789Z"
 
-    def create(): Future[ImagedMoment] = {
+    def create(): Future[MutableImagedMoment] = {
       val i = Instant.parse(s)
       val c = new ImagedMomentController(daoFactory.asInstanceOf[BasicDAOFactory])
       c.create(videoReferenceUuid, recordedDate = Some(i))
@@ -185,7 +185,7 @@ class ImagedMomentControllerSpec extends AnyFlatSpec with Matchers with BeforeAn
 
   }
 
-  private def checkUuids(imagedMoment: ImagedMoment): Unit = {
+  private def checkUuids(imagedMoment: MutableImagedMoment): Unit = {
     imagedMoment.uuid should not be null
     for (obs <- imagedMoment.observations) {
       obs.uuid should not be null

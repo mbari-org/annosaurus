@@ -19,7 +19,7 @@ package org.mbari.annosaurus.repository.jpa
 import java.time.{Duration, Instant}
 import java.util.{UUID, ArrayList => JArrayList, List => JList}
 import com.google.gson.annotations.{Expose, SerializedName}
-import org.mbari.annosaurus.model.{MutableAssociation, MutableAnnotation, MutableImageReference, ImagedMoment, MutableObservation}
+import org.mbari.annosaurus.model.{MutableAssociation, MutableAnnotation, MutableImageReference, MutableImagedMoment, MutableObservation}
 import org.mbari.annosaurus.repository.jpa.entity.{AssociationEntity, ImageReferenceEntity}
 import org.mbari.vcr4j.time.Timecode
 
@@ -124,7 +124,7 @@ object MutableAnnotationImpl {
     a
   }
 
-  def apply(imagedMoment: ImagedMoment): Iterable[MutableAnnotationImpl] = {
+  def apply(imagedMoment: MutableImagedMoment): Iterable[MutableAnnotationImpl] = {
     imagedMoment
       .observations
       .map(apply)

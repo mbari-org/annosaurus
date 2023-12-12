@@ -16,7 +16,7 @@
 
 package org.mbari.annosaurus.model.simple
 
-import org.mbari.annosaurus.model.{MutableAssociation, CachedAncillaryDatum, CachedVideoReferenceInfo, MutableImageReference, ImagedMoment, MutableObservation}
+import org.mbari.annosaurus.model.{MutableAssociation, MutableCachedAncillaryDatum, CachedVideoReferenceInfo, MutableImageReference, MutableImagedMoment, MutableObservation}
 
 /**
   *
@@ -32,13 +32,13 @@ object Implicits {
   implicit def toCaseClass(observation: MutableObservation): SimpleObservation =
     SimpleObservation(observation)
 
-  implicit def toCaseClass(imagedMoment: ImagedMoment): SimpleImagedMoment =
+  implicit def toCaseClass(imagedMoment: MutableImagedMoment): SimpleImagedMoment =
     SimpleImagedMoment(imagedMoment)
 
   implicit def toCaseClass(imageReference: MutableImageReference): SimpleImageReference =
     SimpleImageReference(imageReference)
 
-  implicit def toCaseClass(ancillaryDatum: CachedAncillaryDatum): SimpleAncillaryDatum =
+  implicit def toCaseClass(ancillaryDatum: MutableCachedAncillaryDatum): SimpleAncillaryDatum =
     SimpleAncillaryDatum(ancillaryDatum)
 
   implicit def toCaseClass(videoReferenceInfo: CachedVideoReferenceInfo): SimpleVideoReferenceInfo =
@@ -52,11 +52,11 @@ object Implicits {
     def asCase: SimpleObservation = toCaseClass(observation)
   }
 
-  implicit class RichImagedMoment(imagedMoment: ImagedMoment) {
+  implicit class RichImagedMoment(imagedMoment: MutableImagedMoment) {
     def asCase: SimpleImagedMoment = toCaseClass(imagedMoment)
   }
 
-  implicit class RichAncillaryDatum(ancillaryDatum: CachedAncillaryDatum) {
+  implicit class RichAncillaryDatum(ancillaryDatum: MutableCachedAncillaryDatum) {
     def asCase: SimpleAncillaryDatum = toCaseClass(ancillaryDatum)
   }
 

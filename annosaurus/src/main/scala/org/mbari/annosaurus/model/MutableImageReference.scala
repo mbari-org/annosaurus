@@ -28,7 +28,7 @@ import java.util.UUID
 trait MutableImageReference extends PersistentObject {
 
     var uuid: UUID
-    var imagedMoment: ImagedMoment
+    var imagedMoment: MutableImagedMoment
 
     /** This is essentially the mimetype
       */

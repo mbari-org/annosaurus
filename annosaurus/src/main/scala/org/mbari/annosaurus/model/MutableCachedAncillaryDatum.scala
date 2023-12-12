@@ -24,10 +24,10 @@ import java.util.UUID
   *   Brian Schlining
   * @since 2016-06-15T16:55:00
   */
-trait CachedAncillaryDatum extends PersistentObject {
+trait MutableCachedAncillaryDatum extends PersistentObject {
 
     var uuid: UUID
-    var imagedMoment: ImagedMoment
+    var imagedMoment: MutableImagedMoment
 
     // --- Position
     var latitude: Option[Double]

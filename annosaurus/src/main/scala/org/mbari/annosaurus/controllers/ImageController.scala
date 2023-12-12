@@ -16,7 +16,7 @@
 
 package org.mbari.annosaurus.controllers
 
-import org.mbari.annosaurus.model.{MutableImageReference, ImagedMoment}
+import org.mbari.annosaurus.model.{MutableImageReference, MutableImagedMoment}
 import java.net.URL
 import java.time.{Duration, Instant}
 import java.util.UUID
@@ -178,9 +178,9 @@ class ImageController(daoFactory: BasicDAOFactory) {
   }
 
   private def move(
-      dao: ImagedMomentDAO[ImagedMoment],
-      newIm: ImagedMoment,
-      imageReference: MutableImageReference
+                      dao: ImagedMomentDAO[MutableImagedMoment],
+                      newIm: MutableImagedMoment,
+                      imageReference: MutableImageReference
   ): Unit = {
     val oldIm = imageReference.imagedMoment
     if (!oldIm.uuid.equals(newIm.uuid)) {

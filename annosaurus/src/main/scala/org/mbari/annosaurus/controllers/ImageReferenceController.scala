@@ -16,7 +16,7 @@
 
 package org.mbari.annosaurus.controllers
 
-import org.mbari.annosaurus.model.{MutableImageReference, ImagedMoment}
+import org.mbari.annosaurus.model.{MutableImageReference, MutableImagedMoment}
 import org.mbari.annosaurus.repository.{ImageReferenceDAO, NotFoundInDatastoreException}
 
 import java.net.URL
@@ -104,8 +104,9 @@ class ImageReferenceController(val daoFactory: BasicDAOFactory)
   }
 
   /**
-    * This controller will also delete the [[ImagedMoment]] if
+    * This controller will also delete the [[MutableImagedMoment]] if
     * it is empty (i.e. no observations or other imageReferences)
+ *
     * @param uuid
     * @param ec
     * @return

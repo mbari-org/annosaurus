@@ -16,7 +16,7 @@
 
 package org.mbari.annosaurus
 
-import org.mbari.annosaurus.model.{CachedAncillaryDatum, CachedVideoReferenceInfo, MutableImageReference, ImagedMoment, MutableObservation}
+import org.mbari.annosaurus.model.{MutableCachedAncillaryDatum, CachedVideoReferenceInfo, MutableImageReference, MutableImagedMoment, MutableObservation}
 import org.mbari.annosaurus.repository.jpa.DAOFactory
 import org.mbari.annosaurus.model._
 
@@ -32,12 +32,12 @@ import org.mbari.annosaurus.model._
 package object controllers {
 
   type BasicDAOFactory = DAOFactory[
-    ImagedMoment,
+    MutableImagedMoment,
     MutableObservation,
     MutableAssociation,
     MutableImageReference,
-    CachedAncillaryDatum,
+    MutableCachedAncillaryDatum,
     CachedVideoReferenceInfo,
-    ImagedMoment
+    MutableImagedMoment
   ]
 }

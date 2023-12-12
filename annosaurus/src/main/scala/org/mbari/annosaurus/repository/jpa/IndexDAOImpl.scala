@@ -18,7 +18,7 @@ package org.mbari.annosaurus.repository.jpa
 
 import java.util.UUID
 import jakarta.persistence.EntityManager
-import org.mbari.annosaurus.model.ImagedMoment
+import org.mbari.annosaurus.model.MutableImagedMoment
 import org.mbari.annosaurus.repository.IndexDAO
 import org.mbari.annosaurus.repository.jpa.entity.IndexEntity
 
@@ -36,7 +36,7 @@ class IndexDAOImpl(entityManager: EntityManager)
       videoReferenceUuid: UUID,
       limit: Option[Int] = None,
       offset: Option[Int] = None
-  ): Iterable[ImagedMoment] =
+  ): Iterable[MutableImagedMoment] =
     findByNamedQuery(
       "Index.findByVideoReferenceUUID",
       Map("uuid" -> videoReferenceUuid),

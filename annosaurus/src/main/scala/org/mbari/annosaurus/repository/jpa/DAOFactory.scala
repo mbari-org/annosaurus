@@ -24,13 +24,13 @@ import org.mbari.annosaurus.repository.{AssociationDAO, CachedAncillaryDatumDAO,
   * @since 2016-06-16T14:04:00
   */
 trait DAOFactory[
-    IM <: ImagedMoment,
+    IM <: MutableImagedMoment,
     OBS <: MutableObservation,
     A <: MutableAssociation,
     IR <: MutableImageReference,
-    CAD <: CachedAncillaryDatum,
+    CAD <: MutableCachedAncillaryDatum,
     CMI <: CachedVideoReferenceInfo,
-    ID <: ImagedMoment
+    ID <: MutableImagedMoment
 ] {
 
     def newAssociationDAO(): AssociationDAO[A]

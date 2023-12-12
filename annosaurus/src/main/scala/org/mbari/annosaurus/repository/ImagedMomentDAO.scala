@@ -16,7 +16,7 @@
 
 package org.mbari.annosaurus.repository
 
-import org.mbari.annosaurus.model.ImagedMoment
+import org.mbari.annosaurus.model.MutableImagedMoment
 import org.mbari.annosaurus.model.simple.WindowRequest
 import org.mbari.annosaurus.repository.jpa.entity.ImagedMomentEntity
 import org.mbari.vcr4j.time.Timecode
@@ -28,7 +28,7 @@ import java.util.UUID
   *   Brian Schlining
   * @since 2016-06-17T16:07:00
   */
-trait ImagedMomentDAO[T <: ImagedMoment] extends DAO[T] {
+trait ImagedMomentDAO[T <: MutableImagedMoment] extends DAO[T] {
 
     def newPersistentObject(
         videoReferenceUUID: UUID,
@@ -37,7 +37,7 @@ trait ImagedMomentDAO[T <: ImagedMoment] extends DAO[T] {
         recordedDate: Option[Instant] = None
     ): T
 
-    def newPersistentObject(imagedMoment: ImagedMoment): T
+    def newPersistentObject(imagedMoment: MutableImagedMoment): T
 
     /** Find ImagedMoments where the imagedmoment OR observation has been updated between the
       * requested dates.

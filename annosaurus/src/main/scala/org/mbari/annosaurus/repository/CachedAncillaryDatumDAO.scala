@@ -16,7 +16,7 @@
 
 package org.mbari.annosaurus.repository
 
-import org.mbari.annosaurus.model.CachedAncillaryDatum
+import org.mbari.annosaurus.model.MutableCachedAncillaryDatum
 
 import java.util.UUID
 
@@ -24,7 +24,7 @@ import java.util.UUID
   *   Brian Schlining
   * @since 2016-06-17T16:08:00
   */
-trait CachedAncillaryDatumDAO[T <: CachedAncillaryDatum] extends DAO[T] {
+trait CachedAncillaryDatumDAO[T <: MutableCachedAncillaryDatum] extends DAO[T] {
 
     def newPersistentObject(
         latitude: Double,
@@ -44,13 +44,13 @@ trait CachedAncillaryDatumDAO[T <: CachedAncillaryDatum] extends DAO[T] {
         phi: Option[Double] = None,
         theta: Option[Double] = None,
         psi: Option[Double] = None
-    ): CachedAncillaryDatum
+    ): MutableCachedAncillaryDatum
 
-    def findByObservationUUID(observationUuid: UUID): Option[CachedAncillaryDatum]
+    def findByObservationUUID(observationUuid: UUID): Option[MutableCachedAncillaryDatum]
 
-    def findByImagedMomentUUID(imagedMomentUuid: UUID): Option[CachedAncillaryDatum]
+    def findByImagedMomentUUID(imagedMomentUuid: UUID): Option[MutableCachedAncillaryDatum]
 
-    def newPersistentObject(bean: CachedAncillaryDatum): CachedAncillaryDatum
+    def newPersistentObject(bean: MutableCachedAncillaryDatum): MutableCachedAncillaryDatum
 
     /** Delete all ancillary data associated with annotations for a given video reference
       * @param videoReferenceUuid

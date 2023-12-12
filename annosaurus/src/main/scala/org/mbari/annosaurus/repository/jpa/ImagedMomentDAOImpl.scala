@@ -21,7 +21,7 @@ import java.time.{Duration, Instant}
 import java.util.function.Function
 import java.util.{UUID, stream}
 import jakarta.persistence.EntityManager
-import org.mbari.annosaurus.model.ImagedMoment
+import org.mbari.annosaurus.model.MutableImagedMoment
 import org.mbari.annosaurus.model.simple.WindowRequest
 import org.mbari.annosaurus.repository.ImagedMomentDAO
 import org.mbari.annosaurus.repository.jpa.entity.ImagedMomentEntity
@@ -55,7 +55,7 @@ class ImagedMomentDAOImpl(entityManager: EntityManager)
     imagedMoment
   }
 
-  override def newPersistentObject(imagedMoment: ImagedMoment): ImagedMomentEntity =
+  override def newPersistentObject(imagedMoment: MutableImagedMoment): ImagedMomentEntity =
     ImagedMomentEntity(imagedMoment)
 
   override def findBetweenUpdatedDates(

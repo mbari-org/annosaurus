@@ -27,7 +27,7 @@ import java.util.UUID
 trait MutableObservation extends PersistentObject {
 
     var uuid: UUID
-    var imagedMoment: ImagedMoment
+    var imagedMoment: MutableImagedMoment
 
     /** A Concept is the term used for the annotation. For science purposes, this is typically the
       * name of the object, such as a species name

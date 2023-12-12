@@ -17,7 +17,7 @@
 package org.mbari.annosaurus
 
 import org.junit.Assert._
-import org.mbari.annosaurus.model.{MutableAssociation, CachedAncillaryDatum, MutableImageReference, MutableObservation}
+import org.mbari.annosaurus.model.{MutableAssociation, MutableCachedAncillaryDatum, MutableImageReference, MutableObservation}
 import org.mbari.annosaurus.repository.jpa.entity.ImagedMomentEntity
 
 object AssertUtils {
@@ -108,7 +108,7 @@ object AssertUtils {
         }
     }
 
-    def assertSameAncillaryDatum(a: CachedAncillaryDatum, b: CachedAncillaryDatum): Unit = {
+    def assertSameAncillaryDatum(a: MutableCachedAncillaryDatum, b: MutableCachedAncillaryDatum): Unit = {
         if (a == null && b == null) {
             // do nothing
         }

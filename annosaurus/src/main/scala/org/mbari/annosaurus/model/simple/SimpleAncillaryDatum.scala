@@ -16,7 +16,7 @@
 
 package org.mbari.annosaurus.model.simple
 
-import org.mbari.annosaurus.model.CachedAncillaryDatum
+import org.mbari.annosaurus.model.MutableCachedAncillaryDatum
 
 import java.util.UUID
 
@@ -39,7 +39,7 @@ case class SimpleAncillaryDatum(
 
 object SimpleAncillaryDatum {
 
-  def apply(datum: CachedAncillaryDatum): SimpleAncillaryDatum =
+  def apply(datum: MutableCachedAncillaryDatum): SimpleAncillaryDatum =
     new SimpleAncillaryDatum(
       datum.uuid,
       datum.latitude,

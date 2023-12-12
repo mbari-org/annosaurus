@@ -22,7 +22,7 @@ import org.mbari.vcr4j.time.Timecode
 import java.time.{Duration, Instant}
 import java.util.UUID
 
-/** An [[ImagedMoment]] is an index back to a particular video-file. The index can be one or more of
+/** An [[MutableImagedMoment]] is an index back to a particular video-file. The index can be one or more of
   * the following:
   *   1. timecode (if the video has a time-code track) 2. elapsedTime - The elapsed time from the
   *      start or the video until the frame containing the obseration 3. recordedDate - The moment
@@ -32,7 +32,7 @@ import java.util.UUID
   *   Brian Schlining
   * @since 2016-06-15T16:54:00
   */
-trait ImagedMoment extends PersistentObject {
+trait MutableImagedMoment extends PersistentObject {
 
     var uuid: UUID
 
@@ -54,7 +54,7 @@ trait ImagedMoment extends PersistentObject {
     def addImageReference(imageReference: MutableImageReference): Unit
     def removeImageReference(imageReference: MutableImageReference): Unit
     def imageReferences: Iterable[MutableImageReference]
-    var ancillaryDatum: CachedAncillaryDatum
+    var ancillaryDatum: MutableCachedAncillaryDatum
     def isEmpty: Boolean = observations.isEmpty && imageReferences.isEmpty
 
 }

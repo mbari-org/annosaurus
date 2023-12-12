@@ -20,7 +20,7 @@ import java.time.{Duration, Instant}
 import java.util.UUID
 import io.reactivex.rxjava3.subjects.Subject
 import org.mbari.annosaurus.messaging.{AnnotationPublisher, MessageBus}
-import org.mbari.annosaurus.model.{ImagedMoment, MutableObservation}
+import org.mbari.annosaurus.model.{MutableImagedMoment, MutableObservation}
 import org.mbari.annosaurus.repository.{NotFoundInDatastoreException, ObservationDAO}
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -150,8 +150,9 @@ class ObservationController(
   }
 
   /**
-    * This controller will also delete the [[ImagedMoment]] if
+    * This controller will also delete the [[MutableImagedMoment]] if
     * it is empty (i.e. no observations or other imageReferences)
+ *
     * @param uuid
     * @param ec
     * @return

@@ -18,7 +18,7 @@ package org.mbari.annosaurus.repository.jpa.entity
 
 import com.google.gson.annotations.{Expose, SerializedName}
 import jakarta.persistence._
-import org.mbari.annosaurus.model.{MutableAssociation, ImagedMoment, MutableObservation}
+import org.mbari.annosaurus.model.{MutableAssociation, MutableImagedMoment, MutableObservation}
 import org.mbari.annosaurus.repository.jpa.{DurationConverter, InstantConverter, JPAPersistentObject, TransactionLogger}
 
 import java.time.{Duration, Instant}
@@ -156,7 +156,7 @@ class ObservationEntity extends MutableObservation with JPAPersistentObject {
     targetEntity = classOf[ImagedMomentEntity]
   )
   @JoinColumn(name = "imaged_moment_uuid", nullable = false, columnDefinition = "CHAR(36)")
-  var imagedMoment: ImagedMoment = _
+  var imagedMoment: MutableImagedMoment = _
 
   @Expose(serialize = true)
   @SerializedName(value = "observation_timestamp")

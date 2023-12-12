@@ -16,7 +16,7 @@
 
 package org.mbari.annosaurus.api.v2
 
-import org.mbari.annosaurus.model.ImagedMoment
+import org.mbari.annosaurus.model.MutableImagedMoment
 import java.time.Instant
 import java.util.UUID
 
@@ -49,7 +49,7 @@ class ImagedMomentV2Api(controller: ImagedMomentController)(implicit val executo
     val offset = params.getAs[Int]("offset")
 
     val (closeable, stream) = controller.streamByVideoReferenceUUID(uuid, limit, offset)
-    ResponseUtilities.sendStreamedResponse(response, stream, (im: ImagedMoment) => toJson(im))
+    ResponseUtilities.sendStreamedResponse(response, stream, (im: MutableImagedMoment) => toJson(im))
     closeable.close()
     ()
   }
@@ -121,7 +121,7 @@ class ImagedMomentV2Api(controller: ImagedMomentController)(implicit val executo
     val offset = params.getAs[Int]("offset")
 
     val (closeable, stream) = controller.streamBetweenUpdatedDates(start, end, limit, offset)
-    ResponseUtilities.sendStreamedResponse(response, stream, (im: ImagedMoment) => toJson(im))
+    ResponseUtilities.sendStreamedResponse(response, stream, (im: MutableImagedMoment) => toJson(im))
     closeable.close()
     ()
   }
@@ -143,7 +143,7 @@ class ImagedMomentV2Api(controller: ImagedMomentController)(implicit val executo
     val offset = params.getAs[Int]("offset")
 
     val (closeable, stream) = controller.streamBetweenUpdatedDates(start, end, limit, offset)
-    ResponseUtilities.sendStreamedResponse(response, stream, (im: ImagedMoment) => toJson(im))
+    ResponseUtilities.sendStreamedResponse(response, stream, (im: MutableImagedMoment) => toJson(im))
     closeable.close()
     ()
   }
@@ -155,7 +155,7 @@ class ImagedMomentV2Api(controller: ImagedMomentController)(implicit val executo
     val limit               = params.getAs[Int]("limit")
     val offset              = params.getAs[Int]("offset")
     val (closeable, stream) = controller.streamByConcept(name, limit, offset)
-    ResponseUtilities.sendStreamedResponse(response, stream, (im: ImagedMoment) => toJson(im))
+    ResponseUtilities.sendStreamedResponse(response, stream, (im: MutableImagedMoment) => toJson(im))
     closeable.close()
     ()
   }

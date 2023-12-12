@@ -223,7 +223,7 @@ import scala.jdk.CollectionConverters._
     )
   )
 )
-class ImagedMomentEntity extends ImagedMoment with JPAPersistentObject {
+class ImagedMomentEntity extends MutableImagedMoment with JPAPersistentObject {
 
   @Expose(serialize = true)
   @Column(name = "elapsed_time_millis", nullable = true)
@@ -309,10 +309,10 @@ class ImagedMomentEntity extends ImagedMoment with JPAPersistentObject {
     fetch = FetchType.LAZY,
     targetEntity = classOf[CachedAncillaryDatumEntity]
   )
-  protected var _ancillaryDatum: CachedAncillaryDatum = _
+  protected var _ancillaryDatum: MutableCachedAncillaryDatum = _
 
-  def ancillaryDatum: CachedAncillaryDatum = _ancillaryDatum
-  def ancillaryDatum_=(ad: CachedAncillaryDatum): Unit = {
+  def ancillaryDatum: MutableCachedAncillaryDatum = _ancillaryDatum
+  def ancillaryDatum_=(ad: MutableCachedAncillaryDatum): Unit = {
     if (_ancillaryDatum != null) _ancillaryDatum.imagedMoment = null
     _ancillaryDatum = ad
     ad.imagedMoment = this
@@ -338,7 +338,7 @@ object ImagedMomentEntity {
     im
   }
 
-  def apply(imagedMoment: ImagedMoment): ImagedMomentEntity = {
+  def apply(imagedMoment: MutableImagedMoment): ImagedMomentEntity = {
     val newImagedMoment = apply(
       Option(imagedMoment.videoReferenceUUID),
       Option(imagedMoment.recordedDate),

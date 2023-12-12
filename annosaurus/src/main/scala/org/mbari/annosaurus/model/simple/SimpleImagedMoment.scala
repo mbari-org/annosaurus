@@ -16,7 +16,7 @@
 
 package org.mbari.annosaurus.model.simple
 
-import org.mbari.annosaurus.model.ImagedMoment
+import org.mbari.annosaurus.model.MutableImagedMoment
 import java.time.{Duration, Instant}
 import java.util.UUID
 import org.mbari.vcr4j.time.Timecode
@@ -40,7 +40,7 @@ case class SimpleImagedMoment(
 
 object SimpleImagedMoment {
 
-  def apply(imagedMoment: ImagedMoment): SimpleImagedMoment =
+  def apply(imagedMoment: MutableImagedMoment): SimpleImagedMoment =
     new SimpleImagedMoment(
       imagedMoment.uuid,
       imagedMoment.videoReferenceUUID,
