@@ -17,18 +17,17 @@
 package org.mbari.annosaurus.api.v1
 
 import java.util.UUID
-
 import org.mbari.annosaurus.controllers.AssociationController
-import org.mbari.annosaurus.model.{MutableAssociation => MutableAssociation}
+import org.mbari.annosaurus.model.MutableAssociation
 import org.mbari.annosaurus.domain.{Association, AssociationSC}
 import org.mbari.annosaurus.model.simple.{ConceptAssociationRequest, ErrorMsg}
 import org.scalatra.{BadRequest, NoContent, NotFound}
-import io.circe._
-import io.circe.parser._
-import org.mbari.annosaurus.etc.circe.CirceCodecs._
+import io.circe.*
+import io.circe.parser.*
+import org.mbari.annosaurus.etc.circe.CirceCodecs.{associationDecoder, *}
 
 import scala.concurrent.ExecutionContext
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 
 /** @author
   *   Brian Schlining

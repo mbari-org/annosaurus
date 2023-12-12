@@ -16,7 +16,7 @@
 
 package org.mbari.annosaurus.repository
 
-import org.mbari.annosaurus.model.CachedVideoReferenceInfo
+import org.mbari.annosaurus.model.MutableCachedVideoReferenceInfo
 
 import java.util.UUID
 
@@ -24,12 +24,12 @@ import java.util.UUID
   *   Brian Schlining
   * @since 2016-06-17T16:10:00
   */
-trait CachedVideoReferenceInfoDAO[T <: CachedVideoReferenceInfo] extends DAO[T] {
+trait CachedVideoReferenceInfoDAO[T <: MutableCachedVideoReferenceInfo] extends DAO[T] {
 
-    def findByVideoReferenceUUID(uuid: UUID): Option[CachedVideoReferenceInfo]
-    def findByPlatformName(platformName: String): Iterable[CachedVideoReferenceInfo]
-    def findByMissionID(missionID: String): Iterable[CachedVideoReferenceInfo]
-    def findByMissionContact(missionContact: String): Iterable[CachedVideoReferenceInfo]
+    def findByVideoReferenceUUID(uuid: UUID): Option[MutableCachedVideoReferenceInfo]
+    def findByPlatformName(platformName: String): Iterable[MutableCachedVideoReferenceInfo]
+    def findByMissionID(missionID: String): Iterable[MutableCachedVideoReferenceInfo]
+    def findByMissionContact(missionContact: String): Iterable[MutableCachedVideoReferenceInfo]
     def findAllVideoReferenceUUIDs(): Iterable[UUID]
     def findAllMissionContacts(): Iterable[String]
     def findAllPlatformNames(): Iterable[String]

@@ -116,6 +116,7 @@ object CirceCodecs {
     private val associationCcDecoder: Decoder[Association] = deriveDecoder // or associationScDecoder.map(_.toCamelCase)
     given associationEncoder: Encoder[Association] = deriveEncoder
     given associationDecoder: Decoder[Association] = associationCcDecoder or associationScDecoder.map(_.toCamelCase)
+    given alDecoder: Decoder[List[Association]] = deriveDecoder
 
     given imageReferenceScDecoder: Decoder[ImageReferenceSC] = deriveDecoder
     given imageReferenceScEncoder: Encoder[ImageReferenceSC] = deriveEncoder

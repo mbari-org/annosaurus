@@ -18,7 +18,7 @@ package org.mbari.annosaurus.model
 
 import com.google.gson.annotations.Expose
 
-class GeographicRange {
+class MutableGeographicRange {
 
   @Expose(serialize = true)
   var minLatitude: Double = _
@@ -40,7 +40,7 @@ class GeographicRange {
 
 }
 
-object GeographicRange {
+object MutableGeographicRange {
   def apply(
       minLatitude: Double,
       maxLatitude: Double,
@@ -48,8 +48,8 @@ object GeographicRange {
       maxLongitude: Double,
       minDepthMeters: Double,
       maxDepthMeters: Double
-  ): GeographicRange = {
-    val gr = new GeographicRange()
+  ): MutableGeographicRange = {
+    val gr = new MutableGeographicRange()
     gr.minLatitude = minLatitude
     gr.maxLatitude = maxLatitude
     gr.minLongitude = minLongitude
@@ -59,6 +59,6 @@ object GeographicRange {
     gr
   }
 
-  val Empty: GeographicRange =
+  val Empty: MutableGeographicRange =
     apply(Double.NaN, Double.NaN, Double.NaN, Double.NaN, Double.NaN, Double.NaN)
 }

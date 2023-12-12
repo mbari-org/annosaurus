@@ -29,7 +29,7 @@ trait DAOFactory[
     A <: MutableAssociation,
     IR <: MutableImageReference,
     CAD <: MutableCachedAncillaryDatum,
-    CMI <: CachedVideoReferenceInfo,
+    CMI <: MutableCachedVideoReferenceInfo,
     ID <: MutableImagedMoment
 ] {
 

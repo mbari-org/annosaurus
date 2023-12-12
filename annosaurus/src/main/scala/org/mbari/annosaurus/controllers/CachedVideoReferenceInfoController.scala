@@ -16,7 +16,7 @@
 
 package org.mbari.annosaurus.controllers
 
-import org.mbari.annosaurus.model.CachedVideoReferenceInfo
+import org.mbari.annosaurus.model.MutableCachedVideoReferenceInfo
 import org.mbari.annosaurus.repository.CachedVideoReferenceInfoDAO
 import java.util.UUID
 
@@ -29,13 +29,13 @@ import scala.concurrent.{ExecutionContext, Future}
   * @since 2016-09-14T10:50:00
   */
 class CachedVideoReferenceInfoController(val daoFactory: BasicDAOFactory)
-    extends BaseController[CachedVideoReferenceInfo, CachedVideoReferenceInfoDAO[
-      CachedVideoReferenceInfo
+    extends BaseController[MutableCachedVideoReferenceInfo, CachedVideoReferenceInfoDAO[
+      MutableCachedVideoReferenceInfo
     ]] {
 
-  protected type VRDAO = CachedVideoReferenceInfoDAO[CachedVideoReferenceInfo]
+  protected type VRDAO = CachedVideoReferenceInfoDAO[MutableCachedVideoReferenceInfo]
 
-  override def newDAO(): CachedVideoReferenceInfoDAO[CachedVideoReferenceInfo] =
+  override def newDAO(): CachedVideoReferenceInfoDAO[MutableCachedVideoReferenceInfo] =
     daoFactory.newCachedVideoReferenceInfoDAO()
 
   //  def findAll(limit: Int, offset: Int)(implicit ec: ExecutionContext): Future[Iterable[CachedVideoReferenceInfo]] =
@@ -43,29 +43,29 @@ class CachedVideoReferenceInfoController(val daoFactory: BasicDAOFactory)
 
   def findByVideoReferenceUUID(
       uuid: UUID
-  )(implicit ec: ExecutionContext): Future[Option[CachedVideoReferenceInfo]] = {
-    def fn(dao: VRDAO): Option[CachedVideoReferenceInfo] = dao.findByVideoReferenceUUID(uuid)
+  )(implicit ec: ExecutionContext): Future[Option[MutableCachedVideoReferenceInfo]] = {
+    def fn(dao: VRDAO): Option[MutableCachedVideoReferenceInfo] = dao.findByVideoReferenceUUID(uuid)
     exec(fn)
   }
 
   def findByPlatformName(
       name: String
-  )(implicit ec: ExecutionContext): Future[Iterable[CachedVideoReferenceInfo]] = {
-    def fn(dao: VRDAO): Iterable[CachedVideoReferenceInfo] = dao.findByPlatformName(name)
+  )(implicit ec: ExecutionContext): Future[Iterable[MutableCachedVideoReferenceInfo]] = {
+    def fn(dao: VRDAO): Iterable[MutableCachedVideoReferenceInfo] = dao.findByPlatformName(name)
     exec(fn)
   }
 
   def findByMissionID(
       id: String
-  )(implicit ec: ExecutionContext): Future[Iterable[CachedVideoReferenceInfo]] = {
-    def fn(dao: VRDAO): Iterable[CachedVideoReferenceInfo] = dao.findByMissionID(id)
+  )(implicit ec: ExecutionContext): Future[Iterable[MutableCachedVideoReferenceInfo]] = {
+    def fn(dao: VRDAO): Iterable[MutableCachedVideoReferenceInfo] = dao.findByMissionID(id)
     exec(fn)
   }
 
   def findByMissionContact(
       contact: String
-  )(implicit ec: ExecutionContext): Future[Iterable[CachedVideoReferenceInfo]] = {
-    def fn(dao: VRDAO): Iterable[CachedVideoReferenceInfo] = dao.findByMissionContact(contact)
+  )(implicit ec: ExecutionContext): Future[Iterable[MutableCachedVideoReferenceInfo]] = {
+    def fn(dao: VRDAO): Iterable[MutableCachedVideoReferenceInfo] = dao.findByMissionContact(contact)
     exec(fn)
   }
 
@@ -94,9 +94,9 @@ class CachedVideoReferenceInfoController(val daoFactory: BasicDAOFactory)
       platformName: String,
       missionID: String,
       missionContact: Option[String] = None
-  )(implicit ec: ExecutionContext): Future[CachedVideoReferenceInfo] = {
+  )(implicit ec: ExecutionContext): Future[MutableCachedVideoReferenceInfo] = {
 
-    def fn(dao: VRDAO): CachedVideoReferenceInfo = {
+    def fn(dao: VRDAO): MutableCachedVideoReferenceInfo = {
       val v = dao.newPersistentObject()
       v.videoReferenceUUID = videoReferenceUUID
       v.platformName = platformName
@@ -114,9 +114,9 @@ class CachedVideoReferenceInfoController(val daoFactory: BasicDAOFactory)
       platformName: Option[String] = None,
       missionID: Option[String] = None,
       missionContact: Option[String] = None
-  )(implicit ec: ExecutionContext): Future[Option[CachedVideoReferenceInfo]] = {
+  )(implicit ec: ExecutionContext): Future[Option[MutableCachedVideoReferenceInfo]] = {
 
-    def fn(dao: VRDAO): Option[CachedVideoReferenceInfo] = dao.findByUUID(uuid) match {
+    def fn(dao: VRDAO): Option[MutableCachedVideoReferenceInfo] = dao.findByUUID(uuid) match {
       case None => None
       case Some(v) =>
         videoReferenceUUID.foreach(v.videoReferenceUUID = _)

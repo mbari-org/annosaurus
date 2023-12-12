@@ -16,7 +16,7 @@
 
 package org.mbari.annosaurus.model.simple
 
-import org.mbari.annosaurus.model.CachedVideoReferenceInfo
+import org.mbari.annosaurus.model.MutableCachedVideoReferenceInfo
 
 import java.util.UUID
 
@@ -36,7 +36,7 @@ case class SimpleVideoReferenceInfo(
 
 object SimpleVideoReferenceInfo {
 
-  def apply(info: CachedVideoReferenceInfo): SimpleVideoReferenceInfo =
+  def apply(info: MutableCachedVideoReferenceInfo): SimpleVideoReferenceInfo =
     new SimpleVideoReferenceInfo(
       info.uuid,
       info.videoReferenceUUID,

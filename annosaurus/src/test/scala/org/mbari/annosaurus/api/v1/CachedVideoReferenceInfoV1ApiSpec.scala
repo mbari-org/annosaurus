@@ -19,7 +19,7 @@ package org.mbari.annosaurus.api.v1
 import org.mbari.annosaurus.Constants
 import org.mbari.annosaurus.api.WebApiStack
 import org.mbari.annosaurus.controllers.CachedVideoReferenceInfoController
-import org.mbari.annosaurus.model.CachedVideoReferenceInfo
+import org.mbari.annosaurus.model.MutableCachedVideoReferenceInfo
 import org.mbari.annosaurus.repository.jpa.entity.CachedVideoReferenceInfoEntity
 
 import java.util.UUID
@@ -48,7 +48,7 @@ class CachedVideoReferenceInfoV1ApiSpec extends WebApiStack {
 
   addServlet(videoinfoV1Api, path)
 
-  var videoinfos = new mutable.ArrayBuffer[CachedVideoReferenceInfo]
+  var videoinfos = new mutable.ArrayBuffer[MutableCachedVideoReferenceInfo]
 
   val n = 10
 

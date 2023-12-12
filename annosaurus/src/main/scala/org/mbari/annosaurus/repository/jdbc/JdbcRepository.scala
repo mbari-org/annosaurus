@@ -20,7 +20,7 @@ import java.sql.Timestamp
 import java.time.Instant
 import java.util.UUID
 import jakarta.persistence.{EntityManager, EntityManagerFactory, Query}
-import org.mbari.annosaurus.model.GeographicRange
+import org.mbari.annosaurus.model.MutableGeographicRange
 import org.mbari.annosaurus.model.MutableAnnotation
 import org.mbari.annosaurus.model.simple.{
   ConcurrentRequest,
@@ -110,7 +110,7 @@ class JdbcRepository(entityManagerFactory: EntityManagerFactory) {
 
   def findGeographicRangeByQueryConstraint(
       constraints: QueryConstraints
-  ): Option[GeographicRange] = {
+  ): Option[MutableGeographicRange] = {
     implicit val entityManager: EntityManager = entityManagerFactory.createEntityManager()
     val query                                 = QueryConstraints.toGeographicRangeQuery(constraints, entityManager)
     // Queries return java.util.List[Array[Object]]
@@ -118,7 +118,7 @@ class JdbcRepository(entityManagerFactory: EntityManagerFactory) {
     if (count.nonEmpty) {
       val head = count.head.asInstanceOf[Array[_]]
       Some(
-        GeographicRange(
+        MutableGeographicRange(
           head(0).toString.toDouble,
           head(1).toString.toDouble,
           head(2).toString.toDouble,
