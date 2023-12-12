@@ -38,7 +38,7 @@ class TestUtilsSuite extends munit.FunSuite {
     }
 
     test("build(2, 2, 2, 2, true)") {
-         val xs = TestUtils.build(2, 2, 2, 2, true)
+        val xs = TestUtils.build(2, 2, 2, 2, true)
         assertEquals(xs.size, 2)
         val x = xs.head
         println(x)

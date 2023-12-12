@@ -18,6 +18,7 @@ package org.mbari.annosaurus.model.simple
 
 import org.mbari.annosaurus.AppConfig
 
+@deprecated("Use org.mbari.annosaurus.domain.HealthStatus instead", "2023-12-11")
 final case class HealthStatus(
     jdkVersion: String,
     availableProcessors: Int,

@@ -69,6 +69,16 @@ object Dependencies {
   lazy val slf4jJul   = "org.slf4j" % "jul-to-slf4j" % slf4jVersion
   lazy val slf4jLog4j = "org.slf4j" % "log4j-over-slf4j" % slf4jVersion
 
+  private val tapirVersion = "1.9.4"
+  lazy val tapirSttpCirce  = "com.softwaremill.sttp.client3" %% "circe"                    % "3.9.1"
+  lazy val tapirCirce      = "com.softwaremill.sttp.tapir"   %% "tapir-json-circe"         % tapirVersion
+  lazy val tapirPrometheus = "com.softwaremill.sttp.tapir"   %% "tapir-prometheus-metrics" % tapirVersion
+  lazy val tapirServerStub = "com.softwaremill.sttp.tapir"   %% "tapir-sttp-stub-server"   % tapirVersion
+  lazy val tapirSwagger    = "com.softwaremill.sttp.tapir"   %% "tapir-swagger-ui-bundle"  % tapirVersion
+  lazy val tapirVertex     = "com.softwaremill.sttp.tapir"   %% "tapir-vertx-server"       % tapirVersion
+  lazy val tapirHelidon    = "com.softwaremill.sttp.tapir"   %% "tapir-nima-server"       % tapirVersion
+
+
   val testcontainersScalaVersion = "0.41.0"
   lazy val testcontainersPostgresql =
     "com.dimafeng" %% "testcontainers-scala-postgresql" % testcontainersScalaVersion

@@ -19,8 +19,8 @@ package org.mbari.annosaurus.api.v1
 import java.util.UUID
 
 import org.mbari.annosaurus.controllers.AssociationController
-import org.mbari.annosaurus.model.Association
-import org.mbari.vars.annotation.domain.{AssociationSC => SAssociation}
+import org.mbari.annosaurus.model.{Association => MutableAssociation}
+import org.mbari.annosaurus.domain.{Association, AssociationSC}
 import org.mbari.annosaurus.model.simple.{ConceptAssociationRequest, ErrorMsg}
 import org.scalatra.{BadRequest, NoContent, NotFound}
 import io.circe._
@@ -96,8 +96,8 @@ class AssociationV1Api(controller: AssociationController)(implicit val executor:
                 .getOrElse(
                     halt(BadRequest(toJson(ErrorMsg(400, "A 'link_name' parameter is required"))))
                 )
-        val toConcept       = params.get("to_concept").getOrElse(Association.TO_CONCEPT_SELF)
-        val linkValue       = params.get("link_value").getOrElse(Association.LINK_VALUE_NIL)
+        val toConcept       = params.get("to_concept").getOrElse(MutableAssociation.TO_CONCEPT_SELF)
+        val linkValue       = params.get("link_value").getOrElse(MutableAssociation.LINK_VALUE_NIL)
         val mimeType        = params.get("mime_type").getOrElse("text/plain")
         val associationUuid = params.getAs[UUID]("association_uuid")
         controller
@@ -139,7 +139,7 @@ class AssociationV1Api(controller: AssociationController)(implicit val executor:
         request.getHeader("Content-Type") match {
             case "application/json" =>
 //                val associations = fromJson(request.body, classOf[Array[Association]])
-                decode[List[SAssociation]](request.body) match {
+                decode[List[Association]](request.body) match {
                     case Left(_) => halt(BadRequest(toJson(ErrorMsg(400, "Unable to parse your request body"))))
                     case Right(xs) =>
                         val associations = xs.map(_.toEntity)

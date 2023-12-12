@@ -19,6 +19,7 @@ package org.mbari.annosaurus.model.simple
 import com.google.gson.annotations.Expose
 import scala.jdk.CollectionConverters._
 
+@deprecated
 class DepthHistogram {
 
   @Expose(serialize = true)

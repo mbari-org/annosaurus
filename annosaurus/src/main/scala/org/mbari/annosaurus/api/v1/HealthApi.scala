@@ -20,7 +20,7 @@ import org.mbari.annosaurus.etc.circe.CirceCodecs
 import org.scalatra.ScalatraServlet
 
 import org.mbari.annosaurus.model.simple.HealthStatus
-import CirceCodecs._
+import org.mbari.annosaurus.etc.circe.CirceCodecs.{given, *}
 
 class HealthApi extends ScalatraServlet {
 
@@ -29,7 +29,7 @@ class HealthApi extends ScalatraServlet {
   }
 
   get("/") {
-    CirceCodecs.print(HealthStatus.default)
+    HealthStatus.default.stringify
   }
 
 }

@@ -17,7 +17,8 @@
 package org.mbari.annosaurus.repository.jdbc
 
 import jakarta.persistence.{EntityManager, EntityManagerFactory}
-import org.mbari.annosaurus.model.simple.{DepthHistogram, QueryConstraints, TimeHistogram}
+import org.mbari.annosaurus.model.simple.{QueryConstraints}
+import org.mbari.annosaurus.domain.{DepthHistogram, TimeHistogram}
 import org.slf4j.LoggerFactory
 
 import scala.jdk.CollectionConverters._
@@ -37,7 +38,8 @@ class AnalysisRepository(entityManagerFactory: EntityManagerFactory) {
             .head
             .asInstanceOf[Array[Object]]
             .map(s => s.toString.toInt)
-        val binsMin                      = (0 until DepthHistogramSQL.MaxDepth by binSizeMeters).toArray
+            .toList
+        val binsMin                      = (0 until DepthHistogramSQL.MaxDepth by binSizeMeters).toList
         val binsMax                      = binsMin.map(_ + binSizeMeters)
         DepthHistogram(binsMin, binsMax, values)
     }
