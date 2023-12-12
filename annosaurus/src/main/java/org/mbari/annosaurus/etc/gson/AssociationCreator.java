@@ -18,7 +18,7 @@ package org.mbari.annosaurus.etc.gson;
 
 import com.google.gson.InstanceCreator;
 import org.mbari.annosaurus.repository.jpa.entity.AssociationEntity;
-import org.mbari.annosaurus.model.Association;
+import org.mbari.annosaurus.model.MutableAssociation;
 
 import java.lang.reflect.Type;
 
@@ -26,9 +26,9 @@ import java.lang.reflect.Type;
  * @author Brian Schlining
  * @since 2017-09-20T14:15:00
  */
-public class AssociationCreator implements InstanceCreator<Association> {
+public class AssociationCreator implements InstanceCreator<MutableAssociation> {
     @Override
-    public Association createInstance(Type type) {
+    public MutableAssociation createInstance(Type type) {
         return new AssociationEntity();
     }
 }

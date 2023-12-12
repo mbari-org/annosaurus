@@ -20,7 +20,7 @@ import org.mbari.annosaurus.Constants
 import org.mbari.annosaurus.api.WebApiStack
 import org.mbari.annosaurus.controllers.{AnnotationController, AssociationController, BasicDAOFactory, ObservationController}
 import org.mbari.annosaurus.model.simple.{ConceptAssociationRequest, ConceptAssociationResponse}
-import org.mbari.annosaurus.model.{MutableAnnotation, Association}
+import org.mbari.annosaurus.model.{MutableAnnotation, MutableAssociation}
 import org.mbari.annosaurus.repository.jpa.entity.AssociationEntity
 
 import java.nio.charset.StandardCharsets
@@ -49,7 +49,7 @@ class AssociationV1ApiSpec extends WebApiStack {
   addServlet(associationV1Api, "/v1/associations")
 
   var annotation: MutableAnnotation   = _
-  var association: Association = _
+  var association: MutableAssociation = _
 
   "AssociationV1Api" should "create" in {
 

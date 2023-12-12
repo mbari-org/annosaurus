@@ -17,7 +17,7 @@
 package org.mbari.annosaurus.messaging
 
 import org.mbari.annosaurus.model.simple.ExtendedAssociation
-import org.mbari.annosaurus.model.{MutableAnnotation, Association}
+import org.mbari.annosaurus.model.{MutableAnnotation, MutableAssociation}
 
 /**
   * @author Brian Schlining
@@ -49,7 +49,7 @@ case class AnnotationMessage(content: MutableAnnotation) extends GenericMessage[
   override def toJson: String = JsonEncoders.AnnotationEncoder(content).toJson
 }
 
-case class AssociationMessage(content: Association) extends GenericMessage[Association] {
+case class AssociationMessage(content: MutableAssociation) extends GenericMessage[MutableAssociation] {
 //  override def hashCode(): Int = this.content.uuid.hashCode()
 //
 //  override def equals(obj: Any): Boolean = obj match {

@@ -23,7 +23,7 @@ import java.util.UUID
   * @author Brian Schlining
   * @since 2019-10-22T14:35:00
   */
-class AssociationExt extends AssociationEntity {
+class MutableAssociationExt extends AssociationEntity {
   //  @Expose(serialize = true)
   var observationUuid: UUID  = _
   var imagedMomentUuid: UUID = _

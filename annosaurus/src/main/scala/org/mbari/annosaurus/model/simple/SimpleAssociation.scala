@@ -18,7 +18,7 @@ package org.mbari.annosaurus.model.simple
 
 import java.util.UUID
 
-import org.mbari.annosaurus.model.Association
+import org.mbari.annosaurus.model.MutableAssociation
 
 /**
   *
@@ -29,7 +29,7 @@ import org.mbari.annosaurus.model.Association
 case class SimpleAssociation(uuid: UUID, linkName: String, toConcept: String, linkValue: String)
 
 object SimpleAssociation {
-  def apply(association: Association): SimpleAssociation =
+  def apply(association: MutableAssociation): SimpleAssociation =
     new SimpleAssociation(
       association.uuid,
       association.linkName,

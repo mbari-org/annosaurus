@@ -39,7 +39,7 @@ trait MutableAnnotation {
     var duration: Duration
     var group: String
     var activity: String
-    var associations: Seq[Association]
+    var associations: Seq[MutableAssociation]
     var imageReferences: Seq[MutableImageReference]
 
 }

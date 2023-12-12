@@ -22,12 +22,12 @@ import org.mbari.annosaurus.model.MutableAnnotation
 
 object AssociationSQL {
 
-    def resultListToAssociations(rows: List[_]): Seq[AssociationExt] = {
+    def resultListToAssociations(rows: List[_]): Seq[MutableAssociationExt] = {
         for {
             row <- rows
         } yield {
             val xs = row.asInstanceOf[Array[Object]]
-            val a  = new AssociationExt
+            val a  = new MutableAssociationExt
             a.uuid = UUID.fromString(xs(0).toString)
             a.observationUuid = UUID.fromString(xs(1).toString)
             Option(xs(2)).foreach(v => a.linkName = v.toString)
@@ -45,7 +45,7 @@ object AssociationSQL {
 
     def join(
                 annotations: Seq[MutableAnnotationImpl],
-                associations: Seq[AssociationExt]
+                associations: Seq[MutableAssociationExt]
     ): Seq[MutableAnnotation] = {
         for {
             a <- associations

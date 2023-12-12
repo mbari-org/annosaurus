@@ -26,7 +26,7 @@ CREATE INDEX idx_activity ON observations (activity)
 GO
 
 
--- Association
+-- MutableAssociation
 CREATE TABLE associations (uuid VARCHAR(255) NOT NULL, last_updated_timestamp DATETIME2 NULL, link_name VARCHAR(128) NOT NULL, link_value VARCHAR(1024) NULL, to_concept VARCHAR(128) NULL, observation_uuid VARCHAR(255) NOT NULL, PRIMARY KEY (uuid))
 GO
 

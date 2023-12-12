@@ -25,7 +25,7 @@ import java.util.UUID
   *   Brian Schlining
   * @since 2016-06-15T16:54:00
   */
-trait Association extends PersistentObject {
+trait MutableAssociation extends PersistentObject {
 
     var uuid: UUID
     var observation: MutableObservation
@@ -40,7 +40,7 @@ trait Association extends PersistentObject {
 
 }
 
-object Association {
+object MutableAssociation {
 
     val LINK_VALUE_NIL = "nil"
 
@@ -48,7 +48,7 @@ object Association {
 
     val SEPARATOR = " | "
 
-    def asString(association: Association): String = {
+    def asString(association: MutableAssociation): String = {
         association.linkName + SEPARATOR +
             Option(association.toConcept).getOrElse(TO_CONCEPT_SELF) + SEPARATOR +
             Option(association.linkValue).getOrElse(LINK_VALUE_NIL)

@@ -20,7 +20,7 @@ import com.fatboyindustrial.gsonjavatime.Converters
 import com.google.gson.{FieldNamingPolicy, GsonBuilder}
 import org.mbari.annosaurus.Constants
 import org.mbari.annosaurus.model.simple.ExtendedAssociation
-import org.mbari.annosaurus.model.{MutableAnnotation, Association}
+import org.mbari.annosaurus.model.{MutableAnnotation, MutableAssociation}
 
 /**
   * @author Brian Schlining
@@ -44,7 +44,7 @@ object JsonEncoders {
   implicit class AnnotationEncoder(val x: MutableAnnotation) extends JsonEncoder[MutableAnnotation] {
     override def toJson: String = Constants.GSON.toJson(x)
   }
-  implicit class AssocationEncoder(val x: Association) extends JsonEncoder[Association] {
+  implicit class AssocationEncoder(val x: MutableAssociation) extends JsonEncoder[MutableAssociation] {
     override def toJson: String = Constants.GSON.toJson(x)
   }
   implicit class ExtendedAssocationEncoder(val x: ExtendedAssociation)

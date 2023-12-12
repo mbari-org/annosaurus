@@ -19,7 +19,7 @@ package org.mbari.annosaurus.model.simple
 import java.util.UUID
 
 import com.google.gson.annotations.Expose
-import org.mbari.annosaurus.model.Association
+import org.mbari.annosaurus.model.MutableAssociation
 
 /**
   * This is a vewi of an association that includes the observationUUid. It's used
@@ -41,7 +41,7 @@ case class ExtendedAssociation(
 }
 
 object ExtendedAssociation {
-  def apply(a: Association): ExtendedAssociation = {
+  def apply(a: MutableAssociation): ExtendedAssociation = {
     require(a.observation != null, "Can not extend an association without an observation")
     ExtendedAssociation(
       a.uuid,

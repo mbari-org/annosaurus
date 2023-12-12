@@ -21,7 +21,7 @@ import com.google.gson.reflect.TypeToken
 import com.google.gson.{FieldNamingPolicy, Gson, GsonBuilder}
 import com.typesafe.config.ConfigFactory
 import org.mbari.annosaurus.etc.gson.{AssociationCreator, CollectionConverter, DurationConverter, ImageReferenceCreator, OptionSerializer, TimecodeConverter}
-import org.mbari.annosaurus.model.{Association, MutableImageReference}
+import org.mbari.annosaurus.model.{MutableAssociation, MutableImageReference}
 import org.mbari.annosaurus.etc.gson._
 import org.mbari.vcr4j.time.Timecode
 
@@ -55,7 +55,7 @@ object Constants {
     val timecodeType: Type = new TypeToken[Timecode]() {}.getType
     gsonBuilder.registerTypeAdapter(timecodeType, new TimecodeConverter)
 
-    val associationType: Type = new TypeToken[Association]() {}.getType
+    val associationType: Type = new TypeToken[MutableAssociation]() {}.getType
     gsonBuilder.registerTypeAdapter(associationType, new AssociationCreator)
 
     val imageReferenceType: Type = new TypeToken[MutableImageReference]() {}.getType
@@ -82,7 +82,7 @@ object Constants {
     val timecodeType: Type = new TypeToken[Timecode]() {}.getType
     gsonBuilder.registerTypeAdapter(timecodeType, new TimecodeConverter)
 
-    val associationType: Type = new TypeToken[Association]() {}.getType
+    val associationType: Type = new TypeToken[MutableAssociation]() {}.getType
     gsonBuilder.registerTypeAdapter(associationType, new AssociationCreator)
 
     val imageReferenceType: Type = new TypeToken[MutableImageReference]() {}.getType

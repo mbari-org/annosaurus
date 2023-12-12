@@ -16,7 +16,7 @@
 
 package org.mbari.annosaurus.repository
 
-import org.mbari.annosaurus.model.Association
+import org.mbari.annosaurus.model.MutableAssociation
 import org.mbari.annosaurus.model.simple.{ConceptAssociation, ConceptAssociationRequest}
 
 import java.util.UUID
@@ -25,16 +25,16 @@ import java.util.UUID
   *   Brian Schlining
   * @since 2016-06-17T16:08:00
   */
-trait AssociationDAO[T <: Association] extends DAO[T] {
+trait AssociationDAO[T <: MutableAssociation] extends DAO[T] {
 
     def newPersistentObject(
-        linkName: String,
-        toConcept: Option[String] = Some(Association.TO_CONCEPT_SELF),
-        linkValue: Option[String] = Some(Association.LINK_VALUE_NIL),
-        mimeType: Option[String] = Some("text/plain")
+                               linkName: String,
+                               toConcept: Option[String] = Some(MutableAssociation.TO_CONCEPT_SELF),
+                               linkValue: Option[String] = Some(MutableAssociation.LINK_VALUE_NIL),
+                               mimeType: Option[String] = Some("text/plain")
     ): T
 
-    def newPersistentObject(association: Association): T
+    def newPersistentObject(association: MutableAssociation): T
 
     def findByLinkName(linkName: String): Iterable[T]
 

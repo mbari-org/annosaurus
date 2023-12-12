@@ -18,7 +18,7 @@ package org.mbari.annosaurus.repository.jpa.entity
 
 import com.google.gson.annotations.{Expose, SerializedName}
 import jakarta.persistence._
-import org.mbari.annosaurus.model.{Association, ImagedMoment, MutableObservation}
+import org.mbari.annosaurus.model.{MutableAssociation, ImagedMoment, MutableObservation}
 import org.mbari.annosaurus.repository.jpa.{DurationConverter, InstantConverter, JPAPersistentObject, TransactionLogger}
 
 import java.time.{Duration, Instant}
@@ -187,17 +187,17 @@ class ObservationEntity extends MutableObservation with JPAPersistentObject {
   )
   protected var javaAssociations: JList[AssociationEntity] = new JArrayList[AssociationEntity]
 
-  override def addAssociation(association: Association): Unit = {
+  override def addAssociation(association: MutableAssociation): Unit = {
     javaAssociations.add(association.asInstanceOf[AssociationEntity])
     association.observation = this
   }
 
-  override def removeAssociation(association: Association): Unit = {
+  override def removeAssociation(association: MutableAssociation): Unit = {
     javaAssociations.remove(association)
     association.observation = null
   }
 
-  override def associations: Iterable[Association] = javaAssociations.asScala
+  override def associations: Iterable[MutableAssociation] = javaAssociations.asScala
 
 }
 

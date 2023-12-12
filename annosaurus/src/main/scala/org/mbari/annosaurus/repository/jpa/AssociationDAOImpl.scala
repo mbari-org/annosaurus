@@ -18,7 +18,7 @@ package org.mbari.annosaurus.repository.jpa
 
 import java.util.UUID
 import jakarta.persistence.EntityManager
-import org.mbari.annosaurus.model.Association
+import org.mbari.annosaurus.model.MutableAssociation
 import org.mbari.annosaurus.model.simple.{ConceptAssociation, ConceptAssociationRequest}
 import org.mbari.annosaurus.repository.AssociationDAO
 import org.mbari.annosaurus.repository.jpa.entity.AssociationEntity
@@ -51,7 +51,7 @@ class AssociationDAOImpl(entityManager: EntityManager)
     a
   }
 
-  override def newPersistentObject(association: Association): AssociationEntity =
+  override def newPersistentObject(association: MutableAssociation): AssociationEntity =
     AssociationEntity(association)
 
   override def findByLinkName(linkName: String): Iterable[AssociationEntity] =
@@ -59,7 +59,7 @@ class AssociationDAOImpl(entityManager: EntityManager)
 
   //  override def findByLinkNameAndVideoReferenceUUID(linkName: String, videoReferenceUUID: UUID): Iterable[AssociationImpl] =
   //    findByNamedQuery(
-  //      "Association.findByLinkNameAndVideoReferenceUUID",
+  //      "MutableAssociation.findByLinkNameAndVideoReferenceUUID",
   //      Map("linkName" -> linkName, "videoReferenceUuid" -> videoReferenceUUID))
 
   override def findByLinkNameAndVideoReferenceUUID(
@@ -85,7 +85,7 @@ class AssociationDAOImpl(entityManager: EntityManager)
     // }
     setUuidParameter(query, 1, videoReferenceUUID)
     query.setParameter(2, linkName)
-    // Concept -> Association map
+    // Concept -> MutableAssociation map
     val tuples = query
       .getResultList
       .asScala
@@ -168,7 +168,7 @@ class AssociationDAOImpl(entityManager: EntityManager)
     findByNamedQuery("Association.findAll", limit = limit, offset = offset)
 
   override def countByToConcept(toConcept: String): Long = {
-    //val query = entityManager.createNativeQuery("Association.countByToConcept")
+    //val query = entityManager.createNativeQuery("MutableAssociation.countByToConcept")
     val query = entityManager.createNamedQuery("Association.countByToConcept")
     query.setParameter(1, toConcept)
     query

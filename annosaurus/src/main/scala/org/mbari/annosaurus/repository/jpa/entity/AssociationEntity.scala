@@ -78,7 +78,7 @@ import org.mbari.annosaurus.repository.jpa.{JPAPersistentObject, TransactionLogg
     )
   )
 )
-class AssociationEntity extends Association with JPAPersistentObject {
+class AssociationEntity extends MutableAssociation with JPAPersistentObject {
 
   @Expose(serialize = true)
   @Column(name = "link_name", length = 128, nullable = false)
@@ -108,7 +108,7 @@ class AssociationEntity extends Association with JPAPersistentObject {
   @Column(name = "mime_type", length = 64, nullable = false)
   var mimeType: String = "text/plain"
 
-  override def toString: String = Association.asString(this)
+  override def toString: String = MutableAssociation.asString(this)
 
 }
 
@@ -148,7 +148,7 @@ object AssociationEntity {
     a
   }
 
-  def apply(v: Association): AssociationEntity = {
+  def apply(v: MutableAssociation): AssociationEntity = {
     val a = new AssociationEntity
     a.linkName = v.linkName
     a.toConcept = v.toConcept

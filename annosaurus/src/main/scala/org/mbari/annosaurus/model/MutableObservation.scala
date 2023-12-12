@@ -58,7 +58,7 @@ trait MutableObservation extends PersistentObject {
       */
     var observationDate: Instant
     def lastUpdated: Option[Instant]
-    def addAssociation(association: Association): Unit
-    def removeAssociation(association: Association): Unit
-    def associations: Iterable[Association]
+    def addAssociation(association: MutableAssociation): Unit
+    def removeAssociation(association: MutableAssociation): Unit
+    def associations: Iterable[MutableAssociation]
 }

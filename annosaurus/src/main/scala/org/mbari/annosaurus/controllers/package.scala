@@ -34,7 +34,7 @@ package object controllers {
   type BasicDAOFactory = DAOFactory[
     ImagedMoment,
     MutableObservation,
-    Association,
+    MutableAssociation,
     MutableImageReference,
     CachedAncillaryDatum,
     CachedVideoReferenceInfo,

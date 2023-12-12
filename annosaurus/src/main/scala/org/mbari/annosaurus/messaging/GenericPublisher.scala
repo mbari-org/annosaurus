@@ -18,7 +18,7 @@ package org.mbari.annosaurus.messaging
 
 import io.reactivex.rxjava3.subjects.Subject
 import org.mbari.annosaurus.model.MutableObservation
-import org.mbari.annosaurus.model.{MutableAnnotation, Association}
+import org.mbari.annosaurus.model.{MutableAnnotation, MutableAssociation}
 import org.mbari.annosaurus.repository.jpa.MutableAnnotationImpl
 
 import scala.util.Try
@@ -49,6 +49,6 @@ class AnnotationPublisher(subject: Subject[Any]) extends GenericPublisher[Mutabl
   def publish(observation: MutableObservation): Unit = publish(MutableAnnotationImpl(observation))
 }
 
-class AssociationPublisher(subject: Subject[Any]) extends GenericPublisher[Association] {
-  def publish(association: Association): Unit = Try(subject.onNext(AssociationMessage(association)))
+class AssociationPublisher(subject: Subject[Any]) extends GenericPublisher[MutableAssociation] {
+  def publish(association: MutableAssociation): Unit = Try(subject.onNext(AssociationMessage(association)))
 }

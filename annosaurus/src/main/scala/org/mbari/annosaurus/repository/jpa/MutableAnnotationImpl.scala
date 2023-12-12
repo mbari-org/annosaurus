@@ -19,7 +19,7 @@ package org.mbari.annosaurus.repository.jpa
 import java.time.{Duration, Instant}
 import java.util.{UUID, ArrayList => JArrayList, List => JList}
 import com.google.gson.annotations.{Expose, SerializedName}
-import org.mbari.annosaurus.model.{Association, MutableAnnotation, MutableImageReference, ImagedMoment, MutableObservation}
+import org.mbari.annosaurus.model.{MutableAssociation, MutableAnnotation, MutableImageReference, ImagedMoment, MutableObservation}
 import org.mbari.annosaurus.repository.jpa.entity.{AssociationEntity, ImageReferenceEntity}
 import org.mbari.vcr4j.time.Timecode
 
@@ -75,12 +75,12 @@ class MutableAnnotationImpl extends MutableAnnotation {
   @SerializedName(value = "associations")
   var javaAssociations: JList[AssociationEntity] =
     new JArrayList[AssociationEntity]()
-  def associations: Seq[Association] = javaAssociations.asScala.toSeq
-  def associations_=(as: Seq[Association]): Unit = {
+  def associations: Seq[MutableAssociation] = javaAssociations.asScala.toSeq
+  def associations_=(as: Seq[MutableAssociation]): Unit = {
     javaAssociations = as
       .map({
         case a: AssociationEntity => a
-        case v: Association     => AssociationEntity(v)
+        case v: MutableAssociation     => AssociationEntity(v)
       })
       .asJava
   }

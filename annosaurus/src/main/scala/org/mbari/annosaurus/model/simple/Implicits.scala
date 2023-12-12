@@ -16,7 +16,7 @@
 
 package org.mbari.annosaurus.model.simple
 
-import org.mbari.annosaurus.model.{Association, CachedAncillaryDatum, CachedVideoReferenceInfo, MutableImageReference, ImagedMoment, MutableObservation}
+import org.mbari.annosaurus.model.{MutableAssociation, CachedAncillaryDatum, CachedVideoReferenceInfo, MutableImageReference, ImagedMoment, MutableObservation}
 
 /**
   *
@@ -26,7 +26,7 @@ import org.mbari.annosaurus.model.{Association, CachedAncillaryDatum, CachedVide
   */
 object Implicits {
 
-  implicit def toCaseClass(association: Association): SimpleAssociation =
+  implicit def toCaseClass(association: MutableAssociation): SimpleAssociation =
     SimpleAssociation(association)
 
   implicit def toCaseClass(observation: MutableObservation): SimpleObservation =
@@ -44,7 +44,7 @@ object Implicits {
   implicit def toCaseClass(videoReferenceInfo: CachedVideoReferenceInfo): SimpleVideoReferenceInfo =
     SimpleVideoReferenceInfo(videoReferenceInfo)
 
-  implicit class RichAssociation(association: Association) {
+  implicit class RichAssociation(association: MutableAssociation) {
     def asCase: SimpleAssociation = toCaseClass(association)
   }
 

@@ -19,7 +19,7 @@ package org.mbari.annosaurus.api.v1
 import java.util.UUID
 
 import org.mbari.annosaurus.controllers.AssociationController
-import org.mbari.annosaurus.model.{Association => MutableAssociation}
+import org.mbari.annosaurus.model.{MutableAssociation => MutableAssociation}
 import org.mbari.annosaurus.domain.{Association, AssociationSC}
 import org.mbari.annosaurus.model.simple.{ConceptAssociationRequest, ErrorMsg}
 import org.scalatra.{BadRequest, NoContent, NotFound}
@@ -138,7 +138,7 @@ class AssociationV1Api(controller: AssociationController)(implicit val executor:
         validateRequest()
         request.getHeader("Content-Type") match {
             case "application/json" =>
-//                val associations = fromJson(request.body, classOf[Array[Association]])
+//                val associations = fromJson(request.body, classOf[Array[MutableAssociation]])
                 decode[List[Association]](request.body) match {
                     case Left(_) => halt(BadRequest(toJson(ErrorMsg(400, "Unable to parse your request body"))))
                     case Right(xs) =>

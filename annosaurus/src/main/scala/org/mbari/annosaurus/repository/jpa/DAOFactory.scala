@@ -26,7 +26,7 @@ import org.mbari.annosaurus.repository.{AssociationDAO, CachedAncillaryDatumDAO,
 trait DAOFactory[
     IM <: ImagedMoment,
     OBS <: MutableObservation,
-    A <: Association,
+    A <: MutableAssociation,
     IR <: MutableImageReference,
     CAD <: CachedAncillaryDatum,
     CMI <: CachedVideoReferenceInfo,

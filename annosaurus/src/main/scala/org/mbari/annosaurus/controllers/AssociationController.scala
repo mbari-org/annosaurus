@@ -20,7 +20,7 @@ import java.util.UUID
 
 import io.reactivex.rxjava3.subjects.Subject
 import org.mbari.annosaurus.messaging.{AssociationPublisher, MessageBus}
-import org.mbari.annosaurus.model.Association
+import org.mbari.annosaurus.model.MutableAssociation
 import org.mbari.annosaurus.model.simple.{
   ConceptAssociation,
   ConceptAssociationRequest,
@@ -39,13 +39,13 @@ import scala.concurrent.{ExecutionContext, Future}
 class AssociationController(
     val daoFactory: BasicDAOFactory,
     bus: Subject[Any] = MessageBus.RxSubject
-) extends BaseController[Association, AssociationDAO[Association]] {
+) extends BaseController[MutableAssociation, AssociationDAO[MutableAssociation]] {
 
-  type ADAO = AssociationDAO[Association]
+  type ADAO = AssociationDAO[MutableAssociation]
 
   private[this] val associationPublisher = new AssociationPublisher(bus)
 
-  override def newDAO(): AssociationDAO[Association] = daoFactory.newAssociationDAO()
+  override def newDAO(): AssociationDAO[MutableAssociation] = daoFactory.newAssociationDAO()
 
   def create(
       observationUuid: UUID,
@@ -54,8 +54,8 @@ class AssociationController(
       linkValue: String,
       mimeType: String,
       associationUuid: Option[UUID] = None
-  )(implicit ec: ExecutionContext): Future[Association] = {
-    def fn(dao: ADAO): Association = {
+  )(implicit ec: ExecutionContext): Future[MutableAssociation] = {
+    def fn(dao: ADAO): MutableAssociation = {
       val obsDao = daoFactory.newObservationDAO(dao)
       obsDao.findByUUID(observationUuid) match {
         case None =>
@@ -81,9 +81,9 @@ class AssociationController(
       toConcept: Option[String] = None,
       linkValue: Option[String] = None,
       mimeType: Option[String] = None
-  )(implicit ec: ExecutionContext): Future[Option[Association]] = {
+  )(implicit ec: ExecutionContext): Future[Option[MutableAssociation]] = {
 
-    def fn(dao: ADAO): Option[Association] = {
+    def fn(dao: ADAO): Option[MutableAssociation] = {
       dao
         .findByUUID(uuid)
         .map(association => {
@@ -109,9 +109,9 @@ class AssociationController(
   }
 
   def bulkUpdate(
-      associations: Iterable[Association]
-  )(implicit ec: ExecutionContext): Future[Iterable[Association]] = {
-    def fn(dao: ADAO): Iterable[Association] =
+      associations: Iterable[MutableAssociation]
+  )(implicit ec: ExecutionContext): Future[Iterable[MutableAssociation]] = {
+    def fn(dao: ADAO): Iterable[MutableAssociation] =
       associations.flatMap(a0 => {
         dao
           .findByUUID(a0.uuid)
@@ -133,15 +133,15 @@ class AssociationController(
 
   def findByLinkName(
       linkName: String
-  )(implicit ec: ExecutionContext): Future[Iterable[Association]] = {
-    def fn(dao: ADAO): Iterable[Association] = dao.findByLinkName(linkName)
+  )(implicit ec: ExecutionContext): Future[Iterable[MutableAssociation]] = {
+    def fn(dao: ADAO): Iterable[MutableAssociation] = dao.findByLinkName(linkName)
     exec(fn)
   }
 
   def findByLinkNameAndVideoReferenceUUID(linkName: String, videoReferenceUUID: UUID)(
       implicit ec: ExecutionContext
-  ): Future[Iterable[Association]] = {
-    def fn(dao: ADAO): Iterable[Association] =
+  ): Future[Iterable[MutableAssociation]] = {
+    def fn(dao: ADAO): Iterable[MutableAssociation] =
       dao.findByLinkNameAndVideoReferenceUUID(linkName, videoReferenceUUID)
     exec(fn)
   }
@@ -150,8 +150,8 @@ class AssociationController(
       linkName: String,
       videoReferenceUUID: UUID,
       concept: Option[String] = None
-  )(implicit ec: ExecutionContext): Future[Iterable[Association]] = {
-    def fn(dao: ADAO): Iterable[Association] =
+  )(implicit ec: ExecutionContext): Future[Iterable[MutableAssociation]] = {
+    def fn(dao: ADAO): Iterable[MutableAssociation] =
       dao.findByLinkNameAndVideoReferenceUUIDAndConcept(linkName, videoReferenceUUID, concept)
     exec(fn)
   }
