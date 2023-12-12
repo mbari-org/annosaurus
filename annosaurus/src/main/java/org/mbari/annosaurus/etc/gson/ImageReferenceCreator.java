@@ -18,7 +18,7 @@ package org.mbari.annosaurus.etc.gson;
 
 import com.google.gson.InstanceCreator;
 import org.mbari.annosaurus.repository.jpa.entity.ImageReferenceEntity;
-import org.mbari.annosaurus.model.ImageReference;
+import org.mbari.annosaurus.model.MutableImageReference;
 
 import java.lang.reflect.Type;
 
@@ -26,9 +26,9 @@ import java.lang.reflect.Type;
  * @author Brian Schlining
  * @since 2017-09-20T14:14:00
  */
-public class ImageReferenceCreator implements InstanceCreator<ImageReference> {
+public class ImageReferenceCreator implements InstanceCreator<MutableImageReference> {
     @Override
-    public ImageReference createInstance(Type type) {
+    public MutableImageReference createInstance(Type type) {
         return new ImageReferenceEntity();
     }
 }

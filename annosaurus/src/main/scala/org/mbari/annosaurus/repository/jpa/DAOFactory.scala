@@ -27,7 +27,7 @@ trait DAOFactory[
     IM <: ImagedMoment,
     OBS <: MutableObservation,
     A <: Association,
-    IR <: ImageReference,
+    IR <: MutableImageReference,
     CAD <: CachedAncillaryDatum,
     CMI <: CachedVideoReferenceInfo,
     ID <: ImagedMoment

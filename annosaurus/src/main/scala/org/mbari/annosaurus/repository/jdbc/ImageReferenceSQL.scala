@@ -68,12 +68,12 @@ object ImageReferenceSQL {
       | )
       |""".stripMargin
 
-    def resultListToImageReferences(rows: List[_]): Seq[ImageReferenceExt] = {
+    def resultListToImageReferences(rows: List[_]): Seq[MutableImageReferenceExt] = {
         for {
             row <- rows
         } yield {
             val xs = row.asInstanceOf[Array[Object]]
-            val i  = new ImageReferenceExt
+            val i  = new MutableImageReferenceExt
             i.uuid = UUID.fromString(xs(0).toString)
             Option(xs(1))
                 .map(_.toString)
@@ -93,7 +93,7 @@ object ImageReferenceSQL {
         }
     }
 
-    def join(annotations: Seq[MutableAnnotationImpl], images: Seq[ImageReferenceExt]): Seq[MutableAnnotation] = {
+    def join(annotations: Seq[MutableAnnotationImpl], images: Seq[MutableImageReferenceExt]): Seq[MutableAnnotation] = {
         for {
             i <- images
         } {

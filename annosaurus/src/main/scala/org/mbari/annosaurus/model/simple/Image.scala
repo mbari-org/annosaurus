@@ -21,7 +21,7 @@ import java.time.{Duration, Instant}
 import java.util.UUID
 
 import com.google.gson.annotations.{Expose, SerializedName}
-import org.mbari.annosaurus.model.ImageReference
+import org.mbari.annosaurus.model.MutableImageReference
 import org.mbari.vcr4j.time.Timecode
 
 /**
@@ -67,7 +67,7 @@ class Image {
 
 object Image {
 
-  def apply(imageReference: ImageReference): Image = {
+  def apply(imageReference: MutableImageReference): Image = {
     val i = new Image
     i.imageReferenceUuid = imageReference.uuid
     i.format = imageReference.format

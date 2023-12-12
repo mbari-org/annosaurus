@@ -18,7 +18,7 @@ package org.mbari.annosaurus.repository.jpa.entity
 
 import com.google.gson.annotations.{Expose, SerializedName}
 import jakarta.persistence._
-import org.mbari.annosaurus.model.{ImageReference, ImagedMoment}
+import org.mbari.annosaurus.model.{MutableImageReference, ImagedMoment}
 import org.mbari.annosaurus.repository.jpa.{JPAPersistentObject, TransactionLogger, URLConverter}
 
 import java.net.URL
@@ -57,7 +57,7 @@ import java.net.URL
     )
   )
 )
-class ImageReferenceEntity extends ImageReference with JPAPersistentObject {
+class ImageReferenceEntity extends MutableImageReference with JPAPersistentObject {
 
   @Expose(serialize = true)
   @Column(name = "description", length = 256, nullable = true)
@@ -113,7 +113,7 @@ object ImageReferenceEntity {
     i
   }
 
-  def apply(v: ImageReference): ImageReferenceEntity = {
+  def apply(v: MutableImageReference): ImageReferenceEntity = {
     val i = new ImageReferenceEntity
     i.url = v.url
     i.description = v.description

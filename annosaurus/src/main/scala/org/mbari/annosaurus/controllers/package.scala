@@ -16,7 +16,7 @@
 
 package org.mbari.annosaurus
 
-import org.mbari.annosaurus.model.{CachedAncillaryDatum, CachedVideoReferenceInfo, ImageReference, ImagedMoment, MutableObservation}
+import org.mbari.annosaurus.model.{CachedAncillaryDatum, CachedVideoReferenceInfo, MutableImageReference, ImagedMoment, MutableObservation}
 import org.mbari.annosaurus.repository.jpa.DAOFactory
 import org.mbari.annosaurus.model._
 
@@ -35,7 +35,7 @@ package object controllers {
     ImagedMoment,
     MutableObservation,
     Association,
-    ImageReference,
+    MutableImageReference,
     CachedAncillaryDatum,
     CachedVideoReferenceInfo,
     ImagedMoment

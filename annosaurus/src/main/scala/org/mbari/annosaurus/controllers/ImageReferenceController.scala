@@ -16,7 +16,7 @@
 
 package org.mbari.annosaurus.controllers
 
-import org.mbari.annosaurus.model.{ImageReference, ImagedMoment}
+import org.mbari.annosaurus.model.{MutableImageReference, ImagedMoment}
 import org.mbari.annosaurus.repository.{ImageReferenceDAO, NotFoundInDatastoreException}
 
 import java.net.URL
@@ -31,9 +31,9 @@ import scala.concurrent.{ExecutionContext, Future}
   * @since 2016-07-04T22:15:00
   */
 class ImageReferenceController(val daoFactory: BasicDAOFactory)
-    extends BaseController[ImageReference, ImageReferenceDAO[ImageReference]] {
+    extends BaseController[MutableImageReference, ImageReferenceDAO[MutableImageReference]] {
 
-  type IRDAO = ImageReferenceDAO[ImageReference]
+  type IRDAO = ImageReferenceDAO[MutableImageReference]
 
   override def newDAO(): IRDAO = daoFactory.newImageReferenceDAO()
 
@@ -44,9 +44,9 @@ class ImageReferenceController(val daoFactory: BasicDAOFactory)
       heightPixels: Option[Int],
       widthPixels: Option[Int],
       format: Option[String]
-  )(implicit ec: ExecutionContext): Future[ImageReference] = {
+  )(implicit ec: ExecutionContext): Future[MutableImageReference] = {
 
-    def fn(dao: IRDAO): ImageReference = {
+    def fn(dao: IRDAO): MutableImageReference = {
       val imDao = daoFactory.newImagedMomentDAO()
       imDao.findByUUID(imagedMomentUUID) match {
         case None =>
@@ -72,9 +72,9 @@ class ImageReferenceController(val daoFactory: BasicDAOFactory)
       widthPixels: Option[Int] = None,
       format: Option[String] = None,
       imagedMomentUUID: Option[UUID] = None
-  )(implicit ec: ExecutionContext): Future[Option[ImageReference]] = {
+  )(implicit ec: ExecutionContext): Future[Option[MutableImageReference]] = {
 
-    def fn(dao: IRDAO): Option[ImageReference] = {
+    def fn(dao: IRDAO): Option[MutableImageReference] = {
       dao
         .findByUUID(uuid)
         .map(imageReference => {

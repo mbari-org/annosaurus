@@ -287,15 +287,15 @@ class ImagedMomentEntity extends ImagedMoment with JPAPersistentObject {
   protected var javaImageReferences: JList[ImageReferenceEntity] =
     new JArrayList[ImageReferenceEntity]
 
-  override def addImageReference(imageReference: ImageReference): Unit = {
+  override def addImageReference(imageReference: MutableImageReference): Unit = {
     javaImageReferences.add(imageReference.asInstanceOf[ImageReferenceEntity])
     imageReference.imagedMoment = this
   }
 
-  override def imageReferences: Iterable[ImageReference] =
+  override def imageReferences: Iterable[MutableImageReference] =
     javaImageReferences.asScala
 
-  override def removeImageReference(imageReference: ImageReference): Unit = {
+  override def removeImageReference(imageReference: MutableImageReference): Unit = {
     javaImageReferences.remove(imageReference)
     imageReference.imagedMoment = null
   }

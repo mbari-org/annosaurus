@@ -51,9 +51,9 @@ trait ImagedMoment extends PersistentObject {
     def addObservation(observation: MutableObservation): Unit
     def removeObservation(observation: MutableObservation): Unit
     def observations: Iterable[MutableObservation]
-    def addImageReference(imageReference: ImageReference): Unit
-    def removeImageReference(imageReference: ImageReference): Unit
-    def imageReferences: Iterable[ImageReference]
+    def addImageReference(imageReference: MutableImageReference): Unit
+    def removeImageReference(imageReference: MutableImageReference): Unit
+    def imageReferences: Iterable[MutableImageReference]
     var ancillaryDatum: CachedAncillaryDatum
     def isEmpty: Boolean = observations.isEmpty && imageReferences.isEmpty
 

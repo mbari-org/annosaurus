@@ -25,7 +25,7 @@ import java.util.UUID
   *   Brian Schlining
   * @since 2016-06-15T16:54:00
   */
-trait ImageReference extends PersistentObject {
+trait MutableImageReference extends PersistentObject {
 
     var uuid: UUID
     var imagedMoment: ImagedMoment

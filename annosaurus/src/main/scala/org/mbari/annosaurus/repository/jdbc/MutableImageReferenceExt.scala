@@ -23,6 +23,6 @@ import java.util.UUID
   * @author Brian Schlining
   * @since 2019-10-22T14:37:00
   */
-class ImageReferenceExt extends ImageReferenceEntity {
+class MutableImageReferenceExt extends ImageReferenceEntity {
   var imagedMomentUuid: UUID = _
 }

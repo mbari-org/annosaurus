@@ -40,6 +40,6 @@ trait MutableAnnotation {
     var group: String
     var activity: String
     var associations: Seq[Association]
-    var imageReferences: Seq[ImageReference]
+    var imageReferences: Seq[MutableImageReference]
 
 }

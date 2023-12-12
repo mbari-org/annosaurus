@@ -19,7 +19,7 @@ package org.mbari.annosaurus.repository.jpa
 import java.time.{Duration, Instant}
 import java.util.{UUID, ArrayList => JArrayList, List => JList}
 import com.google.gson.annotations.{Expose, SerializedName}
-import org.mbari.annosaurus.model.{Association, MutableAnnotation, ImageReference, ImagedMoment, MutableObservation}
+import org.mbari.annosaurus.model.{Association, MutableAnnotation, MutableImageReference, ImagedMoment, MutableObservation}
 import org.mbari.annosaurus.repository.jpa.entity.{AssociationEntity, ImageReferenceEntity}
 import org.mbari.vcr4j.time.Timecode
 
@@ -89,12 +89,12 @@ class MutableAnnotationImpl extends MutableAnnotation {
   @SerializedName(value = "image_references")
   var javaImageReferences: JList[ImageReferenceEntity] =
     new JArrayList[ImageReferenceEntity]()
-  def imageReferences: Seq[ImageReference] = javaImageReferences.asScala.toSeq
-  def imageReferences_=(irs: Seq[ImageReference]): Unit = {
+  def imageReferences: Seq[MutableImageReference] = javaImageReferences.asScala.toSeq
+  def imageReferences_=(irs: Seq[MutableImageReference]): Unit = {
     javaImageReferences = irs
       .map({
         case i: ImageReferenceEntity => i
-        case v: ImageReference     => ImageReferenceEntity(v)
+        case v: MutableImageReference     => ImageReferenceEntity(v)
       })
       .asJava
   }

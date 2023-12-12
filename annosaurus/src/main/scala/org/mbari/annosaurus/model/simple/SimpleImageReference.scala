@@ -16,7 +16,7 @@
 
 package org.mbari.annosaurus.model.simple
 
-import org.mbari.annosaurus.model.ImageReference
+import org.mbari.annosaurus.model.MutableImageReference
 
 import java.net.URL
 import java.util.UUID
@@ -38,7 +38,7 @@ case class SimpleImageReference(
 
 object SimpleImageReference {
 
-  def apply(imageReference: ImageReference): SimpleImageReference =
+  def apply(imageReference: MutableImageReference): SimpleImageReference =
     new SimpleImageReference(
       imageReference.uuid,
       imageReference.url,
