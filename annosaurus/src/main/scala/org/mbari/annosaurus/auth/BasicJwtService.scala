@@ -29,6 +29,9 @@ import com.typesafe.config.ConfigFactory
 import scala.util.control.NonFatal
 import java.time.Duration
 
+import org.mbari.annosaurus.domain.Authorization
+import org.mbari.annosaurus.etc.circe.CirceCodecs.*
+
 /**
   * To use this authentication. The client and server should both have a shared
   * secret (aka client secret). The client sends this to the server in a

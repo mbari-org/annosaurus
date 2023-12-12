@@ -17,10 +17,13 @@
 package org.mbari.annosaurus.auth
 
 import com.typesafe.config.ConfigFactory
-import io.circe.parser._
+import io.circe.*
+import io.circe.parser.*
+import io.circe.generic.semiauto.*
 import org.mbari.annosaurus.Constants
-import org.mbari.annosaurus.etc.circe.CirceCodecs._
-import org.mbari.vars.annotation.auth.{AuthorizationSnakeCase, BasicJwtService}
+import org.mbari.annosaurus.etc.circe.CirceCodecs.{given, *}
+import org.mbari.annosaurus.domain.{Authorization, AuthorizationSC}
+import org.mbari.vars.annotation.auth.BasicJwtService
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
 
@@ -39,10 +42,15 @@ class BasicJwtServiceSpec extends AnyFunSpec with Matchers {
       val service = new BasicJwtService()
       val opt = service.requestAuthorization(new MockJwtHttpServletRequest("APIKEY", apikey))
       opt.isDefined shouldBe true
-      decode[AuthorizationSnakeCase](opt.get) match {
+      opt.get.reify[Authorization] match {
+          case Left(_) => fail("Failed to decode authorization: " + opt.get)
+          case Right(auth) =>
+              service.isValid(Some(auth)) shouldBe true
+      }
+      decode[Authorization](opt.get) match {
         case Left(_) => fail("Failed to decode authorization: " + opt.get)
         case Right(auth) => 
-          service.isValid(Some(auth.toAuthorization)) shouldBe true
+          service.isValid(Some(auth)) shouldBe true
       }
     }
 
@@ -50,10 +58,9 @@ class BasicJwtServiceSpec extends AnyFunSpec with Matchers {
       val service = new BasicJwtService(Duration.ofSeconds(1))
       val opt = service.requestAuthorization(new MockJwtHttpServletRequest("APIKEY", apikey))
       opt.isDefined shouldBe true
-      decode[AuthorizationSnakeCase](opt.get) match {
+      decode[Authorization](opt.get) match {
         case Left(_) => fail("Failed to decode authorization: " + opt.get)
-        case Right(authSc) => 
-          val auth = authSc.toAuthorization
+        case Right(auth) =>
           val newRequest = new MockJwtHttpServletRequest("Bearer", auth.accessToken)
           service.validateAuthorization(newRequest) shouldBe true
           Thread.sleep(1000)

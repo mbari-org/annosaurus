@@ -21,16 +21,12 @@ import io.circe.generic.semiauto._
 import io.circe.syntax._
 
 import org.mbari.annosaurus.util.HexUtil
-// import org.mbari.annosaurus.auth.AuthorizationSnakeCase
 import org.mbari.annosaurus.domain.*
 
 import java.net.{URI, URL}
 import scala.util.Try
 
 import org.mbari.annosaurus.model.simple.{HealthStatus => OldHealthStatus}
-
-
-
 
 
 object CirceCodecs {
