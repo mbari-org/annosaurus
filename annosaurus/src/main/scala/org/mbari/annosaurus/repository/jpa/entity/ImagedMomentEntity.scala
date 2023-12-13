@@ -27,6 +27,7 @@ import java.time.{Duration, Instant}
 import java.util.{UUID, ArrayList => JArrayList, List => JList}
 import scala.collection.mutable
 import scala.jdk.CollectionConverters._
+import org.mbari.annosaurus.domain.ImagedMoment
 
 /**
   *
@@ -354,6 +355,23 @@ object ImagedMomentEntity {
       .foreach(ir => newImagedMoment.addImageReference(ImageReferenceEntity(ir)))
     newImagedMoment
   }
+
+  // def apply(imagedMoment: ImagedMoment): ImagedMomentEntity = {
+  //   val newImagedMoment = apply(
+  //     Option(imagedMoment.videoReferenceUuid),
+  //     imagedMoment.recordedTimestamp,
+  //     imagedMoment.timecode.map(Timecode(_)),
+  //     imagedMoment.elapsedTime
+  //   )
+  //   newImagedMoment.uuid = imagedMoment.uuid.orNull
+  //   Option(imagedMoment.ancillaryDatum)
+  //     .foreach(ad => newImagedMoment.ancillaryDatum = CachedAncillaryDatumEntity(ad))
+  //   imagedMoment.observations.foreach(obs => newImagedMoment.addObservation(ObservationEntity(obs)))
+  //   imagedMoment
+  //     .imageReferences
+  //     .foreach(ir => newImagedMoment.addImageReference(ImageReferenceEntity(ir)))
+  //   newImagedMoment
+  // }
 
   /**
     * Map a group of annotations to the equivalent group of imagedMOments

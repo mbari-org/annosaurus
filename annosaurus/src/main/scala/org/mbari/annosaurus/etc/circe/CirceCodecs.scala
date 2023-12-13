@@ -112,13 +112,31 @@ object CirceCodecs {
     private val associationCcDecoder: Decoder[Association] = deriveDecoder // or associationScDecoder.map(_.toCamelCase)
     given associationEncoder: Encoder[Association] = deriveEncoder
     given associationDecoder: Decoder[Association] = associationCcDecoder or associationScDecoder.map(_.toCamelCase)
-    given alDecoder: Decoder[List[Association]] = deriveDecoder
+    // given alDecoder: Decoder[List[Association]] = deriveDecoder
 
     given imageReferenceScDecoder: Decoder[ImageReferenceSC] = deriveDecoder
     given imageReferenceScEncoder: Encoder[ImageReferenceSC] = deriveEncoder
     private val imageReferenceCcDecoder: Decoder[ImageReference] = deriveDecoder // or imageReferenceScDecoder.map(_.toCamelCase)
     given imageReferenceEncoder: Encoder[ImageReference] = deriveEncoder
     given imageReferenceDecoder: Decoder[ImageReference] = imageReferenceCcDecoder or imageReferenceScDecoder.map(_.toCamelCase)
+
+    given observationScDecoder: Decoder[ObservationSC] = deriveDecoder
+    given observationScEncoder: Encoder[ObservationSC] = deriveEncoder
+    private val observationCcDecoder: Decoder[Observation] = deriveDecoder // or observationScDecoder.map(_.toCamelCase)
+    given observationEncoder: Encoder[Observation] = deriveEncoder
+    given observationDecoder: Decoder[Observation] = observationCcDecoder or observationScDecoder.map(_.toCamelCase)
+
+    given ancillaryDatumScDecoder: Decoder[CachedAncillaryDatumSC] = deriveDecoder
+    given ancillaryDatumScEncoder: Encoder[CachedAncillaryDatumSC] = deriveEncoder
+    private val ancillaryDatumCcDecoder: Decoder[CachedAncillaryDatum] = deriveDecoder // or ancillaryDatumScDecoder.map(_.toCamelCase)
+    given ancillaryDatumEncoder: Encoder[CachedAncillaryDatum] = deriveEncoder
+    given ancillaryDatumDecoder: Decoder[CachedAncillaryDatum] = ancillaryDatumCcDecoder or ancillaryDatumScDecoder.map(_.toCamelCase)
+
+    given imagedMomentScDecoder: Decoder[ImagedMomentSC] = deriveDecoder
+    given imagedMomentScEncoder: Encoder[ImagedMomentSC] = deriveEncoder
+    private val imagedMomentCcDecoder: Decoder[ImagedMoment] = deriveDecoder // or imagedMomentScDecoder.map(_.toCamelCase)
+    given imagedMomentEncoder: Encoder[ImagedMoment] = deriveEncoder
+    given imagedMomentDecoder: Decoder[ImagedMoment] = imagedMomentCcDecoder or imagedMomentScDecoder.map(_.toCamelCase)
 
     given annotationScDecoder: Decoder[AnnotationSC] = deriveDecoder
     given annotationScEncoder: Encoder[AnnotationSC] = deriveEncoder

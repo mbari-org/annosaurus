@@ -45,45 +45,45 @@ import scala.jdk.CollectionConverters._
 @NamedNativeQueries(
   Array(
     new NamedNativeQuery(
-      name = "MutableObservation.findAllNames",
+      name = "Observation.findAllNames",
       query = "SELECT DISTINCT concept FROM observations ORDER BY concept"
     ),
     new NamedNativeQuery(
-      name = "MutableObservation.findAllGroups",
+      name = "Observation.findAllGroups",
       query = "SELECT DISTINCT observation_group FROM observations ORDER BY observation_group"
     ),
     new NamedNativeQuery(
-      name = "MutableObservation.findAllNamesByVideoReferenceUUID",
+      name = "Observation.findAllNamesByVideoReferenceUUID",
       query =
         "SELECT DISTINCT concept FROM imaged_moments LEFT JOIN observations ON observations.imaged_moment_uuid = imaged_moments.uuid WHERE imaged_moments.video_reference_uuid = ?1 ORDER BY concept"
     ),
     new NamedNativeQuery(
-      name = "MutableObservation.findAllActivities",
+      name = "Observation.findAllActivities",
       query = "SELECT DISTINCT activity FROM observations ORDER BY activity"
     ),
     new NamedNativeQuery(
-      name = "MutableObservation.countByVideoReferenceUUID",
+      name = "Observation.countByVideoReferenceUUID",
       query =
         "SELECT COUNT(obs.uuid) FROM observations obs RIGHT JOIN imaged_moments im ON obs.imaged_moment_uuid = im.uuid " +
           "WHERE im.video_reference_uuid = ?1"
     ),
     new NamedNativeQuery(
-      name = "MutableObservation.countByVideoReferenceUUIDAndTimestamps",
+      name = "Observation.countByVideoReferenceUUIDAndTimestamps",
       query =
         "SELECT COUNT(obs.uuid) FROM observations obs RIGHT JOIN imaged_moments im ON obs.imaged_moment_uuid = im.uuid " +
           "WHERE im.uuid = ?1 AND im.recorded_timestamp BETWEEN ?2 AND ?3"
     ),
     new NamedNativeQuery(
-      name = "MutableObservation.countAllByVideoReferenceUUIDs",
+      name = "Observation.countAllByVideoReferenceUUIDs",
       query =
         "SELECT im.video_reference_uuid, COUNT(obs.uuid) as n FROM observations obs RIGHT JOIN imaged_moments im ON im.uuid = obs.imaged_moment_uuid GROUP BY im.video_reference_uuid ORDER BY n"
     ),
     new NamedNativeQuery(
-      name = "MutableObservation.countByConcept",
+      name = "Observation.countByConcept",
       query = "SELECT COUNT(*) FROM observations WHERE concept = ?1"
     ),
     new NamedNativeQuery(
-      name = "MutableObservation.countByConceptWithImages",
+      name = "Observation.countByConceptWithImages",
       query = "SELECT COUNT(*) FROM (" +
         "SELECT DISTINCT obs.uuid FROM observations obs " +
         "LEFT JOIN imaged_moments im ON obs.imaged_moment_uuid = im.uuid " +
@@ -91,11 +91,11 @@ import scala.jdk.CollectionConverters._
         "WHERE obs.uuid IS NOT NULL AND obs.concept = ?1 AND ir.url IS NOT NULL) foo"
     ),
     new NamedNativeQuery(
-      name = "MutableObservation.updateConcept",
+      name = "Observation.updateConcept",
       query = "UPDATE observations SET concept = ?1 WHERE concept = ?2"
     ),
     new NamedNativeQuery(
-      name = "MutableObservation.updateImagedMomentUUID",
+      name = "Observation.updateImagedMomentUUID",
       query = "UPDATE observations SET imaged_moment_uuid = ?1 WHERE uuid = ?2"
     )
   )
@@ -103,38 +103,38 @@ import scala.jdk.CollectionConverters._
 @NamedQueries(
   Array(
     new NamedQuery(
-      name = "MutableObservation.findAll",
-      query = "SELECT o FROM MutableObservation o ORDER BY o.uuid"
+      name = "Observation.findAll",
+      query = "SELECT o FROM Observation o ORDER BY o.uuid"
     ),
     new NamedQuery(
-      name = "MutableObservation.findByMultiRequest",
+      name = "Observation.findByMultiRequest",
       query =
-        "SELECT o FROM MutableObservation o LEFT JOIN o.imagedMoment i WHERE i.videoReferenceUUID IN :uuids ORDER BY o.uuid"
+        "SELECT o FROM Observation o LEFT JOIN o.imagedMoment i WHERE i.videoReferenceUUID IN :uuids ORDER BY o.uuid"
     ),
     new NamedQuery(
-      name = "MutableObservation.countByMultiRequest",
+      name = "Observation.countByMultiRequest",
       query =
-        "SELECT COUNT(o.uuid) FROM MutableObservation o LEFT JOIN o.imagedMoment i WHERE i.videoReferenceUUID IN :uuids"
+        "SELECT COUNT(o.uuid) FROM Observation o LEFT JOIN o.imagedMoment i WHERE i.videoReferenceUUID IN :uuids"
     ),
     new NamedQuery(
-      name = "MutableObservation.findByConcurrentRequest",
+      name = "Observation.findByConcurrentRequest",
       query =
-        "SELECT o FROM MutableObservation o LEFT JOIN o.imagedMoment i WHERE i.videoReferenceUUID IN :uuids AND i.recordedDate BETWEEN :start AND :end ORDER BY o.uuid"
+        "SELECT o FROM Observation o LEFT JOIN o.imagedMoment i WHERE i.videoReferenceUUID IN :uuids AND i.recordedDate BETWEEN :start AND :end ORDER BY o.uuid"
     ),
     new NamedQuery(
-      name = "MutableObservation.countByConcurrentRequest",
+      name = "Observation.countByConcurrentRequest",
       query =
-        "SELECT COUNT(o.uuid) FROM MutableObservation o LEFT JOIN o.imagedMoment i WHERE i.videoReferenceUUID IN :uuids AND i.recordedDate BETWEEN :start AND :end"
+        "SELECT COUNT(o.uuid) FROM Observation o LEFT JOIN o.imagedMoment i WHERE i.videoReferenceUUID IN :uuids AND i.recordedDate BETWEEN :start AND :end"
     ),
     new NamedQuery(
-      name = "MutableObservation.findByVideoReferenceUUID",
+      name = "Observation.findByVideoReferenceUUID",
       query =
-        "SELECT o FROM MutableObservation o LEFT JOIN o.imagedMoment i WHERE i.videoReferenceUUID = :uuid ORDER BY o.uuid"
+        "SELECT o FROM Observation o LEFT JOIN o.imagedMoment i WHERE i.videoReferenceUUID = :uuid ORDER BY o.uuid"
     ),
     new NamedQuery(
-      name = "MutableObservation.findByVideoReferenceUUIDAndTimestamps",
+      name = "Observation.findByVideoReferenceUUIDAndTimestamps",
       query =
-        "SELECT o FROM MutableObservation o LEFT JOIN o.imagedMoment i WHERE i.videoReferenceUUID = :uuid AND i.recordedDate BETWEEN :start AND :end ORDER BY i.recordedDate"
+        "SELECT o FROM Observation o LEFT JOIN o.imagedMoment i WHERE i.videoReferenceUUID = :uuid AND i.recordedDate BETWEEN :start AND :end ORDER BY i.recordedDate"
     )
   )
 )
