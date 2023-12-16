@@ -16,17 +16,13 @@
 
 package org.mbari.annosaurus.domain
 
-final case class Authorization(tokenType: String, accessToken: String) extends ToSnakeCase[AuthorizationSC] {
-    override def toSnakeCase: AuthorizationSC = AuthorizationSC(tokenType, accessToken)
+import java.time.Instant
+
+final case class TimeHistogram(binsMin: Seq[Instant], binsMax: Seq[Instant], values: Seq[Int])
+    extends ToSnakeCase[TimeHistogramSC] {
+    override def toSnakeCase: TimeHistogramSC = TimeHistogramSC(binsMin, binsMax, values)
 }
 
-final case class AuthorizationSC(token_type: String, access_token: String) extends ToCamelCase[Authorization] {
-    override def toCamelCase: Authorization = Authorization(token_type, access_token)
-}
-
-object Authorization {
-    val TokenTypeBearer: String = "Bearer"
-    val TokenTypeApiKey: String = "APIKey"
-
-    def bearer(accessToken: String): Authorization = Authorization(TokenTypeBearer, accessToken)
+final case class TimeHistogramSC(bins_min: Seq[Instant], bins_max: Seq[Instant], values: Seq[Int]) extends ToCamelCase[TimeHistogram] {
+    override def toCamelCase: TimeHistogram = TimeHistogram(bins_min, bins_max, values)
 }

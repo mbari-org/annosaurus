@@ -18,6 +18,8 @@ package org.mbari.annosaurus.domain
 
 import java.time.{Duration, Instant}
 import java.util.UUID
+import org.mbari.annosaurus.repository.jpa.entity.ObservationEntity
+import org.mbari.annosaurus.model.MutableObservation
 
 final case class Observation(
     concept: String,
@@ -30,8 +32,8 @@ final case class Observation(
     uuid: Option[UUID] = None,
     lastUpdated: Option[Instant] = None
     
-) {
-    def toSnakeCase: ObservationSC =
+) extends ToSnakeCase[ObservationSC] with ToEntity[ObservationEntity] {
+    override def toSnakeCase: ObservationSC =
         ObservationSC(
             concept,
             durationMillis,
@@ -43,8 +45,34 @@ final case class Observation(
             uuid,
             lastUpdated
         )
+
+    override def toEntity: ObservationEntity =
+        val entity = new ObservationEntity
+        entity.concept = concept
+        durationMillis.foreach(d => entity.duration = Duration.ofMillis(d))
+        group.foreach(entity.group = _)
+        activity.foreach(entity.activity = _)
+        observer.foreach(entity.observer = _)
+        observationTimestamp.foreach(entity.observationDate = _)
+        associations.foreach(a => entity.addAssociation(a.toEntity))
+        uuid.foreach(entity.uuid = _)
+        entity
         
     lazy val duration: Option[Duration] = durationMillis.map(Duration.ofMillis)
+}
+
+object Observation {
+    def from(entity: MutableObservation): Observation = Observation(
+        entity.concept,
+        Option(entity.duration).map(_.toMillis),
+        Option(entity.group),
+        Option(entity.activity),
+        Option(entity.observer),
+        Option(entity.observationDate),
+        entity.associations.map(Association.from).toSeq,
+        Option(entity.uuid),
+        entity.lastUpdated
+    )
 }
 
 final case class ObservationSC(
@@ -57,8 +85,8 @@ final case class ObservationSC(
     associations: Seq[AssociationSC] = Nil,
     uuid: Option[UUID] = None,
     last_updated_time: Option[Instant] = None,
-) {
-    def toCamelCase: Observation =
+) extends ToCamelCase[Observation] {
+    override def toCamelCase: Observation =
         Observation(
             concept,
             duration_millis,

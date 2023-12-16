@@ -16,17 +16,10 @@
 
 package org.mbari.annosaurus.domain
 
-final case class Authorization(tokenType: String, accessToken: String) extends ToSnakeCase[AuthorizationSC] {
-    override def toSnakeCase: AuthorizationSC = AuthorizationSC(tokenType, accessToken)
+case class DepthHistogram(binsMin: List[Int], binsMax: List[Int], values: List[Int]) extends ToSnakeCase[DepthHistogramSC] {
+    override def toSnakeCase: DepthHistogramSC = DepthHistogramSC(binsMin, binsMax, values)
 }
 
-final case class AuthorizationSC(token_type: String, access_token: String) extends ToCamelCase[Authorization] {
-    override def toCamelCase: Authorization = Authorization(token_type, access_token)
-}
-
-object Authorization {
-    val TokenTypeBearer: String = "Bearer"
-    val TokenTypeApiKey: String = "APIKey"
-
-    def bearer(accessToken: String): Authorization = Authorization(TokenTypeBearer, accessToken)
+case class DepthHistogramSC(bins_min: List[Int], bins_max: List[Int], values: List[Int]) extends ToCamelCase[DepthHistogram] {
+    override def toCamelCase: DepthHistogram = DepthHistogram(bins_min, bins_max, values)
 }

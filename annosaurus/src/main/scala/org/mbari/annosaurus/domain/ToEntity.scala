@@ -16,17 +16,6 @@
 
 package org.mbari.annosaurus.domain
 
-final case class Authorization(tokenType: String, accessToken: String) extends ToSnakeCase[AuthorizationSC] {
-    override def toSnakeCase: AuthorizationSC = AuthorizationSC(tokenType, accessToken)
-}
-
-final case class AuthorizationSC(token_type: String, access_token: String) extends ToCamelCase[Authorization] {
-    override def toCamelCase: Authorization = Authorization(token_type, access_token)
-}
-
-object Authorization {
-    val TokenTypeBearer: String = "Bearer"
-    val TokenTypeApiKey: String = "APIKey"
-
-    def bearer(accessToken: String): Authorization = Authorization(TokenTypeBearer, accessToken)
+trait ToEntity[A] {
+  def toEntity: A
 }
