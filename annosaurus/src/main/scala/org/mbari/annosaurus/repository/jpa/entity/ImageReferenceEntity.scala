@@ -19,7 +19,7 @@ package org.mbari.annosaurus.repository.jpa.entity
 import com.google.gson.annotations.{Expose, SerializedName}
 import jakarta.persistence._
 import org.mbari.annosaurus.model.{MutableImageReference, MutableImagedMoment}
-import org.mbari.annosaurus.repository.jpa.{JPAPersistentObject, TransactionLogger, URLConverter}
+import org.mbari.annosaurus.repository.jpa.{JpaEntity, TransactionLogger, URLConverter}
 
 import java.net.URL
 
@@ -57,7 +57,7 @@ import java.net.URL
     )
   )
 )
-class ImageReferenceEntity extends MutableImageReference with JPAPersistentObject {
+class ImageReferenceEntity extends MutableImageReference with JpaEntity {
 
   @Expose(serialize = true)
   @Column(name = "description", length = 256, nullable = true)

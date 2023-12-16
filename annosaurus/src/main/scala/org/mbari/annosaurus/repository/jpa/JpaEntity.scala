@@ -22,4 +22,4 @@ package org.mbari.annosaurus.repository.jpa
   * @author Brian Schlining
   * @since 2016-06-16T14:31:00
   */
-trait JPAPersistentObject extends HasUUID with HasOptimisticLock {}
+trait JpaEntity extends HasUUID with HasOptimisticLock {}

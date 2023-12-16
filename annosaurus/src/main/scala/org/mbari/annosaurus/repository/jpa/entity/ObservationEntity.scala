@@ -19,7 +19,7 @@ package org.mbari.annosaurus.repository.jpa.entity
 import com.google.gson.annotations.{Expose, SerializedName}
 import jakarta.persistence._
 import org.mbari.annosaurus.model.{MutableAssociation, MutableImagedMoment, MutableObservation}
-import org.mbari.annosaurus.repository.jpa.{DurationConverter, InstantConverter, JPAPersistentObject, TransactionLogger}
+import org.mbari.annosaurus.repository.jpa.{DurationConverter, InstantConverter, JpaEntity, TransactionLogger}
 
 import java.time.{Duration, Instant}
 import java.util.{ArrayList => JArrayList, List => JList}
@@ -138,7 +138,7 @@ import scala.jdk.CollectionConverters._
     )
   )
 )
-class ObservationEntity extends MutableObservation with JPAPersistentObject {
+class ObservationEntity extends MutableObservation with JpaEntity {
 
   @Expose(serialize = true)
   @Column(name = "concept", length = 256)

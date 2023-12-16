@@ -19,7 +19,7 @@ package org.mbari.annosaurus.repository.jpa.entity
 import com.google.gson.annotations.{Expose, SerializedName}
 import jakarta.persistence._
 import org.mbari.annosaurus.model.MutableCachedVideoReferenceInfo
-import org.mbari.annosaurus.repository.jpa.{JPAPersistentObject, TransactionLogger, UUIDConverter}
+import org.mbari.annosaurus.repository.jpa.{JpaEntity, TransactionLogger, UUIDConverter}
 
 import java.util.UUID
 
@@ -90,7 +90,7 @@ import java.util.UUID
     )
   )
 )
-class CachedVideoReferenceInfoEntity extends MutableCachedVideoReferenceInfo with JPAPersistentObject {
+class CachedVideoReferenceInfoEntity extends MutableCachedVideoReferenceInfo with JpaEntity {
 
   /**
     * typically this will be the chief scientist

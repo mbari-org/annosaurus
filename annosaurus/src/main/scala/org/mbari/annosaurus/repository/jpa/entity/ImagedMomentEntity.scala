@@ -224,7 +224,7 @@ import org.mbari.annosaurus.domain.ImagedMoment
     )
   )
 )
-class ImagedMomentEntity extends MutableImagedMoment with JPAPersistentObject {
+class ImagedMomentEntity extends MutableImagedMoment with JpaEntity {
 
   @Expose(serialize = true)
   @Column(name = "elapsed_time_millis", nullable = true)

@@ -19,7 +19,7 @@ package org.mbari.annosaurus.repository.jpa.entity
 import com.google.gson.annotations.Expose
 import jakarta.persistence._
 import org.mbari.annosaurus.model.{MutableCachedAncillaryDatum, MutableImagedMoment}
-import org.mbari.annosaurus.repository.jpa.{DoubleOptionConverter, JPAPersistentObject, TransactionLogger}
+import org.mbari.annosaurus.repository.jpa.{DoubleOptionConverter, JpaEntity, TransactionLogger}
 
 /**
   *
@@ -63,7 +63,7 @@ import org.mbari.annosaurus.repository.jpa.{DoubleOptionConverter, JPAPersistent
     )
   )
 )
-class CachedAncillaryDatumEntity extends MutableCachedAncillaryDatum with JPAPersistentObject {
+class CachedAncillaryDatumEntity extends MutableCachedAncillaryDatum with JpaEntity {
 
   @Expose(serialize = true)
   @Column(name = "coordinate_reference_system", length = 32, nullable = true)

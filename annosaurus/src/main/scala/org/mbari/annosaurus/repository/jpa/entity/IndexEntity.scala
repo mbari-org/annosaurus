@@ -41,7 +41,7 @@ import java.util.UUID
     )
   )
 )
-class IndexEntity extends MutableImagedMoment with JPAPersistentObject {
+class IndexEntity extends MutableImagedMoment with JpaEntity {
 
   @Expose(serialize = true)
   @SerializedName(value = "video_reference_uuid")

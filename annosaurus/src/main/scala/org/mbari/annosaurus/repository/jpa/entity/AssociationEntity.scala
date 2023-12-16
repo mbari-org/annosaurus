@@ -19,7 +19,7 @@ package org.mbari.annosaurus.repository.jpa.entity
 import com.google.gson.annotations.Expose
 import jakarta.persistence._
 import org.mbari.annosaurus.model._
-import org.mbari.annosaurus.repository.jpa.{JPAPersistentObject, TransactionLogger}
+import org.mbari.annosaurus.repository.jpa.{JpaEntity, TransactionLogger}
 
 /**
   *
@@ -78,7 +78,7 @@ import org.mbari.annosaurus.repository.jpa.{JPAPersistentObject, TransactionLogg
     )
   )
 )
-class AssociationEntity extends MutableAssociation with JPAPersistentObject {
+class AssociationEntity extends MutableAssociation with JpaEntity {
 
   @Expose(serialize = true)
   @Column(name = "link_name", length = 128, nullable = false)
