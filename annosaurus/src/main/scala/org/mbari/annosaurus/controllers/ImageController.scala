@@ -25,10 +25,11 @@ import org.mbari.annosaurus.repository.ImagedMomentDAO
 import org.mbari.vcr4j.time.Timecode
 
 import scala.concurrent.{ExecutionContext, Future}
+import org.mbari.annosaurus.repository.jpa.JPADAOFactory
 
 /** Created by brian on 7/14/16.
   */
-class ImageController(daoFactory: BasicDAOFactory) {
+class ImageController(daoFactory: JPADAOFactory) {
 
     def findByUUID(uuid: UUID)(implicit ec: ExecutionContext): Future[Option[Image]] = {
         val irDao = daoFactory.newImageReferenceDAO()

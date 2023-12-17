@@ -67,7 +67,7 @@ import org.mbari.annosaurus.repository.jpa.{DoubleOptionConverter, JpaEntity, Tr
         )
     )
 )
-class CachedAncillaryDatumEntity extends MutableCachedAncillaryDatum with JpaEntity {
+class CachedAncillaryDatumEntity extends JpaEntity {
 
     @Expose(serialize = true)
     @Column(name = "coordinate_reference_system", length = 32, nullable = true)
@@ -105,7 +105,7 @@ class CachedAncillaryDatumEntity extends MutableCachedAncillaryDatum with JpaEnt
         targetEntity = classOf[ImagedMomentEntity]
     )
     @JoinColumn(name = "imaged_moment_uuid", nullable = false, columnDefinition = "CHAR(36)")
-    var imagedMoment: MutableImagedMoment = _
+    var imagedMoment: ImagedMomentEntity = _
 
     @Expose(serialize = true)
     @Column(name = "y", nullable = true)
@@ -171,7 +171,7 @@ object CachedAncillaryDatumEntity {
             case c                             =>
                 val d = new CachedAncillaryDatumEntity
                 d.uuid = c.uuid
-                d.imagedMoment = c.imagedMoment
+                d.imagedMoment = ImagedMomentEntity(c.imagedMoment)
                 d.latitude = c.latitude
                 d.longitude = c.longitude
                 d.depthMeters = c.depthMeters

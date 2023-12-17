@@ -21,6 +21,7 @@ import org.mbari.annosaurus.repository.DAO
 import java.util.UUID
 
 import scala.concurrent.{ExecutionContext, Future}
+import org.mbari.annosaurus.repository.jpa.JPADAOFactory
 
 /** @author
   *   Brian Schlining
@@ -28,7 +29,7 @@ import scala.concurrent.{ExecutionContext, Future}
   */
 trait BaseController[A <: PersistentObject, B <: DAO[A]] {
 
-    def daoFactory: BasicDAOFactory
+    def daoFactory: JPADAOFactory
 
     def newDAO(): B
 

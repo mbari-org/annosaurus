@@ -23,22 +23,24 @@ import java.util.concurrent.Executors
 
 import io.reactivex.rxjava3.subjects.Subject
 import org.mbari.annosaurus.messaging.{AnnotationPublisher, MessageBus}
-import org.mbari.annosaurus.model.{MutableAnnotation, MutableObservation}
+import org.mbari.annosaurus.model.MutableAnnotation
 import org.mbari.annosaurus.repository.jpa.MutableAnnotationImpl
 import org.mbari.annosaurus.model.simple.{ConcurrentRequest, MultiRequest}
 import org.mbari.annosaurus.repository.DAO
 import org.mbari.annosaurus.repository.jpa.UUIDSequence
-import org.mbari.annosaurus.repository.jpa.entity.ImagedMomentEntity
+import org.mbari.annosaurus.repository.jpa.entity.{ImagedMomentEntity< ObservationEntity}
 import org.mbari.vcr4j.time.Timecode
 import org.mbari.annosaurus.repository.jpa.Implicits._
 
 import scala.concurrent.{ExecutionContext, Future}
+import org.mbari.annosaurus.repository.jpa.JPADAOFactory
+import org.mbari.annosaurus.repository.jpa.entity.ObservationEntity
 
 /** @author
   *   Brian Schlining
   * @since 2016-06-25T20:28:00
   */
-class AnnotationController(daoFactory: BasicDAOFactory, bus: Subject[Any] = MessageBus.RxSubject) {
+class AnnotationController(daoFactory: JPADAOFactory, bus: Subject[Any] = MessageBus.RxSubject) {
 
     // HACK Assumes where using JDADAPFactory!
 //  private[this] val repository: JdbcRepository = {
@@ -451,7 +453,7 @@ class AnnotationController(daoFactory: BasicDAOFactory, bus: Subject[Any] = Mess
         dao: DAO[_],
         uuid: UUID,
         recordedTimestampOpt: Option[Instant]
-    ): Seq[MutableObservation] = {
+    ): Seq[ObservationEntity] = {
 
         val obsDao = daoFactory.newObservationDAO(dao)
         obsDao
@@ -508,7 +510,7 @@ class AnnotationController(daoFactory: BasicDAOFactory, bus: Subject[Any] = Mess
         duration: Option[Duration] = None,
         group: Option[String] = None,
         activity: Option[String] = None
-    ): Option[MutableObservation] = {
+    ): Option[ObservationEntity] = {
         val obsDao      = daoFactory.newObservationDAO(dao)
         val imDao       = daoFactory.newImagedMomentDAO(dao)
         val observation = obsDao.findByUUID(uuid)

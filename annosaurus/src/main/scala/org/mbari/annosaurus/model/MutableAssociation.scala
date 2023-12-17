@@ -25,6 +25,7 @@ import java.util.UUID
   *   Brian Schlining
   * @since 2016-06-15T16:54:00
   */
+@deprecated("Use org.mbari.annosaurus.repository.jpa.AssociationEntity instead", "2021-11-23T11:00:00")
 trait MutableAssociation extends PersistentObject {
 
     var uuid: UUID

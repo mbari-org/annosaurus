@@ -24,6 +24,7 @@ import java.util.UUID
   *   Brian Schlining
   * @since 2016-06-15T16:55:00
   */
+@deprecated("Use org.mbari.annosaurus.repository.jpa.CachedAncillaryDatumEntity instead", "2021-11-23T11:00:00")
 trait MutableCachedAncillaryDatum extends PersistentObject {
 
     var uuid: UUID

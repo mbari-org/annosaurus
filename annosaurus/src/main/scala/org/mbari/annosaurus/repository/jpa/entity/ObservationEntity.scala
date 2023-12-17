@@ -141,7 +141,7 @@ import scala.jdk.CollectionConverters._
         )
     )
 )
-class ObservationEntity extends MutableObservation with JpaEntity {
+class ObservationEntity extends JpaEntity {
 
     @Expose(serialize = true)
     @Column(name = "concept", length = 256)
@@ -159,7 +159,7 @@ class ObservationEntity extends MutableObservation with JpaEntity {
         targetEntity = classOf[ImagedMomentEntity]
     )
     @JoinColumn(name = "imaged_moment_uuid", nullable = false, columnDefinition = "CHAR(36)")
-    var imagedMoment: MutableImagedMoment = _
+    var imagedMoment: ImagedMomentEntity = _
 
     @Expose(serialize = true)
     @SerializedName(value = "observation_timestamp")
@@ -190,17 +190,17 @@ class ObservationEntity extends MutableObservation with JpaEntity {
     )
     protected var javaAssociations: JList[AssociationEntity] = new JArrayList[AssociationEntity]
 
-    override def addAssociation(association: MutableAssociation): Unit = {
+    override def addAssociation(association: AssociationEntity): Unit = {
         javaAssociations.add(association.asInstanceOf[AssociationEntity])
         association.observation = this
     }
 
-    override def removeAssociation(association: MutableAssociation): Unit = {
+    override def removeAssociation(association: AssociationEntity): Unit = {
         javaAssociations.remove(association)
         association.observation = null
     }
 
-    override def associations: Iterable[MutableAssociation] = javaAssociations.asScala
+    override def associations: Iterable[AssociationEntity] = javaAssociations.asScala
 
 }
 

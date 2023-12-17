@@ -27,20 +27,22 @@ import org.mbari.annosaurus.repository.{CachedAncillaryDatumDAO, NotFoundInDatas
 import org.slf4j.LoggerFactory
 
 import scala.concurrent.{ExecutionContext, Future}
+import org.mbari.annosaurus.repository.jpa.JPADAOFactory
+import org.mbari.annosaurus.repository.jpa.entity.CachedAncillaryDatumEntity
 
 /** @author
   *   Brian Schlining
   * @since 2017-05-01T10:53:00
   */
-class CachedAncillaryDatumController(val daoFactory: BasicDAOFactory)
+class CachedAncillaryDatumController(val daoFactory: JPADAOFactory)
     extends BaseController[MutableCachedAncillaryDatum, CachedAncillaryDatumDAO[
         MutableCachedAncillaryDatum
     ]] {
 
-    protected type ADDAO = CachedAncillaryDatumDAO[MutableCachedAncillaryDatum]
+    protected type ADDAO = CachedAncillaryDatumDAO[CachedAncillaryDatumEntity]
     LoggerFactory.getLogger(getClass)
 
-    override def newDAO(): CachedAncillaryDatumDAO[MutableCachedAncillaryDatum] =
+    override def newDAO(): CachedAncillaryDatumDAO[CachedAncillaryDatumEntity] =
         daoFactory.newCachedAncillaryDatumDAO()
 
     def create(

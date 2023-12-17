@@ -23,6 +23,7 @@ import java.util.UUID
 import com.google.gson.annotations.{Expose, SerializedName}
 import org.mbari.annosaurus.model.MutableImageReference
 import org.mbari.vcr4j.time.Timecode
+import org.mbari.annosaurus.repository.jpa.entity.ImageReferenceEntity
 
 /** Created by brian on 7/14/16.
   */
@@ -66,7 +67,7 @@ class Image {
 
 object Image {
 
-    def apply(imageReference: MutableImageReference): Image = {
+    def apply(imageReference: ImageReferenceEntity): Image = {
         val i = new Image
         i.imageReferenceUuid = imageReference.uuid
         i.format = imageReference.format

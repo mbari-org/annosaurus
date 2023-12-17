@@ -129,7 +129,8 @@ lazy val integrationTests = (project in file("it"))
       junit,
       munit,
       scalatraScalatest,
-      slf4j
+      slf4j,
+      tapirServerStub
     )
   )
 

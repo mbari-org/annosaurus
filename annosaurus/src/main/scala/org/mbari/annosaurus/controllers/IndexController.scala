@@ -22,17 +22,20 @@ import java.time.Instant
 import java.util.UUID
 
 import scala.concurrent.{ExecutionContext, Future}
+import org.mbari.annosaurus.repository.jpa.entity.ImagedMomentEntity
+import org.mbari.annosaurus.repository.jpa.JPADAOFactory
+import org.mbari.annosaurus.repository.jpa.entity.IndexEntity
 
 /** @author
   *   Brian Schlining
   * @since 2019-02-08T11:00:00
   */
-class IndexController(val daoFactory: BasicDAOFactory)
-    extends BaseController[MutableImagedMoment, IndexDAO[MutableImagedMoment]] {
+class IndexController(val daoFactory: JPADAOFactory)
+    extends BaseController[IndexEntity, IndexDAO[IndexEntity]] {
 
-    protected type IDDAO = IndexDAO[MutableImagedMoment]
+    protected type IDDAO = IndexDAO[IndexEntity]
 
-    override def newDAO(): IndexDAO[MutableImagedMoment] = daoFactory.newIndexDAO()
+    override def newDAO(): IndexDAO[IndexEntity] = daoFactory.newIndexDAO()
 
     def findByVideoReferenceUUID(uuid: UUID, limit: Option[Int] = None, offset: Option[Int] = None)(
         implicit ec: ExecutionContext

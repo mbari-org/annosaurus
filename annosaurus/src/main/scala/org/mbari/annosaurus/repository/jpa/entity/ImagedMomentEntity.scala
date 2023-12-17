@@ -223,7 +223,7 @@ import org.mbari.annosaurus.domain.ImagedMoment
         )
     )
 )
-class ImagedMomentEntity extends MutableImagedMoment with JpaEntity {
+class ImagedMomentEntity extends JpaEntity {
 
     @Expose(serialize = true)
     @Column(name = "elapsed_time_millis", nullable = true)
@@ -263,17 +263,17 @@ class ImagedMomentEntity extends MutableImagedMoment with JpaEntity {
     var javaObservations: JList[ObservationEntity] =
         new JArrayList[ObservationEntity]
 
-    override def addObservation(observation: MutableObservation): Unit = {
+    override def addObservation(observation: ObservationEntity): Unit = {
         javaObservations.add(observation.asInstanceOf[ObservationEntity])
         observation.imagedMoment = this
     }
 
-    override def removeObservation(observation: MutableObservation): Unit = {
+    override def removeObservation(observation: ObservationEntity): Unit = {
         javaObservations.remove(observation)
         observation.imagedMoment = null
     }
 
-    override def observations: Iterable[MutableObservation] = javaObservations.asScala
+    override def observations: Iterable[ObservationEntity] = javaObservations.asScala
 
     @Expose(serialize = true)
     @SerializedName(value = "image_references")
@@ -287,15 +287,15 @@ class ImagedMomentEntity extends MutableImagedMoment with JpaEntity {
     protected var javaImageReferences: JList[ImageReferenceEntity] =
         new JArrayList[ImageReferenceEntity]
 
-    override def addImageReference(imageReference: MutableImageReference): Unit = {
-        javaImageReferences.add(imageReference.asInstanceOf[ImageReferenceEntity])
+    override def addImageReference(imageReference: ImageReferenceEntity): Unit = {
+        javaImageReferences.add(imageReference)
         imageReference.imagedMoment = this
     }
 
-    override def imageReferences: Iterable[MutableImageReference] =
+    override def imageReferences: Iterable[ImageReferenceEntity] =
         javaImageReferences.asScala
 
-    override def removeImageReference(imageReference: MutableImageReference): Unit = {
+    override def removeImageReference(imageReference: ImageReferenceEntity): Unit = {
         javaImageReferences.remove(imageReference)
         imageReference.imagedMoment = null
     }
@@ -309,10 +309,10 @@ class ImagedMomentEntity extends MutableImagedMoment with JpaEntity {
         fetch = FetchType.LAZY,
         targetEntity = classOf[CachedAncillaryDatumEntity]
     )
-    protected var _ancillaryDatum: MutableCachedAncillaryDatum = _
+    protected var _ancillaryDatum: CachedAncillaryDatumEntity = _
 
-    def ancillaryDatum: MutableCachedAncillaryDatum             = _ancillaryDatum
-    def ancillaryDatum_=(ad: MutableCachedAncillaryDatum): Unit = {
+    def ancillaryDatum: CachedAncillaryDatumEntity             = _ancillaryDatum
+    def ancillaryDatum_=(ad: CachedAncillaryDatumEntity): Unit = {
         if (_ancillaryDatum != null) _ancillaryDatum.imagedMoment = null
         _ancillaryDatum = ad
         ad.imagedMoment = this
@@ -417,7 +417,7 @@ object ImagedMomentEntity {
             imagedMoment.addObservation(o)
 
             // Add the associations
-            a.associations.foreach(ass => o.addAssociation(ass))
+            a.associations.foreach(ass => o.addAssociation(AssociationEntity(ass)))
 
             // Add the images (if needed)
             a.imageReferences
@@ -425,7 +425,7 @@ object ImagedMomentEntity {
                     imagedMoment
                         .imageReferences
                         .find(i => i.url == img.url) match {
-                        case None    => imagedMoment.addImageReference(img)
+                        case None    => imagedMoment.addImageReference(ImageReferenceEntity(img))
                         case Some(_) => // Do nothing. Image already exists
                     }
 

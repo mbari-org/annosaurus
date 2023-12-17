@@ -24,7 +24,7 @@ import scala.concurrent.Await
 import scala.concurrent.duration.Duration
 import org.mbari.annosaurus.repository.jpa.EntityManagerFactories
 
-trait TestDAOFactory extends JPADAOFactory {
+trait TestDAOFactory extends JPADAOFactory{
 
     lazy val config: Config = ConfigFactory.load()
 

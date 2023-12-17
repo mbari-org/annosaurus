@@ -55,7 +55,7 @@ import java.net.URL
         )
     )
 )
-class ImageReferenceEntity extends MutableImageReference with JpaEntity {
+class ImageReferenceEntity extends JpaEntity {
 
     @Expose(serialize = true)
     @Column(name = "description", length = 256, nullable = true)
@@ -76,7 +76,7 @@ class ImageReferenceEntity extends MutableImageReference with JpaEntity {
         nullable = false,
         columnDefinition = "CHAR(36)"
     )
-    var imagedMoment: MutableImagedMoment = _
+    var imagedMoment: ImagedMomentEntity = _
 
     @Expose(serialize = true)
     @SerializedName(value = "height_pixels")

@@ -24,6 +24,7 @@ import java.util.UUID
   *   Brian Schlining
   * @since 2016-06-15T16:53:00
   */
+@deprecated("Use org.mbari.annosaurus.repository.jpa.ObservationEntity instead", "2021-11-23T11:00:00")
 trait MutableObservation extends PersistentObject {
 
     var uuid: UUID

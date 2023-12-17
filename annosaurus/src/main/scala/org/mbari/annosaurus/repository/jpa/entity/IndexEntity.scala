@@ -46,7 +46,7 @@ import java.util.UUID
         )
     )
 )
-class IndexEntity extends MutableImagedMoment with JpaEntity {
+class IndexEntity extends JpaEntity {
 
     @Expose(serialize = true)
     @SerializedName(value = "video_reference_uuid")
@@ -90,22 +90,22 @@ class IndexEntity extends MutableImagedMoment with JpaEntity {
     override def toString: String = Constants.GSON.toJson(this)
 
     /* --- IGNORE these methods below --- */
-    override def addObservation(observation: MutableObservation): Unit = ???
+    override def addObservation(observation: ObservationEntity): Unit = ???
 
-    override def removeObservation(observation: MutableObservation): Unit = ???
-
-    @Expose(serialize = false)
-    override def observations: Iterable[MutableObservation] = ???
-
-    override def addImageReference(imageReference: MutableImageReference): Unit = ???
-
-    override def removeImageReference(imageReference: MutableImageReference): Unit = ???
+    override def removeObservation(observation: ObservationEntity): Unit = ???
 
     @Expose(serialize = false)
-    override def imageReferences: Iterable[MutableImageReference] = ???
+    override def observations: Iterable[ObservationEntity] = ???
+
+    override def addImageReference(imageReference: ImageReferenceEntity): Unit = ???
+
+    override def removeImageReference(imageReference: ImageReferenceEntity): Unit = ???
+
+    @Expose(serialize = false)
+    override def imageReferences: Iterable[ImageReferenceEntity] = ???
 
     @Transient
-    var ancillaryDatum: MutableCachedAncillaryDatum = _
+    var ancillaryDatum: CachedAncillaryDatumEntity = _
 
     override def primaryKey: Option[UUID] = ???
 }

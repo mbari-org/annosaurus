@@ -23,15 +23,17 @@ import java.net.URL
 import java.util.UUID
 
 import scala.concurrent.{ExecutionContext, Future}
+import org.mbari.annosaurus.repository.jpa.entity.ImageReferenceEntity
+import org.mbari.annosaurus.repository.jpa.JPADAOFactory
 
 /** @author
   *   Brian Schlining
   * @since 2016-07-04T22:15:00
   */
-class ImageReferenceController(val daoFactory: BasicDAOFactory)
-    extends BaseController[MutableImageReference, ImageReferenceDAO[MutableImageReference]] {
+class ImageReferenceController(val daoFactory: JPADAOFactory)
+    extends BaseController[ImageReferenceEntity, ImageReferenceDAO[ImageReferenceEntity]] {
 
-    type IRDAO = ImageReferenceDAO[MutableImageReference]
+    type IRDAO = ImageReferenceDAO[ImageReferenceEntity]
 
     override def newDAO(): IRDAO = daoFactory.newImageReferenceDAO()
 

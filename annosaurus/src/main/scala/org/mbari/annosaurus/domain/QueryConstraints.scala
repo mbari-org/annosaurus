@@ -43,7 +43,7 @@ final case class QueryConstraints(
     missionContacts: List[String] = Nil,
     platformName: Option[String] = None,
     missionId: Option[String] = None
-) {
+) extends ToSnakeCase[QueryConstraintsSC] {
     def toSqlBuilder: QueryConstraintsSqlBuilder = {
         QueryConstraintsSqlBuilder(
             concepts,
@@ -118,7 +118,7 @@ final case class QueryConstraintsSC(
     mission_contacts: List[String] = Nil,
     platform_name: Option[String] = None,
     mission_id: Option[String] = None
-) {
+) extends ToCamelCase[QueryConstraints] {
     def toCamelCase: QueryConstraints = {
         QueryConstraints(
             video_reference_uuids,

@@ -27,15 +27,20 @@ import sttp.tapir.server.ServerEndpoint
 import java.util.UUID
 import org.mbari.annosaurus.domain.ImagedMoment
 import org.mbari.annosaurus.etc.circe.CirceCodecs.{*, given}
+import org.mbari.annosaurus.etc.jwt.JwtService
 
-class IndexEndpoints(controller: IndexController)(implicit val executor: ExecutionContext)
-    extends Endpoints {
+class IndexEndpoints(controller: IndexController, jwtService: JwtService)(implicit
+    val executor: ExecutionContext
+) extends Endpoints {
+
+    given givenJwtService: JwtService = jwtService
 
     val findByVideoReferenceUUID = openEndpoint
         .get
         .in(paging)
-        .in("v1" / "videoreference" / path[UUID]("uuid"))
+        .in("v1" / "index" / "videoreference" / path[UUID]("uuid"))
         .out(jsonBody[List[ImagedMoment]].description("The IndexEntity objects"))
+        .tag("Index")
 
     val findByVideoReferenceUUIDImpl = findByVideoReferenceUUID.serverLogic { (paging, uuid) =>
         val f = controller
@@ -44,22 +49,28 @@ class IndexEndpoints(controller: IndexController)(implicit val executor: Executi
         handleErrors(f)
     }
 
-    val bulkUpdateRecordedTimestamps = openEndpoint
+    val bulkUpdateRecordedTimestamps = secureEndpoint
         .put
-        .in("v1" / "tapetime")
+        .in("v1" / "index" / "tapetime")
         .in(jsonBody[List[ImagedMoment]].description("The IndexEntity objects"))
         .out(jsonBody[List[ImagedMoment]].description("The IndexEntity objects"))
+        .tag("Index")
 
-    // val bulkUpdateRecordedTimestampsImpl = bulkUpdateRecordedTimestamps.serverLogic { indices =>
-    //     val im = indices.map(ImagedMoment.from)
-    //     val f = controller.bulkUpdateRecordedTimestamps(im)
-    //     handleErrors(f)
-    // }
+    val bulkUpdateRecordedTimestampsImpl = bulkUpdateRecordedTimestamps
+        .serverSecurityLogic(jwtOpt => verify(jwtOpt))
+        .serverLogic(_ =>
+            indices =>
+                val im = indices.map(_.toEntity)
+                val f  = controller
+                    .bulkUpdateRecordedTimestamps(im)
+                    .map(xs => xs.map(ImagedMoment.from).toList)
+                handleErrors(f)
+        )
 
-    override def all: List[Endpoint[?, ?, ?, ?, ?]] = ???
-//         List(findByVideoReferenceUUID, bulkUpdateRecordedTimestamps)
+    override def all: List[Endpoint[?, ?, ?, ?, ?]] =
+        List(findByVideoReferenceUUID, bulkUpdateRecordedTimestamps)
 
-    override def allImpl: List[ServerEndpoint[Any, Future]] = ???
-    // List(findByVideoReferenceUUIDImpl, bulkUpdateRecordedTimestampsImpl)
+    override def allImpl: List[ServerEndpoint[Any, Future]] =
+        List(findByVideoReferenceUUIDImpl, bulkUpdateRecordedTimestampsImpl)
 
 }

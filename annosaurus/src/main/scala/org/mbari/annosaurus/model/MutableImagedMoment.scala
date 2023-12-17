@@ -32,6 +32,7 @@ import java.util.UUID
   *   Brian Schlining
   * @since 2016-06-15T16:54:00
   */
+@deprecated("Use org.mbari.annosaurus.repository.jpa.ImagedMomentEntity instead", "2021-11-23T11:00:00")
 trait MutableImagedMoment extends PersistentObject {
 
     var uuid: UUID

@@ -76,7 +76,7 @@ import org.mbari.annosaurus.repository.jpa.{JpaEntity, TransactionLogger}
         )
     )
 )
-class AssociationEntity extends MutableAssociation with JpaEntity {
+class AssociationEntity extends JpaEntity {
 
     @Expose(serialize = true)
     @Column(name = "link_name", length = 128, nullable = false)
@@ -93,7 +93,7 @@ class AssociationEntity extends MutableAssociation with JpaEntity {
         targetEntity = classOf[ObservationEntity]
     )
     @JoinColumn(name = "observation_uuid", nullable = false, columnDefinition = "CHAR(36)")
-    var observation: MutableObservation = _
+    var observation: ObservationEntity = _
 
     @Expose(serialize = true)
     @Column(name = "to_concept", length = 128, nullable = true)
@@ -105,11 +105,19 @@ class AssociationEntity extends MutableAssociation with JpaEntity {
     @Column(name = "mime_type", length = 64, nullable = false)
     var mimeType: String = "text/plain"
 
-    override def toString: String = MutableAssociation.asString(this)
+    override def toString: String = {
+        s"AssociationEntity(linkName=$linkName, toConcept=$toConcept, linkValue=$linkValue)"
+    }
 
 }
 
 object AssociationEntity {
+
+    val LinkValueNil = "nil"
+
+    val ToConceptSelf = "self"
+
+    val Separator = " | "
 
     def apply(linkName: String, toConcept: String, linkValue: String): AssociationEntity = {
         val a = new AssociationEntity

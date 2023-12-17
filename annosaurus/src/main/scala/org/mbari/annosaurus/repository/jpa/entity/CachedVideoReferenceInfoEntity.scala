@@ -92,7 +92,7 @@ import java.util.UUID
         )
     )
 )
-class CachedVideoReferenceInfoEntity extends MutableCachedVideoReferenceInfo with JpaEntity {
+class CachedVideoReferenceInfoEntity extends JpaEntity {
 
     /** typically this will be the chief scientist
       */

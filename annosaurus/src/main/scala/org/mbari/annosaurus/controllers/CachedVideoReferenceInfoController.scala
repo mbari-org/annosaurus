@@ -21,19 +21,21 @@ import org.mbari.annosaurus.repository.CachedVideoReferenceInfoDAO
 import java.util.UUID
 
 import scala.concurrent.{ExecutionContext, Future}
+import org.mbari.annosaurus.repository.jpa.entity.CachedVideoReferenceInfoEntity
+import org.mbari.annosaurus.repository.jpa.JPADAOFactory
 
 /** @author
   *   Brian Schlining
   * @since 2016-09-14T10:50:00
   */
-class CachedVideoReferenceInfoController(val daoFactory: BasicDAOFactory)
+class CachedVideoReferenceInfoController(val daoFactory: JPADAOFactory)
     extends BaseController[MutableCachedVideoReferenceInfo, CachedVideoReferenceInfoDAO[
-        MutableCachedVideoReferenceInfo
+        CachedVideoReferenceInfoEntity
     ]] {
 
-    protected type VRDAO = CachedVideoReferenceInfoDAO[MutableCachedVideoReferenceInfo]
+    protected type VRDAO = CachedVideoReferenceInfoDAO[CachedVideoReferenceInfoEntity]
 
-    override def newDAO(): CachedVideoReferenceInfoDAO[MutableCachedVideoReferenceInfo] =
+    override def newDAO(): CachedVideoReferenceInfoDAO[CachedVideoReferenceInfoEntity] =
         daoFactory.newCachedVideoReferenceInfoDAO()
 
     //  def findAll(limit: Int, offset: Int)(implicit ec: ExecutionContext): Future[Iterable[CachedVideoReferenceInfo]] =
