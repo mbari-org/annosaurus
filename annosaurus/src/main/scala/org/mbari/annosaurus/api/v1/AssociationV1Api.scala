@@ -139,7 +139,8 @@ class AssociationV1Api(controller: AssociationController)(implicit val executor:
             case "application/json" =>
 //                val associations = fromJson(request.body, classOf[Array[MutableAssociation]])
                 decode[List[Association]](request.body) match {
-                    case Left(_) => halt(BadRequest(toJson(ErrorMsg(400, "Unable to parse your request body"))))
+                    case Left(_)   =>
+                        halt(BadRequest(toJson(ErrorMsg(400, "Unable to parse your request body"))))
                     case Right(xs) =>
                         val associations = xs.map(_.toEntity)
                         controller
@@ -147,7 +148,7 @@ class AssociationV1Api(controller: AssociationController)(implicit val executor:
                             .map(ys => toJson(ys.asJava))
                 }
 
-            case _                  =>
+            case _ =>
                 halt(
                     BadRequest(
                         toJson(

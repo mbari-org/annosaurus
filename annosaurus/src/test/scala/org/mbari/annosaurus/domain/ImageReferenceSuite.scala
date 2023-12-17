@@ -16,7 +16,30 @@
 
 package org.mbari.annosaurus.domain
 
-class ImageReferenceSuite {
-  // TODO need to round trip to and from snakecase/camelcase
-    // TODO need to round trip to and from entity
+class ImageReferenceSuite extends munit.FunSuite {
+
+    val cc1 = DomainObjects.imageReference
+
+    test("camelCase/snake_case round trip") {
+        val sc1 = cc1.toSnakeCase
+        val cc2 = sc1.toCamelCase
+        val sc2 = cc2.toSnakeCase
+        assertEquals(cc2, cc1)
+        assertEquals(sc1, sc2)
+    }
+
+    test("camelCase/Entity round trip") {
+        val e1 = cc1.toEntity
+        val cc2 = ImageReference.from(e1).copy(lastUpdated = None)
+        val e2 = cc2.toEntity
+        assertEquals(cc2, cc1)
+        assertEquals(e2.url, cc1.url)
+        assertEquals(e2.format, cc1.format.orNull)
+        assertEquals(e2.width, cc1.widthPixels.orNull)
+        assertEquals(e2.height, cc1.heightPixels.orNull)
+        assertEquals(e2.description, cc1.description.orNull)
+        assertEquals(e2.uuid, cc1.uuid.orNull)
+    }
+
+
 }

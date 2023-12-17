@@ -44,8 +44,8 @@ object AssociationSQL {
     }
 
     def join(
-                annotations: Seq[MutableAnnotationImpl],
-                associations: Seq[MutableAssociationExt]
+        annotations: Seq[MutableAnnotationImpl],
+        associations: Seq[MutableAssociationExt]
     ): Seq[MutableAnnotation] = {
         for {
             a <- associations

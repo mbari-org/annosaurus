@@ -16,52 +16,59 @@
 
 package org.mbari.annosaurus.model.simple
 
-import org.mbari.annosaurus.model.{MutableAssociation, MutableCachedAncillaryDatum, MutableCachedVideoReferenceInfo, MutableImageReference, MutableImagedMoment, MutableObservation}
+import org.mbari.annosaurus.model.{
+    MutableAssociation,
+    MutableCachedAncillaryDatum,
+    MutableCachedVideoReferenceInfo,
+    MutableImageReference,
+    MutableImagedMoment,
+    MutableObservation
+}
 
-/**
-  *
-  *
-  * @author Brian Schlining
+/** @author
+  *   Brian Schlining
   * @since 2016-07-11T14:41:00
   */
 object Implicits {
 
-  implicit def toCaseClass(association: MutableAssociation): SimpleAssociation =
-    SimpleAssociation(association)
+    implicit def toCaseClass(association: MutableAssociation): SimpleAssociation =
+        SimpleAssociation(association)
 
-  implicit def toCaseClass(observation: MutableObservation): SimpleObservation =
-    SimpleObservation(observation)
+    implicit def toCaseClass(observation: MutableObservation): SimpleObservation =
+        SimpleObservation(observation)
 
-  implicit def toCaseClass(imagedMoment: MutableImagedMoment): SimpleImagedMoment =
-    SimpleImagedMoment(imagedMoment)
+    implicit def toCaseClass(imagedMoment: MutableImagedMoment): SimpleImagedMoment =
+        SimpleImagedMoment(imagedMoment)
 
-  implicit def toCaseClass(imageReference: MutableImageReference): SimpleImageReference =
-    SimpleImageReference(imageReference)
+    implicit def toCaseClass(imageReference: MutableImageReference): SimpleImageReference =
+        SimpleImageReference(imageReference)
 
-  implicit def toCaseClass(ancillaryDatum: MutableCachedAncillaryDatum): SimpleAncillaryDatum =
-    SimpleAncillaryDatum(ancillaryDatum)
+    implicit def toCaseClass(ancillaryDatum: MutableCachedAncillaryDatum): SimpleAncillaryDatum =
+        SimpleAncillaryDatum(ancillaryDatum)
 
-  implicit def toCaseClass(videoReferenceInfo: MutableCachedVideoReferenceInfo): SimpleVideoReferenceInfo =
-    SimpleVideoReferenceInfo(videoReferenceInfo)
+    implicit def toCaseClass(
+        videoReferenceInfo: MutableCachedVideoReferenceInfo
+    ): SimpleVideoReferenceInfo =
+        SimpleVideoReferenceInfo(videoReferenceInfo)
 
-  implicit class RichAssociation(association: MutableAssociation) {
-    def asCase: SimpleAssociation = toCaseClass(association)
-  }
+    implicit class RichAssociation(association: MutableAssociation) {
+        def asCase: SimpleAssociation = toCaseClass(association)
+    }
 
-  implicit class RichObservation(observation: MutableObservation) {
-    def asCase: SimpleObservation = toCaseClass(observation)
-  }
+    implicit class RichObservation(observation: MutableObservation) {
+        def asCase: SimpleObservation = toCaseClass(observation)
+    }
 
-  implicit class RichImagedMoment(imagedMoment: MutableImagedMoment) {
-    def asCase: SimpleImagedMoment = toCaseClass(imagedMoment)
-  }
+    implicit class RichImagedMoment(imagedMoment: MutableImagedMoment) {
+        def asCase: SimpleImagedMoment = toCaseClass(imagedMoment)
+    }
 
-  implicit class RichAncillaryDatum(ancillaryDatum: MutableCachedAncillaryDatum) {
-    def asCase: SimpleAncillaryDatum = toCaseClass(ancillaryDatum)
-  }
+    implicit class RichAncillaryDatum(ancillaryDatum: MutableCachedAncillaryDatum) {
+        def asCase: SimpleAncillaryDatum = toCaseClass(ancillaryDatum)
+    }
 
-  implicit class RichVideoReferenceInfo(videoReferenceInfo: MutableCachedVideoReferenceInfo) {
-    def asCase: SimpleVideoReferenceInfo = toCaseClass(videoReferenceInfo)
-  }
+    implicit class RichVideoReferenceInfo(videoReferenceInfo: MutableCachedVideoReferenceInfo) {
+        def asCase: SimpleVideoReferenceInfo = toCaseClass(videoReferenceInfo)
+    }
 
 }

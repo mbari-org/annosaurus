@@ -22,23 +22,23 @@ import scala.jdk.CollectionConverters._
 @deprecated
 class DepthHistogram {
 
-  @Expose(serialize = true)
-  var binsMin: java.util.List[Int] = _
+    @Expose(serialize = true)
+    var binsMin: java.util.List[Int] = _
 
-  @Expose(serialize = true)
-  var binsMax: java.util.List[Int] = _
+    @Expose(serialize = true)
+    var binsMax: java.util.List[Int] = _
 
-  @Expose(serialize = true)
-  var values: java.util.List[Int] = _
+    @Expose(serialize = true)
+    var values: java.util.List[Int] = _
 
 }
 
 object DepthHistogram {
-  def apply(binsMin: Array[Int], binsMax: Array[Int], values: Array[Int]): DepthHistogram = {
-    val obj = new DepthHistogram
-    obj.binsMin = binsMin.toList.asJava
-    obj.binsMax = binsMax.toList.asJava
-    obj.values = values.toList.asJava
-    obj
-  }
+    def apply(binsMin: Array[Int], binsMax: Array[Int], values: Array[Int]): DepthHistogram = {
+        val obj = new DepthHistogram
+        obj.binsMin = binsMin.toList.asJava
+        obj.binsMax = binsMax.toList.asJava
+        obj.values = values.toList.asJava
+        obj
+    }
 }

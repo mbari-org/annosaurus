@@ -19,24 +19,21 @@ package org.mbari.annosaurus.messaging
 import io.reactivex.rxjava3.subjects.{PublishSubject, Subject}
 import org.slf4j.LoggerFactory
 
-/**
-  * This is the shared message bus. All publishers whould listen to this bus and
-  * publish the appropriate events to their subscribers.
+/** This is the shared message bus. All publishers whould listen to this bus and publish the
+  * appropriate events to their subscribers.
   *
-  * MessageBus.RxSubject: Subject[Any]
-  *      ^
-  *      |
-  * AnnotationPublisher.publish(msg)
- **/
+  * MessageBus.RxSubject: Subject[Any] ^
+  * \| AnnotationPublisher.publish(msg)
+  */
 object MessageBus {
 
-  private lazy val log = LoggerFactory.getLogger(getClass)
+    private lazy val log = LoggerFactory.getLogger(getClass)
 
-  val RxSubject: Subject[Any] =
-    PublishSubject.create[Any]().toSerialized
+    val RxSubject: Subject[Any] =
+        PublishSubject.create[Any]().toSerialized
 
-  if (log.isDebugEnabled()) {
-    RxSubject.subscribe(m => log.debug(m.toString))
-  }
+    if (log.isDebugEnabled()) {
+        RxSubject.subscribe(m => log.debug(m.toString))
+    }
 
 }

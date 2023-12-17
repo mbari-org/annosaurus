@@ -32,10 +32,12 @@ import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
 
 // Endpoint[SECURITY_INPUT, INPUT, ERROR_OUTPUT, OUTPUT, -R]
-class AnalysisEndpoint(repository: AnalysisRepository)(implicit val executor: ExecutionContext) extends Endpoints {
+class AnalysisEndpoint(repository: AnalysisRepository)(implicit val executor: ExecutionContext)
+    extends Endpoints {
 
-
-    val depthHistogram: Endpoint[Unit, (Int, QueryConstraints), ErrorMsg, QueryConstraintsResponse[DepthHistogram], Any] = openEndpoint
+    val depthHistogram: Endpoint[Unit, (Int, QueryConstraints), ErrorMsg, QueryConstraintsResponse[
+        DepthHistogram
+    ], Any] = openEndpoint
         .post
         .in("v1" / "histogram" / "depth")
         .in(query[Int]("size").description("Bin size in meters").example(50))
@@ -45,11 +47,15 @@ class AnalysisEndpoint(repository: AnalysisRepository)(implicit val executor: Ex
     val depthHistogramImpl: ServerEndpoint[Any, Future] =
         depthHistogram.serverLogic { case (binSizeMeters, constraints) =>
             val sqlBuilder = constraints.toSqlBuilder
-            val f = Future(repository.depthHistogram(sqlBuilder, binSizeMeters)).map(dh => QueryConstraintsResponse(constraints, dh))
+            val f          = Future(repository.depthHistogram(sqlBuilder, binSizeMeters)).map(dh =>
+                QueryConstraintsResponse(constraints, dh)
+            )
             handleErrors(f)
         }
 
-    val timeHistogram: Endpoint[Unit, (Int, QueryConstraints), ErrorMsg, QueryConstraintsResponse[TimeHistogram], Any] = openEndpoint
+    val timeHistogram: Endpoint[Unit, (Int, QueryConstraints), ErrorMsg, QueryConstraintsResponse[
+        TimeHistogram
+    ], Any] = openEndpoint
         .post
         .in("v1" / "histogram" / "time")
         .in(query[Int]("size").description("Bin size in days").example(50))
@@ -59,7 +65,9 @@ class AnalysisEndpoint(repository: AnalysisRepository)(implicit val executor: Ex
     val timeHistogramImpl: ServerEndpoint[Any, Future] =
         timeHistogram.serverLogic { case (binSizeDays, constraints) =>
             val sqlBuilder = constraints.toSqlBuilder
-            val f = Future(repository.timeHistogram(sqlBuilder, binSizeDays)).map(dh => QueryConstraintsResponse(constraints, dh))
+            val f          = Future(repository.timeHistogram(sqlBuilder, binSizeDays)).map(dh =>
+                QueryConstraintsResponse(constraints, dh)
+            )
             handleErrors(f)
         }
 
@@ -68,6 +76,4 @@ class AnalysisEndpoint(repository: AnalysisRepository)(implicit val executor: Ex
 
     override def allImpl: List[ServerEndpoint[Any, Future]] = List(depthHistogramImpl)
 
-
-  
 }

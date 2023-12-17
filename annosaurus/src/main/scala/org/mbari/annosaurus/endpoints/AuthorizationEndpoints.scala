@@ -44,7 +44,9 @@ class AuthorizationEndpoints(jwtService: JwtService)(using ec: ExecutionContext)
                 oneOf[ErrorMsg](
                     oneOfVariant(statusCode(StatusCode.BadRequest).and(jsonBody[BadRequest])),
                     oneOfVariant(statusCode(StatusCode.NotFound).and(jsonBody[NotFound])),
-                    oneOfVariant(statusCode(StatusCode.InternalServerError).and(jsonBody[ServerError])),
+                    oneOfVariant(
+                        statusCode(StatusCode.InternalServerError).and(jsonBody[ServerError])
+                    ),
                     oneOfVariant(statusCode(StatusCode.Unauthorized).and(jsonBody[Unauthorized]))
                 )
             )

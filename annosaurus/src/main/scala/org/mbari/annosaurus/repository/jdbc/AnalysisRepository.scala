@@ -17,7 +17,7 @@
 package org.mbari.annosaurus.repository.jdbc
 
 import jakarta.persistence.{EntityManager, EntityManagerFactory}
-import org.mbari.annosaurus.model.simple.{QueryConstraints}
+import org.mbari.annosaurus.model.simple.QueryConstraints
 import org.mbari.annosaurus.domain.{DepthHistogram, TimeHistogram}
 import org.slf4j.LoggerFactory
 

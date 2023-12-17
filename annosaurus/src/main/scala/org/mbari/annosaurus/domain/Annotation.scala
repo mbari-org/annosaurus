@@ -18,57 +18,83 @@ package org.mbari.annosaurus.domain
 
 import java.util.UUID
 import org.mbari.annosaurus.repository.jpa.entity.ImagedMomentEntity
+import org.mbari.vcr4j.time.Timecode
+import java.time.Duration
+import java.time.Instant
 
 final case class Annotation(
-    observationUuid: UUID,
-    concept: String,
-    observer: String,
-    observationTimestamp: String,
-    videoReferenceUuid: UUID,
-    imagedMomentUuid: UUID,
-    timecode: String,
-    elapsedTime: String,
-    recordedTimestamp: String,
-    duration: String,
-    group: String,
-    activity: String,
-    associations: Seq[Association],
-    imageReferences: Seq[ImageReference]
-)
+    activity: Option[String] = None,
+    ancillaryData: Option[CachedAncillaryDatum] = None,
+    associations: Seq[Association] = Nil,
+    concept: Option[String] = None,
+    durationMillis: Option[Long] = None,
+    elapsedTimeMillis: Option[Long] = None,
+    group: Option[String] = None,
+    imagedMomentUuid: Option[UUID] = None,
+    imageReferences: Seq[ImageReference] = Nil,
+    observationTimestamp: Option[Instant] = None,
+    observationUuid: Option[UUID] = None,
+    observer: Option[String] = None,
+    recordedTimestamp: Option[Instant] = None,
+    timecode: Option[String] = None,
+    videoReferenceUuid: Option[UUID] = None
+) extends ToSnakeCase[AnnotationSC] {
 
-final case class AnnotationSC(
-    observation_uuid: UUID,
-    concept: String,
-    observer: String,
-    observation_timestamp: String,
-    video_reference_uuid: UUID,
-    imaged_moment_uuid: UUID,
-    timecode: String,
-    elapsed_time: String,
-    recorded_timestamp: String,
-    duration: String,
-    group: String,
-    activity: String,
-    associations: Seq[AssociationSC],
-    image_references: Seq[ImageReferenceSC]
-) {
+    override def toSnakeCase: AnnotationSC =
+        AnnotationSC(
+            activity,
+            ancillaryData.map(_.toSnakeCase),
+            associations.map(_.toSnakeCase),
+            concept,
+            durationMillis,
+            elapsedTimeMillis,
+            group,
+            imagedMomentUuid,
+            imageReferences.map(_.toSnakeCase),
+            observationTimestamp,
+            observationUuid,
+            observer,
+            recordedTimestamp,
+            timecode,
+            videoReferenceUuid
+        )
 
-    def toCamelCase: Annotation = Annotation(
-        observation_uuid,
-        concept,
-        observer,
-        observation_timestamp,
-        video_reference_uuid,
-        imaged_moment_uuid,
-        timecode,
-        elapsed_time,
-        recorded_timestamp,
-        duration,
-        group,
-        activity,
-        associations.map(_.toCamelCase),
-        image_references.map(_.toCamelCase)
-    )
 }
 
+final case class AnnotationSC(
+    activity: Option[String] = None,
+    ancillary_data: Option[CachedAncillaryDatumSC] = None,
+    associations: Seq[AssociationSC] = Nil,
+    concept: Option[String] = None,
+    duration_millis: Option[Long] = None,
+    elapsed_time_millis: Option[Long] = None,
+    group: Option[String] = None,
+    imaged_moment_uuid: Option[UUID] = None,
+    image_references: Seq[ImageReferenceSC] = Nil,
+    observation_timestamp: Option[Instant] = None,
+    observation_uuid: Option[UUID] = None,
+    observer: Option[String] = None,
+    recorded_timestamp: Option[Instant] = None,
+    timecode: Option[String] = None,
+    video_reference_uuid: Option[UUID] = None
+) extends ToCamelCase[Annotation] {
 
+    override def toCamelCase: Annotation =
+        Annotation(
+            activity,
+            ancillary_data.map(_.toCamelCase),
+            associations.map(_.toCamelCase),
+            concept,
+            duration_millis,
+            elapsed_time_millis,
+            group,
+            imaged_moment_uuid,
+            image_references.map(_.toCamelCase),
+            observation_timestamp,
+            observation_uuid,
+            observer,
+            recorded_timestamp,
+            timecode,
+            video_reference_uuid
+        )
+}

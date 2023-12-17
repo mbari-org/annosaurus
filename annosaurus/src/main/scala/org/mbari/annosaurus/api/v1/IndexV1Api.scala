@@ -26,44 +26,46 @@ import org.scalatra.BadRequest
 import scala.jdk.CollectionConverters._
 import scala.concurrent.ExecutionContext
 
-/**
-  * @author Brian Schlining
+/** @author
+  *   Brian Schlining
   * @since 2019-02-08T11:00:00
   */
 class IndexV1Api(controller: IndexController)(implicit val executor: ExecutionContext)
     extends V1APIStack {
 
-  before() {
-    contentType = "application/json"
-  }
-
-  get("/videoreference/:uuid") {
-    val uuid = params
-      .getAs[UUID]("uuid")
-      .getOrElse(halt(BadRequest(toJson(ErrorMsg(400, "Please provide a Video Reference UUID")))))
-    val limit  = params.getAs[Int]("limit")
-    val offset = params.getAs[Int]("offset")
-    controller
-      .findByVideoReferenceUUID(uuid, limit, offset)
-      .map(_.asJava)
-      .map(toJson)
-  }
-
-  put("/tapetime") {
-    validateRequest()
-    request.getHeader("Content-Type") match {
-      case "application/json" =>
-        val indices = fromJson(request.body, classOf[Array[IndexEntity]])
-        controller
-          .bulkUpdateRecordedTimestamps(indices)
-          .map(_.asJava)
-          .map(toJson)
-      case _ =>
-        val m = Map(
-          "error" -> "Puts to tapetime only accept JSON body (i.e. Content-Type: application/json)"
-        ).asJava
-        halt(BadRequest(toJson(m)))
+    before() {
+        contentType = "application/json"
     }
-  }
+
+    get("/videoreference/:uuid") {
+        val uuid   = params
+            .getAs[UUID]("uuid")
+            .getOrElse(
+                halt(BadRequest(toJson(ErrorMsg(400, "Please provide a Video Reference UUID"))))
+            )
+        val limit  = params.getAs[Int]("limit")
+        val offset = params.getAs[Int]("offset")
+        controller
+            .findByVideoReferenceUUID(uuid, limit, offset)
+            .map(_.asJava)
+            .map(toJson)
+    }
+
+    put("/tapetime") {
+        validateRequest()
+        request.getHeader("Content-Type") match {
+            case "application/json" =>
+                val indices = fromJson(request.body, classOf[Array[IndexEntity]])
+                controller
+                    .bulkUpdateRecordedTimestamps(indices)
+                    .map(_.asJava)
+                    .map(toJson)
+            case _                  =>
+                val m = Map(
+                    "error" -> "Puts to tapetime only accept JSON body (i.e. Content-Type: application/json)"
+                ).asJava
+                halt(BadRequest(toJson(m)))
+        }
+    }
 
 }

@@ -23,58 +23,64 @@ import org.mbari.annosaurus.repository.jpa.entity.CachedVideoReferenceInfoEntity
 
 import scala.jdk.CollectionConverters._
 
-/**
-  *
-  *
-  * @author Brian Schlining
+/** @author
+  *   Brian Schlining
   * @since 2016-06-17T17:15:00
   */
 class CachedVideoReferenceInfoDAOImpl(entityManager: EntityManager)
     extends BaseDAO[CachedVideoReferenceInfoEntity](entityManager)
     with CachedVideoReferenceInfoDAO[CachedVideoReferenceInfoEntity] {
 
-  override def newPersistentObject(): CachedVideoReferenceInfoEntity =
-    new CachedVideoReferenceInfoEntity
+    override def newPersistentObject(): CachedVideoReferenceInfoEntity =
+        new CachedVideoReferenceInfoEntity
 
-  override def findByMissionContact(
-      missionContact: String
-  ): Iterable[CachedVideoReferenceInfoEntity] =
-    findByNamedQuery("VideoReferenceInfo.findByMissionContact", Map("contact" -> missionContact))
+    override def findByMissionContact(
+        missionContact: String
+    ): Iterable[CachedVideoReferenceInfoEntity] =
+        findByNamedQuery(
+            "VideoReferenceInfo.findByMissionContact",
+            Map("contact" -> missionContact)
+        )
 
-  override def findByPlatformName(platformName: String): Iterable[CachedVideoReferenceInfoEntity] =
-    findByNamedQuery("VideoReferenceInfo.findByPlatformName", Map("name" -> platformName))
+    override def findByPlatformName(
+        platformName: String
+    ): Iterable[CachedVideoReferenceInfoEntity] =
+        findByNamedQuery("VideoReferenceInfo.findByPlatformName", Map("name" -> platformName))
 
-  override def findByMissionID(missionID: String): Iterable[CachedVideoReferenceInfoEntity] =
-    findByNamedQuery("VideoReferenceInfo.findByMissionID", Map("id" -> missionID))
+    override def findByMissionID(missionID: String): Iterable[CachedVideoReferenceInfoEntity] =
+        findByNamedQuery("VideoReferenceInfo.findByMissionID", Map("id" -> missionID))
 
-  override def findByVideoReferenceUUID(uuid: UUID): Option[CachedVideoReferenceInfoEntity] =
-    findByNamedQuery("VideoReferenceInfo.findByVideoReferenceUUID", Map("uuid" -> uuid)).headOption
+    override def findByVideoReferenceUUID(uuid: UUID): Option[CachedVideoReferenceInfoEntity] =
+        findByNamedQuery(
+            "VideoReferenceInfo.findByVideoReferenceUUID",
+            Map("uuid" -> uuid)
+        ).headOption
 
-  override def findAll(
-      limit: Option[Int] = None,
-      offset: Option[Int] = None
-  ): Iterable[CachedVideoReferenceInfoEntity] =
-    findByNamedQuery("VideoReferenceInfo.findAll", limit = limit, offset = offset)
+    override def findAll(
+        limit: Option[Int] = None,
+        offset: Option[Int] = None
+    ): Iterable[CachedVideoReferenceInfoEntity] =
+        findByNamedQuery("VideoReferenceInfo.findAll", limit = limit, offset = offset)
 
-  override def findAllVideoReferenceUUIDs(): Iterable[UUID] =
-    fetchUsing("VideoReferenceInfo.findAllVideoReferenceUUIDs")
-      .map(s => UUID.fromString(s))
+    override def findAllVideoReferenceUUIDs(): Iterable[UUID] =
+        fetchUsing("VideoReferenceInfo.findAllVideoReferenceUUIDs")
+            .map(s => UUID.fromString(s))
 
-  override def findAllMissionContacts(): Iterable[String] =
-    fetchUsing("VideoReferenceInfo.findAllMissionContacts")
+    override def findAllMissionContacts(): Iterable[String] =
+        fetchUsing("VideoReferenceInfo.findAllMissionContacts")
 
-  override def findAllPlatformNames(): Iterable[String] =
-    fetchUsing("VideoReferenceInfo.findAllVideoReferenceUUIDs")
+    override def findAllPlatformNames(): Iterable[String] =
+        fetchUsing("VideoReferenceInfo.findAllVideoReferenceUUIDs")
 
-  override def findAllMissionIDs(): Iterable[String] =
-    fetchUsing("VideoReferenceInfo.findAllMissionIDs")
+    override def findAllMissionIDs(): Iterable[String] =
+        fetchUsing("VideoReferenceInfo.findAllMissionIDs")
 
-  private def fetchUsing(namedQuery: String): Iterable[String] =
-    entityManager
-      .createNamedQuery(namedQuery)
-      .getResultList
-      .asScala
-      .filter(_ != null)
-      .map(_.toString)
+    private def fetchUsing(namedQuery: String): Iterable[String] =
+        entityManager
+            .createNamedQuery(namedQuery)
+            .getResultList
+            .asScala
+            .filter(_ != null)
+            .map(_.toString)
 
 }

@@ -25,64 +25,74 @@ import org.scalatra.{BadRequest, NoContent, NotFound}
 
 import scala.concurrent.ExecutionContext
 
-/**
-  * Created by brian on 7/14/16.
+/** Created by brian on 7/14/16.
   */
-class ImageReferenceV1Api(controller: ImageReferenceController)(
-    implicit val executor: ExecutionContext
+class ImageReferenceV1Api(controller: ImageReferenceController)(implicit
+    val executor: ExecutionContext
 ) extends V1APIStack {
 
-  before() {
-    contentType = "application/json"
-  }
+    before() {
+        contentType = "application/json"
+    }
 
-  get("/:uuid") {
-    val uuid = params
-      .getAs[UUID]("uuid")
-      .getOrElse(halt(BadRequest(toJson(ErrorMsg(400, "Please provide a UUID")))))
-    controller
-      .findByUUID(uuid)
-      .map({
-        case None =>
-          halt(
-            NotFound(toJson(ErrorMsg(404, s"An ImagedMoment with a UUID of $uuid was not found")))
-          )
-        case Some(v) => toJson(v)
-      })
-  }
+    get("/:uuid") {
+        val uuid = params
+            .getAs[UUID]("uuid")
+            .getOrElse(halt(BadRequest(toJson(ErrorMsg(400, "Please provide a UUID")))))
+        controller
+            .findByUUID(uuid)
+            .map {
+                case None    =>
+                    halt(
+                        NotFound(
+                            toJson(
+                                ErrorMsg(404, s"An ImagedMoment with a UUID of $uuid was not found")
+                            )
+                        )
+                    )
+                case Some(v) => toJson(v)
+            }
+    }
 
-  put("/:uuid") {
-    validateRequest() // Apply API security
-    val uuid = params
-      .getAs[UUID]("uuid")
-      .getOrElse(halt(BadRequest(toJson(ErrorMsg(400, "A 'uuid' parameter is required")))))
-    val url              = params.getAs[URL]("url")
-    val format           = params.get("format")
-    val width            = params.getAs[Int]("width_pixels")
-    val height           = params.getAs[Int]("height_pixels")
-    val description      = params.get("description")
-    val imagedMomentUUID = params.getAs[UUID]("imaged_moment_uuid")
-    controller
-      .update(uuid, url, description, height, width, format, imagedMomentUUID)
-      .map({
-        case None     => halt(NotFound(s"An ImageReference with uuid of $uuid was not found"))
-        case Some(ir) => toJson(ir)
-      })
-  }
+    put("/:uuid") {
+        validateRequest() // Apply API security
+        val uuid             = params
+            .getAs[UUID]("uuid")
+            .getOrElse(halt(BadRequest(toJson(ErrorMsg(400, "A 'uuid' parameter is required")))))
+        val url              = params.getAs[URL]("url")
+        val format           = params.get("format")
+        val width            = params.getAs[Int]("width_pixels")
+        val height           = params.getAs[Int]("height_pixels")
+        val description      = params.get("description")
+        val imagedMomentUUID = params.getAs[UUID]("imaged_moment_uuid")
+        controller
+            .update(uuid, url, description, height, width, format, imagedMomentUUID)
+            .map {
+                case None     => halt(NotFound(s"An ImageReference with uuid of $uuid was not found"))
+                case Some(ir) => toJson(ir)
+            }
+    }
 
-  delete("/:uuid") {
-    validateRequest() // Apply API security
-    val uuid = params
-      .getAs[UUID]("uuid")
-      .getOrElse(halt(BadRequest(toJson(ErrorMsg(400, "A 'uuid' parameter is required")))))
-    controller
-      .delete(uuid)
-      .map({
-        case true => halt(NoContent()) // Success
-        case false =>
-          halt(
-            NotFound(toJson(ErrorMsg(404, s"Failed. No observation with UUID of $uuid was found.")))
-          )
-      })
-  }
+    delete("/:uuid") {
+        validateRequest() // Apply API security
+        val uuid = params
+            .getAs[UUID]("uuid")
+            .getOrElse(halt(BadRequest(toJson(ErrorMsg(400, "A 'uuid' parameter is required")))))
+        controller
+            .delete(uuid)
+            .map {
+                case true  => halt(NoContent()) // Success
+                case false =>
+                    halt(
+                        NotFound(
+                            toJson(
+                                ErrorMsg(
+                                    404,
+                                    s"Failed. No observation with UUID of $uuid was found."
+                                )
+                            )
+                        )
+                    )
+            }
+    }
 }

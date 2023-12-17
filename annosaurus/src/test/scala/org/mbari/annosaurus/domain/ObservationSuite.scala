@@ -16,6 +16,43 @@
 
 package org.mbari.annosaurus.domain
 
-class ObservationSuite {
-  
+import java.time.Instant
+import java.util.UUID
+
+class ObservationSuite extends munit.FunSuite {
+
+    val cc1   = DomainObjects.observation
+
+    test("camelCase/snake_case round trip") {
+
+        val sc1 = cc1.toSnakeCase
+        val cc2 = sc1.toCamelCase
+        val sc2 = cc2.toSnakeCase
+        assertEquals(cc2, cc1)
+        assertEquals(sc1, sc2)
+        assertEquals(sc2.concept, cc1.concept)
+        assertEquals(sc2.duration_millis, cc1.durationMillis)
+        assertEquals(sc2.group, cc1.group)
+        assertEquals(sc2.activity, cc1.activity)
+        assertEquals(sc2.observer, cc1.observer)
+        assertEquals(sc2.uuid, cc1.uuid)
+        assertEquals(sc1.associations.size, 1)
+        assertEquals(cc2.associations.size, 1)
+    }
+
+    test("camelCase/Entity round trip") {
+        val e1 = cc1.toEntity
+        val cc2 = Observation.from(e1)
+        val e2 = cc2.toEntity
+        assertEquals(cc2, cc1)
+        assertEquals(e2.concept, cc1.concept)
+        assertEquals(e2.duration.toMillis, cc1.durationMillis.get)
+        assertEquals(e2.group, cc1.group.get)
+        assertEquals(e2.activity, cc1.activity.get)
+        assertEquals(e2.observer, cc1.observer.get)
+        assertEquals(e2.uuid, cc1.uuid.get)
+        assertEquals(e2.associations.size, 1)
+        assertEquals(cc2.associations.size, 1)
+    }
+
 }

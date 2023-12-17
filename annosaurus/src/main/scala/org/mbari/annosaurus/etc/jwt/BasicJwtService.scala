@@ -26,26 +26,25 @@ import scala.util.control.NonFatal
 import org.mbari.annosaurus.JwtParams
 import org.mbari.annosaurus.domain.Authorization
 
-/**
- * To use this authentication. The client and server should both have a shared secret (aka client secret). The client
- * sends this to the server in a authorization header. If the secret is correct, the server will send back a JWT token
- * that can be used to validate subsequent requests.
- *
- * {{{
- *   Client                                                                Server
- *     |-------> POST /auth: Authorization: APIKEY <client_secret>      ----->|
- *     |                                                                      |
- *     |<------- {'access_token': <token>, 'token_type': 'Bearer'}     <------|
- *     |                                                                      |
- *     |                                                                      |
- *     |-------> POST /somemethod: Authorization: Bearer <token>       ------>|
- *     |                                                                      |
- *     |<------- 200                                                   <------|
- * }}}
- * @author
- *   Brian Schlining
- * @since 2017-01-18T16:42:00
- */
+/** To use this authentication. The client and server should both have a shared secret (aka client
+  * secret). The client sends this to the server in a authorization header. If the secret is
+  * correct, the server will send back a JWT token that can be used to validate subsequent requests.
+  *
+  * {{{
+  *   Client                                                                Server
+  *     |-------> POST /auth: Authorization: APIKEY <client_secret>      ----->|
+  *     |                                                                      |
+  *     |<------- {'access_token': <token>, 'token_type': 'Bearer'}     <------|
+  *     |                                                                      |
+  *     |                                                                      |
+  *     |-------> POST /somemethod: Authorization: Bearer <token>       ------>|
+  *     |                                                                      |
+  *     |<------- 200                                                   <------|
+  * }}}
+  * @author
+  *   Brian Schlining
+  * @since 2017-01-18T16:42:00
+  */
 class BasicJwtService(apiKey: String, issuer: String, signingSecret: String) {
 
     def this(params: JwtParams) = this(params.clientSecret, params.issuer, params.signingSecret)
@@ -74,7 +73,7 @@ class BasicJwtService(apiKey: String, issuer: String, signingSecret: String) {
 
     private def parseAuthHeader(header: String): Authorization = {
         val parts       = header.split("\\s")
-        val tokenType   = if (parts.length == 1)  "undefined" else parts(0)
+        val tokenType   = if (parts.length == 1) "undefined" else parts(0)
         val accessToken = if (parts.length == 1) parts(0) else parts(1)
         Authorization(tokenType, accessToken)
     }
@@ -84,7 +83,7 @@ class BasicJwtService(apiKey: String, issuer: String, signingSecret: String) {
     def requestAuthorization(providedApiKey: String): Option[Authorization] =
         authorize(providedApiKey).map(jwt => Authorization("Bearer", jwt))
 
-    def authorize(providedApiKey: String): Option[String] = 
+    def authorize(providedApiKey: String): Option[String] =
         if (apiKey == providedApiKey) {
             val now      = Instant.now()
             val tomorrow = now.plus(1, ChronoUnit.DAYS)
@@ -102,5 +101,4 @@ class BasicJwtService(apiKey: String, issuer: String, signingSecret: String) {
         }
         else None
 
-    }
-
+}

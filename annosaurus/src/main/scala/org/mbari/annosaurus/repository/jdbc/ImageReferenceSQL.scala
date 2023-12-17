@@ -93,7 +93,10 @@ object ImageReferenceSQL {
         }
     }
 
-    def join(annotations: Seq[MutableAnnotationImpl], images: Seq[MutableImageReferenceExt]): Seq[MutableAnnotation] = {
+    def join(
+        annotations: Seq[MutableAnnotationImpl],
+        images: Seq[MutableImageReferenceExt]
+    ): Seq[MutableAnnotation] = {
         for {
             i <- images
         } {

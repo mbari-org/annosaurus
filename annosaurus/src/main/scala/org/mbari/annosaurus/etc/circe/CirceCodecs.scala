@@ -28,7 +28,6 @@ import scala.util.Try
 
 import org.mbari.annosaurus.model.simple.{HealthStatus => OldHealthStatus}
 
-
 object CirceCodecs {
     implicit val byteArrayEncoder: Encoder[Array[Byte]] = new Encoder[Array[Byte]] {
         final def apply(xs: Array[Byte]): Json =
@@ -79,99 +78,124 @@ object CirceCodecs {
     given Decoder[Unauthorized] = deriveDecoder
     given Encoder[Unauthorized] = deriveEncoder
 
-    given queryConstraintsScDecoder: Decoder[QueryConstraintsSC] = deriveDecoder
-    given queryConstraintsScEncoder: Encoder[QueryConstraintsSC] = deriveEncoder
-    private val queryConstraintsCcDecoder: Decoder[QueryConstraints] = deriveDecoder // or queryConstraintsScDecoder.map(_.toCamelCase)
+    given queryConstraintsScDecoder: Decoder[QueryConstraintsSC]     = deriveDecoder
+    given queryConstraintsScEncoder: Encoder[QueryConstraintsSC]     = deriveEncoder
+    private val queryConstraintsCcDecoder: Decoder[QueryConstraints] =
+        deriveDecoder // or queryConstraintsScDecoder.map(_.toCamelCase)
     given queryConstraintsEncoder: Encoder[QueryConstraints] = deriveEncoder
-    given queryConstraintsDecoder: Decoder[QueryConstraints] = queryConstraintsCcDecoder or queryConstraintsScDecoder.map(_.toCamelCase)
+    given queryConstraintsDecoder: Decoder[QueryConstraints] =
+        queryConstraintsCcDecoder or queryConstraintsScDecoder.map(_.toCamelCase)
 
-    given depthHistogramScDecoder: Decoder[DepthHistogramSC] = deriveDecoder
-    given depthHistogramScEncoder: Encoder[DepthHistogramSC] = deriveEncoder
-    private val depthHistogramCcDecoder: Decoder[DepthHistogram] = deriveDecoder // or depthHistogramScDecoder.map(_.toCamelCase)
+    given depthHistogramScDecoder: Decoder[DepthHistogramSC]     = deriveDecoder
+    given depthHistogramScEncoder: Encoder[DepthHistogramSC]     = deriveEncoder
+    private val depthHistogramCcDecoder: Decoder[DepthHistogram] =
+        deriveDecoder // or depthHistogramScDecoder.map(_.toCamelCase)
     given depthHistogramEncoder: Encoder[DepthHistogram] = deriveEncoder
-    given depthHistogramDecoder: Decoder[DepthHistogram] = depthHistogramCcDecoder or depthHistogramScDecoder.map(_.toCamelCase)
+    given depthHistogramDecoder: Decoder[DepthHistogram] =
+        depthHistogramCcDecoder or depthHistogramScDecoder.map(_.toCamelCase)
 
-    given timeHistogramScDecoder: Decoder[TimeHistogramSC] = deriveDecoder
-    given timeHistogramScEncoder: Encoder[TimeHistogramSC] = deriveEncoder
-    private val timeHistogramCcDecoder: Decoder[TimeHistogram] = deriveDecoder // or timeHistogramScDecoder.map(_.toCamelCase)
+    given timeHistogramScDecoder: Decoder[TimeHistogramSC]     = deriveDecoder
+    given timeHistogramScEncoder: Encoder[TimeHistogramSC]     = deriveEncoder
+    private val timeHistogramCcDecoder: Decoder[TimeHistogram] =
+        deriveDecoder // or timeHistogramScDecoder.map(_.toCamelCase)
     given timeHistogramEncoder: Encoder[TimeHistogram] = deriveEncoder
-    given timeHistogramDecoder: Decoder[TimeHistogram] = timeHistogramCcDecoder or timeHistogramScDecoder.map(_.toCamelCase)
+    given timeHistogramDecoder: Decoder[TimeHistogram] =
+        timeHistogramCcDecoder or timeHistogramScDecoder.map(_.toCamelCase)
 
-    given qcrDepthHistogramScDecoder: Decoder[QueryConstraintsResponseSC[DepthHistogramSC]] = deriveDecoder
-    given qcrDepthHistogramScEncoder: Encoder[QueryConstraintsResponseSC[DepthHistogramSC]] = deriveEncoder
-    given qcrDepthHistogramDecoder: Decoder[QueryConstraintsResponse[DepthHistogram]] = deriveDecoder
-    given qcrDepthHistogramEncoder: Encoder[QueryConstraintsResponse[DepthHistogram]] = deriveEncoder
+    given qcrDepthHistogramScDecoder: Decoder[QueryConstraintsResponseSC[DepthHistogramSC]] =
+        deriveDecoder
+    given qcrDepthHistogramScEncoder: Encoder[QueryConstraintsResponseSC[DepthHistogramSC]] =
+        deriveEncoder
+    given qcrDepthHistogramDecoder: Decoder[QueryConstraintsResponse[DepthHistogram]]       =
+        deriveDecoder
+    given qcrDepthHistogramEncoder: Encoder[QueryConstraintsResponse[DepthHistogram]]       =
+        deriveEncoder
 
-    given qcrTimeHistogramScDecoder: Decoder[QueryConstraintsResponseSC[TimeHistogramSC]] = deriveDecoder
-    given qcrTimeHistogramScEncoder: Encoder[QueryConstraintsResponseSC[TimeHistogramSC]] = deriveEncoder
-    given qcrTimeHistogramDecoder: Decoder[QueryConstraintsResponse[TimeHistogram]] = deriveDecoder
-    given qcrTimeHistogramEncoder: Encoder[QueryConstraintsResponse[TimeHistogram]] = deriveEncoder
+    given qcrTimeHistogramScDecoder: Decoder[QueryConstraintsResponseSC[TimeHistogramSC]] =
+        deriveDecoder
+    given qcrTimeHistogramScEncoder: Encoder[QueryConstraintsResponseSC[TimeHistogramSC]] =
+        deriveEncoder
+    given qcrTimeHistogramDecoder: Decoder[QueryConstraintsResponse[TimeHistogram]]       = deriveDecoder
+    given qcrTimeHistogramEncoder: Encoder[QueryConstraintsResponse[TimeHistogram]]       = deriveEncoder
 
-    given associationScDecoder: Decoder[AssociationSC] = deriveDecoder
-    given associationScEncoder: Encoder[AssociationSC] = deriveEncoder
-    private val associationCcDecoder: Decoder[Association] = deriveDecoder // or associationScDecoder.map(_.toCamelCase)
+    given associationScDecoder: Decoder[AssociationSC]     = deriveDecoder
+    given associationScEncoder: Encoder[AssociationSC]     = deriveEncoder
+    private val associationCcDecoder: Decoder[Association] =
+        deriveDecoder // or associationScDecoder.map(_.toCamelCase)
     given associationEncoder: Encoder[Association] = deriveEncoder
-    given associationDecoder: Decoder[Association] = associationCcDecoder or associationScDecoder.map(_.toCamelCase)
+    given associationDecoder: Decoder[Association] =
+        associationCcDecoder or associationScDecoder.map(_.toCamelCase)
     // given alDecoder: Decoder[List[Association]] = deriveDecoder
 
-    given imageReferenceScDecoder: Decoder[ImageReferenceSC] = deriveDecoder
-    given imageReferenceScEncoder: Encoder[ImageReferenceSC] = deriveEncoder
-    private val imageReferenceCcDecoder: Decoder[ImageReference] = deriveDecoder // or imageReferenceScDecoder.map(_.toCamelCase)
+    given imageReferenceScDecoder: Decoder[ImageReferenceSC]     = deriveDecoder
+    given imageReferenceScEncoder: Encoder[ImageReferenceSC]     = deriveEncoder
+    private val imageReferenceCcDecoder: Decoder[ImageReference] =
+        deriveDecoder // or imageReferenceScDecoder.map(_.toCamelCase)
     given imageReferenceEncoder: Encoder[ImageReference] = deriveEncoder
-    given imageReferenceDecoder: Decoder[ImageReference] = imageReferenceCcDecoder or imageReferenceScDecoder.map(_.toCamelCase)
+    given imageReferenceDecoder: Decoder[ImageReference] =
+        imageReferenceCcDecoder or imageReferenceScDecoder.map(_.toCamelCase)
 
-    given observationScDecoder: Decoder[ObservationSC] = deriveDecoder
-    given observationScEncoder: Encoder[ObservationSC] = deriveEncoder
-    private val observationCcDecoder: Decoder[Observation] = deriveDecoder // or observationScDecoder.map(_.toCamelCase)
+    given observationScDecoder: Decoder[ObservationSC]     = deriveDecoder
+    given observationScEncoder: Encoder[ObservationSC]     = deriveEncoder
+    private val observationCcDecoder: Decoder[Observation] =
+        deriveDecoder // or observationScDecoder.map(_.toCamelCase)
     given observationEncoder: Encoder[Observation] = deriveEncoder
-    given observationDecoder: Decoder[Observation] = observationCcDecoder or observationScDecoder.map(_.toCamelCase)
+    given observationDecoder: Decoder[Observation] =
+        observationCcDecoder or observationScDecoder.map(_.toCamelCase)
 
-    given ancillaryDatumScDecoder: Decoder[CachedAncillaryDatumSC] = deriveDecoder
-    given ancillaryDatumScEncoder: Encoder[CachedAncillaryDatumSC] = deriveEncoder
-    private val ancillaryDatumCcDecoder: Decoder[CachedAncillaryDatum] = deriveDecoder // or ancillaryDatumScDecoder.map(_.toCamelCase)
+    given ancillaryDatumScDecoder: Decoder[CachedAncillaryDatumSC]     = deriveDecoder
+    given ancillaryDatumScEncoder: Encoder[CachedAncillaryDatumSC]     = deriveEncoder
+    private val ancillaryDatumCcDecoder: Decoder[CachedAncillaryDatum] =
+        deriveDecoder // or ancillaryDatumScDecoder.map(_.toCamelCase)
     given ancillaryDatumEncoder: Encoder[CachedAncillaryDatum] = deriveEncoder
-    given ancillaryDatumDecoder: Decoder[CachedAncillaryDatum] = ancillaryDatumCcDecoder or ancillaryDatumScDecoder.map(_.toCamelCase)
+    given ancillaryDatumDecoder: Decoder[CachedAncillaryDatum] =
+        ancillaryDatumCcDecoder or ancillaryDatumScDecoder.map(_.toCamelCase)
 
-    given imagedMomentScDecoder: Decoder[ImagedMomentSC] = deriveDecoder
-    given imagedMomentScEncoder: Encoder[ImagedMomentSC] = deriveEncoder
-    private val imagedMomentCcDecoder: Decoder[ImagedMoment] = deriveDecoder // or imagedMomentScDecoder.map(_.toCamelCase)
+    given imagedMomentScDecoder: Decoder[ImagedMomentSC]     = deriveDecoder
+    given imagedMomentScEncoder: Encoder[ImagedMomentSC]     = deriveEncoder
+    private val imagedMomentCcDecoder: Decoder[ImagedMoment] =
+        deriveDecoder // or imagedMomentScDecoder.map(_.toCamelCase)
     given imagedMomentEncoder: Encoder[ImagedMoment] = deriveEncoder
-    given imagedMomentDecoder: Decoder[ImagedMoment] = imagedMomentCcDecoder or imagedMomentScDecoder.map(_.toCamelCase)
+    given imagedMomentDecoder: Decoder[ImagedMoment] =
+        imagedMomentCcDecoder or imagedMomentScDecoder.map(_.toCamelCase)
 
-    given annotationScDecoder: Decoder[AnnotationSC] = deriveDecoder
-    given annotationScEncoder: Encoder[AnnotationSC] = deriveEncoder
-    private val annotationCcDecoder: Decoder[Annotation] = deriveDecoder // or annotationScDecoder.map(_.toCamelCase)
+    given annotationScDecoder: Decoder[AnnotationSC]     = deriveDecoder
+    given annotationScEncoder: Encoder[AnnotationSC]     = deriveEncoder
+    private val annotationCcDecoder: Decoder[Annotation] =
+        deriveDecoder // or annotationScDecoder.map(_.toCamelCase)
     given annotationEncoder: Encoder[Annotation] = deriveEncoder
-    given annotationDecoder: Decoder[Annotation] = annotationCcDecoder or annotationScDecoder.map(_.toCamelCase)
+    given annotationDecoder: Decoder[Annotation] =
+        annotationCcDecoder or annotationScDecoder.map(_.toCamelCase)
 
-    given authorizationScDecoder: Decoder[AuthorizationSC] = deriveDecoder
-    given authorizationScEncoder: Encoder[AuthorizationSC] = deriveEncoder
-    private val authorizationCcDecoder: Decoder[Authorization] = deriveDecoder // or authorizationScDecoder.map(_.toCamelCase)
+    given authorizationScDecoder: Decoder[AuthorizationSC]     = deriveDecoder
+    given authorizationScEncoder: Encoder[AuthorizationSC]     = deriveEncoder
+    private val authorizationCcDecoder: Decoder[Authorization] =
+        deriveDecoder // or authorizationScDecoder.map(_.toCamelCase)
     given authorizationEncoder: Encoder[Authorization] = deriveEncoder
-    given authorizationDecoder: Decoder[Authorization] = authorizationCcDecoder or authorizationScDecoder.map(_.toCamelCase)
+    given authorizationDecoder: Decoder[Authorization] =
+        authorizationCcDecoder or authorizationScDecoder.map(_.toCamelCase)
 
     private val printer = Printer.noSpaces.copy(dropNullValues = true)
 
     @deprecated("Use stringify[T: Encoder] instead", "2021-11-23T11:00:00")
     def print[T: Encoder](t: T): String = printer.print(t.asJson)
 
-    /**
-     * Convert a circe Json object to a JSON string
-     *
-     * @param value
-     *   Any value with an implicit circe coder in scope
-     */
+    /** Convert a circe Json object to a JSON string
+      *
+      * @param value
+      *   Any value with an implicit circe coder in scope
+      */
     extension (json: Json) def stringify: String = printer.print(json)
 
-    /**
-     * Convert an object to a JSON string
-     *
-     * @param value
-     *   Any value with an implicit circe coder in scope
-     */
+    /** Convert an object to a JSON string
+      *
+      * @param value
+      *   Any value with an implicit circe coder in scope
+      */
     extension [T: Encoder](value: T) def stringify: String = Encoder[T].apply(value).stringify
 
-    extension [T: Decoder](jsonString: String) def toJson: Either[ParsingFailure, Json] = parser.parse(jsonString);
+    extension [T: Decoder](jsonString: String)
+        def toJson: Either[ParsingFailure, Json] = parser.parse(jsonString);
 
     extension (jsonString: String)
         def reify[T: Decoder]: Either[Error, T] =

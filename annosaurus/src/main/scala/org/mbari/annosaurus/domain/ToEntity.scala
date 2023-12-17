@@ -19,5 +19,5 @@ package org.mbari.annosaurus.domain
 import org.mbari.annosaurus.repository.jpa.JpaEntity
 
 trait ToEntity[A <: JpaEntity] {
-  def toEntity: A
+    def toEntity: A
 }

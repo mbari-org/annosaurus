@@ -23,32 +23,34 @@ import org.mbari.annosaurus.repository.jpa.MutableAnnotationImpl
 
 import scala.util.Try
 
-/**
-  * @author Brian Schlining
+/** @author
+  *   Brian Schlining
   * @since 2020-03-04T13:32:00
   */
 trait GenericPublisher[A] {
-  def publish(x: A): Unit
-  def publish(xs: Iterable[A]): Unit =
-    for {
-      x <- xs
-    } publish(x)
-  def publish(opt: Option[A]): Unit = opt match {
-    case None    => // do nothing
-    case Some(a) => Try(publish(a))
-  }
+    def publish(x: A): Unit
+    def publish(xs: Iterable[A]): Unit =
+        for {
+            x <- xs
+        } publish(x)
+    def publish(opt: Option[A]): Unit  = opt match {
+        case None    => // do nothing
+        case Some(a) => Try(publish(a))
+    }
 }
 
-/**
-  * Decorator for an reactive Subject that publishes AnnotationMessages for
-  * common use cases.
+/** Decorator for an reactive Subject that publishes AnnotationMessages for common use cases.
   * @param subject
   */
 class AnnotationPublisher(subject: Subject[Any]) extends GenericPublisher[MutableAnnotation] {
-  def publish(annotation: MutableAnnotation): Unit   = Try(subject.onNext(AnnotationMessage(annotation)))
-  def publish(observation: MutableObservation): Unit = publish(MutableAnnotationImpl(observation))
+    def publish(annotation: MutableAnnotation): Unit   = Try(
+        subject.onNext(AnnotationMessage(annotation))
+    )
+    def publish(observation: MutableObservation): Unit = publish(MutableAnnotationImpl(observation))
 }
 
 class AssociationPublisher(subject: Subject[Any]) extends GenericPublisher[MutableAssociation] {
-  def publish(association: MutableAssociation): Unit = Try(subject.onNext(AssociationMessage(association)))
+    def publish(association: MutableAssociation): Unit = Try(
+        subject.onNext(AssociationMessage(association))
+    )
 }

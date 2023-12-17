@@ -16,7 +16,26 @@
 
 package org.mbari.annosaurus.domain
 
-class ImagedMomentSuite {
+class ImagedMomentSuite extends munit.FunSuite {
+
+    val cc1 = DomainObjects.imagedMoment
+
+    test("camelCase/snake_case round trip") {
+        val sc1 = cc1.toSnakeCase
+        val cc2 = sc1.toCamelCase
+        val sc2 = cc2.toSnakeCase
+        assertEquals(cc2, cc1)
+        assertEquals(sc1, sc2)
+    }
+
+    test("camelCase/Entity round trip") {
+        val e1 = cc1.toEntity
+        val cc2 = ImagedMoment.from(e1).copy(lastUpdated = None)
+        val e2 = cc2.toEntity
+        assertEquals(cc2, cc1)
+        // assertEquals(e1, e2)
+    }
+
     // TODO need to round trip to and from snakecase/camelcase
     // TODO need to round trip to and from entity
 }

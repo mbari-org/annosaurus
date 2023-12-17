@@ -41,7 +41,8 @@ final case class CachedAncillaryDatum(
     psi: Option[Double] = None,
     uuid: Option[UUID] = None,
     lastUpdated: Option[java.time.Instant] = None
-) extends ToSnakeCase[CachedAncillaryDatumSC] with ToEntity[CachedAncillaryDatumEntity] {
+) extends ToSnakeCase[CachedAncillaryDatumSC]
+    with ToEntity[CachedAncillaryDatumEntity] {
     override def toSnakeCase: CachedAncillaryDatumSC =
         CachedAncillaryDatumSC(
             latitude,
@@ -65,7 +66,7 @@ final case class CachedAncillaryDatum(
             lastUpdated
         )
 
-    override def toEntity: CachedAncillaryDatumEntity = 
+    override def toEntity: CachedAncillaryDatumEntity =
         var entity = new CachedAncillaryDatumEntity
         entity.latitude = latitude
         entity.longitude = longitude
@@ -89,7 +90,7 @@ final case class CachedAncillaryDatum(
         entity
 }
 
-object CachedAncillaryDatum {
+object CachedAncillaryDatum extends FromEntity[MutableCachedAncillaryDatum, CachedAncillaryDatum] {
     def from(entity: MutableCachedAncillaryDatum): CachedAncillaryDatum =
         CachedAncillaryDatum(
             entity.latitude,

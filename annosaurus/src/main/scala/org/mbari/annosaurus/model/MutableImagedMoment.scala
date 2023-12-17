@@ -22,8 +22,8 @@ import org.mbari.vcr4j.time.Timecode
 import java.time.{Duration, Instant}
 import java.util.UUID
 
-/** An [[MutableImagedMoment]] is an index back to a particular video-file. The index can be one or more of
-  * the following:
+/** An [[MutableImagedMoment]] is an index back to a particular video-file. The index can be one or
+  * more of the following:
   *   1. timecode (if the video has a time-code track) 2. elapsedTime - The elapsed time from the
   *      start or the video until the frame containing the obseration 3. recordedDate - The moment
   *      in time when the frame of video was recorded.

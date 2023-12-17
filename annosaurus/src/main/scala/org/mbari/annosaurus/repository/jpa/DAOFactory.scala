@@ -17,7 +17,16 @@
 package org.mbari.annosaurus.repository.jpa
 
 import org.mbari.annosaurus.model._
-import org.mbari.annosaurus.repository.{AssociationDAO, CachedAncillaryDatumDAO, CachedVideoReferenceInfoDAO, DAO, ImageReferenceDAO, ImagedMomentDAO, IndexDAO, ObservationDAO}
+import org.mbari.annosaurus.repository.{
+    AssociationDAO,
+    CachedAncillaryDatumDAO,
+    CachedVideoReferenceInfoDAO,
+    DAO,
+    ImageReferenceDAO,
+    ImagedMomentDAO,
+    IndexDAO,
+    ObservationDAO
+}
 
 /** @author
   *   Brian Schlining

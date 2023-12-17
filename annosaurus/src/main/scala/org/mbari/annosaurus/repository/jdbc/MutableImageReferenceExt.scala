@@ -19,10 +19,10 @@ package org.mbari.annosaurus.repository.jdbc
 import org.mbari.annosaurus.repository.jpa.entity.ImageReferenceEntity
 import java.util.UUID
 
-/**
-  * @author Brian Schlining
+/** @author
+  *   Brian Schlining
   * @since 2019-10-22T14:37:00
   */
 class MutableImageReferenceExt extends ImageReferenceEntity {
-  var imagedMomentUuid: UUID = _
+    var imagedMomentUuid: UUID = _
 }

@@ -27,7 +27,8 @@ case class Association(
     mimeType: Option[String] = None,
     uuid: Option[UUID] = None,
     lastUpdated: Option[java.time.Instant] = None
-) extends ToSnakeCase[AssociationSC] with ToEntity[AssociationEntity]{
+) extends ToSnakeCase[AssociationSC]
+    with ToEntity[AssociationEntity] {
 
     override def toSnakeCase: AssociationSC =
         AssociationSC(linkName, toConcept, linkValue, mimeType, uuid, lastUpdated)
@@ -39,7 +40,7 @@ case class Association(
     }
 }
 
-object Association {
+object Association extends FromEntity[MutableAssociation, Association] {
     def from(entity: MutableAssociation): Association =
         Association(
             entity.linkName,

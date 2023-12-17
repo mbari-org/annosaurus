@@ -16,7 +16,35 @@
 
 package org.mbari.annosaurus.domain
 
-class AssociationSuite {
-  // TODO need to round trip to and from snakecase/camelcase
-    // TODO need to round trip to and from entity
+import java.util.UUID
+
+class AssociationSuite extends munit.FunSuite {
+
+    val cc1 = DomainObjects.associaiton
+
+    test("camelCase/snake_case round trip") {
+        
+        val sc1 = cc1.toSnakeCase
+        val cc2 = sc1.toCamelCase
+        val sc2 = cc2.toSnakeCase
+        assertEquals(cc2, cc1)
+        assertEquals(sc1, sc2)
+        assertEquals(sc2.link_name, cc1.linkName)
+        assertEquals(sc2.to_concept, cc1.toConcept)
+        assertEquals(sc2.link_value, cc1.linkValue)
+        assertEquals(sc2.uuid, cc1.uuid)
+    }
+
+    test("camelCase/Entity round trip") {
+        val e1 = cc1.toEntity
+        val cc2 = Association.from(e1)
+        val e2 = cc2.toEntity
+        assertEquals(cc2, cc1)
+//        assertEquals(e1, e2)
+        assertEquals(e2.linkName, cc1.linkName)
+        assertEquals(e2.toConcept, cc1.toConcept)
+        assertEquals(e2.linkValue, cc1.linkValue)
+        assertEquals(e2.uuid, cc1.uuid.get)
+    }
+
 }

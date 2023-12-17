@@ -110,7 +110,10 @@ object AncillaryDatumSQL {
       | )
       |""".stripMargin
 
-    def join(annotations: Seq[MutableAnnotationExt], data: Seq[AncillaryDatumExt]): Seq[MutableAnnotation] = {
+    def join(
+        annotations: Seq[MutableAnnotationExt],
+        data: Seq[AncillaryDatumExt]
+    ): Seq[MutableAnnotation] = {
         for {
             d <- data
         } {

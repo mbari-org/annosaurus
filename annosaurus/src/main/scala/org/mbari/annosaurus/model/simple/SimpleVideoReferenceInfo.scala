@@ -20,10 +20,8 @@ import org.mbari.annosaurus.model.MutableCachedVideoReferenceInfo
 
 import java.util.UUID
 
-/**
-  *
-  *
-  * @author Brian Schlining
+/** @author
+  *   Brian Schlining
   * @since 2016-07-11T14:57:00
   */
 case class SimpleVideoReferenceInfo(
@@ -36,12 +34,12 @@ case class SimpleVideoReferenceInfo(
 
 object SimpleVideoReferenceInfo {
 
-  def apply(info: MutableCachedVideoReferenceInfo): SimpleVideoReferenceInfo =
-    new SimpleVideoReferenceInfo(
-      info.uuid,
-      info.videoReferenceUUID,
-      info.platformName,
-      info.missionId,
-      info.missionContact
-    )
+    def apply(info: MutableCachedVideoReferenceInfo): SimpleVideoReferenceInfo =
+        new SimpleVideoReferenceInfo(
+            info.uuid,
+            info.videoReferenceUUID,
+            info.platformName,
+            info.missionId,
+            info.missionContact
+        )
 }

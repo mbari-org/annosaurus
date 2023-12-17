@@ -22,36 +22,39 @@ import org.mbari.annosaurus.model.MutableImagedMoment
 import org.mbari.annosaurus.repository.IndexDAO
 import org.mbari.annosaurus.repository.jpa.entity.IndexEntity
 
-/**
-  * @author Brian Schlining
+/** @author
+  *   Brian Schlining
   * @since 2019-02-08T08:55:00
   */
 class IndexDAOImpl(entityManager: EntityManager)
     extends BaseDAO[IndexEntity](entityManager)
     with IndexDAO[IndexEntity] {
 
-  def newPersistentObject(): IndexEntity = new IndexEntity
+    def newPersistentObject(): IndexEntity = new IndexEntity
 
-  override def findByVideoReferenceUuid(
-      videoReferenceUuid: UUID,
-      limit: Option[Int] = None,
-      offset: Option[Int] = None
-  ): Iterable[MutableImagedMoment] =
-    findByNamedQuery(
-      "Index.findByVideoReferenceUUID",
-      Map("uuid" -> videoReferenceUuid),
-      limit,
-      offset
-    )
+    override def findByVideoReferenceUuid(
+        videoReferenceUuid: UUID,
+        limit: Option[Int] = None,
+        offset: Option[Int] = None
+    ): Iterable[MutableImagedMoment] =
+        findByNamedQuery(
+            "Index.findByVideoReferenceUUID",
+            Map("uuid" -> videoReferenceUuid),
+            limit,
+            offset
+        )
 
-  // --- These methods are deliberately overridden ---
+    // --- These methods are deliberately overridden ---
 
-  override def findAll(limit: Option[Int] = None, offset: Option[Int] = None): Iterable[IndexEntity] =
-    ???
+    override def findAll(
+        limit: Option[Int] = None,
+        offset: Option[Int] = None
+    ): Iterable[IndexEntity] =
+        ???
 
-  override def deleteByUUID(primaryKey: UUID): Unit = ???
+    override def deleteByUUID(primaryKey: UUID): Unit = ???
 
-  override def create(entity: IndexEntity): Unit = ???
+    override def create(entity: IndexEntity): Unit = ???
 
-  override def delete(entity: IndexEntity): Unit = ???
+    override def delete(entity: IndexEntity): Unit = ???
 }

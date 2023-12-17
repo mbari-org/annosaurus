@@ -20,16 +20,16 @@ import org.mbari.annosaurus.etc.circe.CirceCodecs
 import org.scalatra.ScalatraServlet
 
 import org.mbari.annosaurus.model.simple.HealthStatus
-import org.mbari.annosaurus.etc.circe.CirceCodecs.{given, *}
+import org.mbari.annosaurus.etc.circe.CirceCodecs.{*, given}
 
 class HealthApi extends ScalatraServlet {
 
-  before() {
-    contentType = "application/json"
-  }
+    before() {
+        contentType = "application/json"
+    }
 
-  get("/") {
-    HealthStatus.default.stringify
-  }
+    get("/") {
+        HealthStatus.default.stringify
+    }
 
 }

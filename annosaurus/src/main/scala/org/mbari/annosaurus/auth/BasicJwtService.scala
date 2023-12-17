@@ -32,11 +32,9 @@ import java.time.Duration
 import org.mbari.annosaurus.domain.Authorization
 import org.mbari.annosaurus.etc.circe.CirceCodecs.*
 
-/**
-  * To use this authentication. The client and server should both have a shared
-  * secret (aka client secret). The client sends this to the server in a
-  * authorization header. If the secret is correct, the server will send back
-  * a JWT token that can be used to validate subsequent requests.
+/** To use this authentication. The client and server should both have a shared secret (aka client
+  * secret). The client sends this to the server in a authorization header. If the secret is
+  * correct, the server will send back a JWT token that can be used to validate subsequent requests.
   *
   * {{{
   *   Client                                                                Server
@@ -49,82 +47,83 @@ import org.mbari.annosaurus.etc.circe.CirceCodecs.*
   *     |                                                                      |
   *     |<------- 200                                                   <------|
   * }}}
-  * @author Brian Schlining
+  * @author
+  *   Brian Schlining
   * @since 2017-01-18T16:42:00
   */
 class BasicJwtService(tokenDuration: Duration = Duration.ofDays(1)) extends AuthorizationService {
 
-  def this() = this(Duration.ofDays(1))
+    def this() = this(Duration.ofDays(1))
 
-  private[this] val config        = ConfigFactory.load()
-  private[this] val issuer        = config.getString("basicjwt.issuer")
-  private[this] val apiKey        = config.getString("basicjwt.client.secret")
-  private[this] val signingSecret = config.getString("basicjwt.signing.secret")
-  private[this] val algorithm     = Algorithm.HMAC512(signingSecret)
+    private[this] val config        = ConfigFactory.load()
+    private[this] val issuer        = config.getString("basicjwt.issuer")
+    private[this] val apiKey        = config.getString("basicjwt.client.secret")
+    private[this] val signingSecret = config.getString("basicjwt.signing.secret")
+    private[this] val algorithm     = Algorithm.HMAC512(signingSecret)
 
-  private[this] val verifier = JWT
-    .require(algorithm)
-    .withIssuer(issuer)
-    .build()
+    private[this] val verifier = JWT
+        .require(algorithm)
+        .withIssuer(issuer)
+        .build()
 
-  val gson = new GsonBuilder()
-    .setPrettyPrinting()
-    .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
-    .create()
+    val gson = new GsonBuilder()
+        .setPrettyPrinting()
+        .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
+        .create()
 
-  private def authorize(request: HttpServletRequest): Option[Authorization] = {
-    Option(request.getHeader("Authorization"))
-      .map(parseAuthHeader)
-  }
-
-  def isValid(auth: Option[Authorization]): Boolean = {
-    //println("RUNNING JWT with auth = " + auth.getOrElse("NONE"))
-    try {
-      auth match {
-        case None => false
-        case Some(a) =>
-          if (a.tokenType.equalsIgnoreCase("BEARER")) {
-            verifier.verify(a.accessToken)
-            true
-          }
-          else false
-      }
+    private def authorize(request: HttpServletRequest): Option[Authorization] = {
+        Option(request.getHeader("Authorization"))
+            .map(parseAuthHeader)
     }
-    catch {
-      case NonFatal(e) => false
+
+    def isValid(auth: Option[Authorization]): Boolean = {
+        // println("RUNNING JWT with auth = " + auth.getOrElse("NONE"))
+        try {
+            auth match {
+                case None    => false
+                case Some(a) =>
+                    if (a.tokenType.equalsIgnoreCase("BEARER")) {
+                        verifier.verify(a.accessToken)
+                        true
+                    }
+                    else false
+            }
+        }
+        catch {
+            case NonFatal(e) => false
+        }
     }
-  }
 
-  private def parseAuthHeader(header: String): Authorization = {
-    val parts       = header.split("\\s")
-    val tokenType   = if (parts.length == 1) "undefined" else parts(0)
-    val accessToken = if (parts.length == 1) parts(0) else parts(1)
-    Authorization(tokenType, accessToken)
-  }
+    private def parseAuthHeader(header: String): Authorization = {
+        val parts       = header.split("\\s")
+        val tokenType   = if (parts.length == 1) "undefined" else parts(0)
+        val accessToken = if (parts.length == 1) parts(0) else parts(1)
+        Authorization(tokenType, accessToken)
+    }
 
-  override def validateAuthorization(request: HttpServletRequest): Boolean =
-    isValid(authorize(request))
+    override def validateAuthorization(request: HttpServletRequest): Boolean =
+        isValid(authorize(request))
 
-  override def requestAuthorization(request: HttpServletRequest): Option[String] = {
-    Option(request.getHeader("Authorization"))
-      .map(parseAuthHeader)
-      .filter(_.tokenType.equalsIgnoreCase("APIKEY"))
-      .filter(_.accessToken == apiKey)
-      .map(a => {
-        val now      = Instant.now()
-        val expires  = now.plus(tokenDuration)
-        val iat      = Date.from(now)
-        val exp      = Date.from(expires)
+    override def requestAuthorization(request: HttpServletRequest): Option[String] = {
+        Option(request.getHeader("Authorization"))
+            .map(parseAuthHeader)
+            .filter(_.tokenType.equalsIgnoreCase("APIKEY"))
+            .filter(_.accessToken == apiKey)
+            .map(a => {
+                val now     = Instant.now()
+                val expires = now.plus(tokenDuration)
+                val iat     = Date.from(now)
+                val exp     = Date.from(expires)
 
-        JWT
-          .create()
-          .withIssuer(issuer)
-          .withIssuedAt(iat)
-          .withExpiresAt(exp)
-          .sign(algorithm)
+                JWT
+                    .create()
+                    .withIssuer(issuer)
+                    .withIssuedAt(iat)
+                    .withExpiresAt(exp)
+                    .sign(algorithm)
 
-      })
-      .map(Authorization("Bearer", _))
-      .map(gson.toJson)
-  }
+            })
+            .map(Authorization("Bearer", _))
+            .map(gson.toJson)
+    }
 }

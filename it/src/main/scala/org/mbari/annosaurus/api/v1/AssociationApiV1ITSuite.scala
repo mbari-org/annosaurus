@@ -28,7 +28,7 @@ trait AssociationApiV1ITSuite extends WebSuite {
 
     implicit val df: JPADAOFactory = daoFactory
 //    implicit val ec: ExecutionContext = ExecutionContext.global
-    private val gson = Constants.GSON
+    private val gson               = Constants.GSON
 
     override def beforeAll(): Unit = {
         super.beforeAll()
@@ -47,11 +47,11 @@ trait AssociationApiV1ITSuite extends WebSuite {
     }
 
     test("POST /bulk") {
-        val linkName = "foobarbazbinboobulk"
-        val x = TestUtils.create(1, 1, 4).head
+        val linkName     = "foobarbazbinboobulk"
+        val x            = TestUtils.create(1, 1, 4).head
         val associations = x.observations.flatMap(_.associations)
         associations.foreach(_.linkName = linkName)
-        val json = gson.toJson(associations.toArray)
+        val json         = gson.toJson(associations.toArray)
         println(json)
 
         put(

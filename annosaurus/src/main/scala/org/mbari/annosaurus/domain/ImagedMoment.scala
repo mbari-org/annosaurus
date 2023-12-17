@@ -23,10 +23,9 @@ import java.time.Instant
 import org.mbari.annosaurus.repository.jpa.entity.ImagedMomentEntity
 import org.mbari.annosaurus.model.MutableImagedMoment
 
-
 final case class ImagedMoment(
     videoReferenceUuid: UUID,
-    timecode: Option[String] = None, 
+    timecode: Option[String] = None,
     elapsedTimeMillis: Option[Long] = None,
     recordedTimestamp: Option[Instant] = None,
     observations: Seq[Observation] = Nil,
@@ -34,8 +33,8 @@ final case class ImagedMoment(
     ancillaryData: Option[CachedAncillaryDatum] = None,
     uuid: Option[UUID] = None,
     lastUpdated: Option[java.time.Instant] = None
-    
-) extends ToSnakeCase[ImagedMomentSC] with ToEntity[ImagedMomentEntity] {
+) extends ToSnakeCase[ImagedMomentSC]
+    with ToEntity[ImagedMomentEntity] {
     override def toSnakeCase: ImagedMomentSC =
         ImagedMomentSC(
             videoReferenceUuid,
@@ -49,7 +48,7 @@ final case class ImagedMoment(
             lastUpdated
         )
 
-    override def toEntity: ImagedMomentEntity = 
+    override def toEntity: ImagedMomentEntity =
         var entity = new ImagedMomentEntity
         entity.videoReferenceUUID = videoReferenceUuid
         timecode.foreach(tc => entity.timecode = Timecode(tc))
@@ -61,12 +60,10 @@ final case class ImagedMoment(
         uuid.foreach(entity.uuid = _)
         entity
 
-
-
     lazy val elapsedTime: Option[Duration] = elapsedTimeMillis.map(Duration.ofMillis)
 }
 
-object ImagedMoment {
+object ImagedMoment extends FromEntity[MutableImagedMoment, ImagedMoment] {
     def from(entity: MutableImagedMoment): ImagedMoment = {
         ImagedMoment(
             entity.videoReferenceUUID,
@@ -81,7 +78,6 @@ object ImagedMoment {
         )
     }
 }
-
 
 final case class ImagedMomentSC(
     video_reference_uuid: UUID,

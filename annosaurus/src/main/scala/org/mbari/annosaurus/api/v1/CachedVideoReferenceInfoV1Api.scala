@@ -26,170 +26,191 @@ import org.scalatra.{BadRequest, NoContent, NotFound}
 import scala.jdk.CollectionConverters._
 import scala.concurrent.ExecutionContext
 
-/**
-  *
-  *
-  * @author Brian Schlining
+/** @author
+  *   Brian Schlining
   * @since 2016-09-14T10:50:00
   */
-class CachedVideoReferenceInfoV1Api(controller: CachedVideoReferenceInfoController)(
-    implicit val executor: ExecutionContext
+class CachedVideoReferenceInfoV1Api(controller: CachedVideoReferenceInfoController)(implicit
+    val executor: ExecutionContext
 ) extends V1APIStack {
 
-  before() {
-    contentType = "application/json"
-  }
+    before() {
+        contentType = "application/json"
+    }
 
-  get("/?") {
-    params.getAs[Int]("limit")
-    params.getAs[Int]("offset")
-    controller
-      .findAll()
-      .map(_.asJava)
-      .map(toJson)
-  }
+    get("/?") {
+        params.getAs[Int]("limit")
+        params.getAs[Int]("offset")
+        controller
+            .findAll()
+            .map(_.asJava)
+            .map(toJson)
+    }
 
-  get("/:uuid") {
-    val uuid = params
-      .getAs[UUID]("uuid")
-      .getOrElse(halt(BadRequest(toJson(ErrorMsg(400, "Please provide a UUID")))))
-    params.getAs[Int]("limit")
-    params.getAs[Int]("offset")
-    controller
-      .findByUUID(uuid)
-      .map({
-        case None =>
-          halt(
-            NotFound(
-              toJson(
-                ErrorMsg(404, s"A CachedVideoReferenceInfo with a UUID of $uuid was not found")
-              )
+    get("/:uuid") {
+        val uuid = params
+            .getAs[UUID]("uuid")
+            .getOrElse(halt(BadRequest(toJson(ErrorMsg(400, "Please provide a UUID")))))
+        params.getAs[Int]("limit")
+        params.getAs[Int]("offset")
+        controller
+            .findByUUID(uuid)
+            .map {
+                case None    =>
+                    halt(
+                        NotFound(
+                            toJson(
+                                ErrorMsg(
+                                    404,
+                                    s"A CachedVideoReferenceInfo with a UUID of $uuid was not found"
+                                )
+                            )
+                        )
+                    )
+                case Some(v) => toJson(v)
+            }
+    }
+
+    get("/videoreferences") {
+        controller
+            .findAllVideoReferenceUUIDs
+            .map(s => UUIDArray(s.toArray))
+            .map(toJson)
+    }
+
+    // find a CachedVideoReferenceInfo by it's unique videoreferenceuuid
+    get("/videoreference/:uuid") {
+        val uuid = params
+            .getAs[UUID]("uuid")
+            .getOrElse(
+                halt(BadRequest(toJson(ErrorMsg(400, "Please provide a Video Reference UUID"))))
             )
-          )
-        case Some(v) => toJson(v)
-      })
-  }
 
-  get("/videoreferences") {
-    controller
-      .findAllVideoReferenceUUIDs
-      .map(s => UUIDArray(s.toArray))
-      .map(toJson)
-  }
+        controller
+            .findByVideoReferenceUUID(uuid)
+            .map {
+                case None    =>
+                    halt(
+                        NotFound(
+                            toJson(
+                                ErrorMsg(
+                                    404,
+                                    s"A CachedVideoReferenceInfo with a videoreference uuid of $uuid was not found"
+                                )
+                            )
+                        )
+                    )
+                case Some(v) => toJson(v)
+            }
+    }
 
-  // find a CachedVideoReferenceInfo by it's unique videoreferenceuuid
-  get("/videoreference/:uuid") {
-    val uuid = params
-      .getAs[UUID]("uuid")
-      .getOrElse(halt(BadRequest(toJson(ErrorMsg(400, "Please provide a Video Reference UUID")))))
+    // find all mission ids
+    get("/missionids") {
+        controller
+            .findAllMissionIDs
+            .map(s => StringArray(s.toArray))
+            .map(toJson)
+    }
 
-    controller
-      .findByVideoReferenceUUID(uuid)
-      .map({
-        case None =>
-          halt(
-            NotFound(
-              toJson(
-                ErrorMsg(
-                  404,
-                  s"A CachedVideoReferenceInfo with a videoreference uuid of $uuid was not found"
+    get("/missionid/:id") {
+        val id = params.get("id").getOrElse(halt(BadRequest("Please provide a mission id")))
+        controller
+            .findByMissionID(id)
+            .map(_.asJava)
+            .map(toJson)
+    }
+
+    get("/missioncontacts") {
+        controller
+            .findAllMissionContacts
+            .map(s => StringArray(s.toArray))
+            .map(toJson)
+    }
+
+    get("/missioncontact/:name") {
+        val name = params
+            .get("name")
+            .getOrElse(halt(BadRequest(toJson(ErrorMsg(400, "Please provide a mission contact")))))
+        controller
+            .findByMissionContact(name)
+            .map(_.asJava)
+            .map(toJson)
+    }
+
+    post("/") {
+        validateRequest() // Apply API security
+        val videoReferenceUUID = params
+            .getAs[UUID]("video_reference_uuid")
+            .getOrElse(
+                halt(
+                    BadRequest(
+                        toJson(ErrorMsg(400, "A 'video_reference_uuid' parameter is required"))
+                    )
                 )
-              )
             )
-          )
-        case Some(v) => toJson(v)
-      })
-  }
+        val missionContact     = params.get("mission_contact")
+        val missionID          =
+            params
+                .get("mission_id")
+                .getOrElse(
+                    halt(BadRequest(toJson(ErrorMsg(400, "A 'mission_id' parameter is required"))))
+                )
+        val platformName       = params
+            .get("platform_name")
+            .getOrElse(halt(BadRequest("A 'platform_name' parameter is required")))
+        controller
+            .create(videoReferenceUUID, platformName, missionID, missionContact)
+            .map(toJson)
+    }
 
-  // find all mission ids
-  get("/missionids") {
-    controller
-      .findAllMissionIDs
-      .map(s => StringArray(s.toArray))
-      .map(toJson)
-  }
+    put("/:uuid") {
+        validateRequest() // Apply API security
+        val uuid               = params
+            .getAs[UUID]("uuid")
+            .getOrElse(halt(BadRequest(toJson(ErrorMsg(400, "A 'uuid' parameter is required")))))
+        val videoReferenceUUID = params.getAs[UUID]("video_reference_uuid")
+        val missionContact     = params.get("mission_contact")
+        val missionID          = params.get("mission_id")
+        val platformName       = params.get("platform_name")
+        controller
+            .update(uuid, videoReferenceUUID, platformName, missionID, missionContact)
+            .map {
+                case None    =>
+                    halt(
+                        NotFound(
+                            toJson(
+                                ErrorMsg(
+                                    404,
+                                    s"Failed. No VideoReferenceInfo with UUID of $uuid was found."
+                                )
+                            )
+                        )
+                    )
+                case Some(v) => toJson(v)
+            }
+    }
 
-  get("/missionid/:id") {
-    val id = params.get("id").getOrElse(halt(BadRequest("Please provide a mission id")))
-    controller
-      .findByMissionID(id)
-      .map(_.asJava)
-      .map(toJson)
-  }
-
-  get("/missioncontacts") {
-    controller
-      .findAllMissionContacts
-      .map(s => StringArray(s.toArray))
-      .map(toJson)
-  }
-
-  get("/missioncontact/:name") {
-    val name = params
-      .get("name")
-      .getOrElse(halt(BadRequest(toJson(ErrorMsg(400, "Please provide a mission contact")))))
-    controller
-      .findByMissionContact(name)
-      .map(_.asJava)
-      .map(toJson)
-  }
-
-  post("/") {
-    validateRequest() // Apply API security
-    val videoReferenceUUID = params
-      .getAs[UUID]("video_reference_uuid")
-      .getOrElse(
-        halt(BadRequest(toJson(ErrorMsg(400, "A 'video_reference_uuid' parameter is required"))))
-      )
-    val missionContact = params.get("mission_contact")
-    val missionID =
-      params
-        .get("mission_id")
-        .getOrElse(halt(BadRequest(toJson(ErrorMsg(400, "A 'mission_id' parameter is required")))))
-    val platformName = params
-      .get("platform_name")
-      .getOrElse(halt(BadRequest("A 'platform_name' parameter is required")))
-    controller
-      .create(videoReferenceUUID, platformName, missionID, missionContact)
-      .map(toJson)
-  }
-
-  put("/:uuid") {
-    validateRequest() // Apply API security
-    val uuid = params
-      .getAs[UUID]("uuid")
-      .getOrElse(halt(BadRequest(toJson(ErrorMsg(400, "A 'uuid' parameter is required")))))
-    val videoReferenceUUID = params.getAs[UUID]("video_reference_uuid")
-    val missionContact     = params.get("mission_contact")
-    val missionID          = params.get("mission_id")
-    val platformName       = params.get("platform_name")
-    controller
-      .update(uuid, videoReferenceUUID, platformName, missionID, missionContact)
-      .map({
-        case None =>
-          halt(
-            NotFound(
-              toJson(ErrorMsg(404, s"Failed. No VideoReferenceInfo with UUID of $uuid was found."))
-            )
-          )
-        case Some(v) => toJson(v)
-      })
-  }
-
-  delete("/:uuid") {
-    validateRequest() // Apply API security
-    val uuid = params
-      .getAs[UUID]("uuid")
-      .getOrElse(halt(BadRequest(toJson(ErrorMsg(400, "A 'uuid' parameter is required")))))
-    controller
-      .delete(uuid)
-      .map({
-        case true => halt(NoContent()) // Success
-        case false =>
-          halt(
-            NotFound(toJson(ErrorMsg(404, s"Failed. No observation with UUID of $uuid was found.")))
-          )
-      })
-  }
+    delete("/:uuid") {
+        validateRequest() // Apply API security
+        val uuid = params
+            .getAs[UUID]("uuid")
+            .getOrElse(halt(BadRequest(toJson(ErrorMsg(400, "A 'uuid' parameter is required")))))
+        controller
+            .delete(uuid)
+            .map {
+                case true  => halt(NoContent()) // Success
+                case false =>
+                    halt(
+                        NotFound(
+                            toJson(
+                                ErrorMsg(
+                                    404,
+                                    s"Failed. No observation with UUID of $uuid was found."
+                                )
+                            )
+                        )
+                    )
+            }
+    }
 
 }

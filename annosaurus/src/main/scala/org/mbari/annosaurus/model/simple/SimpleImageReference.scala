@@ -21,10 +21,8 @@ import org.mbari.annosaurus.model.MutableImageReference
 import java.net.URL
 import java.util.UUID
 
-/**
-  *
-  *
-  * @author Brian Schlining
+/** @author
+  *   Brian Schlining
   * @since 2016-07-11T14:59:00
   */
 case class SimpleImageReference(
@@ -38,14 +36,14 @@ case class SimpleImageReference(
 
 object SimpleImageReference {
 
-  def apply(imageReference: MutableImageReference): SimpleImageReference =
-    new SimpleImageReference(
-      imageReference.uuid,
-      imageReference.url,
-      imageReference.description,
-      imageReference.format,
-      imageReference.width,
-      imageReference.height
-    )
+    def apply(imageReference: MutableImageReference): SimpleImageReference =
+        new SimpleImageReference(
+            imageReference.uuid,
+            imageReference.url,
+            imageReference.description,
+            imageReference.format,
+            imageReference.width,
+            imageReference.height
+        )
 
 }

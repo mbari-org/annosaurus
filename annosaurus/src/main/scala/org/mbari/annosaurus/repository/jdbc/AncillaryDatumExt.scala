@@ -20,5 +20,5 @@ import org.mbari.annosaurus.repository.jpa.entity.CachedAncillaryDatumEntity
 import java.util.UUID
 
 class AncillaryDatumExt extends CachedAncillaryDatumEntity {
-  var imagedMomentUuid: UUID = _
+    var imagedMomentUuid: UUID = _
 }

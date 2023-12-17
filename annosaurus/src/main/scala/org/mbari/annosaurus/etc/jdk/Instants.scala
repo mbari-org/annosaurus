@@ -24,7 +24,8 @@ object Instants:
 
     private val utcZone                           = ZoneId.of("UTC")
     val TimeFormatter: DateTimeFormatter          = DateTimeFormatter.ISO_DATE_TIME.withZone(utcZone)
-    val CompactTimeFormatter: DateTimeFormatter   = DateTimeFormatter.ofPattern("yyyyMMdd'T'HHmmssX").withZone(utcZone)
+    val CompactTimeFormatter: DateTimeFormatter   =
+        DateTimeFormatter.ofPattern("yyyyMMdd'T'HHmmssX").withZone(utcZone)
     val CompactTimeFormatterMs: DateTimeFormatter =
         DateTimeFormatter.ofPattern("yyyyMMdd'T'HHmmss.SSSX").withZone(utcZone)
     val CompactTimeFormatterNs: DateTimeFormatter =

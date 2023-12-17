@@ -29,135 +29,169 @@ import org.scalatra.BadRequest
 import scala.jdk.CollectionConverters._
 import scala.concurrent.ExecutionContext
 
-/**
-  * @author Brian Schlining
+/** @author
+  *   Brian Schlining
   * @since 2019-05-08T10:02:00
   */
 class ImagedMomentV2Api(controller: ImagedMomentController)(implicit val executor: ExecutionContext)
     extends APIStack {
 
-  before() {
-    contentType = "application/json"
-    response.headers.set("Access-Control-Allow-Origin", "*")
-  }
+    before() {
+        contentType = "application/json"
+        response.headers.set("Access-Control-Allow-Origin", "*")
+    }
 
-  get("/videoreference/:uuid") {
-    val uuid = params
-      .getAs[UUID]("uuid")
-      .getOrElse(halt(BadRequest(toJson(ErrorMsg(400, "Please provide a Video Reference UUID")))))
-    val limit  = params.getAs[Int]("limit").orElse(Some(defaultLimit))
-    val offset = params.getAs[Int]("offset")
+    get("/videoreference/:uuid") {
+        val uuid   = params
+            .getAs[UUID]("uuid")
+            .getOrElse(
+                halt(BadRequest(toJson(ErrorMsg(400, "Please provide a Video Reference UUID"))))
+            )
+        val limit  = params.getAs[Int]("limit").orElse(Some(defaultLimit))
+        val offset = params.getAs[Int]("offset")
 
-    val (closeable, stream) = controller.streamByVideoReferenceUUID(uuid, limit, offset)
-    ResponseUtilities.sendStreamedResponse(response, stream, (im: MutableImagedMoment) => toJson(im))
-    closeable.close()
-    ()
-  }
-
-  get("/videoreferences/modified/:start") {
-    val start = params
-      .getAs[Instant]("start")
-      .getOrElse(
-        halt(
-          BadRequest(toJson(ErrorMsg(400, "Please provide a start date (yyyy-mm-ddThh:mm:ssZ)")))
+        val (closeable, stream) = controller.streamByVideoReferenceUUID(uuid, limit, offset)
+        ResponseUtilities.sendStreamedResponse(
+            response,
+            stream,
+            (im: MutableImagedMoment) => toJson(im)
         )
-      )
-    val end    = Instant.now()
-    val limit  = params.getAs[Int]("limit")
-    val offset = params.getAs[Int]("offset")
-    val (closeable, stream) =
-      controller.streamVideoReferenceUuidsBetweenUpdatedDates(start, end, limit, offset)
-    val json = toJson(
-      stream
-        .iterator()
-        .asScala
-        .toSeq
-        .map(_.toString)
-        .asJava
-    )
-    closeable.close()
-    json
-  }
+        closeable.close()
+        ()
+    }
 
-  get("/videoreferences/modified/:start/:end") {
-    val start = params
-      .getAs[Instant]("start")
-      .getOrElse(
-        halt(
-          BadRequest(toJson(ErrorMsg(400, "Please provide a start date (yyyy-mm-ddThh:mm:ssZ)")))
+    get("/videoreferences/modified/:start") {
+        val start               = params
+            .getAs[Instant]("start")
+            .getOrElse(
+                halt(
+                    BadRequest(
+                        toJson(ErrorMsg(400, "Please provide a start date (yyyy-mm-ddThh:mm:ssZ)"))
+                    )
+                )
+            )
+        val end                 = Instant.now()
+        val limit               = params.getAs[Int]("limit")
+        val offset              = params.getAs[Int]("offset")
+        val (closeable, stream) =
+            controller.streamVideoReferenceUuidsBetweenUpdatedDates(start, end, limit, offset)
+        val json                = toJson(
+            stream
+                .iterator()
+                .asScala
+                .toSeq
+                .map(_.toString)
+                .asJava
         )
-      )
-    val end = params
-      .getAs[Instant]("end")
-      .getOrElse(
-        halt(BadRequest(toJson(ErrorMsg(400, "Please provide an end date (yyyy-mm-ddThh:mm:ssZ)"))))
-      )
-    val limit  = params.getAs[Int]("limit")
-    val offset = params.getAs[Int]("offset")
-    val (closeable, stream) =
-      controller.streamVideoReferenceUuidsBetweenUpdatedDates(start, end, limit, offset)
-    val json = toJson(
-      stream
-        .iterator()
-        .asScala
-        .toSeq
-        .map(_.toString)
-        .asJava
-    )
-    closeable.close()
-    json
-  }
+        closeable.close()
+        json
+    }
 
-  get("/modified/:start") {
-    val start = params
-      .getAs[Instant]("start")
-      .getOrElse(
-        halt(
-          BadRequest(toJson(ErrorMsg(400, "Please provide a start date (yyyy-mm-ddThh:mm:ssZ)")))
+    get("/videoreferences/modified/:start/:end") {
+        val start               = params
+            .getAs[Instant]("start")
+            .getOrElse(
+                halt(
+                    BadRequest(
+                        toJson(ErrorMsg(400, "Please provide a start date (yyyy-mm-ddThh:mm:ssZ)"))
+                    )
+                )
+            )
+        val end                 = params
+            .getAs[Instant]("end")
+            .getOrElse(
+                halt(
+                    BadRequest(
+                        toJson(ErrorMsg(400, "Please provide an end date (yyyy-mm-ddThh:mm:ssZ)"))
+                    )
+                )
+            )
+        val limit               = params.getAs[Int]("limit")
+        val offset              = params.getAs[Int]("offset")
+        val (closeable, stream) =
+            controller.streamVideoReferenceUuidsBetweenUpdatedDates(start, end, limit, offset)
+        val json                = toJson(
+            stream
+                .iterator()
+                .asScala
+                .toSeq
+                .map(_.toString)
+                .asJava
         )
-      )
-    val end    = Instant.now()
-    val limit  = params.getAs[Int]("limit")
-    val offset = params.getAs[Int]("offset")
+        closeable.close()
+        json
+    }
 
-    val (closeable, stream) = controller.streamBetweenUpdatedDates(start, end, limit, offset)
-    ResponseUtilities.sendStreamedResponse(response, stream, (im: MutableImagedMoment) => toJson(im))
-    closeable.close()
-    ()
-  }
+    get("/modified/:start") {
+        val start  = params
+            .getAs[Instant]("start")
+            .getOrElse(
+                halt(
+                    BadRequest(
+                        toJson(ErrorMsg(400, "Please provide a start date (yyyy-mm-ddThh:mm:ssZ)"))
+                    )
+                )
+            )
+        val end    = Instant.now()
+        val limit  = params.getAs[Int]("limit")
+        val offset = params.getAs[Int]("offset")
 
-  get("/modified/:start/:end") {
-    val start = params
-      .getAs[Instant]("start")
-      .getOrElse(
-        halt(
-          BadRequest(toJson(ErrorMsg(400, "Please provide a start date (yyyy-mm-ddThh:mm:ssZ)")))
+        val (closeable, stream) = controller.streamBetweenUpdatedDates(start, end, limit, offset)
+        ResponseUtilities.sendStreamedResponse(
+            response,
+            stream,
+            (im: MutableImagedMoment) => toJson(im)
         )
-      )
-    val end = params
-      .getAs[Instant]("end")
-      .getOrElse(
-        halt(BadRequest(toJson(ErrorMsg(400, "Please provide an end date (yyyy-mm-ddThh:mm:ssZ)"))))
-      )
-    val limit  = params.getAs[Int]("limit").orElse(Some(defaultLimit))
-    val offset = params.getAs[Int]("offset")
+        closeable.close()
+        ()
+    }
 
-    val (closeable, stream) = controller.streamBetweenUpdatedDates(start, end, limit, offset)
-    ResponseUtilities.sendStreamedResponse(response, stream, (im: MutableImagedMoment) => toJson(im))
-    closeable.close()
-    ()
-  }
+    get("/modified/:start/:end") {
+        val start  = params
+            .getAs[Instant]("start")
+            .getOrElse(
+                halt(
+                    BadRequest(
+                        toJson(ErrorMsg(400, "Please provide a start date (yyyy-mm-ddThh:mm:ssZ)"))
+                    )
+                )
+            )
+        val end    = params
+            .getAs[Instant]("end")
+            .getOrElse(
+                halt(
+                    BadRequest(
+                        toJson(ErrorMsg(400, "Please provide an end date (yyyy-mm-ddThh:mm:ssZ)"))
+                    )
+                )
+            )
+        val limit  = params.getAs[Int]("limit").orElse(Some(defaultLimit))
+        val offset = params.getAs[Int]("offset")
 
-  get("/concept/:name") {
-    val name = params
-      .get("name")
-      .getOrElse(halt(BadRequest(toJson(ErrorMsg(400, "Please provide a concept name")))))
-    val limit               = params.getAs[Int]("limit")
-    val offset              = params.getAs[Int]("offset")
-    val (closeable, stream) = controller.streamByConcept(name, limit, offset)
-    ResponseUtilities.sendStreamedResponse(response, stream, (im: MutableImagedMoment) => toJson(im))
-    closeable.close()
-    ()
-  }
+        val (closeable, stream) = controller.streamBetweenUpdatedDates(start, end, limit, offset)
+        ResponseUtilities.sendStreamedResponse(
+            response,
+            stream,
+            (im: MutableImagedMoment) => toJson(im)
+        )
+        closeable.close()
+        ()
+    }
+
+    get("/concept/:name") {
+        val name                = params
+            .get("name")
+            .getOrElse(halt(BadRequest(toJson(ErrorMsg(400, "Please provide a concept name")))))
+        val limit               = params.getAs[Int]("limit")
+        val offset              = params.getAs[Int]("offset")
+        val (closeable, stream) = controller.streamByConcept(name, limit, offset)
+        ResponseUtilities.sendStreamedResponse(
+            response,
+            stream,
+            (im: MutableImagedMoment) => toJson(im)
+        )
+        closeable.close()
+        ()
+    }
 
 }

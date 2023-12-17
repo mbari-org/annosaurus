@@ -23,6 +23,7 @@ final case class TimeHistogram(binsMin: Seq[Instant], binsMax: Seq[Instant], val
     override def toSnakeCase: TimeHistogramSC = TimeHistogramSC(binsMin, binsMax, values)
 }
 
-final case class TimeHistogramSC(bins_min: Seq[Instant], bins_max: Seq[Instant], values: Seq[Int]) extends ToCamelCase[TimeHistogram] {
+final case class TimeHistogramSC(bins_min: Seq[Instant], bins_max: Seq[Instant], values: Seq[Int])
+    extends ToCamelCase[TimeHistogram] {
     override def toCamelCase: TimeHistogram = TimeHistogram(bins_min, bins_max, values)
 }

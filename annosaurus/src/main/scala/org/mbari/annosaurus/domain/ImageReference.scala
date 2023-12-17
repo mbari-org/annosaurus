@@ -29,11 +29,12 @@ case class ImageReference(
     description: Option[String] = None,
     uuid: Option[UUID] = None,
     lastUpdated: Option[java.time.Instant] = None
-) extends ToSnakeCase[ImageReferenceSC] with ToEntity[ImageReferenceEntity] {
+) extends ToSnakeCase[ImageReferenceSC]
+    with ToEntity[ImageReferenceEntity] {
     override def toSnakeCase: ImageReferenceSC =
         ImageReferenceSC(url, format, widthPixels, heightPixels, description, uuid, lastUpdated)
 
-    override def toEntity: ImageReferenceEntity = 
+    override def toEntity: ImageReferenceEntity =
         val entity = new ImageReferenceEntity
         entity.url = url
         format.foreach(entity.format = _)
@@ -44,7 +45,7 @@ case class ImageReference(
         entity
 }
 
-object ImageReference {
+object ImageReference extends FromEntity[MutableImageReference, ImageReference] {
     def from(entity: MutableImageReference): ImageReference =
         ImageReference(
             entity.url,
@@ -67,5 +68,13 @@ case class ImageReferenceSC(
     last_updated_time: Option[java.time.Instant] = None
 ) extends ToCamelCase[ImageReference] {
     override def toCamelCase: ImageReference =
-        ImageReference(url, format, width_pixels, height_pixels, description, uuid, last_updated_time)
+        ImageReference(
+            url,
+            format,
+            width_pixels,
+            height_pixels,
+            description,
+            uuid,
+            last_updated_time
+        )
 }

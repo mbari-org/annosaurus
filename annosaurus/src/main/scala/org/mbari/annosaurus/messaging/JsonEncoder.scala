@@ -22,33 +22,35 @@ import org.mbari.annosaurus.Constants
 import org.mbari.annosaurus.model.simple.ExtendedAssociation
 import org.mbari.annosaurus.model.{MutableAnnotation, MutableAssociation}
 
-/**
-  * @author Brian Schlining
+/** @author
+  *   Brian Schlining
   * @since 2020-03-04T13:53:00
   */
 trait JsonEncoder[A] {
-  def toJson: String
+    def toJson: String
 }
 
 object JsonEncoders {
 
-  private[this] val caseClassGson = {
-    val builder = new GsonBuilder()
-      .setPrettyPrinting()
-      .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
-      .setDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'")
-    Converters.registerInstant(builder)
-    builder.create()
-  }
+    private[this] val caseClassGson = {
+        val builder = new GsonBuilder()
+            .setPrettyPrinting()
+            .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
+            .setDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'")
+        Converters.registerInstant(builder)
+        builder.create()
+    }
 
-  implicit class AnnotationEncoder(val x: MutableAnnotation) extends JsonEncoder[MutableAnnotation] {
-    override def toJson: String = Constants.GSON.toJson(x)
-  }
-  implicit class AssocationEncoder(val x: MutableAssociation) extends JsonEncoder[MutableAssociation] {
-    override def toJson: String = Constants.GSON.toJson(x)
-  }
-  implicit class ExtendedAssocationEncoder(val x: ExtendedAssociation)
-      extends JsonEncoder[ExtendedAssociation] {
-    override def toJson: String = caseClassGson.toJson(x)
-  }
+    implicit class AnnotationEncoder(val x: MutableAnnotation)
+        extends JsonEncoder[MutableAnnotation]   {
+        override def toJson: String = Constants.GSON.toJson(x)
+    }
+    implicit class AssocationEncoder(val x: MutableAssociation)
+        extends JsonEncoder[MutableAssociation]  {
+        override def toJson: String = Constants.GSON.toJson(x)
+    }
+    implicit class ExtendedAssocationEncoder(val x: ExtendedAssociation)
+        extends JsonEncoder[ExtendedAssociation] {
+        override def toJson: String = caseClassGson.toJson(x)
+    }
 }

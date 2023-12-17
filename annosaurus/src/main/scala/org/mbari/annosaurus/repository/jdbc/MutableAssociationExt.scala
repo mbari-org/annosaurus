@@ -19,12 +19,12 @@ package org.mbari.annosaurus.repository.jdbc
 import org.mbari.annosaurus.repository.jpa.entity.AssociationEntity
 import java.util.UUID
 
-/**
-  * @author Brian Schlining
+/** @author
+  *   Brian Schlining
   * @since 2019-10-22T14:35:00
   */
 class MutableAssociationExt extends AssociationEntity {
-  //  @Expose(serialize = true)
-  var observationUuid: UUID  = _
-  var imagedMomentUuid: UUID = _
+    //  @Expose(serialize = true)
+    var observationUuid: UUID  = _
+    var imagedMomentUuid: UUID = _
 }

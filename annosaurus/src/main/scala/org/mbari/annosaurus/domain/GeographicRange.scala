@@ -16,17 +16,20 @@
 
 package org.mbari.annosaurus.domain
 
+case class GeographicRange(
+    minLatitude: Double,
+    maxLatitude: Double,
+    minLongitude: Double,
+    maxLongitude: Double,
+    minDepthMeters: Double,
+    maxDepthMeters: Double
+)
 
-case class GeographicRange(minLatitude: Double,
-                           maxLatitude: Double,
-                           minLongitude: Double,
-                           maxLongitude: Double,
-                           minDepthMeters: Double,
-                           maxDepthMeters: Double)
-
-case class GeographicRangeSC(min_latitude: Double,
-                             max_latitude: Double,
-                             min_longitude: Double,
-                             max_longitude: Double,
-                             min_depth_meters: Double,
-                             max_depth_meters: Double)
+case class GeographicRangeSC(
+    min_latitude: Double,
+    max_latitude: Double,
+    min_longitude: Double,
+    max_longitude: Double,
+    min_depth_meters: Double,
+    max_depth_meters: Double
+)

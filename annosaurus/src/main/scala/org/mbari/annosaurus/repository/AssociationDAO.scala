@@ -28,10 +28,10 @@ import java.util.UUID
 trait AssociationDAO[T <: MutableAssociation] extends DAO[T] {
 
     def newPersistentObject(
-                               linkName: String,
-                               toConcept: Option[String] = Some(MutableAssociation.TO_CONCEPT_SELF),
-                               linkValue: Option[String] = Some(MutableAssociation.LINK_VALUE_NIL),
-                               mimeType: Option[String] = Some("text/plain")
+        linkName: String,
+        toConcept: Option[String] = Some(MutableAssociation.TO_CONCEPT_SELF),
+        linkValue: Option[String] = Some(MutableAssociation.LINK_VALUE_NIL),
+        mimeType: Option[String] = Some("text/plain")
     ): T
 
     def newPersistentObject(association: MutableAssociation): T

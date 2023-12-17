@@ -21,12 +21,11 @@ import java.util.UUID
 import com.google.gson.annotations.Expose
 import org.mbari.annosaurus.model.MutableAssociation
 
-/**
-  * This is a vewi of an association that includes the observationUUid. It's used
-  * for serializing messages to external applications that need the UUID included
+/** This is a vewi of an association that includes the observationUUid. It's used for serializing
+  * messages to external applications that need the UUID included
   *
-  *
-  * @author Brian Schlining
+  * @author
+  *   Brian Schlining
   * @since 2020-03-04T13:36:00
   */
 case class ExtendedAssociation(
@@ -37,19 +36,19 @@ case class ExtendedAssociation(
     @Expose(serialize = true) linkValue: String = "nil",
     @Expose(serialize = true) mimeType: String = "text/plain"
 ) {
-  val objectType: String = "Association"
+    val objectType: String = "Association"
 }
 
 object ExtendedAssociation {
-  def apply(a: MutableAssociation): ExtendedAssociation = {
-    require(a.observation != null, "Can not extend an association without an observation")
-    ExtendedAssociation(
-      a.uuid,
-      a.observation.uuid,
-      a.linkName,
-      a.toConcept,
-      a.linkValue,
-      a.mimeType
-    )
-  }
+    def apply(a: MutableAssociation): ExtendedAssociation = {
+        require(a.observation != null, "Can not extend an association without an observation")
+        ExtendedAssociation(
+            a.uuid,
+            a.observation.uuid,
+            a.linkName,
+            a.toConcept,
+            a.linkValue,
+            a.mimeType
+        )
+    }
 }

@@ -24,10 +24,9 @@ object Futures:
 
     private val Timeout = Duration.apply(10, TimeUnit.SECONDS)
 
-    /**
-     * Join a future. (i.e. Await.result(future, Duration.Inf)
-     *
-     * @return
-     *   The result of the future
-     */
+    /** Join a future. (i.e. Await.result(future, Duration.Inf)
+      *
+      * @return
+      *   The result of the future
+      */
     extension [T](t: Future[T]) def join: T = Await.result(t, Timeout)

@@ -16,28 +16,33 @@
 
 package org.mbari.annosaurus
 
-import org.mbari.annosaurus.model.{MutableCachedAncillaryDatum, MutableCachedVideoReferenceInfo, MutableImageReference, MutableImagedMoment, MutableObservation}
+import org.mbari.annosaurus.model.{
+    MutableCachedAncillaryDatum,
+    MutableCachedVideoReferenceInfo,
+    MutableImageReference,
+    MutableImagedMoment,
+    MutableObservation
+}
 import org.mbari.annosaurus.repository.jpa.DAOFactory
 import org.mbari.annosaurus.model._
 
-/**
+/** Controllers abstract away the messier details of the DAO objects. Controllers are used by the
+  * api classes. You should be able to plug in any implementation of DAO's that you like. Although
+  * currently, I've only created a JPA/SQL version.
   *
-  *  Controllers abstract away the messier details of the DAO objects. Controllers are used by
-  *  the api classes. You should be able to plug in any implementation of DAO's that you like.
-  *  Although currently, I've only created a JPA/SQL version.
-  *
-  * @author Brian Schlining
+  * @author
+  *   Brian Schlining
   * @since 2016-06-25T17:45:00
   */
 package object controllers {
 
-  type BasicDAOFactory = DAOFactory[
-    MutableImagedMoment,
-    MutableObservation,
-    MutableAssociation,
-    MutableImageReference,
-    MutableCachedAncillaryDatum,
-    MutableCachedVideoReferenceInfo,
-    MutableImagedMoment
-  ]
+    type BasicDAOFactory = DAOFactory[
+        MutableImagedMoment,
+        MutableObservation,
+        MutableAssociation,
+        MutableImageReference,
+        MutableCachedAncillaryDatum,
+        MutableCachedVideoReferenceInfo,
+        MutableImagedMoment
+    ]
 }

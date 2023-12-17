@@ -18,15 +18,15 @@ package org.mbari.vars.annotation.auth
 
 import jakarta.servlet.http.HttpServletRequest
 
-/**
-  * Service that does not validation. All requests are valid. Useful for testing
+/** Service that does not validation. All requests are valid. Useful for testing
   *
-  * @author Brian Schlining
+  * @author
+  *   Brian Schlining
   * @since 2017-01-19T08:50:00
   */
 class NoopAuthService extends AuthorizationService {
 
-  override def requestAuthorization(request: HttpServletRequest): Option[String] = None
+    override def requestAuthorization(request: HttpServletRequest): Option[String] = None
 
-  override def validateAuthorization(request: HttpServletRequest): Boolean = true
+    override def validateAuthorization(request: HttpServletRequest): Boolean = true
 }

@@ -21,23 +21,23 @@ import scala.jdk.CollectionConverters._
 import java.time.Instant
 
 class TimeHistogram {
-  @Expose(serialize = true)
-  var binsMin: java.util.List[Instant] = _
+    @Expose(serialize = true)
+    var binsMin: java.util.List[Instant] = _
 
-  @Expose(serialize = true)
-  var binsMax: java.util.List[Instant] = _
+    @Expose(serialize = true)
+    var binsMax: java.util.List[Instant] = _
 
-  @Expose(serialize = true)
-  var values: java.util.List[Int] = _
+    @Expose(serialize = true)
+    var values: java.util.List[Int] = _
 }
 
 object TimeHistogram {
 
-  def apply(binsMin: Seq[Instant], binsMax: Seq[Instant], values: Seq[Int]): TimeHistogram = {
-    val histogram = new TimeHistogram
-    histogram.binsMin = binsMin.asJava
-    histogram.binsMax = binsMax.asJava
-    histogram.values = values.asJava
-    histogram
-  }
+    def apply(binsMin: Seq[Instant], binsMax: Seq[Instant], values: Seq[Int]): TimeHistogram = {
+        val histogram = new TimeHistogram
+        histogram.binsMin = binsMin.asJava
+        histogram.binsMax = binsMax.asJava
+        histogram.values = values.asJava
+        histogram
+    }
 }

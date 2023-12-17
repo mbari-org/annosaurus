@@ -24,7 +24,7 @@ import scala.concurrent.ExecutionContext
 
 trait AssociationControllerITSuite extends BaseDAOSuite {
 
-    implicit val df: JPADAOFactory    = daoFactory
+    implicit val df: JPADAOFactory = daoFactory
 //    override implicit val ec: ExecutionContext = ExecutionContext.global
 
     override def beforeAll(): Unit = daoFactory.beforeAll()

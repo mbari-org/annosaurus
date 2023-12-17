@@ -17,7 +17,13 @@
 package org.mbari.annosaurus.controllers
 
 import org.mbari.annosaurus.etc.jdk.Strings
-import org.mbari.annosaurus.repository.jpa.entity.{AssociationEntity, CachedAncillaryDatumEntity, ImageReferenceEntity, ImagedMomentEntity, ObservationEntity}
+import org.mbari.annosaurus.repository.jpa.entity.{
+    AssociationEntity,
+    CachedAncillaryDatumEntity,
+    ImageReferenceEntity,
+    ImagedMomentEntity,
+    ObservationEntity
+}
 import org.mbari.scilube3.ocean.Ocean
 import org.mbari.annosaurus.repository.jpa.JPADAOFactory
 import org.mbari.annosaurus.repository.jpa.entity._
@@ -129,7 +135,8 @@ object TestUtils {
         val linkName  = Strings.random(random.nextInt(30) + 2)
         val linkValue = Strings.random(random.nextInt(254) + 2)
         val toConcept = Strings.random(random.nextInt(30) + 2)
-        AssociationEntity(linkName, toConcept, linkValue)
+        val mimeType  = Strings.random(random.nextInt(12))
+        AssociationEntity(linkName, toConcept, linkValue, mimeType)
     }
 
     def randomImageReference(): ImageReferenceEntity = {

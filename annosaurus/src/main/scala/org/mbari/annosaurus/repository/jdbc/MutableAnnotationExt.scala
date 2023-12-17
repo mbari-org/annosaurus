@@ -19,24 +19,24 @@ package org.mbari.annosaurus.repository.jdbc
 import com.google.gson.annotations.Expose
 import org.mbari.annosaurus.repository.jpa.MutableAnnotationImpl
 
-/**
-  * @author Brian Schlining
+/** @author
+  *   Brian Schlining
   * @since 2019-10-22T14:34:00
   */
 class MutableAnnotationExt extends MutableAnnotationImpl {
-  @Expose(serialize = true)
-  var ancillaryData: AncillaryDatumExt = _
+    @Expose(serialize = true)
+    var ancillaryData: AncillaryDatumExt = _
 
-  override def equals(obj: Any): Boolean = {
-    if (!obj.isInstanceOf[MutableAnnotationExt]) false
-    else {
-      val other: MutableAnnotationExt = obj.asInstanceOf[MutableAnnotationExt]
-      other.observationUuid != null &&
-      this.observationUuid != null &&
-      other.observationUuid == this.observationUuid
+    override def equals(obj: Any): Boolean = {
+        if (!obj.isInstanceOf[MutableAnnotationExt]) false
+        else {
+            val other: MutableAnnotationExt = obj.asInstanceOf[MutableAnnotationExt]
+            other.observationUuid != null &&
+            this.observationUuid != null &&
+            other.observationUuid == this.observationUuid
+        }
     }
-  }
 
-  override def hashCode(): Int = this.observationUuid.hashCode()
+    override def hashCode(): Int = this.observationUuid.hashCode()
 
 }

@@ -18,41 +18,40 @@ package org.mbari.annosaurus.model.simple
 
 import java.time.Instant
 import java.util
-import java.util.{UUID, List => JList}
+import java.util.{List => JList, UUID}
 
 import com.google.gson.annotations.Expose
 
 import scala.jdk.CollectionConverters._
 
-/**
-  * Data class enacpsulating information for concurrent requests. That is a request
-  * of annotations from multiple videos between a given time span
+/** Data class enacpsulating information for concurrent requests. That is a request of annotations
+  * from multiple videos between a given time span
   */
 class ConcurrentRequest {
 
-  @Expose(serialize = true)
-  var startTimestamp: Instant = _
+    @Expose(serialize = true)
+    var startTimestamp: Instant = _
 
-  @Expose(serialize = true)
-  var endTimestamp: Instant = _
+    @Expose(serialize = true)
+    var endTimestamp: Instant = _
 
-  @Expose(serialize = true)
-  var videoReferenceUuids: JList[UUID] = new util.ArrayList[UUID]()
+    @Expose(serialize = true)
+    var videoReferenceUuids: JList[UUID] = new util.ArrayList[UUID]()
 
-  def uuids: List[UUID] = videoReferenceUuids.asScala.toList
+    def uuids: List[UUID] = videoReferenceUuids.asScala.toList
 
 }
 
 object ConcurrentRequest {
-  def apply(
-      startTimestamp: Instant,
-      endTimestamp: Instant,
-      videoReferenceUuids: Seq[UUID]
-  ): ConcurrentRequest = {
-    val cr = new ConcurrentRequest
-    cr.startTimestamp = startTimestamp
-    cr.endTimestamp = endTimestamp
-    videoReferenceUuids.foreach(uuid => cr.videoReferenceUuids.add(uuid))
-    cr
-  }
+    def apply(
+        startTimestamp: Instant,
+        endTimestamp: Instant,
+        videoReferenceUuids: Seq[UUID]
+    ): ConcurrentRequest = {
+        val cr = new ConcurrentRequest
+        cr.startTimestamp = startTimestamp
+        cr.endTimestamp = endTimestamp
+        videoReferenceUuids.foreach(uuid => cr.videoReferenceUuids.add(uuid))
+        cr
+    }
 }

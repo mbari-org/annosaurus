@@ -17,12 +17,21 @@
 package org.mbari.annosaurus
 
 import org.junit.Assert._
-import org.mbari.annosaurus.model.{MutableAssociation, MutableCachedAncillaryDatum, MutableImageReference, MutableObservation}
+import org.mbari.annosaurus.model.{
+    MutableAssociation,
+    MutableCachedAncillaryDatum,
+    MutableImageReference,
+    MutableObservation
+}
 import org.mbari.annosaurus.repository.jpa.entity.ImagedMomentEntity
 
 object AssertUtils {
 
-    def assertSameImagedMoment(a: ImagedMomentEntity, b: ImagedMomentEntity, cascade: Boolean = true): Unit = {
+    def assertSameImagedMoment(
+        a: ImagedMomentEntity,
+        b: ImagedMomentEntity,
+        cascade: Boolean = true
+    ): Unit = {
         if (a == null && b == null) {
             // do nothing
         }
@@ -51,7 +60,11 @@ object AssertUtils {
         }
     }
 
-    def assertSameObservation(a: MutableObservation, b: MutableObservation, cascade: Boolean = true): Unit = {
+    def assertSameObservation(
+        a: MutableObservation,
+        b: MutableObservation,
+        cascade: Boolean = true
+    ): Unit = {
         if (a == null && b == null) {
             // do nothing
         }
@@ -108,7 +121,10 @@ object AssertUtils {
         }
     }
 
-    def assertSameAncillaryDatum(a: MutableCachedAncillaryDatum, b: MutableCachedAncillaryDatum): Unit = {
+    def assertSameAncillaryDatum(
+        a: MutableCachedAncillaryDatum,
+        b: MutableCachedAncillaryDatum
+    ): Unit = {
         if (a == null && b == null) {
             // do nothing
         }

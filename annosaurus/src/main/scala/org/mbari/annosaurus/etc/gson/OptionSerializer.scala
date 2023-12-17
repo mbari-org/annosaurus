@@ -20,39 +20,37 @@ import com.google.gson._
 
 import java.lang.reflect.{ParameterizedType, Type}
 
-/**
-  * @author Brian Schlining
+/** @author
+  *   Brian Schlining
   * @since 2017-11-14T11:42:00
   */
 class OptionSerializer extends JsonSerializer[Option[Any]] with JsonDeserializer[Option[Any]] {
 
+    private def innerType(outerType: Type) =
+        outerType match {
+            case pt: ParameterizedType => pt.getActualTypeArguments()(0)
+            case _                     => throw new UnsupportedOperationException("Expected ParameterizedType")
+        }
 
-  private def innerType(outerType: Type) = 
-    outerType match {
-      case pt: ParameterizedType => pt.getActualTypeArguments()(0)
-      case _                     => throw new UnsupportedOperationException("Expected ParameterizedType")
+    override def serialize(
+        src: Option[Any],
+        typeOfSrc: Type,
+        context: JsonSerializationContext
+    ): JsonElement = {
+        src match {
+            case None    => JsonNull.INSTANCE
+            case Some(v) => context.serialize(v, innerType(typeOfSrc))
+        }
     }
-  
-
-  override def serialize(
-      src: Option[Any],
-      typeOfSrc: Type,
-      context: JsonSerializationContext
-  ): JsonElement = {
-    src match {
-      case None    => JsonNull.INSTANCE
-      case Some(v) => context.serialize(v, innerType(typeOfSrc))
+    override def deserialize(
+        json: JsonElement,
+        typeOfT: Type,
+        context: JsonDeserializationContext
+    ): Option[Any] = {
+        json match {
+            case null                 => None
+            case _ if json.isJsonNull => None
+            case _                    => Some(context.deserialize(json, innerType(typeOfT)))
+        }
     }
-  }
-  override def deserialize(
-      json: JsonElement,
-      typeOfT: Type,
-      context: JsonDeserializationContext
-  ): Option[Any] = {
-    json match {
-      case null                 => None
-      case _ if json.isJsonNull => None
-      case _                    => Some(context.deserialize(json, innerType(typeOfT)))
-    }
-  }
 }

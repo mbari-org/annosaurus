@@ -19,37 +19,37 @@ package org.mbari.annosaurus.messaging
 import org.mbari.annosaurus.model.simple.ExtendedAssociation
 import org.mbari.annosaurus.model.{MutableAnnotation, MutableAssociation}
 
-/**
-  * @author Brian Schlining
+/** @author
+  *   Brian Schlining
   * @since 2020-03-04T13:31:00
   */
 sealed trait GenericMessage[+A] {
-  def content: A
-  def toJson: String
+    def content: A
+    def toJson: String
 }
 
-/**
-  * Send when a new annotation is created or an existing one is updated
+/** Send when a new annotation is created or an existing one is updated
   * @param content
   */
 case class AnnotationMessage(content: MutableAnnotation) extends GenericMessage[MutableAnnotation] {
 
-  override def hashCode(): Int =
-    this.content.observationUuid.hashCode() +
-      this.content.observationTimestamp.hashCode() * 3
+    override def hashCode(): Int =
+        this.content.observationUuid.hashCode() +
+            this.content.observationTimestamp.hashCode() * 3
 
-  override def equals(obj: Any): Boolean =
-    obj match {
-      case that: AnnotationMessage =>
-        this.content.observationUuid == that.content.observationUuid &&
-          this.content.observationTimestamp == that.content.observationTimestamp
-      case _ => false
-    }
+    override def equals(obj: Any): Boolean =
+        obj match {
+            case that: AnnotationMessage =>
+                this.content.observationUuid == that.content.observationUuid &&
+                this.content.observationTimestamp == that.content.observationTimestamp
+            case _                       => false
+        }
 
-  override def toJson: String = JsonEncoders.AnnotationEncoder(content).toJson
+    override def toJson: String = JsonEncoders.AnnotationEncoder(content).toJson
 }
 
-case class AssociationMessage(content: MutableAssociation) extends GenericMessage[MutableAssociation] {
+case class AssociationMessage(content: MutableAssociation)
+    extends GenericMessage[MutableAssociation] {
 //  override def hashCode(): Int = this.content.uuid.hashCode()
 //
 //  override def equals(obj: Any): Boolean = obj match {
@@ -57,8 +57,8 @@ case class AssociationMessage(content: MutableAssociation) extends GenericMessag
 //    case _ => false
 //  }
 
-  override def toJson: String = {
-    val ea = ExtendedAssociation(content)
-    JsonEncoders.ExtendedAssocationEncoder(ea).toJson
-  }
+    override def toJson: String = {
+        val ea = ExtendedAssociation(content)
+        JsonEncoders.ExtendedAssocationEncoder(ea).toJson
+    }
 }

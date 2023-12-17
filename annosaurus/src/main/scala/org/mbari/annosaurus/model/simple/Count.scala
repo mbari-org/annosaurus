@@ -18,21 +18,21 @@ package org.mbari.annosaurus.model.simple
 
 import com.google.gson.annotations.Expose
 
-/**
-  * @author Brian Schlining
+/** @author
+  *   Brian Schlining
   * @since 2019-12-12T10:46:00
   */
 class Count {
 
-  @Expose(serialize = true)
-  var count: Long = _
+    @Expose(serialize = true)
+    var count: Long = _
 
 }
 
 object Count {
-  def apply(n: Long) = {
-    val c = new Count
-    c.count = n
-    c
-  }
+    def apply(n: Long) = {
+        val c = new Count
+        c.count = n
+        c
+    }
 }

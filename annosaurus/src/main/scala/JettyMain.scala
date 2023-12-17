@@ -48,75 +48,74 @@ import java.util.{List => JList}
 
 object JettyMain {
 
-  SLF4JBridgeHandler.removeHandlersForRootLogger()
-  SLF4JBridgeHandler.install()
+    SLF4JBridgeHandler.removeHandlersForRootLogger()
+    SLF4JBridgeHandler.install()
 
-  // hold on to messaging objects so they don't get GC'd
-  private[this] val zmq = ZeroMQPublisher.autowire(Constants.AppConfig.zeroMQConfig)
+    // hold on to messaging objects so they don't get GC'd
+    private[this] val zmq = ZeroMQPublisher.autowire(Constants.AppConfig.zeroMQConfig)
 
-  def main(args: Array[String]): Unit = {
-    System.setProperty("user.timezone", "UTC")
-    val s = """                                                
+    def main(args: Array[String]): Unit = {
+        System.setProperty("user.timezone", "UTC")
+        val s = """                                                
       |   __ _ _ __  _ __   ___  ___  __ _ _   _ _ __ _   _ ___ 
       |  / _` | '_ \| '_ \ / _ \/ __|/ _` | | | | '__| | | / __|
       | | (_| | | | | | | | (_) \__ \ (_| | |_| | |  | |_| \__ \
       |  \__,_|_| |_|_| |_|\___/|___/\__,_|\__,_|_|   \__,_|___/""".stripMargin
-    println(s)
+        println(s)
 
+        val conf = Constants.AppConfig.httpConfig
 
-    val conf = Constants.AppConfig.httpConfig
+        LoggerFactory
+            .getLogger(getClass)
+            .atInfo
+            .log("Starting Jetty server on port {}", conf.port)
+        ZeroMQPublisher.log(zmq)
 
-    LoggerFactory.getLogger(getClass)
-      .atInfo
-      .log("Starting Jetty server on port {}", conf.port)
-    ZeroMQPublisher.log(zmq)
+        val server: Server         = new Server(conf.port)
+        server.setStopAtShutdown(true)
+        val context: WebAppContext = new WebAppContext()
+        context.setContextPath(conf.contextPath)
+        context.setResourceBase("src/main/webapp")
+        context.addEventListener(new ScalatraListener)
+        context.addServlet(classOf[DefaultServlet], "/")
+        server.setHandler(context)
+        server.start()
+        server.join()
 
-    val server: Server = new Server(conf.port)
-    server.setStopAtShutdown(true)
-    val context: WebAppContext = new WebAppContext()
-    context.setContextPath(conf.contextPath)
-    context.setResourceBase("src/main/webapp")
-    context.addEventListener(new ScalatraListener)
-    context.addServlet(classOf[DefaultServlet], "/")
-    server.setHandler(context)
-    server.start()
-    server.join()
+        // server.setStopTimeout(conf.stopTimeout.toLong)
+        // server.setStopAtShutdown(true)
 
+        // val httpConfig = new HttpConfiguration()
+        // httpConfig.setSendDateHeader(true)
+        // httpConfig.setSendServerVersion(false)
 
-    // server.setStopTimeout(conf.stopTimeout.toLong)
-    // server.setStopAtShutdown(true)
+        // val connector = new NetworkTrafficServerConnector(server, new HttpConnectionFactory(httpConfig))
+        // connector.setPort(conf.port)
+        // connector.setIdleTimeout(conf.connectorIdleTimeout.toLong)
+        // server.addConnector(connector)
 
-    // val httpConfig = new HttpConfiguration()
-    // httpConfig.setSendDateHeader(true)
-    // httpConfig.setSendServerVersion(false)
+        // val webApp = new WebAppContext
+        // webApp.setContextPath(conf.contextPath)
+        // webApp.setResourceBase("src/main/webapp")
+        // // webApp.setResourceBase(conf.webapp)
+        // // webApp.setEventListeners(Array(new ScalatraListener))
+        // webApp.setEventListeners(java.util.List.of(new ScalatraListener))
 
-    // val connector = new NetworkTrafficServerConnector(server, new HttpConnectionFactory(httpConfig))
-    // connector.setPort(conf.port)
-    // connector.setIdleTimeout(conf.connectorIdleTimeout.toLong)
-    // server.addConnector(connector)
+        // // Add JavaMelody for monitoring
+        // // webApp.addServlet(classOf[ReportServlet], "/monitoring")
+        // // webApp.addEventListener(new SessionListener)
+        // // val monitoringFilter = new FilterHolder(new MonitoringFilter())
+        // // monitoringFilter.setInitParameter(Parameter.APPLICATION_NAME.getCode, conf.webapp)
+        // // monitoringFilter.setInitParameter("authorized-users", "adminz:Cranchiidae")
 
-    // val webApp = new WebAppContext
-    // webApp.setContextPath(conf.contextPath)
-    // webApp.setResourceBase("src/main/webapp")
-    // // webApp.setResourceBase(conf.webapp)
-    // // webApp.setEventListeners(Array(new ScalatraListener))
-    // webApp.setEventListeners(java.util.List.of(new ScalatraListener))
+        // // webApp.addFilter(
+        // //   monitoringFilter,
+        // //   "/*",
+        // //   java.util.EnumSet.of(DispatcherType.REQUEST, DispatcherType.ASYNC)
+        // // )
 
-    // // Add JavaMelody for monitoring
-    // // webApp.addServlet(classOf[ReportServlet], "/monitoring")
-    // // webApp.addEventListener(new SessionListener)
-    // // val monitoringFilter = new FilterHolder(new MonitoringFilter())
-    // // monitoringFilter.setInitParameter(Parameter.APPLICATION_NAME.getCode, conf.webapp)
-    // // monitoringFilter.setInitParameter("authorized-users", "adminz:Cranchiidae")
+        // server.setHandler(webApp)
 
-    // // webApp.addFilter(
-    // //   monitoringFilter,
-    // //   "/*",
-    // //   java.util.EnumSet.of(DispatcherType.REQUEST, DispatcherType.ASYNC)
-    // // )
-
-    // server.setHandler(webApp)
-
-    // server.start()
-  }
+        // server.start()
+    }
 }

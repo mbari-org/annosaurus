@@ -21,10 +21,8 @@ import java.time.{Duration, Instant}
 import java.util.UUID
 import org.mbari.vcr4j.time.Timecode
 
-/**
-  *
-  *
-  * @author Brian Schlining
+/** @author
+  *   Brian Schlining
   * @since 2016-07-11T14:58:00
   */
 case class SimpleImagedMoment(
@@ -40,15 +38,15 @@ case class SimpleImagedMoment(
 
 object SimpleImagedMoment {
 
-  def apply(imagedMoment: MutableImagedMoment): SimpleImagedMoment =
-    new SimpleImagedMoment(
-      imagedMoment.uuid,
-      imagedMoment.videoReferenceUUID,
-      imagedMoment.timecode,
-      imagedMoment.elapsedTime,
-      imagedMoment.recordedDate,
-      imagedMoment.observations.map(SimpleObservation(_)),
-      imagedMoment.imageReferences.map(SimpleImageReference(_)),
-      SimpleAncillaryDatum(imagedMoment.ancillaryDatum)
-    )
+    def apply(imagedMoment: MutableImagedMoment): SimpleImagedMoment =
+        new SimpleImagedMoment(
+            imagedMoment.uuid,
+            imagedMoment.videoReferenceUUID,
+            imagedMoment.timecode,
+            imagedMoment.elapsedTime,
+            imagedMoment.recordedDate,
+            imagedMoment.observations.map(SimpleObservation(_)),
+            imagedMoment.imageReferences.map(SimpleImageReference(_)),
+            SimpleAncillaryDatum(imagedMoment.ancillaryDatum)
+        )
 }

@@ -20,10 +20,8 @@ import org.mbari.annosaurus.model.MutableCachedAncillaryDatum
 
 import java.util.UUID
 
-/**
-  *
-  *
-  * @author Brian Schlining
+/** @author
+  *   Brian Schlining
   * @since 2016-07-11T14:55:00
   */
 case class SimpleAncillaryDatum(
@@ -39,16 +37,16 @@ case class SimpleAncillaryDatum(
 
 object SimpleAncillaryDatum {
 
-  def apply(datum: MutableCachedAncillaryDatum): SimpleAncillaryDatum =
-    new SimpleAncillaryDatum(
-      datum.uuid,
-      datum.latitude,
-      datum.longitude,
-      datum.depthMeters,
-      datum.salinity,
-      datum.temperatureCelsius,
-      datum.oxygenMlL,
-      datum.pressureDbar
-    )
+    def apply(datum: MutableCachedAncillaryDatum): SimpleAncillaryDatum =
+        new SimpleAncillaryDatum(
+            datum.uuid,
+            datum.latitude,
+            datum.longitude,
+            datum.depthMeters,
+            datum.salinity,
+            datum.temperatureCelsius,
+            datum.oxygenMlL,
+            datum.pressureDbar
+        )
 
 }

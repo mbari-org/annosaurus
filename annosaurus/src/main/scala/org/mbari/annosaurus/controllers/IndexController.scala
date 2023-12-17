@@ -23,63 +23,62 @@ import java.util.UUID
 
 import scala.concurrent.{ExecutionContext, Future}
 
-/**
-  * @author Brian Schlining
+/** @author
+  *   Brian Schlining
   * @since 2019-02-08T11:00:00
   */
 class IndexController(val daoFactory: BasicDAOFactory)
     extends BaseController[MutableImagedMoment, IndexDAO[MutableImagedMoment]] {
 
-  protected type IDDAO = IndexDAO[MutableImagedMoment]
+    protected type IDDAO = IndexDAO[MutableImagedMoment]
 
-  override def newDAO(): IndexDAO[MutableImagedMoment] = daoFactory.newIndexDAO()
+    override def newDAO(): IndexDAO[MutableImagedMoment] = daoFactory.newIndexDAO()
 
-  def findByVideoReferenceUUID(uuid: UUID, limit: Option[Int] = None, offset: Option[Int] = None)(
-      implicit ec: ExecutionContext
-  ): Future[Iterable[MutableImagedMoment]] =
-    exec(d => d.findByVideoReferenceUuid(uuid, limit, offset))
+    def findByVideoReferenceUUID(uuid: UUID, limit: Option[Int] = None, offset: Option[Int] = None)(
+        implicit ec: ExecutionContext
+    ): Future[Iterable[MutableImagedMoment]] =
+        exec(d => d.findByVideoReferenceUuid(uuid, limit, offset))
 
-  /**
-    * Updates all recordedTimestamps thave have an elapsed time using
-    * the updated video starttimestamp
-    * @param videoReferenceUuid
-    * @param newStartTimestamp
-    * @param ec
-    * @return
-    */
-  def updateRecordedTimestamps(videoReferenceUuid: UUID, newStartTimestamp: Instant)(
-      implicit ec: ExecutionContext
-  ): Future[Iterable[MutableImagedMoment]] = {
-    def fn(dao: IDDAO): Iterable[MutableImagedMoment] = {
-      dao
-        .findByVideoReferenceUuid(videoReferenceUuid)
-        .map(im => {
-          if (im.elapsedTime != null) {
-            val newRecordedDate = newStartTimestamp.plus(im.elapsedTime)
-            if (newRecordedDate != im.recordedDate) {
-              im.recordedDate = newRecordedDate
-            }
-          }
-          im
-        })
+    /** Updates all recordedTimestamps thave have an elapsed time using the updated video
+      * starttimestamp
+      * @param videoReferenceUuid
+      * @param newStartTimestamp
+      * @param ec
+      * @return
+      */
+    def updateRecordedTimestamps(videoReferenceUuid: UUID, newStartTimestamp: Instant)(implicit
+        ec: ExecutionContext
+    ): Future[Iterable[MutableImagedMoment]] = {
+        def fn(dao: IDDAO): Iterable[MutableImagedMoment] = {
+            dao
+                .findByVideoReferenceUuid(videoReferenceUuid)
+                .map(im => {
+                    if (im.elapsedTime != null) {
+                        val newRecordedDate = newStartTimestamp.plus(im.elapsedTime)
+                        if (newRecordedDate != im.recordedDate) {
+                            im.recordedDate = newRecordedDate
+                        }
+                    }
+                    im
+                })
+        }
+        exec(fn)
     }
-    exec(fn)
-  }
 
-  def bulkUpdateRecordedTimestamps(
-      imagedMoments: Iterable[MutableImagedMoment]
-  )(implicit ec: ExecutionContext): Future[Iterable[MutableImagedMoment]] = {
-    def fn(dao: IDDAO): Iterable[MutableImagedMoment] = {
-      (for (im <- imagedMoments) yield {
-        dao
-          .findByUUID(im.uuid)
-          .map(i => {
-            Option(im.recordedDate).foreach(d => i.recordedDate = d)
-            i
-          })
-      }).flatten
+    def bulkUpdateRecordedTimestamps(
+        imagedMoments: Iterable[MutableImagedMoment]
+    )(implicit ec: ExecutionContext): Future[Iterable[MutableImagedMoment]] = {
+        def fn(dao: IDDAO): Iterable[MutableImagedMoment] = {
+            (for (im <- imagedMoments) yield {
+                dao
+                    .findByUUID(im.uuid)
+                    .map(i => {
+                        Option(im.recordedDate).foreach(d => i.recordedDate = d)
+                        i
+                    })
+            }).flatten
+        }
+        exec(fn)
     }
-    exec(fn)
-  }
 
 }

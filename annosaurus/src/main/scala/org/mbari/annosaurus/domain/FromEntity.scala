@@ -14,24 +14,10 @@
  * limitations under the License.
  */
 
-package org.mbari.annosaurus.model.simple
+package org.mbari.annosaurus.domain
 
-import java.util.UUID
+import org.mbari.annosaurus.PersistentObject
 
-import org.mbari.annosaurus.model.MutableAssociation
-
-/** @author
-  *   Brian Schlining
-  * @since 2016-07-11T14:54:00
-  */
-case class SimpleAssociation(uuid: UUID, linkName: String, toConcept: String, linkValue: String)
-
-object SimpleAssociation {
-    def apply(association: MutableAssociation): SimpleAssociation =
-        new SimpleAssociation(
-            association.uuid,
-            association.linkName,
-            association.toConcept,
-            association.linkValue
-        )
+trait FromEntity[A <: PersistentObject, B] {
+    def from(entity: A): B
 }

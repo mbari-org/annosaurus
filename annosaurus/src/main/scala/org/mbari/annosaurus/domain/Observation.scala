@@ -31,8 +31,8 @@ final case class Observation(
     associations: Seq[Association] = Nil,
     uuid: Option[UUID] = None,
     lastUpdated: Option[Instant] = None
-    
-) extends ToSnakeCase[ObservationSC] with ToEntity[ObservationEntity] {
+) extends ToSnakeCase[ObservationSC]
+    with ToEntity[ObservationEntity] {
     override def toSnakeCase: ObservationSC =
         ObservationSC(
             concept,
@@ -57,11 +57,11 @@ final case class Observation(
         associations.foreach(a => entity.addAssociation(a.toEntity))
         uuid.foreach(entity.uuid = _)
         entity
-        
+
     lazy val duration: Option[Duration] = durationMillis.map(Duration.ofMillis)
 }
 
-object Observation {
+object Observation extends FromEntity[MutableObservation, Observation] {
     def from(entity: MutableObservation): Observation = Observation(
         entity.concept,
         Option(entity.duration).map(_.toMillis),
@@ -84,7 +84,7 @@ final case class ObservationSC(
     observation_timestamp: Option[Instant] = None,
     associations: Seq[AssociationSC] = Nil,
     uuid: Option[UUID] = None,
-    last_updated_time: Option[Instant] = None,
+    last_updated_time: Option[Instant] = None
 ) extends ToCamelCase[Observation] {
     override def toCamelCase: Observation =
         Observation(

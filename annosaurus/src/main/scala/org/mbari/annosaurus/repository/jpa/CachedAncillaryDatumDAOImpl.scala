@@ -22,76 +22,84 @@ import org.mbari.annosaurus.model.MutableCachedAncillaryDatum
 import org.mbari.annosaurus.repository.CachedAncillaryDatumDAO
 import org.mbari.annosaurus.repository.jpa.entity.CachedAncillaryDatumEntity
 
-/**
-  *
-  *
-  * @author Brian Schlining
+/** @author
+  *   Brian Schlining
   * @since 2016-06-17T17:12:00
   */
 class CachedAncillaryDatumDAOImpl(entityManager: EntityManager)
     extends BaseDAO[CachedAncillaryDatumEntity](entityManager)
     with CachedAncillaryDatumDAO[CachedAncillaryDatumEntity] {
 
-  override def newPersistentObject(): CachedAncillaryDatumEntity = new CachedAncillaryDatumEntity
+    override def newPersistentObject(): CachedAncillaryDatumEntity = new CachedAncillaryDatumEntity
 
-  def newPersistentObject(
-      latitude: Double,
-      longitude: Double,
-      depthMeters: Double,
-      altitude: Option[Double] = None,
-      crs: Option[String] = None,
-      salinity: Option[Double] = None,
-      temperatureCelsius: Option[Double] = None,
-      oxygenMlL: Option[Double] = None,
-      pressureDbar: Option[Double] = None,
-      lightTransmission: Option[Double] = None,
-      x: Option[Double] = None,
-      y: Option[Double] = None,
-      z: Option[Double] = None,
-      posePositionUnits: Option[String] = None,
-      phi: Option[Double] = None,
-      theta: Option[Double] = None,
-      psi: Option[Double] = None
-  ): MutableCachedAncillaryDatum = {
+    def newPersistentObject(
+        latitude: Double,
+        longitude: Double,
+        depthMeters: Double,
+        altitude: Option[Double] = None,
+        crs: Option[String] = None,
+        salinity: Option[Double] = None,
+        temperatureCelsius: Option[Double] = None,
+        oxygenMlL: Option[Double] = None,
+        pressureDbar: Option[Double] = None,
+        lightTransmission: Option[Double] = None,
+        x: Option[Double] = None,
+        y: Option[Double] = None,
+        z: Option[Double] = None,
+        posePositionUnits: Option[String] = None,
+        phi: Option[Double] = None,
+        theta: Option[Double] = None,
+        psi: Option[Double] = None
+    ): MutableCachedAncillaryDatum = {
 
-    val cad = new CachedAncillaryDatumEntity()
-    cad.latitude = Some(latitude)
-    cad.longitude = Some(longitude)
-    cad.depthMeters = Some(depthMeters)
-    cad.altitude = altitude
-    crs.foreach(cad.crs = _)
-    cad.salinity = salinity
-    cad.temperatureCelsius = temperatureCelsius
-    cad.oxygenMlL = oxygenMlL
-    cad.pressureDbar = pressureDbar
-    cad.x = x
-    cad.y = y
-    cad.z = z
-    posePositionUnits.foreach(cad.posePositionUnits = _)
-    cad.phi = phi
-    cad.theta = theta
-    cad.psi = psi
-    cad
-  }
+        val cad = new CachedAncillaryDatumEntity()
+        cad.latitude = Some(latitude)
+        cad.longitude = Some(longitude)
+        cad.depthMeters = Some(depthMeters)
+        cad.altitude = altitude
+        crs.foreach(cad.crs = _)
+        cad.salinity = salinity
+        cad.temperatureCelsius = temperatureCelsius
+        cad.oxygenMlL = oxygenMlL
+        cad.pressureDbar = pressureDbar
+        cad.x = x
+        cad.y = y
+        cad.z = z
+        posePositionUnits.foreach(cad.posePositionUnits = _)
+        cad.phi = phi
+        cad.theta = theta
+        cad.psi = psi
+        cad
+    }
 
-  override def newPersistentObject(datum: MutableCachedAncillaryDatum): MutableCachedAncillaryDatum =
-    CachedAncillaryDatumEntity(datum)
+    override def newPersistentObject(
+        datum: MutableCachedAncillaryDatum
+    ): MutableCachedAncillaryDatum =
+        CachedAncillaryDatumEntity(datum)
 
-  override def findAll(
-      limit: Option[Int] = None,
-      offset: Option[Int] = None
-  ): Iterable[CachedAncillaryDatumEntity] =
-    findByNamedQuery("AncillaryDatum.findAll", limit = limit, offset = offset)
+    override def findAll(
+        limit: Option[Int] = None,
+        offset: Option[Int] = None
+    ): Iterable[CachedAncillaryDatumEntity] =
+        findByNamedQuery("AncillaryDatum.findAll", limit = limit, offset = offset)
 
-  override def findByObservationUUID(observationUuid: UUID): Option[MutableCachedAncillaryDatum] =
-    findByNamedQuery("AncillaryDatum.findByObservationUUID", Map("uuid" -> observationUuid)).headOption
+    override def findByObservationUUID(observationUuid: UUID): Option[MutableCachedAncillaryDatum] =
+        findByNamedQuery(
+            "AncillaryDatum.findByObservationUUID",
+            Map("uuid" -> observationUuid)
+        ).headOption
 
-  override def findByImagedMomentUUID(imagedMomentUuid: UUID): Option[MutableCachedAncillaryDatum] =
-    findByNamedQuery("AncillaryDatum.findByImagedMomentUUID", Map("uuid" -> imagedMomentUuid)).headOption
+    override def findByImagedMomentUUID(
+        imagedMomentUuid: UUID
+    ): Option[MutableCachedAncillaryDatum] =
+        findByNamedQuery(
+            "AncillaryDatum.findByImagedMomentUUID",
+            Map("uuid" -> imagedMomentUuid)
+        ).headOption
 
-  override def deleteByVideoReferenceUuid(videoReferenceUuid: UUID): Int = {
-    val query = entityManager.createNamedQuery("AncillaryDatum.deleteByVideoReferenceUuid")
-    query.setParameter(1, videoReferenceUuid)
-    query.executeUpdate()
-  }
+    override def deleteByVideoReferenceUuid(videoReferenceUuid: UUID): Int = {
+        val query = entityManager.createNamedQuery("AncillaryDatum.deleteByVideoReferenceUuid")
+        query.setParameter(1, videoReferenceUuid)
+        query.executeUpdate()
+    }
 }

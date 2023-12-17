@@ -42,7 +42,7 @@ final case class QueryConstraints(
     data: Option[Boolean] = Some(false),
     missionContacts: List[String] = Nil,
     platformName: Option[String] = None,
-    missionId: Option[String] = None,
+    missionId: Option[String] = None
 ) {
     def toSqlBuilder: QueryConstraintsSqlBuilder = {
         QueryConstraintsSqlBuilder(
@@ -65,7 +65,7 @@ final case class QueryConstraints(
             platformName,
             missionId,
             limit.getOrElse(5000),
-            offset.getOrElse(0),
+            offset.getOrElse(0)
         )
     }
 
@@ -91,7 +91,7 @@ final case class QueryConstraints(
             data,
             missionContacts,
             platformName,
-            missionId,
+            missionId
         )
     }
 }
@@ -117,7 +117,7 @@ final case class QueryConstraintsSC(
     data: Option[Boolean] = Some(false),
     mission_contacts: List[String] = Nil,
     platform_name: Option[String] = None,
-    mission_id: Option[String] = None,
+    mission_id: Option[String] = None
 ) {
     def toCamelCase: QueryConstraints = {
         QueryConstraints(
@@ -141,8 +141,7 @@ final case class QueryConstraintsSC(
             data,
             mission_contacts,
             platform_name,
-            mission_id,
+            mission_id
         )
     }
 }
-

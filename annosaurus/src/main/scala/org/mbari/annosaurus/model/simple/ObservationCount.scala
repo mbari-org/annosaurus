@@ -20,25 +20,25 @@ import java.util.UUID
 
 import com.google.gson.annotations.Expose
 
-/**
-  * @author Brian Schlining
+/** @author
+  *   Brian Schlining
   * @since 2018-07-19T13:57:00
   */
 class ObservationCount {
 
-  @Expose(serialize = true)
-  var videoReferenceUuid: UUID = _
+    @Expose(serialize = true)
+    var videoReferenceUuid: UUID = _
 
-  @Expose(serialize = true)
-  var count: Int = _
+    @Expose(serialize = true)
+    var count: Int = _
 
 }
 
 object ObservationCount {
-  def apply(videoReferenceUuid: UUID, observationCount: Int): ObservationCount = {
-    val oc = new ObservationCount
-    oc.videoReferenceUuid = videoReferenceUuid
-    oc.count = observationCount
-    oc
-  }
+    def apply(videoReferenceUuid: UUID, observationCount: Int): ObservationCount = {
+        val oc = new ObservationCount
+        oc.videoReferenceUuid = videoReferenceUuid
+        oc.count = observationCount
+        oc
+    }
 }

@@ -20,45 +20,45 @@ import com.google.gson.annotations.Expose
 
 class MutableGeographicRange {
 
-  @Expose(serialize = true)
-  var minLatitude: Double = _
+    @Expose(serialize = true)
+    var minLatitude: Double = _
 
-  @Expose(serialize = true)
-  var maxLatitude: Double = _
+    @Expose(serialize = true)
+    var maxLatitude: Double = _
 
-  @Expose(serialize = true)
-  var minLongitude: Double = _
+    @Expose(serialize = true)
+    var minLongitude: Double = _
 
-  @Expose(serialize = true)
-  var maxLongitude: Double = _
+    @Expose(serialize = true)
+    var maxLongitude: Double = _
 
-  @Expose(serialize = true)
-  var minDepthMeters: Double = _
+    @Expose(serialize = true)
+    var minDepthMeters: Double = _
 
-  @Expose(serialize = true)
-  var maxDepthMeters: Double = _
+    @Expose(serialize = true)
+    var maxDepthMeters: Double = _
 
 }
 
 object MutableGeographicRange {
-  def apply(
-      minLatitude: Double,
-      maxLatitude: Double,
-      minLongitude: Double,
-      maxLongitude: Double,
-      minDepthMeters: Double,
-      maxDepthMeters: Double
-  ): MutableGeographicRange = {
-    val gr = new MutableGeographicRange()
-    gr.minLatitude = minLatitude
-    gr.maxLatitude = maxLatitude
-    gr.minLongitude = minLongitude
-    gr.maxLongitude = maxLongitude
-    gr.minDepthMeters = minDepthMeters
-    gr.maxDepthMeters = maxDepthMeters
-    gr
-  }
+    def apply(
+        minLatitude: Double,
+        maxLatitude: Double,
+        minLongitude: Double,
+        maxLongitude: Double,
+        minDepthMeters: Double,
+        maxDepthMeters: Double
+    ): MutableGeographicRange = {
+        val gr = new MutableGeographicRange()
+        gr.minLatitude = minLatitude
+        gr.maxLatitude = maxLatitude
+        gr.minLongitude = minLongitude
+        gr.maxLongitude = maxLongitude
+        gr.minDepthMeters = minDepthMeters
+        gr.maxDepthMeters = maxDepthMeters
+        gr
+    }
 
-  val Empty: MutableGeographicRange =
-    apply(Double.NaN, Double.NaN, Double.NaN, Double.NaN, Double.NaN, Double.NaN)
+    val Empty: MutableGeographicRange =
+        apply(Double.NaN, Double.NaN, Double.NaN, Double.NaN, Double.NaN, Double.NaN)
 }

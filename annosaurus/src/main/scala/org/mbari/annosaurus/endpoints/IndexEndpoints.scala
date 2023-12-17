@@ -28,36 +28,38 @@ import java.util.UUID
 import org.mbari.annosaurus.domain.ImagedMoment
 import org.mbari.annosaurus.etc.circe.CirceCodecs.{*, given}
 
-class IndexEndpoints(controller: IndexController)(implicit val executor: ExecutionContext) extends Endpoints {
+class IndexEndpoints(controller: IndexController)(implicit val executor: ExecutionContext)
+    extends Endpoints {
 
     val findByVideoReferenceUUID = openEndpoint
         .get
         .in(paging)
         .in("v1" / "videoreference" / path[UUID]("uuid"))
         .out(jsonBody[List[ImagedMoment]].description("The IndexEntity objects"))
-    
+
     val findByVideoReferenceUUIDImpl = findByVideoReferenceUUID.serverLogic { (paging, uuid) =>
-        val f = controller.findByVideoReferenceUUID(uuid, paging.limit, paging.offset)
+        val f = controller
+            .findByVideoReferenceUUID(uuid, paging.limit, paging.offset)
             .map(xs => xs.map(ImagedMoment.from).toList)
         handleErrors(f)
     }
-    
+
     val bulkUpdateRecordedTimestamps = openEndpoint
         .put
         .in("v1" / "tapetime")
         .in(jsonBody[List[ImagedMoment]].description("The IndexEntity objects"))
         .out(jsonBody[List[ImagedMoment]].description("The IndexEntity objects"))
-    
+
     // val bulkUpdateRecordedTimestampsImpl = bulkUpdateRecordedTimestamps.serverLogic { indices =>
     //     val im = indices.map(ImagedMoment.from)
     //     val f = controller.bulkUpdateRecordedTimestamps(im)
     //     handleErrors(f)
     // }
-    
-     override def all: List[Endpoint[?, ?, ?, ?, ?]] = ???
+
+    override def all: List[Endpoint[?, ?, ?, ?, ?]] = ???
 //         List(findByVideoReferenceUUID, bulkUpdateRecordedTimestamps)
-    
-     override def allImpl: List[ServerEndpoint[Any, Future]] = ???
-         //List(findByVideoReferenceUUIDImpl, bulkUpdateRecordedTimestampsImpl)
-  
+
+    override def allImpl: List[ServerEndpoint[Any, Future]] = ???
+    // List(findByVideoReferenceUUIDImpl, bulkUpdateRecordedTimestampsImpl)
+
 }
