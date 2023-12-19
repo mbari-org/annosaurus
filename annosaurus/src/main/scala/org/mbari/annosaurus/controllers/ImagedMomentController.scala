@@ -19,11 +19,9 @@ package org.mbari.annosaurus.controllers
 import java.io.Closeable
 import java.time.{Duration, Instant}
 import java.util.UUID
-//
-//import org.mbari.vars.annotation.dao.jdbc.JdbcRepository
-//import org.mbari.vars.annotation.dao.jpa.JPADAOFactory
 
-import org.mbari.annosaurus.model.simple.WindowRequest
+
+import org.mbari.annosaurus.domain.WindowRequest
 import org.mbari.annosaurus.repository.{DAO, ImagedMomentDAO, NotFoundInDatastoreException}
 import org.mbari.vcr4j.time.Timecode
 import org.slf4j.LoggerFactory
@@ -31,6 +29,7 @@ import org.slf4j.LoggerFactory
 import scala.concurrent.{ExecutionContext, Future}
 import org.mbari.annosaurus.repository.jpa.JPADAOFactory
 import org.mbari.annosaurus.repository.jpa.entity.ImagedMomentEntity
+import java.awt.Window
 
 /** @author
   *   Brian Schlining
@@ -292,7 +291,7 @@ class ImagedMomentController(val daoFactory: JPADAOFactory)
       * @param sourceImagedMoment
       * @return
       */
-    def create(dao: DAO[_], sourceImagedMoment: ImagedMomentEntity): MutableImagedMoment = {
+    def create(dao: DAO[_], sourceImagedMoment: ImagedMomentEntity): ImagedMomentEntity = {
         val imDao  = daoFactory.newImagedMomentDAO(dao)
         val irDao  = daoFactory.newImageReferenceDAO(dao)
         val adDao  = daoFactory.newCachedAncillaryDatumDAO(dao)

@@ -16,16 +16,19 @@
 
 package org.mbari.annosaurus.controllers
 
-import org.mbari.annosaurus.model.{MutableImageReference, MutableImagedMoment}
+
 import java.net.URL
 import java.time.{Duration, Instant}
 import java.util.UUID
-import org.mbari.annosaurus.model.simple.Image
+
 import org.mbari.annosaurus.repository.ImagedMomentDAO
+import org.mbari.annosaurus.domain.Image
 import org.mbari.vcr4j.time.Timecode
 
 import scala.concurrent.{ExecutionContext, Future}
 import org.mbari.annosaurus.repository.jpa.JPADAOFactory
+import org.mbari.annosaurus.repository.jpa.entity.ImagedMomentEntity
+import org.mbari.annosaurus.repository.jpa.entity.ImageReferenceEntity
 
 /** Created by brian on 7/14/16.
   */
@@ -35,7 +38,7 @@ class ImageController(daoFactory: JPADAOFactory) {
         val irDao = daoFactory.newImageReferenceDAO()
         val f     = irDao.runTransaction(d => irDao.findByUUID(uuid))
         f.onComplete(t => irDao.close())
-        f.map(_.map(Image(_)))
+        f.map(_.map(Image.from(_)))
     }
 
     def findByVideoReferenceUUID(
@@ -45,24 +48,29 @@ class ImageController(daoFactory: JPADAOFactory) {
     )(implicit ec: ExecutionContext): Future[Seq[Image]] = {
         val dao = daoFactory.newImagedMomentDAO()
         val f   =
-            dao.runTransaction(d => d.findByVideoReferenceUUID(videoReferenceUUID, limit, offset))
+            dao.runTransaction(d => d.findByVideoReferenceUUID(videoReferenceUUID, limit, offset)
+                .flatMap(_.imageReferences)
+                .map(Image.from(_)))
+                .map(_.toSeq)
         f.onComplete(t => dao.close())
-        f.map(ims => ims.flatMap(_.imageReferences))
-            .map(irs => irs.toSeq.map(Image(_)))
+        f
     }
 
     def findByURL(url: URL)(implicit ec: ExecutionContext): Future[Option[Image]] = {
         val dao = daoFactory.newImageReferenceDAO()
-        val f   = dao.runTransaction(d => d.findByURL(url))
+        val f   = dao.runTransaction(d => d.findByURL(url)
+            .map(Image.from(_)))
         f.onComplete(_ => dao.close())
-        f.map(_.map(Image(_)))
+        f
     }
 
     def findByImageName(name: String)(implicit ec: ExecutionContext): Future[Seq[Image]] = {
         val dao = daoFactory.newImageReferenceDAO()
-        val f   = dao.runTransaction(d => d.findByImageName(name))
+        val f   = dao.runTransaction(d => d.findByImageName(name)
+            .map(Image.from(_))
+            .toSeq)
         f.onComplete(t => dao.close())
-        f.map(_.map(Image(_)))
+        f
     }
 
     def create(
@@ -93,10 +101,10 @@ class ImageController(daoFactory: JPADAOFactory) {
             imageReferenceUUID.foreach(uuid => imageReference.uuid = uuid)
             irDao.create(imageReference)
             imagedMoment.addImageReference(imageReference)
-            imageReference
+            Image.from(imageReference)
         })
         f.onComplete(t => irDao.close())
-        f.map(Image(_))
+        f
     }
 
     /** Update params. Note that if you provide video indices then the image is moved, the indices
@@ -162,11 +170,11 @@ class ImageController(daoFactory: JPADAOFactory) {
                 width.foreach(ir.width = _)
                 height.foreach(ir.height = _)
                 description.foreach(ir.description = _)
-                ir
+                Image.from(ir)
             })
         })
         f.onComplete(_ => irDao.close())
-        f.map(_.map(Image(_)))
+        f
     }
 
     def delete(uuid: UUID)(implicit ec: ExecutionContext): Future[Boolean] = {
@@ -194,9 +202,9 @@ class ImageController(daoFactory: JPADAOFactory) {
     }
 
     private def move(
-        dao: ImagedMomentDAO[MutableImagedMoment],
-        newIm: MutableImagedMoment,
-        imageReference: MutableImageReference
+        dao: ImagedMomentDAO[ImagedMomentEntity],
+        newIm: ImagedMomentEntity,
+        imageReference: ImageReferenceEntity
     ): Unit = {
         val oldIm = imageReference.imagedMoment
         if (!oldIm.uuid.equals(newIm.uuid)) {

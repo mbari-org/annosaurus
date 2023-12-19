@@ -17,19 +17,10 @@
 package org.mbari.annosaurus
 
 import com.fatboyindustrial.gsonjavatime.Converters
-import com.google.gson.reflect.TypeToken
-import com.google.gson.{FieldNamingPolicy, Gson, GsonBuilder}
+
 import com.typesafe.config.ConfigFactory
-import org.mbari.annosaurus.etc.gson.{
-    AssociationCreator,
-    CollectionConverter,
-    DurationConverter,
-    ImageReferenceCreator,
-    OptionSerializer,
-    TimecodeConverter
-}
-import org.mbari.annosaurus.model.{MutableAssociation, MutableImageReference}
-import org.mbari.annosaurus.etc.gson._
+
+
 import org.mbari.vcr4j.time.Timecode
 
 import java.lang.reflect.Type
@@ -43,62 +34,5 @@ object Constants {
 
     val AppConfig: AppConfig = new AppConfig(ConfigFactory.load())
 
-    /** Gson parser configured for the VAM's use cases.
-      */
-    val GSON: Gson = {
-
-        val gsonBuilder = new GsonBuilder()
-            .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
-            .excludeFieldsWithoutExposeAnnotation()
-            .setDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'")
-        Converters.registerInstant(gsonBuilder)
-
-        val durationType: Type = new TypeToken[Duration]() {}.getType
-        gsonBuilder.registerTypeAdapter(durationType, new DurationConverter)
-
-        val timecodeType: Type = new TypeToken[Timecode]() {}.getType
-        gsonBuilder.registerTypeAdapter(timecodeType, new TimecodeConverter)
-
-        val associationType: Type = new TypeToken[MutableAssociation]() {}.getType
-        gsonBuilder.registerTypeAdapter(associationType, new AssociationCreator)
-
-        val imageReferenceType: Type = new TypeToken[MutableImageReference]() {}.getType
-        gsonBuilder.registerTypeAdapter(imageReferenceType, new ImageReferenceCreator)
-
-        gsonBuilder.registerTypeAdapter(classOf[Option[Any]], new OptionSerializer)
-
-        gsonBuilder.registerTypeAdapter(classOf[java.util.Collection[_]], new CollectionConverter)
-
-        gsonBuilder.create()
-
-    }
-
-    val GSON_CAMEL_CASE = {
-        val gsonBuilder = new GsonBuilder()
-            .setPrettyPrinting()
-            .excludeFieldsWithoutExposeAnnotation()
-            .setDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'")
-        Converters.registerInstant(gsonBuilder)
-
-        val durationType: Type = new TypeToken[Duration]() {}.getType
-        gsonBuilder.registerTypeAdapter(durationType, new DurationConverter)
-
-        val timecodeType: Type = new TypeToken[Timecode]() {}.getType
-        gsonBuilder.registerTypeAdapter(timecodeType, new TimecodeConverter)
-
-        val associationType: Type = new TypeToken[MutableAssociation]() {}.getType
-        gsonBuilder.registerTypeAdapter(associationType, new AssociationCreator)
-
-        val imageReferenceType: Type = new TypeToken[MutableImageReference]() {}.getType
-        gsonBuilder.registerTypeAdapter(imageReferenceType, new ImageReferenceCreator)
-
-        gsonBuilder.registerTypeAdapter(classOf[Option[Any]], new OptionSerializer)
-
-        gsonBuilder.registerTypeAdapter(classOf[java.util.Collection[_]], new CollectionConverter)
-
-        gsonBuilder.create()
-    }
-
-    val GSON_FOR_ANNOTATION: Gson = GSON
 
 }

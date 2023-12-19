@@ -17,29 +17,46 @@
 package org.mbari.annosaurus.repository.jdbc
 
 import java.util.UUID
-import org.mbari.annosaurus.repository.jpa.MutableAnnotationImpl
-import org.mbari.annosaurus.model.MutableAnnotation
+import org.mbari.annosaurus.domain.Association
 
+@deprecated("Use Association's NamedQueries instead", "2023-12-18")
 object AssociationSQL {
 
-    def resultListToAssociations(rows: List[_]): Seq[MutableAssociationExt] = {
+    def resultListToAssociations(rows: List[_]): Seq[Association] = {
         for {
             row <- rows
         } yield {
             val xs = row.asInstanceOf[Array[Object]]
-            val a  = new MutableAssociationExt
-            a.uuid = UUID.fromString(xs(0).toString)
-            a.observationUuid = UUID.fromString(xs(1).toString)
-            Option(xs(2)).foreach(v => a.linkName = v.toString)
-            Option(xs(3)).foreach(v => a.toConcept = v.toString)
-            Option(xs(4)).foreach(v => a.linkValue = v.toString)
-            Option(xs(5)).foreach(v => a.mimeType = v.toString)
-            // a.linkName = xs(2).toString
-            // a.toConcept = xs(3).toString
-            // a.linkValue = xs(4).toString
-            // a.mimeType = xs(5).toString
-            a.imagedMomentUuid = UUID.fromString(xs(6).toString)
-            a
+            val uuid = UUID.fromString(xs(0).toString)
+            val observationUuid = UUID.fromString(xs(1).toString)
+            val linkName = Option(xs(2)).map(_.toString)
+            val toConcept = Option(xs(3)).map(_.toString)
+            val linkValue = Option(xs(4)).map(_.toString)
+            val mimeType = Option(xs(5)).map(_.toString)
+            val imagedMomentUuid = UUID.fromString(xs(6).toString)
+            Association(
+                linkName.getOrElse(""),
+                toConcept.getOrElse(""),
+                linkValue.getOrElse(""),
+                mimeType,
+                Option(uuid),
+                None,
+                Option(observationUuid),
+                Option(imagedMomentUuid)
+            )
+            // val a  = new MutableAssociationExt
+            // a.uuid = UUID.fromString(xs(0).toString)
+            // a.observationUuid = UUID.fromString(xs(1).toString)
+            // Option(xs(2)).foreach(v => a.linkName = v.toString)
+            // Option(xs(3)).foreach(v => a.toConcept = v.toString)
+            // Option(xs(4)).foreach(v => a.linkValue = v.toString)
+            // Option(xs(5)).foreach(v => a.mimeType = v.toString)
+            // // a.linkName = xs(2).toString
+            // // a.toConcept = xs(3).toString
+            // // a.linkValue = xs(4).toString
+            // // a.mimeType = xs(5).toString
+            // a.imagedMomentUuid = UUID.fromString(xs(6).toString)
+            // a
         }
     }
 

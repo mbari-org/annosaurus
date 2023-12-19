@@ -20,16 +20,18 @@ import java.util.UUID
 
 import io.reactivex.rxjava3.subjects.Subject
 import org.mbari.annosaurus.messaging.{AssociationPublisher, MessageBus}
-import org.mbari.annosaurus.model.simple.{
-    ConceptAssociation,
-    ConceptAssociationRequest,
-    ConceptAssociationResponse
-}
+
 import org.mbari.annosaurus.repository.{AssociationDAO, NotFoundInDatastoreException}
 
 import scala.concurrent.{ExecutionContext, Future}
 import org.mbari.annosaurus.repository.jpa.JPADAOFactory
 import org.mbari.annosaurus.repository.jpa.entity.AssociationEntity
+import org.mbari.annosaurus.domain.{
+    Association,
+    ConceptAssociation,
+    ConceptAssociationRequest,
+    ConceptAssociationResponse
+}
 
 /** @author
   *   Brian Schlining
@@ -71,7 +73,7 @@ class AssociationController(
                         )
                     associationUuid.foreach(uuid => association.uuid = uuid)
                     observation.addAssociation(association)
-                    associationPublisher.publish(association)
+                    associationPublisher.publish(Association.from(association))
                     association
             }
         }
@@ -104,7 +106,7 @@ class AssociationController(
                         association.observation.removeAssociation(association)
                         obs.addAssociation(association)
                     }
-                    associationPublisher.publish(association)
+                    associationPublisher.publish(Association.from(association))
                     association
                 })
         }

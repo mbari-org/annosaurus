@@ -54,6 +54,15 @@ abstract class BaseDAO[B <: PersistentObject: ClassTag](val entityManager: Entit
         limit: Option[Int] = None,
         offset: Option[Int] = None
     ): List[B] = {
+        findByTypedNamedQuery[B](name, namedParameters, limit, offset)
+    }
+
+    def findByTypedNamedQuery[C](
+        name: String,
+        namedParameters: Map[String, Any] = Map.empty,
+        limit: Option[Int] = None,
+        offset: Option[Int] = None
+    ): List[C] = {
         if (log.isDebugEnabled()) {
             log.debug(s"JPA Query => $name using $namedParameters")
         }
@@ -65,7 +74,7 @@ abstract class BaseDAO[B <: PersistentObject: ClassTag](val entityManager: Entit
             .getResultList
             .asScala
             .toList
-            .map(_.asInstanceOf[B])
+            .map(_.asInstanceOf[C])
     }
 
     /** Fetches the results as a stream. This better allows for fetching large sets and returning

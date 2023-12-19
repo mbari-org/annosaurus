@@ -18,12 +18,13 @@ package org.mbari.annosaurus.repository.jpa
 
 import java.util.UUID
 import jakarta.persistence.EntityManager
-import org.mbari.annosaurus.model.MutableAssociation
-import org.mbari.annosaurus.model.simple.{ConceptAssociation, ConceptAssociationRequest}
+
+
 import org.mbari.annosaurus.repository.AssociationDAO
 import org.mbari.annosaurus.repository.jpa.entity.AssociationEntity
 
 import scala.jdk.CollectionConverters._
+import org.mbari.annosaurus.domain.{ConceptAssociation, ConceptAssociationRequest}
 
 /** @author
   *   Brian Schlining
@@ -49,7 +50,7 @@ class AssociationDAOImpl(entityManager: EntityManager)
         a
     }
 
-    override def newPersistentObject(association: MutableAssociation): AssociationEntity =
+    override def newPersistentObject(association: AssociationEntity): AssociationEntity =
         AssociationEntity(association)
 
     override def findByLinkName(linkName: String): Iterable[AssociationEntity] =
@@ -113,50 +114,10 @@ class AssociationDAOImpl(entityManager: EntityManager)
         request: ConceptAssociationRequest
     ): Iterable[ConceptAssociation] = {
 
-        val sql   =
-            s"""
-        |SELECT
-        |  a.uuid,
-        |  i.video_reference_uuid,
-        |  o.concept,
-        |  a.link_name,
-        |  a.to_concept,
-        |  a.link_value,
-        |  a.mime_type
-        |FROM
-        |  associations a RIGHT JOIN
-        |  observations o ON a.observation_uuid = o.uuid RIGHT JOIN
-        |  imaged_moments i ON o.imaged_moment_uuid = i.uuid
-        |WHERE
-        |  i.video_reference_uuid IN ${request.uuids.mkString("('", "','", "')")} AND
-        |  a.link_name = '${request.linkName}'
-      """.stripMargin
-        val query = entityManager.createNativeQuery(sql)
-        // HACK: Dropping into SQL. Fast with ugly typecasting
-        // a.uuid, i.video_reference_uuid, o.concept, a.link_name, a.to_concept, a.link_value, a.mime_type
-        query
-            .getResultList
-            .asScala
-            .map(obj => obj.asInstanceOf[Array[Object]])
-            .map(obj => {
-//        obj.foreach(println)
-                val uuid               = UUID.fromString(obj(0).toString())
-                val videoReferenceUuid = UUID.fromString(obj(1).toString())
-                val conept             = obj(2).asInstanceOf[String]
-                val linkName           = obj(3).asInstanceOf[String]
-                val toConcept          = obj(4).asInstanceOf[String]
-                val linkValue          = obj(5).asInstanceOf[String]
-                val mimeType           = obj(6).asInstanceOf[String]
-                ConceptAssociation(
-                    uuid,
-                    videoReferenceUuid,
-                    conept,
-                    linkName,
-                    toConcept,
-                    linkValue,
-                    mimeType
-                )
-            })
+        findByTypedNamedQuery[ConceptAssociation]("Association.findByConceptAssociationRequest", 
+            Map("uuids" -> request.videoReferenceUuids.toList.asJava, 
+                "linkName" -> request.linkName)) 
+
     }
 
     override def findAll(

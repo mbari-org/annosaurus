@@ -20,45 +20,69 @@ import java.time.Duration
 import java.util.UUID
 import java.sql.Timestamp
 import org.mbari.vcr4j.time.Timecode
+import org.mbari.annosaurus.domain.Annotation
 
 /** Object that contains the SQL and methods to build annotations
   */
 object AnnotationSQL {
 
-    def resultListToAnnotations(rows: List[_]): Seq[MutableAnnotationExt] = {
+    def resultListToAnnotations(rows: List[_]): Seq[Annotation] = {
         for {
             row <- rows
         } yield {
             val xs = row.asInstanceOf[Array[Object]]
-            val a  = new MutableAnnotationExt
-            a.imagedMomentUuid = UUID.fromString(xs(0).toString)
-            a.videoReferenceUuid = UUID.fromString(xs(1).toString)
-            Option(xs(2))
-                .map(v => v.asInstanceOf[Number].longValue())
-                .map(Duration.ofMillis)
-                .foreach(v => a.elapsedTime = v)
-            Option(xs(3))
-                .map(v => v.asInstanceOf[Timestamp])
-                .map(v => v.toInstant)
-                .foreach(v => a.recordedTimestamp = v)
-            Option(xs(4))
-                .map(v => v.toString)
-                .map(v => new Timecode(v))
-                .foreach(v => a.timecode = v)
-            a.observationUuid = UUID.fromString(xs(5).toString)
-            a.concept = xs(6).toString
-            Option(xs(7)).foreach(v => a.activity = v.toString)
-            Option(xs(8))
-                .map(v => v.asInstanceOf[Number].longValue())
-                .map(Duration.ofMillis)
-                .foreach(v => a.duration = v)
-            Option(xs(9)).foreach(v => a.group = v.toString)
-            Option(xs(10)).foreach(v =>
-                a.observationTimestamp = v.asInstanceOf[Timestamp].toInstant
+            Annotation(
+                imagedMomentUuid = Some(UUID.fromString(xs(0).toString)),
+                videoReferenceUuid = Some(UUID.fromString(xs(1).toString)),
+                elapsedTimeMillis = Option(xs(2))
+                    .map(v => v.asInstanceOf[Number].longValue()),
+                recordedTimestamp = Option(xs(3))
+                    .map(v => v.asInstanceOf[Timestamp])
+                    .map(v => v.toInstant),
+                timecode = Option(xs(4)).map(_.toString()),
+                observationUuid = Some(UUID.fromString(xs(5).toString)),
+                concept = Option(xs(6)).map(_.toString),
+                activity = Option(xs(7)).map(_.toString()),
+                durationMillis = Option(xs(8))
+                    .map(v => v.asInstanceOf[Number].longValue()),
+                group = Option(xs(9)).map(_.toString()),
+                observationTimestamp = Option(xs(10))
+                    .map(v => v.asInstanceOf[Timestamp])
+                    .map(v => v.toInstant),
+                observer = Option(xs(11)).map(_.toString())
             )
-            // a.observationTimestamp = xs(10).asInstanceOf[Timestamp].toInstant
-            a.observer = xs(11).toString
-            a
+
+
+            // ORIGINAL CODE
+            // val a  = new MutableAnnotationExt
+            // a.imagedMomentUuid = UUID.fromString(xs(0).toString)
+            // a.videoReferenceUuid = UUID.fromString(xs(1).toString)
+            // Option(xs(2))
+            //     .map(v => v.asInstanceOf[Number].longValue())
+            //     .map(Duration.ofMillis)
+            //     .foreach(v => a.elapsedTime = v)
+            // Option(xs(3))
+            //     .map(v => v.asInstanceOf[Timestamp])
+            //     .map(v => v.toInstant)
+            //     .foreach(v => a.recordedTimestamp = v)
+            // Option(xs(4))
+            //     .map(v => v.toString)
+            //     .map(v => new Timecode(v))
+            //     .foreach(v => a.timecode = v)
+            // a.observationUuid = UUID.fromString(xs(5).toString)
+            // a.concept = xs(6).toString
+            // Option(xs(7)).foreach(v => a.activity = v.toString)
+            // Option(xs(8))
+            //     .map(v => v.asInstanceOf[Number].longValue())
+            //     .map(Duration.ofMillis)
+            //     .foreach(v => a.duration = v)
+            // Option(xs(9)).foreach(v => a.group = v.toString)
+            // Option(xs(10)).foreach(v =>
+            //     a.observationTimestamp = v.asInstanceOf[Timestamp].toInstant
+            // )
+            // // a.observationTimestamp = xs(10).asInstanceOf[Timestamp].toInstant
+            // a.observer = xs(11).toString
+            // a
         }
     }
 

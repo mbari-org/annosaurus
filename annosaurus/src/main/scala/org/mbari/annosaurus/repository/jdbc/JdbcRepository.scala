@@ -20,21 +20,18 @@ import java.sql.Timestamp
 import java.time.Instant
 import java.util.UUID
 import jakarta.persistence.{EntityManager, EntityManagerFactory, Query}
-import org.mbari.annosaurus.model.MutableGeographicRange
-import org.mbari.annosaurus.model.MutableAnnotation
-import org.mbari.annosaurus.model.simple.{
-    ConcurrentRequest,
-    DeleteCount,
-    Image,
-    MultiRequest,
-    QueryConstraints
-}
 import org.mbari.annosaurus.repository.jpa.DatabaseProductName
 import org.slf4j.LoggerFactory
 
 import scala.jdk.CollectionConverters._
 import scala.util.control.NonFatal
 import scala.util.Try
+import org.mbari.annosaurus.domain.{ConcurrentRequest, DeleteCount, MultiRequest}
+import org.mbari.annosaurus.domain.QueryConstraints
+import org.mbari.annosaurus.domain.Annotation
+import org.mbari.annosaurus.domain.GeographicRange
+import org.mbari.annosaurus.domain.Image
+
 
 /** Database access (read-only) provider that uses SQL for fast lookups. WHY? JPA makes about 1 +
   * (rows * 4) database requests when looking up annotations. For 1000 rows that 4001 database calls
@@ -80,8 +77,9 @@ class JdbcRepository(entityManagerFactory: EntityManagerFactory) {
         }
         catch {
             case NonFatal(e) =>
-                deleteCount.errorMessage =
-                    s"A(n) ${e.getClass} was thrown. It reports: `${e.getMessage}`"
+                val errorMessage = s"A(n) ${e.getClass} was thrown. It reports: `${e.getMessage}`"
+                deleteCount = deleteCount.copy(errorMessage = Some(errorMessage))
+                    
         }
         finally {
             if (transaction.isActive) {
@@ -93,20 +91,20 @@ class JdbcRepository(entityManagerFactory: EntityManagerFactory) {
 
     }
 
-    def findByQueryConstraint(constraints: QueryConstraints): Seq[MutableAnnotationExt] = {
+    def findByQueryConstraint(constraints: QueryConstraints): Seq[Annotation] = {
         implicit val entityManager: EntityManager = entityManagerFactory.createEntityManager()
-        val query1                                = QueryConstraints.toQuery(constraints, entityManager)
 
+        val query1                                = QueryConstraintsSqlBuilder.toQuery(constraints, entityManager)
         val r1          = query1.getResultList.asScala.toList
         val annotations = AnnotationSQL.resultListToAnnotations(r1)
-        executeQueryForAnnotations(annotations, constraints.data)
+        executeQueryForAnnotations(annotations, constraints.includeData)
         entityManager.close()
         annotations
     }
 
     def countByQueryConstraint(constraints: QueryConstraints): Int = {
         implicit val entityManager: EntityManager = entityManagerFactory.createEntityManager()
-        val query                                 = QueryConstraints.toCountQuery(constraints, entityManager)
+        val query                                 = QueryConstraintsSqlBuilder.toCountQuery(constraints, entityManager)
         // Postgresql returns a Long, Everything else returns an Int
         val count                                 = query.getResultList.get(0).toString().toInt
         entityManager.close()
@@ -115,15 +113,15 @@ class JdbcRepository(entityManagerFactory: EntityManagerFactory) {
 
     def findGeographicRangeByQueryConstraint(
         constraints: QueryConstraints
-    ): Option[MutableGeographicRange] = {
+    ): Option[GeographicRange] = {
         implicit val entityManager: EntityManager = entityManagerFactory.createEntityManager()
-        val query                                 = QueryConstraints.toGeographicRangeQuery(constraints, entityManager)
+        val query                                 = QueryConstraintsSqlBuilder.toGeographicRangeQuery(constraints, entityManager)
         // Queries return java.util.List[Array[Object]]
         val count                                 = query.getResultList.asScala.toList
         if (count.nonEmpty) {
             val head = count.head.asInstanceOf[Array[_]]
             Some(
-                MutableGeographicRange(
+                GeographicRange(
                     head(0).toString.toDouble,
                     head(1).toString.toDouble,
                     head(2).toString.toDouble,
@@ -140,7 +138,7 @@ class JdbcRepository(entityManagerFactory: EntityManagerFactory) {
         limit: Option[Int] = Some(1000),
         offset: Option[Int] = None,
         includeAncillaryData: Boolean = false
-    ): Seq[MutableAnnotationExt] = {
+    ): Seq[Annotation] = {
 
         implicit val entityManager: EntityManager = entityManagerFactory.createEntityManager()
         val query1                                = entityManager.createNativeQuery(AnnotationSQL.all)
@@ -150,7 +148,6 @@ class JdbcRepository(entityManagerFactory: EntityManagerFactory) {
         val r1          = query1.getResultList.asScala.toList
         val annotations = AnnotationSQL.resultListToAnnotations(r1)
         executeQueryForAnnotations(annotations, includeAncillaryData)
-//    if (includeAncillaryData) findAncillaryData(annotations)
         entityManager.close()
         annotations
 
@@ -186,7 +183,7 @@ class JdbcRepository(entityManagerFactory: EntityManagerFactory) {
         limit: Option[Int] = None,
         offset: Option[Int] = None,
         includeAncillaryData: Boolean = false
-    ): Seq[MutableAnnotationExt] = {
+    ): Seq[Annotation] = {
 
         implicit val entityManager: EntityManager = entityManagerFactory.createEntityManager()
 
@@ -219,7 +216,7 @@ class JdbcRepository(entityManagerFactory: EntityManagerFactory) {
         limit: Option[Int] = None,
         offset: Option[Int],
         includeAncillaryData: Boolean = false
-    ): Seq[MutableAnnotationExt] = {
+    ): Seq[Annotation] = {
 
         implicit val entityManager: EntityManager = entityManagerFactory.createEntityManager()
         val queries                               = List(
@@ -251,16 +248,16 @@ class JdbcRepository(entityManagerFactory: EntityManagerFactory) {
         limit: Option[Int] = None,
         offset: Option[Int] = None,
         includeAncillaryData: Boolean = false
-    ): Seq[MutableAnnotation] = {
+    ): Seq[Annotation] = {
 
-        val uuids = request.uuids.map(_.toString)
+        val videoReferenceUuids = request.videoReferenceUuids.map(_.toString)
 
         implicit val entityManager: EntityManager = entityManagerFactory.createEntityManager()
         val queries                               = List(
             AnnotationSQL.byConcurrentRequest,
             AssociationSQL.byConcurrentRequest,
             ImageReferenceSQL.byConcurrentRequest
-        ).map(sql => inClause(sql, uuids))
+        ).map(sql => inClause(sql, videoReferenceUuids))
             .map(entityManager.createNativeQuery)
 
         queries.foreach(q => {
@@ -280,8 +277,8 @@ class JdbcRepository(entityManagerFactory: EntityManagerFactory) {
         limit: Option[Int] = None,
         offset: Option[Int] = None,
         includeAncillaryData: Boolean = false
-    ): Seq[MutableAnnotationExt] = {
-        val uuids                                 = request.uuids.map(_.toString)
+    ): Seq[Annotation] = {
+        val uuids                                 = request.videoReferenceUuids.map(_.toString)
         implicit val entityManager: EntityManager = entityManagerFactory.createEntityManager()
         val queries                               = List(
             AnnotationSQL.byMultiRequest,
@@ -301,7 +298,7 @@ class JdbcRepository(entityManagerFactory: EntityManagerFactory) {
         limit: Option[Int] = None,
         offset: Option[Int] = None,
         includeAncillaryData: Boolean = false
-    ): Seq[MutableAnnotationExt] = {
+    ): Seq[Annotation] = {
         implicit val entityManager: EntityManager = entityManagerFactory.createEntityManager()
         val query1                                = entityManager.createNativeQuery(AnnotationSQL.byConcept)
         query1.setParameter(1, concept)
@@ -311,7 +308,6 @@ class JdbcRepository(entityManagerFactory: EntityManagerFactory) {
         val r1          = query1.getResultList.asScala.toList
         val annotations = AnnotationSQL.resultListToAnnotations(r1)
         executeQueryForAnnotations(annotations, includeAncillaryData)
-//    if (includeAncillaryData) findAncillaryData(annotations)
         entityManager.close()
         annotations
     }
@@ -321,7 +317,7 @@ class JdbcRepository(entityManagerFactory: EntityManagerFactory) {
         limit: Option[Int] = None,
         offset: Option[Int] = None,
         includeAncillaryData: Boolean = false
-    ): Seq[MutableAnnotationExt] = {
+    ): Seq[Annotation] = {
         implicit val entityManager: EntityManager = entityManagerFactory.createEntityManager()
         val query1                                = entityManager.createNativeQuery(AnnotationSQL.byConceptWithImages)
         query1.setParameter(1, concept)
@@ -340,7 +336,7 @@ class JdbcRepository(entityManagerFactory: EntityManagerFactory) {
         limit: Option[Int] = None,
         offset: Option[Int] = None,
         includeAncillaryData: Boolean = false
-    ): Seq[MutableAnnotationExt] = {
+    ): Seq[Annotation] = {
         implicit val entityManager: EntityManager = entityManagerFactory.createEntityManager()
         val query1                                = entityManager.createNativeQuery(AnnotationSQL.byToConceptWithImages)
         query1.setParameter(1, toConcept)
@@ -415,14 +411,14 @@ class JdbcRepository(entityManagerFactory: EntityManagerFactory) {
         linkName: String,
         linkValue: String,
         includeAncillaryData: Boolean = false
-    ): Seq[MutableAnnotationExt] = {
+    ): Seq[Annotation] = {
         implicit val entityManager: EntityManager = entityManagerFactory.createEntityManager()
         val query                                 = entityManager.createNativeQuery(AssociationSQL.byLinkNameAndLinkValue)
         query.setParameter(1, linkName)
         query.setParameter(2, linkValue)
         val results                               = query.getResultList.asScala.toList
         val associations                          = AssociationSQL.resultListToAssociations(results)
-        val imagedMomentUuids                     = associations.map(_.imagedMomentUuid)
+        val imagedMomentUuids                     = associations.flatMap(_.imagedMomentUuid)
         val annotations                           =
             executeQueryForAnnotationsUsingImagedMomentUuids(
                 imagedMomentUuids,
@@ -440,7 +436,7 @@ class JdbcRepository(entityManagerFactory: EntityManagerFactory) {
     private def executeQueryForAnnotationsUsingImagedMomentUuids(
         imagedMomentUuids: Seq[UUID],
         includeAncillaryData: Boolean = false
-    )(implicit entityManager: EntityManager): Seq[MutableAnnotationExt] = {
+    )(implicit entityManager: EntityManager): Seq[Annotation] = {
         val imUuids     = imagedMomentUuids.map(_.toString).distinct
         val annotations = (for (im <- imUuids.grouped(200)) yield {
             val sql     = inClause(AnnotationSQL.byImagedMomentUuids, im)
@@ -452,9 +448,9 @@ class JdbcRepository(entityManagerFactory: EntityManagerFactory) {
     }
 
     private def executeQueryForAnnotations(
-        annotations: Seq[MutableAnnotationExt],
+        annotations: Seq[Annotation],
         includeAncillaryData: Boolean = false
-    )(implicit entityManager: EntityManager): Seq[MutableAnnotationExt] = {
+    )(implicit entityManager: EntityManager): Seq[Annotation] = {
 
         // lookup associations
         val observationUuids = annotations.map(_.observationUuid.toString).distinct
@@ -488,7 +484,7 @@ class JdbcRepository(entityManagerFactory: EntityManagerFactory) {
         limit: Option[Int] = None,
         offset: Option[Int] = None,
         includeAncillaryData: Boolean = false
-    )(implicit entityManager: EntityManager): Seq[MutableAnnotationExt] = {
+    )(implicit entityManager: EntityManager): Seq[Annotation] = {
 
         limit.foreach(annotationQuery.setMaxResults)
         offset.foreach(annotationQuery.setFirstResult)
@@ -518,8 +514,8 @@ class JdbcRepository(entityManagerFactory: EntityManagerFactory) {
     }
 
     private def findAncillaryData(
-        annotations: Seq[MutableAnnotationExt]
-    )(implicit entityManager: EntityManager): Seq[MutableAnnotationExt] = {
+        annotations: Seq[Annotation]
+    )(implicit entityManager: EntityManager): Seq[Annotation] = {
 
         for (annos <- annotations.grouped(200)) {
             val ims   = annos.map(_.imagedMomentUuid.toString).distinct

@@ -16,20 +16,21 @@
 
 package org.mbari.annosaurus.repository
 
-import org.mbari.annosaurus.model.MutableCachedVideoReferenceInfo
+
 
 import java.util.UUID
+import org.mbari.annosaurus.PersistentObject
 
 /** @author
   *   Brian Schlining
   * @since 2016-06-17T16:10:00
   */
-trait CachedVideoReferenceInfoDAO[T <: MutableCachedVideoReferenceInfo] extends DAO[T] {
+trait CachedVideoReferenceInfoDAO[T <: PersistentObject] extends DAO[T] {
 
-    def findByVideoReferenceUUID(uuid: UUID): Option[MutableCachedVideoReferenceInfo]
-    def findByPlatformName(platformName: String): Iterable[MutableCachedVideoReferenceInfo]
-    def findByMissionID(missionID: String): Iterable[MutableCachedVideoReferenceInfo]
-    def findByMissionContact(missionContact: String): Iterable[MutableCachedVideoReferenceInfo]
+    def findByVideoReferenceUUID(uuid: UUID): Option[T]
+    def findByPlatformName(platformName: String): Iterable[T]
+    def findByMissionID(missionID: String): Iterable[T]
+    def findByMissionContact(missionContact: String): Iterable[T]
     def findAllVideoReferenceUUIDs(): Iterable[UUID]
     def findAllMissionContacts(): Iterable[String]
     def findAllPlatformNames(): Iterable[String]

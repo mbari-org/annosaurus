@@ -23,18 +23,18 @@ import java.util.concurrent.Executors
 
 import io.reactivex.rxjava3.subjects.Subject
 import org.mbari.annosaurus.messaging.{AnnotationPublisher, MessageBus}
-import org.mbari.annosaurus.model.MutableAnnotation
-import org.mbari.annosaurus.repository.jpa.MutableAnnotationImpl
-import org.mbari.annosaurus.model.simple.{ConcurrentRequest, MultiRequest}
+import org.mbari.annosaurus.domain.{ConcurrentRequest, MultiRequest}
+
 import org.mbari.annosaurus.repository.DAO
 import org.mbari.annosaurus.repository.jpa.UUIDSequence
-import org.mbari.annosaurus.repository.jpa.entity.{ImagedMomentEntity< ObservationEntity}
+import org.mbari.annosaurus.repository.jpa.entity.{ImagedMomentEntity, ObservationEntity}
 import org.mbari.vcr4j.time.Timecode
 import org.mbari.annosaurus.repository.jpa.Implicits._
 
 import scala.concurrent.{ExecutionContext, Future}
 import org.mbari.annosaurus.repository.jpa.JPADAOFactory
 import org.mbari.annosaurus.repository.jpa.entity.ObservationEntity
+import org.mbari.annosaurus.domain.Annotation
 
 /** @author
   *   Brian Schlining
@@ -42,23 +42,16 @@ import org.mbari.annosaurus.repository.jpa.entity.ObservationEntity
   */
 class AnnotationController(daoFactory: JPADAOFactory, bus: Subject[Any] = MessageBus.RxSubject) {
 
-    // HACK Assumes where using JDADAPFactory!
-//  private[this] val repository: JdbcRepository = {
-//    val entityManagerFactory = daoFactory.asInstanceOf[JPADAOFactory].entityManagerFactory
-//    new JdbcRepository(entityManagerFactory)
-//  }
+
 
     private[this] val imagedMomentController = new ImagedMomentController(daoFactory)
     private[this] val annotationPublisher    = new AnnotationPublisher(bus)
 
-    // Executor to throttle bulk inserts
-    // private[this] val bulkExecutionContext: ExecutionContext = ExecutionContext.fromExecutor(Executors.newFixedThreadPool(1))
-
-    def findByUUID(uuid: UUID)(implicit ec: ExecutionContext): Future[Option[MutableAnnotation]] = {
+    def findByUUID(uuid: UUID)(implicit ec: ExecutionContext): Future[Option[Annotation]] = {
         val obsDao = daoFactory.newObservationDAO()
         val f      = obsDao.runTransaction(d => obsDao.findByUUID(uuid))
         f.onComplete(_ => obsDao.close())
-        f.map(_.map(MutableAnnotationImpl(_)))
+        f.map(_.map(obs => Annotation.from(obs, true)))
     }
 
     def countByVideoReferenceUuid(uuid: UUID)(implicit ec: ExecutionContext): Future[Int] = {
@@ -80,13 +73,13 @@ class AnnotationController(daoFactory: JPADAOFactory, bus: Subject[Any] = Messag
         limit: Option[Int] = None,
         offset: Option[Int] = None,
         includedAncillaryData: Boolean = false
-    )(implicit ec: ExecutionContext): Future[Seq[MutableAnnotation]] = {
+    )(implicit ec: ExecutionContext): Future[Seq[Annotation]] = {
 
         val dao = daoFactory.newObservationDAO()
         val f   =
             dao.runTransaction(d => d.findByVideoReferenceUUID(videoReferenceUUID, limit, offset))
         f.onComplete(_ => dao.close())
-        f.map(_.map(MutableAnnotationImpl(_)).toSeq)
+        f.map(_.map(obs => Annotation.from(obs, true)).toSeq)
     }
 
     /** @param videoReferenceUuid
@@ -100,13 +93,13 @@ class AnnotationController(daoFactory: JPADAOFactory, bus: Subject[Any] = Messag
         videoReferenceUuid: UUID,
         limit: Option[Int] = None,
         offset: Option[Int] = None
-    ): (Closeable, java.util.stream.Stream[MutableAnnotation]) = {
+    ): (Closeable, java.util.stream.Stream[Annotation]) = {
         val dao = daoFactory.newObservationDAO()
         (
             () => dao.close(),
             dao
                 .streamByVideoReferenceUUID(videoReferenceUuid, limit, offset)
-                .map(obs => MutableAnnotationImpl(obs))
+                .map(obs => Annotation.from(obs, true))
         )
     }
 
@@ -116,7 +109,7 @@ class AnnotationController(daoFactory: JPADAOFactory, bus: Subject[Any] = Messag
         endTimestamp: Instant,
         limit: Option[Int] = None,
         offset: Option[Int] = None
-    ): (Closeable, java.util.stream.Stream[MutableAnnotation]) = {
+    ): (Closeable, java.util.stream.Stream[Annotation]) = {
 //    val dao = daoFactory.newImagedMomentDAO()
 //    (() => dao.close(),
 //      dao.streamByVideoReferenceUUIDAndTimestamps(videoReferenceUuid, startTimestamp, endTimestamp, limit, offset)
@@ -132,7 +125,7 @@ class AnnotationController(daoFactory: JPADAOFactory, bus: Subject[Any] = Messag
                     limit,
                     offset
                 )
-                .map(obs => MutableAnnotationImpl(obs))
+                .map(obs => Annotation.from(obs, true))
         )
     }
 
@@ -140,12 +133,12 @@ class AnnotationController(daoFactory: JPADAOFactory, bus: Subject[Any] = Messag
         request: ConcurrentRequest,
         limit: Option[Int],
         offset: Option[Int]
-    ): (Closeable, java.util.stream.Stream[MutableAnnotation]) = {
+    ): (Closeable, java.util.stream.Stream[Annotation]) = {
         val dao = daoFactory.newObservationDAO()
         (
             () => dao.close(),
             dao.streamByConcurrentRequest(request, limit, offset)
-                .map(obs => MutableAnnotationImpl(obs))
+                .map(obs => Annotation.from(obs, true))
         )
     }
 
@@ -162,11 +155,11 @@ class AnnotationController(daoFactory: JPADAOFactory, bus: Subject[Any] = Messag
         request: MultiRequest,
         limit: Option[Int],
         offset: Option[Int]
-    ): (Closeable, java.util.stream.Stream[MutableAnnotation]) = {
+    ): (Closeable, java.util.stream.Stream[Annotation]) = {
         val dao = daoFactory.newObservationDAO()
         (
             () => dao.close(),
-            dao.streamByMultiRequest(request, limit, offset).map(obs => MutableAnnotationImpl(obs))
+            dao.streamByMultiRequest(request, limit, offset).map(obs => Annotation.from(obs))
         )
     }
 
@@ -179,7 +172,7 @@ class AnnotationController(daoFactory: JPADAOFactory, bus: Subject[Any] = Messag
 
     def findByImageReferenceUUID(
         imageReferenceUUID: UUID
-    )(implicit ec: ExecutionContext): Future[Iterable[MutableAnnotation]] = {
+    )(implicit ec: ExecutionContext): Future[Iterable[Annotation]] = {
 
         val imDao = daoFactory.newImagedMomentDAO()
         val f     = imDao.runTransaction(d => d.findByImageReferenceUUID(imageReferenceUUID))
@@ -187,7 +180,7 @@ class AnnotationController(daoFactory: JPADAOFactory, bus: Subject[Any] = Messag
         f.map {
             case None     => Nil
             case Some(im) => im.observations
-        }.map(obs => obs.map(MutableAnnotationImpl(_)))
+        }.map(obs => obs.map(Annotation.from(_)))
     }
 
     def create(
@@ -201,34 +194,28 @@ class AnnotationController(daoFactory: JPADAOFactory, bus: Subject[Any] = Messag
         duration: Option[Duration] = None,
         group: Option[String] = None,
         activity: Option[String] = None
-    )(implicit ec: ExecutionContext): Future[MutableAnnotation] = {
-        val annotation = MutableAnnotationImpl(
-            videoReferenceUUID,
-            concept,
-            observer,
-            observationDate,
-            timecode,
-            elapsedTime,
-            recordedDate,
-            duration,
-            group,
-            activity
-        )
-
+    )(implicit ec: ExecutionContext): Future[Annotation] = {
         // We need to assign a UUID first so that we can find the correct
         // observation. This is only needed if more than one observation
         // exists at the same timestamp
         val observationUuid = UUIDSequence.newUuid()
-        annotation.observationUuid = observationUuid
+        val annotation = Annotation(
+            videoReferenceUuid = Option(videoReferenceUUID),
+            concept = Some(concept),
+            observer = Some(observer),
+            observationTimestamp = Some(observationDate),
+            timecode = timecode.map(_.toString),
+            elapsedTimeMillis = elapsedTime.map(_.toMillis),
+            recordedTimestamp = recordedDate,
+            durationMillis = duration.map(_.toMillis),
+            group = group,
+            activity = activity,
+            observationUuid = Some(observationUuid)
+        )
 
         bulkCreate(Seq(annotation))
             .map(xs => xs.find(_.observationUuid == observationUuid).get)
 
-//    val f = obsDao.runTransaction(d => create(d, annotation))
-//    f.onComplete(_ => obsDao.close())
-//    val rf = f.map(MutableAnnotationImpl(_))
-//    rf.foreach(annotationPublisher.publish) // publish new annotations
-//    rf
     }
 
     /** Bulk create annotations
@@ -238,7 +225,7 @@ class AnnotationController(daoFactory: JPADAOFactory, bus: Subject[Any] = Messag
       *   The newly created annotations along with any existing ones that share the same
       *   imagedMoment
       */
-    def bulkCreate(annotations: Iterable[MutableAnnotation]): Future[Seq[MutableAnnotationImpl]] = {
+    def bulkCreate(annotations: Iterable[Annotation]): Future[Seq[Annotation]] = {
 
         // We're inserting the annotations using a fixed thread executor
         // grouping them into 50 annotation chunks (ie. 50 annotations per
@@ -249,7 +236,8 @@ class AnnotationController(daoFactory: JPADAOFactory, bus: Subject[Any] = Messag
 
         val obsDao = daoFactory.newObservationDAO()
 
-        val imagedMoments = ImagedMomentEntity(annotations.toSeq)
+        val imagedMoments = Annotation.toEntities(annotations.toSeq)
+
         val futures       = imagedMoments
             .grouped(50)
             .map(imagedMoments => {
@@ -257,7 +245,7 @@ class AnnotationController(daoFactory: JPADAOFactory, bus: Subject[Any] = Messag
                     obsDao.runTransaction(d =>
                         imagedMoments.map(i => imagedMomentController.create(d, i))
                     )
-                f.map(imagedMomentList => imagedMomentList.flatMap(i => MutableAnnotationImpl(i)))
+                f.map(imagedMomentList => imagedMomentList.flatMap(i => Annotation.fromImagedMoment(i, true)))
             })
         val future        = Future.sequence(futures)
         future.onComplete(_ => obsDao.close())
@@ -339,7 +327,7 @@ class AnnotationController(daoFactory: JPADAOFactory, bus: Subject[Any] = Messag
         duration: Option[Duration] = None,
         group: Option[String] = None,
         activity: Option[String] = None
-    )(implicit ec: ExecutionContext): Future[Option[MutableAnnotation]] = {
+    )(implicit ec: ExecutionContext): Future[Option[Annotation]] = {
 
         // We have to do this in 2 transactions. The first makes all the changes. The second to
         // retrieve them. We have to do this because we may make a SQL call to move an observaton
@@ -366,7 +354,7 @@ class AnnotationController(daoFactory: JPADAOFactory, bus: Subject[Any] = Messag
 
         val g = f.flatMap(opt => {
             val dao1 = daoFactory.newObservationDAO()
-            val ff   = dao1.runTransaction(d => d.findByUUID(uuid).map(MutableAnnotationImpl(_)))
+            val ff   = dao1.runTransaction(d => d.findByUUID(uuid).map(Annotation.from(_, true)))
             ff.onComplete(_ => dao1.close())
             ff
         })
@@ -377,28 +365,33 @@ class AnnotationController(daoFactory: JPADAOFactory, bus: Subject[Any] = Messag
     }
 
     def bulkUpdate(
-        annotations: Iterable[MutableAnnotation]
-    )(implicit ec: ExecutionContext): Future[Iterable[MutableAnnotationImpl]] = {
+        annotations: Iterable[Annotation]
+    )(implicit ec: ExecutionContext): Future[Iterable[Annotation]] = {
         val dao = daoFactory.newObservationDAO()
         // We have to do this in 2 transactions. The first makes all the changes. The second to
         // retrieve them. We have to do this because we may make a SQL call to move an observaton
         // to a new imagedmoment. The enitymanage doesn't see this change and so returns the cached
         // value which may have the wrong time index or videoreference.
+        val goodAnnos = annotations.filter(x => x.observationUuid.isDefined 
+                && x.concept.isDefined
+                && x.videoReferenceUuid.isDefined
+                && x.observer.isDefined 
+                && x.observationTimestamp.isDefined)
         val f   = dao.runTransaction(d => {
-            annotations.flatMap(a => {
+            goodAnnos.flatMap(a => {
                 _update(
                     d,
-                    a.observationUuid,
-                    Some(a.videoReferenceUuid),
-                    Some(a.concept),
-                    Some(a.observer),
-                    a.observationTimestamp,
-                    Option(a.timecode),
-                    Option(a.elapsedTime),
-                    Option(a.recordedTimestamp),
-                    Option(a.duration),
-                    Option(a.group),
-                    Option(a.activity)
+                    a.observationUuid.get,
+                    a.videoReferenceUuid,
+                    a.concept,
+                    a.observer,
+                    a.observationTimestamp.get,
+                    a.validTimecode,
+                    a.elapsedTime,
+                    a.recordedTimestamp,
+                    a.duration,
+                    a.group,
+                    a.activity
                 )
             })
         })
@@ -408,7 +401,7 @@ class AnnotationController(daoFactory: JPADAOFactory, bus: Subject[Any] = Messag
             val dao1 = daoFactory.newObservationDAO()
             val ff   =
                 dao1.runTransaction(d =>
-                    obs.flatMap(o => d.findByUUID(o.uuid).map(MutableAnnotationImpl(_)))
+                    obs.flatMap(o => d.findByUUID(o.uuid).map(Annotation.from(_, true)))
                 )
             ff.onComplete(_ => dao1.close())
             ff.foreach(annotationPublisher.publish)
@@ -418,26 +411,29 @@ class AnnotationController(daoFactory: JPADAOFactory, bus: Subject[Any] = Messag
     }
 
     def bulkUpdateRecordedTimestampOnly(
-        annotations: Iterable[MutableAnnotation]
-    )(implicit ec: ExecutionContext): Future[Iterable[MutableAnnotationImpl]] = {
-        val dao = daoFactory.newObservationDAO()
-        val f   = dao.runTransaction(d => {
-            annotations.flatMap(a => {
-                _updateRecordedTimestamp(d, a.observationUuid, Option(a.recordedTimestamp))
+        annotations: Iterable[Annotation]
+    )(implicit ec: ExecutionContext): Future[Iterable[Annotation]] = {
+        if (annotations.isEmpty) return Future.successful(Nil)
+        else
+            val goodAnnos = annotations.filter(x => x.observationUuid.isDefined)
+            val dao = daoFactory.newObservationDAO()
+            val f   = dao.runTransaction(d => {
+                goodAnnos.flatMap(a => {
+                    _updateRecordedTimestamp(d, a.observationUuid.get, a.recordedTimestamp)
+                })
             })
-        })
-        f.onComplete(_ => dao.close())
-        // --- After update find all the changes
-        val g   = f.flatMap(obs => {
-            val dao1 = daoFactory.newObservationDAO()
-            val ff   =
-                dao1.runTransaction(d =>
-                    obs.flatMap(o => d.findByUUID(o.uuid).map(MutableAnnotationImpl(_)))
-                )
-            ff.onComplete(_ => dao1.close())
-            ff
-        })
-        g
+            f.onComplete(_ => dao.close())
+            // --- After update find all the changes
+            val g   = f.flatMap(obs => {
+                val dao1 = daoFactory.newObservationDAO()
+                val ff   =
+                    dao1.runTransaction(d =>
+                        obs.flatMap(o => d.findByUUID(o.uuid).map(Annotation.from(_, true)))
+                    )
+                ff.onComplete(_ => dao1.close())
+                ff
+            })
+            g
     }
 
     /** This is a special method to handle the case where an ImagedMoment's recordedTimestamp needs

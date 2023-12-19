@@ -19,5 +19,5 @@ package org.mbari.annosaurus.domain
 import org.mbari.annosaurus.PersistentObject
 
 trait FromEntity[A <: PersistentObject, B] {
-    def from(entity: A): B
+    def from(entity: A, extend: Boolean): B
 }

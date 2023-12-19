@@ -18,7 +18,7 @@ package org.mbari.annosaurus.repository.jpa
 
 import java.util.UUID
 import jakarta.persistence.EntityManager
-import org.mbari.annosaurus.model.MutableCachedAncillaryDatum
+
 import org.mbari.annosaurus.repository.CachedAncillaryDatumDAO
 import org.mbari.annosaurus.repository.jpa.entity.CachedAncillaryDatumEntity
 
@@ -50,7 +50,7 @@ class CachedAncillaryDatumDAOImpl(entityManager: EntityManager)
         phi: Option[Double] = None,
         theta: Option[Double] = None,
         psi: Option[Double] = None
-    ): MutableCachedAncillaryDatum = {
+    ): CachedAncillaryDatumEntity = {
 
         val cad = new CachedAncillaryDatumEntity()
         cad.latitude = Some(latitude)
@@ -73,8 +73,8 @@ class CachedAncillaryDatumDAOImpl(entityManager: EntityManager)
     }
 
     override def newPersistentObject(
-        datum: MutableCachedAncillaryDatum
-    ): MutableCachedAncillaryDatum =
+        datum: CachedAncillaryDatumEntity
+    ): CachedAncillaryDatumEntity =
         CachedAncillaryDatumEntity(datum)
 
     override def findAll(
@@ -83,7 +83,7 @@ class CachedAncillaryDatumDAOImpl(entityManager: EntityManager)
     ): Iterable[CachedAncillaryDatumEntity] =
         findByNamedQuery("AncillaryDatum.findAll", limit = limit, offset = offset)
 
-    override def findByObservationUUID(observationUuid: UUID): Option[MutableCachedAncillaryDatum] =
+    override def findByObservationUUID(observationUuid: UUID): Option[CachedAncillaryDatumEntity] =
         findByNamedQuery(
             "AncillaryDatum.findByObservationUUID",
             Map("uuid" -> observationUuid)
@@ -91,7 +91,7 @@ class CachedAncillaryDatumDAOImpl(entityManager: EntityManager)
 
     override def findByImagedMomentUUID(
         imagedMomentUuid: UUID
-    ): Option[MutableCachedAncillaryDatum] =
+    ): Option[CachedAncillaryDatumEntity] =
         findByNamedQuery(
             "AncillaryDatum.findByImagedMomentUUID",
             Map("uuid" -> imagedMomentUuid)

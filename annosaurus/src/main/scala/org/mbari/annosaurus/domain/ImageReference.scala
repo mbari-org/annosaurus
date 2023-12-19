@@ -18,7 +18,6 @@ package org.mbari.annosaurus.domain
 
 import java.util.UUID
 import java.net.URL
-import org.mbari.annosaurus.model.MutableImageReference
 import org.mbari.annosaurus.repository.jpa.entity.ImageReferenceEntity
 
 case class ImageReference(
@@ -28,11 +27,12 @@ case class ImageReference(
     heightPixels: Option[Int] = None,
     description: Option[String] = None,
     uuid: Option[UUID] = None,
-    lastUpdated: Option[java.time.Instant] = None
+    lastUpdated: Option[java.time.Instant] = None,
+    imagedMomentUuid: Option[UUID] = None
 ) extends ToSnakeCase[ImageReferenceSC]
     with ToEntity[ImageReferenceEntity] {
     override def toSnakeCase: ImageReferenceSC =
-        ImageReferenceSC(url, format, widthPixels, heightPixels, description, uuid, lastUpdated)
+        ImageReferenceSC(url, format, widthPixels, heightPixels, description, uuid, lastUpdated, imagedMomentUuid)
 
     override def toEntity: ImageReferenceEntity =
         val entity = new ImageReferenceEntity
@@ -45,8 +45,9 @@ case class ImageReference(
         entity
 }
 
-object ImageReference extends FromEntity[MutableImageReference, ImageReference] {
-    def from(entity: MutableImageReference): ImageReference =
+object ImageReference extends FromEntity[ImageReferenceEntity, ImageReference] {
+    override def from(entity: ImageReferenceEntity, extend: Boolean = false): ImageReference =
+        val opt = if extend then entity.imagedMoment.primaryKey else None
         ImageReference(
             entity.url,
             Option(entity.format),
@@ -54,7 +55,8 @@ object ImageReference extends FromEntity[MutableImageReference, ImageReference] 
             Option(entity.height),
             Option(entity.description),
             Option(entity.uuid),
-            entity.lastUpdated
+            entity.lastUpdated,
+            opt
         )
 }
 
@@ -65,7 +67,8 @@ case class ImageReferenceSC(
     height_pixels: Option[Int] = None,
     description: Option[String] = None,
     uuid: Option[UUID] = None,
-    last_updated_time: Option[java.time.Instant] = None
+    last_updated_time: Option[java.time.Instant] = None,
+    imaged_moment_uuid: Option[UUID] = None
 ) extends ToCamelCase[ImageReference] {
     override def toCamelCase: ImageReference =
         ImageReference(
@@ -75,6 +78,7 @@ case class ImageReferenceSC(
             height_pixels,
             description,
             uuid,
-            last_updated_time
+            last_updated_time,
+            imaged_moment_uuid
         )
 }

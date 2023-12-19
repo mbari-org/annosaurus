@@ -18,7 +18,6 @@ package org.mbari.annosaurus.repository.jpa.entity
 
 import com.google.gson.annotations.{Expose, SerializedName}
 import jakarta.persistence._
-import org.mbari.annosaurus.model.{MutableAssociation, MutableImagedMoment, MutableObservation}
 import org.mbari.annosaurus.repository.jpa.{
     DurationConverter,
     InstantConverter,
@@ -224,7 +223,7 @@ object ObservationEntity {
         obs
     }
 
-    def apply(observation: MutableObservation): ObservationEntity = {
+    def apply(observation: ObservationEntity): ObservationEntity = {
         val newObservation = apply(
             observation.concept,
             Option(observation.duration),

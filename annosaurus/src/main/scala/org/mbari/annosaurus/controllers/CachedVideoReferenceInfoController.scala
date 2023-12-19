@@ -16,20 +16,21 @@
 
 package org.mbari.annosaurus.controllers
 
-import org.mbari.annosaurus.model.MutableCachedVideoReferenceInfo
+
 import org.mbari.annosaurus.repository.CachedVideoReferenceInfoDAO
 import java.util.UUID
 
 import scala.concurrent.{ExecutionContext, Future}
 import org.mbari.annosaurus.repository.jpa.entity.CachedVideoReferenceInfoEntity
 import org.mbari.annosaurus.repository.jpa.JPADAOFactory
+import org.mbari.annosaurus.domain.CachedVideoReferenceInfo
 
 /** @author
   *   Brian Schlining
   * @since 2016-09-14T10:50:00
   */
 class CachedVideoReferenceInfoController(val daoFactory: JPADAOFactory)
-    extends BaseController[MutableCachedVideoReferenceInfo, CachedVideoReferenceInfoDAO[
+    extends BaseController[CachedVideoReferenceInfoEntity, CachedVideoReferenceInfoDAO[
         CachedVideoReferenceInfoEntity
     ]] {
 
@@ -43,30 +44,30 @@ class CachedVideoReferenceInfoController(val daoFactory: JPADAOFactory)
 
     def findByVideoReferenceUUID(
         uuid: UUID
-    )(implicit ec: ExecutionContext): Future[Option[MutableCachedVideoReferenceInfo]] = {
-        def fn(dao: VRDAO): Option[MutableCachedVideoReferenceInfo] =
+    )(implicit ec: ExecutionContext): Future[Option[CachedVideoReferenceInfoEntity]] = {
+        def fn(dao: VRDAO): Option[CachedVideoReferenceInfoEntity] =
             dao.findByVideoReferenceUUID(uuid)
         exec(fn)
     }
 
     def findByPlatformName(
         name: String
-    )(implicit ec: ExecutionContext): Future[Iterable[MutableCachedVideoReferenceInfo]] = {
-        def fn(dao: VRDAO): Iterable[MutableCachedVideoReferenceInfo] = dao.findByPlatformName(name)
+    )(implicit ec: ExecutionContext): Future[Iterable[CachedVideoReferenceInfoEntity]] = {
+        def fn(dao: VRDAO): Iterable[CachedVideoReferenceInfoEntity] = dao.findByPlatformName(name)
         exec(fn)
     }
 
     def findByMissionID(
         id: String
-    )(implicit ec: ExecutionContext): Future[Iterable[MutableCachedVideoReferenceInfo]] = {
-        def fn(dao: VRDAO): Iterable[MutableCachedVideoReferenceInfo] = dao.findByMissionID(id)
+    )(implicit ec: ExecutionContext): Future[Iterable[CachedVideoReferenceInfoEntity]] = {
+        def fn(dao: VRDAO): Iterable[CachedVideoReferenceInfoEntity] = dao.findByMissionID(id)
         exec(fn)
     }
 
     def findByMissionContact(
         contact: String
-    )(implicit ec: ExecutionContext): Future[Iterable[MutableCachedVideoReferenceInfo]] = {
-        def fn(dao: VRDAO): Iterable[MutableCachedVideoReferenceInfo] =
+    )(implicit ec: ExecutionContext): Future[Iterable[CachedVideoReferenceInfoEntity]] = {
+        def fn(dao: VRDAO): Iterable[CachedVideoReferenceInfoEntity] =
             dao.findByMissionContact(contact)
         exec(fn)
     }
@@ -96,9 +97,9 @@ class CachedVideoReferenceInfoController(val daoFactory: JPADAOFactory)
         platformName: String,
         missionID: String,
         missionContact: Option[String] = None
-    )(implicit ec: ExecutionContext): Future[MutableCachedVideoReferenceInfo] = {
+    )(implicit ec: ExecutionContext): Future[CachedVideoReferenceInfoEntity] = {
 
-        def fn(dao: VRDAO): MutableCachedVideoReferenceInfo = {
+        def fn(dao: VRDAO): CachedVideoReferenceInfoEntity = {
             val v = dao.newPersistentObject()
             v.videoReferenceUUID = videoReferenceUUID
             v.platformName = platformName
@@ -116,9 +117,9 @@ class CachedVideoReferenceInfoController(val daoFactory: JPADAOFactory)
         platformName: Option[String] = None,
         missionID: Option[String] = None,
         missionContact: Option[String] = None
-    )(implicit ec: ExecutionContext): Future[Option[MutableCachedVideoReferenceInfo]] = {
+    )(implicit ec: ExecutionContext): Future[Option[CachedVideoReferenceInfoEntity]] = {
 
-        def fn(dao: VRDAO): Option[MutableCachedVideoReferenceInfo] = dao.findByUUID(uuid) match {
+        def fn(dao: VRDAO): Option[CachedVideoReferenceInfoEntity] = dao.findByUUID(uuid) match {
             case None    => None
             case Some(v) =>
                 videoReferenceUUID.foreach(v.videoReferenceUUID = _)

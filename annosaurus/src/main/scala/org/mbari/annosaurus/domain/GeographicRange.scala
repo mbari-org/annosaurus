@@ -23,7 +23,16 @@ case class GeographicRange(
     maxLongitude: Double,
     minDepthMeters: Double,
     maxDepthMeters: Double
-)
+) extends ToSnakeCase[GeographicRangeSC] {
+  def toSnakeCase: GeographicRangeSC = GeographicRangeSC(
+    minLatitude,
+    maxLatitude,
+    minLongitude,
+    maxLongitude,
+    minDepthMeters,
+    maxDepthMeters
+  )
+}
 
 case class GeographicRangeSC(
     min_latitude: Double,
@@ -32,4 +41,13 @@ case class GeographicRangeSC(
     max_longitude: Double,
     min_depth_meters: Double,
     max_depth_meters: Double
-)
+) extends ToCamelCase[GeographicRange] {
+  def toCamelCase: GeographicRange = GeographicRange(
+    min_latitude,
+    max_latitude,
+    min_longitude,
+    max_longitude,
+    min_depth_meters,
+    max_depth_meters
+  )
+}

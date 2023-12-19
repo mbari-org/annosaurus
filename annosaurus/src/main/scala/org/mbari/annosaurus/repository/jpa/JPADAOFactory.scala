@@ -34,16 +34,7 @@ import org.mbari.annosaurus.repository.jpa.entity._
   *   Brian Schlining
   * @since 2016-06-25T17:27:00
   */
-trait JPADAOFactory
-    extends DAOFactory[
-        ImagedMomentEntity,
-        ObservationEntity,
-        AssociationEntity,
-        ImageReferenceEntity,
-        CachedAncillaryDatumEntity,
-        CachedVideoReferenceInfoEntity,
-        IndexEntity
-    ] {
+trait JPADAOFactory {
 
     def entityManagerFactory: EntityManagerFactory
 

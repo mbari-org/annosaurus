@@ -19,7 +19,6 @@ package org.mbari.annosaurus.repository.jpa.entity
 import com.google.gson.annotations.{Expose, SerializedName}
 import jakarta.persistence._
 import org.mbari.annosaurus.Constants
-import org.mbari.annosaurus.model._
 import org.mbari.annosaurus.repository.jpa._
 import org.mbari.vcr4j.time.Timecode
 
@@ -28,6 +27,7 @@ import java.util.{ArrayList => JArrayList, List => JList, UUID}
 import scala.collection.mutable
 import scala.jdk.CollectionConverters._
 import org.mbari.annosaurus.domain.ImagedMoment
+import org.mbari.annosaurus.domain.Annotation
 
 /** @author
   *   Brian Schlining
@@ -338,102 +338,8 @@ object ImagedMomentEntity {
         im
     }
 
-    def apply(imagedMoment: MutableImagedMoment): ImagedMomentEntity = {
-        val newImagedMoment = apply(
-            Option(imagedMoment.videoReferenceUUID),
-            Option(imagedMoment.recordedDate),
-            Option(imagedMoment.timecode),
-            Option(imagedMoment.elapsedTime)
-        )
-        newImagedMoment.uuid = imagedMoment.uuid
-        Option(imagedMoment.ancillaryDatum)
-            .foreach(ad => newImagedMoment.ancillaryDatum = CachedAncillaryDatumEntity(ad))
-        imagedMoment
-            .observations
-            .foreach(obs => newImagedMoment.addObservation(ObservationEntity(obs)))
-        imagedMoment
-            .imageReferences
-            .foreach(ir => newImagedMoment.addImageReference(ImageReferenceEntity(ir)))
-        newImagedMoment
-    }
+    def from(imagedMoment: ImagedMomentEntity): ImagedMomentEntity = 
+        ImagedMoment.from(imagedMoment).toEntity
 
-    // def apply(imagedMoment: ImagedMoment): ImagedMomentEntity = {
-    //   val newImagedMoment = apply(
-    //     Option(imagedMoment.videoReferenceUuid),
-    //     imagedMoment.recordedTimestamp,
-    //     imagedMoment.timecode.map(Timecode(_)),
-    //     imagedMoment.elapsedTime
-    //   )
-    //   newImagedMoment.uuid = imagedMoment.uuid.orNull
-    //   Option(imagedMoment.ancillaryDatum)
-    //     .foreach(ad => newImagedMoment.ancillaryDatum = CachedAncillaryDatumEntity(ad))
-    //   imagedMoment.observations.foreach(obs => newImagedMoment.addObservation(ObservationEntity(obs)))
-    //   imagedMoment
-    //     .imageReferences
-    //     .foreach(ir => newImagedMoment.addImageReference(ImageReferenceEntity(ir)))
-    //   newImagedMoment
-    // }
-
-    /** Map a group of annotations to the equivalent group of imagedMOments
-      * @param annotations
-      * @return
-      */
-    def apply(annotations: Seq[MutableAnnotation]): Seq[ImagedMomentEntity] = {
-        val moments = new mutable.ArrayBuffer[ImagedMomentEntity]()
-        // -- 1st pass create moments
-        for (a <- annotations) {
-
-            // Grab the correct imageMoment
-            val imagedMoment = moments
-                .filter(i => i.videoReferenceUUID == a.videoReferenceUuid)
-                .find(i =>
-                    (a.imagedMomentUuid != null && i.uuid == a.imagedMomentUuid)
-                        || (a.recordedTimestamp != null && i.recordedDate == a.recordedTimestamp)
-                        || (a.elapsedTime != null && i.elapsedTime == a.elapsedTime)
-                        || (a.timecode != null && i.timecode == a.timecode)
-                )
-                .getOrElse {
-                    val i = ImagedMomentEntity(
-                        Some(a.videoReferenceUuid),
-                        Option(a.recordedTimestamp),
-                        Option(a.timecode),
-                        Option(a.elapsedTime)
-                    )
-                    Option(a.imagedMomentUuid).foreach(uuid => i.uuid = uuid)
-                    moments.append(i)
-                    i
-                }
-
-            // Add the observation
-            val o = ObservationEntity(
-                a.concept,
-                Option(a.duration),
-                Option(a.observationTimestamp),
-                Option(a.observer),
-                Option(a.group),
-                Option(a.activity)
-            )
-            Option(a.observationUuid).foreach(uuid => o.uuid = uuid)
-            imagedMoment.addObservation(o)
-
-            // Add the associations
-            a.associations.foreach(ass => o.addAssociation(AssociationEntity(ass)))
-
-            // Add the images (if needed)
-            a.imageReferences
-                .foreach(img => {
-                    imagedMoment
-                        .imageReferences
-                        .find(i => i.url == img.url) match {
-                        case None    => imagedMoment.addImageReference(ImageReferenceEntity(img))
-                        case Some(_) => // Do nothing. Image already exists
-                    }
-
-                })
-
-        }
-        moments.toSeq
-
-    }
 
 }

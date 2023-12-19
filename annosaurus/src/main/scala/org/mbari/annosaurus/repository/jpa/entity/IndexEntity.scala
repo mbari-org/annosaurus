@@ -19,12 +19,7 @@ package org.mbari.annosaurus.repository.jpa.entity
 import com.google.gson.annotations.{Expose, SerializedName}
 import jakarta.persistence._
 import org.mbari.annosaurus.Constants
-import org.mbari.annosaurus.model.{
-    MutableCachedAncillaryDatum,
-    MutableImageReference,
-    MutableImagedMoment,
-    MutableObservation
-}
+
 import org.mbari.annosaurus.repository.jpa._
 import org.mbari.vcr4j.time.Timecode
 

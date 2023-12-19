@@ -19,7 +19,7 @@ package org.mbari.annosaurus.domain
 import java.time.{Duration, Instant}
 import java.util.UUID
 import org.mbari.annosaurus.repository.jpa.entity.ObservationEntity
-import org.mbari.annosaurus.model.MutableObservation
+
 
 final case class Observation(
     concept: String,
@@ -61,15 +61,15 @@ final case class Observation(
     lazy val duration: Option[Duration] = durationMillis.map(Duration.ofMillis)
 }
 
-object Observation extends FromEntity[MutableObservation, Observation] {
-    def from(entity: MutableObservation): Observation = Observation(
+object Observation extends FromEntity[ObservationEntity, Observation] {
+    override def from(entity: ObservationEntity, extend: Boolean = false): Observation = Observation(
         entity.concept,
         Option(entity.duration).map(_.toMillis),
         Option(entity.group),
         Option(entity.activity),
         Option(entity.observer),
         Option(entity.observationDate),
-        entity.associations.map(Association.from).toSeq,
+        entity.associations.map(x => Association.from(x, false)).toSeq,
         Option(entity.uuid),
         entity.lastUpdated
     )

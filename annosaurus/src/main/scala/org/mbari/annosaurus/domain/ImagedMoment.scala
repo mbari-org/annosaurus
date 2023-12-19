@@ -21,7 +21,7 @@ import java.time.Duration
 import org.mbari.vcr4j.time.Timecode
 import java.time.Instant
 import org.mbari.annosaurus.repository.jpa.entity.ImagedMomentEntity
-import org.mbari.annosaurus.model.MutableImagedMoment
+
 
 final case class ImagedMoment(
     videoReferenceUuid: UUID,
@@ -63,16 +63,16 @@ final case class ImagedMoment(
     lazy val elapsedTime: Option[Duration] = elapsedTimeMillis.map(Duration.ofMillis)
 }
 
-object ImagedMoment extends FromEntity[MutableImagedMoment, ImagedMoment] {
-    def from(entity: MutableImagedMoment): ImagedMoment = {
+object ImagedMoment extends FromEntity[ImagedMomentEntity, ImagedMoment] {
+    def from(entity: ImagedMomentEntity): ImagedMoment = {
         ImagedMoment(
             entity.videoReferenceUUID,
             Option(entity.timecode).map(_.toString()),
             Option(entity.elapsedTime).map(_.toMillis),
             Option(entity.recordedDate),
-            entity.observations.map(Observation.from).toSeq,
-            entity.imageReferences.map(ImageReference.from).toSeq,
-            Option(entity.ancillaryDatum).map(CachedAncillaryDatum.from),
+            entity.observations.map(x => Observation.from(x, false)).toSeq,
+            entity.imageReferences.map(x =>  ImageReference.from(x, false)).toSeq,
+            Option(entity.ancillaryDatum).map(x => CachedAncillaryDatum.from(x, false)),
             Option(entity.uuid),
             entity.lastUpdated
         )

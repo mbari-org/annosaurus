@@ -16,8 +16,8 @@
 
 package org.mbari.annosaurus.repository
 
-import org.mbari.annosaurus.model.MutableImagedMoment
-import org.mbari.annosaurus.model.simple.WindowRequest
+import org.mbari.annosaurus.PersistentObject
+import org.mbari.annosaurus.domain.WindowRequest
 import org.mbari.annosaurus.repository.jpa.entity.ImagedMomentEntity
 import org.mbari.vcr4j.time.Timecode
 
@@ -28,7 +28,7 @@ import java.util.UUID
   *   Brian Schlining
   * @since 2016-06-17T16:07:00
   */
-trait ImagedMomentDAO[T <: MutableImagedMoment] extends DAO[T] {
+trait ImagedMomentDAO[T <: PersistentObject] extends DAO[T] {
 
     def newPersistentObject(
         videoReferenceUUID: UUID,
@@ -37,7 +37,7 @@ trait ImagedMomentDAO[T <: MutableImagedMoment] extends DAO[T] {
         recordedDate: Option[Instant] = None
     ): T
 
-    def newPersistentObject(imagedMoment: MutableImagedMoment): T
+    def newPersistentObject(imagedMoment: T): T
 
     /** Find ImagedMoments where the imagedmoment OR observation has been updated between the
       * requested dates.
@@ -198,16 +198,12 @@ trait ImagedMomentDAO[T <: MutableImagedMoment] extends DAO[T] {
       * @return
       *   true if deleted, false if not deleted.
       */
-    def deleteIfEmpty(imagedMoment: T): Boolean = deleteIfEmptyByUUID(imagedMoment.uuid)
+    def deleteIfEmpty(imagedMoment: T): Boolean = 
+        imagedMoment.primaryKey match {
+            case Some(pk) => deleteIfEmptyByUUID(pk)
+            case None     => false
+        }
 
-    def deleteIfEmptyByUUID(uuid: UUID): Boolean = {
-        findByUUID(uuid).exists(imagedMoment => {
 
-            if (imagedMoment.imageReferences.isEmpty && imagedMoment.observations.isEmpty) {
-                delete(imagedMoment)
-                true
-            }
-            else false
-        })
-    }
+    def deleteIfEmptyByUUID(uuid: UUID): Boolean
 }

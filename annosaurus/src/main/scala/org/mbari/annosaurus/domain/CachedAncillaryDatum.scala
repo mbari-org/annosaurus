@@ -17,8 +17,7 @@
 package org.mbari.annosaurus.domain
 
 import java.util.UUID
-import cats.instances.uuid
-import org.mbari.annosaurus.model.MutableCachedAncillaryDatum
+
 import org.mbari.annosaurus.repository.jpa.entity.CachedAncillaryDatumEntity
 
 final case class CachedAncillaryDatum(
@@ -40,7 +39,9 @@ final case class CachedAncillaryDatum(
     theta: Option[Double] = None,
     psi: Option[Double] = None,
     uuid: Option[UUID] = None,
-    lastUpdated: Option[java.time.Instant] = None
+    lastUpdated: Option[java.time.Instant] = None,
+    imagedMomentUuid: Option[UUID] = None,  // extend
+    recordedTimestamp: Option[java.time.Instant] = None //extend
 ) extends ToSnakeCase[CachedAncillaryDatumSC]
     with ToEntity[CachedAncillaryDatumEntity] {
     override def toSnakeCase: CachedAncillaryDatumSC =
@@ -63,7 +64,9 @@ final case class CachedAncillaryDatum(
             theta,
             psi,
             uuid,
-            lastUpdated
+            lastUpdated,
+            imagedMomentUuid,
+            recordedTimestamp
         )
 
     override def toEntity: CachedAncillaryDatumEntity =
@@ -90,8 +93,10 @@ final case class CachedAncillaryDatum(
         entity
 }
 
-object CachedAncillaryDatum extends FromEntity[MutableCachedAncillaryDatum, CachedAncillaryDatum] {
-    def from(entity: MutableCachedAncillaryDatum): CachedAncillaryDatum =
+object CachedAncillaryDatum extends FromEntity[CachedAncillaryDatumEntity, CachedAncillaryDatum] {
+    def from(entity: CachedAncillaryDatumEntity, extend: Boolean = false): CachedAncillaryDatum =
+        val opt = if extend && entity.imagedMoment != null then entity.imagedMoment.primaryKey else None
+        val rt = if extend && entity.imagedMoment != null then Option(entity.imagedMoment.recordedDate) else None
         CachedAncillaryDatum(
             entity.latitude,
             entity.longitude,
@@ -111,7 +116,9 @@ object CachedAncillaryDatum extends FromEntity[MutableCachedAncillaryDatum, Cach
             entity.theta,
             entity.psi,
             Option(entity.uuid),
-            entity.lastUpdated
+            entity.lastUpdated,
+            opt,
+            rt
         )
 }
 
@@ -134,7 +141,9 @@ final case class CachedAncillaryDatumSC(
     theta: Option[Double] = None,
     psi: Option[Double] = None,
     uuid: Option[UUID] = None,
-    last_updated_time: Option[java.time.Instant] = None
+    last_updated_time: Option[java.time.Instant] = None,
+    imaged_moment_uuid: Option[UUID] = None,
+    recorded_timestamp: Option[java.time.Instant] = None
 ) extends ToCamelCase[CachedAncillaryDatum] {
     override def toCamelCase: CachedAncillaryDatum =
         CachedAncillaryDatum(
@@ -156,6 +165,8 @@ final case class CachedAncillaryDatumSC(
             theta,
             psi,
             uuid,
-            last_updated_time
+            last_updated_time,
+            imaged_moment_uuid,
+            recorded_timestamp
         )
 }

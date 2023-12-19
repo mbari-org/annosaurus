@@ -18,7 +18,7 @@ package org.mbari.annosaurus.domain
 
 import java.util.UUID
 import java.time.Instant
-import org.mbari.annosaurus.model.simple.{QueryConstraints => QueryConstraintsSqlBuilder}
+import org.mbari.annosaurus.repository.jdbc.QueryConstraintsSqlBuilder
 import scala.jdk.CollectionConverters.*
 
 final case class QueryConstraints(
@@ -44,30 +44,11 @@ final case class QueryConstraints(
     platformName: Option[String] = None,
     missionId: Option[String] = None
 ) extends ToSnakeCase[QueryConstraintsSC] {
-    def toSqlBuilder: QueryConstraintsSqlBuilder = {
-        QueryConstraintsSqlBuilder(
-            concepts,
-            videoReferenceUuids,
-            observers,
-            groups,
-            activities,
-            minDepth,
-            maxDepth,
-            minLat,
-            maxLat,
-            minLon,
-            maxLon,
-            minTimestamp,
-            maxTimestamp,
-            linkName,
-            linkValue,
-            missionContacts,
-            platformName,
-            missionId,
-            limit.getOrElse(5000),
-            offset.getOrElse(0)
-        )
-    }
+
+    val definedLimit = limit.getOrElse(5000)
+    val definedOffset = offset.getOrElse(0)
+    val includeData = data.getOrElse(false)
+
 
     def toSnakeCase: QueryConstraintsSC = {
         QueryConstraintsSC(

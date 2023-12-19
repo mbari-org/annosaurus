@@ -21,8 +21,8 @@ import java.time.{Duration, Instant}
 import java.util.function.Function
 import java.util.{stream, UUID}
 import jakarta.persistence.EntityManager
-import org.mbari.annosaurus.model.MutableImagedMoment
-import org.mbari.annosaurus.model.simple.WindowRequest
+
+import org.mbari.annosaurus.domain.WindowRequest
 import org.mbari.annosaurus.repository.ImagedMomentDAO
 import org.mbari.annosaurus.repository.jpa.entity.ImagedMomentEntity
 import org.mbari.vcr4j.time.Timecode
@@ -53,8 +53,19 @@ class ImagedMomentDAOImpl(entityManager: EntityManager)
         imagedMoment
     }
 
-    override def newPersistentObject(imagedMoment: MutableImagedMoment): ImagedMomentEntity =
-        ImagedMomentEntity(imagedMoment)
+    override def newPersistentObject(imagedMoment: ImagedMomentEntity): ImagedMomentEntity =
+        ImagedMomentEntity.from(imagedMoment)
+
+    def deleteIfEmptyByUUID(uuid: UUID): Boolean = {
+        findByUUID(uuid).exists(imagedMoment => {
+
+            if (imagedMoment.imageReferences.isEmpty && imagedMoment.observations.isEmpty) {
+                delete(imagedMoment)
+                true
+            }
+            else false
+        })
+    }
 
     override def findBetweenUpdatedDates(
         start: Instant,
@@ -306,7 +317,7 @@ class ImagedMomentDAOImpl(entityManager: EntityManager)
                         findByNamedQuery(
                             "ImagedMoment.findByWindowRequest",
                             Map(
-                                "uuids" -> windowRequest.uuids.asJava,
+                                "uuids" -> windowRequest.videoReferenceUuids.asJava,
                                 "start" -> start,
                                 "end"   -> end
                             ),

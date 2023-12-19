@@ -18,7 +18,6 @@ package org.mbari.annosaurus.repository.jpa.entity
 
 import com.google.gson.annotations.Expose
 import jakarta.persistence._
-import org.mbari.annosaurus.model._
 import org.mbari.annosaurus.repository.jpa.{JpaEntity, TransactionLogger}
 
 /** @author
@@ -73,7 +72,51 @@ import org.mbari.annosaurus.repository.jpa.{JpaEntity, TransactionLogger}
             query = "SELECT a FROM Association a INNER JOIN FETCH a.observation o " +
                 "INNER JOIN FETCH o.imagedMoment im WHERE im.videoReferenceUUID = :videoReferenceUuid " +
                 "AND a.linkName = :linkName ORDER BY a.uuid"
-        )
+        ),
+        new NamedQuery(
+            name = "Association.findByConceptAssociationRequest",
+            query = "SELECT new org.mbari.annosaurus.repository.jpa.entity.ConceptAssociationDTO(a.linkName, a.toConcept, a.linkValue, a.mimeType, a.uuid, o.concept, im.videoReferenceUUID) " +
+                "FROM Association a RIGHT JOIN a.observation o RIGHT JOIN o.imagedMoment im " +
+                "WHERE im.videoReferenceUUID IN :uuids AND a.linkName = :linkName ORDER BY a.uuid"
+        ),
+        new NamedQuery(
+            name = "Association.findConceptAssociationByVideoReferenceUuid",
+            query = "SELECT new org.mbari.annosaurus.repository.jpa.AssociationDTO(a.linkName, a.toConcept, a.linkValue, a.mimeType, a.mimeType, a.uuid, a.lastUpdated, o.uuid, im.uuid) " +
+                "FROM Association a RIGHT JOIN a.observation o RIGHT JOIN o.imagedMoment im " +
+                "WHERE im.videoReferenceUUID = :videoReferenceUuid AND a.linkName = :linkName ORDER BY a.uuid"
+        ),
+        new NamedQuery(
+            name = "Association.findConceptAssociationByVideoReferenceUuidBetweenDates",
+            query = "SELECT new org.mbari.annosaurus.repository.jpa.AssociationDTO(a.linkName, a.toConcept, a.linkValue, a.mimeType, a.mimeType, a.uuid, a.lastUpdated, o.uuid, im.uuid) " +
+                "FROM Association a RIGHT JOIN a.observation o RIGHT JOIN o.imagedMoment im " +
+                "WHERE im.videoReferenceUUID = :videoReferenceUuid AND im.recordedTimestamp BETWEEN :start AND :end ORDER BY a.uuid"
+        ),
+        new NamedQuery(
+            name = "Association.findConceptAssociationByConcurrentRequest",
+            query = "SELECT new org.mbari.annosaurus.repository.jpa.AssociationDTO(a.linkName, a.toConcept, a.linkValue, a.mimeType, a.mimeType, a.uuid, a.lastUpdated, o.uuid, im.uuid) " +
+                "FROM Association a RIGHT JOIN a.observation o RIGHT JOIN o.imagedMoment im " +
+                "WHERE im.videoReferenceUUID IN :uuids AND im.recordedTimestamp BETWEEN :start AND :end ORDER BY a.uuid"
+        ),
+        new NamedQuery(
+            name = "Association.findConceptAssociationByMultiRequest",
+            query = "SELECT new org.mbari.annosaurus.repository.jpa.AssociationDTO(a.linkName, a.toConcept, a.linkValue, a.mimeType, a.mimeType, a.uuid, a.lastUpdated, o.uuid, im.uuid) " +
+                "FROM Association a RIGHT JOIN a.observation o RIGHT JOIN o.imagedMoment im " +
+                "WHERE im.videoReferenceUUID IN :uuids ORDER BY a.uuid"
+        ),
+        new NamedQuery(
+            name = "Association.findConceptAssociationByObservationUuids",
+            query = "SELECT new org.mbari.annosaurus.repository.jpa.AssociationDTO(a.linkName, a.toConcept, a.linkValue, a.mimeType, a.mimeType, a.uuid, a.lastUpdated, o.uuid, im.uuid) " +
+                "FROM Association a RIGHT JOIN a.observation o RIGHT JOIN o.imagedMoment im " +
+                "WHERE o.uuid IN :uuids ORDER BY a.uuid"
+        ),
+        new NamedQuery(
+            name = "Association.findConceptAssociationByLinkNameAndValue",
+            query = "SELECT new org.mbari.annosaurus.repository.jpa.AssociationDTO(a.linkName, a.toConcept, a.linkValue, a.mimeType, a.mimeType, a.uuid, a.lastUpdated, o.uuid, im.uuid) " +
+                "FROM Association a RIGHT JOIN a.observation o RIGHT JOIN o.imagedMoment im " +
+                "WHERE a.linkName = :linkName AND a.linkValue = :linkValue ORDER BY a.uuid"
+        ),
+
+
     )
 )
 class AssociationEntity extends JpaEntity {
@@ -153,7 +196,7 @@ object AssociationEntity {
         a
     }
 
-    def apply(v: MutableAssociation): AssociationEntity = {
+    def apply(v: AssociationEntity): AssociationEntity = {
         val a = new AssociationEntity
         a.linkName = v.linkName
         a.toConcept = v.toConcept

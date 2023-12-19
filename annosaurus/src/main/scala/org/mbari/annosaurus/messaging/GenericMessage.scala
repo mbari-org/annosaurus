@@ -16,8 +16,10 @@
 
 package org.mbari.annosaurus.messaging
 
-import org.mbari.annosaurus.model.simple.ExtendedAssociation
-import org.mbari.annosaurus.model.{MutableAnnotation, MutableAssociation}
+import org.mbari.annosaurus.domain.Annotation
+import org.mbari.annosaurus.domain.Association
+import org.mbari.annosaurus.etc.circe.CirceCodecs.{given, *}
+
 
 /** @author
   *   Brian Schlining
@@ -31,7 +33,7 @@ sealed trait GenericMessage[+A] {
 /** Send when a new annotation is created or an existing one is updated
   * @param content
   */
-case class AnnotationMessage(content: MutableAnnotation) extends GenericMessage[MutableAnnotation] {
+case class AnnotationMessage(content: Annotation) extends GenericMessage[Annotation] {
 
     override def hashCode(): Int =
         this.content.observationUuid.hashCode() +
@@ -45,11 +47,11 @@ case class AnnotationMessage(content: MutableAnnotation) extends GenericMessage[
             case _                       => false
         }
 
-    override def toJson: String = JsonEncoders.AnnotationEncoder(content).toJson
+    override def toJson: String = content.stringify
 }
 
-case class AssociationMessage(content: MutableAssociation)
-    extends GenericMessage[MutableAssociation] {
+case class AssociationMessage(content: Association)
+    extends GenericMessage[Association] {
 //  override def hashCode(): Int = this.content.uuid.hashCode()
 //
 //  override def equals(obj: Any): Boolean = obj match {
@@ -58,7 +60,6 @@ case class AssociationMessage(content: MutableAssociation)
 //  }
 
     override def toJson: String = {
-        val ea = ExtendedAssociation(content)
-        JsonEncoders.ExtendedAssocationEncoder(ea).toJson
+        content.stringify
     }
 }

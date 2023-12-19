@@ -18,7 +18,6 @@ package org.mbari.annosaurus.domain
 
 import org.mbari.annosaurus.repository.jpa.entity.AssociationEntity
 import java.util.UUID
-import org.mbari.annosaurus.model.MutableAssociation
 
 case class Association(
     linkName: String,
@@ -26,7 +25,9 @@ case class Association(
     linkValue: String,
     mimeType: Option[String] = None,
     uuid: Option[UUID] = None,
-    lastUpdated: Option[java.time.Instant] = None
+    lastUpdated: Option[java.time.Instant] = None,
+    observationUuid: Option[UUID] = None,
+    imagedMomentUuid: Option[UUID] = None
 ) extends ToSnakeCase[AssociationSC]
     with ToEntity[AssociationEntity] {
 
@@ -40,15 +41,20 @@ case class Association(
     }
 }
 
-object Association extends FromEntity[MutableAssociation, Association] {
-    def from(entity: MutableAssociation): Association =
+object Association extends FromEntity[AssociationEntity, Association] {
+    def from(entity: AssociationEntity, extend: Boolean = false): Association =
+        var (optObs, optIm) = if extend then 
+            (Option(entity.observation.uuid), Option(entity.observation.imagedMoment.uuid))
+        else (None, None)
         Association(
             entity.linkName,
             entity.toConcept,
             entity.linkValue,
             Option(entity.mimeType),
             Option(entity.uuid),
-            entity.lastUpdated
+            entity.lastUpdated,
+            optObs,
+            optIm
         )
 }
 
@@ -58,7 +64,9 @@ case class AssociationSC(
     link_value: String,
     mime_type: Option[String] = None,
     uuid: Option[UUID] = None,
-    last_updated_time: Option[java.time.Instant] = None
+    last_updated_time: Option[java.time.Instant] = None,
+    observation_uuid: Option[UUID] = None,
+    imaged_moment_uuid: Option[UUID] = None
 ) extends ToCamelCase[Association] {
 
     def toCamelCase: Association =

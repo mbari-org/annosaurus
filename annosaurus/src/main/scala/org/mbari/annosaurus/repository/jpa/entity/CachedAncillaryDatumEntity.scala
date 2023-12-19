@@ -18,8 +18,8 @@ package org.mbari.annosaurus.repository.jpa.entity
 
 import com.google.gson.annotations.Expose
 import jakarta.persistence._
-import org.mbari.annosaurus.model.{MutableCachedAncillaryDatum, MutableImagedMoment}
 import org.mbari.annosaurus.repository.jpa.{DoubleOptionConverter, JpaEntity, TransactionLogger}
+import org.mbari.annosaurus.domain.CachedAncillaryDatum
 
 /** @author
   *   Brian Schlining
@@ -165,30 +165,29 @@ class CachedAncillaryDatumEntity extends JpaEntity {
 
 object CachedAncillaryDatumEntity {
 
-    def apply(datum: MutableCachedAncillaryDatum): CachedAncillaryDatumEntity = {
+    def apply(datum: CachedAncillaryDatum | CachedAncillaryDatumEntity): CachedAncillaryDatumEntity = {
         datum match {
-            case c: CachedAncillaryDatumEntity => c
-            case c                             =>
+            case a: CachedAncillaryDatumEntity => a
+            case b: CachedAncillaryDatum                             =>
                 val d = new CachedAncillaryDatumEntity
-                d.uuid = c.uuid
-                d.imagedMoment = ImagedMomentEntity(c.imagedMoment)
-                d.latitude = c.latitude
-                d.longitude = c.longitude
-                d.depthMeters = c.depthMeters
-                d.altitude = c.altitude
-                d.crs = c.crs
-                d.salinity = c.salinity
-                d.temperatureCelsius = c.temperatureCelsius
-                d.oxygenMlL = c.oxygenMlL
-                d.pressureDbar = c.pressureDbar
-                d.lightTransmission = c.lightTransmission
-                d.x = c.x
-                d.y = c.y
-                d.z = c.z
-                d.posePositionUnits = c.posePositionUnits
-                d.phi = c.phi
-                d.theta = c.theta
-                d.psi = c.psi
+                b.uuid.foreach(d.uuid = _)
+                d.latitude = b.latitude
+                d.longitude = b.longitude
+                d.depthMeters = b.depthMeters
+                d.altitude = b.altitude
+                b.crs.foreach(d.crs = _)
+                d.salinity = b.salinity
+                d.temperatureCelsius = b.temperatureCelsius
+                d.oxygenMlL = b.oxygenMlL
+                d.pressureDbar = b.pressureDbar
+                d.lightTransmission = b.lightTransmission
+                d.x = b.x
+                d.y = b.y
+                d.z = b.z
+                b.posePositionUnits.foreach(d.posePositionUnits = _)
+                d.phi = b.phi
+                d.theta = b.theta
+                d.psi = b.psi
                 d
         }
     }
