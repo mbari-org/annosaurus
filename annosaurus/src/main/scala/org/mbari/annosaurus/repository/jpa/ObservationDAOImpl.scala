@@ -17,7 +17,7 @@
 package org.mbari.annosaurus.repository.jpa
 
 import jakarta.persistence.EntityManager
-import org.mbari.annosaurus.model.simple.{ConcurrentRequest, MultiRequest}
+import org.mbari.annosaurus.domain.{ConcurrentRequest, MultiRequest}
 import org.mbari.annosaurus.repository.ObservationDAO
 import org.mbari.annosaurus.repository.jpa.entity.ObservationEntity
 

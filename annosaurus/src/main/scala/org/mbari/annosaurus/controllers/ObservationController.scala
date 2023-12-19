@@ -25,6 +25,7 @@ import org.mbari.annosaurus.repository.{NotFoundInDatastoreException, Observatio
 import scala.concurrent.{ExecutionContext, Future}
 import org.mbari.annosaurus.repository.jpa.entity.{ImagedMomentEntity, ObservationEntity}
 import org.mbari.annosaurus.repository.jpa.JPADAOFactory
+import org.mbari.annosaurus.domain.Observation
 
 /** @author
   *   Brian Schlining
@@ -48,9 +49,9 @@ class ObservationController(
         observationDate: Instant = Instant.now(),
         duration: Option[Duration] = None,
         group: Option[String] = None
-    )(implicit ec: ExecutionContext): Future[MutableObservation] = {
+    )(implicit ec: ExecutionContext): Future[ObservationEntity] = {
 
-        def fn(dao: ODAO): MutableObservation = {
+        def fn(dao: ODAO): ObservationEntity = {
             val imDao = daoFactory.newImagedMomentDAO(dao)
             imDao.findByUUID(imagedMomentUUID) match {
                 case None               =>
@@ -61,7 +62,7 @@ class ObservationController(
                     val observation =
                         dao.newPersistentObject(concept, observer, observationDate, group, duration)
                     observation.imagedMoment = imagedMoment
-                    annotationPublisher.publish(observation)
+                    annotationPublisher.publish(Observation.from(observation))
                     observation
             }
         }
@@ -100,7 +101,7 @@ class ObservationController(
                     newIm.addObservation(obs)
                 }
 
-                annotationPublisher.publish(obs)
+                annotationPublisher.publish(Observation.from(obs))
                 obs
             })
         }

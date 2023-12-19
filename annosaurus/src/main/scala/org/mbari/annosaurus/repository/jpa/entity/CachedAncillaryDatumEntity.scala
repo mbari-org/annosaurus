@@ -64,7 +64,33 @@ import org.mbari.annosaurus.domain.CachedAncillaryDatum
             name = "AncillaryDatum.findByObservationUUID",
             query =
                 "SELECT a FROM AncillaryDatum a INNER JOIN FETCH a.imagedMoment im INNER JOIN FETCH im.javaObservations o WHERE o.uuid = :uuid ORDER BY a.uuid"
+        ),
+        new NamedQuery(
+            name = "AncillaryDatum.findDTOByVideoReferenceUUID",
+            query =
+                "SELECT new org.mbari.annosaurus.repository.jpa.AncillaryDatumDTO(a.latitude, a.longitude, a.depthMeters, a.altitude, a.crs, a.salinity, a.temperatureCelsius, a.oxygenMlL, a.pressureDbar, a.lightTransmission, a.x, a.y, a.z, a.posePositionUnits, a.phi, a.theta, a.psi, a.uuid, a.lastUpdated, im.uuid, im.recordedTimestamp) FROM AncillaryDatum a LEFT JOIN a.imagedMoment im WHERE im.videoReferenceUUID = :uuid ORDER BY a.uuid"
+        ),
+        new NamedQuery(
+            name = "AncillaryDatum.findDTOByImagedMomentUUID",
+            query =
+                "SELECT new org.mbari.annosaurus.repository.jpa.AncillaryDatumDTO(a.latitude, a.longitude, a.depthMeters, a.altitude, a.crs, a.salinity, a.temperatureCelsius, a.oxygenMlL, a.pressureDbar, a.lightTransmission, a.x, a.y, a.z, a.posePositionUnits, a.phi, a.theta, a.psi, a.uuid, a.lastUpdated, im.uuid, im.recordedTimestamp) FROM AncillaryDatum a LEFT JOIN a.imagedMoment im WHERE im.uuid = :uuid ORDER BY a.uuid"
+        ),
+        new NamedQuery(
+            name = "AncillaryDatum.findDTOByVidoeReferenceUUIDBetweenDates",
+            query =
+                "SELECT new org.mbari.annosaurus.repository.jpa.AncillaryDatumDTO(a.latitude, a.longitude, a.depthMeters, a.altitude, a.crs, a.salinity, a.temperatureCelsius, a.oxygenMlL, a.pressureDbar, a.lightTransmission, a.x, a.y, a.z, a.posePositionUnits, a.phi, a.theta, a.psi, a.uuid, a.lastUpdated, im.uuid, im.recordedTimestamp) FROM AncillaryDatum a LEFT JOIN a.imagedMoment im WHERE im.videoReferenceUUID = :uuid AND im.recordedTimestamp BETWEEN :start AND :end ORDER BY a.uuid"
+        ),
+        new NamedQuery(
+            name = "AncillaryDatum.findDTOByConcurrentRequest",
+            query =
+                "SELECT new org.mbari.annosaurus.repository.jpa.AncillaryDatumDTO(a.latitude, a.longitude, a.depthMeters, a.altitude, a.crs, a.salinity, a.temperatureCelsius, a.oxygenMlL, a.pressureDbar, a.lightTransmission, a.x, a.y, a.z, a.posePositionUnits, a.phi, a.theta, a.psi, a.uuid, a.lastUpdated, im.uuid, im.recordedTimestamp) FROM AncillaryDatum a LEFT JOIN a.imagedMoment im WHERE im.videoReferenceUUID IN :uuids AND im.recordedTimestamp BETWEEN :start AND :end ORDER BY a.uuid"
+        ),
+        new NamedQuery(
+            name = "AncillaryDatum.findDTOByMultiRequest",
+            query =
+                "SELECT new org.mbari.annosaurus.repository.jpa.AncillaryDatumDTO(a.latitude, a.longitude, a.depthMeters, a.altitude, a.crs, a.salinity, a.temperatureCelsius, a.oxygenMlL, a.pressureDbar, a.lightTransmission, a.x, a.y, a.z, a.posePositionUnits, a.phi, a.theta, a.psi, a.uuid, a.lastUpdated, im.uuid, im.recordedTimestamp) FROM AncillaryDatum a LEFT JOIN a.imagedMoment im WHERE im.videoReferenceUUID IN :uuids ORDER BY a.uuid"
         )
+
     )
 )
 class CachedAncillaryDatumEntity extends JpaEntity {

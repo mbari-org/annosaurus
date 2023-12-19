@@ -41,51 +41,51 @@ trait JPADAOFactory {
     private def extractEntityManager(dao: DAO[_]): EntityManager =
         dao.asInstanceOf[BaseDAO[_]].entityManager
 
-    override def newAssociationDAO(): AssociationDAO[AssociationEntity] =
+    def newAssociationDAO(): AssociationDAO[AssociationEntity] =
         new AssociationDAOImpl(entityManagerFactory.createEntityManager())
 
-    override def newAssociationDAO(dao: DAO[_]): AssociationDAO[AssociationEntity] =
+    def newAssociationDAO(dao: DAO[_]): AssociationDAO[AssociationEntity] =
         new AssociationDAOImpl(extractEntityManager(dao))
 
-    override def newCachedAncillaryDatumDAO(): CachedAncillaryDatumDAO[CachedAncillaryDatumEntity] =
+    def newCachedAncillaryDatumDAO(): CachedAncillaryDatumDAO[CachedAncillaryDatumEntity] =
         new CachedAncillaryDatumDAOImpl(entityManagerFactory.createEntityManager())
 
-    override def newCachedAncillaryDatumDAO(
+    def newCachedAncillaryDatumDAO(
         dao: DAO[_]
     ): CachedAncillaryDatumDAO[CachedAncillaryDatumEntity] =
         new CachedAncillaryDatumDAOImpl(extractEntityManager(dao))
 
-    override def newObservationDAO(): ObservationDAO[ObservationEntity] =
+    def newObservationDAO(): ObservationDAO[ObservationEntity] =
         new ObservationDAOImpl(entityManagerFactory.createEntityManager())
 
-    override def newObservationDAO(dao: DAO[_]): ObservationDAO[ObservationEntity] =
+    def newObservationDAO(dao: DAO[_]): ObservationDAO[ObservationEntity] =
         new ObservationDAOImpl(extractEntityManager(dao))
 
-    override def newCachedVideoReferenceInfoDAO()
+    def newCachedVideoReferenceInfoDAO()
         : CachedVideoReferenceInfoDAO[CachedVideoReferenceInfoEntity] =
         new CachedVideoReferenceInfoDAOImpl(entityManagerFactory.createEntityManager())
 
-    override def newCachedVideoReferenceInfoDAO(
+    def newCachedVideoReferenceInfoDAO(
         dao: DAO[_]
     ): CachedVideoReferenceInfoDAO[CachedVideoReferenceInfoEntity] =
         new CachedVideoReferenceInfoDAOImpl(extractEntityManager(dao))
 
-    override def newIndexDAO(): IndexDAO[IndexEntity] =
+    def newIndexDAO(): IndexDAO[IndexEntity] =
         new IndexDAOImpl(entityManagerFactory.createEntityManager())
 
-    override def newIndexDAO(dao: DAO[_]): IndexDAO[IndexEntity] =
+    def newIndexDAO(dao: DAO[_]): IndexDAO[IndexEntity] =
         new IndexDAOImpl(extractEntityManager(dao))
 
-    override def newImageReferenceDAO(): ImageReferenceDAO[ImageReferenceEntity] =
+    def newImageReferenceDAO(): ImageReferenceDAO[ImageReferenceEntity] =
         new ImageReferenceDAOImpl(entityManagerFactory.createEntityManager())
 
-    override def newImageReferenceDAO(dao: DAO[_]): ImageReferenceDAO[ImageReferenceEntity] =
+    def newImageReferenceDAO(dao: DAO[_]): ImageReferenceDAO[ImageReferenceEntity] =
         new ImageReferenceDAOImpl(extractEntityManager(dao))
 
-    override def newImagedMomentDAO(): ImagedMomentDAO[ImagedMomentEntity] =
+    def newImagedMomentDAO(): ImagedMomentDAO[ImagedMomentEntity] =
         new ImagedMomentDAOImpl(entityManagerFactory.createEntityManager())
 
-    override def newImagedMomentDAO(dao: DAO[_]): ImagedMomentDAO[ImagedMomentEntity] =
+    def newImagedMomentDAO(dao: DAO[_]): ImagedMomentDAO[ImagedMomentEntity] =
         new ImagedMomentDAOImpl(extractEntityManager(dao))
 
 }

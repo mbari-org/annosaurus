@@ -22,7 +22,7 @@ final case class ConceptAssociationRequest(
     videoReferenceUuids: Seq[UUID],
     linkName: String,
 ) extends ToSnakeCase[ConceptAssociationRequestSC] {
-    def toConceptAssociationRequestSC: ConceptAssociationRequestSC = ConceptAssociationRequestSC(
+    def toSnakeCase: ConceptAssociationRequestSC = ConceptAssociationRequestSC(
         videoReferenceUuids,
         linkName,
     )
@@ -32,7 +32,7 @@ final case class ConceptAssociationRequestSC(
     video_reference_uuids: Seq[UUID],
     link_name: String,
 ) extends ToCamelCase[ConceptAssociationRequest] {
-    def toConceptAssociationRequest: ConceptAssociationRequest = ConceptAssociationRequest(
+    def toCamelCase: ConceptAssociationRequest = ConceptAssociationRequest(
         video_reference_uuids,
         link_name,
     )

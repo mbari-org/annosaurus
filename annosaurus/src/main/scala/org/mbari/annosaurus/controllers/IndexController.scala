@@ -16,7 +16,7 @@
 
 package org.mbari.annosaurus.controllers
 
-import org.mbari.annosaurus.model.MutableImagedMoment
+
 import org.mbari.annosaurus.repository.IndexDAO
 import java.time.Instant
 import java.util.UUID
@@ -39,7 +39,7 @@ class IndexController(val daoFactory: JPADAOFactory)
 
     def findByVideoReferenceUUID(uuid: UUID, limit: Option[Int] = None, offset: Option[Int] = None)(
         implicit ec: ExecutionContext
-    ): Future[Iterable[MutableImagedMoment]] =
+    ): Future[Iterable[IndexEntity]] =
         exec(d => d.findByVideoReferenceUuid(uuid, limit, offset))
 
     /** Updates all recordedTimestamps thave have an elapsed time using the updated video
@@ -51,8 +51,8 @@ class IndexController(val daoFactory: JPADAOFactory)
       */
     def updateRecordedTimestamps(videoReferenceUuid: UUID, newStartTimestamp: Instant)(implicit
         ec: ExecutionContext
-    ): Future[Iterable[MutableImagedMoment]] = {
-        def fn(dao: IDDAO): Iterable[MutableImagedMoment] = {
+    ): Future[Iterable[IndexEntity]] = {
+        def fn(dao: IDDAO): Iterable[IndexEntity] = {
             dao
                 .findByVideoReferenceUuid(videoReferenceUuid)
                 .map(im => {
@@ -69,9 +69,9 @@ class IndexController(val daoFactory: JPADAOFactory)
     }
 
     def bulkUpdateRecordedTimestamps(
-        imagedMoments: Iterable[MutableImagedMoment]
-    )(implicit ec: ExecutionContext): Future[Iterable[MutableImagedMoment]] = {
-        def fn(dao: IDDAO): Iterable[MutableImagedMoment] = {
+        imagedMoments: Iterable[IndexEntity]
+    )(implicit ec: ExecutionContext): Future[Iterable[IndexEntity]] = {
+        def fn(dao: IDDAO): Iterable[IndexEntity] = {
             (for (im <- imagedMoments) yield {
                 dao
                     .findByUUID(im.uuid)

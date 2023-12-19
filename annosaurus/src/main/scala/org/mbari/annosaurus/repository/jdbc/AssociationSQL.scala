@@ -18,6 +18,7 @@ package org.mbari.annosaurus.repository.jdbc
 
 import java.util.UUID
 import org.mbari.annosaurus.domain.Association
+import org.mbari.annosaurus.domain.Annotation
 
 @deprecated("Use Association's NamedQueries instead", "2023-12-18")
 object AssociationSQL {
@@ -61,20 +62,21 @@ object AssociationSQL {
     }
 
     def join(
-        annotations: Seq[MutableAnnotationImpl],
-        associations: Seq[MutableAssociationExt]
-    ): Seq[MutableAnnotation] = {
-        for {
+        annotations: Seq[Annotation],
+        associations: Seq[Association]
+    ): Seq[Annotation] = {
+        val mergedAnnos = for {
             a <- associations
-        } {
+        } yield {
             annotations.find(anno => anno.observationUuid == a.observationUuid) match {
                 case None       =>
                 // TODO warn of missing match?
                 case Some(anno) =>
-                    anno.javaAssociations.add(a)
+                    anno.copy(associations = anno.associations :+ a)
+                    // anno.javaAssociations.add(a)
             }
         }
-        annotations
+        annotations.distinctBy(_.observationUuid)
     }
 
     val SELECT: String =

@@ -82,22 +82,24 @@ class IndexEntity extends JpaEntity {
     //    ad.imagedMoment = this
     //  }
 
-    override def toString: String = Constants.GSON.toJson(this)
+    override def toString: String = {
+        s"IndexEntity($uuid, $videoReferenceUUID, $elapsedTime, $recordedDate, $timecode)"
+    }
 
     /* --- IGNORE these methods below --- */
-    override def addObservation(observation: ObservationEntity): Unit = ???
+    def addObservation(observation: ObservationEntity): Unit = ???
 
-    override def removeObservation(observation: ObservationEntity): Unit = ???
-
-    @Expose(serialize = false)
-    override def observations: Iterable[ObservationEntity] = ???
-
-    override def addImageReference(imageReference: ImageReferenceEntity): Unit = ???
-
-    override def removeImageReference(imageReference: ImageReferenceEntity): Unit = ???
+    def removeObservation(observation: ObservationEntity): Unit = ???
 
     @Expose(serialize = false)
-    override def imageReferences: Iterable[ImageReferenceEntity] = ???
+    def observations: Iterable[ObservationEntity] = ???
+
+    def addImageReference(imageReference: ImageReferenceEntity): Unit = ???
+
+    def removeImageReference(imageReference: ImageReferenceEntity): Unit = ???
+
+    @Expose(serialize = false)
+    def imageReferences: Iterable[ImageReferenceEntity] = ???
 
     @Transient
     var ancillaryDatum: CachedAncillaryDatumEntity = _

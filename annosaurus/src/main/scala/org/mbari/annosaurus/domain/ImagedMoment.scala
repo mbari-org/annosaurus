@@ -64,7 +64,7 @@ final case class ImagedMoment(
 }
 
 object ImagedMoment extends FromEntity[ImagedMomentEntity, ImagedMoment] {
-    def from(entity: ImagedMomentEntity): ImagedMoment = {
+    def from(entity: ImagedMomentEntity, extend: Boolean = false): ImagedMoment = {
         ImagedMoment(
             entity.videoReferenceUUID,
             Option(entity.timecode).map(_.toString()),

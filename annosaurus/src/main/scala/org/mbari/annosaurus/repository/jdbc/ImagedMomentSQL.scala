@@ -16,7 +16,7 @@
 
 package org.mbari.annosaurus.repository.jdbc
 
-import org.mbari.annosaurus.model.simple.Image
+import org.mbari.annosaurus.domain.Image
 import java.util.UUID
 import java.time.Duration
 import java.sql.Timestamp
@@ -74,28 +74,47 @@ object ImagedMomentSQL {
             row <- rows
         } yield {
             val xs = row.asInstanceOf[Array[Object]]
-            val i  = new Image;
-            i.imagedMomentUuid = UUID.fromString(xs(0).toString)
-            i.videoReferenceUuid = UUID.fromString(xs(1).toString)
-            Option(xs(2))
-                .map(v => v.asInstanceOf[Number].longValue())
-                .map(Duration.ofMillis)
-                .foreach(v => i.elapsedTime = v)
-            Option(xs(3))
-                .map(v => v.asInstanceOf[Timestamp])
-                .map(v => v.toInstant)
-                .foreach(v => i.recordedTimestamp = v)
-            Option(xs(4))
-                .map(v => v.toString)
-                .map(v => new Timecode(v))
-                .foreach(v => i.timecode = v)
-            Option(xs(5)).foreach(v => i.description = v.toString)
-            Option(xs(6)).foreach(v => i.format = v.toString)
-            Option(xs(7)).foreach(v => i.height = v.asInstanceOf[Number].intValue())
-            Option(xs(8)).foreach(v => i.width = v.asInstanceOf[Number].intValue())
-            i.url = URI.create(xs(9).toString).toURL
-            i.imageReferenceUuid = UUID.fromString(xs(10).toString)
-            i
+            Image(
+                imagedMomentUuid = UUID.fromString(xs(0).toString()),
+                videoReferenceUuid = UUID.fromString(xs(1).toString()),
+                elapsedTimeMillis = Option(xs(2))
+                    .map(v => v.asInstanceOf[Number].longValue()),
+                recordedTimestamp = Option(xs(3))
+                    .map(v => v.asInstanceOf[Timestamp])
+                    .map(v => v.toInstant),
+                timecode = Option(xs(4))
+                    .map(v => v.toString),
+                description =  Option(xs(5)).map(v => v.toString),
+                format = Option(xs(6)).map(v => v.toString),
+                height = Option(xs(7)).map(v => v.asInstanceOf[Number].intValue()),
+                width = Option(xs(8)).map(v => v.asInstanceOf[Number].intValue()),
+                url = Option(xs(9)).map(x => URI.create(x.toString()).toURL),
+                imageReferenceUuid = UUID.fromString(xs(10).toString())
+            )
+
+
+            // val i  = new Image;
+            // i.imagedMomentUuid = UUID.fromString(xs(0).toString)
+            // i.videoReferenceUuid = UUID.fromString(xs(1).toString)
+            // Option(xs(2))
+            //     .map(v => v.asInstanceOf[Number].longValue())
+            //     .map(Duration.ofMillis)
+            //     .foreach(v => i.elapsedTime = v)
+            // Option(xs(3))
+            //     .map(v => v.asInstanceOf[Timestamp])
+            //     .map(v => v.toInstant)
+            //     .foreach(v => i.recordedTimestamp = v)
+            // Option(xs(4))
+            //     .map(v => v.toString)
+            //     .map(v => new Timecode(v))
+            //     .foreach(v => i.timecode = v)
+            // Option(xs(5)).foreach(v => i.description = v.toString)
+            // Option(xs(6)).foreach(v => i.format = v.toString)
+            // Option(xs(7)).foreach(v => i.height = v.asInstanceOf[Number].intValue())
+            // Option(xs(8)).foreach(v => i.width = v.asInstanceOf[Number].intValue())
+            // i.url = URI.create(xs(9).toString).toURL
+            // i.imageReferenceUuid = UUID.fromString(xs(10).toString)
+            // i
         }
     }
 

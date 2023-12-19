@@ -16,7 +16,6 @@
 
 package org.mbari.annosaurus.controllers
 
-import org.mbari.annosaurus.model.{MutableImageReference, MutableImagedMoment}
 import org.mbari.annosaurus.repository.{ImageReferenceDAO, NotFoundInDatastoreException}
 
 import java.net.URL
@@ -44,9 +43,9 @@ class ImageReferenceController(val daoFactory: JPADAOFactory)
         heightPixels: Option[Int],
         widthPixels: Option[Int],
         format: Option[String]
-    )(implicit ec: ExecutionContext): Future[MutableImageReference] = {
+    )(implicit ec: ExecutionContext): Future[ImageReferenceEntity] = {
 
-        def fn(dao: IRDAO): MutableImageReference = {
+        def fn(dao: IRDAO): ImageReferenceEntity = {
             val imDao = daoFactory.newImagedMomentDAO()
             imDao.findByUUID(imagedMomentUUID) match {
                 case None               =>
@@ -72,9 +71,9 @@ class ImageReferenceController(val daoFactory: JPADAOFactory)
         widthPixels: Option[Int] = None,
         format: Option[String] = None,
         imagedMomentUUID: Option[UUID] = None
-    )(implicit ec: ExecutionContext): Future[Option[MutableImageReference]] = {
+    )(implicit ec: ExecutionContext): Future[Option[ImageReferenceEntity]] = {
 
-        def fn(dao: IRDAO): Option[MutableImageReference] = {
+        def fn(dao: IRDAO): Option[ImageReferenceEntity] = {
             dao
                 .findByUUID(uuid)
                 .map(imageReference => {

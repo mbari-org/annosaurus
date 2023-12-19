@@ -46,8 +46,7 @@ class AnalysisEndpoint(repository: AnalysisRepository)(implicit val executor: Ex
 
     val depthHistogramImpl: ServerEndpoint[Any, Future] =
         depthHistogram.serverLogic { case (binSizeMeters, constraints) =>
-            val sqlBuilder = constraints.toSqlBuilder
-            val f          = Future(repository.depthHistogram(sqlBuilder, binSizeMeters)).map(dh =>
+            val f          = Future(repository.depthHistogram(constraints, binSizeMeters)).map(dh =>
                 QueryConstraintsResponse(constraints, dh)
             )
             handleErrors(f)
@@ -64,8 +63,7 @@ class AnalysisEndpoint(repository: AnalysisRepository)(implicit val executor: Ex
 
     val timeHistogramImpl: ServerEndpoint[Any, Future] =
         timeHistogram.serverLogic { case (binSizeDays, constraints) =>
-            val sqlBuilder = constraints.toSqlBuilder
-            val f          = Future(repository.timeHistogram(sqlBuilder, binSizeDays)).map(dh =>
+            val f          = Future(repository.timeHistogram(constraints, binSizeDays)).map(dh =>
                 QueryConstraintsResponse(constraints, dh)
             )
             handleErrors(f)

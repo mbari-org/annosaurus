@@ -18,8 +18,9 @@ package org.mbari.annosaurus.repository.jdbc
 
 import java.util.UUID
 import java.net.URI
-import org.mbari.annosaurus.repository.jpa.MutableAnnotationImpl
-import org.mbari.annosaurus.model.MutableAnnotation
+import org.mbari.annosaurus.domain.ImageReference
+import org.mbari.annosaurus.domain.Annotation
+
 
 object ImageReferenceSQL {
     val SELECT: String =
@@ -68,43 +69,55 @@ object ImageReferenceSQL {
       | )
       |""".stripMargin
 
-    def resultListToImageReferences(rows: List[_]): Seq[MutableImageReferenceExt] = {
+    def resultListToImageReferences(rows: List[_]): Seq[ImageReference] = {
         for {
             row <- rows
         } yield {
             val xs = row.asInstanceOf[Array[Object]]
-            val i  = new MutableImageReferenceExt
-            i.uuid = UUID.fromString(xs(0).toString)
-            Option(xs(1))
-                .map(_.toString)
-                .foreach(v => i.description = v)
-            Option(xs(2))
-                .map(_.toString)
-                .foreach(v => i.format = v)
-            Option(xs(3))
-                .map(_.asInstanceOf[Number].intValue())
-                .foreach(v => i.height = v)
-            i.url = URI.create(xs(4).toString).toURL
-            Option(xs(5))
-                .map(_.asInstanceOf[Number].intValue())
-                .foreach(v => i.width = v)
-            i.imagedMomentUuid = UUID.fromString(xs(6).toString)
-            i
+            ImageReference(
+                url = URI.create(xs(4).toString).toURL,
+                format = Option(xs(2)).map(_.toString),
+                widthPixels = Option(xs(5)).map(_.asInstanceOf[Number].intValue()),
+                heightPixels = Option(xs(3)).map(_.asInstanceOf[Number].intValue()),
+                description = Option(xs(1)).map(_.toString),
+                uuid = Option(xs(0)).map(_.toString).map(UUID.fromString),
+                imagedMomentUuid = Option(xs(6)).map(_.toString).map(UUID.fromString)
+            )
+
+
+            // val i  = new MutableImageReferenceExt
+            // i.uuid = UUID.fromString(xs(0).toString)
+            // Option(xs(1))
+            //     .map(_.toString)
+            //     .foreach(v => i.description = v)
+            // Option(xs(2))
+            //     .map(_.toString)
+            //     .foreach(v => i.format = v)
+            // Option(xs(3))
+            //     .map(_.asInstanceOf[Number].intValue())
+            //     .foreach(v => i.height = v)
+            // i.url = URI.create(xs(4).toString).toURL
+            // Option(xs(5))
+            //     .map(_.asInstanceOf[Number].intValue())
+            //     .foreach(v => i.width = v)
+            // i.imagedMomentUuid = UUID.fromString(xs(6).toString)
+            // i
         }
     }
 
     def join(
-        annotations: Seq[MutableAnnotationImpl],
-        images: Seq[MutableImageReferenceExt]
-    ): Seq[MutableAnnotation] = {
-        for {
+        annotations: Seq[Annotation],
+        images: Seq[ImageReference]
+    ): Seq[Annotation] = {
+        val mergedAnnos = for {
             i <- images
-        } {
+        } yield {
             annotations
                 .filter(anno => anno.imagedMomentUuid == i.imagedMomentUuid)
-                .foreach(anno => anno.javaImageReferences.add(i))
+                .map(anno => anno.copy(imageReferences = anno.imageReferences :+ i))
+                
         }
-        annotations
+        mergedAnnos.flatten
     }
 
 }

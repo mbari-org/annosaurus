@@ -55,9 +55,6 @@ object CirceCodecs {
     given Decoder[BadRequest] = deriveDecoder
     given Encoder[BadRequest] = deriveEncoder
 
-    given Decoder[HealthStatus] = deriveDecoder
-    given Encoder[HealthStatus] = deriveEncoder
-
     // given Decoder[ServiceStatus] = deriveDecoder
     // given Encoder[ServiceStatus] = deriveEncoder
 
@@ -131,6 +128,12 @@ object CirceCodecs {
     given ancillaryDatumEncoder: Encoder[CachedAncillaryDatum]         = deriveEncoder
     given ancillaryDatumDecoder: Decoder[CachedAncillaryDatum]         =
         ancillaryDatumCcDecoder or ancillaryDatumScDecoder.map(_.toCamelCase)
+
+    given indexScDecoder: Decoder[IndexSC]     = deriveDecoder
+    given indexScEncoder: Encoder[IndexSC]     = deriveEncoder
+    private val indexCcDecoder: Decoder[Index] = deriveDecoder
+    given indexEncoder: Encoder[Index]         = deriveEncoder
+    given indexDecoder: Decoder[Index]         = indexCcDecoder or indexScDecoder.map(_.toCamelCase)
 
     given imagedMomentScDecoder: Decoder[ImagedMomentSC]     = deriveDecoder
     given imagedMomentScEncoder: Encoder[ImagedMomentSC]     = deriveEncoder
@@ -215,6 +218,7 @@ object CirceCodecs {
     given geographicRangeEncoder: Encoder[GeographicRange]         = deriveEncoder
 
     given healthStatusEncoder: Encoder[HealthStatus] = deriveEncoder
+    given healthStatusDecoder: Decoder[HealthStatus] = deriveDecoder
 
 
     private val printer = Printer.noSpaces.copy(dropNullValues = true)

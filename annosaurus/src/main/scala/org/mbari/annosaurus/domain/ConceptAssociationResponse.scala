@@ -20,8 +20,8 @@ final case class ConceptAssociationResponse(
     conceptAssociationRequest: ConceptAssociationRequest,
     conceptAssociations: Seq[ConceptAssociation]
 ) extends ToSnakeCase[ConceptAssociationResponseSC] {
-    def toConceptAssociationResponseSC: ConceptAssociationResponseSC = ConceptAssociationResponseSC(
-        conceptAssociationRequest.toConceptAssociationRequestSC,
+    def toSnakeCase: ConceptAssociationResponseSC = ConceptAssociationResponseSC(
+        conceptAssociationRequest.toSnakeCase,
         conceptAssociations.map(_.toSnakeCase)
     )
 }
@@ -31,8 +31,8 @@ final case class ConceptAssociationResponseSC(
     concept_association_request: ConceptAssociationRequestSC,
     concept_associations: Seq[ConceptAssociationSC]
 ) extends ToCamelCase[ConceptAssociationResponse] {
-    def toConceptAssociationResponse: ConceptAssociationResponse = ConceptAssociationResponse(
-        concept_association_request.toConceptAssociationRequest,
+    def toCamelCase: ConceptAssociationResponse = ConceptAssociationResponse(
+        concept_association_request.toCamelCase,
         concept_associations.map(_.toCamelCase)
     )
 }

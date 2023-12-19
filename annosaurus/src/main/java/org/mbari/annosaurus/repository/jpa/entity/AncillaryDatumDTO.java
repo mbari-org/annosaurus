@@ -16,17 +16,32 @@
 
 package org.mbari.annosaurus.repository.jpa.entity;
 
-import java.net.URL;
 import java.util.UUID;
+import java.sql.Timestamp;
+import java.time.Instant;
 
-record ImageReferenceDTO(
-    URL url, 
-    Integer width,
-    Integer height,
-    String format,
-    String description,
-    UUID uuid, 
-    UUID imagedMomentUuid
+record AncillaryDatumDTO(
+    Double latitude,
+    Double longitude,
+    Double depthMeters,
+    Double altitude,
+    String crs,
+    Double salinity, 
+    Double temperatureCelsius,
+    Double oxygenMlL,
+    Double pressureDbar,
+    Double lightTransmission,
+    Double x,
+    Double y,
+    Double z,
+    String posePositionUnits,
+    Double phi,
+    Double theta,
+    Double psi,
+    UUID uuid,
+    Timestamp lastUpdated,
+    UUID imagedMomentUuid,
+    Instant recordedTimestamp
 ) {
 
 }

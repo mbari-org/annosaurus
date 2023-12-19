@@ -17,13 +17,12 @@
 package org.mbari.annosaurus
 
 import org.junit.Assert._
-import org.mbari.annosaurus.model.{
-    MutableAssociation,
-    MutableCachedAncillaryDatum,
-    MutableImageReference,
-    MutableObservation
-}
+
 import org.mbari.annosaurus.repository.jpa.entity.ImagedMomentEntity
+import org.mbari.annosaurus.repository.jpa.entity.ObservationEntity
+import org.mbari.annosaurus.repository.jpa.entity.ImageReferenceEntity
+import org.mbari.annosaurus.repository.jpa.entity.AssociationEntity
+import org.mbari.annosaurus.repository.jpa.entity.CachedAncillaryDatumEntity
 
 object AssertUtils {
 
@@ -61,8 +60,8 @@ object AssertUtils {
     }
 
     def assertSameObservation(
-        a: MutableObservation,
-        b: MutableObservation,
+        a: ObservationEntity,
+        b: ObservationEntity,
         cascade: Boolean = true
     ): Unit = {
         if (a == null && b == null) {
@@ -88,7 +87,7 @@ object AssertUtils {
 
     }
 
-    def assertSameImageReference(a: MutableImageReference, b: MutableImageReference): Unit = {
+    def assertSameImageReference(a: ImageReferenceEntity, b: ImageReferenceEntity): Unit = {
         if (a == null && b == null) {
             // do nothing
         }
@@ -105,7 +104,7 @@ object AssertUtils {
         }
     }
 
-    def assertSameAssociation(a: MutableAssociation, b: MutableAssociation): Unit = {
+    def assertSameAssociation(a: AssociationEntity, b: AssociationEntity): Unit = {
         if (a == null && b == null) {
             // do nothing
         }
@@ -122,8 +121,8 @@ object AssertUtils {
     }
 
     def assertSameAncillaryDatum(
-        a: MutableCachedAncillaryDatum,
-        b: MutableCachedAncillaryDatum
+        a: CachedAncillaryDatumEntity,
+        b: CachedAncillaryDatumEntity
     ): Unit = {
         if (a == null && b == null) {
             // do nothing

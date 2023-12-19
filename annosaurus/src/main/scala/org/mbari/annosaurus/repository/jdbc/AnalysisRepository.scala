@@ -17,12 +17,13 @@
 package org.mbari.annosaurus.repository.jdbc
 
 import jakarta.persistence.{EntityManager, EntityManagerFactory}
-import org.mbari.annosaurus.model.simple.QueryConstraints
+
 import org.mbari.annosaurus.domain.{DepthHistogram, TimeHistogram}
 import org.slf4j.LoggerFactory
 
 import scala.jdk.CollectionConverters._
 import java.time.Instant
+import org.mbari.annosaurus.domain.QueryConstraints
 
 class AnalysisRepository(entityManagerFactory: EntityManagerFactory) {
 
@@ -31,7 +32,7 @@ class AnalysisRepository(entityManagerFactory: EntityManagerFactory) {
     def depthHistogram(constraints: QueryConstraints, binSizeMeters: Int = 50): DepthHistogram = {
         val select                       = DepthHistogramSQL.selectFromBinSize(binSizeMeters)
         val entityManager: EntityManager = entityManagerFactory.createEntityManager()
-        val query                        = QueryConstraints.toQuery(constraints, entityManager, select, "")
+        val query                        = QueryConstraintsSqlBuilder.toQuery(constraints, entityManager, select, "")
         val results                      = query.getResultList.asScala.toList
         entityManager.close()
         val values                       = results
@@ -48,7 +49,7 @@ class AnalysisRepository(entityManagerFactory: EntityManagerFactory) {
         val now                          = Instant.now()
         val select                       = TimeHistogramSQL.selectFromBinSize(now, binSizeDays)
         val entityManager: EntityManager = entityManagerFactory.createEntityManager()
-        val query                        = QueryConstraints.toQuery(constraints, entityManager, select, "")
+        val query                        = QueryConstraintsSqlBuilder.toQuery(constraints, entityManager, select, "")
 
         println(query)
         val results = query.getResultList.asScala.toList

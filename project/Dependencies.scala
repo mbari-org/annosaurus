@@ -43,17 +43,17 @@ object Dependencies {
   lazy val jettyWebapp   = "org.eclipse.jetty" % "jetty-webapp" % jettyVersion
 
   lazy val jmelody       = "net.bull.javamelody" % "javamelody-core" % "2.0.1"
-  lazy val json4sJackson = "org.json4s"          %% "json4s-jackson" % "4.0.6"
+  lazy val json4sJackson = "org.json4s"          %% "json4s-jackson" % "4.0.7"
   lazy val junit         = "junit"               % "junit"           % "4.13.2"
 
-  val logbackVersion      = "1.4.11"
+  val logbackVersion      = "1.4.14"
   lazy val logbackClassic = "ch.qos.logback" % "logback-classic" % logbackVersion
   lazy val logbackCore    = "ch.qos.logback" % "logback-core" % logbackVersion
 
   lazy val mssqlserver      = "com.microsoft.sqlserver" % "mssql-jdbc" % "12.4.2.jre11"
   lazy val munit            = "org.scalameta" %% "munit" % "1.0.0-M10"
   lazy val oracle           = "com.oracle.ojdbc"        % "ojdbc8"     % "19.3.0.0"
-  lazy val postgresql       = "org.postgresql"          % "postgresql" % "42.7.0"
+  lazy val postgresql       = "org.postgresql"          % "postgresql" % "42.7.1"
   lazy val rxJava3          = "io.reactivex.rxjava3"    % "rxjava"     % "3.1.8"
   lazy val scalatest = "org.scalatest"           %% "scalatest" % "3.2.17"
 
@@ -69,7 +69,7 @@ object Dependencies {
   lazy val slf4jJul   = "org.slf4j" % "jul-to-slf4j" % slf4jVersion
   lazy val slf4jLog4j = "org.slf4j" % "log4j-over-slf4j" % slf4jVersion
 
-  private val tapirVersion = "1.9.4"
+  private val tapirVersion = "1.9.5"
   lazy val tapirSttpCirce  = "com.softwaremill.sttp.client3" %% "circe"                    % "3.9.1"
   lazy val tapirCirce      = "com.softwaremill.sttp.tapir"   %% "tapir-json-circe"         % tapirVersion
   lazy val tapirPrometheus = "com.softwaremill.sttp.tapir"   %% "tapir-prometheus-metrics" % tapirVersion

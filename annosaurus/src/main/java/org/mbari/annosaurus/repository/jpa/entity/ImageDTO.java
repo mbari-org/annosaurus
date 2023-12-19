@@ -17,16 +17,23 @@
 package org.mbari.annosaurus.repository.jpa.entity;
 
 import java.net.URL;
+import java.time.Instant;
+import java.time.Duration;
 import java.util.UUID;
+import org.mbari.vcr4j.time.Timecode;
 
-record ImageReferenceDTO(
-    URL url, 
-    Integer width,
-    Integer height,
-    String format,
+record ImageDTO(
+    UUID imagedMomentUuid,
+    UUID videoReferenceUuid,
+    Duration elapsedTime,
+    Instant recordedTimestamp,
+    Timecode timecode,
     String description,
-    UUID uuid, 
-    UUID imagedMomentUuid
+    String format,
+    Integer height,
+    Integer width,
+    URL url,
+    UUID imageReferenceUuid
 ) {
 
 }

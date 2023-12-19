@@ -220,6 +220,24 @@ import org.mbari.annosaurus.domain.Annotation
             name = "ImagedMoment.findByImageReferenceUUID",
             query =
                 "SELECT i FROM ImagedMoment i LEFT JOIN i.javaImageReferences r WHERE r.uuid = :uuid ORDER BY i.uuid"
+        ),
+        new NamedQuery(
+            name = "ImagedMoment.findImageByConceptWithImages",
+            query = "SELECT new org.mbari.annosaurus.repository.jpa.entity.ImageDTO(i.uuid, i.elapsedTime, i.videoReferenceUUID, i.recordedDate, i.timecode, ir.description, ir.format, ir.height, ir.width, ir.url, ir.uuid) " +
+                "FROM ImagedMoment i LEFT JOIN i.javaObservations o LEFT JOIN i.javaImageReferences ir " +
+                "WHERE ir.url IS NOT NULL AND o.concept = :concept ORDER BY i.uuid"
+        ),
+        new NamedQuery(
+            name = "ImagedMoment.findImageByToConceptWithImages",
+            query = "SELECT new org.mbari.annosaurus.repository.jpa.entity.ImageDTO(i.uuid, i.elapsedTime, i.videoReferenceUUID, i.recordedDate, i.timecode, ir.description, ir.format, ir.height, ir.width, ir.url, ir.uuid) " +
+                "FROM ImagedMoment i LEFT JOIN i.javaObservations o LEFT JOIN i.javaImageReferences ir LEFT JOIN o.javaAssociations a " +
+                "WHERE ir.url IS NOT NULL AND a.toConcept = :concept ORDER BY i.uuid"
+        ),
+        new NamedQuery(
+            name = "ImagedMoment.findImageByVideoReferenceUUID",
+            query = "SELECT new org.mbari.annosaurus.repository.jpa.entity.ImageDTO(i.uuid, i.elapsedTime, i.videoReferenceUUID, i.recordedDate, i.timecode, ir.description, ir.format, ir.height, ir.width, ir.url, ir.uuid) " +
+                "FROM ImagedMoment i LEFT JOIN i.javaImageReferences ir " +
+                "WHERE ir.url IS NOT NULL AND i.videoReferenceUUID = :uuid ORDER BY i.uuid"
         )
     )
 )
@@ -263,17 +281,17 @@ class ImagedMomentEntity extends JpaEntity {
     var javaObservations: JList[ObservationEntity] =
         new JArrayList[ObservationEntity]
 
-    override def addObservation(observation: ObservationEntity): Unit = {
+    def addObservation(observation: ObservationEntity): Unit = {
         javaObservations.add(observation.asInstanceOf[ObservationEntity])
         observation.imagedMoment = this
     }
 
-    override def removeObservation(observation: ObservationEntity): Unit = {
+    def removeObservation(observation: ObservationEntity): Unit = {
         javaObservations.remove(observation)
         observation.imagedMoment = null
     }
 
-    override def observations: Iterable[ObservationEntity] = javaObservations.asScala
+    def observations: Iterable[ObservationEntity] = javaObservations.asScala
 
     @Expose(serialize = true)
     @SerializedName(value = "image_references")
@@ -287,15 +305,15 @@ class ImagedMomentEntity extends JpaEntity {
     protected var javaImageReferences: JList[ImageReferenceEntity] =
         new JArrayList[ImageReferenceEntity]
 
-    override def addImageReference(imageReference: ImageReferenceEntity): Unit = {
+    def addImageReference(imageReference: ImageReferenceEntity): Unit = {
         javaImageReferences.add(imageReference)
         imageReference.imagedMoment = this
     }
 
-    override def imageReferences: Iterable[ImageReferenceEntity] =
+    def imageReferences: Iterable[ImageReferenceEntity] =
         javaImageReferences.asScala
 
-    override def removeImageReference(imageReference: ImageReferenceEntity): Unit = {
+    def removeImageReference(imageReference: ImageReferenceEntity): Unit = {
         javaImageReferences.remove(imageReference)
         imageReference.imagedMoment = null
     }

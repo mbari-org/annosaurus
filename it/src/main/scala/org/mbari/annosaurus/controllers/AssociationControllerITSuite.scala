@@ -30,7 +30,7 @@ trait AssociationControllerITSuite extends BaseDAOSuite {
     override def beforeAll(): Unit = daoFactory.beforeAll()
     override def afterAll(): Unit  = daoFactory.afterAll()
 
-    lazy val controller = new AssociationController(daoFactory.asInstanceOf[BasicDAOFactory])
+    lazy val controller = new AssociationController(daoFactory)
 
     test("bulkUpdate") {
         val x               = TestUtils.create(1, 1, 8, 0).head

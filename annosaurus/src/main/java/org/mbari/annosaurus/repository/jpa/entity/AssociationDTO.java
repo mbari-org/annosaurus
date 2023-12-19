@@ -20,7 +20,8 @@ import java.util.UUID;
 import java.sql.Timestamp;
 
 
-record AssociationDTO(String linkName, String toConcept, String linkValue, String mimeType, UUID uuid, Timestamp lastUpdated,
+record AssociationDTO(String linkName, String toConcept, String linkValue, 
+        String mimeType, UUID uuid, Timestamp lastUpdated,
 		UUID observationUuid, UUID imagedMomentUuid) {
 
 }

@@ -16,38 +16,64 @@
 
 package org.mbari.annosaurus.repository.jdbc
 
-import org.mbari.annosaurus.model.MutableAnnotation
+
 
 import java.util.UUID
+import org.mbari.annosaurus.domain.CachedAncillaryDatum
+import org.mbari.annosaurus.domain.Annotation
+import org.mbari.annosaurus.domain.CachedAncillaryDatumSC
 
 object AncillaryDatumSQL {
 
-    def resultListToAnncillaryData(rows: List[_]): Seq[AncillaryDatumExt] = {
+    def resultListToAnncillaryData(rows: List[_]): Seq[CachedAncillaryDatum] = {
         for {
             row <- rows
         } yield {
             val xs = row.asInstanceOf[Array[Object]]
-            val a  = new AncillaryDatumExt
-            a.uuid = UUID.fromString(xs(0).toString)
-            a.altitude = toDouble(xs(1).asInstanceOf[Number])
-            Option(xs(2)).foreach(v => a.crs = v.toString)
-            a.depthMeters = toDouble(xs(3).asInstanceOf[Number])
-            a.latitude = toDouble(xs(4).asInstanceOf[Number])
-            a.longitude = toDouble(xs(5).asInstanceOf[Number])
-            a.oxygenMlL = toDouble(xs(6).asInstanceOf[Number])
-            a.phi = toDouble(xs(7).asInstanceOf[Number])
-            Option(xs(8)).foreach(v => a.posePositionUnits = v.toString)
-            a.pressureDbar = toDouble(xs(9).asInstanceOf[Number])
-            a.psi = toDouble(xs(10).asInstanceOf[Number])
-            a.salinity = toDouble(xs(11).asInstanceOf[Number])
-            a.temperatureCelsius = toDouble(xs(12).asInstanceOf[Number])
-            a.theta = toDouble(xs(13).asInstanceOf[Number])
-            a.x = toDouble(xs(14).asInstanceOf[Number])
-            a.y = toDouble(xs(15).asInstanceOf[Number])
-            a.z = toDouble(xs(16).asInstanceOf[Number])
-            a.lightTransmission = toDouble(xs(17).asInstanceOf[Number])
-            a.imagedMomentUuid = UUID.fromString(xs(18).toString)
-            a
+
+            CachedAncillaryDatum(
+                uuid = Option(xs(0).toString).map(UUID.fromString),
+                altitude = toDouble(xs(1).asInstanceOf[Number]),
+                crs = Option(xs(2)).map(_.toString),
+                depthMeters = toDouble(xs(3).asInstanceOf[Number]),
+                latitude = toDouble(xs(4).asInstanceOf[Number]),
+                longitude = toDouble(xs(5).asInstanceOf[Number]),
+                oxygenMlL = toDouble(xs(6).asInstanceOf[Number]),
+                phi = toDouble(xs(7).asInstanceOf[Number]),
+                posePositionUnits = Option(xs(8)).map(_.toString),
+                pressureDbar = toDouble(xs(9).asInstanceOf[Number]),
+                psi = toDouble(xs(10).asInstanceOf[Number]),
+                salinity = toDouble(xs(11).asInstanceOf[Number]),
+                temperatureCelsius = toDouble(xs(12).asInstanceOf[Number]),
+                theta = toDouble(xs(13).asInstanceOf[Number]),
+                x = toDouble(xs(14).asInstanceOf[Number]),
+                y = toDouble(xs(15).asInstanceOf[Number]),
+                z = toDouble(xs(16).asInstanceOf[Number]),
+                lightTransmission = toDouble(xs(17).asInstanceOf[Number]),
+                imagedMomentUuid = Option(xs(18).toString).map(UUID.fromString)
+            )
+
+            // val a  = new AncillaryDatumExt
+            // a.uuid = UUID.fromString(xs(0).toString)
+            // a.altitude = toDouble(xs(1).asInstanceOf[Number])
+            // Option(xs(2)).foreach(v => a.crs = v.toString)
+            // a.depthMeters = toDouble(xs(3).asInstanceOf[Number])
+            // a.latitude = toDouble(xs(4).asInstanceOf[Number])
+            // a.longitude = toDouble(xs(5).asInstanceOf[Number])
+            // a.oxygenMlL = toDouble(xs(6).asInstanceOf[Number])
+            // a.phi = toDouble(xs(7).asInstanceOf[Number])
+            // Option(xs(8)).foreach(v => a.posePositionUnits = v.toString)
+            // a.pressureDbar = toDouble(xs(9).asInstanceOf[Number])
+            // a.psi = toDouble(xs(10).asInstanceOf[Number])
+            // a.salinity = toDouble(xs(11).asInstanceOf[Number])
+            // a.temperatureCelsius = toDouble(xs(12).asInstanceOf[Number])
+            // a.theta = toDouble(xs(13).asInstanceOf[Number])
+            // a.x = toDouble(xs(14).asInstanceOf[Number])
+            // a.y = toDouble(xs(15).asInstanceOf[Number])
+            // a.z = toDouble(xs(16).asInstanceOf[Number])
+            // a.lightTransmission = toDouble(xs(17).asInstanceOf[Number])
+            // a.imagedMomentUuid = UUID.fromString(xs(18).toString)
+            // a
         }
     }
 
@@ -111,17 +137,17 @@ object AncillaryDatumSQL {
       |""".stripMargin
 
     def join(
-        annotations: Seq[MutableAnnotationExt],
-        data: Seq[AncillaryDatumExt]
-    ): Seq[MutableAnnotation] = {
-        for {
+        annotations: Seq[Annotation],
+        data: Seq[CachedAncillaryDatum]
+    ): Seq[Annotation] = {
+        val resolvedAnnos = for {
             d <- data
-        } {
+        } yield {
             annotations
                 .filter(anno => anno.imagedMomentUuid == d.imagedMomentUuid)
-                .foreach(anno => anno.ancillaryData = d)
+                .map(anno => anno.copy(ancillaryData = Some(d)))
         }
-        annotations
+        resolvedAnnos.flatten.toSeq
     }
 
 }

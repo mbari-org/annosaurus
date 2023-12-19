@@ -28,6 +28,9 @@ import java.util.UUID
 import org.mbari.annosaurus.domain.ImagedMoment
 import org.mbari.annosaurus.etc.circe.CirceCodecs.{*, given}
 import org.mbari.annosaurus.etc.jwt.JwtService
+import org.mbari.annosaurus.domain.Index
+import org.mbari.annosaurus.domain.IndexSC
+import org.mbari.annosaurus.repository.jpa.entity.IndexEntity
 
 class IndexEndpoints(controller: IndexController, jwtService: JwtService)(implicit
     val executor: ExecutionContext
@@ -35,25 +38,27 @@ class IndexEndpoints(controller: IndexController, jwtService: JwtService)(implic
 
     given givenJwtService: JwtService = jwtService
 
+    private val toEntity = Index.from(_: IndexEntity, false) // curried function
+
     val findByVideoReferenceUUID = openEndpoint
         .get
         .in(paging)
         .in("v1" / "index" / "videoreference" / path[UUID]("uuid"))
-        .out(jsonBody[List[ImagedMoment]].description("The IndexEntity objects"))
+        .out(jsonBody[List[IndexSC]].description("The IndexEntity objects"))
         .tag("Index")
 
     val findByVideoReferenceUUIDImpl = findByVideoReferenceUUID.serverLogic { (paging, uuid) =>
         val f = controller
             .findByVideoReferenceUUID(uuid, paging.limit, paging.offset)
-            .map(xs => xs.map(ImagedMoment.from).toList)
+            .map(xs => xs.map(toEntity).map(_.toSnakeCase).toList)
         handleErrors(f)
     }
 
     val bulkUpdateRecordedTimestamps = secureEndpoint
         .put
         .in("v1" / "index" / "tapetime")
-        .in(jsonBody[List[ImagedMoment]].description("The IndexEntity objects"))
-        .out(jsonBody[List[ImagedMoment]].description("The IndexEntity objects"))
+        .in(jsonBody[List[Index]].description("The IndexEntity objects"))
+        .out(jsonBody[List[IndexSC]].description("The IndexEntity objects"))
         .tag("Index")
 
     val bulkUpdateRecordedTimestampsImpl = bulkUpdateRecordedTimestamps
@@ -63,7 +68,7 @@ class IndexEndpoints(controller: IndexController, jwtService: JwtService)(implic
                 val im = indices.map(_.toEntity)
                 val f  = controller
                     .bulkUpdateRecordedTimestamps(im)
-                    .map(xs => xs.map(ImagedMoment.from).toList)
+                    .map(xs => xs.map(toEntity).map(_.toSnakeCase).toList)
                 handleErrors(f)
         )
 

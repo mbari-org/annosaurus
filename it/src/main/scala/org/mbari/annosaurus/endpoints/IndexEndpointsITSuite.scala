@@ -23,9 +23,10 @@ import org.mbari.annosaurus.etc.jdk.Logging
 import sttp.model.StatusCode
 import org.mbari.annosaurus.repository.jpa.JPADAOFactory
 import org.mbari.annosaurus.etc.jwt.JwtService
+import org.mbari.annosaurus.etc.circe.CirceCodecs.given
 
 
-class IndexEndpointsITSuite extends EndpointsSuite {
+trait IndexEndpointsITSuite extends EndpointsSuite {
 
     private val log = Logging(getClass)
 
@@ -37,7 +38,7 @@ class IndexEndpointsITSuite extends EndpointsSuite {
     test("findByVideoReferenceUUID") {
         val im = TestUtils.create(1, 1).head
         runGet(
-            endpoints.findByVideoReferenceUUID,
+            endpoints.findByVideoReferenceUUIDImpl,
             s"http://test.com/v1/index/videoreference/${im.videoReferenceUUID}",
             response =>
                 assertEquals(response.code, StatusCode.Ok)

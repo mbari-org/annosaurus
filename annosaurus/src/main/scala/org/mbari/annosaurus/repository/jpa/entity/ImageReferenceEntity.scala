@@ -18,7 +18,7 @@ package org.mbari.annosaurus.repository.jpa.entity
 
 import com.google.gson.annotations.{Expose, SerializedName}
 import jakarta.persistence._
-import org.mbari.annosaurus.model.{MutableImageReference, MutableImagedMoment}
+
 import org.mbari.annosaurus.repository.jpa.{JpaEntity, TransactionLogger, URLConverter}
 
 import java.net.URL
@@ -52,6 +52,26 @@ import java.net.URL
         new NamedQuery(
             name = "ImageReference.findByURL",
             query = "SELECT r FROM ImageReference r WHERE r.url = :url ORDER BY r.url"
+        ),
+        new NamedQuery(
+            name = "ImageReference.findDTOByVideoReferenceUuid",
+            query = "SELECT new org.mbari.annosaurus.model.ImageReferenceDTO(r.url, r.width, r.height, r.format, r.description, r.uuid, im.uuid) FROM ImageReference r LEFT JOIN ImagedMoment im WHERE im.videoReferenceUUID = :uuid ORDER BY r.url"
+        ),
+        new NamedQuery(
+            name = "ImageReference.findDTOByVideoReferenceUuidBetweenDates",
+            query = "SELECT new org.mbari.annosaurus.model.ImageReferenceDTO(r.url, r.width, r.height, r.format, r.description, r.uuid, im.uuid) FROM ImageReference r LEFT JOIN ImagedMoment im WHERE im.videoReferenceUUID = :uuid AND im.recordedDate BETWEEN :start AND :end ORDER BY r.url"
+        ),
+        new NamedQuery(
+            name = "ImageReference.findDTOByConcurrentRequest",
+            query = "SELECT new org.mbari.annosaurus.model.ImageReferenceDTO(r.url, r.width, r.height, r.format, r.description, r.uuid, im.uuid) FROM ImageReference r LEFT JOIN ImagedMoment im WHERE im.videoReferenceUUID IN :uuids AND im.recordedDate BETWEEN :start AND :end ORDER BY r.url"
+        ),
+        new NamedQuery(
+            name = "ImageReference.findDTOByMultiRequest",
+            query = "SELECT new org.mbari.annosaurus.model.ImageReferenceDTO(r.url, r.width, r.height, r.format, r.description, r.uuid, im.uuid) FROM ImageReference r LEFT JOIN ImagedMoment im WHERE im.videoReferenceUUID IN :uuids IN :uuids ORDER BY r.url"
+        ),
+        new NamedQuery(
+            name = "ImageReference.findDTOByImagedMomentUuids",
+            query = "SELECT new org.mbari.annosaurus.model.ImageReferenceDTO(r.url, r.width, r.height, r.format, r.description, r.uuid, im.uuid) FROM ImageReference r LEFT JOIN ImagedMoment im WHERE im.uuid IN :uuids ORDER BY r.url"
         )
     )
 )
@@ -111,7 +131,7 @@ object ImageReferenceEntity {
         i
     }
 
-    def apply(v: MutableImageReference): ImageReferenceEntity = {
+    def apply(v: ImageReferenceEntity): ImageReferenceEntity = {
         val i = new ImageReferenceEntity
         i.url = v.url
         i.description = v.description

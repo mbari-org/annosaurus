@@ -189,17 +189,17 @@ class ObservationEntity extends JpaEntity {
     )
     protected var javaAssociations: JList[AssociationEntity] = new JArrayList[AssociationEntity]
 
-    override def addAssociation(association: AssociationEntity): Unit = {
+    def addAssociation(association: AssociationEntity): Unit = {
         javaAssociations.add(association.asInstanceOf[AssociationEntity])
         association.observation = this
     }
 
-    override def removeAssociation(association: AssociationEntity): Unit = {
+    def removeAssociation(association: AssociationEntity): Unit = {
         javaAssociations.remove(association)
         association.observation = null
     }
 
-    override def associations: Iterable[AssociationEntity] = javaAssociations.asScala
+    def associations: Iterable[AssociationEntity] = javaAssociations.asScala
 
 }
 
