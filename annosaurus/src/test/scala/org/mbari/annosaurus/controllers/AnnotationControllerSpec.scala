@@ -17,10 +17,10 @@
 package org.mbari.annosaurus.controllers
 
 import org.mbari.annosaurus.Constants
-import org.mbari.annosaurus.model.MutableAnnotation
-import org.mbari.annosaurus.model.simple.{ConcurrentRequest, MultiRequest}
+
+
 import org.mbari.annosaurus.repository.jpa.TestDAOFactory
-import org.mbari.annosaurus.repository.jpa.MutableAnnotationImpl
+
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
@@ -34,6 +34,8 @@ import scala.concurrent.{Await, Future}
 import scala.io.Source
 import scala.jdk.CollectionConverters._
 import scala.util.Random
+import org.mbari.annosaurus.domain.*
+import org.mbari.annosaurus.etc.circe.CirceCodecs.{given, *}
 
 /**
   * @author Brian Schlining
@@ -43,7 +45,7 @@ class AnnotationControllerSpec extends AnyFlatSpec with Matchers with BeforeAndA
 
   private[this] val daoFactory    = TestDAOFactory.Instance
   private[this] val entityFactory = new TestEntityFactory(daoFactory)
-  private[this] val controller    = new AnnotationController(daoFactory.asInstanceOf[BasicDAOFactory])
+  private[this] val controller    = new AnnotationController(daoFactory)
   private[this] val timeout       = SDuration(200, TimeUnit.SECONDS)
   private[this] val recordedDate  = Instant.now()
 //  private[this] val log = LoggerFactory.getLogger(getClass)
@@ -80,7 +82,7 @@ class AnnotationControllerSpec extends AnyFlatSpec with Matchers with BeforeAndA
       )
     )
 
-    val b = exec(() => controller.findByVideoReferenceUUID(a.videoReferenceUuid))
+    val b = exec(() => controller.findByVideoReferenceUUID(a.videoReferenceUuid.get))
     b should not be empty
     b.size should be(1)
     b.head.concept should be("Slime mold")
@@ -202,7 +204,7 @@ class AnnotationControllerSpec extends AnyFlatSpec with Matchers with BeforeAndA
 
     val b = exec(() =>
       controller
-        .update(a.observationUuid, Some(a.videoReferenceUuid), concept = Some("Nanomia bijuga"))
+        .update(a.observationUuid.get, Some(a.videoReferenceUuid.get), concept = Some("Nanomia bijuga"))
     )
     b should not be (empty)
     b.get.concept should be("Nanomia bijuga")
@@ -220,8 +222,8 @@ class AnnotationControllerSpec extends AnyFlatSpec with Matchers with BeforeAndA
 
     val b = exec(() =>
       controller.update(
-        a.observationUuid,
-        Some(a.videoReferenceUuid),
+        a.observationUuid.get,
+        a.videoReferenceUuid,
         concept = Some("Nanomia bijuga"),
         elapsedTime = Some(et1)
       )
@@ -230,7 +232,7 @@ class AnnotationControllerSpec extends AnyFlatSpec with Matchers with BeforeAndA
     b.get.concept should be("Nanomia bijuga")
     b.get.elapsedTime should be(et1)
 
-    val c = exec(() => controller.update(a.observationUuid, elapsedTime = Some(et0)))
+    val c = exec(() => controller.update(a.observationUuid.get, elapsedTime = Some(et0)))
     c should not be (empty)
     c.get.elapsedTime should be(et0)
   }
@@ -255,11 +257,11 @@ class AnnotationControllerSpec extends AnyFlatSpec with Matchers with BeforeAndA
     val videoReferenceUuid = UUID.randomUUID()
     val now                = Instant.now()
     val annos = (0 until 4).map(i =>
-      MutableAnnotationImpl(
-        videoReferenceUuid,
-        "concept" + i,
-        "brian",
-        recordedDate = Some(now.plus(Duration.ofSeconds(Random.nextInt(1000))))
+      Annotation(
+        videoReferenceUuid = Some(videoReferenceUuid),
+        concept = Some("concept" + i),
+        observer = Some("brian"),
+        recordedTimestamp = Some(now.plus(Duration.ofSeconds(Random.nextInt(1000))))
       )
     )
     val newAnnos = exec(() => controller.bulkCreate(annos))
@@ -278,7 +280,7 @@ class AnnotationControllerSpec extends AnyFlatSpec with Matchers with BeforeAndA
         now.plus(Duration.ofSeconds(Random.nextInt(10000)))
       )
     )
-    val annos    = imagedMoments.flatMap(i => MutableAnnotationImpl(i))
+    val annos    = imagedMoments.flatMap(i => Annotation.fromImagedMoment(i))
     val newAnnos = exec(() => controller.bulkCreate(annos))
     newAnnos.size should be(3)
     newAnnos.foreach(checkUuids)
@@ -287,7 +289,7 @@ class AnnotationControllerSpec extends AnyFlatSpec with Matchers with BeforeAndA
   it should "bulk insert a full dive of annotations" in {
 
     daoFactory.cleanup()
-    val df                       = daoFactory.asInstanceOf[BasicDAOFactory]
+    val df                       = daoFactory
     val imagedMomentController   = new ImagedMomentController(df)
     val associationController    = new AssociationController(df)
     val observationController    = new ObservationController(df)
@@ -302,14 +304,15 @@ class AnnotationControllerSpec extends AnyFlatSpec with Matchers with BeforeAndA
     source.close()
 
     // --- Insert all annotations
-    val annos = Constants.GSON.fromJson(json, classOf[Array[MutableAnnotationImpl]])
-    annos should not be null
+    val annos = json.reify[Array[Annotation]].getOrElse(throw new RuntimeException("Failed to parse json"))
+    // val annos = Constants.GSON.fromJson(json, classOf[Array[MutableAnnotationImpl]])
+    annos should not be (null)
     annos.isEmpty should be(false)
     val newAnnos = exec(() => controller.bulkCreate(annos))
     newAnnos.size should be(annos.size)
 
     // --- Trust insert, but verify
-    val videoReferenceUuid = newAnnos.head.videoReferenceUuid
+    val videoReferenceUuid = newAnnos.head.videoReferenceUuid.get
     val n                  = exec(() => imagedMomentController.countByVideoReferenceUuid(videoReferenceUuid))
     n should be > (0)
     val obsCount = exec(() => observationController.countByVideoReferenceUUID(videoReferenceUuid))
@@ -342,10 +345,10 @@ class AnnotationControllerSpec extends AnyFlatSpec with Matchers with BeforeAndA
 
   }
 
-  def checkUuids(a: MutableAnnotation): Unit = {
-    a.imagedMomentUuid should not be null
-    a.imageReferences.foreach(_.uuid should not be null)
-    a.associations.foreach(_.uuid should not be null)
+  def checkUuids(a: Annotation): Unit = {
+    a.imagedMomentUuid should not be empty
+    a.imageReferences.foreach(_.uuid should not be empty)
+    a.associations.foreach(_.uuid should not be empty)
   }
 
   override protected def afterAll(): Unit = {

@@ -39,7 +39,7 @@ record AncillaryDatumDTO(
     Double theta,
     Double psi,
     UUID uuid,
-    Timestamp lastUpdated,
+    Timestamp lastUpdatedTime,
     UUID imagedMomentUuid,
     Instant recordedTimestamp
 ) {

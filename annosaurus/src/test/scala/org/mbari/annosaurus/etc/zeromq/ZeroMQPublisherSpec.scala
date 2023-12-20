@@ -18,7 +18,7 @@ package org.mbari.annosaurus.etc.zeromq
 
 import org.mbari.annosaurus.messaging.{AnnotationMessage, AssociationMessage, MessageBus}
 import org.mbari.annosaurus.repository.jpa.entity.{AssociationEntity, ObservationEntity}
-import org.mbari.annosaurus.repository.jpa.MutableAnnotationImpl
+
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
@@ -27,6 +27,8 @@ import zmq.ZMQ
 
 import java.time.Instant
 import java.util.UUID
+import org.mbari.annosaurus.domain.Annotation
+import org.mbari.annosaurus.domain.Association
 
 /**
   * @author Brian Schlining
@@ -67,11 +69,13 @@ class ZeroMQPublisherSpec extends AnyFlatSpec with Matchers with BeforeAndAfterA
     Thread.sleep(200) // Give the thread above time to get set up.
 
     // Publish annotations
-    val annotation = new MutableAnnotationImpl
-    annotation.concept = "foo"
-    annotation.observationUuid = UUID.randomUUID()
-    annotation.observationTimestamp = Instant.now()
-    annotation.recordedTimestamp = Instant.now()
+    val annotation = Annotation(
+      concept = Some("foo"),
+      observationUuid = Some(UUID.randomUUID()),
+      observationTimestamp = Some(Instant.now()),
+      recordedTimestamp = Some(Instant.now())
+    )
+
     val thread = new Thread(() =>
       MessageBus
         .RxSubject
@@ -115,11 +119,12 @@ class ZeroMQPublisherSpec extends AnyFlatSpec with Matchers with BeforeAndAfterA
 
     // Publish annotations
     for (i <- 0 until 1000) {
-      val annotation = new MutableAnnotationImpl
-      annotation.concept = "bar" + i
-      annotation.observationUuid = UUID.randomUUID()
-      annotation.recordedTimestamp = Instant.now()
-      annotation.observationTimestamp = Instant.now()
+      val annotation = Annotation(
+        concept = Some("foo"),
+        observationUuid = Some(UUID.randomUUID()),
+        observationTimestamp = Some(Instant.now()),
+        recordedTimestamp = Some(Instant.now())
+      )
       val thread = new Thread(() => MessageBus.RxSubject.onNext(AnnotationMessage(annotation)))
       thread.setDaemon(true)
       thread.start()
@@ -167,10 +172,11 @@ class ZeroMQPublisherSpec extends AnyFlatSpec with Matchers with BeforeAndAfterA
     val association = AssociationEntity("test", "self", "foo", "text/plain")
     association.uuid = UUID.randomUUID()
     observation.addAssociation(association)
+    val assoc = Association.from(association, true)
     val thread = new Thread(() =>
       MessageBus
         .RxSubject
-        .onNext(AssociationMessage(association))
+        .onNext(AssociationMessage(assoc))
     )
     thread.run()
     Thread.sleep(1000)

@@ -16,6 +16,8 @@
 
 package org.mbari.annosaurus.endpoints
 
+import org.mbari.annosaurus.repository.jpa.DerbyTestDAOFactory
+
 class DerbyIndexEndpointsSuite extends IndexEndpointsITSuite {
 
     override val daoFactory = DerbyTestDAOFactory

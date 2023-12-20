@@ -16,7 +16,8 @@
 
 package org.mbari.annosaurus.controllers
 
-import org.mbari.annosaurus.model.simple.CachedAncillaryDatumBean
+
+import org.mbari.annosaurus.domain.*
 import org.mbari.annosaurus.repository.jpa.TestDAOFactory
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.flatspec.AnyFlatSpec
@@ -37,10 +38,10 @@ class CachedAncillaryDatumControllerSpec extends AnyFlatSpec with Matchers with 
 
   private[this] val daoFactory = TestDAOFactory.Instance
   private[this] val controller = new CachedAncillaryDatumController(
-    daoFactory.asInstanceOf[BasicDAOFactory]
+    daoFactory
   )
   private[this] val imagedMomentController = new ImagedMomentController(
-    daoFactory.asInstanceOf[BasicDAOFactory]
+    daoFactory
   )
   private[this] val timeout            = SDuration(200, TimeUnit.SECONDS)
   private[this] val recordedDate       = Instant.now()
@@ -75,12 +76,12 @@ class CachedAncillaryDatumControllerSpec extends AnyFlatSpec with Matchers with 
 
   it should "bulk create datums" in {
     val cads = imagedMoments.map(i => {
-      val c = new CachedAncillaryDatumBean
-      c.imagedMomentUuid = i.uuid
-      c.latitude = Some(math.random() * 90)
-      c.longitude = Some(math.random() * 180)
-      c.depthMeters = Some(1000)
-      c
+      CachedAncillaryDatum(
+        imagedMomentUuid = Some(i.uuid),
+        latitude = Some(math.random() * 90),
+        longitude = Some(math.random() * 180),
+        depthMeters = Some(1000)
+      )
     })
 
     exec(() => controller.bulkCreateOrUpdate(cads))
@@ -106,17 +107,18 @@ class CachedAncillaryDatumControllerSpec extends AnyFlatSpec with Matchers with 
         case (im, idx) =>
           //val ts = im.recordedDate.plusMillis(1000)
           val ts = Instant.ofEpochMilli(minEpochMillis + idx * 10 * 1000 + 1000)
-          val c  = new CachedAncillaryDatumBean
-          c.recordedTimestamp = Some(ts)
-          c.latitude = Some(90)
-          c.longitude = Some(180)
-          c.depthMeters = Some(2000)
-          c.imagedMomentUuid = im.uuid
-          c.lightTransmission = Some(50)
-          c.temperatureCelsius = Some(4)
-          c.salinity = Some(33.5f)
-          c.crs = "EPSG:4326"
-          c
+          CachedAncillaryDatum(
+            recordedTimestamp = Some(ts),
+            latitude = Some(90),
+            longitude = Some(180),
+            depthMeters = Some(2000),
+            imagedMomentUuid = Some(im.uuid),
+            lightTransmission = Some(50),
+            temperatureCelsius = Some(4),
+            salinity = Some(33.5f),
+            crs = Some("EPSG:4326")
+          )
+
       })
 
     exec(() => controller.merge(cads, videoReferenceUuid, Duration.ofMillis(15000)))

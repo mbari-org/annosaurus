@@ -16,7 +16,7 @@
 
 package org.mbari.annosaurus.controllers
 
-import org.mbari.annosaurus.model.MutableImagedMoment
+import org.mbari.annosaurus.domain.*
 import org.mbari.annosaurus.repository.jpa.TestDAOFactory
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.flatspec.AnyFlatSpec
@@ -32,13 +32,14 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.{Duration => SDuration}
 import scala.concurrent.{Await, Future}
 import scala.util.Random
+import org.mbari.annosaurus.repository.jpa.entity.ImagedMomentEntity
 
 class ImagedMomentControllerSpec extends AnyFlatSpec with Matchers with BeforeAndAfterAll {
 
   private[this] val daoFactory    = TestDAOFactory.Instance
   private[this] val entityFactory = new TestEntityFactory(daoFactory)
   private[this] val controller = new ImagedMomentController(
-    daoFactory.asInstanceOf[BasicDAOFactory]
+    daoFactory
   )
   private[this] val recordedDate       = Instant.now()
   private[this] val log                = LoggerFactory.getLogger(getClass)
@@ -76,9 +77,9 @@ class ImagedMomentControllerSpec extends AnyFlatSpec with Matchers with BeforeAn
 
     val s = "2019-09-22T01:23:45.6789Z"
 
-    def create(): Future[MutableImagedMoment] = {
+    def create(): Future[ImagedMomentEntity] = {
       val i = Instant.parse(s)
-      val c = new ImagedMomentController(daoFactory.asInstanceOf[BasicDAOFactory])
+      val c = new ImagedMomentController(daoFactory)
       c.create(videoReferenceUuid, recordedDate = Some(i))
     }
 
@@ -185,7 +186,7 @@ class ImagedMomentControllerSpec extends AnyFlatSpec with Matchers with BeforeAn
 
   }
 
-  private def checkUuids(imagedMoment: MutableImagedMoment): Unit = {
+  private def checkUuids(imagedMoment: ImagedMomentEntity): Unit = {
     imagedMoment.uuid should not be null
     for (obs <- imagedMoment.observations) {
       obs.uuid should not be null

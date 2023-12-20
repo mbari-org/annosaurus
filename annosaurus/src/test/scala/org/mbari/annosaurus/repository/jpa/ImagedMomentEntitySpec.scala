@@ -25,6 +25,8 @@ import org.scalatest.matchers.should.Matchers
 
 import java.time.{Duration, Instant}
 import java.util.UUID
+import org.mbari.annosaurus.domain.Annotation
+import org.mbari.annosaurus.etc.circe.CirceCodecs.{given, *}
 
 class ImagedMomentEntitySpec extends AnyFlatSpec with Matchers with BeforeAndAfterAll {
 
@@ -63,10 +65,10 @@ class ImagedMomentEntitySpec extends AnyFlatSpec with Matchers with BeforeAndAft
 
     val xs = Seq(imagedMoment0, imagedMoment1, imagedMoment2, imagedMoment3)
 
-    val annos = xs.flatMap(o => MutableAnnotationImpl(o))
+    val annos = xs.flatMap(o => Annotation.fromImagedMoment(o))
     annos.size should be(5)
 //    println(annos)
-    val ims = ImagedMomentEntity(annos)
+    val ims = Annotation.toEntities(annos)
 
 //    print(ims)
     ims.size should be(4)
@@ -98,8 +100,8 @@ class ImagedMomentEntitySpec extends AnyFlatSpec with Matchers with BeforeAndAft
         |  }
         |]""".stripMargin
 
-    val annotations   = Constants.GSON.fromJson(json, classOf[Array[MutableAnnotationImpl]])
-    val imagedMoments = ImagedMomentEntity(annotations)
+    val annotations = json.reify[Seq[Annotation]].getOrElse(throw new RuntimeException("Failed to parse json"))
+    val imagedMoments = Annotation.toEntities(annotations)
     imagedMoments should have size (1)
     val im = imagedMoments.head
     im.videoReferenceUUID should be(UUID.fromString("a9f75399-9bc5-4ff3-934c-0bd72ba4dccb"))

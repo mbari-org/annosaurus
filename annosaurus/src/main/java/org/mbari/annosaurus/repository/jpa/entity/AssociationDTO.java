@@ -21,7 +21,7 @@ import java.sql.Timestamp;
 
 
 record AssociationDTO(String linkName, String toConcept, String linkValue, 
-        String mimeType, UUID uuid, Timestamp lastUpdated,
+        String mimeType, UUID uuid, 
 		UUID observationUuid, UUID imagedMomentUuid) {
 
 }

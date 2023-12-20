@@ -16,6 +16,7 @@
 
 package org.mbari.annosaurus.controllers
 
+import org.mbari.annosaurus.domain.*
 import org.mbari.annosaurus.repository.jpa.TestDAOFactory
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.flatspec.AnyFlatSpec
@@ -36,7 +37,7 @@ import scala.concurrent.{Await, Future}
 class ImageControllerSpec extends AnyFlatSpec with Matchers with BeforeAndAfterAll {
 
   private[this] val daoFactory         = TestDAOFactory.Instance
-  private[this] val controller         = new ImageController(daoFactory.asInstanceOf[BasicDAOFactory])
+  private[this] val controller         = new ImageController(daoFactory)
   private[this] val timeout            = SDuration(200, TimeUnit.SECONDS)
   private[this] val recordedDate       = Instant.now
   private[this] val urlPng             = new URL("http://www.mbari.org/foo.png")

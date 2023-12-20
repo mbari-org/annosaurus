@@ -16,6 +16,7 @@
 
 package org.mbari.annosaurus.controllers
 
+import org.mbari.annosaurus.domain.*
 import org.mbari.annosaurus.repository.jpa.TestDAOFactory
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
@@ -31,11 +32,11 @@ class ObservationControllerSpec extends AnyFunSpec with Matchers {
 
   private[this] val daoFactory = TestDAOFactory.Instance
   private[this] val annoController = new AnnotationController(
-    daoFactory.asInstanceOf[BasicDAOFactory]
+    daoFactory
   )
 
   private[this] val controller = new ObservationController(
-    daoFactory.asInstanceOf[BasicDAOFactory]
+    daoFactory
   )
   private[this] val timeout = SDuration(200, TimeUnit.SECONDS)
 
@@ -64,13 +65,13 @@ class ObservationControllerSpec extends AnyFunSpec with Matchers {
         a.duration should be(duration)
 
         // look up and verify no duration
-        val opt0 = exec(() => controller.findByUUID(a.observationUuid))
+        val opt0 = exec(() => controller.findByUUID(a.observationUuid.get))
         opt0 should not be None
         val obs0 = opt0.get
         obs0.duration should be(duration)
 
         // delete duration
-        val opt = exec(() => controller.deleteDuration(a.observationUuid))
+        val opt = exec(() => controller.deleteDuration(a.observationUuid.get))
         opt should not be None
         val obs = opt.get
         obs.duration should be(null)

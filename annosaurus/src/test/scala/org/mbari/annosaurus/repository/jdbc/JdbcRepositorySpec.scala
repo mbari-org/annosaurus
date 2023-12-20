@@ -17,10 +17,10 @@
 package org.mbari.annosaurus.repository.jdbc
 
 import org.mbari.annosaurus.Constants
-import org.mbari.annosaurus.controllers.{AnnotationController, BasicDAOFactory, TestEntityFactory}
-import org.mbari.annosaurus.model.MutableAnnotation
+import org.mbari.annosaurus.controllers.{AnnotationController, TestEntityFactory}
+import org.mbari.annosaurus.domain.*
 import org.mbari.annosaurus.repository.jpa.TestDAOFactory
-import org.mbari.annosaurus.repository.jpa.{MutableAnnotationImpl, JPADAOFactory}
+import org.mbari.annosaurus.repository.jpa.JPADAOFactory
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
@@ -29,6 +29,7 @@ import java.util.concurrent.TimeUnit
 import scala.concurrent.duration.{Duration => SDuration}
 import scala.concurrent.{Await, Future}
 import scala.io.Source
+import org.mbari.annosaurus.etc.circe.CirceCodecs.{given, *}
 
 /**
   * @author Brian Schlining
@@ -37,7 +38,7 @@ import scala.io.Source
 class JdbcRepositorySpec extends AnyFunSpec with Matchers with BeforeAndAfterAll {
 
   private[this] val daoFactory    = TestDAOFactory.Instance
-  private[this] val controller    = new AnnotationController(daoFactory.asInstanceOf[BasicDAOFactory])
+  private[this] val controller    = new AnnotationController(daoFactory)
   private[this] val entityFactory = new TestEntityFactory(daoFactory)
   // HACK Assumes where using JDADAPFactory!
   private[this] val repository: JdbcRepository = {
@@ -52,7 +53,7 @@ class JdbcRepositorySpec extends AnyFunSpec with Matchers with BeforeAndAfterAll
     daoFactory.cleanup()
   }
 
-  private def loadAnnos(): Seq[MutableAnnotation] = {
+  private def loadAnnos(): Seq[Annotation] = {
     val url    = getClass.getResource("/json/annotation_full_dive.json").toURI
     val source = Source.fromFile(url, "UTF-8")
     val json = source
@@ -61,8 +62,8 @@ class JdbcRepositorySpec extends AnyFunSpec with Matchers with BeforeAndAfterAll
     source.close()
 
     // Insert all annotations
-    val annos = Constants.GSON.fromJson(json, classOf[Array[MutableAnnotationImpl]])
-    annos should not be null
+    val annos = json.reify[Array[Annotation]].getOrElse(throw new RuntimeException("Failed to parse"))
+    annos should not be empty
     annos.isEmpty should be(false)
     val newAnnos = exec(() => controller.bulkCreate(annos))
     newAnnos.size should be(annos.size)
@@ -74,9 +75,9 @@ class JdbcRepositorySpec extends AnyFunSpec with Matchers with BeforeAndAfterAll
       it("should deleteByVideoReferenceUuid") {
         val newAnnos = loadAnnos()
         // Delete them
-        val videoReferenceUuid = newAnnos.head.videoReferenceUuid
+        val videoReferenceUuid = newAnnos.head.videoReferenceUuid.get
         val deleteCount        = repository.deleteByVideoReferenceUuid(videoReferenceUuid)
-        println(Constants.GSON.toJson(deleteCount))
+        println(deleteCount.stringify)
 
         // Verify that they are gone
         val foundAnnos = repository.findByVideoReferenceUuid(videoReferenceUuid)
@@ -88,7 +89,7 @@ class JdbcRepositorySpec extends AnyFunSpec with Matchers with BeforeAndAfterAll
 
       it("should findImagedMomentUuidsByConceptWithImages") {
         val newAnnos           = loadAnnos()
-        val videoReferenceUuid = newAnnos.head.videoReferenceUuid
+        val videoReferenceUuid = newAnnos.head.videoReferenceUuid.get
 
         val n = repository.findImagedMomentUuidsByConceptWithImages("Myxoderma platyacanthum")
         n.size should be(2)
@@ -100,7 +101,7 @@ class JdbcRepositorySpec extends AnyFunSpec with Matchers with BeforeAndAfterAll
 
       it("should findImagesByVideoReferenceUuid") {
         val newAnnos           = loadAnnos()
-        val videoReferenceUuid = newAnnos.head.videoReferenceUuid
+        val videoReferenceUuid = newAnnos.head.videoReferenceUuid.get
 
         val xs = repository.findImagesByVideoReferenceUuid(videoReferenceUuid)
         xs.size should be(62)
@@ -109,15 +110,13 @@ class JdbcRepositorySpec extends AnyFunSpec with Matchers with BeforeAndAfterAll
         deleteCount.observationCount should be(newAnnos.size)
       }
 
-      
-
     }
   }
 
   describe("count") {
     it("should countImagesByVideoReferenceUuid") {
         val newAnnos           = loadAnnos()
-        val videoReferenceUuid = newAnnos.head.videoReferenceUuid
+        val videoReferenceUuid = newAnnos.head.videoReferenceUuid.get
         val xs = repository.countImagesByVideoReferenceUuid(videoReferenceUuid)
         xs should be (62)
         val deleteCount = repository.deleteByVideoReferenceUuid(videoReferenceUuid)

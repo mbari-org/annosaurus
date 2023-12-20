@@ -16,7 +16,7 @@
 
 package org.mbari.annosaurus.repository.jpa
 
-import org.mbari.annosaurus.model.simple.WindowRequest
+import org.mbari.annosaurus.domain.WindowRequest
 import org.mbari.annosaurus.repository.ImagedMomentDAO
 import org.mbari.annosaurus.repository.jpa.entity.ImagedMomentEntity
 import org.mbari.vcr4j.time.Timecode
@@ -125,7 +125,7 @@ class ImagedMomentDAOSpec extends AnyFlatSpec with Matchers with BeforeAndAfterA
 
   it should "findByWindowRequest" in {
     val windowRequest =
-      WindowRequest(Seq(videoReferenceUUID), imagedMoment0.uuid, Duration.ofSeconds(61))
+      WindowRequest(Seq(videoReferenceUUID), imagedMoment0.uuid, Duration.ofSeconds(61).toMillis())
     val im0 = run(_.findByWindowRequest(windowRequest))
     im0.size should be >= 2
   }

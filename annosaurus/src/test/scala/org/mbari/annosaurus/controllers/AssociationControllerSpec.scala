@@ -16,10 +16,10 @@
 
 package org.mbari.annosaurus.controllers
 
-import org.mbari.annosaurus.model.simple.ConceptAssociationRequest
+import org.mbari.annosaurus.domain.*
 import org.mbari.annosaurus.repository.jpa.TestDAOFactory
 import org.mbari.annosaurus.repository.jpa.entity.{AssociationEntity, ImagedMomentEntity, ObservationEntity}
-import org.mbari.annosaurus.repository.jpa.MutableAnnotationImpl
+
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
@@ -38,10 +38,8 @@ import scala.concurrent.{Await, Future}
 class AssociationControllerSpec extends AnyFlatSpec with Matchers with BeforeAndAfterAll {
 
   private[this] val daoFactory = TestDAOFactory.Instance
-  private[this] val controller = new AssociationController(daoFactory.asInstanceOf[BasicDAOFactory])
-  private[this] val annotationController = new AnnotationController(
-    daoFactory.asInstanceOf[BasicDAOFactory]
-  )
+  private[this] val controller = new AssociationController(daoFactory)
+  private[this] val annotationController = new AnnotationController(daoFactory)
   private[this] val timeout      = SDuration(200, TimeUnit.SECONDS)
   private[this] val recordedDate = Instant.now()
 
@@ -60,18 +58,18 @@ class AssociationControllerSpec extends AnyFlatSpec with Matchers with BeforeAnd
       im.addObservation(obs)
       val ass = AssociationEntity(s"foo-$i", "self", s"$i")
       obs.addAssociation(ass)
-      MutableAnnotationImpl(obs)
+      Annotation.from(obs, true)
     }
     val annotations = exec(() => annotationController.bulkCreate(as))
     annotations.size should be(25)
 
     // Find by request
     val linkName = "foo-0"
-    val request  = ConceptAssociationRequest(linkName, uuids)
+    val request  = ConceptAssociationRequest(uuids, linkName)
     val response = exec(() => controller.findByConceptAssociationRequest(request))
 //    println(Constants.GSON.toJson(response))
     response.conceptAssociationRequest.linkName should be(linkName)
-    response.conceptAssociationRequest.uuids should contain theSameElementsAs uuids
+    response.conceptAssociationRequest.videoReferenceUuids should contain theSameElementsAs uuids
     response.associations.size should be(5)
     response.associations.foreach(a => a.linkName should be(linkName))
     response.associations.foreach(a => a.linkValue should be("0"))

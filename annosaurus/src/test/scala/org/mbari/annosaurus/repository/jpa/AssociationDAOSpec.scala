@@ -16,7 +16,7 @@
 
 package org.mbari.annosaurus.repository.jpa
 
-import org.mbari.annosaurus.model.MutableAssociation
+import org.mbari.annosaurus.domain.Association
 import org.mbari.annosaurus.repository.AssociationDAO
 import org.mbari.annosaurus.repository.jpa.entity.{AssociationEntity, ImagedMomentEntity, ObservationEntity}
 import org.scalatest.BeforeAndAfterAll
@@ -52,9 +52,9 @@ class AssociationDAOSpec extends AnyFlatSpec with Matchers with BeforeAndAfterAl
   private[this] val observation0 =
     ObservationEntity(concept, observationDate = Some(now), observer = Some("brian"))
   private[this] val association0 =
-    AssociationEntity("surface-color", MutableAssociation.TO_CONCEPT_SELF, "red")
+    AssociationEntity("surface-color", AssociationEntity.ToConceptSelf, "red")
   private[this] val association1 =
-    AssociationEntity("image-quality", MutableAssociation.TO_CONCEPT_SELF, "mega-awesome!!")
+    AssociationEntity("image-quality", AssociationEntity.ToConceptSelf, "mega-awesome!!")
 
   private type ADAO = AssociationDAO[AssociationEntity]
   def run[R](fn: ADAO => R): R = Await.result(dao.runTransaction(fn), timeout)
