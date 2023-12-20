@@ -52,7 +52,6 @@ object AnnotationSQL {
                 observer = Option(xs(11)).map(_.toString())
             )
 
-
             // ORIGINAL CODE
             // val a  = new MutableAnnotationExt
             // a.imagedMomentUuid = UUID.fromString(xs(0).toString)

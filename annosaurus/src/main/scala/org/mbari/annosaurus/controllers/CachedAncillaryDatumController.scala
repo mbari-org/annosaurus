@@ -16,7 +16,6 @@
 
 package org.mbari.annosaurus.controllers
 
-
 import org.mbari.annosaurus.util.FastCollator
 import java.time.Duration
 import java.util.UUID
@@ -140,10 +139,14 @@ class CachedAncillaryDatumController(val daoFactory: JPADAOFactory)
         datum: CachedAncillaryDatum
     )(implicit ec: ExecutionContext): Future[CachedAncillaryDatumEntity] =
         datum.imagedMomentUuid match {
-            case None => Future.failed(new RuntimeException(s"ImagedMoment UUID is required but it was missing from $datum"))
+            case None       =>
+                Future.failed(
+                    new RuntimeException(
+                        s"ImagedMoment UUID is required but it was missing from $datum"
+                    )
+                )
             case Some(uuid) => create(uuid, datum)
         }
-
 
     def update(
         uuid: UUID,
@@ -257,7 +260,6 @@ class CachedAncillaryDatumController(val daoFactory: JPADAOFactory)
             im.uuid != null,
             "The ImagedMoment should already be present in the database. (Null UUID was found"
         )
-
 
         if (im.ancillaryDatum != null) {
             updateValues(im.ancillaryDatum, d)

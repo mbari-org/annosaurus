@@ -22,7 +22,6 @@ import org.mbari.vcr4j.time.Timecode
 import java.time.Instant
 import org.mbari.annosaurus.repository.jpa.entity.ImagedMomentEntity
 
-
 final case class ImagedMoment(
     videoReferenceUuid: UUID,
     timecode: Option[String] = None,
@@ -71,7 +70,7 @@ object ImagedMoment extends FromEntity[ImagedMomentEntity, ImagedMoment] {
             Option(entity.elapsedTime).map(_.toMillis),
             Option(entity.recordedDate),
             entity.observations.map(x => Observation.from(x, false)).toSeq,
-            entity.imageReferences.map(x =>  ImageReference.from(x, false)).toSeq,
+            entity.imageReferences.map(x => ImageReference.from(x, false)).toSeq,
             Option(entity.ancillaryDatum).map(x => CachedAncillaryDatum.from(x, false)),
             Option(entity.uuid),
             entity.lastUpdated

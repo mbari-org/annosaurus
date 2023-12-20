@@ -38,7 +38,6 @@ final case class DeleteCount(
     )
 }
 
-
 final case class DeleteCountSC(
     video_reference_uuid: UUID,
     ancillary_data_count: Int = 0,
@@ -46,14 +45,15 @@ final case class DeleteCountSC(
     association_count: Int = 0,
     observation_count: Int = 0,
     imaged_moment_count: Int = 0,
-    error_message: Option[String] = None) extends ToCamelCase[DeleteCount] {
-        override def toCamelCase: DeleteCount = DeleteCount(
-            video_reference_uuid,
-            ancillary_data_count,
-            image_reference_count,
-            association_count,
-            observation_count,
-            imaged_moment_count,
-            error_message
-        )
-    }
+    error_message: Option[String] = None
+) extends ToCamelCase[DeleteCount] {
+    override def toCamelCase: DeleteCount = DeleteCount(
+        video_reference_uuid,
+        ancillary_data_count,
+        image_reference_count,
+        association_count,
+        observation_count,
+        imaged_moment_count,
+        error_message
+    )
+}

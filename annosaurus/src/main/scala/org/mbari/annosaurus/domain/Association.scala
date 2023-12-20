@@ -43,9 +43,10 @@ case class Association(
 
 object Association extends FromEntity[AssociationEntity, Association] {
     def from(entity: AssociationEntity, extend: Boolean = false): Association =
-        var (optObs, optIm) = if extend then 
-            (Option(entity.observation.uuid), Option(entity.observation.imagedMoment.uuid))
-        else (None, None)
+        var (optObs, optIm) =
+            if extend then
+                (Option(entity.observation.uuid), Option(entity.observation.imagedMoment.uuid))
+            else (None, None)
         Association(
             entity.linkName,
             entity.toConcept,

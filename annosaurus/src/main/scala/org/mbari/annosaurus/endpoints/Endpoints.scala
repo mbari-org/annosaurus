@@ -37,7 +37,12 @@ import sttp.tapir.json.circe.*
 import sttp.tapir.server.ServerEndpoint
 
 import java.time.Instant
-import org.mbari.annosaurus.domain.{DepthHistogram, Image, QueryConstraints, QueryConstraintsResponse}
+import org.mbari.annosaurus.domain.{
+    DepthHistogram,
+    Image,
+    QueryConstraints,
+    QueryConstraintsResponse
+}
 import org.mbari.annosaurus.domain.ImagedMoment
 import org.mbari.annosaurus.domain.Observation
 import org.mbari.annosaurus.domain.Association

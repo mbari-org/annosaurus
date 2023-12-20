@@ -20,13 +20,15 @@ import java.util.UUID
 import org.mbari.annosaurus.repository.jpa.entity.IndexEntity
 
 final case class Index(
-    videoReferenceUuid: UUID, 
+    videoReferenceUuid: UUID,
     timecode: Option[String] = None,
     elapsedTimeMillis: Option[Long] = None,
     recordedTimestamp: Option[java.time.Instant] = None,
     uuid: Option[UUID] = None,
-    lastUpdated: Option[java.time.Instant] = None) extends ToSnakeCase[IndexSC] with ToEntity[IndexEntity] {
-    override def toSnakeCase: IndexSC = 
+    lastUpdated: Option[java.time.Instant] = None
+) extends ToSnakeCase[IndexSC]
+    with ToEntity[IndexEntity] {
+    override def toSnakeCase: IndexSC =
         IndexSC(
             videoReferenceUuid,
             timecode,
@@ -60,15 +62,15 @@ object Index extends FromEntity[IndexEntity, Index] {
     }
 }
 
-
 final case class IndexSC(
-    video_reference_uuid: UUID, 
+    video_reference_uuid: UUID,
     timecode: Option[String] = None,
     elapsed_time_millis: Option[Long] = None,
     recorded_timestamp: Option[java.time.Instant] = None,
     uuid: Option[UUID] = None,
-    last_updated: Option[java.time.Instant] = None) extends ToCamelCase[Index] {
-    override def toCamelCase: Index = 
+    last_updated: Option[java.time.Instant] = None
+) extends ToCamelCase[Index] {
+    override def toCamelCase: Index =
         Index(
             video_reference_uuid,
             timecode,
@@ -77,4 +79,4 @@ final case class IndexSC(
             uuid,
             last_updated
         )
-    }
+}

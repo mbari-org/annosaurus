@@ -20,7 +20,6 @@ import java.io.Closeable
 import java.time.{Duration, Instant}
 import java.util.UUID
 
-
 import org.mbari.annosaurus.domain.WindowRequest
 import org.mbari.annosaurus.repository.{DAO, ImagedMomentDAO, NotFoundInDatastoreException}
 import org.mbari.vcr4j.time.Timecode

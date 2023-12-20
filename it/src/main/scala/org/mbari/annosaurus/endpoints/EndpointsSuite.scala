@@ -56,11 +56,10 @@ trait EndpointsSuite extends BaseDAOSuite:
                     case Left(error)  => fail(error.getLocalizedMessage)
                     case Right(value) => value
 
-    /**
-     * Creates a stubbed backend for testing endpoints. Adds exception logging to the stub.
-     * @param serverEndpoint
-     * @return
-     */
+    /** Creates a stubbed backend for testing endpoints. Adds exception logging to the stub.
+      * @param serverEndpoint
+      * @return
+      */
     def newBackendStub(serverEndpoint: ServerEndpoint[Any, Future]): SttpBackend[Future, Any] =
         // --- START: This block adds exception logging to the stub
         val exceptionHandler = ExceptionHandler.pure[Future](ctx =>

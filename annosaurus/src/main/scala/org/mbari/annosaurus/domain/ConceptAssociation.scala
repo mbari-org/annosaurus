@@ -38,7 +38,6 @@ final case class ConceptAssociation(
     )
 }
 
-
 final case class ConceptAssociationSC(
     uuid: UUID,
     video_reference_uuid: UUID,
@@ -58,4 +57,3 @@ final case class ConceptAssociationSC(
         mime_type
     )
 }
-

@@ -19,8 +19,11 @@ package org.mbari.annosaurus.domain
 import java.util.UUID
 import java.time.Duration
 
-
-final case class WindowRequest(videoReferenceUuids: Seq[UUID], imagedMomentUuid: UUID, windowMillis: Long) extends ToSnakeCase[WindowRequestSC] {
+final case class WindowRequest(
+    videoReferenceUuids: Seq[UUID],
+    imagedMomentUuid: UUID,
+    windowMillis: Long
+) extends ToSnakeCase[WindowRequestSC] {
     def toSnakeCase: WindowRequestSC = WindowRequestSC(
         videoReferenceUuids,
         imagedMomentUuid,
@@ -41,5 +44,3 @@ final case class WindowRequestSC(
         window_millis
     )
 }
-
-

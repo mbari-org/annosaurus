@@ -25,15 +25,14 @@ import org.mbari.annosaurus.repository.jpa.JPADAOFactory
 import org.mbari.annosaurus.etc.jwt.JwtService
 import org.mbari.annosaurus.etc.circe.CirceCodecs.given
 
-
 trait IndexEndpointsITSuite extends EndpointsSuite {
 
     private val log = Logging(getClass)
 
-    given JPADAOFactory             = daoFactory
-    private val jwtService          = new JwtService("mbari", "foo", "bar")
-    private lazy val controller     = new IndexController(daoFactory)
-    private lazy val endpoints      = new IndexEndpoints(controller, jwtService)
+    given JPADAOFactory         = daoFactory
+    private val jwtService      = new JwtService("mbari", "foo", "bar")
+    private lazy val controller = new IndexController(daoFactory)
+    private lazy val endpoints  = new IndexEndpoints(controller, jwtService)
 
     test("findByVideoReferenceUUID") {
         val im = TestUtils.create(1, 1).head
@@ -47,5 +46,5 @@ trait IndexEndpointsITSuite extends EndpointsSuite {
         )
 
     }
-  
+
 }

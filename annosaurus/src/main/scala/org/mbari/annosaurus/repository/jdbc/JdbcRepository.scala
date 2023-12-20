@@ -32,7 +32,6 @@ import org.mbari.annosaurus.domain.Annotation
 import org.mbari.annosaurus.domain.GeographicRange
 import org.mbari.annosaurus.domain.Image
 
-
 /** Database access (read-only) provider that uses SQL for fast lookups. WHY? JPA makes about 1 +
   * (rows * 4) database requests when looking up annotations. For 1000 rows that 4001 database calls
   * which is very SLOW!!. With SQL we can fetch annotations for a video using 3 database queries
@@ -79,7 +78,7 @@ class JdbcRepository(entityManagerFactory: EntityManagerFactory) {
             case NonFatal(e) =>
                 val errorMessage = s"A(n) ${e.getClass} was thrown. It reports: `${e.getMessage}`"
                 deleteCount = deleteCount.copy(errorMessage = Some(errorMessage))
-                    
+
         }
         finally {
             if (transaction.isActive) {
@@ -94,7 +93,7 @@ class JdbcRepository(entityManagerFactory: EntityManagerFactory) {
     def findByQueryConstraint(constraints: QueryConstraints): Seq[Annotation] = {
         implicit val entityManager: EntityManager = entityManagerFactory.createEntityManager()
 
-        val query1                                = QueryConstraintsSqlBuilder.toQuery(constraints, entityManager)
+        val query1      = QueryConstraintsSqlBuilder.toQuery(constraints, entityManager)
         val r1          = query1.getResultList.asScala.toList
         val annotations = AnnotationSQL.resultListToAnnotations(r1)
         executeQueryForAnnotations(annotations, constraints.includeData)

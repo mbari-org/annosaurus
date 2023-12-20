@@ -42,8 +42,8 @@ final case class Annotation(
     videoReferenceUuid: Option[UUID] = None
 ) extends ToSnakeCase[AnnotationSC] {
 
-    lazy val elapsedTime: Option[Duration] = elapsedTimeMillis.map(Duration.ofMillis(_))
-    lazy val duration: Option[Duration] = durationMillis.map(Duration.ofMillis(_))
+    lazy val elapsedTime: Option[Duration]   = elapsedTimeMillis.map(Duration.ofMillis(_))
+    lazy val duration: Option[Duration]      = durationMillis.map(Duration.ofMillis(_))
     lazy val validTimecode: Option[Timecode] = timecode.map(Timecode(_))
 
     override def toSnakeCase: AnnotationSC =
@@ -67,22 +67,24 @@ final case class Annotation(
 
 }
 
-object Annotation 
-    extends FromEntity[ObservationEntity, Annotation] {
+object Annotation extends FromEntity[ObservationEntity, Annotation] {
 
     override def from(entity: ObservationEntity, extend: Boolean = false): Annotation =
-        val ad = 
-            if extend && entity.imagedMoment != null then 
-                Option(entity.imagedMoment.ancillaryDatum).map(x => CachedAncillaryDatum.from(x, false))
+        val ad =
+            if extend && entity.imagedMoment != null then
+                Option(entity.imagedMoment.ancillaryDatum).map(x =>
+                    CachedAncillaryDatum.from(x, false)
+                )
             else None
 
         val imOpt = Option(entity.imagedMoment)
 
-        val irs = imOpt.map(_.imageReferences)
+        val irs = imOpt
+            .map(_.imageReferences)
             .getOrElse(Nil)
             .map(x => ImageReference.from(x, false))
             .toSeq
-            
+
         Annotation(
             Option(entity.activity),
             ad,
@@ -107,38 +109,48 @@ object Annotation
 
     def toEntities(annotations: Seq[Annotation]): Seq[ImagedMomentEntity] = {
 
-        val imagedMoments = for 
-            (imagedMomentUuid, annos) <- annotations
-                    .filter(x => x.imagedMomentUuid.isDefined && x.videoReferenceUuid.isDefined && x.concept.isDefined)
-                    .groupBy(_.imagedMomentUuid.get)
-        yield
-            val a = annos.head
-            val tc = a.timecode.map(Timecode(_))
-            val et = a.elapsedTimeMillis.map(Duration.ofMillis(_))
-            val im = ImagedMomentEntity(a.videoReferenceUuid, a.recordedTimestamp, tc, et)
-            im.uuid = imagedMomentUuid
+        val imagedMoments =
+            for (imagedMomentUuid, annos) <- annotations
+                                                 .filter(x =>
+                                                     x.imagedMomentUuid.isDefined && x
+                                                         .videoReferenceUuid
+                                                         .isDefined && x.concept.isDefined
+                                                 )
+                                                 .groupBy(_.imagedMomentUuid.get)
+            yield
+                val a  = annos.head
+                val tc = a.timecode.map(Timecode(_))
+                val et = a.elapsedTimeMillis.map(Duration.ofMillis(_))
+                val im = ImagedMomentEntity(a.videoReferenceUuid, a.recordedTimestamp, tc, et)
+                im.uuid = imagedMomentUuid
 
-            for 
-                a <- annos
-            do
-                val d = a.durationMillis.map(Duration.ofMillis(_))
-                val obs = ObservationEntity(a.concept.get, d, a.observationTimestamp, a.observer, a.group, a.activity)
-                a.observationUuid.foreach(obs.uuid = _)
-                im.addObservation(obs)
+                for a <- annos
+                do
+                    val d   = a.durationMillis.map(Duration.ofMillis(_))
+                    val obs = ObservationEntity(
+                        a.concept.get,
+                        d,
+                        a.observationTimestamp,
+                        a.observer,
+                        a.group,
+                        a.activity
+                    )
+                    a.observationUuid.foreach(obs.uuid = _)
+                    im.addObservation(obs)
 
-                a.associations.foreach(x => obs.addAssociation(x.toEntity))
-                a.imageReferences.foreach(x =>
-                    im.imageReferences.find(i => i.url == x.url) match
-                        case Some(link_value) => // Do nothing. Image already exists
-                        case None => im.addImageReference(x.toEntity)
-                )
-            im
-        
+                    a.associations.foreach(x => obs.addAssociation(x.toEntity))
+                    a.imageReferences
+                        .foreach(x =>
+                            im.imageReferences.find(i => i.url == x.url) match
+                                case Some(link_value) => // Do nothing. Image already exists
+                                case None             => im.addImageReference(x.toEntity)
+                        )
+                im
+
         imagedMoments.toSeq
 
     }
 
-        
 }
 
 final case class AnnotationSC(

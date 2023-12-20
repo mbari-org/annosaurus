@@ -235,9 +235,10 @@ import org.mbari.annosaurus.domain.Annotation
         ),
         new NamedQuery(
             name = "ImagedMoment.findImageByVideoReferenceUUID",
-            query = "SELECT new org.mbari.annosaurus.repository.jpa.entity.ImageDTO(i.uuid, i.elapsedTime, i.videoReferenceUUID, i.recordedDate, i.timecode, ir.description, ir.format, ir.height, ir.width, ir.url, ir.uuid) " +
-                "FROM ImagedMoment i LEFT JOIN i.javaImageReferences ir " +
-                "WHERE ir.url IS NOT NULL AND i.videoReferenceUUID = :uuid ORDER BY i.uuid"
+            query =
+                "SELECT new org.mbari.annosaurus.repository.jpa.entity.ImageDTO(i.uuid, i.elapsedTime, i.videoReferenceUUID, i.recordedDate, i.timecode, ir.description, ir.format, ir.height, ir.width, ir.url, ir.uuid) " +
+                    "FROM ImagedMoment i LEFT JOIN i.javaImageReferences ir " +
+                    "WHERE ir.url IS NOT NULL AND i.videoReferenceUUID = :uuid ORDER BY i.uuid"
         )
     )
 )
@@ -356,8 +357,7 @@ object ImagedMomentEntity {
         im
     }
 
-    def from(imagedMoment: ImagedMomentEntity): ImagedMomentEntity = 
+    def from(imagedMoment: ImagedMomentEntity): ImagedMomentEntity =
         ImagedMoment.from(imagedMoment).toEntity
-
 
 }

@@ -198,12 +198,11 @@ trait ImagedMomentDAO[T <: PersistentObject] extends DAO[T] {
       * @return
       *   true if deleted, false if not deleted.
       */
-    def deleteIfEmpty(imagedMoment: T): Boolean = 
+    def deleteIfEmpty(imagedMoment: T): Boolean =
         imagedMoment.primaryKey match {
             case Some(pk) => deleteIfEmptyByUUID(pk)
             case None     => false
         }
-
 
     def deleteIfEmptyByUUID(uuid: UUID): Boolean
 }

@@ -25,8 +25,6 @@ import java.sql.Timestamp
 
 object QueryConstraintsSqlBuilder {
 
-
-
     /** Generates a SQL template for use to build a query. It's not executable SQL though!
       * @param qc
       * @return

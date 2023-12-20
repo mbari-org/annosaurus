@@ -40,8 +40,8 @@ final case class CachedAncillaryDatum(
     psi: Option[Double] = None,
     uuid: Option[UUID] = None,
     lastUpdated: Option[java.time.Instant] = None,
-    imagedMomentUuid: Option[UUID] = None,  // extend
-    recordedTimestamp: Option[java.time.Instant] = None //extend
+    imagedMomentUuid: Option[UUID] = None,              // extend
+    recordedTimestamp: Option[java.time.Instant] = None // extend
 ) extends ToSnakeCase[CachedAncillaryDatumSC]
     with ToEntity[CachedAncillaryDatumEntity] {
     override def toSnakeCase: CachedAncillaryDatumSC =
@@ -95,8 +95,11 @@ final case class CachedAncillaryDatum(
 
 object CachedAncillaryDatum extends FromEntity[CachedAncillaryDatumEntity, CachedAncillaryDatum] {
     def from(entity: CachedAncillaryDatumEntity, extend: Boolean = false): CachedAncillaryDatum =
-        val opt = if extend && entity.imagedMoment != null then entity.imagedMoment.primaryKey else None
-        val rt = if extend && entity.imagedMoment != null then Option(entity.imagedMoment.recordedDate) else None
+        val opt =
+            if extend && entity.imagedMoment != null then entity.imagedMoment.primaryKey else None
+        val rt  =
+            if extend && entity.imagedMoment != null then Option(entity.imagedMoment.recordedDate)
+            else None
         CachedAncillaryDatum(
             entity.latitude,
             entity.longitude,

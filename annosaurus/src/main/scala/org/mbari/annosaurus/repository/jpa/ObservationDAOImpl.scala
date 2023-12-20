@@ -268,5 +268,4 @@ class ObservationDAOImpl(entityManager: EntityManager)
         query.executeUpdate()
     }
 
-    
 }

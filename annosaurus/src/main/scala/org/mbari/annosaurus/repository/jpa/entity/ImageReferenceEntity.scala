@@ -55,23 +55,28 @@ import java.net.URL
         ),
         new NamedQuery(
             name = "ImageReference.findDTOByVideoReferenceUuid",
-            query = "SELECT new org.mbari.annosaurus.repository.jpa.entity.ImageReferenceDTO(r.url, r.width, r.height, r.format, r.description, r.uuid, im.uuid) FROM ImageReference r LEFT JOIN ImagedMoment im WHERE im.videoReferenceUUID = :uuid ORDER BY r.url"
+            query =
+                "SELECT new org.mbari.annosaurus.repository.jpa.entity.ImageReferenceDTO(r.url, r.width, r.height, r.format, r.description, r.uuid, im.uuid) FROM ImageReference r LEFT JOIN ImagedMoment im WHERE im.videoReferenceUUID = :uuid ORDER BY r.url"
         ),
         new NamedQuery(
             name = "ImageReference.findDTOByVideoReferenceUuidBetweenDates",
-            query = "SELECT new org.mbari.annosaurus.repository.jpa.entity.ImageReferenceDTO(r.url, r.width, r.height, r.format, r.description, r.uuid, im.uuid) FROM ImageReference r JOIN ImagedMoment im WHERE im.videoReferenceUUID = :uuid AND im.recordedDate BETWEEN :start AND :end ORDER BY r.url"
+            query =
+                "SELECT new org.mbari.annosaurus.repository.jpa.entity.ImageReferenceDTO(r.url, r.width, r.height, r.format, r.description, r.uuid, im.uuid) FROM ImageReference r JOIN ImagedMoment im WHERE im.videoReferenceUUID = :uuid AND im.recordedDate BETWEEN :start AND :end ORDER BY r.url"
         ),
         new NamedQuery(
             name = "ImageReference.findDTOByConcurrentRequest",
-            query = "SELECT new org.mbari.annosaurus.repository.jpa.entity.ImageReferenceDTO(r.url, r.width, r.height, r.format, r.description, r.uuid, im.uuid) FROM ImageReference r JOIN ImagedMoment im WHERE im.videoReferenceUUID IN :uuids AND im.recordedDate BETWEEN :start AND :end ORDER BY r.url"
+            query =
+                "SELECT new org.mbari.annosaurus.repository.jpa.entity.ImageReferenceDTO(r.url, r.width, r.height, r.format, r.description, r.uuid, im.uuid) FROM ImageReference r JOIN ImagedMoment im WHERE im.videoReferenceUUID IN :uuids AND im.recordedDate BETWEEN :start AND :end ORDER BY r.url"
         ),
         new NamedQuery(
             name = "ImageReference.findDTOByMultiRequest",
-            query = "SELECT new org.mbari.annosaurus.repository.jpa.entity.ImageReferenceDTO(r.url, r.width, r.height, r.format, r.description, r.uuid, im.uuid) FROM ImageReference r JOIN ImagedMoment im WHERE im.videoReferenceUUID IN :uuids ORDER BY r.url"
+            query =
+                "SELECT new org.mbari.annosaurus.repository.jpa.entity.ImageReferenceDTO(r.url, r.width, r.height, r.format, r.description, r.uuid, im.uuid) FROM ImageReference r JOIN ImagedMoment im WHERE im.videoReferenceUUID IN :uuids ORDER BY r.url"
         ),
         new NamedQuery(
             name = "ImageReference.findDTOByImagedMomentUuids",
-            query = "SELECT new org.mbari.annosaurus.repository.jpa.entity.ImageReferenceDTO(r.url, r.width, r.height, r.format, r.description, r.uuid, im.uuid) FROM ImageReference r LEFT JOIN ImagedMoment im WHERE im.uuid IN :uuids ORDER BY r.url"
+            query =
+                "SELECT new org.mbari.annosaurus.repository.jpa.entity.ImageReferenceDTO(r.url, r.width, r.height, r.format, r.description, r.uuid, im.uuid) FROM ImageReference r LEFT JOIN ImagedMoment im WHERE im.uuid IN :uuids ORDER BY r.url"
         )
     )
 )

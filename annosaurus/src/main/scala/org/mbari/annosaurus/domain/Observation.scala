@@ -20,7 +20,6 @@ import java.time.{Duration, Instant}
 import java.util.UUID
 import org.mbari.annosaurus.repository.jpa.entity.ObservationEntity
 
-
 final case class Observation(
     concept: String,
     durationMillis: Option[Long] = None,
@@ -62,17 +61,18 @@ final case class Observation(
 }
 
 object Observation extends FromEntity[ObservationEntity, Observation] {
-    override def from(entity: ObservationEntity, extend: Boolean = false): Observation = Observation(
-        entity.concept,
-        Option(entity.duration).map(_.toMillis),
-        Option(entity.group),
-        Option(entity.activity),
-        Option(entity.observer),
-        Option(entity.observationDate),
-        entity.associations.map(x => Association.from(x, false)).toSeq,
-        Option(entity.uuid),
-        entity.lastUpdated
-    )
+    override def from(entity: ObservationEntity, extend: Boolean = false): Observation =
+        Observation(
+            entity.concept,
+            Option(entity.duration).map(_.toMillis),
+            Option(entity.group),
+            Option(entity.activity),
+            Option(entity.observer),
+            Option(entity.observationDate),
+            entity.associations.map(x => Association.from(x, false)).toSeq,
+            Option(entity.uuid),
+            entity.lastUpdated
+        )
 }
 
 final case class ObservationSC(

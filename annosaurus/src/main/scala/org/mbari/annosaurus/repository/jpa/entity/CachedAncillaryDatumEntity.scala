@@ -90,7 +90,6 @@ import org.mbari.annosaurus.domain.CachedAncillaryDatum
             query =
                 "SELECT new org.mbari.annosaurus.repository.jpa.entity.AncillaryDatumDTO(a.latitude, a.longitude, a.depthMeters, a.altitude, a.crs, a.salinity, a.temperatureCelsius, a.oxygenMlL, a.pressureDbar, a.lightTransmission, a.x, a.y, a.z, a.posePositionUnits, a.phi, a.theta, a.psi, a.uuid, a.lastUpdatedTime, im.uuid, im.recordedDate) FROM AncillaryDatum a LEFT JOIN a.imagedMoment im WHERE im.videoReferenceUUID IN :uuids ORDER BY a.uuid"
         )
-
     )
 )
 class CachedAncillaryDatumEntity extends JpaEntity {
@@ -191,10 +190,12 @@ class CachedAncillaryDatumEntity extends JpaEntity {
 
 object CachedAncillaryDatumEntity {
 
-    def apply(datum: CachedAncillaryDatum | CachedAncillaryDatumEntity): CachedAncillaryDatumEntity = {
+    def apply(
+        datum: CachedAncillaryDatum | CachedAncillaryDatumEntity
+    ): CachedAncillaryDatumEntity = {
         datum match {
             case a: CachedAncillaryDatumEntity => a
-            case b: CachedAncillaryDatum                             =>
+            case b: CachedAncillaryDatum       =>
                 val d = new CachedAncillaryDatumEntity
                 b.uuid.foreach(d.uuid = _)
                 d.latitude = b.latitude

@@ -116,7 +116,6 @@ import org.mbari.annosaurus.repository.jpa.{JpaEntity, TransactionLogger}
         //         "WHERE a.linkName = :linkName AND a.linkValue = :linkValue ORDER BY a.uuid"
         // ),
 
-
     )
 )
 class AssociationEntity extends JpaEntity {

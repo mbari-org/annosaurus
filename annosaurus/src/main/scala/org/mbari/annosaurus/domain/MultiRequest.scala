@@ -22,6 +22,7 @@ final case class MultiRequest(videoReferenceUuids: Seq[UUID]) extends ToSnakeCas
     def toSnakeCase: MultiRequestSC = MultiRequestSC(videoReferenceUuids)
 }
 
-final case class MultiRequestSC(video_reference_uuids: Seq[UUID]) extends ToCamelCase[MultiRequest] {
+final case class MultiRequestSC(video_reference_uuids: Seq[UUID])
+    extends ToCamelCase[MultiRequest] {
     def toCamelCase: MultiRequest = MultiRequest(video_reference_uuids)
 }

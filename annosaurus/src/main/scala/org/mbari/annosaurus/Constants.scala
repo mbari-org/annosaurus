@@ -20,7 +20,6 @@ import com.fatboyindustrial.gsonjavatime.Converters
 
 import com.typesafe.config.ConfigFactory
 
-
 import org.mbari.vcr4j.time.Timecode
 
 import java.lang.reflect.Type
@@ -33,6 +32,5 @@ import java.time.Duration
 object Constants {
 
     val AppConfig: AppConfig = new AppConfig(ConfigFactory.load())
-
 
 }

@@ -42,8 +42,6 @@ import org.mbari.annosaurus.domain.Annotation
   */
 class AnnotationController(daoFactory: JPADAOFactory, bus: Subject[Any] = MessageBus.RxSubject) {
 
-
-
     private[this] val imagedMomentController = new ImagedMomentController(daoFactory)
     private[this] val annotationPublisher    = new AnnotationPublisher(bus)
 
@@ -199,7 +197,7 @@ class AnnotationController(daoFactory: JPADAOFactory, bus: Subject[Any] = Messag
         // observation. This is only needed if more than one observation
         // exists at the same timestamp
         val observationUuid = UUIDSequence.newUuid()
-        val annotation = Annotation(
+        val annotation      = Annotation(
             videoReferenceUuid = Option(videoReferenceUUID),
             concept = Some(concept),
             observer = Some(observer),
@@ -238,18 +236,20 @@ class AnnotationController(daoFactory: JPADAOFactory, bus: Subject[Any] = Messag
 
         val imagedMoments = Annotation.toEntities(annotations.toSeq)
 
-        val futures       = imagedMoments
+        val futures = imagedMoments
             .grouped(50)
             .map(imagedMoments => {
                 val f =
                     obsDao.runTransaction(d =>
                         imagedMoments.map(i => imagedMomentController.create(d, i))
                     )
-                f.map(imagedMomentList => imagedMomentList.flatMap(i => Annotation.fromImagedMoment(i, true)))
+                f.map(imagedMomentList =>
+                    imagedMomentList.flatMap(i => Annotation.fromImagedMoment(i, true))
+                )
             })
-        val future        = Future.sequence(futures)
+        val future  = Future.sequence(futures)
         future.onComplete(_ => obsDao.close())
-        val rf            = future.map(_.flatten.toSeq)
+        val rf      = future.map(_.flatten.toSeq)
         rf.foreach(annotationPublisher.publish) // publish new annotations
         rf
 
@@ -367,17 +367,19 @@ class AnnotationController(daoFactory: JPADAOFactory, bus: Subject[Any] = Messag
     def bulkUpdate(
         annotations: Iterable[Annotation]
     )(implicit ec: ExecutionContext): Future[Iterable[Annotation]] = {
-        val dao = daoFactory.newObservationDAO()
+        val dao       = daoFactory.newObservationDAO()
         // We have to do this in 2 transactions. The first makes all the changes. The second to
         // retrieve them. We have to do this because we may make a SQL call to move an observaton
         // to a new imagedmoment. The enitymanage doesn't see this change and so returns the cached
         // value which may have the wrong time index or videoreference.
-        val goodAnnos = annotations.filter(x => x.observationUuid.isDefined 
+        val goodAnnos = annotations.filter(x =>
+            x.observationUuid.isDefined
                 && x.concept.isDefined
                 && x.videoReferenceUuid.isDefined
-                && x.observer.isDefined 
-                && x.observationTimestamp.isDefined)
-        val f   = dao.runTransaction(d => {
+                && x.observer.isDefined
+                && x.observationTimestamp.isDefined
+        )
+        val f         = dao.runTransaction(d => {
             goodAnnos.flatMap(a => {
                 _update(
                     d,
@@ -397,7 +399,7 @@ class AnnotationController(daoFactory: JPADAOFactory, bus: Subject[Any] = Messag
         })
         f.onComplete(_ => dao.close())
         // --- After update find all the changes
-        val g   = f.flatMap(obs => {
+        val g         = f.flatMap(obs => {
             val dao1 = daoFactory.newObservationDAO()
             val ff   =
                 dao1.runTransaction(d =>
@@ -416,15 +418,15 @@ class AnnotationController(daoFactory: JPADAOFactory, bus: Subject[Any] = Messag
         if (annotations.isEmpty) return Future.successful(Nil)
         else
             val goodAnnos = annotations.filter(x => x.observationUuid.isDefined)
-            val dao = daoFactory.newObservationDAO()
-            val f   = dao.runTransaction(d => {
+            val dao       = daoFactory.newObservationDAO()
+            val f         = dao.runTransaction(d => {
                 goodAnnos.flatMap(a => {
                     _updateRecordedTimestamp(d, a.observationUuid.get, a.recordedTimestamp)
                 })
             })
             f.onComplete(_ => dao.close())
             // --- After update find all the changes
-            val g   = f.flatMap(obs => {
+            val g         = f.flatMap(obs => {
                 val dao1 = daoFactory.newObservationDAO()
                 val ff   =
                     dao1.runTransaction(d =>

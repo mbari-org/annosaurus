@@ -84,14 +84,13 @@ object ImagedMomentSQL {
                     .map(v => v.toInstant),
                 timecode = Option(xs(4))
                     .map(v => v.toString),
-                description =  Option(xs(5)).map(v => v.toString),
+                description = Option(xs(5)).map(v => v.toString),
                 format = Option(xs(6)).map(v => v.toString),
                 height = Option(xs(7)).map(v => v.asInstanceOf[Number].intValue()),
                 width = Option(xs(8)).map(v => v.asInstanceOf[Number].intValue()),
                 url = Option(xs(9)).map(x => URI.create(x.toString()).toURL),
                 imageReferenceUuid = UUID.fromString(xs(10).toString())
             )
-
 
             // val i  = new Image;
             // i.imagedMomentUuid = UUID.fromString(xs(0).toString)

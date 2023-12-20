@@ -45,10 +45,9 @@ final case class QueryConstraints(
     missionId: Option[String] = None
 ) extends ToSnakeCase[QueryConstraintsSC] {
 
-    val definedLimit = limit.getOrElse(5000)
+    val definedLimit  = limit.getOrElse(5000)
     val definedOffset = offset.getOrElse(0)
-    val includeData = data.getOrElse(false)
-
+    val includeData   = data.getOrElse(false)
 
     def toSnakeCase: QueryConstraintsSC = {
         QueryConstraintsSC(

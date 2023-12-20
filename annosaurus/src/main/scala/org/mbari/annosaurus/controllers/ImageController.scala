@@ -16,7 +16,6 @@
 
 package org.mbari.annosaurus.controllers
 
-
 import java.net.URL
 import java.time.{Duration, Instant}
 import java.util.UUID
@@ -48,27 +47,32 @@ class ImageController(daoFactory: JPADAOFactory) {
     )(implicit ec: ExecutionContext): Future[Seq[Image]] = {
         val dao = daoFactory.newImagedMomentDAO()
         val f   =
-            dao.runTransaction(d => d.findByVideoReferenceUUID(videoReferenceUUID, limit, offset)
-                .flatMap(_.imageReferences)
-                .map(Image.from(_)))
-                .map(_.toSeq)
+            dao.runTransaction(d =>
+                d.findByVideoReferenceUUID(videoReferenceUUID, limit, offset)
+                    .flatMap(_.imageReferences)
+                    .map(Image.from(_))
+            ).map(_.toSeq)
         f.onComplete(t => dao.close())
         f
     }
 
     def findByURL(url: URL)(implicit ec: ExecutionContext): Future[Option[Image]] = {
         val dao = daoFactory.newImageReferenceDAO()
-        val f   = dao.runTransaction(d => d.findByURL(url)
-            .map(Image.from(_)))
+        val f   = dao.runTransaction(d =>
+            d.findByURL(url)
+                .map(Image.from(_))
+        )
         f.onComplete(_ => dao.close())
         f
     }
 
     def findByImageName(name: String)(implicit ec: ExecutionContext): Future[Seq[Image]] = {
         val dao = daoFactory.newImageReferenceDAO()
-        val f   = dao.runTransaction(d => d.findByImageName(name)
-            .map(Image.from(_))
-            .toSeq)
+        val f   = dao.runTransaction(d =>
+            d.findByImageName(name)
+                .map(Image.from(_))
+                .toSeq
+        )
         f.onComplete(t => dao.close())
         f
     }

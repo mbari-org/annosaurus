@@ -20,20 +20,20 @@ import java.util.UUID
 
 final case class ConceptAssociationRequest(
     videoReferenceUuids: Seq[UUID],
-    linkName: String,
+    linkName: String
 ) extends ToSnakeCase[ConceptAssociationRequestSC] {
     def toSnakeCase: ConceptAssociationRequestSC = ConceptAssociationRequestSC(
         videoReferenceUuids,
-        linkName,
+        linkName
     )
 }
 
 final case class ConceptAssociationRequestSC(
     video_reference_uuids: Seq[UUID],
-    link_name: String,
+    link_name: String
 ) extends ToCamelCase[ConceptAssociationRequest] {
     def toCamelCase: ConceptAssociationRequest = ConceptAssociationRequest(
         video_reference_uuids,
-        link_name,
+        link_name
     )
 }

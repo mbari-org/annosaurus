@@ -18,8 +18,7 @@ package org.mbari.annosaurus.messaging
 
 import org.mbari.annosaurus.domain.Annotation
 import org.mbari.annosaurus.domain.Association
-import org.mbari.annosaurus.etc.circe.CirceCodecs.{given, *}
-
+import org.mbari.annosaurus.etc.circe.CirceCodecs.{*, given}
 
 /** @author
   *   Brian Schlining
@@ -50,8 +49,7 @@ case class AnnotationMessage(content: Annotation) extends GenericMessage[Annotat
     override def toJson: String = content.stringify
 }
 
-case class AssociationMessage(content: Association)
-    extends GenericMessage[Association] {
+case class AssociationMessage(content: Association) extends GenericMessage[Association] {
 //  override def hashCode(): Int = this.content.uuid.hashCode()
 //
 //  override def equals(obj: Any): Boolean = obj match {

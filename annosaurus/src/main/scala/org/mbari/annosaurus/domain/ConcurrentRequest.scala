@@ -19,12 +19,17 @@ package org.mbari.annosaurus.domain
 import java.time.Instant
 import java.util.UUID
 
-final case class ConcurrentRequest(startTimestamp: Instant, endTimestamp: Instant, videoReferenceUuids: Seq[UUID]) extends ToSnakeCase[ConcurrentRequestSC] {
+final case class ConcurrentRequest(
+    startTimestamp: Instant,
+    endTimestamp: Instant,
+    videoReferenceUuids: Seq[UUID]
+) extends ToSnakeCase[ConcurrentRequestSC] {
     def toSnakeCase: ConcurrentRequestSC = ConcurrentRequestSC(
         startTimestamp,
         endTimestamp,
         videoReferenceUuids
-    )}
+    )
+}
 
 final case class ConcurrentRequestSC(
     start_timestamp: Instant,
@@ -35,5 +40,5 @@ final case class ConcurrentRequestSC(
         start_timestamp,
         end_timestamp,
         video_reference_uuids
-    )}
-
+    )
+}

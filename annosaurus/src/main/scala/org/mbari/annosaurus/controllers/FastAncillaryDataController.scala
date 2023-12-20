@@ -57,7 +57,7 @@ class FastAncillaryDataController(entityManager: EntityManager) {
 
     def exists(data: CachedAncillaryDatum): Boolean = {
         if (data.imagedMomentUuid.isEmpty) false
-        else 
+        else
             val sql   =
                 s"SELECT uuid FROM $tableName WHERE imaged_moment_uuid = '${data.imagedMomentUuid.get}'"
             val query = entityManager.createNativeQuery(sql)

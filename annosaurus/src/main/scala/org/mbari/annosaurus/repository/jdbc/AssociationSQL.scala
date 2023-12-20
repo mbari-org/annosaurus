@@ -27,13 +27,13 @@ object AssociationSQL {
         for {
             row <- rows
         } yield {
-            val xs = row.asInstanceOf[Array[Object]]
-            val uuid = UUID.fromString(xs(0).toString)
-            val observationUuid = UUID.fromString(xs(1).toString)
-            val linkName = Option(xs(2)).map(_.toString)
-            val toConcept = Option(xs(3)).map(_.toString)
-            val linkValue = Option(xs(4)).map(_.toString)
-            val mimeType = Option(xs(5)).map(_.toString)
+            val xs               = row.asInstanceOf[Array[Object]]
+            val uuid             = UUID.fromString(xs(0).toString)
+            val observationUuid  = UUID.fromString(xs(1).toString)
+            val linkName         = Option(xs(2)).map(_.toString)
+            val toConcept        = Option(xs(3)).map(_.toString)
+            val linkValue        = Option(xs(4)).map(_.toString)
+            val mimeType         = Option(xs(5)).map(_.toString)
             val imagedMomentUuid = UUID.fromString(xs(6).toString)
             Association(
                 linkName.getOrElse(""),
@@ -73,7 +73,7 @@ object AssociationSQL {
                 // TODO warn of missing match?
                 case Some(anno) =>
                     anno.copy(associations = anno.associations :+ a)
-                    // anno.javaAssociations.add(a)
+                // anno.javaAssociations.add(a)
             }
         }
         annotations.distinctBy(_.observationUuid)

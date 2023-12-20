@@ -51,11 +51,15 @@ final case class Image(
 
 object Image extends FromEntity[ImageReferenceEntity, Image] {
     override def from(entity: ImageReferenceEntity, extend: Boolean = false): Image =
-        val im = entity.imagedMoment // TODO: This may be null!!
-        val (tc, etm, rt) = if extend then
-            (Option(im.timecode).map(_.toString), 
-            Option(im.elapsedTime).map(_.toMillis()), Option(im.recordedDate))
-        else (None, None, None)
+        val im            = entity.imagedMoment // TODO: This may be null!!
+        val (tc, etm, rt) =
+            if extend then
+                (
+                    Option(im.timecode).map(_.toString),
+                    Option(im.elapsedTime).map(_.toMillis()),
+                    Option(im.recordedDate)
+                )
+            else (None, None, None)
 
         Image(
             entity.uuid,
@@ -71,7 +75,6 @@ object Image extends FromEntity[ImageReferenceEntity, Image] {
             rt
         )
 }
-
 
 final case class ImageSC(
     image_reference_uuid: UUID,

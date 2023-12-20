@@ -91,13 +91,19 @@ object CirceCodecs {
     given timeHistogramDecoder: Decoder[TimeHistogram]         =
         timeHistogramCcDecoder or timeHistogramScDecoder.map(_.toCamelCase)
 
-    given qcrDepthHistogramScDecoder: Decoder[QueryConstraintsResponseSC[DepthHistogramSC]] = deriveDecoder
-    given qcrDepthHistogramScEncoder: Encoder[QueryConstraintsResponseSC[DepthHistogramSC]] = deriveEncoder
-    given qcrDepthHistogramDecoder: Decoder[QueryConstraintsResponse[DepthHistogram]]       = deriveDecoder
-    given qcrDepthHistogramEncoder: Encoder[QueryConstraintsResponse[DepthHistogram]]       = deriveEncoder
+    given qcrDepthHistogramScDecoder: Decoder[QueryConstraintsResponseSC[DepthHistogramSC]] =
+        deriveDecoder
+    given qcrDepthHistogramScEncoder: Encoder[QueryConstraintsResponseSC[DepthHistogramSC]] =
+        deriveEncoder
+    given qcrDepthHistogramDecoder: Decoder[QueryConstraintsResponse[DepthHistogram]]       =
+        deriveDecoder
+    given qcrDepthHistogramEncoder: Encoder[QueryConstraintsResponse[DepthHistogram]]       =
+        deriveEncoder
 
-    given qcrTimeHistogramScDecoder: Decoder[QueryConstraintsResponseSC[TimeHistogramSC]] = deriveDecoder
-    given qcrTimeHistogramScEncoder: Encoder[QueryConstraintsResponseSC[TimeHistogramSC]] = deriveEncoder
+    given qcrTimeHistogramScDecoder: Decoder[QueryConstraintsResponseSC[TimeHistogramSC]] =
+        deriveDecoder
+    given qcrTimeHistogramScEncoder: Encoder[QueryConstraintsResponseSC[TimeHistogramSC]] =
+        deriveEncoder
     given qcrTimeHistogramDecoder: Decoder[QueryConstraintsResponse[TimeHistogram]]       = deriveDecoder
     given qcrTimeHistogramEncoder: Encoder[QueryConstraintsResponse[TimeHistogram]]       = deriveEncoder
 
@@ -178,17 +184,21 @@ object CirceCodecs {
 
     given conceptAssociationRequestScDecoder: Decoder[ConceptAssociationRequestSC]     = deriveDecoder
     given conceptAssociationRequestScEncoder: Encoder[ConceptAssociationRequestSC]     = deriveEncoder
-    private val conceptAssociationRequestCcDecoder: Decoder[ConceptAssociationRequest] = deriveDecoder
+    private val conceptAssociationRequestCcDecoder: Decoder[ConceptAssociationRequest] =
+        deriveDecoder
     given conceptAssociationRequestEncoder: Encoder[ConceptAssociationRequest]         = deriveEncoder
     given conceptAssociationRequestDecoder: Decoder[ConceptAssociationRequest]         =
         conceptAssociationRequestCcDecoder or conceptAssociationRequestScDecoder.map(_.toCamelCase)
 
     given conceptAssociationResponseScDecoder: Decoder[ConceptAssociationResponseSC]     = deriveDecoder
     given conceptAssociationResponseScEncoder: Encoder[ConceptAssociationResponseSC]     = deriveEncoder
-    private val conceptAssociationResponseCcDecoder: Decoder[ConceptAssociationResponse] = deriveDecoder
+    private val conceptAssociationResponseCcDecoder: Decoder[ConceptAssociationResponse] =
+        deriveDecoder
     given conceptAssociationResponseEncoder: Encoder[ConceptAssociationResponse]         = deriveEncoder
     given conceptAssociationResponseDecoder: Decoder[ConceptAssociationResponse]         =
-        conceptAssociationResponseCcDecoder or conceptAssociationResponseScDecoder.map(_.toCamelCase)
+        conceptAssociationResponseCcDecoder or conceptAssociationResponseScDecoder.map(
+            _.toCamelCase
+        )
 
     given concurrentRequestScDecoder: Decoder[ConcurrentRequestSC]     = deriveDecoder
     given concurrentRequestScEncoder: Encoder[ConcurrentRequestSC]     = deriveEncoder
@@ -211,15 +221,14 @@ object CirceCodecs {
     given windowRequestDecoder: Decoder[WindowRequest]         =
         windowRequestCcDecoder or windowRequestScDecoder.map(_.toCamelCase)
 
-    given deleteCountScEncoder: Encoder[DeleteCountSC]     = deriveEncoder
-    given deleteCountEncoder: Encoder[DeleteCount]         = deriveEncoder
+    given deleteCountScEncoder: Encoder[DeleteCountSC] = deriveEncoder
+    given deleteCountEncoder: Encoder[DeleteCount]     = deriveEncoder
 
-    given geographicRangeScEncoder: Encoder[GeographicRangeSC]     = deriveEncoder
-    given geographicRangeEncoder: Encoder[GeographicRange]         = deriveEncoder
+    given geographicRangeScEncoder: Encoder[GeographicRangeSC] = deriveEncoder
+    given geographicRangeEncoder: Encoder[GeographicRange]     = deriveEncoder
 
     given healthStatusEncoder: Encoder[HealthStatus] = deriveEncoder
     given healthStatusDecoder: Decoder[HealthStatus] = deriveDecoder
-
 
     private val printer = Printer.noSpaces.copy(dropNullValues = true)
 

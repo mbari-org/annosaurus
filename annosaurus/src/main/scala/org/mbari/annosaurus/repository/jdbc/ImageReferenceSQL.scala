@@ -21,7 +21,6 @@ import java.net.URI
 import org.mbari.annosaurus.domain.ImageReference
 import org.mbari.annosaurus.domain.Annotation
 
-
 object ImageReferenceSQL {
     val SELECT: String =
         """ SELECT DISTINCT
@@ -84,7 +83,6 @@ object ImageReferenceSQL {
                 imagedMomentUuid = Option(xs(6)).map(_.toString).map(UUID.fromString)
             )
 
-
             // val i  = new MutableImageReferenceExt
             // i.uuid = UUID.fromString(xs(0).toString)
             // Option(xs(1))
@@ -115,7 +113,7 @@ object ImageReferenceSQL {
             annotations
                 .filter(anno => anno.imagedMomentUuid == i.imagedMomentUuid)
                 .map(anno => anno.copy(imageReferences = anno.imageReferences :+ i))
-                
+
         }
         mergedAnnos.flatten
     }

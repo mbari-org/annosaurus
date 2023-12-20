@@ -32,7 +32,16 @@ case class ImageReference(
 ) extends ToSnakeCase[ImageReferenceSC]
     with ToEntity[ImageReferenceEntity] {
     override def toSnakeCase: ImageReferenceSC =
-        ImageReferenceSC(url, format, widthPixels, heightPixels, description, uuid, lastUpdated, imagedMomentUuid)
+        ImageReferenceSC(
+            url,
+            format,
+            widthPixels,
+            heightPixels,
+            description,
+            uuid,
+            lastUpdated,
+            imagedMomentUuid
+        )
 
     override def toEntity: ImageReferenceEntity =
         val entity = new ImageReferenceEntity

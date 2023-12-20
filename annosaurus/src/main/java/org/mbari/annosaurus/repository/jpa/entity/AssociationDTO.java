@@ -19,9 +19,7 @@ package org.mbari.annosaurus.repository.jpa.entity;
 import java.util.UUID;
 import java.sql.Timestamp;
 
-
-record AssociationDTO(String linkName, String toConcept, String linkValue, 
-        String mimeType, UUID uuid, 
+record AssociationDTO(String linkName, String toConcept, String linkValue, String mimeType, UUID uuid,
 		UUID observationUuid, UUID imagedMomentUuid) {
 
 }

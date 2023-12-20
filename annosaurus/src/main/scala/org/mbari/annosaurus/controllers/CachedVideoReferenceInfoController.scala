@@ -16,7 +16,6 @@
 
 package org.mbari.annosaurus.controllers
 
-
 import org.mbari.annosaurus.repository.CachedVideoReferenceInfoDAO
 import java.util.UUID
 

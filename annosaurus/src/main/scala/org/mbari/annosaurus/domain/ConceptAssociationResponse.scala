@@ -26,7 +26,6 @@ final case class ConceptAssociationResponse(
     )
 }
 
-
 final case class ConceptAssociationResponseSC(
     concept_association_request: ConceptAssociationRequestSC,
     associations: Seq[ConceptAssociationSC]
@@ -36,4 +35,3 @@ final case class ConceptAssociationResponseSC(
         associations.map(_.toCamelCase)
     )
 }
-

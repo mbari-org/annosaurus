@@ -36,7 +36,6 @@ final case class CachedVideoReferenceInfo(
     )
 }
 
-
 final case class CachedVideoReferenceInfoSC(
     uuid: UUID,
     video_reference_uuid: UUID,
@@ -54,4 +53,3 @@ final case class CachedVideoReferenceInfoSC(
         last_updated
     )
 }
-

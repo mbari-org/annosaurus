@@ -16,7 +16,6 @@
 
 package org.mbari.annosaurus.repository
 
-
 import org.mbari.annosaurus.PersistentObject
 
 import org.mbari.annosaurus.repository.jpa.entity.ObservationEntity
