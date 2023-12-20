@@ -24,6 +24,12 @@ object Dependencies {
     lazy val fatboyGson       = "com.fatboyindustrial.gson-javatime-serialisers" % "gson-javatime-serialisers" % "1.1.2"
     lazy val gson             = "com.google.code.gson" % "gson"              % "2.10.1"
     lazy val h2               = "com.h2database"       % "h2"                % "2.2.224"
+
+    val hibernateVersion     = "6.4.1.Final"
+    lazy val hibernateCore   = "org.hibernate.orm" % "hibernate-core"     % hibernateVersion
+    lazy val hibernateEnvers = "org.hibernate.orm" % "hibernate-envers"   % hibernateVersion
+    lazy val hibernateHikari = "org.hibernate.orm" % "hibernate-hikaricp" % hibernateVersion
+
     lazy val hikariCp         = "com.zaxxer"           % "HikariCP"          % "5.1.0"
     lazy val jansi            = "org.fusesource.jansi" % "jansi"             % "2.4.1"
     lazy val javaxServlet     = "javax.servlet"        % "javax.servlet-api" % "4.0.1"

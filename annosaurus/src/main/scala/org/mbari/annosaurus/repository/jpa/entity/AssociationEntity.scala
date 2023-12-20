@@ -148,7 +148,7 @@ class AssociationEntity extends JpaEntity {
     var mimeType: String = "text/plain"
 
     override def toString: String = {
-        s"AssociationEntity(linkName=$linkName, toConcept=$toConcept, linkValue=$linkValue)"
+        s"AssociationEntity(uuid=$uuid, linkName=$linkName, toConcept=$toConcept, linkValue=$linkValue)"
     }
 
 }

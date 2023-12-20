@@ -18,9 +18,10 @@ package org.mbari.annosaurus.repository.jpa
 
 import com.typesafe.config.ConfigFactory
 import jakarta.persistence.{EntityManagerFactory, Persistence}
-import org.eclipse.persistence.config.PersistenceUnitProperties
-import org.slf4j.LoggerFactory
 import scala.jdk.CollectionConverters._
+
+import org.mbari.annosaurus.etc.jdk.Logging.given
+import java.lang.System.Logger.Level
 
 /** https://stackoverflow.com/questions/4106078/dynamic-jpa-connection
   *
@@ -34,29 +35,24 @@ import scala.jdk.CollectionConverters._
   */
 object EntityManagerFactories {
 
-    private[this] val log = LoggerFactory.getLogger(getClass)
+    private val log = System.getLogger(getClass.getName)
 
     private lazy val config = ConfigFactory.load()
 
     // <property name="eclipselink.weaving" value="static"/>
+    // https://juliuskrah.com/tutorial/2017/02/16/getting-started-with-hikaricp-hibernate-and-jpa/
     val PRODUCTION_PROPS = Map(
-        "eclipselink.connection-pool.default.initial"           -> "2",
-        "eclipselink.connection-pool.default.max"               -> "16",
-        "eclipselink.connection-pool.default.min"               -> "2",
-        "eclipselink.logging.logger"                            -> "org.eclipse.persistence.logging.slf4j.SLF4JLogger",
-        "eclipselink.logging.session"                           -> "false",
-        "eclipselink.logging.thread"                            -> "false",
-        "eclipselink.logging.timestamp"                         -> "false",
-        "eclipselink.weaving"                                   -> "static",
-        "jakarta.persistence.schema-generation.database.action" -> "none", // create,none
-        "jakarta.persistence.sharedCache.mode"                  -> "ENABLE_SELECTIVE",
-        PersistenceUnitProperties.SESSION_CUSTOMIZER            -> "org.mbari.annosaurus.repository.jpa.UUIDSequence"
+        "hibernate.connection.provider_class" -> "org.hibernate.hikaricp.internal.HikariCPConnectionProvider",
+        "hibernate.hbm2ddl.auto"              -> "validate",
+        "hibernate.hikari.idleTimeout"        -> "30000",
+        "hibernate.hikari.maximumPoolSize"    -> "16",
+        "hibernate.hikari.minimumIdle"        -> "2"
     )
 
     def apply(properties: Map[String, String]): EntityManagerFactory = {
         val props = PRODUCTION_PROPS ++ properties
         val emf   = Persistence.createEntityManagerFactory("annosaurus", props.asJava)
-        if (log.isInfoEnabled()) {
+        if (log.isLoggable(Level.INFO)) {
             val props = emf
                 .getProperties
                 .asScala
@@ -64,7 +60,7 @@ object EntityManagerFactories {
                 .toList
                 .sorted
                 .mkString("\n")
-            log.info(s"EntityManager Properties:\n${props}")
+            log.atInfo.log(s"EntityManager Properties:\n${props}")
         }
         emf
     }
@@ -88,14 +84,12 @@ object EntityManagerFactories {
 
     def apply(configNode: String): EntityManagerFactory = {
         val driver      = config.getString(configNode + ".driver")
-        val logLevel    = config.getString("database.loglevel")
         val password    = config.getString(configNode + ".password")
         val productName = config.getString(configNode + ".name")
         val url         = config.getString(configNode + ".url")
         val user        = config.getString(configNode + ".user")
         val props       = Map(
-            "eclipselink.logging.level"                 -> logLevel,
-            "eclipselink.target-database"               -> productName,
+            "hibernate.dialect"                 -> productName,
             "jakarta.persistence.database-product-name" -> productName,
             "jakarta.persistence.jdbc.driver"           -> driver,
             "jakarta.persistence.jdbc.password"         -> password,

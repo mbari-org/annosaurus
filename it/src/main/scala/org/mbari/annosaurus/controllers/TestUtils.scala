@@ -38,12 +38,14 @@ import java.util.UUID
 import java.util.concurrent.TimeUnit
 import scala.concurrent.duration
 import scala.util.Random
+import scala.concurrent.ExecutionContext
 
 object TestUtils {
 
     val Timeout        = duration.Duration(3, TimeUnit.SECONDS)
     val Digest         = MessageDigest.getInstance("SHA-512")
     private val random = Random
+    given ExecutionContext = ExecutionContext.global
 
     private val log = LoggerFactory.getLogger(getClass)
 
@@ -87,7 +89,8 @@ object TestUtils {
     )(implicit daoFactory: JPADAOFactory): Seq[ImagedMomentEntity] = {
         val dao = daoFactory.newImagedMomentDAO()
         val xs  = build(nImagedMoments, nObservations, nAssociations, nImageReferences, includeData)
-        xs.foreach(e => dao.create(e))
+        dao.runTransaction(d => xs.foreach(e => d.create(e)))
+        dao.close()
         xs
     }
 

@@ -116,6 +116,10 @@ class ImageReferenceEntity extends JpaEntity {
     @Expose(serialize = true)
     @Column(name = "format", length = 64, nullable = true)
     var format: String = _
+
+    override def toString(): String = {
+        s"ImageReferenceEntity(url=$url, width=$width, height=$height, format=$format, description=$description, uuid=$uuid)"
+    }
 }
 
 object ImageReferenceEntity {

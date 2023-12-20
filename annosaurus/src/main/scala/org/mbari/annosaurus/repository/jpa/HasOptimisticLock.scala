@@ -16,7 +16,6 @@
 
 package org.mbari.annosaurus.repository.jpa
 
-import com.google.gson.annotations.Expose
 import jakarta.persistence.{Column, Version}
 
 import java.sql.Timestamp
@@ -31,7 +30,6 @@ import java.time.Instant
 trait HasOptimisticLock {
 
     /** Optimistic lock to prevent concurrent overwrites */
-    @Expose(serialize = true)
     @Version
     @Column(name = "last_updated_timestamp")
     protected var lastUpdatedTime: Timestamp = _

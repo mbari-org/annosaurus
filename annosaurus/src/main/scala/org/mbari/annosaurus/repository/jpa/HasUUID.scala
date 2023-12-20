@@ -16,11 +16,11 @@
 
 package org.mbari.annosaurus.repository.jpa
 
-import com.google.gson.annotations.Expose
 import jakarta.persistence.{Column, Convert, GeneratedValue, Id}
 import org.mbari.annosaurus.PersistentObject
 
 import java.util.UUID
+import jakarta.persistence.GenerationType
 
 /** Mixin that supports the UUID fields
   *
@@ -30,16 +30,14 @@ import java.util.UUID
   */
 trait HasUUID extends PersistentObject {
 
-    @Expose(serialize = true)
     @Id
-    @GeneratedValue(generator = "system-uuid")
     @Column(
         name = "uuid",
         nullable = false,
         updatable = false,
         length = 36,
-        columnDefinition = "CHAR(36)"
     )
+    @GeneratedValue(strategy = GenerationType.UUID)
     @Convert(converter = classOf[UUIDConverter])
     var uuid: UUID = _
 

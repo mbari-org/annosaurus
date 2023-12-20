@@ -24,15 +24,12 @@ object DerbyTestDAOFactory extends TestDAOFactory {
     override def testProps(): Map[String, String] =
         TestDAOFactory.TestProperties ++
             Map(
-                "eclipselink.target-database"             -> TargetDatabase.Derby,
-                "jakarta.persistence.database-product-name" -> TargetDatabase.Derby
+                "hibernate.dialect"                                     -> "org.hibernate.dialect.DerbyDialect",
+                "hibernate.hbm2ddl.auto"                                -> "create",
+                "jakarta.persistence.schema-generation.database.action" -> "create",
+                "jakarta.persistence.schema-generation.scripts.action"  -> "drop-and-create"
             )
-            // Map(
-            //     "hibernate.dialect"                                     -> "org.hibernate.dialect.DerbyDialect",
-            //     "hibernate.hbm2ddl.auto"                                -> "create",
-            //     "jakarta.persistence.schema-generation.database.action" -> "create",
-            //     "jakarta.persistence.schema-generation.scripts.action" -> "drop-and-create"
-            // )
+
 
     lazy val entityManagerFactory: EntityManagerFactory = {
         val driver   = config.getString("org.mbari.vars.annotation.database.derby.driver")

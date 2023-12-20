@@ -201,6 +201,10 @@ class ObservationEntity extends JpaEntity {
 
     def associations: Iterable[AssociationEntity] = javaAssociations.asScala
 
+    override def toString(): String = {
+        s"ObservationEntity($uuid, $concept, $duration, $observationDate, $observer, $group, $activity)"
+    }
+
 }
 
 object ObservationEntity {
