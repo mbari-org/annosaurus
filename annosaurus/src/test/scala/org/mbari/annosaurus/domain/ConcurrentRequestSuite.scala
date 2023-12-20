@@ -16,6 +16,18 @@
 
 package org.mbari.annosaurus.domain
 
-class AuthorizationSuite {
-  
+import java.time.Instant
+import java.util.UUID
+
+class ConcurrentRequestSuite extends munit.FunSuite {
+    
+        val cc1 = ConcurrentRequest(Instant.EPOCH, Instant.now, Seq(UUID.randomUUID(), UUID.randomUUID()))
+    
+        test("camelCase/snake_case round trip") {
+            val sc1 = cc1.toSnakeCase
+            val cc2 = sc1.toCamelCase
+            val sc2 = cc2.toSnakeCase
+            assertEquals(cc2, cc1)
+            assertEquals(sc1, sc2)
+        }
 }

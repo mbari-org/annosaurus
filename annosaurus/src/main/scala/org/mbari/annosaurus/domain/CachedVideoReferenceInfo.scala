@@ -17,6 +17,8 @@
 package org.mbari.annosaurus.domain
 
 import java.util.UUID
+import org.mbari.annosaurus.repository.jpa.entity.CachedVideoReferenceInfoEntity
+import org.mbari.annosaurus.domain.FromEntity
 
 final case class CachedVideoReferenceInfo(
     uuid: UUID,
@@ -25,7 +27,7 @@ final case class CachedVideoReferenceInfo(
     missionId: Option[String] = None,
     missionContact: Option[String] = None,
     lastUpdated: Option[java.time.Instant] = None
-) extends ToSnakeCase[CachedVideoReferenceInfoSC] {
+) extends ToSnakeCase[CachedVideoReferenceInfoSC] with ToEntity[CachedVideoReferenceInfoEntity] {
     override def toSnakeCase: CachedVideoReferenceInfoSC = CachedVideoReferenceInfoSC(
         uuid,
         videoReferenceUuid,
@@ -34,6 +36,30 @@ final case class CachedVideoReferenceInfo(
         missionContact,
         lastUpdated
     )
+
+    override def toEntity: CachedVideoReferenceInfoEntity = {
+        val entity = CachedVideoReferenceInfoEntity(
+            videoReferenceUuid,
+            missionId.orNull,
+            platformName.orNull,
+            missionContact,
+        )
+        entity.uuid = uuid
+        entity
+    }
+}
+
+object CachedVideoReferenceInfo extends FromEntity[CachedVideoReferenceInfoEntity, CachedVideoReferenceInfo] {
+    override def from(entity: CachedVideoReferenceInfoEntity, extend: Boolean = false): CachedVideoReferenceInfo = {
+        CachedVideoReferenceInfo(
+            entity.uuid,
+            entity.videoReferenceUUID,
+            Option(entity.platformName),
+            Option(entity.missionId),
+            Option(entity.missionContact),
+            entity.lastUpdated
+        )
+    }
 }
 
 final case class CachedVideoReferenceInfoSC(

@@ -16,6 +16,24 @@
 
 package org.mbari.annosaurus.domain
 
-class AuthorizationSuite {
+class CachedVideoReferenceInfoSuite extends munit.FunSuite {
+
+    val cc1 = DomainObjects.videoReferenceInfo.copy(lastUpdated = None )
+
+    test("camelCase/snake_case round trip") {
+        val sc1 = cc1.toSnakeCase
+        val cc2 = sc1.toCamelCase
+        val sc2 = cc2.toSnakeCase
+        assertEquals(cc2, cc1)
+        assertEquals(sc1, sc2)
+    }
+
+    test("camelCase/Entity round trip") {
+        val e1 = cc1.toEntity
+        val cc2 = CachedVideoReferenceInfo.from(e1).copy(lastUpdated = None)
+        val e2 = cc2.toEntity
+        assertEquals(cc2, cc1)
+        // assertEquals(e1, e2)
+    }
   
 }

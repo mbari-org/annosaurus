@@ -17,6 +17,7 @@
 package org.mbari.annosaurus.domain
 
 import java.util.UUID
+import org.mbari.annosaurus.repository.jpa.entity.AssociationEntity
 
 final case class ConceptAssociation(
     uuid: UUID,
@@ -36,6 +37,20 @@ final case class ConceptAssociation(
         linkValue,
         mimeType
     )
+}
+
+object ConceptAssociation extends FromEntity[AssociationEntity, ConceptAssociation] {
+    def from(entity: AssociationEntity, extend: Boolean = false): ConceptAssociation = {
+        ConceptAssociation(
+            entity.uuid,
+            entity.observation.imagedMoment.videoReferenceUUID,
+            entity.observation.concept,
+            entity.linkName,
+            entity.toConcept,
+            entity.linkValue,
+            entity.mimeType
+        )
+    }
 }
 
 final case class ConceptAssociationSC(

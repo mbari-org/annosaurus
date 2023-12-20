@@ -16,6 +16,25 @@
 
 package org.mbari.annosaurus.domain
 
-class AuthorizationSuite {
-  
+class ConceptAssociationSuite extends munit.FunSuite {
+
+
+    val cc1 = ConceptAssociation.from(DomainObjects.imagedMoment.toEntity
+            .observations.head
+            .associations.head)
+
+    test("camelCase/snake_case round trip") {
+
+        val sc1 = cc1.toSnakeCase
+        val cc2 = sc1.toCamelCase
+        val sc2 = cc2.toSnakeCase
+        assertEquals(cc2, cc1)
+        assertEquals(sc1, sc2)
+        assertEquals(sc2.link_name, cc1.linkName)
+        assertEquals(sc2.to_concept, cc1.toConcept)
+        assertEquals(sc2.link_value, cc1.linkValue)
+        assertEquals(sc2.uuid, cc1.uuid)
+    }
+
+
 }

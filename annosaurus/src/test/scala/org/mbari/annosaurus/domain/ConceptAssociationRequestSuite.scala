@@ -16,6 +16,19 @@
 
 package org.mbari.annosaurus.domain
 
-class AuthorizationSuite {
+import java.util.UUID
+
+class ConceptAssociationRequestSuite extends munit.FunSuite {
+
+    val cc1 = ConceptAssociationRequest(Seq(UUID.randomUUID(), UUID.randomUUID()), "bounding box")
+
+    test("camelCase/snake_case round trip") {
+
+        val sc1 = cc1.toSnakeCase
+        val cc2 = sc1.toCamelCase
+        val sc2 = cc2.toSnakeCase
+        assertEquals(cc2, cc1)
+        assertEquals(sc1, sc2)
+    }
   
 }

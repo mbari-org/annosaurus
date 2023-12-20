@@ -22,8 +22,8 @@ import java.util.UUID
 object DomainObjects {
 
     val association = Association("foo", "bar", "baz", Some("some/stuff"), Some(UUID.randomUUID()))
-    
-    val observation   = Observation(
+
+    val observation = Observation(
         "Grimpoteuthis",
         Some(123456L),
         Some("foo"),
@@ -58,7 +58,7 @@ object DomainObjects {
     )
 
     val imageReference = ImageReference(
-        new java.net.URL("http://www.mbari.org"),
+        java.net.URI.create("http://www.mbari.org").toURL(),
         Some("image/jpeg"),
         Some(100),
         Some(200),
@@ -97,5 +97,46 @@ object DomainObjects {
         Some(UUID.randomUUID())
     )
 
+    val videoReferenceInfo = CachedVideoReferenceInfo(
+        UUID.randomUUID(),
+        UUID.randomUUID(),
+        Some("Ventana"),
+        Some("Ventana 1234"),
+        Some("Brian Schlining"),
+        Some(Instant.now())
+    )
+
+    val index = Index(
+        UUID.randomUUID(),
+        Some("01:23:45:22"),
+        Some(12345L),
+        Some(Instant.now()),
+        Some(UUID.randomUUID()),
+        Some(Instant.now())
+    )
+
+    val queryConstraints = QueryConstraints(
+        videoReferenceUuids = List(UUID.randomUUID(), UUID.randomUUID()),
+        concepts = List("Grimpoteuthis"),
+        observers = List("brian"),
+        groups = List("ROV:detailed"),
+        activities = List("transect"),
+        minDepth = Some(10.0),
+        maxDepth = Some(20.0),
+        minLat = Some(36.2),
+        maxLat = Some(36.3),
+        minLon = Some(-121.2),
+        maxLon = Some(-121.1),
+        minTimestamp = Some(Instant.now()),
+        maxTimestamp = Some(Instant.now()),
+        linkName = Some("some/stuff"),
+        linkValue = Some("some/stuff"),
+        limit = Some(100),
+        offset = Some(0),
+        data = Some(true),
+        missionContacts = List("Brian Schlining"),
+        platformName = Some("Ventana"),
+        missionId = Some("Ventana 1234")
+    )
 
 }

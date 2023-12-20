@@ -14,8 +14,13 @@
  * limitations under the License.
  */
 
-package org.mbari.annosaurus.domain
+package org.mbari.annosaurus.controllers
 
-class AuthorizationSuite {
+import org.mbari.annosaurus.repository.jpa.TestDAOFactory
+import org.mbari.annosaurus.repository.jpa.DerbyTestDAOFactory
+
+class DerbyAnnotationControllerSuite extends AnnotationControllerITSuite {
+
+    override def daoFactory: TestDAOFactory = DerbyTestDAOFactory
   
 }
