@@ -21,7 +21,7 @@ import java.util.UUID
 
 object DomainObjects {
 
-    val associaiton = Association("foo", "bar", "baz", Some("some/stuff"), Some(UUID.randomUUID()))
+    val association = Association("foo", "bar", "baz", Some("some/stuff"), Some(UUID.randomUUID()))
     
     val observation   = Observation(
         "Grimpoteuthis",
@@ -30,7 +30,7 @@ object DomainObjects {
         Some("bar"),
         Some("brian"),
         Some(Instant.now()),
-        Seq(associaiton),
+        Seq(association),
         Some(UUID.randomUUID()),
         None // Don't compare lastUpdated as it is set by the database
     )
@@ -77,6 +77,24 @@ object DomainObjects {
         Some(ancillaryDatum),
         Some(UUID.randomUUID()),
         None // Don't compare lastUpdated as it is set by the database
+    )
+
+    val annotation = Annotation(
+        Some("transect"),
+        Some(ancillaryDatum),
+        Seq(association),
+        Some("Grimpoteuthis"),
+        Some(123456L),
+        Some(12345L),
+        Some("ROV:detailed"),
+        Some(UUID.randomUUID()),
+        Seq(imageReference),
+        Some(Instant.now()),
+        Some(UUID.randomUUID()),
+        Some("brian"),
+        Some(Instant.now()),
+        Some("01:23:45:22"),
+        Some(UUID.randomUUID())
     )
 
 

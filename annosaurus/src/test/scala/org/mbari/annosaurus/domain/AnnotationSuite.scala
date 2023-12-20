@@ -1,0 +1,52 @@
+package org.mbari.annosaurus.domain
+
+import org.mbari.annosaurus.etc.circe.CirceCodecs.{*, given}
+
+class AnnotationSuite extends munit.FunSuite {
+
+    val cc1 = DomainObjects.annotation
+
+    test("camelCase/snake_case round trip") {
+
+        val sc1 = cc1.toSnakeCase
+        val cc2 = sc1.toCamelCase
+        val sc2 = cc2.toSnakeCase
+        assertEquals(cc2, cc1)
+        assertEquals(sc1, sc2)
+        assertEquals(sc2.activity, cc1.activity)
+        assert(sc2.ancillary_data.isDefined)
+        assertEquals(sc2.ancillary_data.get, sc1.ancillary_data.get)
+        assertEquals(sc2.associations, sc1.associations)
+        assertEquals(cc2.associations, cc1.associations)
+        assertEquals(sc2.concept, cc1.concept)
+        assertEquals(sc2.duration_millis, cc1.durationMillis)
+        assertEquals(sc2.elapsed_time_millis, cc1.elapsedTimeMillis)
+        assertEquals(sc2.group, cc1.group)
+        assertEquals(sc2.imaged_moment_uuid, cc1.imagedMomentUuid)
+        assert(sc2.image_references.nonEmpty)
+        assertEquals(sc2.image_references, sc1.image_references)
+        assertEquals(cc2.imageReferences, cc1.imageReferences)
+        assertEquals(sc2.observation_timestamp, cc1.observationTimestamp)
+        assertEquals(sc2.observation_uuid, cc1.observationUuid)
+        assertEquals(sc2.observer, cc1.observer)
+        assertEquals(sc2.recorded_timestamp, cc1.recordedTimestamp)
+        assertEquals(sc2.timecode, cc1.timecode)
+        assertEquals(sc2.video_reference_uuid, cc1.videoReferenceUuid)
+        // println(cc2.stringify)
+    }
+
+    test("camelCase/Entity round trip") {
+        val e1 = Annotation.toEntities(Seq(cc1), true).head
+        val cc2 = Annotation.from(e1.observations.head, true)
+        val e2 = Annotation.toEntities(Seq(cc2), true).head
+        assertEquals(cc2, cc1)
+        assertEquals(e2.elapsedTime, e1.elapsedTime)
+        assertEquals(e2.timecode.toString(), e1.timecode.toString())
+        assertEquals(e2.recordedDate, e1.recordedDate)
+        assertEquals(e2.videoReferenceUUID, e1.videoReferenceUUID)
+        assertEquals(e2.uuid, e1.uuid)
+        assertEquals(e2.observations.size, e1.observations.size)
+
+    }
+
+}

@@ -20,7 +20,7 @@ import java.util.UUID
 
 class AssociationSuite extends munit.FunSuite {
 
-    val cc1 = DomainObjects.associaiton
+    val cc1 = DomainObjects.association
 
     test("camelCase/snake_case round trip") {
         
