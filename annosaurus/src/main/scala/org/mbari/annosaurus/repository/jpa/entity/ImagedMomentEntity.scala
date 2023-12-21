@@ -324,7 +324,17 @@ class ImagedMomentEntity extends JpaEntity {
         ad.imagedMoment = this
     }
 
-//  override def toString: String = ???
+    override def toString: String = {
+        val sb = new StringBuilder
+        sb.append("ImagedMomentEntity(")
+        sb.append("uuid=" + uuid)
+        sb.append(", videoReferenceUUID=" + videoReferenceUUID)
+        sb.append(", recordedDate=" + recordedDate)
+        sb.append(", timecode=" + timecode)
+        sb.append(", elapsedTime=" + elapsedTime)
+        sb.append(")")
+        sb.toString
+    }
 }
 
 object ImagedMomentEntity {

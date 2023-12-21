@@ -16,10 +16,8 @@
 
 package org.mbari.annosaurus.repository.jpa.entity
 
-import org.mbari.annosaurus.Constants
 import org.mbari.annosaurus.domain.Annotation
 import org.mbari.annosaurus.etc.circe.CirceCodecs.{*, given}
-import org.mbari.annosaurus.repository.jpa.entity.{AssociationEntity, ImagedMomentEntity, ObservationEntity}
 import org.mbari.vcr4j.time.{FrameRates, Timecode}
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.flatspec.AnyFlatSpec
@@ -30,62 +28,67 @@ import java.util.UUID
 
 class ImagedMomentEntitySpec extends AnyFlatSpec with Matchers with BeforeAndAfterAll {
 
-  "ImagedMomentImpl" should "round trip to/from annotations" in {
-    val now                = Instant.now()
-    val videoReferenceUuid = UUID.randomUUID()
+    "ImagedMomentImpl" should "round trip to/from annotations" in {
+        val now                = Instant.now()
+        val videoReferenceUuid = UUID.randomUUID()
 
-    val imagedMoment0 = ImagedMomentEntity(Some(videoReferenceUuid), recordedDate = Some(now))
-    val observation0  = ObservationEntity("zero")
-    imagedMoment0.addObservation(observation0)
+        val imagedMoment0 = ImagedMomentEntity(Some(videoReferenceUuid), recordedDate = Some(now))
+        imagedMoment0.uuid = UUID.randomUUID()
+        val observation0  = ObservationEntity("zero")
+        imagedMoment0.addObservation(observation0)
 
-    val imagedMoment1 = ImagedMomentEntity(
-      Some(videoReferenceUuid),
-      recordedDate = Some(now.plusSeconds(60)),
-      elapsedTime = Some(Duration.ofMinutes(1))
-    )
-    val observation1 = ObservationEntity("one", group = Some("ROV"))
-    imagedMoment1.addObservation(observation1)
+        val imagedMoment1 = ImagedMomentEntity(
+            Some(videoReferenceUuid),
+            recordedDate = Some(now.plusSeconds(60)),
+            elapsedTime = Some(Duration.ofMinutes(1))
+        )
+        imagedMoment1.uuid = UUID.randomUUID()
+        val observation1  = ObservationEntity("one", group = Some("ROV"))
+        imagedMoment1.addObservation(observation1)
 
-    val imagedMoment2 =
-      ImagedMomentEntity(Some(videoReferenceUuid), elapsedTime = Some(Duration.ofMinutes(2)))
-    val observation2 = ObservationEntity("two", activity = Some("transect"))
-    observation2.uuid = UUID.randomUUID()
-    imagedMoment2.addObservation(observation2)
-    val association2 = AssociationEntity("foo", linkValue = Some("bar"))
-    observation2.addAssociation(association2)
+        val imagedMoment2 =
+            ImagedMomentEntity(Some(videoReferenceUuid), elapsedTime = Some(Duration.ofMinutes(2)))
+        imagedMoment2.uuid = UUID.randomUUID()
+        val observation2  = ObservationEntity("two", activity = Some("transect"))
+        observation2.uuid = UUID.randomUUID()
+        imagedMoment2.addObservation(observation2)
+        val association2  = AssociationEntity("foo", linkValue = Some("bar"))
+        observation2.addAssociation(association2)
 
-    val imagedMoment3 = ImagedMomentEntity(
-      Some(videoReferenceUuid),
-      timecode = Some(new Timecode("01:23:45:21", FrameRates.NTSC))
-    )
-    val observation3 = ObservationEntity("three", duration = Some(Duration.ofSeconds(10)))
-    val observation4 = ObservationEntity("four", activity = Some("descent"))
-    imagedMoment3.addObservation(observation3)
-    imagedMoment3.addObservation(observation4)
+        val imagedMoment3 = ImagedMomentEntity(
+            Some(videoReferenceUuid),
+            timecode = Some(new Timecode("01:23:45:21", FrameRates.NTSC))
+        )
+        imagedMoment3.uuid = UUID.randomUUID()
+        val observation3  = ObservationEntity("three", duration = Some(Duration.ofSeconds(10)))
+        val observation4  = ObservationEntity("four", activity = Some("descent"))
+        imagedMoment3.addObservation(observation3)
+        imagedMoment3.addObservation(observation4)
 
-    val xs = Seq(imagedMoment0, imagedMoment1, imagedMoment2, imagedMoment3)
+        val xs = Seq(imagedMoment0, imagedMoment1, imagedMoment2, imagedMoment3)
+        println(xs)
 
-    val annos = xs.flatMap(o => Annotation.fromImagedMoment(o))
-    annos.size should be(5)
+        val annos = xs.flatMap(o => Annotation.fromImagedMoment(o))
+        annos.size should be(5)
 //    println(annos)
-    val ims = Annotation.toEntities(annos)
+        val ims   = Annotation.toEntities(annos)
 
-//    print(ims)
-    ims.size should be(4)
-    val obs = ims.flatMap(i => i.observations)
-    obs.size should be(5)
-    obs.find(o => o.concept == "two") match {
-      case None => fail()
-      case Some(o) =>
-        o.uuid should not be null
-        o.associations.size should be(1)
+        print(ims)
+        ims.size should be(4)
+        val obs = ims.flatMap(i => i.observations)
+        obs.size should be(5)
+        obs.find(o => o.concept == "two") match {
+            case None    => fail()
+            case Some(o) =>
+                o.uuid should not be null
+                o.associations.size should be(1)
+        }
+
     }
 
-  }
-
-  it should "round trip an annotation without a video index" in {
-    val json =
-      """[
+    it should "round trip an annotation without a video index" in {
+        val json =
+            """[
         |  {
         |    "concept": "test",
         |    "observer": "brian",
@@ -100,18 +103,20 @@ class ImagedMomentEntitySpec extends AnyFlatSpec with Matchers with BeforeAndAft
         |  }
         |]""".stripMargin
 
-    val annotations = json.reify[Seq[Annotation]].getOrElse(throw new RuntimeException("Failed to parse json"))
-    val imagedMoments = Annotation.toEntities(annotations)
-    imagedMoments should have size (1)
-    val im = imagedMoments.head
-    im.videoReferenceUUID should be(UUID.fromString("a9f75399-9bc5-4ff3-934c-0bd72ba4dccb"))
-    im.imageReferences should have size (0)
-    im.observations should have size (1)
-    val obs = im.observations.head
-    obs.concept should be("test")
-    obs.group should be("ROV")
-    obs.activity should be("descend")
+        val annotations   = json
+            .reify[Seq[Annotation]]
+            .getOrElse(throw new RuntimeException("Failed to parse json"))
+        val imagedMoments = Annotation.toEntities(annotations)
+        imagedMoments should have size 1
+        val im            = imagedMoments.head
+        im.videoReferenceUUID should be(UUID.fromString("a9f75399-9bc5-4ff3-934c-0bd72ba4dccb"))
+        im.imageReferences should have size 0
+        im.observations should have size 1
+        val obs           = im.observations.head
+        obs.concept should be("test")
+        obs.group should be("ROV")
+        obs.activity should be("descend")
 
-  }
+    }
 
 }
