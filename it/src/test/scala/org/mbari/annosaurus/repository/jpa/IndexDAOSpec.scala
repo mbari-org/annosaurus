@@ -16,8 +16,8 @@
 
 package org.mbari.annosaurus.repository.jpa
 
-import org.mbari.annosaurus.repository.{ImagedMomentDAO, IndexDAO}
 import org.mbari.annosaurus.repository.jpa.entity.{ImagedMomentEntity, IndexEntity}
+import org.mbari.annosaurus.repository.{ImagedMomentDAO, IndexDAO}
 import org.mbari.vcr4j.time.Timecode
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.flatspec.AnyFlatSpec
@@ -28,7 +28,7 @@ import java.util.UUID
 import java.util.concurrent.TimeUnit
 import scala.concurrent.Await
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.duration.{Duration => SDuration}
+import scala.concurrent.duration.Duration as SDuration
 
 /**
   * @author Brian Schlining
@@ -38,7 +38,7 @@ class IndexDAOSpec extends AnyFlatSpec with Matchers with BeforeAndAfterAll {
 
   private type IMDAO = ImagedMomentDAO[ImagedMomentEntity]
   private type IDAO  = IndexDAO[IndexEntity]
-  private[this] val daoFactory         = TestDAOFactory.Instance
+  private[this] val daoFactory         = DerbyTestDAOFactory
   private[this] val timeout            = SDuration(2, TimeUnit.SECONDS)
   private[this] val imDao              = daoFactory.newImagedMomentDAO()
   private[this] val dao                = daoFactory.newIndexDAO(imDao)

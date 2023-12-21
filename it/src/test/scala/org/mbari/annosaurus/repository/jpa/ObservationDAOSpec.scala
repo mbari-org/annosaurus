@@ -27,7 +27,7 @@ import java.util.UUID
 import java.util.concurrent.TimeUnit
 import scala.concurrent.Await
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.duration.{Duration => SDuration}
+import scala.concurrent.duration.Duration as SDuration
 
 /**
   *
@@ -37,11 +37,11 @@ import scala.concurrent.duration.{Duration => SDuration}
   */
 class ObservationDAOSpec extends AnyFlatSpec with Matchers with BeforeAndAfterAll {
 
-  private[this] val daoFactory = TestDAOFactory.Instance
+  private[this] val daoFactory = DerbyTestDAOFactory
 
   private[this] val timeout            = SDuration(2, TimeUnit.SECONDS)
-  private[this] val imDao              = TestDAOFactory.Instance.newImagedMomentDAO()
-  private[this] val dao                = TestDAOFactory.Instance.newObservationDAO(imDao)
+  private[this] val imDao              = daoFactory.newImagedMomentDAO()
+  private[this] val dao                = daoFactory.newObservationDAO(imDao)
   private[this] val videoReferenceUUID = UUID.randomUUID()
   private[this] val now                = Instant.now()
   private[this] val imagedMoment0 =

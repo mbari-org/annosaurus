@@ -16,11 +16,9 @@
 
 package org.mbari.annosaurus.controllers
 
-import org.mbari.annosaurus.Constants
-
-
-import org.mbari.annosaurus.repository.jpa.TestDAOFactory
-
+import org.mbari.annosaurus.domain.*
+import org.mbari.annosaurus.etc.circe.CirceCodecs.{*, given}
+import org.mbari.annosaurus.repository.jpa.DerbyTestDAOFactory
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
@@ -29,13 +27,11 @@ import java.time.{Duration, Instant}
 import java.util.UUID
 import java.util.concurrent.TimeUnit
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.duration.{Duration => SDuration}
+import scala.concurrent.duration.Duration as SDuration
 import scala.concurrent.{Await, Future}
 import scala.io.Source
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 import scala.util.Random
-import org.mbari.annosaurus.domain.*
-import org.mbari.annosaurus.etc.circe.CirceCodecs.{given, *}
 
 /**
   * @author Brian Schlining
@@ -43,7 +39,7 @@ import org.mbari.annosaurus.etc.circe.CirceCodecs.{given, *}
   */
 class AnnotationControllerSpec extends AnyFlatSpec with Matchers with BeforeAndAfterAll {
 
-  private[this] val daoFactory    = TestDAOFactory.Instance
+  private[this] val daoFactory    = DerbyTestDAOFactory
   private[this] val entityFactory = new TestEntityFactory(daoFactory)
   private[this] val controller    = new AnnotationController(daoFactory)
   private[this] val timeout       = SDuration(200, TimeUnit.SECONDS)

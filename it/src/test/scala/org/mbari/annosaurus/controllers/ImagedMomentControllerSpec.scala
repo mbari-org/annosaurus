@@ -17,7 +17,8 @@
 package org.mbari.annosaurus.controllers
 
 import org.mbari.annosaurus.domain.*
-import org.mbari.annosaurus.repository.jpa.TestDAOFactory
+import org.mbari.annosaurus.repository.jpa.{DerbyTestDAOFactory, TestDAOFactory}
+import org.mbari.annosaurus.repository.jpa.entity.ImagedMomentEntity
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
@@ -27,16 +28,15 @@ import java.net.URL
 import java.time.{Duration, Instant}
 import java.util.UUID
 import java.util.concurrent.TimeUnit
-import scala.collection.JavaConverters._
+import scala.collection.JavaConverters.*
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.duration.{Duration => SDuration}
+import scala.concurrent.duration.Duration as SDuration
 import scala.concurrent.{Await, Future}
 import scala.util.Random
-import org.mbari.annosaurus.repository.jpa.entity.ImagedMomentEntity
 
 class ImagedMomentControllerSpec extends AnyFlatSpec with Matchers with BeforeAndAfterAll {
 
-  private[this] val daoFactory    = TestDAOFactory.Instance
+  private[this] val daoFactory    = DerbyTestDAOFactory
   private[this] val entityFactory = new TestEntityFactory(daoFactory)
   private[this] val controller = new ImagedMomentController(
     daoFactory

@@ -27,7 +27,7 @@ import java.util.UUID
 import java.util.concurrent.TimeUnit
 import scala.concurrent.Await
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.duration.{Duration => SDuration}
+import scala.concurrent.duration.Duration as SDuration
 
 /**
   *
@@ -37,7 +37,7 @@ import scala.concurrent.duration.{Duration => SDuration}
   */
 class CachedAncillaryDatumDAOSpec extends AnyFlatSpec with Matchers with BeforeAndAfterAll {
 
-  private[this] val daoFactory = TestDAOFactory.Instance
+  private[this] val daoFactory = DerbyTestDAOFactory
 
   private[this] val timeout            = SDuration(2, TimeUnit.SECONDS)
   private[this] val imDao              = daoFactory.newImagedMomentDAO()

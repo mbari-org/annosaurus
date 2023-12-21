@@ -17,20 +17,20 @@
 package org.mbari.annosaurus.controllers
 
 import org.mbari.annosaurus.domain.*
-import org.mbari.annosaurus.repository.jpa.TestDAOFactory
+import org.mbari.annosaurus.repository.jpa.{DerbyTestDAOFactory, TestDAOFactory}
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
 
 import java.time.{Duration, Instant}
+import java.util as ju
 import java.util.concurrent.TimeUnit
-import java.{util => ju}
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.duration.Duration as SDuration
 import scala.concurrent.{Await, Future}
-import scala.concurrent.duration.{Duration => SDuration}
 
 class ObservationControllerSpec extends AnyFunSpec with Matchers {
 
-  private[this] val daoFactory = TestDAOFactory.Instance
+  private[this] val daoFactory = DerbyTestDAOFactory
   private[this] val annoController = new AnnotationController(
     daoFactory
   )

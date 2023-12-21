@@ -16,18 +16,16 @@
 
 package org.mbari.annosaurus.repository.jpa.entity
 
-import com.google.gson.annotations.{Expose, SerializedName}
-import jakarta.persistence._
-import org.mbari.annosaurus.Constants
-import org.mbari.annosaurus.repository.jpa._
+import jakarta.persistence.*
+import org.hibernate.`type`.SqlTypes
+import org.hibernate.annotations.JdbcTypeCode
+import org.mbari.annosaurus.repository.jpa.*
 import org.mbari.vcr4j.time.Timecode
 
 import java.time.{Duration, Instant}
-import java.util.{ArrayList => JArrayList, List => JList, UUID}
-import scala.collection.mutable
-import scala.jdk.CollectionConverters._
+import java.util.{UUID, ArrayList as JArrayList, List as JList}
+import scala.jdk.CollectionConverters.*
 import org.mbari.annosaurus.domain.ImagedMoment
-import org.mbari.annosaurus.domain.Annotation
 
 /** @author
   *   Brian Schlining
@@ -244,34 +242,27 @@ import org.mbari.annosaurus.domain.Annotation
 )
 class ImagedMomentEntity extends JpaEntity {
 
-    @Expose(serialize = true)
     @Column(name = "elapsed_time_millis", nullable = true)
     @Convert(converter = classOf[DurationConverter])
     var elapsedTime: Duration = _
 
-    @Expose(serialize = true)
     @Column(name = "recorded_timestamp", nullable = true)
     @Temporal(value = TemporalType.TIMESTAMP)
     @Convert(converter = classOf[InstantConverter])
     var recordedDate: Instant = _
 
-    @Expose(serialize = true)
     @Column(name = "timecode", nullable = true)
     @Convert(converter = classOf[TimecodeConverter])
     var timecode: Timecode = _
 
-    @Expose(serialize = true)
-    @SerializedName(value = "video_reference_uuid")
     @Column(
         name = "video_reference_uuid",
         nullable = true,
-        columnDefinition = "CHAR(36)"
     )
-    @Convert(converter = classOf[UUIDConverter])
+    @JdbcTypeCode(SqlTypes.UUID)
     var videoReferenceUUID: UUID = _
 
-    @Expose(serialize = true)
-    @SerializedName(value = "observations")
+
     @OneToMany(
         targetEntity = classOf[ObservationEntity],
         cascade = Array(CascadeType.ALL),
@@ -294,8 +285,6 @@ class ImagedMomentEntity extends JpaEntity {
 
     def observations: Iterable[ObservationEntity] = javaObservations.asScala
 
-    @Expose(serialize = true)
-    @SerializedName(value = "image_references")
     @OneToMany(
         targetEntity = classOf[ImageReferenceEntity],
         cascade = Array(CascadeType.ALL),
@@ -319,8 +308,6 @@ class ImagedMomentEntity extends JpaEntity {
         imageReference.imagedMoment = null
     }
 
-    @Expose(serialize = true)
-    @SerializedName(value = "ancillary_data")
     @OneToOne(
         mappedBy = "imagedMoment",
         cascade = Array(CascadeType.ALL),

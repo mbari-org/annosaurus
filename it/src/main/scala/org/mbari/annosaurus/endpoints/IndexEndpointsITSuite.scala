@@ -27,7 +27,7 @@ import org.mbari.annosaurus.etc.circe.CirceCodecs.given
 
 trait IndexEndpointsITSuite extends EndpointsSuite {
 
-    private val log = Logging(getClass)
+    private val log = System.getLogger(getClass.getName)
 
     given JPADAOFactory         = daoFactory
     private val jwtService      = new JwtService("mbari", "foo", "bar")

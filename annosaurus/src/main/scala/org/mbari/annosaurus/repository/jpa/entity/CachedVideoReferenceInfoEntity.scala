@@ -17,7 +17,9 @@
 package org.mbari.annosaurus.repository.jpa.entity
 
 import com.google.gson.annotations.{Expose, SerializedName}
-import jakarta.persistence._
+import jakarta.persistence.*
+import org.hibernate.`type`.SqlTypes
+import org.hibernate.annotations.JdbcTypeCode
 import org.mbari.annosaurus.repository.jpa.{JpaEntity, TransactionLogger, UUIDConverter}
 
 import java.util.UUID
@@ -108,10 +110,11 @@ class CachedVideoReferenceInfoEntity extends JpaEntity {
     @Column(
         name = "video_reference_uuid",
         nullable = false,
-        unique = true,
-        columnDefinition = "CHAR(36)"
+        unique = true
+//        columnDefinition = "CHAR(36)"
     )
-    @Convert(converter = classOf[UUIDConverter])
+//    @Convert(converter = classOf[UUIDConverter])
+    @JdbcTypeCode(SqlTypes.UUID)
     var videoReferenceUUID: UUID = _
 
     @Expose(serialize = true)

@@ -17,10 +17,11 @@
 package org.mbari.annosaurus.repository.jpa.entity
 
 import com.google.gson.annotations.{Expose, SerializedName}
-import jakarta.persistence._
+import jakarta.persistence.*
+import org.hibernate.`type`.SqlTypes
+import org.hibernate.annotations.JdbcTypeCode
 import org.mbari.annosaurus.Constants
-
-import org.mbari.annosaurus.repository.jpa._
+import org.mbari.annosaurus.repository.jpa.*
 import org.mbari.vcr4j.time.Timecode
 
 import java.time.{Duration, Instant}
@@ -45,8 +46,9 @@ class IndexEntity extends JpaEntity {
 
     @Expose(serialize = true)
     @SerializedName(value = "video_reference_uuid")
-    @Column(name = "video_reference_uuid", nullable = true, columnDefinition = "CHAR(36)")
-    @Convert(converter = classOf[UUIDConverter])
+    @Column(name = "video_reference_uuid", nullable = true)
+//    @Convert(converter = classOf[UUIDConverter])
+    @JdbcTypeCode(SqlTypes.UUID)
     var videoReferenceUUID: UUID = _
 
     @Expose(serialize = true)

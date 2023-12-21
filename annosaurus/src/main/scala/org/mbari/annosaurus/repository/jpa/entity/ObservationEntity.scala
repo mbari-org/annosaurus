@@ -157,7 +157,7 @@ class ObservationEntity extends JpaEntity {
         optional = false,
         targetEntity = classOf[ImagedMomentEntity]
     )
-    @JoinColumn(name = "imaged_moment_uuid", nullable = false, columnDefinition = "CHAR(36)")
+    @JoinColumn(name = "imaged_moment_uuid", nullable = false, foreignKey = new ForeignKey(name = "fk_observations__imaged_moment_uuid"))
     var imagedMoment: ImagedMomentEntity = _
 
     @Expose(serialize = true)

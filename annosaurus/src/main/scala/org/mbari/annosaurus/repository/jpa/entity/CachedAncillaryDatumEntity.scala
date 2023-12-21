@@ -129,7 +129,7 @@ class CachedAncillaryDatumEntity extends JpaEntity {
         fetch = FetchType.LAZY,
         targetEntity = classOf[ImagedMomentEntity]
     )
-    @JoinColumn(name = "imaged_moment_uuid", nullable = false, columnDefinition = "CHAR(36)")
+    @JoinColumn(name = "imaged_moment_uuid", nullable = false)
     var imagedMoment: ImagedMomentEntity = _
 
     @Expose(serialize = true)

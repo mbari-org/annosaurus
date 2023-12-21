@@ -19,17 +19,16 @@ package org.mbari.annosaurus.repository.jdbc
 import org.mbari.annosaurus.Constants
 import org.mbari.annosaurus.controllers.{AnnotationController, TestEntityFactory}
 import org.mbari.annosaurus.domain.*
-import org.mbari.annosaurus.repository.jpa.TestDAOFactory
-import org.mbari.annosaurus.repository.jpa.JPADAOFactory
+import org.mbari.annosaurus.etc.circe.CirceCodecs.{*, given}
+import org.mbari.annosaurus.repository.jpa.{DerbyTestDAOFactory, JPADAOFactory, TestDAOFactory}
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
 
 import java.util.concurrent.TimeUnit
-import scala.concurrent.duration.{Duration => SDuration}
+import scala.concurrent.duration.Duration as SDuration
 import scala.concurrent.{Await, Future}
 import scala.io.Source
-import org.mbari.annosaurus.etc.circe.CirceCodecs.{given, *}
 
 /**
   * @author Brian Schlining
@@ -37,7 +36,7 @@ import org.mbari.annosaurus.etc.circe.CirceCodecs.{given, *}
   */
 class JdbcRepositorySpec extends AnyFunSpec with Matchers with BeforeAndAfterAll {
 
-  private[this] val daoFactory    = TestDAOFactory.Instance
+  private[this] val daoFactory    = DerbyTestDAOFactory
   private[this] val controller    = new AnnotationController(daoFactory)
   private[this] val entityFactory = new TestEntityFactory(daoFactory)
   // HACK Assumes where using JDADAPFactory!

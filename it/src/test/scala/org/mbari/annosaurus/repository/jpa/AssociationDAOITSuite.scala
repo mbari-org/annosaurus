@@ -16,31 +16,22 @@
 
 package org.mbari.annosaurus.repository.jpa
 
-import jakarta.persistence.{Column, Convert, GeneratedValue, Id}
-import org.mbari.annosaurus.PersistentObject
+class AssociationDAOITSuite extends munit.FunSuite {
 
-import java.util.UUID
-import jakarta.persistence.GenerationType
+    test("findByLinkName") {}
 
-/** Mixin that supports the UUID fields
-  *
-  * @author
-  *   Brian Schlining
-  * @since 2016-05-05T17:50:00
-  */
-trait HasUUID extends PersistentObject {
+    test("findByLinkNameAndVideoReferenceUUID") {}
 
-    @Id
-    @Column(
-        name = "uuid",
-        nullable = false,
-        updatable = false,
-        length = 36,
-    )
-    @GeneratedValue(strategy = GenerationType.UUID)
-//    @Convert(converter = classOf[UUIDConverter])
-    var uuid: UUID = _
+    test("findByLinkNameAndVideoReferenceUUIDAndConcept") {}
 
-    def primaryKey: Option[UUID] = Option(uuid)
+    test("findByConceptAssociationRequest") {}
 
+    test("findAll") {}
+
+    test("countByConcept") {}
+
+    test("updateToConcept") {}
+  
 }
+
+

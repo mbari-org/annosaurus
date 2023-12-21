@@ -26,7 +26,6 @@ import org.mbari.annosaurus.messaging.{AnnotationPublisher, MessageBus}
 import org.mbari.annosaurus.domain.{ConcurrentRequest, MultiRequest}
 
 import org.mbari.annosaurus.repository.DAO
-import org.mbari.annosaurus.repository.jpa.UUIDSequence
 import org.mbari.annosaurus.repository.jpa.entity.{ImagedMomentEntity, ObservationEntity}
 import org.mbari.vcr4j.time.Timecode
 import org.mbari.annosaurus.repository.jpa.Implicits._
@@ -196,7 +195,7 @@ class AnnotationController(daoFactory: JPADAOFactory, bus: Subject[Any] = Messag
         // We need to assign a UUID first so that we can find the correct
         // observation. This is only needed if more than one observation
         // exists at the same timestamp
-        val observationUuid = UUIDSequence.newUuid()
+        val observationUuid = UUID.randomUUID()
         val annotation      = Annotation(
             videoReferenceUuid = Option(videoReferenceUUID),
             concept = Some(concept),

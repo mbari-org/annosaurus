@@ -134,7 +134,7 @@ class AssociationEntity extends JpaEntity {
         optional = false,
         targetEntity = classOf[ObservationEntity]
     )
-    @JoinColumn(name = "observation_uuid", nullable = false, columnDefinition = "CHAR(36)")
+    @JoinColumn(name = "observation_uuid", nullable = false)
     var observation: ObservationEntity = _
 
     @Expose(serialize = true)

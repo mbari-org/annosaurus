@@ -17,9 +17,8 @@
 package org.mbari.annosaurus.controllers
 
 import org.mbari.annosaurus.domain.*
-import org.mbari.annosaurus.repository.jpa.TestDAOFactory
+import org.mbari.annosaurus.repository.jpa.{DerbyTestDAOFactory, TestDAOFactory}
 import org.mbari.annosaurus.repository.jpa.entity.{AssociationEntity, ImagedMomentEntity, ObservationEntity}
-
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
@@ -28,7 +27,7 @@ import java.time.Instant
 import java.util.UUID
 import java.util.concurrent.TimeUnit
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.duration.{Duration => SDuration}
+import scala.concurrent.duration.Duration as SDuration
 import scala.concurrent.{Await, Future}
 
 /**
@@ -37,7 +36,7 @@ import scala.concurrent.{Await, Future}
   */
 class AssociationControllerSpec extends AnyFlatSpec with Matchers with BeforeAndAfterAll {
 
-  private[this] val daoFactory = TestDAOFactory.Instance
+  private[this] val daoFactory = DerbyTestDAOFactory
   private[this] val controller = new AssociationController(daoFactory)
   private[this] val annotationController = new AnnotationController(daoFactory)
   private[this] val timeout      = SDuration(200, TimeUnit.SECONDS)

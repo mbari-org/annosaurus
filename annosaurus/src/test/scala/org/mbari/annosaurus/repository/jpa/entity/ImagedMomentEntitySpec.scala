@@ -14,9 +14,11 @@
  * limitations under the License.
  */
 
-package org.mbari.annosaurus.repository.jpa
+package org.mbari.annosaurus.repository.jpa.entity
 
 import org.mbari.annosaurus.Constants
+import org.mbari.annosaurus.domain.Annotation
+import org.mbari.annosaurus.etc.circe.CirceCodecs.{*, given}
 import org.mbari.annosaurus.repository.jpa.entity.{AssociationEntity, ImagedMomentEntity, ObservationEntity}
 import org.mbari.vcr4j.time.{FrameRates, Timecode}
 import org.scalatest.BeforeAndAfterAll
@@ -25,8 +27,6 @@ import org.scalatest.matchers.should.Matchers
 
 import java.time.{Duration, Instant}
 import java.util.UUID
-import org.mbari.annosaurus.domain.Annotation
-import org.mbari.annosaurus.etc.circe.CirceCodecs.{given, *}
 
 class ImagedMomentEntitySpec extends AnyFlatSpec with Matchers with BeforeAndAfterAll {
 

@@ -99,7 +99,6 @@ class ImageReferenceEntity extends JpaEntity {
     @JoinColumn(
         name = "imaged_moment_uuid",
         nullable = false,
-        columnDefinition = "CHAR(36)"
     )
     var imagedMoment: ImagedMomentEntity = _
 
