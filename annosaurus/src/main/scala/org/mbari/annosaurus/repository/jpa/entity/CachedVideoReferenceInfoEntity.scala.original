@@ -110,7 +110,9 @@ class CachedVideoReferenceInfoEntity extends JpaEntity {
     @Column(
         name = "video_reference_uuid",
         nullable = false,
-        unique = true
+        unique = true,
+        columnDefinition = "uuid"
+
 //        columnDefinition = "CHAR(36)"
     )
 //    @Convert(converter = classOf[UUIDConverter])

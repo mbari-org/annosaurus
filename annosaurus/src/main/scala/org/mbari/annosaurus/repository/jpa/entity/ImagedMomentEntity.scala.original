@@ -258,8 +258,8 @@ class ImagedMomentEntity extends JpaEntity {
     @Column(
         name = "video_reference_uuid",
         nullable = true,
+        columnDefinition = "uuid-char"
     )
-    @JdbcTypeCode(SqlTypes.UUID)
     var videoReferenceUUID: UUID = _
 
 

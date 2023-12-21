@@ -35,7 +35,7 @@ trait HasUUID extends PersistentObject {
         name = "uuid",
         nullable = false,
         updatable = false,
-        length = 36,
+//        length = 36,
     )
     @GeneratedValue(strategy = GenerationType.UUID)
 //    @Convert(converter = classOf[UUIDConverter])

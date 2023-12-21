@@ -19,6 +19,8 @@ package org.mbari.annosaurus.domain
 import java.time.{Duration, Instant}
 import java.util.UUID
 import org.mbari.annosaurus.repository.jpa.entity.ObservationEntity
+import org.mbari.annosaurus.repository.jpa.entity.extensions.*
+import scala.jdk.CollectionConverters.*
 
 final case class Observation(
     concept: String,
@@ -45,17 +47,18 @@ final case class Observation(
             lastUpdated
         )
 
-    override def toEntity: ObservationEntity =
+    override def toEntity: ObservationEntity = {
         val entity = new ObservationEntity
-        entity.concept = concept
-        durationMillis.foreach(d => entity.duration = Duration.ofMillis(d))
-        group.foreach(entity.group = _)
-        activity.foreach(entity.activity = _)
-        observer.foreach(entity.observer = _)
-        observationTimestamp.foreach(entity.observationDate = _)
+        entity.setConcept(concept)
+        durationMillis.foreach(d => entity.setDuration(Duration.ofMillis(d)))
+        group.foreach(entity.setGroup)
+        activity.foreach(entity.setActivity)
+        observer.foreach(entity.setObserver)
+        observationTimestamp.foreach(entity.setObservationDate)
         associations.foreach(a => entity.addAssociation(a.toEntity))
-        uuid.foreach(entity.uuid = _)
+        uuid.foreach(entity.setUuid)
         entity
+    }
 
     lazy val duration: Option[Duration] = durationMillis.map(Duration.ofMillis)
 }
@@ -63,14 +66,14 @@ final case class Observation(
 object Observation extends FromEntity[ObservationEntity, Observation] {
     override def from(entity: ObservationEntity, extend: Boolean = false): Observation =
         Observation(
-            entity.concept,
-            Option(entity.duration).map(_.toMillis),
-            Option(entity.group),
-            Option(entity.activity),
-            Option(entity.observer),
-            Option(entity.observationDate),
-            entity.associations.map(x => Association.from(x, false)).toSeq,
-            Option(entity.uuid),
+            entity.getConcept,
+            Option(entity.getDuration).map(_.toMillis),
+            Option(entity.getGroup),
+            Option(entity.getActivity),
+            Option(entity.getObserver),
+            Option(entity.getObservationDate),
+            entity.getAssociations.asScala.map(x => Association.from(x, false)).toSeq,
+            entity.primaryKey,
             entity.lastUpdated
         )
 }

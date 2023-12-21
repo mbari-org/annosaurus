@@ -19,6 +19,7 @@ package org.mbari.annosaurus.domain
 import java.util.UUID
 
 import org.mbari.annosaurus.repository.jpa.entity.CachedAncillaryDatumEntity
+import org.mbari.annosaurus.repository.jpa.entity.extensions.*
 
 final case class CachedAncillaryDatum(
     latitude: Option[Double] = None,
@@ -71,24 +72,25 @@ final case class CachedAncillaryDatum(
 
     override def toEntity: CachedAncillaryDatumEntity =
         var entity = new CachedAncillaryDatumEntity
-        entity.latitude = latitude
-        entity.longitude = longitude
-        entity.depthMeters = depthMeters
-        entity.altitude = altitude
-        entity.crs = crs.orNull
-        entity.salinity = salinity
-        entity.temperatureCelsius = temperatureCelsius
-        entity.oxygenMlL = oxygenMlL
-        entity.pressureDbar = pressureDbar
-        entity.lightTransmission = lightTransmission
-        entity.x = x
-        entity.y = y
-        entity.z = z
-        entity.posePositionUnits = posePositionUnits.orNull
-        entity.phi = phi
-        entity.theta = theta
-        entity.psi = psi
-        entity.uuid = uuid.orNull
+        latitude.foreach(entity.setLatitude(_))
+        longitude.foreach(entity.setLongitude(_))
+        depthMeters.foreach(entity.setDepthMeters(_))
+        altitude.foreach(entity.setAltitude(_))
+        crs.foreach(entity.setCrs)
+        salinity.foreach(entity.setSalinity(_))
+        temperatureCelsius.foreach(entity.setTemperatureCelsius(_))
+        oxygenMlL.foreach(entity.setOxygenMlL(_))
+        pressureDbar.foreach(entity.setPressureDbar(_))
+        lightTransmission.foreach(entity.setLightTransmission(_))
+        x.foreach(entity.setX(_))
+        y.foreach(entity.setY(_))
+        z.foreach(entity.setZ(_))
+        posePositionUnits.foreach(entity.setPosePositionUnits)
+        phi.foreach(entity.setPhi(_))
+        theta.foreach(entity.setTheta(_))
+        psi.foreach(entity.setPsi(_))
+        uuid.foreach(entity.setUuid)
+
         // NOTE: We can't set he lastUpdated field because it's set by the database driver
         entity
 }
@@ -96,29 +98,29 @@ final case class CachedAncillaryDatum(
 object CachedAncillaryDatum extends FromEntity[CachedAncillaryDatumEntity, CachedAncillaryDatum] {
     def from(entity: CachedAncillaryDatumEntity, extend: Boolean = false): CachedAncillaryDatum =
         val opt =
-            if extend && entity.imagedMoment != null then entity.imagedMoment.primaryKey else None
+            if extend && entity.getImagedMoment != null then entity.getImagedMoment.primaryKey else None
         val rt  =
-            if extend && entity.imagedMoment != null then Option(entity.imagedMoment.recordedDate)
+            if extend && entity.getImagedMoment != null then Option(entity.getImagedMoment.getRecordedDate)
             else None
         CachedAncillaryDatum(
-            entity.latitude,
-            entity.longitude,
-            entity.depthMeters,
-            entity.altitude,
-            Option(entity.crs),
-            entity.salinity,
-            entity.temperatureCelsius,
-            entity.oxygenMlL,
-            entity.pressureDbar,
-            entity.lightTransmission,
-            entity.x,
-            entity.y,
-            entity.z,
-            Option(entity.posePositionUnits),
-            entity.phi,
-            entity.theta,
-            entity.psi,
-            Option(entity.uuid),
+            Option(entity.getLatitude),
+            Option(entity.getLongitude),
+            Option(entity.getDepthMeters),
+            Option(entity.getAltitude),
+            Option(entity.getCrs),
+            Option(entity.getSalinity),
+            Option(entity.getTemperatureCelsius),
+            Option(entity.getOxygenMlL),
+            Option(entity.getPressureDbar),
+            Option(entity.getLightTransmission),
+            Option(entity.getX),
+            Option(entity.getY),
+            Option(entity.getZ),
+            Option(entity.getPosePositionUnits),
+            Option(entity.getPhi),
+            Option(entity.getTheta),
+            Option(entity.getPsi),
+            Option(entity.getUuid),
             entity.lastUpdated,
             opt,
             rt

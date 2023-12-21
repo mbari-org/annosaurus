@@ -104,3 +104,5 @@ object JPADAOFactory extends JPADAOFactory {
     }
 
 }
+
+class JPADAOFactoryImpl(val entityManagerFactory: EntityManagerFactory) extends JPADAOFactory

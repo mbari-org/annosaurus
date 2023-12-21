@@ -14,10 +14,13 @@
  * limitations under the License.
  */
 
-package org.mbari.annosaurus.domain
+package org.mbari.annosaurus.controllers
 
-import org.mbari.annosaurus.repository.jpa.entity.IPersistentObject
+import org.mbari.annosaurus.repository.jpa.TestDAOFactory
+import org.mbari.annosaurus.repository.jpa.SqlServerTestDAOFactory
 
-trait FromEntity[A <: IPersistentObject, B] {
-    def from(entity: A, extend: Boolean): B
+class SqlServerAnnotationControllerSuite extends AnnotationControllerITSuite {
+
+    override def daoFactory: TestDAOFactory = SqlServerTestDAOFactory
+  
 }

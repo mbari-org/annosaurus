@@ -20,7 +20,6 @@ import com.google.gson.annotations.{Expose, SerializedName}
 import jakarta.persistence.*
 import org.hibernate.`type`.SqlTypes
 import org.hibernate.annotations.JdbcTypeCode
-import org.mbari.annosaurus.Constants
 import org.mbari.annosaurus.repository.jpa.*
 import org.mbari.vcr4j.time.Timecode
 

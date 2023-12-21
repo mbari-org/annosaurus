@@ -10,130 +10,135 @@ ThisBuild / resolvers ++= Seq(Resolver.githubPackages("mbari-org", "maven"))
 ThisBuild / scalaVersion     := "3.3.1"
 // ThisBuild / scalaVersion     := "3.3.1" // Fails. See https://github.com/lampepfl/dotty/issues/17069#issuecomment-1763053572
 ThisBuild / scalacOptions ++= Seq(
-  "-deprecation",  // Emit warning and location for usages of deprecated APIs.
-  "-encoding",
-  "UTF-8",         // yes, this is 2 args. Specify character encoding used by source files.
-  "-explaintypes", // Explain type errors in more detail.
-  "-feature",      // Emit warning and location for usages of features that should be imported explicitly.
-  "-language:existentials",
-  "-language:higherKinds",
-  "-language:implicitConversions",
-  "-unchecked"
+    "-deprecation",  // Emit warning and location for usages of deprecated APIs.
+    "-encoding",
+    "UTF-8",         // yes, this is 2 args. Specify character encoding used by source files.
+    "-explaintypes", // Explain type errors in more detail.
+    "-feature",      // Emit warning and location for usages of features that should be imported explicitly.
+    "-language:existentials",
+    "-language:higherKinds",
+    "-language:implicitConversions",
+    "-unchecked"
 )
 ThisBuild / startYear        := Some(2017)
-ThisBuild / updateOptions := updateOptions.value.withCachedResolution(true)
+ThisBuild / updateOptions    := updateOptions.value.withCachedResolution(true)
 ThisBuild / versionScheme    := Some("semver-spec")
 
-ThisBuild / Test / fork := true
-ThisBuild / Test / parallelExecution     := false
+ThisBuild / Test / fork              := true
+ThisBuild / Test / parallelExecution := false
 ThisBuild / Test / testOptions += Tests.Argument(TestFrameworks.MUnit, "-b")
 
-
 lazy val annosaurus = (project in file("annosaurus"))
-  .enablePlugins(
-    AutomateHeaderPlugin,
-    GitBranchPrompt,
-    GitVersioning,
-    EclipseLinkStaticWeaver,
-    JavaAppPackaging
-  )
-  // .settings(staticWeaverLogLevel := 0)
-  .settings(
-    // Set version based on git tag. I use "0.0.0" format (no leading "v", which is the default)
-    // Use `show gitCurrentTags` in sbt to update/see the tags
-    // https://stackoverflow.com/questions/22772812/using-sbt-native-packager-how-can-i-simply-prepend-a-directory-to-my-bash-scrip
-    bashScriptExtraDefines ++= Seq(
-      """addJava "-Dconfig.file=${app_home}/../conf/application.conf"""",
-      """addJava "-Dlogback.configurationFile=${app_home}/../conf/logback.xml""""
-    ),
-    batScriptExtraDefines ++= Seq(
-      """call :add_java "-Dconfig.file=%APP_HOME%\conf\application.conf"""",
-      """call :add_java "-Dlogback.configurationFile=%APP_HOME%\conf\logback.xml""""
-    ),
-    git.gitTagToVersionNumber := { tag: String =>
-      if (tag matches "[0-9]+\\..*") Some(tag)
-      else None
-    },
-    git.useGitDescribe        := true,
-    libraryDependencies ++= Seq(
-      auth0,
-      circeCore,
-      circeGeneric,
-      circeParser,
-      commonsCodec,
-      derby,
-      derbyClient,
-      derbyNet,
-      derbyShared,
-      derbyTools,
-      hibernateCore,
-      hibernateEnvers,
-      hibernateHikari,
-      fatboyGson,
-      gson,
-      h2                % Test,
-      hikariCp,
-      jansi             % Runtime,
-      javaxServlet,
-      javaxTransaction,
-      jettyServer,
-      jettyServlets,
-      jettyWebapp,
-      jmelody,
-      json4sJackson,
-      junit             % Test,
-      logbackClassic,
-      mssqlserver,
-      munit             % Test,
-      oracle,
-      postgresql,
-      rxJava3,
-      scalatest         % Test,
-      scalatra,
-      scalatraJson,
-      scalatraScalatest % Test,
-      scilube,
-      slf4j,
-      slf4jJul,
-      slf4jLog4j,
-      tapirCirce,
-      tapirPrometheus,
-      tapirServerStub % Test,
-      tapirSttpCirce,
-      tapirSwagger,
-      tapirVertex,
-      typesafeConfig,
-      uuidgen,
-      vcr4jCore,
-      zeromq
-    ).map(
-      _.excludeAll(
-        ExclusionRule("org.slf4j", "slf4j-jdk14"),
-        ExclusionRule("org.slf4j", "slf4j-log4j12"),
-        ExclusionRule("javax.servlet", "servlet-api")
-      )
+    .enablePlugins(
+        AutomateHeaderPlugin,
+        GitBranchPrompt,
+        GitVersioning,
+        EclipseLinkStaticWeaver,
+        JavaAppPackaging
     )
+    // .settings(staticWeaverLogLevel := 0)
+    .settings(
+        // Set version based on git tag. I use "0.0.0" format (no leading "v", which is the default)
+        // Use `show gitCurrentTags` in sbt to update/see the tags
+        // https://stackoverflow.com/questions/22772812/using-sbt-native-packager-how-can-i-simply-prepend-a-directory-to-my-bash-scrip
+        bashScriptExtraDefines ++= Seq(
+            """addJava "-Dconfig.file=${app_home}/../conf/application.conf"""",
+            """addJava "-Dlogback.configurationFile=${app_home}/../conf/logback.xml""""
+        ),
+        batScriptExtraDefines ++= Seq(
+            """call :add_java "-Dconfig.file=%APP_HOME%\conf\application.conf"""",
+            """call :add_java "-Dlogback.configurationFile=%APP_HOME%\conf\logback.xml""""
+        ),
+        git.gitTagToVersionNumber := {
+            tag: String =>
+                if (tag matches "[0-9]+\\..*") Some(tag)
+                else None
+        },
+        git.useGitDescribe        := true,
+        libraryDependencies ++= Seq(
+            auth0,
+            circeCore,
+            circeGeneric,
+            circeParser,
+            commonsCodec,
+            derby,
+            derbyClient,
+            derbyNet,
+            derbyShared,
+            derbyTools,
+            hibernateCore,
+            hibernateEnvers,
+            hibernateHikari,
+            fatboyGson,
+            gson,
+            h2                % Test,
+            hikariCp,
+            jansi             % Runtime,
+            javaxServlet,
+            javaxTransaction,
+            jettyServer,
+            jettyServlets,
+            jettyWebapp,
+            jmelody,
+            json4sJackson,
+            junit             % Test,
+            logbackClassic,
+            mssqlserver,
+            munit             % Test,
+            oracle,
+            postgresql,
+            rxJava3,
+            scalatest         % Test,
+            scalatra,
+            scalatraJson,
+            scalatraScalatest % Test,
+            scilube,
+            slf4j,
+            slf4jJul,
+            slf4jLog4j,
+            tapirCirce,
+            tapirPrometheus,
+            tapirServerStub   % Test,
+            tapirSttpCirce,
+            tapirSwagger,
+            tapirVertex,
+            typesafeConfig,
+            uuidgen,
+            vcr4jCore,
+            zeromq
+        ).map(
+            _.excludeAll(
+                ExclusionRule("org.slf4j", "slf4j-jdk14"),
+                ExclusionRule("org.slf4j", "slf4j-log4j12"),
+                ExclusionRule("javax.servlet", "servlet-api")
+            )
+        )
 //    mainClass in assembly := Some("JettyMain")
-  )
-
+    )
 
 // Aliases
 addCommandAlias("cleanall", ";clean;clean-files")
 
 lazy val integrationTests = (project in file("it"))
-  .dependsOn(annosaurus)
-  .enablePlugins(
-    AutomateHeaderPlugin
-  )
-  .settings(
-    libraryDependencies ++= Seq(
-      junit,
-      munit,
-      scalatraScalatest,
-      slf4j,
-      tapirServerStub
+    .dependsOn(annosaurus)
+    .enablePlugins(
+        AutomateHeaderPlugin
     )
-  )
+    .settings(
+        libraryDependencies ++= Seq(
+            derby,
+            derbyClient,
+            derbyNet,
+            derbyShared,
+            derbyTools,
+            junit,
+            munit,
+            scalatraScalatest,
+            slf4j,
+            tapirServerStub,
+            testcontainersCore
+        )
+    )
 
 // lazy val itOracle = (project in file("it-oracle"))
 //   .dependsOn(integrationTests)
@@ -166,19 +171,13 @@ lazy val integrationTests = (project in file("it"))
 //     )
 //   )
 
-// lazy val itSqlserver = (project in file("it-sqlserver"))
-//   .dependsOn(integrationTests)
-//   .enablePlugins(
-//     AutomateHeaderPlugin
-//   )
-//   .settings(
-//     libraryDependencies ++= Seq(
-//       junit                   % Test,
-//       munit                   % Test,
-//       scalatest               % Test,
-//       testcontainersMunit     % Test,
-//       testcontainersScalatest % Test,
-//       testcontainersSqlserver % Test
-//     )
-//   )
-
+lazy val itSqlserver = (project in file("it-sqlserver"))
+  .dependsOn(integrationTests)
+  .enablePlugins(
+    AutomateHeaderPlugin
+  )
+  .settings(
+    libraryDependencies ++= Seq(
+      testcontainersSqlserver
+    )
+  )

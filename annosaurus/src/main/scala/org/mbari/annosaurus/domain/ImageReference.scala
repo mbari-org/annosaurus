@@ -19,6 +19,7 @@ package org.mbari.annosaurus.domain
 import java.util.UUID
 import java.net.URL
 import org.mbari.annosaurus.repository.jpa.entity.ImageReferenceEntity
+import org.mbari.annosaurus.repository.jpa.entity.extensions.*
 
 case class ImageReference(
     url: URL,
@@ -45,25 +46,25 @@ case class ImageReference(
 
     override def toEntity: ImageReferenceEntity =
         val entity = new ImageReferenceEntity
-        entity.url = url
-        format.foreach(entity.format = _)
-        widthPixels.foreach(entity.width = _)
-        heightPixels.foreach(entity.height = _)
-        description.foreach(entity.description = _)
-        uuid.foreach(entity.uuid = _)
+        entity.setUrl(url)
+        format.foreach(entity.setFormat)
+        widthPixels.foreach(entity.setWidth(_))
+        heightPixels.foreach(entity.setHeight(_))
+        description.foreach(entity.setDescription)
+        uuid.foreach(entity.setUuid)
         entity
 }
 
 object ImageReference extends FromEntity[ImageReferenceEntity, ImageReference] {
     override def from(entity: ImageReferenceEntity, extend: Boolean = false): ImageReference =
-        val opt = if extend then entity.imagedMoment.primaryKey else None
+        val opt = if extend then entity.getImagedMoment.primaryKey else None
         ImageReference(
-            entity.url,
-            Option(entity.format),
-            Option(entity.width),
-            Option(entity.height),
-            Option(entity.description),
-            Option(entity.uuid),
+            entity.getUrl,
+            Option(entity.getFormat),
+            Option(entity.getWidth),
+            Option(entity.getHeight),
+            Option(entity.getDescription),
+            entity.primaryKey,
             entity.lastUpdated,
             opt
         )

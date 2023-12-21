@@ -18,6 +18,7 @@ package org.mbari.annosaurus.domain
 
 import org.mbari.annosaurus.repository.jpa.entity.AssociationEntity
 import java.util.UUID
+import org.mbari.annosaurus.repository.jpa.entity.extensions.*
 
 case class Association(
     linkName: String,
@@ -36,7 +37,7 @@ case class Association(
 
     def toEntity: AssociationEntity = {
         val a = AssociationEntity(linkName, toConcept, linkValue, mimeType.orNull)
-        uuid.foreach(a.uuid = _)
+        uuid.foreach(a.setUuid)
         a
     }
 }
@@ -45,15 +46,15 @@ object Association extends FromEntity[AssociationEntity, Association] {
     def from(entity: AssociationEntity, extend: Boolean = false): Association =
         val (optObs, optIm) =
             if extend then
-                val opt = Option(entity.observation)
-                (opt.map(_.uuid), opt.map(_.imagedMoment).map(_.uuid))
+                val opt = Option(entity.getObservation)
+                (opt.map(_.getUuid), opt.map(_.getImagedMoment).map(_.getUuid))
             else (None, None)
         Association(
-            entity.linkName,
-            entity.toConcept,
-            entity.linkValue,
-            Option(entity.mimeType),
-            Option(entity.uuid),
+            entity.getLinkName,
+            entity.getToConcept,
+            entity.getLinkValue,
+            Option(entity.getMimeType),
+            Option(entity.getUuid),
             entity.lastUpdated,
             optObs,
             optIm

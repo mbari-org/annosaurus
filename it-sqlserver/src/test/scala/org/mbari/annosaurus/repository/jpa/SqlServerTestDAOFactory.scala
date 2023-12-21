@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 MBARI
+ * Copyright 2017 Monterey Bay Aquarium Research Institute
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,9 +17,9 @@
 package org.mbari.annosaurus.repository.jpa
 
 import jakarta.persistence.EntityManagerFactory
-import org.mbari.vampiresquid.etc.tc.AzureSqlEdgeContainerProvider
+import org.mbari.annosaurus.etc.tc.AzureSqlEdgeContainerProvider
 
-object SqlServerTestDAOFactory extends SpecDAOFactory:
+object SqlServerTestDAOFactory extends TestDAOFactory:
 
     val container = new AzureSqlEdgeContainerProvider().newInstance()
 

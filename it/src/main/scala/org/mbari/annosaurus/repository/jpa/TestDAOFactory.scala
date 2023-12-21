@@ -49,11 +49,6 @@ trait TestDAOFactory extends JPADAOFactory {
 
 object TestDAOFactory {
     val TestProperties = EntityManagerFactories.PRODUCTION_PROPS ++ Map(
-        "eclipselink.logging.level.sql"                               -> "FINE",
-        "eclipselink.logging.level"                                   -> "INFO",
-        "eclipselink.logging.parameters"                              -> "true",
-        "jakarta.persistence.schema-generation.database.action"       -> "create",
-        "jakarta.persistence.schema-generation.scripts.action"        -> "drop-and-create",
         "jakarta.persistence.schema-generation.scripts.create-target" -> "target/test-database-create.ddl",
         "jakarta.persistence.schema-generation.scripts.drop-target"   -> "target/test-database-drop.ddl"
     )

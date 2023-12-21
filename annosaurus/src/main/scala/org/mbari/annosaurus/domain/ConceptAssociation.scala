@@ -42,13 +42,13 @@ final case class ConceptAssociation(
 object ConceptAssociation extends FromEntity[AssociationEntity, ConceptAssociation] {
     def from(entity: AssociationEntity, extend: Boolean = false): ConceptAssociation = {
         ConceptAssociation(
-            entity.uuid,
-            entity.observation.imagedMoment.videoReferenceUUID,
-            entity.observation.concept,
-            entity.linkName,
-            entity.toConcept,
-            entity.linkValue,
-            entity.mimeType
+            entity.getUuid,
+            entity.getObservation.getImagedMoment.getVideoReferenceUuid,
+            entity.getObservation.getConcept,
+            entity.getLinkName,
+            entity.getToConcept,
+            entity.getLinkValue,
+            entity.getMimeType
         )
     }
 }

@@ -18,6 +18,7 @@ package org.mbari.annosaurus.domain
 
 import java.util.UUID
 import org.mbari.annosaurus.repository.jpa.entity.IndexEntity
+import org.mbari.annosaurus.repository.jpa.entity.extensions.*
 
 final case class Index(
     videoReferenceUuid: UUID,
@@ -42,11 +43,11 @@ final case class Index(
 
     override def toEntity: IndexEntity = {
         val entity = new IndexEntity
-        entity.videoReferenceUUID = videoReferenceUuid
-        timecode.foreach(tc => entity.timecode = org.mbari.vcr4j.time.Timecode(tc))
-        elapsedTimeMillis.foreach(t => entity.elapsedTime = java.time.Duration.ofMillis(t))
-        recordedTimestamp.foreach(entity.recordedDate = _)
-        uuid.foreach(entity.uuid = _)
+        entity.setVideoReferenceUuid(videoReferenceUuid)
+        timecode.foreach(tc => entity.setTimecode(org.mbari.vcr4j.time.Timecode(tc)))
+        elapsedTimeMillis.foreach(t => entity.setElapsedTime(java.time.Duration.ofMillis(t)))
+        recordedTimestamp.foreach(entity.setRecordedDate)
+        uuid.foreach(entity.setUuid)
         entity
     }
 }
@@ -54,11 +55,11 @@ final case class Index(
 object Index extends FromEntity[IndexEntity, Index] {
     def from(entity: IndexEntity, extend: Boolean = false): Index = {
         Index(
-            entity.videoReferenceUUID,
-            Option(entity.timecode).map(_.toString()),
-            Option(entity.elapsedTime).map(_.toMillis),
-            Option(entity.recordedDate),
-            Option(entity.uuid),
+            entity.getVideoReferenceUuid,
+            Option(entity.getTimecode).map(_.toString()),
+            Option(entity.getElapsedTime).map(_.toMillis),
+            Option(entity.getRecordedDate),
+            entity.primaryKey,
             entity.lastUpdated
         )
     }

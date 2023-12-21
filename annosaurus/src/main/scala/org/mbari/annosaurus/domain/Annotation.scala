@@ -23,6 +23,7 @@ import java.time.Duration
 import java.time.Instant
 import org.mbari.annosaurus.repository.jpa.entity.ObservationEntity
 import scala.collection.mutable
+import scala.jdk.CollectionConverters.*
 
 final case class Annotation(
     activity: Option[String] = None,
@@ -71,40 +72,40 @@ object Annotation extends FromEntity[ObservationEntity, Annotation] {
 
     override def from(entity: ObservationEntity, extend: Boolean = false): Annotation =
         val ad =
-            if extend && entity.imagedMoment != null then
-                Option(entity.imagedMoment.ancillaryDatum).map(x =>
+            if extend && entity.getImagedMoment != null then
+                Option(entity.getImagedMoment.getAncillaryDatum).map(x =>
                     CachedAncillaryDatum.from(x, false)
                 )
             else None
 
-        val imOpt = Option(entity.imagedMoment)
+        val imOpt = Option(entity.getImagedMoment)
 
         val irs = imOpt
-            .map(_.imageReferences)
+            .map(_.getImageReferences.asScala)
             .getOrElse(Nil)
             .map(x => ImageReference.from(x, false))
             .toSeq
 
         Annotation(
-            Option(entity.activity),
+            Option(entity.getActivity),
             ad,
-            entity.associations.map(x => Association.from(x, false)).toSeq,
-            Option(entity.concept),
-            Option(entity.duration).map(_.toMillis),
-            imOpt.flatMap(x => Option(x.elapsedTime)).map(_.toMillis),
-            Option(entity.group),
-            imOpt.map(_.uuid),
+            entity.getAssociations.asScala.map(x => Association.from(x, false)).toSeq,
+            Option(entity.getConcept),
+            Option(entity.getDuration).map(_.toMillis),
+            imOpt.flatMap(x => Option(x.getElapsedTime)).map(_.toMillis),
+            Option(entity.getGroup),
+            imOpt.map(_.getUuid),
             irs,
-            Option(entity.observationDate),
-            Option(entity.uuid),
-            Option(entity.observer),
-            imOpt.map(_.recordedDate),
-            imOpt.flatMap(x => Option(x.timecode).map(_.toString)),
-            imOpt.map(_.videoReferenceUUID)
+            Option(entity.getObservationDate),
+            Option(entity.getUuid),
+            Option(entity.getObserver),
+            imOpt.map(_.getRecordedDate),
+            imOpt.flatMap(x => Option(x.getTimecode).map(_.toString)),
+            imOpt.map(_.getVideoReferenceUuid)
         )
 
     def fromImagedMoment(entity: ImagedMomentEntity, extend: Boolean = false): Seq[Annotation] = {
-        entity.observations.map(x => from(x, extend)).toSeq
+        entity.getObservations.asScala.map(x => from(x, extend)).toSeq
     }
 
     def toEntities(annotations: Seq[Annotation], extend: Boolean = false): Seq[ImagedMomentEntity] = {
@@ -121,13 +122,13 @@ object Annotation extends FromEntity[ObservationEntity, Annotation] {
                                                  .groupBy(_.imagedMomentUuid.get)
             yield
                 val a  = annos.head
-                val tc = a.timecode.map(Timecode(_))
-                val et = a.elapsedTimeMillis.map(Duration.ofMillis(_))
-                val im = ImagedMomentEntity(a.videoReferenceUuid, a.recordedTimestamp, tc, et)
-                im.uuid = imagedMomentUuid
+                val tc = a.timecode.map(Timecode(_)).orNull
+                val et = a.elapsedTimeMillis.map(Duration.ofMillis(_)).orNull
+                val im = ImagedMomentEntity(a.videoReferenceUuid.orNull, a.recordedTimestamp.orNull, tc, et)
+                im.setUuid(imagedMomentUuid)
 
                 if extend then annos.find(_.ancillaryData.isDefined).foreach { a =>
-                    im.ancillaryDatum = a.ancillaryData.get.toEntity
+                    im.setAncillaryDatum(a.ancillaryData.get.toEntity)
                 }
 
                 for a <- annos
@@ -135,19 +136,20 @@ object Annotation extends FromEntity[ObservationEntity, Annotation] {
                     val d   = a.durationMillis.map(Duration.ofMillis(_))
                     val obs = ObservationEntity(
                         a.concept.get,
-                        d,
-                        a.observationTimestamp,
-                        a.observer,
-                        a.group,
-                        a.activity
+                        d.orNull,
+                        a.observationTimestamp.orNull,
+                        a.observer.orNull,
+                        a.group.orNull,
+                        a.activity.orNull
                     )
-                    a.observationUuid.foreach(obs.uuid = _)
+                    a.observationUuid.foreach(obs.setUuid)
                     im.addObservation(obs)
 
                     a.associations.foreach(x => obs.addAssociation(x.toEntity))
+                    val irs = im.getImageReferences.asScala
                     a.imageReferences
                         .foreach(x =>
-                            im.imageReferences.find(i => i.url == x.url) match
+                            irs.find(i => i.getUrl == x.url) match
                                 case Some(link_value) => // Do nothing. Image already exists
                                 case None             => im.addImageReference(x.toEntity)
                         )

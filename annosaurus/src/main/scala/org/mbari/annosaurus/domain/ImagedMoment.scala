@@ -21,6 +21,8 @@ import java.time.Duration
 import org.mbari.vcr4j.time.Timecode
 import java.time.Instant
 import org.mbari.annosaurus.repository.jpa.entity.ImagedMomentEntity
+import org.mbari.annosaurus.repository.jpa.entity.extensions.*
+import scala.jdk.CollectionConverters.*
 
 final case class ImagedMoment(
     videoReferenceUuid: UUID,
@@ -48,15 +50,15 @@ final case class ImagedMoment(
         )
 
     override def toEntity: ImagedMomentEntity =
-        var entity = new ImagedMomentEntity
-        entity.videoReferenceUUID = videoReferenceUuid
-        timecode.foreach(tc => entity.timecode = Timecode(tc))
-        elapsedTimeMillis.foreach(t => entity.elapsedTime = Duration.ofMillis(t))
-        recordedTimestamp.foreach(entity.recordedDate = _)
+        val entity = new ImagedMomentEntity
+        entity.setVideoReferenceUuid(videoReferenceUuid)
+        timecode.foreach(tc => entity.setTimecode(Timecode(tc)))
+        elapsedTimeMillis.foreach(t => entity.setElapsedTime(Duration.ofMillis(t)))
+        recordedTimestamp.foreach(entity.setRecordedDate)
         observations.foreach(obs => entity.addObservation(obs.toEntity))
         imageReferences.foreach(ir => entity.addImageReference(ir.toEntity))
-        ancillaryData.foreach(d => entity.ancillaryDatum = d.toEntity)
-        uuid.foreach(entity.uuid = _)
+        ancillaryData.foreach(d => entity.setAncillaryDatum(d.toEntity))
+        uuid.foreach(entity.setUuid)
         entity
 
     lazy val elapsedTime: Option[Duration] = elapsedTimeMillis.map(Duration.ofMillis)
@@ -65,14 +67,14 @@ final case class ImagedMoment(
 object ImagedMoment extends FromEntity[ImagedMomentEntity, ImagedMoment] {
     def from(entity: ImagedMomentEntity, extend: Boolean = false): ImagedMoment = {
         ImagedMoment(
-            entity.videoReferenceUUID,
-            Option(entity.timecode).map(_.toString()),
-            Option(entity.elapsedTime).map(_.toMillis),
-            Option(entity.recordedDate),
-            entity.observations.map(x => Observation.from(x, false)).toSeq,
-            entity.imageReferences.map(x => ImageReference.from(x, false)).toSeq,
-            Option(entity.ancillaryDatum).map(x => CachedAncillaryDatum.from(x, false)),
-            Option(entity.uuid),
+            entity.getVideoReferenceUuid,
+            Option(entity.getTimecode).map(_.toString()),
+            Option(entity.getElapsedTime).map(_.toMillis),
+            Option(entity.getRecordedDate),
+            entity.getObservations.asScala.map(x => Observation.from(x, false)).toSeq,
+            entity.getImageReferences.asScala.map(x => ImageReference.from(x, false)).toSeq,
+            Option(entity.getAncillaryDatum).map(x => CachedAncillaryDatum.from(x, false)),
+            entity.primaryKey,
             entity.lastUpdated
         )
     }

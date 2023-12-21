@@ -26,7 +26,7 @@ import java.util.UUID
   *   Brian Schlining
   * @since 2016-05-05T16:21:00
   */
-trait PersistentObject {
+trait PersistentObject  {
 
     def primaryKey: Option[UUID]
 }

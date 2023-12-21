@@ -14,8 +14,15 @@
  * limitations under the License.
  */
 
-package org.mbari.annosaurus.repository.jpa
+package org.mbari.annosaurus.repository.jpa.entity;
 
-import jakarta.persistence.EntityManagerFactory
+import java.sql.Timestamp;
+import java.util.UUID;
 
-class JPADAOFactoryImpl(val entityManagerFactory: EntityManagerFactory) extends JPADAOFactory
+public interface IPersistentObject {
+
+    UUID getUuid();
+
+    Timestamp getLastUpdatedTime();
+
+}
