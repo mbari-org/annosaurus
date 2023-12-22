@@ -36,6 +36,4 @@ class ImagedMomentSuite extends munit.FunSuite {
         // assertEquals(e1, e2)
     }
 
-    // TODO need to round trip to and from snakecase/camelcase
-    // TODO need to round trip to and from entity
 }
