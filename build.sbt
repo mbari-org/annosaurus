@@ -33,7 +33,7 @@ lazy val annosaurus = (project in file("annosaurus"))
         AutomateHeaderPlugin,
         GitBranchPrompt,
         GitVersioning,
-        EclipseLinkStaticWeaver,
+        // EclipseLinkStaticWeaver,
         JavaAppPackaging
     )
     // .settings(staticWeaverLogLevel := 0)

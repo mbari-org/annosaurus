@@ -39,6 +39,7 @@ import java.util.concurrent.TimeUnit
 import scala.concurrent.duration
 import scala.util.Random
 import scala.concurrent.ExecutionContext
+import java.sql.Timestamp
 
 object TestUtils {
 
@@ -104,17 +105,17 @@ object TestUtils {
     ): ImagedMomentEntity = {
         val et           = random.nextInt()
         val elapsedTime  = Duration.ofMillis(et)
-        val recordedDate = Some(startDate.plusMillis(et))
+        val recordedDate = Some(startDate.plusMillis(et)).orNull
         val timecode     =
             if (random.nextBoolean())
                 Some(new Timecode(random.nextInt(10000).toDouble, FrameRates.NTSC))
             else None
         val imagedMoment =
-            ImagedMomentEntity(Some(videoReferenceUuid), recordedDate, timecode, Some(elapsedTime))
+            ImagedMomentEntity(videoReferenceUuid, recordedDate, timecode.orNull, elapsedTime)
         for (_ <- 0 until nObservations)
             imagedMoment.addObservation(randomObservation(nAssociations))
         for (_ <- 0 until nImageReferences) imagedMoment.addImageReference(randomImageReference())
-        if (includeData) imagedMoment.ancillaryDatum = randomData()
+        if (includeData) imagedMoment.setAncillaryDatum(randomData())
         imagedMoment
     }
 
@@ -123,11 +124,16 @@ object TestUtils {
         val concept         = Strings.random(random.nextInt(128))
         val duration        =
             if (random.nextBoolean()) Some(Duration.ofMillis(random.nextInt(5000))) else None
-        val observationDate = Some(Instant.now())
+        val observationDate = Instant.now()
         val observer        = if (random.nextBoolean()) Some(Strings.random(32)) else None
         val group           = if (random.nextBoolean()) Some(Strings.random(32)) else None
         val activity        = if (random.nextBoolean()) Some(Strings.random(32)) else None
-        val obs             = ObservationEntity(concept, duration, observationDate, observer, group, activity)
+        val obs             = ObservationEntity(concept, 
+                duration.orNull, 
+                observationDate, 
+                observer.orNull, 
+                group.orNull, 
+                activity.orNull)
         for (_ <- 0 until nAssociations) {
             obs.addAssociation(randomAssociation())
         }
@@ -149,18 +155,46 @@ object TestUtils {
         val description = Strings.random(128)
         val width       = random.nextInt(1440) + 480
         val height      = math.round(width * 0.5625).toInt
-        ImageReferenceEntity(url, Some(width), Some(height), Some("image/png"), Some(description))
+        new ImageReferenceEntity(url, width, height, "image/png", description)
     }
 
     def randomData(): CachedAncillaryDatumEntity = {
         val lat      = (random.nextInt(18000) / 100d) - 90.0
         val lon      = (random.nextInt(36000) / 100d) - 180.0
-        val pressure = random.nextInt(20000) / 10f
-        val depth    = Ocean.depth(pressure.toDouble, lat).toFloat
-        val salinity = random.nextInt(3600) / 100f
-        val temp     = random.nextInt(1500) / 100f
-        val oxygen   = random.nextFloat()
-        CachedAncillaryDatumEntity(lat, lon, depth, salinity, temp, pressure, oxygen)
+        val pressure = random.nextInt(20000) / 10d
+        val depth    = Ocean.depth(pressure.toDouble, lat)
+        val salinity = random.nextInt(3600) / 100d
+        val temp     = random.nextInt(1500) / 100d
+        val oxygen   = random.nextDouble() * 10D
+        val crs      = "EPSG:4326"
+        val x        = random.nextInt(1000) * 1D
+        val y        = random.nextInt(1000) * 1D
+        val z        = random.nextInt(1000) * 1D
+        val pose     = "XYZ"
+        val phi      = random.nextInt(36000) / 100d
+        val theta    = random.nextInt(36000) / 100d
+        val psi      = random.nextInt(36000) / 100d
+        val trans    = random.nextInt(100) * 1D
+        val datum = new CachedAncillaryDatumEntity()
+        datum.setLatitude(lat)
+        datum.setLongitude(lon)
+        datum.setDepthMeters(depth)
+        datum.setPressureDbar(pressure)
+        datum.setSalinity(salinity)
+        datum.setTemperatureCelsius(temp)
+        datum.setOxygenMlL(oxygen)
+        datum.setCrs(crs)
+        datum.setX(x)
+        datum.setY(y)
+        datum.setZ(z)
+        datum.setPosePositionUnits(pose)
+        datum.setPhi(phi)
+        datum.setTheta(theta)
+        datum.setPsi(psi)
+        datum.setLightTransmission(trans)
+        datum
+
+     
     }
 
 }

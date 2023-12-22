@@ -21,6 +21,7 @@ import org.mbari.annosaurus.repository.jpa.BaseDAOSuite
 import org.mbari.annosaurus.repository.jpa.JPADAOFactory
 
 import scala.concurrent.ExecutionContext
+import scala.jdk.CollectionConverters.*
 
 trait AssociationControllerITSuite extends BaseDAOSuite {
 
@@ -34,17 +35,17 @@ trait AssociationControllerITSuite extends BaseDAOSuite {
 
     test("bulkUpdate") {
         val x               = TestUtils.create(1, 1, 8, 0).head
-        val associations    = x.observations.flatMap(_.associations)
-        associations.foreach(_.linkName = "foobarbazbin")
+        val associations    = x.getObservations.asScala.flatMap(_.getAssociations.asScala)
+        associations.foreach(_.setLinkName("foobarbazbin"))
         val newAssociations = exec(controller.bulkUpdate(associations))
-        val ax              = associations.toSeq.sortBy(_.uuid)
-        val bx              = newAssociations.toSeq.sortBy(_.uuid)
+        val ax              = associations.toSeq.sortBy(_.getUuid)
+        val bx              = newAssociations.toSeq.sortBy(_.getUuid)
         ax.zip(bx).foreach(p => AssertUtils.assertSameAssociation(p._1, p._2))
 
         // sanity check
         val dao = daoFactory.newAssociationDAO()
         bx.foreach { b =>
-            val opt = exec(dao.runTransaction(d => d.findByUUID(b.uuid)))
+            val opt = exec(dao.runTransaction(d => d.findByUUID(b.getUuid)))
             assert(opt.isDefined)
             AssertUtils.assertSameAssociation(b, opt.get)
         }

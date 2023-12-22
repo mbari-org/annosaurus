@@ -129,6 +129,14 @@ public class CachedVideoReferenceInfoEntity implements IPersistentObject {
         this.missionContact = missionContact;
     }
 
+    public CachedVideoReferenceInfoEntity(CachedVideoReferenceInfoEntity that) {
+        this.videoReferenceUuid = that.videoReferenceUuid;
+        this.missionId = that.missionId;
+        this.platformName = that.platformName;
+        this.missionContact = that.missionContact;
+        this.uuid = that.uuid;
+    }
+
     @Override
     public UUID getUuid() {
         return uuid;

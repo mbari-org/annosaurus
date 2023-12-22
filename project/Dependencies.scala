@@ -17,9 +17,9 @@ object Dependencies {
     lazy val derbyShared = "org.apache.derby" % "derbyshared" % derbyVersion
     lazy val derbyTools  = "org.apache.derby" % "derbytools"  % derbyVersion
 
-    val eclipselinkVersion        = "4.0.2"
-    lazy val eclipselinkExtension = "org.eclipse.persistence" % "org.eclipse.persistence.extension" % eclipselinkVersion
-    lazy val eclipselinkJpa       = "org.eclipse.persistence" % "org.eclipse.persistence.jpa" % eclipselinkVersion
+    // val eclipselinkVersion        = "4.0.2"
+    // lazy val eclipselinkExtension = "org.eclipse.persistence" % "org.eclipse.persistence.extension" % eclipselinkVersion
+    // lazy val eclipselinkJpa       = "org.eclipse.persistence" % "org.eclipse.persistence.jpa" % eclipselinkVersion
 
     lazy val fatboyGson       = "com.fatboyindustrial.gson-javatime-serialisers" % "gson-javatime-serialisers" % "1.1.2"
     lazy val gson             = "com.google.code.gson" % "gson"              % "2.10.1"

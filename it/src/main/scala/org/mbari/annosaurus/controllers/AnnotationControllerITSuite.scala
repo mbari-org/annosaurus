@@ -22,6 +22,7 @@ import scala.concurrent.ExecutionContext
 import org.mbari.annosaurus.AssertUtils
 import org.mbari.annosaurus.domain.ImagedMoment
 import org.mbari.annosaurus.domain.Annotation
+import scala.jdk.CollectionConverters.*
 
 
 trait AnnotationControllerITSuite extends BaseDAOSuite {
@@ -34,8 +35,8 @@ trait AnnotationControllerITSuite extends BaseDAOSuite {
 
     test("findByUUID") {
         val im1 = TestUtils.create(1, 2, 3, 2, true).head
-        val obs = im1.observations.head
-        val opt = exec(controller.findByUUID(obs.uuid))
+        val obs = im1.getObservations.asScala.head
+        val opt = exec(controller.findByUUID(obs.getUuid))
         opt match
             case None => fail("findByUUID returned None")
             case Some(anno) =>

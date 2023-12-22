@@ -23,6 +23,7 @@ import org.mbari.annosaurus.repository.jpa.entity.ObservationEntity
 import org.mbari.annosaurus.repository.jpa.entity.ImageReferenceEntity
 import org.mbari.annosaurus.repository.jpa.entity.AssociationEntity
 import org.mbari.annosaurus.repository.jpa.entity.CachedAncillaryDatumEntity
+import scala.jdk.CollectionConverters.*
 
 object AssertUtils {
 
@@ -35,23 +36,23 @@ object AssertUtils {
             // do nothing
         }
         else if (a != null && b != null) {
-            assertEquals(a.timecode, b.timecode)
-            assertEquals(a.elapsedTime, b.elapsedTime)
-            assertEquals(a.recordedDate, b.recordedDate)
-            assertEquals(a.videoReferenceUUID, b.videoReferenceUUID)
-            assertEquals(a.uuid, b.uuid)
+            assertEquals(a.getTimecode(), b.getTimecode())
+            assertEquals(a.getElapsedTime(), b.getElapsedTime())
+            assertEquals(a.getRecordedDate(), b.getRecordedDate())
+            assertEquals(a.getVideoReferenceUuid(), b.getVideoReferenceUuid())
+            assertEquals(a.getUuid(), b.getUuid())
             if (cascade) {
-                assertEquals(a.observations.size, b.observations.size)
-                val ax = a.observations.toSeq.sortBy(_.uuid)
-                val bx = b.observations.toSeq.sortBy(_.uuid)
+                assertEquals(a.getObservations().size, b.getObservations().size)
+                val ax = a.getObservations().asScala.toSeq.sortBy(_.getUuid())
+                val bx = b.getObservations().asScala.toSeq.sortBy(_.getUuid())
                 ax.zip(bx).foreach(p => assertSameObservation(p._1, p._2, cascade))
 
-                assertEquals(a.imageReferences.size, b.imageReferences.size)
-                val ay = a.imageReferences.toSeq.sortBy(_.uuid)
-                val by = b.imageReferences.toSeq.sortBy(_.uuid)
+                assertEquals(a.getImageReferences().size, b.getImageReferences().size)
+                val ay = a.getImageReferences().asScala.toSeq.sortBy(_.getUuid())
+                val by = b.getImageReferences().asScala.toSeq.sortBy(_.getUuid())
                 ay.zip(by).foreach(p => assertSameImageReference(p._1, p._2))
 
-                assertEquals(a.ancillaryDatum, b.ancillaryDatum)
+                assertEquals(a.getAncillaryDatum(), b.getAncillaryDatum())
             }
         }
         else {
@@ -68,16 +69,16 @@ object AssertUtils {
             // do nothing
         }
         else if (a != null && b != null) {
-            assertEquals(a.concept, b.concept)
-            assertEquals(a.group, b.group)
-            assertEquals(a.activity, b.activity)
-            assertEquals(a.duration, b.duration)
-            assertEquals(a.observer, b.observer)
-            assertEquals(a.uuid, b.uuid)
+            assertEquals(a.getConcept(), b.getConcept())
+            assertEquals(a.getGroup(), b.getGroup())
+            assertEquals(a.getActivity(), b.getActivity())
+            assertEquals(a.getDuration(), b.getDuration())
+            assertEquals(a.getObserver(), b.getObserver())
+            assertEquals(a.getUuid(), b.getUuid())
             if (cascade) {
-                assertEquals(a.associations.size, b.associations.size)
-                val ax = a.associations.toSeq.sortBy(_.uuid)
-                val bx = b.associations.toSeq.sortBy(_.uuid)
+                assertEquals(a.getAssociations().size, b.getAssociations().size)
+                val ax = a.getAssociations().asScala.toSeq.sortBy(_.getUuid)
+                val bx = b.getAssociations().asScala.toSeq.sortBy(_.getUuid)
                 ax.zip(bx).foreach(p => assertSameAssociation(p._1, p._2))
             }
         }
@@ -92,12 +93,12 @@ object AssertUtils {
             // do nothing
         }
         else if (a != null && b != null) {
-            assertEquals(a.uuid, b.uuid)
-            assertEquals(a.url, b.url)
-            assertEquals(a.width, b.width)
-            assertEquals(a.height, b.height)
-            assertEquals(a.description, b.description)
-            assertEquals(a.format, b.format)
+            assertEquals(a.getUuid, b.getUuid())
+            assertEquals(a.getUrl(), b.getUrl())
+            assertEquals(a.getWidth(), b.getWidth())
+            assertEquals(a.getHeight(), b.getHeight())
+            assertEquals(a.getDescription(), b.getDescription())
+            assertEquals(a.getFormat(), b.getFormat())
         }
         else {
             fail("One of the imagereferences is null")
@@ -109,11 +110,11 @@ object AssertUtils {
             // do nothing
         }
         else if (a != null && b != null) {
-            assertEquals(a.uuid, b.uuid)
-            assertEquals(a.linkName, b.linkName)
-            assertEquals(a.toConcept, b.toConcept)
-            assertEquals(a.linkValue, b.linkValue)
-            assertEquals(a.mimeType, b.mimeType)
+            assertEquals(a.getUuid(), b.getUuid())
+            assertEquals(a.getLinkName(), b.getLinkName())
+            assertEquals(a.getToConcept(), b.getToConcept())
+            assertEquals(a.getLinkValue(), b.getLinkValue())
+            assertEquals(a.getMimeType(), b.getMimeType())
         }
         else {
             fail("One of the associations is null")
@@ -128,20 +129,21 @@ object AssertUtils {
             // do nothing
         }
         else if (a != null && b != null) {
-            assertEquals(a.uuid, b.uuid)
-            assertEquals(a.x, b.x)
-            assertEquals(a.y, b.y)
-            assertEquals(a.crs, b.crs)
-            assertEquals(a.latitude, b.latitude)
-            assertEquals(a.longitude, b.longitude)
-            assertEquals(a.altitude, b.altitude)
-            assertEquals(a.depthMeters, b.depthMeters)
-            assertEquals(a.pressureDbar, b.pressureDbar)
-            assertEquals(a.posePositionUnits, b.posePositionUnits)
-            assertEquals(a.lightTransmission, b.lightTransmission)
-            assertEquals(a.oxygenMlL, b.oxygenMlL)
-            assertEquals(a.salinity, b.salinity)
-            assertEquals(a.temperatureCelsius, b.temperatureCelsius)
+            assertEquals(a.getUuid(), b.getUuid())
+            assertEquals(a.getX(), b.getX())
+            assertEquals(a.getY(), b.getY())
+            assertEquals(a.getZ(), b.getZ())
+            assertEquals(a.getCrs(), b.getCrs())
+            assertEquals(a.getLatitude(), b.getLatitude())
+            assertEquals(a.getLongitude(), b.getLongitude())
+            assertEquals(a.getAltitude(), b.getAltitude())
+            assertEquals(a.getDepthMeters(), b.getDepthMeters())
+            assertEquals(a.getPressureDbar(), b.getPressureDbar())
+            assertEquals(a.getPosePositionUnits(), b.getPosePositionUnits())
+            assertEquals(a.getLightTransmission(), b.getLightTransmission())
+            assertEquals(a.getOxygenMlL(), b.getOxygenMlL())
+            assertEquals(a.getSalinity(), b.getSalinity())
+            assertEquals(a.getTemperatureCelsius(), b.getTemperatureCelsius())
         }
         else {
             fail("One of the ancillarydata is null")

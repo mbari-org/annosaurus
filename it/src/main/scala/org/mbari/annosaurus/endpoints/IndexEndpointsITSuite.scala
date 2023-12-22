@@ -38,7 +38,7 @@ trait IndexEndpointsITSuite extends EndpointsSuite {
         val im = TestUtils.create(1, 1).head
         runGet(
             endpoints.findByVideoReferenceUUIDImpl,
-            s"http://test.com/v1/index/videoreference/${im.videoReferenceUUID}",
+            s"http://test.com/v1/index/videoreference/${im.getVideoReferenceUuid}",
             response =>
                 assertEquals(response.code, StatusCode.Ok)
                 val imagedMoments = checkResponse[List[ImagedMoment]](response.body)

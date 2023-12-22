@@ -120,6 +120,14 @@ public class ImageReferenceEntity implements IPersistentObject {
     public ImageReferenceEntity() {
     }
 
+    public ImageReferenceEntity(URL url, Integer height, Integer width, String forma, String description) {
+        this.url = url;
+        this.description = description;
+        this.height = height;
+        this.width = width;
+        this.format = format;
+    }
+
     @Override
     public UUID getUuid() {
         return uuid;
