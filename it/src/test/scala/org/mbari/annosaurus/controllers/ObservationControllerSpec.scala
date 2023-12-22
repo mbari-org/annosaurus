@@ -27,6 +27,7 @@ import java.util.concurrent.TimeUnit
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.Duration as SDuration
 import scala.concurrent.{Await, Future}
+import scala.jdk.CollectionConverters.*
 
 class ObservationControllerSpec extends AnyFunSpec with Matchers {
 
@@ -68,20 +69,20 @@ class ObservationControllerSpec extends AnyFunSpec with Matchers {
         val opt0 = exec(() => controller.findByUUID(a.observationUuid.get))
         opt0 should not be None
         val obs0 = opt0.get
-        obs0.duration should be(duration)
+        obs0.getDuration() should be(duration)
 
         // delete duration
         val opt = exec(() => controller.deleteDuration(a.observationUuid.get))
         opt should not be None
         val obs = opt.get
-        obs.duration should be(null)
-        obs.imagedMoment.recordedDate.toEpochMilli should be(recordedDate.toEpochMilli())
+        obs.getDuration() should be(null)
+        obs.getImagedMoment().getRecordedDate().toEpochMilli should be(recordedDate.toEpochMilli())
 
         // look up and verify no duration
-        val opt1 = exec(() => controller.findByUUID(obs.uuid))
+        val opt1 = exec(() => controller.findByUUID(obs.getUuid()))
         opt1 should not be None
         val obs1 = opt1.get
-        obs1.duration should be(null)
+        obs1.getDuration() should be(null)
 
       }
     }

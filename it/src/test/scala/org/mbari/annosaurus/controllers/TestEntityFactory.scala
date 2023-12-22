@@ -64,7 +64,7 @@ class TestEntityFactory(daoFactory: JPADAOFactory) {
       Random.nextDouble() * 2000
     )
 
-    imagedMoment.ancillaryDatum = data
+    imagedMoment.setAncillaryDatum(data)
     imDao.close()
     imagedMoment
 

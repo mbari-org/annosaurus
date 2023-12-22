@@ -45,7 +45,7 @@ class CachedAncillaryDatumDAOSpec extends AnyFlatSpec with Matchers with BeforeA
   private[this] val videoReferenceUUID = UUID.randomUUID()
   private[this] val now                = Instant.now()
   private[this] val imagedMoment0 =
-    ImagedMomentEntity(Some(videoReferenceUUID), Some(now), elapsedTime = Some(Duration.ofMinutes(1)))
+    ImagedMomentEntity(videoReferenceUUID, now, null, Duration.ofMinutes(1))
   private[this] val ancillaryDatum0 = CachedAncillaryDatumEntity(36.234, 122.0011, 666)
   private[this] val newTemp         = 3.2
 
@@ -53,21 +53,20 @@ class CachedAncillaryDatumDAOSpec extends AnyFlatSpec with Matchers with BeforeA
   def run[R](fn: CADAO => R): R = Await.result(dao.runTransaction(fn), timeout)
 
   "CachedAncillaryDatumDAOImpl" should "create" in {
-    imagedMoment0.ancillaryDatum = ancillaryDatum0
+    imagedMoment0.setAncillaryDatum(ancillaryDatum0)
     run(_.create(ancillaryDatum0))
-    ancillaryDatum0.uuid should not be null
+    ancillaryDatum0.getUuid() should not be null
   }
 
   it should "update" in {
     run(d => {
-      val ad = d.findByUUID(ancillaryDatum0.uuid)
+      val ad = d.findByUUID(ancillaryDatum0.getUuid())
       ad shouldBe defined
-      ad.get.temperatureCelsius = Some(newTemp)
+      ad.get.setTemperatureCelsius(newTemp)
     })
 
-    val datum = run(d => d.findByUUID(ancillaryDatum0.uuid)).head
-    datum.temperatureCelsius should not be None
-    datum.temperatureCelsius.get should be(newTemp +- 0.000001d)
+    val datum = run(d => d.findByUUID(ancillaryDatum0.getUuid())).head
+    datum.getTemperatureCelsius().doubleValue() should be(newTemp +- 0.000001d)
   }
 
   it should "findAll" in {
@@ -78,11 +77,11 @@ class CachedAncillaryDatumDAOSpec extends AnyFlatSpec with Matchers with BeforeA
 
   it should "delete" in {
     run(d => {
-      val datum = d.findByUUID(ancillaryDatum0.uuid)
+      val datum = d.findByUUID(ancillaryDatum0.getUuid())
       d.delete(datum.get)
     })
 
-    val datCheck = run(_.findByUUID(ancillaryDatum0.uuid))
+    val datCheck = run(_.findByUUID(ancillaryDatum0.getUuid()))
     datCheck shouldBe empty
   }
 

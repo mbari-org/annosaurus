@@ -33,12 +33,12 @@ class ImageReferenceSuite extends munit.FunSuite {
         val cc2 = ImageReference.from(e1).copy(lastUpdated = None)
         val e2 = cc2.toEntity
         assertEquals(cc2, cc1)
-        assertEquals(e2.url, cc1.url)
-        assertEquals(e2.format, cc1.format.orNull)
-        assertEquals(e2.width, cc1.widthPixels.orNull)
-        assertEquals(e2.height, cc1.heightPixels.orNull)
-        assertEquals(e2.description, cc1.description.orNull)
-        assertEquals(e2.uuid, cc1.uuid.orNull)
+        assertEquals(e2.getUrl(), cc1.url)
+        assertEquals(e2.getFormat(), cc1.format.orNull)
+        assertEquals(e2.getWidth().intValue(), cc1.widthPixels.orNull)
+        assertEquals(e2.getHeight().intValue(), cc1.heightPixels.orNull)
+        assertEquals(e2.getDescription(), cc1.description.orNull)
+        assertEquals(e2.getUuid(), cc1.uuid.orNull)
     }
 
 

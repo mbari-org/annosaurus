@@ -197,6 +197,12 @@ public class ObservationEntity implements IPersistentObject {
         this.activity = activity;
     }
 
+    public ObservationEntity(String concept, String observer) {
+        this.concept = concept;
+        this.observer = observer;
+        this.observationDate = Instant.now();
+    }
+
     @Override
     public UUID getUuid() {
         return uuid;

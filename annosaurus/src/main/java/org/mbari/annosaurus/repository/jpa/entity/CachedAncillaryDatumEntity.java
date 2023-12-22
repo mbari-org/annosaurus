@@ -164,6 +164,12 @@ public class CachedAncillaryDatumEntity implements IPersistentObject {
     public CachedAncillaryDatumEntity() {
     }
 
+    public CachedAncillaryDatumEntity(Double lat, Double lon, Double depth) {
+        this.latitude = lat;
+        this.longitude = lon;
+        this.depthMeters = depth;
+    }
+
 
     public CachedAncillaryDatumEntity(CachedAncillaryDatumEntity that) {
         this.altitude = that.altitude;

@@ -45,11 +45,12 @@ class IndexDAOSpec extends AnyFlatSpec with Matchers with BeforeAndAfterAll {
   private[this] val videoReferenceUUID = UUID.randomUUID()
   private[this] val now                = Instant.now()
   private[this] val imagedMoment0 =
-    ImagedMomentEntity(Some(videoReferenceUUID), Some(now), elapsedTime = Some(Duration.ofMinutes(1)))
+    ImagedMomentEntity(videoReferenceUUID, now, null, Duration.ofMinutes(1))
   private[this] val imagedMoment1 = ImagedMomentEntity(
-    Some(videoReferenceUUID),
-    Some(now.plusSeconds(60)),
-    elapsedTime = Some(Duration.ofMinutes(5))
+    videoReferenceUUID,
+    now.plusSeconds(60),
+    null,
+    Duration.ofMinutes(5)
   )
 
   def runIm[R](fn: IMDAO => R): R = Await.result(imDao.runTransaction(fn), timeout)
@@ -58,7 +59,7 @@ class IndexDAOSpec extends AnyFlatSpec with Matchers with BeforeAndAfterAll {
 
   "ImagedMomentDAOImpl" should "create for spec setup" in {
     runIm(_.create(imagedMoment0))
-    imagedMoment0.uuid should not be null
+    imagedMoment0.getUuid() should not be null
 
     // --- Add a second
     runIm(_.create(imagedMoment1))
@@ -76,16 +77,16 @@ class IndexDAOSpec extends AnyFlatSpec with Matchers with BeforeAndAfterAll {
     runId(d => {
       val id = d
         .findByVideoReferenceUuid(videoReferenceUUID)
-        .find(_.uuid == imagedMoment0.uuid)
+        .find(_.getUuid() == imagedMoment0.getUuid())
       id shouldBe defined
-      id.get.timecode = timecode
+      id.get.setTimecode(timecode)
     })
 
     val imagedMoment = runId(_.findByVideoReferenceUuid(videoReferenceUUID))
-      .find(_.uuid == imagedMoment0.uuid)
+      .find(_.getUuid() == imagedMoment0.getUuid())
     imagedMoment should not be empty
-    imagedMoment.get.timecode should not be null
-    imagedMoment.get.timecode.toString should be(timecode.toString)
+    imagedMoment.get.getTimecode() should not be null
+    imagedMoment.get.getTimecode().toString should be(timecode.toString)
   }
 
   override protected def afterAll(): Unit = {

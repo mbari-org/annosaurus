@@ -21,6 +21,7 @@ import org.mbari.annosaurus.repository.jpa.{DerbyTestDAOFactory, TestDAOFactory}
 
 import java.util.concurrent.TimeUnit
 import scala.concurrent.{Await, ExecutionContext}
+import scala.jdk.CollectionConverters.*
 
 class TestUtilsSuite extends munit.FunSuite {
 
@@ -32,9 +33,9 @@ class TestUtilsSuite extends munit.FunSuite {
         val xs = TestUtils.build()
         assertEquals(xs.size, 1)
         val x = xs.head
-        assertEquals(x.imageReferences.size, 0)
-        assertEquals(x.observations.size, 0)
-        assert(x.ancillaryDatum == null)
+        assertEquals(x.getImageReferences().size, 0)
+        assertEquals(x.getObservations().size, 0)
+        assert(x.getAncillaryDatum() == null)
     }
 
     test("build(2, 2, 2, 2, true)") {
@@ -42,10 +43,10 @@ class TestUtilsSuite extends munit.FunSuite {
         assertEquals(xs.size, 2)
         val x = xs.head
         println(x)
-        assertEquals(x.imageReferences.size, 2)
-        assertEquals(x.observations.size, 2)
-        x.observations.foreach(obs => assertEquals(obs.associations.size, 2))
-        assert(x.ancillaryDatum != null)
+        assertEquals(x.getImageReferences().size, 2)
+        assertEquals(x.getObservations().size, 2)
+        x.getObservations().asScala.foreach(obs => assertEquals(obs.getAssociations().size, 2))
+        assert(x.getAncillaryDatum() != null)
     }
 
     test("create") {
@@ -54,7 +55,7 @@ class TestUtilsSuite extends munit.FunSuite {
         val x = xs.head
         val dao = daoFactory.newImagedMomentDAO()
         Await.ready(dao.runTransaction(_.create(x)), timeout)
-        val opt = Await.result(dao.runTransaction(_.findByUUID(x.uuid)), timeout)
+        val opt = Await.result(dao.runTransaction(_.findByUUID(x.getUuid())), timeout)
         assert(opt.isDefined)
         AssertUtils.assertSameImagedMoment(x, opt.get)
 

@@ -46,7 +46,7 @@ class ImageReferenceDAOSpec extends AnyFlatSpec with Matchers with BeforeAndAfte
   private[this] val videoReferenceUUID = UUID.randomUUID()
   private[this] val now                = Instant.now()
   private[this] val imagedMoment0 =
-    ImagedMomentEntity(Some(videoReferenceUUID), Some(now), elapsedTime = Some(Duration.ofMinutes(1)))
+    ImagedMomentEntity(videoReferenceUUID, now, null, Duration.ofMinutes(1))
   private[this] val imageReference0 = ImageReferenceEntity(
     new URL("http://www.mbari.org/wp-content/uploads/2015/08/schlining_brian-180.jpg")
   )
@@ -61,7 +61,7 @@ class ImageReferenceDAOSpec extends AnyFlatSpec with Matchers with BeforeAndAfte
   "ImageReferenceDAOImpl" should "create" in {
     imagedMoment0.addImageReference(imageReference0)
     run(_.create(imageReference0))
-    imageReference0.uuid should not be null
+    imageReference0.getUuid() should not be null
 
     imagedMoment0.addImageReference(imageReference1)
     run(_.create(imageReference0))
@@ -69,30 +69,30 @@ class ImageReferenceDAOSpec extends AnyFlatSpec with Matchers with BeforeAndAfte
 
   it should "update" in {
     run(d => {
-      val ir = d.findByUUID(imageReference0.uuid)
+      val ir = d.findByUUID(imageReference0.getUuid())
       ir shouldBe defined
-      ir.get.description = newDescription
+      ir.get.setDescription(newDescription)
     })
 
-    val ir = run(_.findByUUID(imageReference0.uuid)).head
-    ir.description should be(newDescription)
+    val ir = run(_.findByUUID(imageReference0.getUuid())).head
+    ir.getDescription() should be(newDescription)
 
   }
 
   it should "findAll" in {
-    val irs = run(_.findAll()).filter(_.imagedMoment.uuid == imagedMoment0.uuid)
+    val irs = run(_.findAll()).filter(_.getImagedMoment().getUuid() == imagedMoment0.getUuid())
     irs.size should be(2)
   }
 
   it should "deleteByUUID" in {
-    run(_.deleteByUUID(imageReference1.uuid))
-    val ir1 = run(_.findByUUID(imageReference1.uuid))
+    run(_.deleteByUUID(imageReference1.getUuid()))
+    val ir1 = run(_.findByUUID(imageReference1.getUuid()))
     ir1 shouldBe empty
   }
 
   it should "delete" in {
     run(_.delete(imageReference0))
-    val ir0 = run(_.findByUUID(imageReference0.uuid))
+    val ir0 = run(_.findByUUID(imageReference0.getUuid()))
     ir0 shouldBe empty
   }
 

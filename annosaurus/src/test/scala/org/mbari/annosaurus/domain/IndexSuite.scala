@@ -34,10 +34,10 @@ class IndexSuite extends munit.FunSuite {
         val e2 = cc2.toEntity
         assertEquals(cc2, cc1)
         // assertEquals(e1, e2)
-        assertEquals(e2.videoReferenceUUID, cc1.videoReferenceUuid)
-        assertEquals(e2.timecode.toString(), cc1.timecode.get)
-        assertEquals(Option(e2.elapsedTime), cc1.elapsedTime)
-        assertEquals(Option(e2.recordedDate), cc1.recordedTimestamp)
-        assertEquals(Option(e2.uuid), cc1.uuid)
+        assertEquals(e2.getVideoReferenceUuid(), cc1.videoReferenceUuid)
+        assertEquals(e2.getTimecode().toString(), cc1.timecode.get)
+        assertEquals(Option(e2.getElapsedTime()), cc1.elapsedTime)
+        assertEquals(Option(e2.getRecordedDate()), cc1.recordedTimestamp)
+        assertEquals(Option(e2.getUuid()), cc1.uuid)
     }
 }

@@ -19,6 +19,7 @@ package org.mbari.annosaurus.controllers
 
 import org.mbari.annosaurus.domain.*
 import org.mbari.annosaurus.repository.jpa.{DerbyTestDAOFactory, TestDAOFactory}
+import org.mbari.annosaurus.repository.jpa.entity.extensions.*
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
@@ -65,19 +66,19 @@ class CachedAncillaryDatumControllerSpec extends AnyFlatSpec with Matchers with 
 
   "CacheAncillaryDatumController" should "create" in {
     val im  = imagedMoments.head
-    val cad = exec(() => controller.create(im.uuid, 36.3, -122.345, 1078))
+    val cad = exec(() => controller.create(im.getUuid, 36.3, -122.345, 1078))
     cad should not be (null)
-    cad.uuid should not be (null)
-    cad.imagedMoment.uuid should be(im.uuid)
-    cad.depthMeters should not be None
-    cad.depthMeters.get should be(1078)
+    cad.getUuid() should not be (null)
+    cad.getImagedMoment().getUuid() should be(im.getUuid())
+
+    cad.getDepthMeters() should be(1078)
     cad.lastUpdated should not be None
   }
 
   it should "bulk create datums" in {
     val cads = imagedMoments.map(i => {
       CachedAncillaryDatum(
-        imagedMomentUuid = Some(i.uuid),
+        imagedMomentUuid = Some(i.getUuid()),
         latitude = Some(math.random() * 90),
         longitude = Some(math.random() * 180),
         depthMeters = Some(1000)
@@ -87,19 +88,18 @@ class CachedAncillaryDatumControllerSpec extends AnyFlatSpec with Matchers with 
     exec(() => controller.bulkCreateOrUpdate(cads))
 
     imagedMoments.foreach(im => {
-      val maybeMoment = exec(() => imagedMomentController.findByUUID(im.uuid))
+      val maybeMoment = exec(() => imagedMomentController.findByUUID(im.getUuid()))
       maybeMoment should not be None
       val i = maybeMoment.get
-      i.ancillaryDatum.depthMeters should not be None
-      i.ancillaryDatum.depthMeters.get should be(1000)
-      i.ancillaryDatum.lastUpdated should not be None
+      i.getAncillaryDatum().getDepthMeters() should be(1000)
+      i.getAncillaryDatum().lastUpdated should not be None
     })
   }
 
   it should "merge" in {
 
     // --- Remove
-    val minEpochMillis = imagedMoments.map(_.recordedDate.toEpochMilli).min
+    val minEpochMillis = imagedMoments.map(_.getRecordedDate.toEpochMilli).min
 
     val cads = imagedMoments
       .zipWithIndex
@@ -112,7 +112,7 @@ class CachedAncillaryDatumControllerSpec extends AnyFlatSpec with Matchers with 
             latitude = Some(90),
             longitude = Some(180),
             depthMeters = Some(2000),
-            imagedMomentUuid = Some(im.uuid),
+            imagedMomentUuid = Some(im.getUuid()),
             lightTransmission = Some(50),
             temperatureCelsius = Some(4),
             salinity = Some(33.5f),
@@ -124,17 +124,15 @@ class CachedAncillaryDatumControllerSpec extends AnyFlatSpec with Matchers with 
     exec(() => controller.merge(cads, videoReferenceUuid, Duration.ofMillis(15000)))
 
     imagedMoments.foreach(im => {
-      val maybeMoment = exec(() => imagedMomentController.findByUUID(im.uuid))
+      val maybeMoment = exec(() => imagedMomentController.findByUUID(im.getUuid()))
       maybeMoment should not be None
       val i  = maybeMoment.get
-      val ad = i.ancillaryDatum
+      val ad = i.getAncillaryDatum()
 //      println(im.recordedDate)
-      ad.depthMeters should not be None
-      ad.depthMeters.get should be(2000)
-      ad.salinity should not be None
-      ad.salinity.get should be(33.5f)
-      ad.lightTransmission should not be None
-      ad.lightTransmission.get should be(50)
+
+      ad.getDepthMeters() should be(2000)
+      ad.getSalinity() should be(33.5f)
+      ad.getLightTransmission() should be(50)
     })
 
   }

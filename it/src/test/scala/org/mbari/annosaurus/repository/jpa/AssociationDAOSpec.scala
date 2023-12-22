@@ -47,14 +47,14 @@ class AssociationDAOSpec extends AnyFlatSpec with Matchers with BeforeAndAfterAl
   private[this] val videoReferenceUUID = UUID.randomUUID()
   private[this] val now                = Instant.now()
   private[this] val imagedMoment0 =
-    ImagedMomentEntity(Some(videoReferenceUUID), Some(now), elapsedTime = Some(Duration.ofMinutes(1)))
+    ImagedMomentEntity(videoReferenceUUID, now, null, Duration.ofMinutes(1))
   private[this] val concept = "Grimpoteuthis"
   private[this] val observation0 =
-    ObservationEntity(concept, observationDate = Some(now), observer = Some("brian"))
+    ObservationEntity(concept, "brian")
   private[this] val association0 =
-    AssociationEntity("surface-color", AssociationEntity.ToConceptSelf, "red")
+    AssociationEntity("surface-color", AssociationEntity.TO_CONCEPT_SELF, "red")
   private[this] val association1 =
-    AssociationEntity("image-quality", AssociationEntity.ToConceptSelf, "mega-awesome!!")
+    AssociationEntity("image-quality", AssociationEntity.TO_CONCEPT_SELF, "mega-awesome!!")
 
   private type ADAO = AssociationDAO[AssociationEntity]
   def run[R](fn: ADAO => R): R = Await.result(dao.runTransaction(fn), timeout)
@@ -63,7 +63,7 @@ class AssociationDAOSpec extends AnyFlatSpec with Matchers with BeforeAndAfterAl
     imagedMoment0.addObservation(observation0)
     observation0.addAssociation(association0)
     run(_.create(association0))
-    association0.uuid should not be null
+    association0.getUuid() should not be null
 
     observation0.addAssociation(association1)
     run(_.create(association0))
@@ -71,23 +71,23 @@ class AssociationDAOSpec extends AnyFlatSpec with Matchers with BeforeAndAfterAl
 
   it should "update" in {
     run(d => {
-      val ass = d.findByUUID(association0.uuid)
+      val ass = d.findByUUID(association0.getUuid())
       ass shouldBe defined
-      ass.get.linkValue = "blue"
+      ass.get.setLinkValue("blue")
     })
 
-    val ass = run(_.findByUUID(association0.uuid)).head
-    ass.linkValue should be("blue")
+    val ass = run(_.findByUUID(association0.getUuid())).head
+    ass.getLinkValue() should be("blue")
   }
 
   it should "findByUUID" in {
-    val ass = run(_.findByUUID(association0.uuid))
+    val ass = run(_.findByUUID(association0.getUuid()))
     ass shouldBe defined
   }
 
   it should "findAll" in {
     val ass = run(_.findAll())
-      .filter(_.observation.uuid == observation0.uuid)
+      .filter(_.getObservation().getUuid() == observation0.getUuid())
 
     ass.size should be(2)
   }
@@ -131,10 +131,10 @@ class AssociationDAOSpec extends AnyFlatSpec with Matchers with BeforeAndAfterAl
 
   it should "delete" in {
     val ass = run(_.findAll())
-      .filter(_.uuid == association1.uuid)
+      .filter(_.getUuid() == association1.getUuid())
     run(d => ass.foreach(d.delete))
 
-    val assCheck = run(_.findAll()).filter(_.uuid == association1.uuid)
+    val assCheck = run(_.findAll()).filter(_.getUuid() == association1.getUuid())
     assCheck shouldBe empty
   }
 

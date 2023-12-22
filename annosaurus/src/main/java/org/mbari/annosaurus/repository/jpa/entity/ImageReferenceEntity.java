@@ -120,6 +120,10 @@ public class ImageReferenceEntity implements IPersistentObject {
     public ImageReferenceEntity() {
     }
 
+    public ImageReferenceEntity(URL url) {
+        this.url = url;
+    }
+
     public ImageReferenceEntity(URL url, Integer height, Integer width, String forma, String description) {
         this.url = url;
         this.description = description;

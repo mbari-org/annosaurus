@@ -17,6 +17,7 @@
 package org.mbari.annosaurus.domain
 
 import org.mbari.annosaurus.etc.circe.CirceCodecs.{*, given}
+import scala.jdk.CollectionConverters.*
 
 class AnnotationSuite extends munit.FunSuite {
 
@@ -53,15 +54,15 @@ class AnnotationSuite extends munit.FunSuite {
 
     test("camelCase/Entity round trip") {
         val e1 = Annotation.toEntities(Seq(cc1), true).head
-        val cc2 = Annotation.from(e1.observations.head, true)
+        val cc2 = Annotation.from(e1.getObservations().asScala.head, true)
         val e2 = Annotation.toEntities(Seq(cc2), true).head
         assertEquals(cc2, cc1)
-        assertEquals(e2.elapsedTime, e1.elapsedTime)
-        assertEquals(e2.timecode.toString(), e1.timecode.toString())
-        assertEquals(e2.recordedDate, e1.recordedDate)
-        assertEquals(e2.videoReferenceUUID, e1.videoReferenceUUID)
-        assertEquals(e2.uuid, e1.uuid)
-        assertEquals(e2.observations.size, e1.observations.size)
+        assertEquals(e2.getElapsedTime(), e1.getElapsedTime())
+        assertEquals(e2.getTimecode().toString(), e1.getTimecode().toString())
+        assertEquals(e2.getRecordedDate(), e1.getRecordedDate())
+        assertEquals(e2.getVideoReferenceUuid(), e1.getVideoReferenceUuid())
+        assertEquals(e2.getUuid(), e1.getUuid())
+        assertEquals(e2.getObservations().size, e1.getObservations().size)
 
     }
 

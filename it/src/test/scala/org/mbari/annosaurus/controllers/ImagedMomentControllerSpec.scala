@@ -28,11 +28,11 @@ import java.net.URL
 import java.time.{Duration, Instant}
 import java.util.UUID
 import java.util.concurrent.TimeUnit
-import scala.collection.JavaConverters.*
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.Duration as SDuration
 import scala.concurrent.{Await, Future}
 import scala.util.Random
+import scala.jdk.CollectionConverters.*
 
 class ImagedMomentControllerSpec extends AnyFlatSpec with Matchers with BeforeAndAfterAll {
 
@@ -50,10 +50,10 @@ class ImagedMomentControllerSpec extends AnyFlatSpec with Matchers with BeforeAn
 
   "ImagedMomentController" should "create by recorded timestamp" in {
     val a = exec(() => controller.create(videoReferenceUuid, recordedDate = Some(recordedDate)))
-    a.recordedDate should be(recordedDate)
-    a.timecode should be(null)
-    a.elapsedTime should be(null)
-    a.videoReferenceUUID should be(videoReferenceUuid)
+    a.getRecordedDate() should be(recordedDate)
+    a.getTimecode() should be(null)
+    a.getElapsedTime() should be(null)
+    a.getVideoReferenceUuid() should be(videoReferenceUuid)
   }
 
   it should "find by videoReferenceUuid and recordedDate" in {
@@ -70,7 +70,7 @@ class ImagedMomentControllerSpec extends AnyFlatSpec with Matchers with BeforeAn
     val now = Instant.parse("2007-01-02T00:12:34.3456Z")
     val a   = exec(() => controller.create(videoReferenceUuid, recordedDate = Some(now)))
     val b   = exec(() => controller.create(videoReferenceUuid, recordedDate = Some(now)))
-    a.uuid should be(b.uuid)
+    a.getUuid() should be(b.getUuid())
   }
 
   it should "create one imagedmoment if multiple creates use the same recordedDate parsed from a string" in {
@@ -85,7 +85,7 @@ class ImagedMomentControllerSpec extends AnyFlatSpec with Matchers with BeforeAn
 
     val a = exec(create)
     val b = exec(create)
-    a.uuid should be(b.uuid)
+    a.getUuid() should be(b.getUuid())
   }
 
   it should "fail if trying to insert the same URL more than once" in {
@@ -100,7 +100,7 @@ class ImagedMomentControllerSpec extends AnyFlatSpec with Matchers with BeforeAn
           concept = "URL Test" + i,
           recordedTimestamp = Instant.now().plus(Duration.ofSeconds(Random.nextInt()))
         )
-        source.imageReferences.foreach(_.url = url)
+        source.getImageReferences().stream.forEach(_.setUrl(url))
         exec(() => dao.runTransaction(d => controller.create(d, source)))
       }
     }
@@ -134,8 +134,9 @@ class ImagedMomentControllerSpec extends AnyFlatSpec with Matchers with BeforeAn
     val newImagedMoment = controller.create(imDao, imagedMoment)
     //print(newImagedMoment)
     checkUuids(newImagedMoment)
-    newImagedMoment.observations.size should be(1)
-    newImagedMoment.observations.head.associations.size should be(1)
+    newImagedMoment.getObservations.size should be(1)
+    newImagedMoment.getObservations().asScala.head.getUuid should not be null
+    newImagedMoment.getObservations().asScala.head.getAssociations.size should be(1)
   }
 
   it should "create multiple imagedmoments" in {
@@ -187,24 +188,24 @@ class ImagedMomentControllerSpec extends AnyFlatSpec with Matchers with BeforeAn
   }
 
   private def checkUuids(imagedMoment: ImagedMomentEntity): Unit = {
-    imagedMoment.uuid should not be null
-    for (obs <- imagedMoment.observations) {
-      obs.uuid should not be null
-      for (ass <- obs.associations) {
-        ass.uuid should not be null
+    imagedMoment.getUuid() should not be null
+    for (obs <- imagedMoment.getObservations().asScala) {
+      obs.getUuid() should not be null
+      for (ass <- obs.getAssociations().asScala) {
+        ass.getUuid() should not be null
       }
     }
-    for (ir <- imagedMoment.imageReferences) {
-      ir.uuid should not be null
+    for (ir <- imagedMoment.getImageReferences().asScala) {
+      ir.getUuid() should not be null
     }
-    Option(imagedMoment.ancillaryDatum).foreach(ad => ad.uuid should not be null)
+    Option(imagedMoment.getAncillaryDatum()).foreach(ad => ad.getUuid() should not be null)
   }
 
   it should "create one imagedmoment if multiple creates use the same elasped_time" in {
     val elapsedTime = Duration.ofMillis(123456)
     val a           = exec(() => controller.create(videoReferenceUuid, elapsedTime = Some(elapsedTime)))
     val b           = exec(() => controller.create(videoReferenceUuid, elapsedTime = Some(elapsedTime)))
-    a.uuid should be(b.uuid)
+    a.getUuid() should be(b.getUuid())
   }
 
   it should "stream/find video_reference_uuids modified between dates" in {
@@ -226,8 +227,8 @@ class ImagedMomentControllerSpec extends AnyFlatSpec with Matchers with BeforeAn
     exec(() => dao.runTransaction(d => imagedMoments.foreach(i => d.create(i))))
     dao.close()
     val n = exec(() => controller.countByVideoReferenceUUIDWithImages(videoReferenceUuid))
-    imagedMoments(0).imageReferences.size should be (4)
-    imagedMoments(1).imageReferences.size should be (2)
+    imagedMoments(0).getImageReferences.size should be (4)
+    imagedMoments(1).getImageReferences.size should be (2)
     n should be (2)
   }
 

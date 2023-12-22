@@ -167,10 +167,10 @@ class ZeroMQPublisherSpec extends AnyFlatSpec with Matchers with BeforeAndAfterA
     Thread.sleep(200) // Give the thread above time to get set up.
 
     // Publish association
-    val observation = ObservationEntity("foo")
-    observation.uuid = UUID.randomUUID()
+    val observation = ObservationEntity("foo", "bar")
+    observation.setUuid(UUID.randomUUID())
     val association = AssociationEntity("test", "self", "foo", "text/plain")
-    association.uuid = UUID.randomUUID()
+    association.setUuid(UUID.randomUUID())
     observation.addAssociation(association)
     val assoc = Association.from(association, true)
     val thread = new Thread(() =>

@@ -41,10 +41,10 @@ class AssociationSuite extends munit.FunSuite {
         val e2 = cc2.toEntity
         assertEquals(cc2, cc1)
 //        assertEquals(e1, e2)
-        assertEquals(e2.linkName, cc1.linkName)
-        assertEquals(e2.toConcept, cc1.toConcept)
-        assertEquals(e2.linkValue, cc1.linkValue)
-        assertEquals(e2.uuid, cc1.uuid.get)
+        assertEquals(e2.getLinkName(), cc1.linkName)
+        assertEquals(e2.getToConcept(), cc1.toConcept)
+        assertEquals(e2.getLinkValue(), cc1.linkValue)
+        assertEquals(e2.getUuid(), cc1.uuid.get)
     }
 
 }

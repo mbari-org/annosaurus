@@ -45,13 +45,13 @@ class ObservationSuite extends munit.FunSuite {
         val cc2 = Observation.from(e1)
         val e2 = cc2.toEntity
         assertEquals(cc2, cc1)
-        assertEquals(e2.concept, cc1.concept)
-        assertEquals(e2.duration.toMillis, cc1.durationMillis.get)
-        assertEquals(e2.group, cc1.group.get)
-        assertEquals(e2.activity, cc1.activity.get)
-        assertEquals(e2.observer, cc1.observer.get)
-        assertEquals(e2.uuid, cc1.uuid.get)
-        assertEquals(e2.associations.size, 1)
+        assertEquals(e2.getConcept(), cc1.concept)
+        assertEquals(e2.getDuration().toMillis, cc1.durationMillis.get)
+        assertEquals(e2.getGroup(), cc1.group.get)
+        assertEquals(e2.getActivity(), cc1.activity.get)
+        assertEquals(e2.getObserver(), cc1.observer.get)
+        assertEquals(e2.getUuid(), cc1.uuid.get)
+        assertEquals(e2.getAssociations().size, 1)
         assertEquals(cc2.associations.size, 1)
     }
 

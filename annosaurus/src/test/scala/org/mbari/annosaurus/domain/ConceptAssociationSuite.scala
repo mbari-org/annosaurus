@@ -15,13 +15,14 @@
  */
 
 package org.mbari.annosaurus.domain
+import scala.jdk.CollectionConverters.*
 
 class ConceptAssociationSuite extends munit.FunSuite {
 
 
     val cc1 = ConceptAssociation.from(DomainObjects.imagedMoment.toEntity
-            .observations.head
-            .associations.head)
+            .getObservations.asScala.head
+            .getAssociations.asScala.head)
 
     test("camelCase/snake_case round trip") {
 

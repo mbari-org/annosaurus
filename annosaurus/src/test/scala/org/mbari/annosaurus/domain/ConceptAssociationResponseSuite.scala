@@ -17,12 +17,13 @@
 package org.mbari.annosaurus.domain
 
 import java.util.UUID
+import scala.jdk.CollectionConverters.*
 
 class ConceptAssociationResponseSuite extends munit.FunSuite {
   
     val ca = ConceptAssociation.from(DomainObjects.imagedMoment.toEntity
-            .observations.head
-            .associations.head)
+            .getObservations.asScala.head
+            .getAssociations.asScala.head)
     val cc1 = ConceptAssociationResponse(
         ConceptAssociationRequest(Seq(UUID.randomUUID(), UUID.randomUUID()), "bounding box"),
         Seq(ca)

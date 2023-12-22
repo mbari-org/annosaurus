@@ -46,11 +46,12 @@ class ImagedMomentDAOSpec extends AnyFlatSpec with Matchers with BeforeAndAfterA
   private[this] val videoReferenceUUID = UUID.randomUUID()
   private[this] val now                = Instant.now()
   private[this] val imagedMoment0 =
-    ImagedMomentEntity(Some(videoReferenceUUID), Some(now), elapsedTime = Some(Duration.ofMinutes(1)))
+    ImagedMomentEntity(videoReferenceUUID, now, null, Duration.ofMinutes(1))
   private[this] val imagedMoment1 = ImagedMomentEntity(
-    Some(videoReferenceUUID),
-    Some(now.plusSeconds(60)),
-    elapsedTime = Some(Duration.ofMinutes(5))
+    videoReferenceUUID,
+    now.plusSeconds(60),
+    null,
+    Duration.ofMinutes(5)
   )
 
   private type IMDAO = ImagedMomentDAO[ImagedMomentEntity]
@@ -58,7 +59,7 @@ class ImagedMomentDAOSpec extends AnyFlatSpec with Matchers with BeforeAndAfterA
 
   "ImagedMomentDAOImpl" should "create" in {
     run(_.create(imagedMoment0))
-    imagedMoment0.uuid should not be null
+    imagedMoment0.getUuid() should not be null
 
     // --- Add a second
     run(_.create(imagedMoment1))
@@ -69,28 +70,28 @@ class ImagedMomentDAOSpec extends AnyFlatSpec with Matchers with BeforeAndAfterA
     run(d => {
       val im = d
         .findByVideoReferenceUUID(videoReferenceUUID)
-        .find(_.uuid == imagedMoment0.uuid)
+        .find(_.getUuid() == imagedMoment0.getUuid)
       im shouldBe defined
-      im.get.timecode = timecode
+      im.get.setTimecode(timecode)
     })
 
     val imagedMoment = run(_.findByVideoReferenceUUID(videoReferenceUUID))
-      .find(_.uuid == imagedMoment0.uuid)
+      .find(_.getUuid() == imagedMoment0.getUuid())
     imagedMoment should not be empty
-    imagedMoment.get.timecode should not be null
-    imagedMoment.get.timecode.toString should be(timecode.toString)
+    imagedMoment.get.getTimecode() should not be null
+    imagedMoment.get.getTimecode().toString should be(timecode.toString)
   }
 
   it should "findByUUID" in {
-    val im = run(_.findByUUID(imagedMoment0.uuid))
+    val im = run(_.findByUUID(imagedMoment0.getUuid()))
     im shouldBe defined
   }
 
   it should "findByVideoReferenceUUIDAndElapsedTime" in {
     val im = run(
       _.findByVideoReferenceUUIDAndElapsedTime(
-        imagedMoment0.videoReferenceUUID,
-        imagedMoment0.elapsedTime
+        imagedMoment0.getVideoReferenceUuid(),
+        imagedMoment0.getElapsedTime()
       )
     )
     im shouldBe defined
@@ -99,8 +100,8 @@ class ImagedMomentDAOSpec extends AnyFlatSpec with Matchers with BeforeAndAfterA
   it should "findByVideoReferenceUUIDAndRecordedDate" in {
     val im = run(
       _.findByVideoReferenceUUIDAndRecordedDate(
-        imagedMoment0.videoReferenceUUID,
-        imagedMoment0.recordedDate
+        imagedMoment0.getVideoReferenceUuid(),
+        imagedMoment0.getRecordedDate()
       )
     )
     im shouldBe defined
@@ -110,14 +111,14 @@ class ImagedMomentDAOSpec extends AnyFlatSpec with Matchers with BeforeAndAfterA
     val im0 = run(
       _.findByVideoReferenceUUIDAndIndex(
         videoReferenceUUID,
-        elapsedTime = Option(imagedMoment0.elapsedTime)
+        elapsedTime = Option(imagedMoment0.getElapsedTime())
       )
     )
     im0 shouldBe defined
     val im1 = run(
       _.findByVideoReferenceUUIDAndIndex(
         videoReferenceUUID,
-        recordedDate = Option(imagedMoment0.recordedDate)
+        recordedDate = Option(imagedMoment0.getRecordedDate())
       )
     )
     im1 shouldBe defined
@@ -125,7 +126,7 @@ class ImagedMomentDAOSpec extends AnyFlatSpec with Matchers with BeforeAndAfterA
 
   it should "findByWindowRequest" in {
     val windowRequest =
-      WindowRequest(Seq(videoReferenceUUID), imagedMoment0.uuid, Duration.ofSeconds(61).toMillis())
+      WindowRequest(Seq(videoReferenceUUID), imagedMoment0.getUuid(), Duration.ofSeconds(61).toMillis())
     val im0 = run(_.findByWindowRequest(windowRequest))
     im0.size should be >= 2
   }
@@ -139,14 +140,14 @@ class ImagedMomentDAOSpec extends AnyFlatSpec with Matchers with BeforeAndAfterA
 
   it should "deleteByUUID" in {
     run(_.delete(imagedMoment0))
-    val im = run(_.findByUUID(imagedMoment0.uuid))
+    val im = run(_.findByUUID(imagedMoment0.getUuid()))
     im shouldBe empty
   }
 
   it should "delete" in {
-    val im = run(_.findAll()).filter(_.uuid == imagedMoment1.uuid)
+    val im = run(_.findAll()).filter(_.getUuid() == imagedMoment1.getUuid())
     run(d => im.foreach(d.delete))
-    val imCheck = run(_.findAll()).filter(_.uuid == imagedMoment1.uuid)
+    val imCheck = run(_.findAll()).filter(_.getUuid == imagedMoment1.getUuid)
     imCheck shouldBe empty
   }
 

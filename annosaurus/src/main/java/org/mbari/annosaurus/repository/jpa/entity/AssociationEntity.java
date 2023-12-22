@@ -150,6 +150,12 @@ public class AssociationEntity implements IPersistentObject {
         this.mimeType = mimeType;
     }
 
+    public AssociationEntity(String linkName, String toConcept, String linkValue) {
+        this.linkName = linkName;
+        this.toConcept = toConcept;
+        this.linkValue = linkValue;
+    }
+
     public AssociationEntity(AssociationEntity that) {
         this.linkName = that.linkName;
         this.toConcept = that.toConcept;

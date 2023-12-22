@@ -45,13 +45,13 @@ class ObservationDAOSpec extends AnyFlatSpec with Matchers with BeforeAndAfterAl
   private[this] val videoReferenceUUID = UUID.randomUUID()
   private[this] val now                = Instant.now()
   private[this] val imagedMoment0 =
-    ImagedMomentEntity(Some(videoReferenceUUID), Some(now), elapsedTime = Some(Duration.ofMinutes(1)))
+    ImagedMomentEntity(videoReferenceUUID, now, null, Duration.ofMinutes(1))
   private[this] val concept = "Grimpoteuthis"
   val newConcept            = "Aegina"
   private[this] val observation0 =
-    ObservationEntity(concept, observationDate = Some(now), observer = Some("brian"))
+    ObservationEntity(concept, "brian")
   private[this] val observation1 =
-    ObservationEntity(concept, observationDate = Some(now), observer = Some("kyra"))
+    ObservationEntity(concept, "kyra")
 
   private type ODAO = ObservationDAO[ObservationEntity]
   def run[R](fn: ODAO => R): R = Await.result(dao.runTransaction(fn), timeout)
@@ -59,7 +59,7 @@ class ObservationDAOSpec extends AnyFlatSpec with Matchers with BeforeAndAfterAl
   "ObservationDAOImpl" should "create" in {
     imagedMoment0.addObservation(observation0)
     run(_.create(observation0))
-    observation0.uuid should not be null
+    observation0.getUuid() should not be null
 
     // -- Add a second
     imagedMoment0.addObservation(observation1)
@@ -70,20 +70,20 @@ class ObservationDAOSpec extends AnyFlatSpec with Matchers with BeforeAndAfterAl
 
     val duration = Duration.ofMillis(1234)
     run(d => {
-      val obs = d.findByUUID(observation0.uuid)
+      val obs = d.findByUUID(observation0.getUuid())
       obs shouldBe defined
-      obs.get.concept = newConcept
-      obs.get.duration = duration
+      obs.get.setConcept(newConcept)
+      obs.get.setDuration(duration)
     })
 
-    val obs = run(_.findByUUID(observation0.uuid)).head
-    obs.concept should be(newConcept)
-    obs.duration should be(duration)
+    val obs = run(_.findByUUID(observation0.getUuid())).head
+    obs.getConcept() should be(newConcept)
+    obs.getDuration() should be(duration)
 
   }
 
   it should "findByUUID" in {
-    val obs = run(_.findByUUID(observation0.uuid))
+    val obs = run(_.findByUUID(observation0.getUuid()))
     obs shouldBe defined
   }
 
@@ -98,25 +98,25 @@ class ObservationDAOSpec extends AnyFlatSpec with Matchers with BeforeAndAfterAl
   }
 
   it should "findAllNamesByVideoReferenceUUID" in {
-    val names = run(_.findAllConceptsByVideoReferenceUUID(imagedMoment0.videoReferenceUUID))
+    val names = run(_.findAllConceptsByVideoReferenceUUID(imagedMoment0.getVideoReferenceUuid()))
     names should contain allOf (concept, newConcept)
   }
 
   it should "countByVideoReferenceUUID" in {
-    val count = run(_.countByVideoReferenceUUID(imagedMoment0.videoReferenceUUID))
+    val count = run(_.countByVideoReferenceUUID(imagedMoment0.getVideoReferenceUuid()))
     count should be >= 2
   }
 
   it should "deleteByUUID" in {
-    run(_.deleteByUUID(observation0.uuid))
-    val obs = run(_.findByUUID(observation0.uuid))
+    run(_.deleteByUUID(observation0.getUuid()))
+    val obs = run(_.findByUUID(observation0.getUuid()))
     obs shouldBe empty
   }
 
   it should "delete" in {
-    val obs = run(_.findAll()).filter(_.uuid == observation1.uuid)
+    val obs = run(_.findAll()).filter(_.getUuid() == observation1.getUuid())
     run(d => obs.foreach(d.delete))
-    val obsCheck = run(_.findAll()).filter(_.uuid == observation1.uuid)
+    val obsCheck = run(_.findAll()).filter(_.getUuid() == observation1.getUuid())
     obsCheck shouldBe empty
   }
 
