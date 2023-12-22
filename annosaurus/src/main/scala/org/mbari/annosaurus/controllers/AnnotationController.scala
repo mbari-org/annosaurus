@@ -36,6 +36,7 @@ import org.mbari.annosaurus.repository.jpa.entity.ObservationEntity
 import org.mbari.annosaurus.domain.Annotation
 import org.mbari.annosaurus.repository.ObservationDAO
 import org.mbari.annosaurus.etc.jdk.Logging.given
+import scala.jdk.CollectionConverters.*
 
 /** @author
   *   Brian Schlining
@@ -190,7 +191,7 @@ class AnnotationController(val daoFactory: JPADAOFactory, bus: Subject[Any] = Me
         f.onComplete(t => imDao.close())
         f.map {
             case None     => Nil
-            case Some(im) => im.observations
+            case Some(im) => im.getObservations.asScala
         }.map(obs => obs.map(Annotation.from(_)))
     }
 
@@ -416,7 +417,7 @@ class AnnotationController(val daoFactory: JPADAOFactory, bus: Subject[Any] = Me
             val dao1 = daoFactory.newObservationDAO()
             val ff   =
                 dao1.runTransaction(d =>
-                    obs.flatMap(o => d.findByUUID(o.uuid).map(Annotation.from(_, true)))
+                    obs.flatMap(o => d.findByUUID(o.getUuid).map(Annotation.from(_, true)))
                 )
             ff.onComplete(_ => dao1.close())
             ff.foreach(annotationPublisher.publish)
@@ -443,7 +444,7 @@ class AnnotationController(val daoFactory: JPADAOFactory, bus: Subject[Any] = Me
                 val dao1 = daoFactory.newObservationDAO()
                 val ff   =
                     dao1.runTransaction(d =>
-                        obs.flatMap(o => d.findByUUID(o.uuid).map(Annotation.from(_, true)))
+                        obs.flatMap(o => d.findByUUID(o.getUuid).map(Annotation.from(_, true)))
                     )
                 ff.onComplete(_ => dao1.close())
                 ff
@@ -470,21 +471,21 @@ class AnnotationController(val daoFactory: JPADAOFactory, bus: Subject[Any] = Me
         obsDao
             .findByUUID(uuid)
             .map(observation => {
-                val imagedMoment        = observation.imagedMoment
-                val timecodeOpt         = Option(imagedMoment.timecode)
-                val currentTimestampOpt = Option(imagedMoment.recordedDate)
+                val imagedMoment        = observation.getImagedMoment
+                val timecodeOpt         = Option(imagedMoment.getTimecode)
+                val currentTimestampOpt = Option(imagedMoment.getRecordedDate)
                 // MUST have a timecode!! This method is for tape annotations
                 if (timecodeOpt.isEmpty) Nil
                 else if (recordedTimestampOpt.isEmpty && currentTimestampOpt.isDefined) {
-                    imagedMoment.recordedDate = null
-                    imagedMoment.observations.toSeq
+                    imagedMoment.setRecordedDate(null)
+                    imagedMoment.getObservations.asScala.toSeq
                 }
                 else if (
                     recordedTimestampOpt.isDefined
                     && (currentTimestampOpt.isEmpty || currentTimestampOpt.get != recordedTimestampOpt.get)
                 ) {
-                    imagedMoment.recordedDate = recordedTimestampOpt.get
-                    imagedMoment.observations.toSeq
+                    recordedTimestampOpt.foreach(imagedMoment.setRecordedDate)
+                    imagedMoment.getObservations.asScala.toSeq
                 }
                 else Nil
             })
@@ -527,34 +528,36 @@ class AnnotationController(val daoFactory: JPADAOFactory, bus: Subject[Any] = Me
         val observation = obsDao.findByUUID(uuid)
         observation.map(obs => {
 
+            val imagedMoment = obs.getImagedMoment
+
             val vrChanged = videoReferenceUUID.isDefined &&
-                videoReferenceUUID.get != obs.imagedMoment.videoReferenceUUID
+                videoReferenceUUID.get != imagedMoment.getVideoReferenceUuid
 
             val tcChanged = timecode.isDefined &&
-                timecode.get != obs.imagedMoment.timecode
+                timecode.get != imagedMoment.getTimecode
 
             val etChanged = elapsedTime.isDefined &&
-                elapsedTime.get != obs.imagedMoment.elapsedTime
+                elapsedTime.get != imagedMoment.getElapsedTime
 
             val rdChanged = recordedDate.isDefined &&
-                recordedDate.get != obs.imagedMoment.recordedDate
+                recordedDate.get != imagedMoment.getRecordedDate
 
             if (vrChanged || tcChanged || etChanged || rdChanged) {
-                val vrUUID = videoReferenceUUID.getOrElse(obs.imagedMoment.videoReferenceUUID)
-                val tc     = Option(timecode.getOrElse(obs.imagedMoment.timecode))
-                val rd     = Option(recordedDate.getOrElse(obs.imagedMoment.recordedDate))
-                val et     = Option(elapsedTime.getOrElse(obs.imagedMoment.elapsedTime))
+                val vrUUID = videoReferenceUUID.getOrElse(imagedMoment.getVideoReferenceUuid)
+                val tc     = Option(timecode.getOrElse(imagedMoment.getTimecode))
+                val rd     = Option(recordedDate.getOrElse(imagedMoment.getRecordedDate))
+                val et     = Option(elapsedTime.getOrElse(imagedMoment.getElapsedTime))
                 val newIm  =
                     ImagedMomentController.findOrCreateImagedMoment(imDao, vrUUID, tc, rd, et)
-                obsDao.changeImageMoment(newIm.uuid, obs.uuid)
+                obsDao.changeImageMoment(newIm.getUuid, obs.getUuid)
             }
 
-            concept.foreach(obs.concept = _)
-            observer.foreach(obs.observer = _)
-            duration.foreach(obs.duration = _)
-            group.foreach(obs.group = _)
-            activity.foreach(obs.activity = _)
-            obs.observationDate = observationDate
+            concept.foreach(obs.setConcept)
+            observer.foreach(obs.setObserver)
+            duration.foreach(obs.setDuration)
+            group.foreach(obs.setGroup)
+            activity.foreach(obs.setActivity)
+            obs.setObservationDate(observationDate)
             obs
         })
     }
@@ -566,9 +569,9 @@ class AnnotationController(val daoFactory: JPADAOFactory, bus: Subject[Any] = Me
             d.findByUUID(uuid) match {
                 case None    => false
                 case Some(v) =>
-                    val imagedMoment = v.imagedMoment
+                    val imagedMoment = v.getImagedMoment
                     if (
-                        imagedMoment.observations.size == 1 && imagedMoment.imageReferences.isEmpty
+                        imagedMoment.getObservations.size == 1 && imagedMoment.getImageReferences.isEmpty
                     ) {
                         imDao.delete(imagedMoment)
                     }

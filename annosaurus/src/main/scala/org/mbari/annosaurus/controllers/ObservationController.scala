@@ -59,9 +59,15 @@ class ObservationController(
                         s"ImagedMoment with UUID of $imagedMomentUUID not found"
                     )
                 case Some(imagedMoment) =>
-                    val observation =
-                        dao.newPersistentObject(concept, observer, observationDate, group, duration)
-                    observation.imagedMoment = imagedMoment
+                    val observation = new ObservationEntity(
+                        concept,
+                        duration.orNull,
+                        observationDate,
+                        observer,
+                        group.orNull,
+                        null
+                    )
+                    observation.setImagedMoment(imagedMoment)
                     annotationPublisher.publish(Observation.from(observation))
                     observation
             }
@@ -86,18 +92,18 @@ class ObservationController(
             val observation = dao.findByUUID(uuid)
 
             observation.map(obs => {
-                concept.foreach(obs.concept = _)
-                observer.foreach(obs.observer = _)
-                obs.observationDate = observationDate
-                duration.foreach(obs.duration = _)
-                group.foreach(obs.group = _)
-                activity.foreach(obs.activity = _)
+                concept.foreach(obs.setConcept)
+                observer.foreach(obs.setObserver)
+                obs.setObservationDate(observationDate)
+                duration.foreach(obs.setDuration)
+                group.foreach(obs.setGroup)
+                activity.foreach(obs.setActivity)
                 for {
                     imUUID <- imagedMomentUUID
                     imDao   = daoFactory.newImagedMomentDAO(dao)
                     newIm  <- imDao.findByUUID(imUUID)
                 } {
-                    obs.imagedMoment.removeObservation(obs)
+                    obs.getImagedMoment.removeObservation(obs)
                     newIm.addObservation(obs)
                 }
 
@@ -145,7 +151,7 @@ class ObservationController(
     )(implicit ec: ExecutionContext): Future[Option[ObservationEntity]] = {
         def fn(dao: ODAO): Option[ObservationEntity] = {
             val adao = daoFactory.newAssociationDAO(dao)
-            adao.findByUUID(uuid).map(_.observation)
+            adao.findByUUID(uuid).map(_.getObservation)
         }
         exec(fn)
     }
@@ -169,7 +175,7 @@ class ObservationController(
             dao
                 .findByUUID(uuid)
                 .map(obs => {
-                    obs.duration = null
+                    obs.setDuration(null)
                     obs
                 })
         exec(fn)
@@ -217,9 +223,9 @@ class ObservationController(
         dao.findByUUID(uuid) match {
             case None              => false
             case Some(observation) =>
-                val imagedMoment = observation.imagedMoment
+                val imagedMoment = observation.getImagedMoment
                 // If this is the only observation and there are no imagerefs, delete the imagemoment
-                if (imagedMoment.observations.size == 1 && imagedMoment.imageReferences.isEmpty) {
+                if (imagedMoment.getObservations.size == 1 && imagedMoment.getImageReferences.isEmpty) {
                     val imDao = daoFactory.newImagedMomentDAO(dao)
                     imDao.delete(imagedMoment)
                 }

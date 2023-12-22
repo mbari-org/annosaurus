@@ -44,12 +44,12 @@ class ObservationDAOImpl(entityManager: EntityManager)
         duration: Option[Duration] = None
     ): ObservationEntity = {
 
-        val observation = newPersistentObject()
-        observation.concept = concept
-        observation.observer = observer
-        observation.observationDate = observationDate
-        group.foreach(observation.group = _)
-        duration.foreach(observation.duration = _)
+        val observation = new ObservationEntity
+        observation.setConcept(concept)
+        observation.setObserver(observer)
+        observation.setObservationDate(observationDate)
+        group.foreach(observation.setGroup)
+        duration.foreach(observation.setDuration)
         observation
     }
 

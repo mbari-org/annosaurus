@@ -39,11 +39,12 @@ class ImageReferenceDAOImpl(entityManager: EntityManager)
         format: Option[String] = None
     ): ImageReferenceEntity = {
         val imageReference = newPersistentObject()
-        imageReference.url = url
-        description.foreach(imageReference.description = _)
-        heightPixels.foreach(imageReference.height = _)
-        widthPixels.foreach(imageReference.width = _)
-        format.foreach(imageReference.format = _)
+        imageReference.setUrl(url)
+        description.foreach(imageReference.setDescription)
+        heightPixels.foreach(imageReference.setHeight(_))
+        widthPixels.foreach(imageReference.setWidth(_))
+        format.foreach(imageReference.setFormat)
+
         imageReference
     }
 

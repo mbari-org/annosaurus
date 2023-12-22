@@ -188,10 +188,10 @@ public class ObservationEntity implements IPersistentObject {
     public ObservationEntity() {
     }
 
-    public ObservationEntity(String concept, Duration duration, Instant obserationTimestamp, String observer, String group, String activity) {
+    public ObservationEntity(String concept, Duration duration, Instant observationTimestamp, String observer, String group, String activity) {
         this.concept = concept;
         this.duration = duration;
-        this.observationDate = obserationTimestamp;
+        this.observationDate = observationTimestamp;
         this.observer = observer;
         this.group = group;
         this.activity = activity;

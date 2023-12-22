@@ -28,6 +28,7 @@ import scala.concurrent.{ExecutionContext, Future}
 import org.mbari.annosaurus.repository.jpa.JPADAOFactory
 import org.mbari.annosaurus.repository.jpa.entity.ImagedMomentEntity
 import org.mbari.annosaurus.repository.jpa.entity.ImageReferenceEntity
+import scala.jdk.CollectionConverters.*
 
 /** Created by brian on 7/14/16.
   */
@@ -49,7 +50,7 @@ class ImageController(daoFactory: JPADAOFactory) {
         val f   =
             dao.runTransaction(d =>
                 d.findByVideoReferenceUUID(videoReferenceUUID, limit, offset)
-                    .flatMap(_.imageReferences)
+                    .flatMap(_.getImageReferences.asScala)
                     .map(Image.from(_))
             ).map(_.toSeq)
         f.onComplete(t => dao.close())
@@ -102,7 +103,7 @@ class ImageController(daoFactory: JPADAOFactory) {
                     elapsedTime
                 )
             val imageReference = irDao.newPersistentObject(url, description, height, width, format)
-            imageReferenceUUID.foreach(uuid => imageReference.uuid = uuid)
+            imageReferenceUUID.foreach(imageReference.setUuid)
             irDao.create(imageReference)
             imagedMoment.addImageReference(imageReference)
             Image.from(imageReference)
@@ -146,7 +147,7 @@ class ImageController(daoFactory: JPADAOFactory) {
         val f = irDao.runTransaction(d => {
             val imageReference = d.findByUUID(uuid)
             imageReference.map(ir => {
-                val vrUUID = videoReferenceUUID.getOrElse(ir.imagedMoment.videoReferenceUUID)
+                val vrUUID = videoReferenceUUID.getOrElse(ir.getImagedMoment.getVideoReferenceUuid)
                 if (timecode.isDefined || elapsedTime.isDefined || recordedDate.isDefined) {
                     // change indices
                     val newIm = ImagedMomentController
@@ -160,20 +161,21 @@ class ImageController(daoFactory: JPADAOFactory) {
                     move(imDao, newIm, ir)
                 }
                 else if (videoReferenceUUID.isDefined) {
+                    val imagedMoment = ir.getImagedMoment
                     // move to new video-reference/imaged-moment using the existing images
-                    val tc    = Option(ir.imagedMoment.timecode)
-                    val rd    = Option(ir.imagedMoment.recordedDate)
-                    val et    = Option(ir.imagedMoment.elapsedTime)
+                    val tc    = Option(imagedMoment.getTimecode)
+                    val rd    = Option(imagedMoment.getRecordedDate)
+                    val et    = Option(imagedMoment.getElapsedTime)
                     val newIm =
                         ImagedMomentController.findOrCreateImagedMoment(imDao, vrUUID, tc, rd, et)
                     move(imDao, newIm, ir)
                 }
 
-                url.foreach(ir.url = _)
-                format.foreach(ir.format = _)
-                width.foreach(ir.width = _)
-                height.foreach(ir.height = _)
-                description.foreach(ir.description = _)
+                url.foreach(ir.setUrl)
+                format.foreach(ir.setFormat)
+                width.foreach(ir.setWidth(_))
+                height.foreach(ir.setHeight(_))
+                description.foreach(ir.setDescription)
                 Image.from(ir)
             })
         })
@@ -188,9 +190,9 @@ class ImageController(daoFactory: JPADAOFactory) {
             d.findByUUID(uuid) match {
                 case None                 => false
                 case Some(imageReference) =>
-                    val imagedMoment = imageReference.imagedMoment
+                    val imagedMoment = imageReference.getImagedMoment
                     if (
-                        imagedMoment.imageReferences.size == 1 && imagedMoment.observations.isEmpty
+                        imagedMoment.getImageReferences.size == 1 && imagedMoment.getObservations.isEmpty
                     ) {
                         val imDao = daoFactory.newImagedMomentDAO(d)
                         imDao.delete(imagedMoment)
@@ -210,9 +212,9 @@ class ImageController(daoFactory: JPADAOFactory) {
         newIm: ImagedMomentEntity,
         imageReference: ImageReferenceEntity
     ): Unit = {
-        val oldIm = imageReference.imagedMoment
-        if (!oldIm.uuid.equals(newIm.uuid)) {
-            val shouldDelete = oldIm.imageReferences.size == 1 && oldIm.observations.isEmpty
+        val oldIm = imageReference.getImagedMoment
+        if (!oldIm.getUuid.equals(newIm.getUuid)) {
+            val shouldDelete = oldIm.getImageReferences.size == 1 && oldIm.getObservations.isEmpty
             oldIm.removeImageReference(imageReference)
             newIm.addImageReference(imageReference)
             if (shouldDelete) {

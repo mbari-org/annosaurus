@@ -99,11 +99,11 @@ class CachedVideoReferenceInfoController(val daoFactory: JPADAOFactory)
     )(implicit ec: ExecutionContext): Future[CachedVideoReferenceInfoEntity] = {
 
         def fn(dao: VRDAO): CachedVideoReferenceInfoEntity = {
-            val v = dao.newPersistentObject()
-            v.videoReferenceUUID = videoReferenceUUID
-            v.platformName = platformName
-            v.missionId = missionID
-            missionContact.foreach(v.missionContact = _)
+            val v = new CachedVideoReferenceInfoEntity
+            v.setVideoReferenceUuid(videoReferenceUUID)
+            v.setPlatformName(platformName)
+            v.setMissionId(missionID)
+            missionContact.foreach(v.setMissionContact)
             dao.create(v)
             v
         }
@@ -121,10 +121,10 @@ class CachedVideoReferenceInfoController(val daoFactory: JPADAOFactory)
         def fn(dao: VRDAO): Option[CachedVideoReferenceInfoEntity] = dao.findByUUID(uuid) match {
             case None    => None
             case Some(v) =>
-                videoReferenceUUID.foreach(v.videoReferenceUUID = _)
-                platformName.foreach(v.platformName = _)
-                missionID.foreach(v.missionId = _)
-                missionContact.foreach(v.missionContact = _)
+                videoReferenceUUID.foreach(v.setVideoReferenceUuid)
+                platformName.foreach(v.setPlatformName)
+                missionID.foreach(v.setMissionId)
+                missionContact.foreach(v.setMissionContact)
                 Some(v)
         }
         exec(fn)

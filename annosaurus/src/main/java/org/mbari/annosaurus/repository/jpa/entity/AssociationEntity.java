@@ -103,6 +103,10 @@ import java.util.UUID;
 @org.hibernate.envers.Audited
 public class AssociationEntity implements IPersistentObject {
 
+    public static String TO_CONCEPT_SELF = "self";
+    public static String LINK_VALUE_NIL = "nil";
+    public static String LINK_VALUE_SELF = "self";
+
     @Id
     @Column(name = "uuid", nullable = false, updatable = false)
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -144,6 +148,14 @@ public class AssociationEntity implements IPersistentObject {
         this.toConcept = toConcept;
         this.linkValue = linkValue;
         this.mimeType = mimeType;
+    }
+
+    public AssociationEntity(AssociationEntity that) {
+        this.linkName = that.linkName;
+        this.toConcept = that.toConcept;
+        this.linkValue = that.linkValue;
+        this.mimeType = that.mimeType;
+        this.uuid = that.uuid;
     }
 
     @Override

@@ -42,10 +42,10 @@ class AssociationDAOImpl(entityManager: EntityManager)
         mimeType: Option[String]
     ): AssociationEntity = {
         val a = new AssociationEntity
-        a.linkName = linkName
-        toConcept.foreach(a.toConcept = _)
-        linkValue.foreach(a.linkValue = _)
-        mimeType.foreach(a.mimeType = _)
+        a.setLinkName(linkName)
+        toConcept.foreach(a.setToConcept)
+        linkValue.foreach(a.setLinkValue)
+        mimeType.foreach(a.setMimeType)
         a
     }
 
@@ -97,7 +97,7 @@ class AssociationDAOImpl(entityManager: EntityManager)
                         Option(obj(5).asInstanceOf[String])
                     )
 
-                    ass.uuid = UUID.fromString(obj(1).toString)
+                    ass.setUuid(UUID.fromString(obj(1).toString))
                     ass
                 }
             )

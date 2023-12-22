@@ -17,7 +17,8 @@
 package org.mbari.annosaurus.repository
 
 import java.util.UUID
-import org.mbari.annosaurus.PersistentObject
+
+import org.mbari.annosaurus.repository.jpa.entity.IPersistentObject
 
 /** Special DAO for fetching just the index information from the ImagedMomemnts
   *
@@ -25,7 +26,7 @@ import org.mbari.annosaurus.PersistentObject
   *   Brian Schlining
   * @since 2019-02-08T08:53:00
   */
-trait IndexDAO[T <: PersistentObject] extends DAO[T] {
+trait IndexDAO[T <: IPersistentObject] extends DAO[T] {
 
     def findByVideoReferenceUuid(
         videoReferenceUuid: UUID,

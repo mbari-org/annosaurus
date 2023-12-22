@@ -22,7 +22,7 @@ import java.util.function.Function
 import java.util.{stream, UUID}
 import jakarta.persistence.EntityManager
 
-import org.mbari.annosaurus.domain.WindowRequest
+import org.mbari.annosaurus.domain.{ImagedMoment, WindowRequest}
 import org.mbari.annosaurus.repository.ImagedMomentDAO
 import org.mbari.annosaurus.repository.jpa.entity.ImagedMomentEntity
 import org.mbari.vcr4j.time.Timecode
@@ -46,20 +46,20 @@ class ImagedMomentDAOImpl(entityManager: EntityManager)
         recordedDate: Option[Instant] = None
     ): ImagedMomentEntity = {
         val imagedMoment = new ImagedMomentEntity
-        imagedMoment.videoReferenceUUID = videoReferenceUUID
-        timecode.foreach(imagedMoment.timecode = _)
-        elapsedTime.foreach(imagedMoment.elapsedTime = _)
-        recordedDate.foreach(imagedMoment.recordedDate = _)
+        imagedMoment.setVideoReferenceUuid(videoReferenceUUID)
+        timecode.foreach(imagedMoment.setTimecode)
+        elapsedTime.foreach(imagedMoment.setElapsedTime)
+        recordedDate.foreach(imagedMoment.setRecordedDate)
         imagedMoment
     }
 
     override def newPersistentObject(imagedMoment: ImagedMomentEntity): ImagedMomentEntity =
-        ImagedMomentEntity.from(imagedMoment)
+        ImagedMoment.from(imagedMoment).toEntity
 
     def deleteIfEmptyByUUID(uuid: UUID): Boolean = {
         findByUUID(uuid).exists(imagedMoment => {
 
-            if (imagedMoment.imageReferences.isEmpty && imagedMoment.observations.isEmpty) {
+            if (imagedMoment.getImageReferences.isEmpty && imagedMoment.getObservations.isEmpty) {
                 delete(imagedMoment)
                 true
             }
@@ -309,7 +309,7 @@ class ImagedMomentDAOImpl(entityManager: EntityManager)
         findByUUID(windowRequest.imagedMomentUuid) match {
             case None     => Nil
             case Some(im) =>
-                Option(im.recordedDate) match {
+                Option(im.getRecordedDate) match {
                     case None               => Nil
                     case Some(recordedDate) =>
                         val start = recordedDate.minus(windowRequest.window)

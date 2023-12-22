@@ -74,7 +74,7 @@ class CachedAncillaryDatumController(val daoFactory: JPADAOFactory)
                         s"ImagedMoment with UUID of $imagedMomentUuid was no found"
                     )
                 case Some(imagedMoment) =>
-                    if (imagedMoment.ancillaryDatum != null) {
+                    if (imagedMoment.getAncillaryDatum != null) {
                         throw new RuntimeException(
                             s"ImagedMoment with UUID of $imagedMomentUuid already has ancillary data"
                         )
@@ -99,7 +99,7 @@ class CachedAncillaryDatumController(val daoFactory: JPADAOFactory)
                             theta,
                             psi
                         )
-                        imagedMoment.ancillaryDatum = cad
+                        imagedMoment.setAncillaryDatum(cad)
                         cad
                     }
             }
@@ -119,14 +119,14 @@ class CachedAncillaryDatumController(val daoFactory: JPADAOFactory)
                         s"ImagedMoment with UUID of $imagedMomentUuid was no found"
                     )
                 case Some(imagedMoment) =>
-                    if (imagedMoment.ancillaryDatum != null) {
+                    if (imagedMoment.getAncillaryDatum != null) {
                         throw new RuntimeException(
                             s"ImagedMoment with UUID of $imagedMomentUuid already has ancillary data"
                         )
                     }
                     else {
                         val entity = datum.toEntity
-                        imagedMoment.ancillaryDatum = entity
+                        imagedMoment.setAncillaryDatum(entity)
                         entity
                     }
             }
@@ -173,22 +173,23 @@ class CachedAncillaryDatumController(val daoFactory: JPADAOFactory)
             dao
                 .findByUUID(uuid)
                 .map(cad => {
-                    cad.latitude = latitude
-                    cad.longitude = longitude
-                    cad.depthMeters = depthMeters
-                    cad.altitude = altitude
-                    crs.foreach(cad.crs = _)
-                    cad.salinity = salinity
-                    cad.temperatureCelsius = temperatureCelsius
-                    cad.oxygenMlL = oxygenMlL
-                    cad.pressureDbar = pressureDbar
-                    cad.x = x
-                    cad.y = y
-                    cad.z = z
-                    posePositionUnits.foreach(cad.posePositionUnits = _)
-                    cad.phi = phi
-                    cad.theta = theta
-                    cad.psi = psi
+                    latitude.foreach(cad.setLatitude(_))
+                    longitude.foreach(cad.setLongitude(_))
+                    depthMeters.foreach(cad.setDepthMeters(_))
+                    altitude.foreach(cad.setAltitude(_))
+                    crs.foreach(cad.setCrs(_))
+                    salinity.foreach(cad.setSalinity(_))
+                    temperatureCelsius.foreach(cad.setTemperatureCelsius(_))
+                    oxygenMlL.foreach(cad.setOxygenMlL(_))
+                    pressureDbar.foreach(cad.setPressureDbar(_))
+                    lightTransmission.foreach(cad.setLightTransmission(_))
+                    x.foreach(cad.setX(_))
+                    y.foreach(cad.setY(_))
+                    z.foreach(cad.setZ(_))
+                    posePositionUnits.foreach(cad.setPosePositionUnits(_))
+                    phi.foreach(cad.setPhi(_))
+                    theta.foreach(cad.setTheta(_))
+                    psi.foreach(cad.setPsi(_))
                     cad
                 })
         }
@@ -203,8 +204,8 @@ class CachedAncillaryDatumController(val daoFactory: JPADAOFactory)
             val imDao   = daoFactory.newImagedMomentDAO(dao)
             val moments = imDao.findByVideoReferenceUUID(uuid)
             moments
-                .filter(_.ancillaryDatum != null)
-                .map(im => CachedAncillaryDatumEntity(im.ancillaryDatum))
+                .filter(_.getAncillaryDatum != null)
+                .map(im => CachedAncillaryDatumEntity(im.getAncillaryDatum))
                 .toSeq
         }
 
@@ -257,17 +258,17 @@ class CachedAncillaryDatumController(val daoFactory: JPADAOFactory)
         require(d != null, "A null CachedAncillaryDatum argument is not allowed")
         require(im != null, "A null ImagedMoment argument is not allowed")
         require(
-            im.uuid != null,
+            im.getUuid != null,
             "The ImagedMoment should already be present in the database. (Null UUID was found"
         )
 
-        if (im.ancillaryDatum != null) {
-            updateValues(im.ancillaryDatum, d)
-            im.ancillaryDatum
+        if (im.getAncillaryDatum != null) {
+            updateValues(im.getAncillaryDatum, d)
+            im.getAncillaryDatum
         }
         else {
-            im.ancillaryDatum = d
-            im.ancillaryDatum
+            im.setAncillaryDatum(d)
+            im.getAncillaryDatum
         }
     }
 
@@ -281,12 +282,12 @@ class CachedAncillaryDatumController(val daoFactory: JPADAOFactory)
             val imDao         = daoFactory.newImagedMomentDAO(dao)
             val imagedMoments = imDao
                 .findByVideoReferenceUUID(videoReferenceUuid)
-                .filter(ir => ir.recordedDate != null)
+                .filter(ir => ir.getRecordedDate != null)
 
             val usefulData = data.filter(_.recordedTimestamp.isDefined)
 
             def imagedMomentToMillis(im: ImagedMomentEntity) =
-                im.recordedDate.toEpochMilli.toDouble
+                im.getRecordedDate.toEpochMilli.toDouble
 
             def datumToMillis(cd: CachedAncillaryDatum) =
                 cd.recordedTimestamp.map(_.toEpochMilli).getOrElse(-1L).toDouble
@@ -324,22 +325,22 @@ class CachedAncillaryDatumController(val daoFactory: JPADAOFactory)
         b: CachedAncillaryDatumEntity
     ): Unit = {
         require(a != null && b != null, "Null arguments are not allowed")
-        a.altitude = b.altitude
-        a.depthMeters = b.depthMeters
-        a.crs = b.crs
-        a.latitude = b.latitude
-        a.longitude = b.longitude
-        a.salinity = b.salinity
-        a.temperatureCelsius = b.temperatureCelsius
-        a.oxygenMlL = b.oxygenMlL
-        a.pressureDbar = b.pressureDbar
-        a.x = b.x
-        a.y = b.y
-        a.z = b.z
-        a.posePositionUnits = b.posePositionUnits
-        a.phi = b.phi
-        a.theta = b.theta
-        a.psi = b.psi
-        a.lightTransmission = b.lightTransmission
+        a.setLatitude(b.getLatitude)
+        a.setLongitude(b.getLongitude)
+        a.setDepthMeters(b.getDepthMeters)
+        a.setAltitude(b.getAltitude)
+        a.setCrs(b.getCrs)
+        a.setSalinity(b.getSalinity)
+        a.setTemperatureCelsius(b.getTemperatureCelsius)
+        a.setOxygenMlL(b.getOxygenMlL)
+        a.setPressureDbar(b.getPressureDbar)
+        a.setLightTransmission(b.getLightTransmission)
+        a.setX(b.getX)
+        a.setY(b.getY)
+        a.setZ(b.getZ)
+        a.setPosePositionUnits(b.getPosePositionUnits)
+        a.setPhi(b.getPhi)
+        a.setTheta(b.getTheta)
+        a.setPsi(b.getPsi)
     }
 }

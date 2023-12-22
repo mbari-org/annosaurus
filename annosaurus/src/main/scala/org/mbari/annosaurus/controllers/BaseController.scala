@@ -22,12 +22,13 @@ import java.util.UUID
 
 import scala.concurrent.{ExecutionContext, Future}
 import org.mbari.annosaurus.repository.jpa.JPADAOFactory
+import org.mbari.annosaurus.repository.jpa.entity.IPersistentObject
 
 /** @author
   *   Brian Schlining
   * @since 2016-06-25T17:17:00
   */
-trait BaseController[A <: PersistentObject, B <: DAO[A]] {
+trait BaseController[A <: IPersistentObject, B <: DAO[A]] {
 
     def daoFactory: JPADAOFactory
 

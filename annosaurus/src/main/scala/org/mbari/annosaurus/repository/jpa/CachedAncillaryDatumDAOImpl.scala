@@ -53,23 +53,25 @@ class CachedAncillaryDatumDAOImpl(entityManager: EntityManager)
     ): CachedAncillaryDatumEntity = {
 
         val cad = new CachedAncillaryDatumEntity()
-        cad.latitude = Some(latitude)
-        cad.longitude = Some(longitude)
-        cad.depthMeters = Some(depthMeters)
-        cad.altitude = altitude
-        crs.foreach(cad.crs = _)
-        cad.salinity = salinity
-        cad.temperatureCelsius = temperatureCelsius
-        cad.oxygenMlL = oxygenMlL
-        cad.pressureDbar = pressureDbar
-        cad.x = x
-        cad.y = y
-        cad.z = z
-        posePositionUnits.foreach(cad.posePositionUnits = _)
-        cad.phi = phi
-        cad.theta = theta
-        cad.psi = psi
+        cad.setLatitude(latitude)
+        cad.setLongitude(longitude)
+        cad.setDepthMeters(depthMeters)
+        altitude.foreach(cad.setAltitude(_))
+        crs.foreach(cad.setCrs)
+        salinity.foreach(cad.setSalinity(_))
+        temperatureCelsius.foreach(cad.setTemperatureCelsius(_))
+        oxygenMlL.foreach(cad.setOxygenMlL(_))
+        pressureDbar.foreach(cad.setPressureDbar(_))
+        lightTransmission.foreach(cad.setLightTransmission(_))
+        x.foreach(cad.setX(_))
+        y.foreach(cad.setY(_))
+        z.foreach(cad.setZ(_))
+        posePositionUnits.foreach(cad.setPosePositionUnits)
+        phi.foreach(cad.setPhi(_))
+        theta.foreach(cad.setTheta(_))
+        psi.foreach(cad.setPsi(_))
         cad
+
     }
 
     override def newPersistentObject(

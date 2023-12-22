@@ -19,6 +19,8 @@ package org.mbari.annosaurus.repository
 import org.mbari.annosaurus.PersistentObject
 import org.mbari.annosaurus.domain.WindowRequest
 import org.mbari.annosaurus.repository.jpa.entity.ImagedMomentEntity
+import org.mbari.annosaurus.repository.jpa.entity.IPersistentObject
+import org.mbari.annosaurus.repository.jpa.entity.extensions.*
 import org.mbari.vcr4j.time.Timecode
 
 import java.time.{Duration, Instant}
@@ -28,7 +30,7 @@ import java.util.UUID
   *   Brian Schlining
   * @since 2016-06-17T16:07:00
   */
-trait ImagedMomentDAO[T <: PersistentObject] extends DAO[T] {
+trait ImagedMomentDAO[T <: IPersistentObject] extends DAO[T] {
 
     def newPersistentObject(
         videoReferenceUUID: UUID,

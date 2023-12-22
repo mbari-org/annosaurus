@@ -16,7 +16,7 @@
 
 package org.mbari.annosaurus.repository
 
-import org.mbari.annosaurus.PersistentObject
+import org.mbari.annosaurus.repository.jpa.entity.IPersistentObject
 
 import java.util.UUID
 import scala.concurrent.{ExecutionContext, Future}
@@ -29,7 +29,7 @@ import scala.concurrent.{ExecutionContext, Future}
   * @tparam A
   *   The type of the entity
   */
-trait DAO[A <: PersistentObject] {
+trait DAO[A <: IPersistentObject] {
 
     def newPersistentObject(): A
     def create(entity: A): Unit

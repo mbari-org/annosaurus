@@ -164,6 +164,29 @@ public class CachedAncillaryDatumEntity implements IPersistentObject {
     public CachedAncillaryDatumEntity() {
     }
 
+
+    public CachedAncillaryDatumEntity(CachedAncillaryDatumEntity that) {
+        this.uuid = that.uuid;
+        this.lastUpdatedTime = that.lastUpdatedTime;
+        this.crs = that.crs;
+        this.oxygenMlL = that.oxygenMlL;
+        this.depthMeters = that.depthMeters;
+        this.z = that.z;
+        this.posePositionUnits = that.posePositionUnits;
+        this.latitude = that.latitude;
+        this.y = that.y;
+        this.temperatureCelsius = that.temperatureCelsius;
+        this.x = that.x;
+        this.theta = that.theta;
+        this.longitude = that.longitude;
+        this.phi = that.phi;
+        this.psi = that.psi;
+        this.pressureDbar = that.pressureDbar;
+        this.salinity = that.salinity;
+        this.altitude = that.altitude;
+        this.lightTransmission = that.lightTransmission;
+    }
+
     @Override
     public UUID getUuid() {
         return uuid;

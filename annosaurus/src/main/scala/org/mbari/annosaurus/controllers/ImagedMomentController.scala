@@ -29,6 +29,8 @@ import scala.concurrent.{ExecutionContext, Future}
 import org.mbari.annosaurus.repository.jpa.JPADAOFactory
 import org.mbari.annosaurus.repository.jpa.entity.ImagedMomentEntity
 import java.awt.Window
+import java.awt.Image
+import scala.jdk.CollectionConverters.*
 
 /** @author
   *   Brian Schlining
@@ -112,7 +114,7 @@ class ImagedMomentController(val daoFactory: JPADAOFactory)
     )(implicit ec: ExecutionContext): Future[Option[ImagedMomentEntity]] = {
         def fn(dao: IMDAO): Option[ImagedMomentEntity] = {
             val irDao = daoFactory.newImageReferenceDAO(dao)
-            irDao.findByUUID(uuid).map(_.imagedMoment)
+            irDao.findByUUID(uuid).map(_.getImagedMoment)
         }
         exec(fn)
     }
@@ -122,7 +124,7 @@ class ImagedMomentController(val daoFactory: JPADAOFactory)
     )(implicit ec: ExecutionContext): Future[Option[ImagedMomentEntity]] = {
         def fn(dao: IMDAO): Option[ImagedMomentEntity] = {
             val obsDao = daoFactory.newObservationDAO(dao)
-            obsDao.findByUUID(uuid).map(_.imagedMoment)
+            obsDao.findByUUID(uuid).map(_.getImagedMoment)
         }
         exec(fn)
     }
@@ -303,19 +305,21 @@ class ImagedMomentController(val daoFactory: JPADAOFactory)
         // Transform source to correct types and remove any existing image references
         val mockImagedMoment        = imDao.newPersistentObject(sourceImagedMoment)
         val existingImageReferences = sourceImagedMoment
-            .imageReferences
-            .filter(i => irDao.findByURL(i.url).isDefined)
+            .getImageReferences
+            .asScala
+            .filter(i => irDao.findByURL(i.getUrl).isDefined)
             .toSeq
         existingImageReferences.foreach(ir => mockImagedMoment.removeImageReference(ir))
 
-        Option(mockImagedMoment.ancillaryDatum).foreach(ad => {
-            ad.imagedMoment = null
+        Option(mockImagedMoment.getAncillaryDatum).foreach(ad => {
+            ad.setImagedMoment(null)
             adDao.create(ad)
-            targetImagedMoment.ancillaryDatum = ad
+            targetImagedMoment.setAncillaryDatum(ad)
         })
 
         mockImagedMoment
-            .imageReferences
+            .getImageReferences
+            .asScala
             .toArray
             .foreach(ir => {
                 mockImagedMoment.removeImageReference(ir)
@@ -324,7 +328,8 @@ class ImagedMomentController(val daoFactory: JPADAOFactory)
             })
 
         mockImagedMoment
-            .observations
+            .getObservations
+            .asScala
             .toArray
             .foreach(obs => {
                 mockImagedMoment.removeObservation(obs)
@@ -350,10 +355,10 @@ class ImagedMomentController(val daoFactory: JPADAOFactory)
                         s"No ImageMoment with UUID of $uuid was found in the datastore"
                     )
                 case Some(imagedMoment) =>
-                    videoReferenceUUID.foreach(imagedMoment.videoReferenceUUID = _)
-                    timecode.foreach(imagedMoment.timecode = _)
-                    recordedDate.foreach(imagedMoment.recordedDate = _)
-                    elapsedTime.foreach(imagedMoment.elapsedTime = _)
+                    videoReferenceUUID.foreach(imagedMoment.setVideoReferenceUuid)
+                    timecode.foreach(imagedMoment.setTimecode)
+                    recordedDate.foreach(imagedMoment.setRecordedDate)
+                    elapsedTime.foreach(imagedMoment.setElapsedTime)
                     // dao.update(imagedMoment)
                     imagedMoment
             }
@@ -376,10 +381,10 @@ class ImagedMomentController(val daoFactory: JPADAOFactory)
             dao
                 .findByVideoReferenceUUID(videoReferenceUuid)
                 .map(im => {
-                    if (im.elapsedTime != null) {
-                        val newRecordedDate = newStartTimestamp.plus(im.elapsedTime)
-                        if (newRecordedDate != im.recordedDate) {
-                            im.recordedDate = newRecordedDate
+                    if (im.getElapsedTime != null) {
+                        val newRecordedDate = newStartTimestamp.plus(im.getElapsedTime)
+                        if (newRecordedDate != im.getRecordedDate) {
+                            im.setRecordedDate(newRecordedDate)
                         }
                     }
                     im
@@ -421,8 +426,7 @@ object ImagedMomentController {
                     s"Creating new imaged moment at timecode = ${timecode.getOrElse("")}, recordedDate = ${recordedDate
                             .getOrElse("")}, elapsedTime = ${elapsedTime.getOrElse("")}"
                 )
-                val imagedMoment =
-                    dao.newPersistentObject(videoReferenceUUID, timecode, elapsedTime, recordedDate)
+                val imagedMoment = new ImagedMomentEntity(videoReferenceUUID, recordedDate.orNull, timecode.orNull, elapsedTime.orNull)
                 dao.create(imagedMoment)
                 imagedMoment
         }
@@ -434,10 +438,10 @@ object ImagedMomentController {
     ): ImagedMomentEntity = {
         findOrCreateImagedMoment(
             dao,
-            imagedMoment.videoReferenceUUID,
-            Option(imagedMoment.timecode),
-            Option(imagedMoment.recordedDate),
-            Option(imagedMoment.elapsedTime)
+            imagedMoment.getVideoReferenceUuid,
+            Option(imagedMoment.getTimecode),
+            Option(imagedMoment.getRecordedDate),
+            Option(imagedMoment.getElapsedTime)
         )
     }
 }

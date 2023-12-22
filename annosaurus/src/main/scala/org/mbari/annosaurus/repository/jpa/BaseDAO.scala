@@ -25,14 +25,15 @@ import scala.concurrent.{ExecutionContext, Future}
 import scala.reflect.ClassTag
 import scala.reflect.classTag
 import jakarta.persistence.Query
-import org.mbari.annosaurus.PersistentObject
 import org.mbari.annosaurus.repository.DAO
+import org.mbari.annosaurus.repository.jpa.entity.IPersistentObject
+import org.mbari.annosaurus.repository.jpa.entity.extensions.*
 
 /** @author
   *   Brian Schlining
   * @since 2016-05-06T11:18:00
   */
-abstract class BaseDAO[B <: PersistentObject: ClassTag](val entityManager: EntityManager)
+abstract class BaseDAO[B <: IPersistentObject: ClassTag](val entityManager: EntityManager)
     extends DAO[B] {
     private[this] val log = LoggerFactory.getLogger(getClass)
 

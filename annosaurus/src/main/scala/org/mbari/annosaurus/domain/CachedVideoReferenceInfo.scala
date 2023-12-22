@@ -18,6 +18,7 @@ package org.mbari.annosaurus.domain
 
 import java.util.UUID
 import org.mbari.annosaurus.repository.jpa.entity.CachedVideoReferenceInfoEntity
+import org.mbari.annosaurus.repository.jpa.entity.extensions.*
 import org.mbari.annosaurus.domain.FromEntity
 
 final case class CachedVideoReferenceInfo(
@@ -42,9 +43,9 @@ final case class CachedVideoReferenceInfo(
             videoReferenceUuid,
             missionId.orNull,
             platformName.orNull,
-            missionContact,
+            missionContact.orNull,
         )
-        entity.uuid = uuid
+        entity.setUuid(uuid)
         entity
     }
 }
@@ -52,11 +53,11 @@ final case class CachedVideoReferenceInfo(
 object CachedVideoReferenceInfo extends FromEntity[CachedVideoReferenceInfoEntity, CachedVideoReferenceInfo] {
     override def from(entity: CachedVideoReferenceInfoEntity, extend: Boolean = false): CachedVideoReferenceInfo = {
         CachedVideoReferenceInfo(
-            entity.uuid,
-            entity.videoReferenceUUID,
-            Option(entity.platformName),
-            Option(entity.missionId),
-            Option(entity.missionContact),
+            entity.getUuid,
+            entity.getVideoReferenceUuid,
+            Option(entity.getPlatformName),
+            Option(entity.getMissionId),
+            Option(entity.getMissionContact),
             entity.lastUpdated
         )
     }

@@ -16,8 +16,9 @@
 
 package org.mbari.annosaurus.domain
 
-import org.mbari.annosaurus.repository.jpa.JpaEntity
 
-trait ToEntity[A <: JpaEntity] {
+import org.mbari.annosaurus.repository.jpa.entity.IPersistentObject
+
+trait ToEntity[A <: IPersistentObject] {
     def toEntity: A
 }

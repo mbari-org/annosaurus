@@ -77,11 +77,11 @@ class ImageReferenceController(val daoFactory: JPADAOFactory)
             dao
                 .findByUUID(uuid)
                 .map(imageReference => {
-                    url.foreach(imageReference.url = _)
-                    description.foreach(imageReference.description = _)
-                    heightPixels.foreach(imageReference.height = _)
-                    widthPixels.foreach(imageReference.width = _)
-                    format.foreach(imageReference.format = _)
+                    url.foreach(imageReference.setUrl)
+                    description.foreach(imageReference.setDescription)
+                    heightPixels.foreach(imageReference.setHeight(_))
+                    widthPixels.foreach(imageReference.setWidth(_))
+                    format.foreach(imageReference.setFormat)
                     imagedMomentUUID.foreach(imUUID => {
                         val imDao = daoFactory.newImagedMomentDAO(dao)
                         val newIm = imDao.findByUUID(imUUID)
@@ -91,7 +91,7 @@ class ImageReferenceController(val daoFactory: JPADAOFactory)
                                     s"ImagedMoment with UUID of $imUUID no found"
                                 )
                             case Some(imagedMoment) =>
-                                imageReference.imagedMoment.removeImageReference(imageReference)
+                                imageReference.getImagedMoment.removeImageReference(imageReference)
                                 imagedMoment.addImageReference(imageReference)
                         }
                     })
@@ -114,10 +114,10 @@ class ImageReferenceController(val daoFactory: JPADAOFactory)
             dao.findByUUID(uuid) match {
                 case None                 => false
                 case Some(imageReference) =>
-                    val imagedMoment = imageReference.imagedMoment
+                    val imagedMoment = imageReference.getImagedMoment
                     // If this is the only imageref and there are no observations, delete the imagemoment
                     if (
-                        imagedMoment.imageReferences.size == 1 && imagedMoment.observations.isEmpty
+                        imagedMoment.getImageReferences.size == 1 && imagedMoment.getObservations.isEmpty
                     ) {
                         val imDao = daoFactory.newImagedMomentDAO(dao)
                         imDao.delete(imagedMoment)

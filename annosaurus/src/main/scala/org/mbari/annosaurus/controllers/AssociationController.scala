@@ -71,7 +71,7 @@ class AssociationController(
                             Some(linkValue),
                             Some(mimeType)
                         )
-                    associationUuid.foreach(uuid => association.uuid = uuid)
+                    associationUuid.foreach(association.setUuid)
                     observation.addAssociation(association)
                     associationPublisher.publish(Association.from(association))
                     association
@@ -89,21 +89,21 @@ class AssociationController(
         mimeType: Option[String] = None
     )(implicit ec: ExecutionContext): Future[Option[AssociationEntity]] = {
 
-        def fn(dao: ADAO): Option[AssociationEntity] = {
+        def fn(dao: ADAO): Option[AssociationEntity] = { 
             dao
                 .findByUUID(uuid)
                 .map(association => {
-                    linkName.foreach(association.linkName = _)
-                    toConcept.foreach(association.toConcept = _)
-                    linkValue.foreach(association.linkValue = _)
-                    mimeType.foreach(association.mimeType = _)
+                    linkName.foreach(association.setLinkName)
+                    toConcept.foreach(association.setToConcept)
+                    linkValue.foreach(association.setLinkValue)
+                    mimeType.foreach(association.setMimeType)
                     // Move to new observation if it exists
                     for {
                         obsUUID <- observationUUID
                         obsDao   = daoFactory.newObservationDAO(dao)
                         obs     <- obsDao.findByUUID(obsUUID)
                     } {
-                        association.observation.removeAssociation(association)
+                        association.getObservation.removeAssociation(association)
                         obs.addAssociation(association)
                     }
                     associationPublisher.publish(Association.from(association))
@@ -120,12 +120,12 @@ class AssociationController(
         def fn(dao: ADAO): Iterable[AssociationEntity] =
             associations.flatMap(a0 => {
                 dao
-                    .findByUUID(a0.uuid)
+                    .findByUUID(a0.getUuid)
                     .map(a1 => {
-                        a1.linkName = a0.linkName
-                        a1.toConcept = a0.toConcept
-                        a1.linkValue = a0.linkValue
-                        a1.mimeType = a0.mimeType
+                        a1.setLinkName(a0.getLinkName)
+                        a1.setToConcept(a0.getToConcept)
+                        a1.setLinkValue(a0.getLinkValue)
+                        a1.setMimeType(a0.getMimeType)
                         a1
                     })
             })

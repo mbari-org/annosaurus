@@ -55,10 +55,10 @@ class IndexController(val daoFactory: JPADAOFactory)
             dao
                 .findByVideoReferenceUuid(videoReferenceUuid)
                 .map(im => {
-                    if (im.elapsedTime != null) {
-                        val newRecordedDate = newStartTimestamp.plus(im.elapsedTime)
-                        if (newRecordedDate != im.recordedDate) {
-                            im.recordedDate = newRecordedDate
+                    if (im.getElapsedTime != null) {
+                        val newRecordedDate = newStartTimestamp.plus(im.getElapsedTime)
+                        if (newRecordedDate != im.getRecordedDate) {
+                            im.setRecordedDate(newRecordedDate)
                         }
                     }
                     im
@@ -73,9 +73,9 @@ class IndexController(val daoFactory: JPADAOFactory)
         def fn(dao: IDDAO): Iterable[IndexEntity] = {
             (for (im <- imagedMoments) yield {
                 dao
-                    .findByUUID(im.uuid)
+                    .findByUUID(im.getUuid)
                     .map(i => {
-                        Option(im.recordedDate).foreach(d => i.recordedDate = d)
+                        Option(im.getRecordedDate).foreach(i.setRecordedDate)
                         i
                     })
             }).flatten

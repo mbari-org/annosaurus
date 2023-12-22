@@ -14,33 +14,15 @@
  * limitations under the License.
  */
 
-package org.mbari.annosaurus.repository.jpa
+package org.mbari.annosaurus.repository.jpa.entity
 
-import jakarta.persistence.{Column, Convert, GeneratedValue, Id}
-import org.mbari.annosaurus.PersistentObject
-
+import java.time.Instant
 import java.util.UUID
-import jakarta.persistence.GenerationType
 
-/** Mixin that supports the UUID fields
-  *
-  * @author
-  *   Brian Schlining
-  * @since 2016-05-05T17:50:00
-  */
-trait HasUUID extends PersistentObject {
+object extensions {
 
-    @Id
-    @Column(
-        name = "uuid",
-        nullable = false,
-        updatable = false,
-//        length = 36,
-    )
-    @GeneratedValue(strategy = GenerationType.UUID)
-//    @Convert(converter = classOf[UUIDConverter])
-    var uuid: UUID = _
-
-    def primaryKey: Option[UUID] = Option(uuid)
+    extension (po: IPersistentObject)
+        def primaryKey: Option[UUID] = Option(po.getUuid)
+        def lastUpdated: Option[Instant] = Option(po.getLastUpdatedTime).map(_.toInstant)
 
 }

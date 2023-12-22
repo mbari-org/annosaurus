@@ -302,11 +302,19 @@ public class ImagedMomentEntity implements IPersistentObject {
 
     }
 
-    public ImagedMomentEntity(UUID videoReferenceUuid, Instant recordedTimestamp, Timecode timecode, Duraiton elapsedTime) {
+    public ImagedMomentEntity(UUID videoReferenceUuid, Instant recordedTimestamp, Timecode timecode, Duration elapsedTime) {
         this.videoReferenceUuid = videoReferenceUuid;
         this.recordedDate = recordedTimestamp;
         this.timecode = timecode;
         this.elapsedTime = elapsedTime;
+    }
+
+    public ImagedMomentEntity(ImagedMomentEntity that) {
+        this.videoReferenceUuid = that.videoReferenceUuid;
+        this.recordedDate = that.recordedDate;
+        this.timecode = that.timecode;
+        this.elapsedTime = that.elapsedTime;
+        this.uuid = that.uuid;
     }
 
     @Override

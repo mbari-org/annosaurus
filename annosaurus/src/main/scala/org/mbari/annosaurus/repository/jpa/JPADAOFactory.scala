@@ -28,7 +28,7 @@ import org.mbari.annosaurus.repository.{
     IndexDAO,
     ObservationDAO
 }
-import org.mbari.annosaurus.repository.jpa.entity._
+import org.mbari.annosaurus.repository.jpa.entity.*
 
 /** @author
   *   Brian Schlining
