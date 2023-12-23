@@ -49,7 +49,7 @@ class ImagedMomentDAOImpl(entityManager: EntityManager)
         imagedMoment.setVideoReferenceUuid(videoReferenceUUID)
         timecode.foreach(imagedMoment.setTimecode)
         elapsedTime.foreach(imagedMoment.setElapsedTime)
-        recordedDate.foreach(imagedMoment.setRecordedDate)
+        recordedDate.foreach(imagedMoment.setRecordedTimestamp)
         imagedMoment
     }
 
@@ -309,7 +309,7 @@ class ImagedMomentDAOImpl(entityManager: EntityManager)
         findByUUID(windowRequest.imagedMomentUuid) match {
             case None     => Nil
             case Some(im) =>
-                Option(im.getRecordedDate) match {
+                Option(im.getRecordedTimestamp) match {
                     case None               => Nil
                     case Some(recordedDate) =>
                         val start = recordedDate.minus(windowRequest.window)

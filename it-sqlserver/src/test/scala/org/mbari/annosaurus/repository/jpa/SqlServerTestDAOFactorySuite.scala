@@ -14,12 +14,9 @@
  * limitations under the License.
  */
 
-package org.mbari.annosaurus.endpoints
+package org.mbari.annosaurus.repository.jpa
 
-import org.mbari.annosaurus.repository.jpa.{DerbyTestDAOFactory, TestDAOFactory}
+class SqlServerTestDAOFactorySuite extends TestDAOFactorySuite {
+  given daoFactory: TestDAOFactory = SqlServerTestDAOFactory
 
-class DerbyIndexEndpointsSuite extends IndexEndpointsITSuite {
-
-    given daoFactory: TestDAOFactory = DerbyTestDAOFactory
-  
 }

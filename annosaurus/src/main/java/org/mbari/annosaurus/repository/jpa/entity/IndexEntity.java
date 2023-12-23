@@ -35,7 +35,7 @@ import java.util.UUID;
         {
                 @NamedQuery(
                         name = "Index.findByVideoReferenceUUID",
-                        query = "SELECT i FROM Index i WHERE i.videoReferenceUUID = :uuid ORDER BY i.uuid"
+                        query = "SELECT i FROM Index i WHERE i.videoReferenceUuid = :uuid ORDER BY i.uuid"
                 )
         }
 )
@@ -48,7 +48,7 @@ public class IndexEntity implements IPersistentObject {
 
     /** Optimistic lock to prevent concurrent overwrites */
     @Version
-    @Column(name = "last_updated_time")
+    @Column(name = "last_updated_timestamp")
     protected Timestamp lastUpdatedTime;
 
     @Column(name = "video_reference_uuid", nullable = true)

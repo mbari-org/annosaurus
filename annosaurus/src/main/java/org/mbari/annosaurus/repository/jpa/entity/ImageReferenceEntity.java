@@ -53,22 +53,22 @@ import org.mbari.annosaurus.repository.jpa.URLConverter;
                 @NamedQuery(
                         name = "ImageReference.findDTOByVideoReferenceUuid",
                         query =
-                                "SELECT new org.mbari.annosaurus.repository.jpa.entity.ImageReferenceDTO(r.url, r.width, r.height, r.format, r.description, r.uuid, im.uuid) FROM ImageReference r LEFT JOIN ImagedMoment im WHERE im.videoReferenceUUID = :uuid ORDER BY r.url"
+                                "SELECT new org.mbari.annosaurus.repository.jpa.entity.ImageReferenceDTO(r.url, r.width, r.height, r.format, r.description, r.uuid, im.uuid) FROM ImageReference r LEFT JOIN ImagedMoment im WHERE im.videoReferenceUuid = :uuid ORDER BY r.url"
                 ),
                 @NamedQuery(
                         name = "ImageReference.findDTOByVideoReferenceUuidBetweenDates",
                         query =
-                                "SELECT new org.mbari.annosaurus.repository.jpa.entity.ImageReferenceDTO(r.url, r.width, r.height, r.format, r.description, r.uuid, im.uuid) FROM ImageReference r JOIN ImagedMoment im WHERE im.videoReferenceUUID = :uuid AND im.recordedDate BETWEEN :start AND :end ORDER BY r.url"
+                                "SELECT new org.mbari.annosaurus.repository.jpa.entity.ImageReferenceDTO(r.url, r.width, r.height, r.format, r.description, r.uuid, im.uuid) FROM ImageReference r JOIN ImagedMoment im WHERE im.videoReferenceUuid = :uuid AND im.recordedTimestamp BETWEEN :start AND :end ORDER BY r.url"
                 ),
                 @NamedQuery(
                         name = "ImageReference.findDTOByConcurrentRequest",
                         query =
-                                "SELECT new org.mbari.annosaurus.repository.jpa.entity.ImageReferenceDTO(r.url, r.width, r.height, r.format, r.description, r.uuid, im.uuid) FROM ImageReference r JOIN ImagedMoment im WHERE im.videoReferenceUUID IN :uuids AND im.recordedDate BETWEEN :start AND :end ORDER BY r.url"
+                                "SELECT new org.mbari.annosaurus.repository.jpa.entity.ImageReferenceDTO(r.url, r.width, r.height, r.format, r.description, r.uuid, im.uuid) FROM ImageReference r JOIN ImagedMoment im WHERE im.videoReferenceUuid IN :uuids AND im.recordedTimestamp BETWEEN :start AND :end ORDER BY r.url"
                 ),
                 @NamedQuery(
                         name = "ImageReference.findDTOByMultiRequest",
                         query =
-                                "SELECT new org.mbari.annosaurus.repository.jpa.entity.ImageReferenceDTO(r.url, r.width, r.height, r.format, r.description, r.uuid, im.uuid) FROM ImageReference r JOIN ImagedMoment im WHERE im.videoReferenceUUID IN :uuids ORDER BY r.url"
+                                "SELECT new org.mbari.annosaurus.repository.jpa.entity.ImageReferenceDTO(r.url, r.width, r.height, r.format, r.description, r.uuid, im.uuid) FROM ImageReference r JOIN ImagedMoment im WHERE im.videoReferenceUuid IN :uuids ORDER BY r.url"
                 ),
                 @NamedQuery(
                         name = "ImageReference.findDTOByImagedMomentUuids",
@@ -87,7 +87,7 @@ public class ImageReferenceEntity implements IPersistentObject {
 
     /** Optimistic lock to prevent concurrent overwrites */
     @Version
-    @Column(name = "last_updated_time")
+    @Column(name = "last_updated_timestamp")
     protected Timestamp lastUpdatedTime;
 
     @Column(name = "description", length = 256, nullable = true)

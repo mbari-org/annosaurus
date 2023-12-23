@@ -67,7 +67,7 @@ import java.util.UUID;
                 @NamedQuery(
                         name = "VideoReferenceInfo.findByVideoReferenceUUID",
                         query =
-                                "SELECT v FROM CachedVideoReferenceInfo v WHERE v.videoReferenceUUID = :uuid ORDER BY v.uuid"
+                                "SELECT v FROM CachedVideoReferenceInfo v WHERE v.videoReferenceUuid = :uuid ORDER BY v.uuid"
                 ),
                 @NamedQuery(
                         name = "VideoReferenceInfo.findByPlatformName",
@@ -95,7 +95,7 @@ public class CachedVideoReferenceInfoEntity implements IPersistentObject {
 
     /** Optimistic lock to prevent concurrent overwrites */
     @Version
-    @Column(name = "last_updated_time")
+    @Column(name = "last_updated_timestamp")
     protected Timestamp lastUpdatedTime;
 
     /** typically this will be the chief scientist
@@ -108,10 +108,11 @@ public class CachedVideoReferenceInfoEntity implements IPersistentObject {
 
     @Column(
             name = "video_reference_uuid",
-            nullable = false,
+            nullable = true,
             unique = true,
-            columnDefinition = "uuid-char"
+            columnDefinition = "varchar(36)"
     )
+    @Convert(converter = UUIDConverter.class)
     UUID videoReferenceUuid;
 
     @Column(name = "mission_id", nullable = false, length = 256)

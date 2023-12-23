@@ -22,11 +22,8 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.*;
 
-import org.mbari.annosaurus.domain.ImagedMoment;
-import org.mbari.annosaurus.repository.jpa.DurationConverter;
-import org.mbari.annosaurus.repository.jpa.InstantConverter;
-import org.mbari.annosaurus.repository.jpa.TimecodeConverter;
-import org.mbari.annosaurus.repository.jpa.TransactionLogger;
+import org.hibernate.annotations.Type;
+import org.mbari.annosaurus.repository.jpa.*;
 import org.mbari.vcr4j.time.Timecode;
 
 @Entity(name = "ImagedMoment")
@@ -137,52 +134,52 @@ import org.mbari.vcr4j.time.Timecode;
                 @NamedQuery(
                         name = "ImagedMoment.findWithImages",
                         query = "SELECT i FROM ImagedMoment i " +
-                                "LEFT JOIN i.javaImageReferences ir " +
+                                "LEFT JOIN i.imageReferences ir " +
                                 "WHERE ir.url IS NOT NULL"
                 ),
                 @NamedQuery(
                         name = "ImagedMoment.findByLinkName",
                         query = "SELECT i FROM ImagedMoment i " +
-                                "INNER JOIN i.javaObservations o " +
-                                "INNER JOIN o.javaAssociations a " +
+                                "INNER JOIN i.observations o " +
+                                "INNER JOIN o.associations a " +
                                 "WHERE a.linkName = :linkName"
                 ),
                 @NamedQuery(
                         name = "ImagedMoment.findByConcept",
-                        query = "SELECT i FROM ImagedMoment i LEFT JOIN i.javaObservations o WHERE " +
+                        query = "SELECT i FROM ImagedMoment i LEFT JOIN i.observations o WHERE " +
                                 "o.concept = :concept ORDER BY i.uuid"
                 ),
                 @NamedQuery(
                         name = "ImagedMoment.findByConceptWithImages",
-                        query = "SELECT i FROM ImagedMoment i LEFT JOIN i.javaObservations o " +
-                                "LEFT JOIN i.javaImageReferences ir " +
+                        query = "SELECT i FROM ImagedMoment i LEFT JOIN i.observations o " +
+                                "LEFT JOIN i.imageReferences ir " +
                                 "WHERE ir.url IS NOT NULL AND o.concept = :concept ORDER BY i.uuid"
                 ),
                 @NamedQuery(
                         name = "ImagedMoment.findBetweenUpdatedDates",
-                        query = "SELECT i FROM ImagedMoment i LEFT JOIN i.javaObservations o WHERE " +
+                        query = "SELECT i FROM ImagedMoment i LEFT JOIN i.observations o WHERE " +
                                 "i.lastUpdatedTime BETWEEN :start AND :end OR " +
                                 "o.lastUpdatedTime BETWEEN :start AND :end ORDER BY i.uuid"
                 ),
                 @NamedQuery(
                         name = "ImagedMoment.findByVideoReferenceUUID",
                         query =
-                                "SELECT i FROM ImagedMoment i WHERE i.videoReferenceUUID = :uuid ORDER BY i.uuid"
+                                "SELECT i FROM ImagedMoment i WHERE i.videoReferenceUuid = :uuid ORDER BY i.uuid"
                 ),
                 @NamedQuery(
                         name = "ImagedMoment.findByVideoReferenceUUIDAndTimestamps",
-                        query = "SELECT i FROM ImagedMoment i WHERE i.videoReferenceUUID = :uuid AND " +
-                                "i.recordedDate BETWEEN :start AND :end ORDER BY i.recordedDate"
+                        query = "SELECT i FROM ImagedMoment i WHERE i.videoReferenceUuid = :uuid AND " +
+                                "i.recordedTimestamp BETWEEN :start AND :end ORDER BY i.recordedTimestamp"
                 ),
                 @NamedQuery(
                         name = "ImagedMoment.findWithImageReferences",
                         query =
-                                "SELECT i FROM ImagedMoment i LEFT JOIN i.javaImageReferences r WHERE i.videoReferenceUUID = :uuid ORDER BY i.uuid"
+                                "SELECT i FROM ImagedMoment i LEFT JOIN i.imageReferences r WHERE i.videoReferenceUuid = :uuid ORDER BY i.uuid"
                 ),
                 @NamedQuery(
                         name = "ImagedMoment.findByObservationUUID",
                         query =
-                                "SELECT i FROM ImagedMoment i LEFT JOIN i.javaObservations o WHERE o.uuid = :uuid ORDER BY i.uuid"
+                                "SELECT i FROM ImagedMoment i LEFT JOIN i.observations o WHERE o.uuid = :uuid ORDER BY i.uuid"
                 ),
                 @NamedQuery(
                         name = "ImagedMoment.findByUUID",
@@ -191,50 +188,50 @@ import org.mbari.vcr4j.time.Timecode;
                 @NamedQuery(
                         name = "ImagedMoment.findByVideoReferenceUUIDAndTimecode",
                         query =
-                                "SELECT i FROM ImagedMoment i WHERE i.timecode = :timecode AND i.videoReferenceUUID = :uuid ORDER BY i.uuid"
+                                "SELECT i FROM ImagedMoment i WHERE i.timecode = :timecode AND i.videoReferenceUuid = :uuid ORDER BY i.uuid"
                 ),
                 @NamedQuery(
                         name = "ImagedMoment.findByVideoReferenceUUIDAndElapsedTime",
                         query =
-                                "SELECT i FROM ImagedMoment i WHERE i.elapsedTime = :elapsedTime AND i.videoReferenceUUID = :uuid ORDER BY i.uuid"
+                                "SELECT i FROM ImagedMoment i WHERE i.elapsedTime = :elapsedTime AND i.videoReferenceUuid = :uuid ORDER BY i.uuid"
                 ),
                 @NamedQuery(
                         name = "ImagedMoment.findByVideoReferenceUUIDAndRecordedDate",
                         query =
-                                "SELECT i FROM ImagedMoment i WHERE i.recordedDate = :recordedDate AND i.videoReferenceUUID = :uuid ORDER BY i.uuid"
+                                "SELECT i FROM ImagedMoment i WHERE i.recordedTimestamp = :recordedDate AND i.videoReferenceUuid = :uuid ORDER BY i.uuid"
                 ),
                 @NamedQuery(
                         name = "ImagedMoment.deleteByVideoReferenceUUID",
-                        query = "DELETE FROM ImagedMoment i WHERE i.videoReferenceUUID = :uuid"
+                        query = "DELETE FROM ImagedMoment i WHERE i.videoReferenceUuid = :uuid"
                 ),
                 @NamedQuery(
                         name = "ImagedMoment.findByWindowRequest",
                         query =
-                                "SELECT i from ImagedMoment i WHERE i.videoReferenceUUID IN :uuids AND i.recordedDate BETWEEN :start AND :end"
+                                "SELECT i from ImagedMoment i WHERE i.videoReferenceUuid IN :uuids AND i.recordedTimestamp BETWEEN :start AND :end"
                 ),
                 @NamedQuery(
                         name = "ImagedMoment.findByImageReferenceUUID",
                         query =
-                                "SELECT i FROM ImagedMoment i LEFT JOIN i.javaImageReferences r WHERE r.uuid = :uuid ORDER BY i.uuid"
+                                "SELECT i FROM ImagedMoment i LEFT JOIN i.imageReferences r WHERE r.uuid = :uuid ORDER BY i.uuid"
                 ),
                 @NamedQuery(
                         name = "ImagedMoment.findImageByConceptWithImages",
-                        query = "SELECT new org.mbari.annosaurus.repository.jpa.entity.ImageDTO(i.uuid, i.elapsedTime, i.videoReferenceUUID, i.recordedDate, i.timecode, ir.description, ir.format, ir.height, ir.width, ir.url, ir.uuid) " +
-                                "FROM ImagedMoment i LEFT JOIN i.javaObservations o LEFT JOIN i.javaImageReferences ir " +
+                        query = "SELECT new org.mbari.annosaurus.repository.jpa.entity.ImageDTO(i.uuid, i.elapsedTime, i.videoReferenceUuid, i.recordedTimestamp, i.timecode, ir.description, ir.format, ir.height, ir.width, ir.url, ir.uuid) " +
+                                "FROM ImagedMoment i LEFT JOIN i.observations o LEFT JOIN i.imageReferences ir " +
                                 "WHERE ir.url IS NOT NULL AND o.concept = :concept ORDER BY i.uuid"
                 ),
                 @NamedQuery(
                         name = "ImagedMoment.findImageByToConceptWithImages",
-                        query = "SELECT new org.mbari.annosaurus.repository.jpa.entity.ImageDTO(i.uuid, i.elapsedTime, i.videoReferenceUUID, i.recordedDate, i.timecode, ir.description, ir.format, ir.height, ir.width, ir.url, ir.uuid) " +
-                                "FROM ImagedMoment i LEFT JOIN i.javaObservations o LEFT JOIN i.javaImageReferences ir LEFT JOIN o.javaAssociations a " +
+                        query = "SELECT new org.mbari.annosaurus.repository.jpa.entity.ImageDTO(i.uuid, i.elapsedTime, i.videoReferenceUuid, i.recordedTimestamp, i.timecode, ir.description, ir.format, ir.height, ir.width, ir.url, ir.uuid) " +
+                                "FROM ImagedMoment i LEFT JOIN i.observations o LEFT JOIN i.imageReferences ir LEFT JOIN o.associations a " +
                                 "WHERE ir.url IS NOT NULL AND a.toConcept = :concept ORDER BY i.uuid"
                 ),
                 @NamedQuery(
                         name = "ImagedMoment.findImageByVideoReferenceUUID",
                         query =
-                                "SELECT new org.mbari.annosaurus.repository.jpa.entity.ImageDTO(i.uuid, i.elapsedTime, i.videoReferenceUUID, i.recordedDate, i.timecode, ir.description, ir.format, ir.height, ir.width, ir.url, ir.uuid) " +
-                                        "FROM ImagedMoment i LEFT JOIN i.javaImageReferences ir " +
-                                        "WHERE ir.url IS NOT NULL AND i.videoReferenceUUID = :uuid ORDER BY i.uuid"
+                                "SELECT new org.mbari.annosaurus.repository.jpa.entity.ImageDTO(i.uuid, i.elapsedTime, i.videoReferenceUuid, i.recordedTimestamp, i.timecode, ir.description, ir.format, ir.height, ir.width, ir.url, ir.uuid) " +
+                                        "FROM ImagedMoment i LEFT JOIN i.imageReferences ir " +
+                                        "WHERE ir.url IS NOT NULL AND i.videoReferenceUuid = :uuid ORDER BY i.uuid"
                 )
         }
 )
@@ -248,7 +245,7 @@ public class ImagedMomentEntity implements IPersistentObject {
 
     /** Optimistic lock to prevent concurrent overwrites */
     @Version
-    @Column(name = "last_updated_time")
+    @Column(name = "last_updated_timestamp")
     protected Timestamp lastUpdatedTime;
 
     @Column(name = "elapsed_time_millis", nullable = true)
@@ -258,7 +255,7 @@ public class ImagedMomentEntity implements IPersistentObject {
     @Column(name = "recorded_timestamp", nullable = true)
     @Temporal(value = TemporalType.TIMESTAMP)
     @Convert(converter = InstantConverter.class)
-    Instant recordedDate;
+    Instant recordedTimestamp;
 
     @Column(name = "timecode", nullable = true)
     @Convert(converter = TimecodeConverter.class)
@@ -267,8 +264,9 @@ public class ImagedMomentEntity implements IPersistentObject {
     @Column(
             name = "video_reference_uuid",
             nullable = true,
-            columnDefinition = "uuid-char"
+            columnDefinition = "varchar(36)"
     )
+    @Convert(converter = UUIDConverter.class)
     UUID videoReferenceUuid;
 
     @OneToMany(
@@ -304,14 +302,14 @@ public class ImagedMomentEntity implements IPersistentObject {
 
     public ImagedMomentEntity(UUID videoReferenceUuid, Instant recordedTimestamp, Timecode timecode, Duration elapsedTime) {
         this.videoReferenceUuid = videoReferenceUuid;
-        this.recordedDate = recordedTimestamp;
+        this.recordedTimestamp = recordedTimestamp;
         this.timecode = timecode;
         this.elapsedTime = elapsedTime;
     }
 
     public ImagedMomentEntity(ImagedMomentEntity that) {
         this.videoReferenceUuid = that.videoReferenceUuid;
-        this.recordedDate = that.recordedDate;
+        this.recordedTimestamp = that.recordedTimestamp;
         this.timecode = that.timecode;
         this.elapsedTime = that.elapsedTime;
         this.uuid = that.uuid;
@@ -342,12 +340,12 @@ public class ImagedMomentEntity implements IPersistentObject {
         this.elapsedTime = elapsedTime;
     }
 
-    public Instant getRecordedDate() {
-        return recordedDate;
+    public Instant getRecordedTimestamp() {
+        return recordedTimestamp;
     }
 
-    public void setRecordedDate(Instant recordedDate) {
-        this.recordedDate = recordedDate;
+    public void setRecordedTimestamp(Instant recordedTimestamp) {
+        this.recordedTimestamp = recordedTimestamp;
     }
 
     public Timecode getTimecode() {
@@ -429,7 +427,7 @@ public class ImagedMomentEntity implements IPersistentObject {
         sb.append("ImagedMomentEntity(");
         sb.append("uuid=" + uuid);
         sb.append(", videoReferenceUUID=" + videoReferenceUuid);
-        sb.append(", recordedDate=" + recordedDate);
+        sb.append(", recordedDate=" + recordedTimestamp);
         sb.append(", timecode=" + timecode);
         sb.append(", elapsedTime=" + elapsedTime);
         sb.append(")");

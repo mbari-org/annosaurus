@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 
-package org.mbari.annosaurus.endpoints
+package org.mbari.annosaurus.repository.jpa
 
-import org.mbari.annosaurus.repository.jpa.{DerbyTestDAOFactory, TestDAOFactory}
+trait TestDAOFactorySuite extends BaseDAOSuite {
 
-class DerbyIndexEndpointsSuite extends IndexEndpointsITSuite {
-
-    given daoFactory: TestDAOFactory = DerbyTestDAOFactory
-  
+  test("TestDAOFactory") {
+    val dao = daoFactory.newImagedMomentDAO();
+    val i = exec(dao.runTransaction(d => d.countAll()))
+    dao.close()
+  }
 }

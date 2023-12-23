@@ -38,7 +38,7 @@ object AssertUtils {
         else if (a != null && b != null) {
             assertEquals(a.getTimecode(), b.getTimecode())
             assertEquals(a.getElapsedTime(), b.getElapsedTime())
-            assertEquals(a.getRecordedDate(), b.getRecordedDate())
+            assertEquals(a.getRecordedTimestamp(), b.getRecordedTimestamp())
             assertEquals(a.getVideoReferenceUuid(), b.getVideoReferenceUuid())
             assertEquals(a.getUuid(), b.getUuid())
             if (cascade) {

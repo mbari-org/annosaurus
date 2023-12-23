@@ -76,7 +76,7 @@ class ObservationControllerSpec extends AnyFunSpec with Matchers {
         opt should not be None
         val obs = opt.get
         obs.getDuration() should be(null)
-        obs.getImagedMoment().getRecordedDate().toEpochMilli should be(recordedDate.toEpochMilli())
+        obs.getImagedMoment().getRecordedTimestamp().toEpochMilli should be(recordedDate.toEpochMilli())
 
         // look up and verify no duration
         val opt1 = exec(() => controller.findByUUID(obs.getUuid()))

@@ -164,7 +164,7 @@ class ImageController(daoFactory: JPADAOFactory) {
                     val imagedMoment = ir.getImagedMoment
                     // move to new video-reference/imaged-moment using the existing images
                     val tc    = Option(imagedMoment.getTimecode)
-                    val rd    = Option(imagedMoment.getRecordedDate)
+                    val rd    = Option(imagedMoment.getRecordedTimestamp)
                     val et    = Option(imagedMoment.getElapsedTime)
                     val newIm =
                         ImagedMomentController.findOrCreateImagedMoment(imDao, vrUUID, tc, rd, et)

@@ -99,7 +99,7 @@ object Annotation extends FromEntity[ObservationEntity, Annotation] {
             Option(entity.getObservationDate),
             Option(entity.getUuid),
             Option(entity.getObserver),
-            imOpt.map(_.getRecordedDate),
+            imOpt.map(_.getRecordedTimestamp),
             imOpt.flatMap(x => Option(x.getTimecode).map(_.toString)),
             imOpt.map(_.getVideoReferenceUuid)
         )

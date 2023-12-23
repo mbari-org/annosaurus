@@ -282,12 +282,12 @@ class CachedAncillaryDatumController(val daoFactory: JPADAOFactory)
             val imDao         = daoFactory.newImagedMomentDAO(dao)
             val imagedMoments = imDao
                 .findByVideoReferenceUUID(videoReferenceUuid)
-                .filter(ir => ir.getRecordedDate != null)
+                .filter(ir => ir.getRecordedTimestamp != null)
 
             val usefulData = data.filter(_.recordedTimestamp.isDefined)
 
             def imagedMomentToMillis(im: ImagedMomentEntity) =
-                im.getRecordedDate.toEpochMilli.toDouble
+                im.getRecordedTimestamp.toEpochMilli.toDouble
 
             def datumToMillis(cd: CachedAncillaryDatum) =
                 cd.recordedTimestamp.map(_.toEpochMilli).getOrElse(-1L).toDouble

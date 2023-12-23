@@ -106,32 +106,32 @@ import java.util.UUID;
                 @NamedQuery(
                         name = "Observation.findByMultiRequest",
                         query =
-                                "SELECT o FROM Observation o LEFT JOIN o.imagedMoment i WHERE i.videoReferenceUUID IN :uuids ORDER BY o.uuid"
+                                "SELECT o FROM Observation o LEFT JOIN o.imagedMoment i WHERE i.videoReferenceUuid IN :uuids ORDER BY o.uuid"
                 ),
                 @NamedQuery(
                         name = "Observation.countByMultiRequest",
                         query =
-                                "SELECT COUNT(o.uuid) FROM Observation o LEFT JOIN o.imagedMoment i WHERE i.videoReferenceUUID IN :uuids"
+                                "SELECT COUNT(o.uuid) FROM Observation o LEFT JOIN o.imagedMoment i WHERE i.videoReferenceUuid IN :uuids"
                 ),
                 @NamedQuery(
                         name = "Observation.findByConcurrentRequest",
                         query =
-                                "SELECT o FROM Observation o LEFT JOIN o.imagedMoment i WHERE i.videoReferenceUUID IN :uuids AND i.recordedDate BETWEEN :start AND :end ORDER BY o.uuid"
+                                "SELECT o FROM Observation o LEFT JOIN o.imagedMoment i WHERE i.videoReferenceUuid IN :uuids AND i.recordedTimestamp BETWEEN :start AND :end ORDER BY o.uuid"
                 ),
                 @NamedQuery(
                         name = "Observation.countByConcurrentRequest",
                         query =
-                                "SELECT COUNT(o.uuid) FROM Observation o LEFT JOIN o.imagedMoment i WHERE i.videoReferenceUUID IN :uuids AND i.recordedDate BETWEEN :start AND :end"
+                                "SELECT COUNT(o.uuid) FROM Observation o LEFT JOIN o.imagedMoment i WHERE i.videoReferenceUuid IN :uuids AND i.recordedTimestamp BETWEEN :start AND :end"
                 ),
                 @NamedQuery(
                         name = "Observation.findByVideoReferenceUUID",
                         query =
-                                "SELECT o FROM Observation o LEFT JOIN o.imagedMoment i WHERE i.videoReferenceUUID = :uuid ORDER BY o.uuid"
+                                "SELECT o FROM Observation o LEFT JOIN o.imagedMoment i WHERE i.videoReferenceUuid = :uuid ORDER BY o.uuid"
                 ),
                 @NamedQuery(
                         name = "Observation.findByVideoReferenceUUIDAndTimestamps",
                         query =
-                                "SELECT o FROM Observation o LEFT JOIN o.imagedMoment i WHERE i.videoReferenceUUID = :uuid AND i.recordedDate BETWEEN :start AND :end ORDER BY i.recordedDate"
+                                "SELECT o FROM Observation o LEFT JOIN o.imagedMoment i WHERE i.videoReferenceUuid = :uuid AND i.recordedTimestamp BETWEEN :start AND :end ORDER BY i.recordedTimestamp"
                 )
         }
 )
@@ -145,7 +145,7 @@ public class ObservationEntity implements IPersistentObject {
 
     /** Optimistic lock to prevent concurrent overwrites */
     @Version
-    @Column(name = "last_updated_time")
+    @Column(name = "last_updated_timestamp")
     protected Timestamp lastUpdatedTime;
 
     @Column(name = "concept", length = 256)

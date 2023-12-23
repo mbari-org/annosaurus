@@ -50,7 +50,7 @@ class ImagedMomentControllerSpec extends AnyFlatSpec with Matchers with BeforeAn
 
   "ImagedMomentController" should "create by recorded timestamp" in {
     val a = exec(() => controller.create(videoReferenceUuid, recordedDate = Some(recordedDate)))
-    a.getRecordedDate() should be(recordedDate)
+    a.getRecordedTimestamp() should be(recordedDate)
     a.getTimecode() should be(null)
     a.getElapsedTime() should be(null)
     a.getVideoReferenceUuid() should be(videoReferenceUuid)

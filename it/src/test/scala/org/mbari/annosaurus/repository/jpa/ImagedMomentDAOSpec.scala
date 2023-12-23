@@ -101,7 +101,7 @@ class ImagedMomentDAOSpec extends AnyFlatSpec with Matchers with BeforeAndAfterA
     val im = run(
       _.findByVideoReferenceUUIDAndRecordedDate(
         imagedMoment0.getVideoReferenceUuid(),
-        imagedMoment0.getRecordedDate()
+        imagedMoment0.getRecordedTimestamp()
       )
     )
     im shouldBe defined
@@ -118,7 +118,7 @@ class ImagedMomentDAOSpec extends AnyFlatSpec with Matchers with BeforeAndAfterA
     val im1 = run(
       _.findByVideoReferenceUUIDAndIndex(
         videoReferenceUUID,
-        recordedDate = Option(imagedMoment0.getRecordedDate())
+        recordedDate = Option(imagedMoment0.getRecordedTimestamp())
       )
     )
     im1 shouldBe defined

@@ -473,18 +473,18 @@ class AnnotationController(val daoFactory: JPADAOFactory, bus: Subject[Any] = Me
             .map(observation => {
                 val imagedMoment        = observation.getImagedMoment
                 val timecodeOpt         = Option(imagedMoment.getTimecode)
-                val currentTimestampOpt = Option(imagedMoment.getRecordedDate)
+                val currentTimestampOpt = Option(imagedMoment.getRecordedTimestamp)
                 // MUST have a timecode!! This method is for tape annotations
                 if (timecodeOpt.isEmpty) Nil
                 else if (recordedTimestampOpt.isEmpty && currentTimestampOpt.isDefined) {
-                    imagedMoment.setRecordedDate(null)
+                    imagedMoment.setRecordedTimestamp(null)
                     imagedMoment.getObservations.asScala.toSeq
                 }
                 else if (
                     recordedTimestampOpt.isDefined
                     && (currentTimestampOpt.isEmpty || currentTimestampOpt.get != recordedTimestampOpt.get)
                 ) {
-                    recordedTimestampOpt.foreach(imagedMoment.setRecordedDate)
+                    recordedTimestampOpt.foreach(imagedMoment.setRecordedTimestamp)
                     imagedMoment.getObservations.asScala.toSeq
                 }
                 else Nil
@@ -540,12 +540,12 @@ class AnnotationController(val daoFactory: JPADAOFactory, bus: Subject[Any] = Me
                 elapsedTime.get != imagedMoment.getElapsedTime
 
             val rdChanged = recordedDate.isDefined &&
-                recordedDate.get != imagedMoment.getRecordedDate
+                recordedDate.get != imagedMoment.getRecordedTimestamp
 
             if (vrChanged || tcChanged || etChanged || rdChanged) {
                 val vrUUID = videoReferenceUUID.getOrElse(imagedMoment.getVideoReferenceUuid)
                 val tc     = Option(timecode.getOrElse(imagedMoment.getTimecode))
-                val rd     = Option(recordedDate.getOrElse(imagedMoment.getRecordedDate))
+                val rd     = Option(recordedDate.getOrElse(imagedMoment.getRecordedTimestamp))
                 val et     = Option(elapsedTime.getOrElse(imagedMoment.getElapsedTime))
                 val newIm  =
                     ImagedMomentController.findOrCreateImagedMoment(imDao, vrUUID, tc, rd, et)

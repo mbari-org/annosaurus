@@ -59,7 +59,7 @@ class AnnotationSuite extends munit.FunSuite {
         assertEquals(cc2, cc1)
         assertEquals(e2.getElapsedTime(), e1.getElapsedTime())
         assertEquals(e2.getTimecode().toString(), e1.getTimecode().toString())
-        assertEquals(e2.getRecordedDate(), e1.getRecordedDate())
+        assertEquals(e2.getRecordedTimestamp(), e1.getRecordedTimestamp())
         assertEquals(e2.getVideoReferenceUuid(), e1.getVideoReferenceUuid())
         assertEquals(e2.getUuid(), e1.getUuid())
         assertEquals(e2.getObservations().size, e1.getObservations().size)

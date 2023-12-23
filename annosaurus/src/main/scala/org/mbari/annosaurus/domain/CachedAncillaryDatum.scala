@@ -100,7 +100,7 @@ object CachedAncillaryDatum extends FromEntity[CachedAncillaryDatumEntity, Cache
         val opt =
             if extend && entity.getImagedMoment != null then entity.getImagedMoment.primaryKey else None
         val rt  =
-            if extend && entity.getImagedMoment != null then Option(entity.getImagedMoment.getRecordedDate)
+            if extend && entity.getImagedMoment != null then Option(entity.getImagedMoment.getRecordedTimestamp)
             else None
         CachedAncillaryDatum(
             Option(entity.getLatitude),

@@ -357,7 +357,7 @@ class ImagedMomentController(val daoFactory: JPADAOFactory)
                 case Some(imagedMoment) =>
                     videoReferenceUUID.foreach(imagedMoment.setVideoReferenceUuid)
                     timecode.foreach(imagedMoment.setTimecode)
-                    recordedDate.foreach(imagedMoment.setRecordedDate)
+                    recordedDate.foreach(imagedMoment.setRecordedTimestamp)
                     elapsedTime.foreach(imagedMoment.setElapsedTime)
                     // dao.update(imagedMoment)
                     imagedMoment
@@ -383,8 +383,8 @@ class ImagedMomentController(val daoFactory: JPADAOFactory)
                 .map(im => {
                     if (im.getElapsedTime != null) {
                         val newRecordedDate = newStartTimestamp.plus(im.getElapsedTime)
-                        if (newRecordedDate != im.getRecordedDate) {
-                            im.setRecordedDate(newRecordedDate)
+                        if (newRecordedDate != im.getRecordedTimestamp) {
+                            im.setRecordedTimestamp(newRecordedDate)
                         }
                     }
                     im
@@ -440,7 +440,7 @@ object ImagedMomentController {
             dao,
             imagedMoment.getVideoReferenceUuid,
             Option(imagedMoment.getTimecode),
-            Option(imagedMoment.getRecordedDate),
+            Option(imagedMoment.getRecordedTimestamp),
             Option(imagedMoment.getElapsedTime)
         )
     }

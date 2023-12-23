@@ -54,7 +54,7 @@ final case class ImagedMoment(
         entity.setVideoReferenceUuid(videoReferenceUuid)
         timecode.foreach(tc => entity.setTimecode(Timecode(tc)))
         elapsedTimeMillis.foreach(t => entity.setElapsedTime(Duration.ofMillis(t)))
-        recordedTimestamp.foreach(entity.setRecordedDate)
+        recordedTimestamp.foreach(entity.setRecordedTimestamp)
         observations.foreach(obs => entity.addObservation(obs.toEntity))
         imageReferences.foreach(ir => entity.addImageReference(ir.toEntity))
         ancillaryData.foreach(d => entity.setAncillaryDatum(d.toEntity))
@@ -70,7 +70,7 @@ object ImagedMoment extends FromEntity[ImagedMomentEntity, ImagedMoment] {
             entity.getVideoReferenceUuid,
             Option(entity.getTimecode).map(_.toString()),
             Option(entity.getElapsedTime).map(_.toMillis),
-            Option(entity.getRecordedDate),
+            Option(entity.getRecordedTimestamp),
             entity.getObservations.asScala.map(x => Observation.from(x, false)).toSeq,
             entity.getImageReferences.asScala.map(x => ImageReference.from(x, false)).toSeq,
             Option(entity.getAncillaryDatum).map(x => CachedAncillaryDatum.from(x, false)),

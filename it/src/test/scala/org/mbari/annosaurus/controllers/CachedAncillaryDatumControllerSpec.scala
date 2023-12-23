@@ -99,7 +99,7 @@ class CachedAncillaryDatumControllerSpec extends AnyFlatSpec with Matchers with 
   it should "merge" in {
 
     // --- Remove
-    val minEpochMillis = imagedMoments.map(_.getRecordedDate.toEpochMilli).min
+    val minEpochMillis = imagedMoments.map(_.getRecordedTimestamp.toEpochMilli).min
 
     val cads = imagedMoments
       .zipWithIndex

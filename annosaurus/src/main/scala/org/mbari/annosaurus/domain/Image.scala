@@ -57,7 +57,7 @@ object Image extends FromEntity[ImageReferenceEntity, Image] {
                 (
                     Option(im.getTimecode).map(_.toString),
                     Option(im.getElapsedTime).map(_.toMillis()),
-                    Option(im.getRecordedDate)
+                    Option(im.getRecordedTimestamp)
                 )
             else (None, None, None)
 
