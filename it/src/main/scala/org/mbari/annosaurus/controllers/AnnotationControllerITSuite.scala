@@ -23,18 +23,21 @@ import org.mbari.annosaurus.AssertUtils
 import org.mbari.annosaurus.domain.ImagedMoment
 import org.mbari.annosaurus.domain.Annotation
 import scala.jdk.CollectionConverters.*
+import org.mbari.annosaurus.etc.jdk.Logging.given
 
 
 trait AnnotationControllerITSuite extends BaseDAOSuite {
     given JPADAOFactory = daoFactory
     given ExecutionContext = ExecutionContext.global
     lazy val controller = AnnotationController(daoFactory)
+    private val log = System.getLogger(getClass.getName)
 
     override def beforeAll(): Unit = daoFactory.beforeAll()
     override def afterAll(): Unit  = daoFactory.afterAll()
 
     test("findByUUID") {
         val im1 = TestUtils.create(1, 2, 3, 2, true).head
+        log.atInfo.log("im1: " + im1)
         val obs = im1.getObservations.asScala.head
         val opt = exec(controller.findByUUID(obs.getUuid))
         opt match

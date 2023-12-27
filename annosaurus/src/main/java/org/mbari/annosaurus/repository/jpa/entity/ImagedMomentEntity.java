@@ -23,8 +23,11 @@ import java.time.Instant;
 import java.util.*;
 
 import org.hibernate.annotations.Type;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 import org.mbari.annosaurus.repository.jpa.*;
 import org.mbari.vcr4j.time.Timecode;
+
 
 @Entity(name = "ImagedMoment")
 @Table(
@@ -235,7 +238,7 @@ import org.mbari.vcr4j.time.Timecode;
                 )
         }
 )
-@org.hibernate.envers.Audited
+// @org.hibernate.envers.Audited
 public class ImagedMomentEntity implements IPersistentObject {
 
     @Id
@@ -245,7 +248,7 @@ public class ImagedMomentEntity implements IPersistentObject {
 
     /** Optimistic lock to prevent concurrent overwrites */
     @Version
-    @Column(name = "last_updated_timestamp")
+    @Column(name = "last_updated_time")
     protected Timestamp lastUpdatedTime;
 
     @Column(name = "elapsed_time_millis", nullable = true)
@@ -254,25 +257,24 @@ public class ImagedMomentEntity implements IPersistentObject {
 
     @Column(name = "recorded_timestamp", nullable = true)
     @Temporal(value = TemporalType.TIMESTAMP)
-    @Convert(converter = InstantConverter.class)
+//     @Convert(converter = InstantConverter.class)
     Instant recordedTimestamp;
 
     @Column(name = "timecode", nullable = true)
     @Convert(converter = TimecodeConverter.class)
     Timecode timecode;
 
+    @Basic(optional = false)
     @Column(
-            name = "video_reference_uuid",
-            nullable = true,
-            columnDefinition = "varchar(36)"
+            name = "video_reference_uuid"
     )
-    @Convert(converter = UUIDConverter.class)
+    @JdbcTypeCode(SqlTypes.UUID)
     UUID videoReferenceUuid;
 
     @OneToMany(
             targetEntity = ObservationEntity.class,
             cascade = {CascadeType.ALL},
-            fetch = FetchType.EAGER,
+            fetch = FetchType.LAZY,
             mappedBy = "imagedMoment",
             orphanRemoval = true
     )

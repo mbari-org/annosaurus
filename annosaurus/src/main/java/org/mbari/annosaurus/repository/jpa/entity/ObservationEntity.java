@@ -17,6 +17,8 @@
 package org.mbari.annosaurus.repository.jpa.entity;
 
 import jakarta.persistence.*;
+import org.hibernate.envers.Audited;
+import org.hibernate.envers.RelationTargetAuditMode;
 import org.mbari.annosaurus.repository.jpa.DurationConverter;
 import org.mbari.annosaurus.repository.jpa.InstantConverter;
 import org.mbari.annosaurus.repository.jpa.TransactionLogger;
@@ -135,7 +137,7 @@ import java.util.UUID;
                 )
         }
 )
-@org.hibernate.envers.Audited
+// @org.hibernate.envers.Audited
 public class ObservationEntity implements IPersistentObject {
 
     @Id
@@ -145,7 +147,7 @@ public class ObservationEntity implements IPersistentObject {
 
     /** Optimistic lock to prevent concurrent overwrites */
     @Version
-    @Column(name = "last_updated_timestamp")
+    @Column(name = "last_updated_time")
     protected Timestamp lastUpdatedTime;
 
     @Column(name = "concept", length = 256)
@@ -155,17 +157,16 @@ public class ObservationEntity implements IPersistentObject {
     @Convert(converter = DurationConverter.class)
     Duration duration;
 
+//     @Audited(targetAuditMode = RelationTargetAuditMode.NOT_AUDITED)
     @ManyToOne(
             cascade = {CascadeType.PERSIST, CascadeType.DETACH},
-            optional = false,
-            targetEntity = ImagedMomentEntity.class
+            optional = false
     )
     @JoinColumn(name = "imaged_moment_uuid", nullable = false, foreignKey = @ForeignKey(name = "fk_observations__imaged_moment_uuid"))
     ImagedMomentEntity imagedMoment;
 
     @Column(name = "observation_timestamp", nullable = false)
     @Temporal(value = TemporalType.TIMESTAMP)
-    @Convert(converter = InstantConverter.class)
     Instant observationDate = Instant.now();
 
     @Column(name = "observer", length = 128, nullable = true)

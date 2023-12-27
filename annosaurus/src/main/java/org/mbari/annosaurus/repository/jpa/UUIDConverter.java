@@ -33,12 +33,12 @@ public class UUIDConverter implements AttributeConverter<UUID, Object> {
 
     @Override
     public Object convertToDatabaseColumn(UUID uuid) {
-        if (uuid == null) {
-          return null;
-        }
-        else if (DatabaseProductName.isPostgreSQL()) {
-          return uuid;
-        }
+        // if (uuid == null) {
+        //   return null;
+        // }
+        // else if (DatabaseProductName.isPostgreSQL()) {
+        //   return uuid;
+        // }
         return uuid.toString().toLowerCase();
     }
 

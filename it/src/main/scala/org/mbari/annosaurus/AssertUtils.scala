@@ -24,6 +24,8 @@ import org.mbari.annosaurus.repository.jpa.entity.ImageReferenceEntity
 import org.mbari.annosaurus.repository.jpa.entity.AssociationEntity
 import org.mbari.annosaurus.repository.jpa.entity.CachedAncillaryDatumEntity
 import scala.jdk.CollectionConverters.*
+import org.mbari.annosaurus.domain.CachedVideoReferenceInfo
+import org.mbari.annosaurus.repository.jpa.entity.CachedVideoReferenceInfoEntity
 
 object AssertUtils {
 
@@ -36,7 +38,10 @@ object AssertUtils {
             // do nothing
         }
         else if (a != null && b != null) {
-            assertEquals(a.getTimecode(), b.getTimecode())
+            // assertEquals(a.getTimecode(), b.getTimecode())
+            if (a.getTimecode() != null && b.getTimecode() != null) {
+                assertEquals(a.getTimecode().toString(), b.getTimecode().toString())
+            }
             assertEquals(a.getElapsedTime(), b.getElapsedTime())
             assertEquals(a.getRecordedTimestamp(), b.getRecordedTimestamp())
             assertEquals(a.getVideoReferenceUuid(), b.getVideoReferenceUuid())
@@ -52,7 +57,7 @@ object AssertUtils {
                 val by = b.getImageReferences().asScala.toSeq.sortBy(_.getUuid())
                 ay.zip(by).foreach(p => assertSameImageReference(p._1, p._2))
 
-                assertEquals(a.getAncillaryDatum(), b.getAncillaryDatum())
+                assertSameAncillaryDatum(a.getAncillaryDatum(), b.getAncillaryDatum())
             }
         }
         else {
@@ -148,6 +153,22 @@ object AssertUtils {
         else {
             fail("One of the ancillarydata is null")
         }
+    }
+
+    def assertSameVideoReferenceInfo(
+        a: CachedVideoReferenceInfoEntity,
+        b: CachedVideoReferenceInfoEntity
+    ): Unit = {
+        if (a == null && b == null) {
+            // do nothing
+        }
+        else if (a != null && b != null) {
+            assertEquals(a.getUuid(), b.getUuid())
+            assertEquals(a.getVideoReferenceUuid(), b.getVideoReferenceUuid())
+            assertEquals(a.getMissionContact(), b.getMissionContact())
+            assertEquals(a.getMissionId(), b.getMissionId())
+            assertEquals(a.getPlatformName(), b.getPlatformName())
+       }
     }
 
 }

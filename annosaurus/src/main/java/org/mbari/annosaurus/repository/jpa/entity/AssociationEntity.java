@@ -100,7 +100,7 @@ import java.util.UUID;
 
         }
 )
-@org.hibernate.envers.Audited
+// @org.hibernate.envers.Audited
 public class AssociationEntity implements IPersistentObject {
 
     public static String TO_CONCEPT_SELF = "self";
@@ -114,7 +114,7 @@ public class AssociationEntity implements IPersistentObject {
 
     /** Optimistic lock to prevent concurrent overwrites */
     @Version
-    @Column(name = "last_updated_timestamp")
+    @Column(name = "last_updated_time")
     protected Timestamp lastUpdatedTime;
 
     @Column(name = "link_name", length = 128, nullable = false)

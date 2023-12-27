@@ -56,6 +56,7 @@ object EntityManagerFactories {
             val props = emf
                 .getProperties
                 .asScala
+                .filter(a => a._1.startsWith("hibernate") || a._1.startsWith("jakarta"))
                 .map(a => s"${a._1} : ${a._2}")
                 .toList
                 .sorted
@@ -90,7 +91,7 @@ object EntityManagerFactories {
         val user        = config.getString(configNode + ".user")
         val props       = Map(
             "hibernate.dialect"                 -> productName,
-            "jakarta.persistence.database-product-name" -> productName,
+            // "jakarta.persistence.database-product-name" -> productName,
             "jakarta.persistence.jdbc.driver"           -> driver,
             "jakarta.persistence.jdbc.password"         -> password,
             "jakarta.persistence.jdbc.url"              -> url,

@@ -28,7 +28,7 @@ import org.mbari.scilube3.ocean.Ocean
 import org.mbari.annosaurus.repository.jpa.JPADAOFactory
 import org.mbari.annosaurus.repository.jpa.entity._
 import org.mbari.vcr4j.time.{FrameRates, Timecode}
-import org.slf4j.LoggerFactory
+import org.mbari.annosaurus.etc.jdk.Logging.given
 
 import java.net.URI
 import java.security.MessageDigest
@@ -40,6 +40,7 @@ import scala.concurrent.duration
 import scala.util.Random
 import scala.concurrent.ExecutionContext
 import java.sql.Timestamp
+import scala.concurrent.Await
 
 object TestUtils {
 
@@ -48,14 +49,14 @@ object TestUtils {
     private val random = Random
     given ExecutionContext = ExecutionContext.global
 
-    private val log = LoggerFactory.getLogger(getClass)
+    private val log = System.getLogger(getClass.getName)
 
     def runDdl(ddl: String, connection: Connection): Unit = {
         val statement = connection.createStatement();
         ddl
             .split(";")
             .foreach(sql => {
-                log.warn(s"Running:\n$sql")
+                log.atWarn.log(s"Running:\n$sql")
                 statement.execute(sql)
             })
         statement.close()
@@ -87,10 +88,15 @@ object TestUtils {
         nAssociations: Int = 0,
         nImageReferences: Int = 0,
         includeData: Boolean = false
-    )(implicit daoFactory: JPADAOFactory): Seq[ImagedMomentEntity] = {
-        val dao = daoFactory.newImagedMomentDAO()
+    )(using daoFactory: JPADAOFactory, ec: ExecutionContext): Seq[ImagedMomentEntity] = {
         val xs  = build(nImagedMoments, nObservations, nAssociations, nImageReferences, includeData)
-        dao.runTransaction(d => xs.foreach(e => d.create(e)))
+        log.atInfo.log(s"Creating ${xs.size} ImagedMoments: $xs")
+        val dao = daoFactory.newImagedMomentDAO()
+        Await.ready(dao.runTransaction(d => xs.foreach(x => d.create(x))), Timeout)
+        // for (x <- xs)
+        // do 
+        //     val f = dao.runTransaction(d => d.create(x))
+        //     Await.result(f, Timeout)
         dao.close()
         xs
     }
@@ -193,8 +199,16 @@ object TestUtils {
         datum.setPsi(psi)
         datum.setLightTransmission(trans)
         datum
+    }
 
-     
+    def createVideoReferenceInfo(videoReferenceUuid: UUID = UUID.randomUUID()): CachedVideoReferenceInfoEntity = {
+        
+        return CachedVideoReferenceInfoEntity(
+            videoReferenceUuid,
+            "p-" + Strings.random(10),
+            "missionId" + Strings.random(10),
+            "missionContact" + Strings.random(10)
+        )
     }
 
 }

@@ -17,6 +17,9 @@
 package org.mbari.annosaurus.repository.jpa
 
 import jakarta.persistence.EntityManagerFactory
+import jakarta.persistence.EntityManager
+import org.mbari.annosaurus.repository.jdbc.SqlRunner
+import org.hibernate.Session
 
 object DerbyTestDAOFactory extends TestDAOFactory {
 
@@ -36,6 +39,15 @@ object DerbyTestDAOFactory extends TestDAOFactory {
         val user     = config.getString("org.mbari.vars.annotation.database.derby.user")
         val password = config.getString("org.mbari.vars.annotation.database.derby.password")
         Class.forName(driver)
-        EntityManagerFactories(url, user, password, driver, testProps())
+        val emf = EntityManagerFactories(url, user, password, driver, testProps())
+        val em = emf.createEntityManager()
+        // init(em)
+        em.close()
+        emf
     }
+
+    private def init(entityManager: EntityManager): Unit = 
+        val ddl = getClass.getResource("/sql/derby/02_m3_annotations.sql")
+        SqlRunner.run(ddl, entityManager)
+
 }

@@ -1,3 +1,115 @@
+create table ancillary_data
+(
+    altitude                    float(53),
+    depth_meters                float(53),
+    latitude                    float(53),
+    light_transmission          float(53),
+    longitude                   float(53),
+    oxygen_ml_per_l             float(53),
+    phi                         float(53),
+    pressure_dbar               float(53),
+    psi                         float(53),
+    salinity                    float(53),
+    temperature_celsius         float(53),
+    theta                       float(53),
+    x                           float(53),
+    y                           float(53),
+    z                           float(53),
+    last_updated_time           datetime2(6),
+    imaged_moment_uuid          uniqueidentifier not null,
+    uuid                        uniqueidentifier not null,
+    coordinate_reference_system varchar(32),
+    xyz_position_units          varchar(32),
+    primary key (uuid)
+);
+create table associations
+(
+    last_updated_time datetime2(6),
+    observation_uuid  uniqueidentifier not null,
+    uuid              uniqueidentifier not null,
+    mime_type         varchar(64)      not null,
+    link_name         varchar(128)     not null,
+    to_concept        varchar(128),
+    link_value        varchar(1024),
+    primary key (uuid)
+);
+create table image_references
+(
+    height_pixels      int,
+    width_pixels       int,
+    last_updated_time  datetime2(6),
+    imaged_moment_uuid uniqueidentifier not null,
+    uuid               uniqueidentifier not null,
+    format             varchar(64),
+    description        varchar(256),
+    url                varchar(2048)    not null,
+    primary key (uuid)
+);
+create table imaged_moments
+(
+    elapsed_time_millis  bigint,
+    last_updated_time    datetime2(6),
+    recorded_timestamp   datetimeoffset(6),
+    uuid                 uniqueidentifier not null,
+    video_reference_uuid uniqueidentifier not null,
+    timecode             varchar(255),
+    primary key (uuid)
+);
+create table observations
+(
+    duration_millis       bigint,
+    last_updated_time     datetime2(6),
+    observation_timestamp datetimeoffset(6) not null,
+    imaged_moment_uuid    uniqueidentifier  not null,
+    uuid                  uniqueidentifier  not null,
+    activity              varchar(128),
+    observation_group     varchar(128),
+    observer              varchar(128),
+    concept               varchar(256),
+    primary key (uuid)
+);
+create table video_reference_information
+(
+    last_updated_time    datetime2(6),
+    uuid                 uniqueidentifier not null,
+    video_reference_uuid uniqueidentifier not null,
+    mission_contact      varchar(64),
+    platform_name        varchar(64)      not null,
+    mission_id           varchar(256)     not null,
+    primary key (uuid)
+);
+create index idx_ancillary_data__imaged_moment_uuid on ancillary_data (imaged_moment_uuid);
+create index idx_ancillary_data__position on ancillary_data (latitude, longitude, depth_meters);
+alter table ancillary_data
+    add constraint UK_2yx268s7fsveo44c4eaydm0b3 unique (imaged_moment_uuid);
+create index idx_associations__link_name on associations (link_name);
+create index idx_associations__link_value on associations (link_value);
+create index idx_associations__to_concept on associations (to_concept);
+create index idx_associations__observation_uuid on associations (observation_uuid);
+create index idx_image_references__url on image_references (url);
+create index idx_image_references__imaged_moment_uuid on image_references (imaged_moment_uuid);
+alter table image_references
+    add constraint UK_ikwbuple2jhdifw1dlsp5c4sn unique (url);
+create index idx_imaged_moments__video_reference_uuid on imaged_moments (video_reference_uuid);
+create index idx_imaged_moments__recorded_timestamp on imaged_moments (recorded_timestamp);
+create index idx_imaged_moments__elapsed_time on imaged_moments (elapsed_time_millis);
+create index idx_imaged_moments__timecode on imaged_moments (timecode);
+create index idx_observations__concept on observations (concept);
+create index idx_observations__group on observations (observation_group);
+create index idx_observations__activity on observations (activity);
+create index idx_observations__imaged_moment_uuid on observations (imaged_moment_uuid);
+create index idx_video_reference_information__video_reference_uuid on video_reference_information (video_reference_uuid);
+alter table video_reference_information
+    add constraint uk_video_reference_information__video_reference_uuid unique (video_reference_uuid);
+alter table ancillary_data
+    add constraint fk_ancillary_data__imaged_moments foreign key (imaged_moment_uuid) references imaged_moments;
+alter table associations
+    add constraint fk_assocations__observations foreign key (observation_uuid) references observations;
+alter table image_references
+    add constraint fk_image_references__imaged_moments foreign key (imaged_moment_uuid) references imaged_moments;
+alter table observations
+    add constraint fk_observations__imaged_moments foreign key (imaged_moment_uuid) references imaged_moments;
+
 CREATE TABLE "dbo"."adjust_file_histories"  (
 	"id"                  	bigint IDENTITY(100,1) NOT NULL,
 	"uuid"                	uniqueidentifier NOT NULL,
@@ -18,64 +130,7 @@ CREATE TABLE "dbo"."adjust_rov_tape_histories"  (
 	CONSTRAINT "PK__adjust_r__3213E83F21252C06" PRIMARY KEY CLUSTERED("id")
  ON [PRIMARY]);
 
-CREATE TABLE "dbo"."ancillary_data"  ( 
-	"uuid"                       	uniqueidentifier NOT NULL,
-	"altitude"                   	real NULL,
-	"coordinate_reference_system"	varchar(32) NULL,
-	"depth_meters"               	real NULL,
-	"last_updated_timestamp"     	datetime2 NULL,
-	"latitude"                   	float NULL,
-	"longitude"                  	float NULL,
-	"oxygen_ml_per_l"            	real NULL,
-	"phi"                        	float NULL,
-	"xyz_position_units"         	varchar(255) NULL,
-	"pressure_dbar"              	real NULL,
-	"psi"                        	float NULL,
-	"salinity"                   	real NULL,
-	"temperature_celsius"        	real NULL,
-	"theta"                      	float NULL,
-	"x"                          	float NULL,
-	"y"                          	float NULL,
-	"z"                          	float NULL,
-	"imaged_moment_uuid"         	uniqueidentifier NOT NULL,
-	"light_transmission"         	real NULL,
-	CONSTRAINT "PK__ancillar__7F4279302B7518A4" PRIMARY KEY CLUSTERED("uuid")
- ON [PRIMARY]);
-
-CREATE TABLE "dbo"."associations"  ( 
-	"uuid"                  	uniqueidentifier NOT NULL,
-	"last_updated_timestamp"	datetime2 NULL,
-	"link_name"             	varchar(128) NOT NULL,
-	"link_value"            	varchar(1024) NULL,
-	"to_concept"            	varchar(128) NULL,
-	"observation_uuid"      	uniqueidentifier NOT NULL,
-	"mime_type"             	varchar(64) NOT NULL,
-	CONSTRAINT "PK__associat__7F427930B6C824FA" PRIMARY KEY CLUSTERED("uuid")
- ON [PRIMARY]);
-
-CREATE TABLE "dbo"."image_references"  ( 
-	"uuid"                  	uniqueidentifier NOT NULL,
-	"description"           	varchar(256) NULL,
-	"format"                	varchar(64) NULL,
-	"height_pixels"         	int NULL,
-	"last_updated_timestamp"	datetime2 NULL,
-	"url"                   	varchar(1024) NOT NULL,
-	"width_pixels"          	int NULL,
-	"imaged_moment_uuid"    	uniqueidentifier NOT NULL,
-	CONSTRAINT "PK__image_re__7F427930F815F257" PRIMARY KEY CLUSTERED("uuid")
- ON [PRIMARY]);
-
-CREATE TABLE "dbo"."imaged_moments"  ( 
-	"uuid"                  	uniqueidentifier NOT NULL,
-	"elapsed_time_millis"   	numeric(19,0) NULL,
-	"last_updated_timestamp"	datetime2 NULL,
-	"recorded_timestamp"    	datetime2 NULL,
-	"timecode"              	varchar(255) NULL,
-	"video_reference_uuid"  	uniqueidentifier NULL,
-	CONSTRAINT "PK__imaged_m__7F4279303DEE847D" PRIMARY KEY CLUSTERED("uuid")
- ON [PRIMARY]);
-
-CREATE TABLE "dbo"."merge_rov_histories"  ( 
+ CREATE TABLE "dbo"."merge_rov_histories"  ( 
 	"id"                  	bigint IDENTITY(1,1) NOT NULL,
 	"uuid"                	uniqueidentifier NOT NULL,
 	"video_reference_uuid"	uniqueidentifier NOT NULL,
@@ -87,86 +142,7 @@ CREATE TABLE "dbo"."merge_rov_histories"  (
 	CONSTRAINT "PK_merge_rov_histories" PRIMARY KEY CLUSTERED("id")
  ON [PRIMARY]);
 
-CREATE TABLE "dbo"."observations"  ( 
-	"uuid"                  	uniqueidentifier NOT NULL,
-	"activity"              	varchar(128) NULL,
-	"concept"               	varchar(256) NULL,
-	"duration_millis"       	numeric(19,0) NULL,
-	"observation_group"     	varchar(128) NULL,
-	"last_updated_timestamp"	datetime2 NULL,
-	"observation_timestamp" 	datetime2 NULL,
-	"observer"              	varchar(128) NULL,
-	"imaged_moment_uuid"    	uniqueidentifier NOT NULL,
-	CONSTRAINT "PK__observat__7F4279305ACD8084" PRIMARY KEY CLUSTERED("uuid")
- ON [PRIMARY]);
-
-CREATE TABLE "dbo"."video_reference_information"  ( 
-	"uuid"                  	uniqueidentifier NOT NULL,
-	"last_updated_timestamp"	datetime2 NULL,
-	"mission_contact"       	varchar(64) NULL,
-	"mission_id"            	varchar(256) NOT NULL,
-	"platform_name"         	varchar(64) NOT NULL,
-	"video_reference_uuid"  	uniqueidentifier NOT NULL,
-	CONSTRAINT "PK__video_re__7F427930B246FB6C" PRIMARY KEY CLUSTERED("uuid")
- ON [PRIMARY]);
-
-CREATE NONCLUSTERED INDEX "ids_adjust_file_histories__video_reference_uuid"
-	ON "dbo"."adjust_file_histories"("video_reference_uuid");
-
-CREATE NONCLUSTERED INDEX "idx_adjust_rov_tape_histories__video_reference_uuid"
-	ON "dbo"."adjust_rov_tape_histories"("video_reference_uuid");
-
-CREATE NONCLUSTERED INDEX "idx_ancillary_data__imaged_moment_uuid"
-	ON "dbo"."ancillary_data"("imaged_moment_uuid");
-
-CREATE NONCLUSTERED INDEX "idx_associations__link_name"
-	ON "dbo"."associations"("link_name");
-
-CREATE NONCLUSTERED INDEX "idx_associations__to_concept"
-	ON "dbo"."associations"("to_concept");
-
-CREATE NONCLUSTERED INDEX "idx_associations_link_value"
-	ON "dbo"."associations"("link_value");
-
-CREATE NONCLUSTERED INDEX "idx_image_references__imaged_moment_uuid"
-	ON "dbo"."image_references"("imaged_moment_uuid");
-
-CREATE NONCLUSTERED INDEX "idx_image_references__url"
-	ON "dbo"."image_references"("url");
-
-CREATE NONCLUSTERED INDEX "idx_imaged_moment__video_reference_uuid"
-	ON "dbo"."imaged_moments"("video_reference_uuid");
-
-CREATE NONCLUSTERED INDEX "idx_imaged_moments__elapsed_time"
-	ON "dbo"."imaged_moments"("elapsed_time_millis");
-
-CREATE NONCLUSTERED INDEX "idx_imaged_moments__recorded_timestamp"
-	ON "dbo"."imaged_moments"("recorded_timestamp");
-
-CREATE NONCLUSTERED INDEX "idx_imaged_moments__timecode"
-	ON "dbo"."imaged_moments"("timecode");
-
-CREATE NONCLUSTERED INDEX "idx_merge_rov_histories__video_reference_uuid"
-	ON "dbo"."merge_rov_histories"("video_reference_uuid");
-
-CREATE NONCLUSTERED INDEX "idx_observations__concept"
-	ON "dbo"."observations"("concept");
-
-CREATE NONCLUSTERED INDEX "idx_observations__imaged_moment_uuid"
-	ON "dbo"."observations"("imaged_moment_uuid");
-
-CREATE NONCLUSTERED INDEX "idx_video_reference_information__video_reference_uuid"
-	ON "dbo"."video_reference_information"("video_reference_uuid");
-
-ALTER TABLE "dbo"."image_references"
-	ADD CONSTRAINT "UQ__image_re__DD778417265A2306"
-	UNIQUE ("url");
-
-ALTER TABLE "dbo"."video_reference_information"
-	ADD CONSTRAINT "UQ__video_re__352A4D46EAE426D8"
-	UNIQUE ("video_reference_uuid");
-
-ALTER TABLE "dbo"."ancillary_data" WITH NOCHECK
+ ALTER TABLE "dbo"."ancillary_data" WITH NOCHECK
 	ADD CONSTRAINT "FK_ancillary_data_imaged_moment_uuid"
 	FOREIGN KEY("imaged_moment_uuid")
 	REFERENCES "dbo"."imaged_moments"("uuid")
@@ -193,4 +169,5 @@ ALTER TABLE "dbo"."observations"
 	REFERENCES "dbo"."imaged_moments"("uuid")
 	ON DELETE NO ACTION 
 	ON UPDATE NO ACTION;
+
 

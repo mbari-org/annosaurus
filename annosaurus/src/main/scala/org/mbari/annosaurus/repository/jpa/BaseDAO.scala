@@ -28,6 +28,7 @@ import jakarta.persistence.Query
 import org.mbari.annosaurus.repository.DAO
 import org.mbari.annosaurus.repository.jpa.entity.IPersistentObject
 import org.mbari.annosaurus.repository.jpa.entity.extensions.*
+import org.mbari.annosaurus.repository.jpa.extensions.*
 
 /** @author
   *   Brian Schlining
@@ -122,7 +123,7 @@ abstract class BaseDAO[B <: IPersistentObject: ClassTag](val entityManager: Enti
         findByUUID(primaryKey).foreach(delete)
 
     override def runTransaction[R](fn: this.type => R)(implicit ec: ExecutionContext): Future[R] = {
-        import org.mbari.annosaurus.repository.jpa.Implicits.RichEntityManager
+        
         def fn2(em: EntityManager): R = fn.apply(this)
         entityManager.runTransaction(fn2)
     }
@@ -149,5 +150,5 @@ abstract class BaseDAO[B <: IPersistentObject: ClassTag](val entityManager: Enti
 }
 
 object BaseDAO {
-    val JDBC_URL_KEY = "javax.persistence.jdbc.url"
+    val JDBC_URL_KEY = "jakarta.persistence.jdbc.url"
 }

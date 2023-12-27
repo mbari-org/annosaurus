@@ -17,16 +17,16 @@
 package org.mbari.annosaurus.controllers
 
 import org.mbari.annosaurus.AssertUtils
-import org.mbari.annosaurus.repository.jpa.{DerbyTestDAOFactory, TestDAOFactory}
+import org.mbari.annosaurus.repository.jpa.TestDAOFactory
 
 import java.util.concurrent.TimeUnit
 import scala.concurrent.{Await, ExecutionContext}
 import scala.jdk.CollectionConverters.*
+import org.mbari.annosaurus.repository.jpa.BaseDAOSuite
 
-class TestUtilsSuite extends munit.FunSuite {
+trait TestUtilsSuite extends BaseDAOSuite{
 
-    implicit val daoFactory: TestDAOFactory = DerbyTestDAOFactory
-    implicit val ec: ExecutionContext = ExecutionContext.global
+
     val timeout = scala.concurrent.duration.Duration(10, TimeUnit.SECONDS)
 
     test("build") {
@@ -50,14 +50,45 @@ class TestUtilsSuite extends munit.FunSuite {
     }
 
     test("create") {
+        given df: TestDAOFactory = daoFactory
         val xs = TestUtils.create(1, 2, 2, 2, true)
         assertEquals(xs.size, 1)
         val x = xs.head
+        assert(x.getUuid() != null)
         val dao = daoFactory.newImagedMomentDAO()
-        Await.ready(dao.runTransaction(_.create(x)), timeout)
+        // Await.ready(dao.runTransaction(_.create(x)), timeout)
         val opt = Await.result(dao.runTransaction(_.findByUUID(x.getUuid())), timeout)
         assert(opt.isDefined)
         AssertUtils.assertSameImagedMoment(x, opt.get)
+
+    }
+
+    test("create imagedMoment") {
+        given df: TestDAOFactory = daoFactory
+        val xs = TestUtils.create(1)
+        assertEquals(xs.size, 1)
+        val x = xs.head
+        assert(x.getUuid() != null)
+        val dao = daoFactory.newImagedMomentDAO()
+        // Await.ready(dao.runTransaction(_.create(x)), timeout)
+        val opt = Await.result(dao.runTransaction(_.findByUUID(x.getUuid())), timeout)
+        assert(opt.isDefined)
+        AssertUtils.assertSameImagedMoment(x, opt.get)
+
+    }
+
+    test("create video reference info") {
+        given df: TestDAOFactory = daoFactory
+        val vi = TestUtils.createVideoReferenceInfo()
+        val dao = daoFactory.newCachedVideoReferenceInfoDAO()
+        Await.ready(dao.runTransaction(_.create(vi)), timeout)
+        assert(vi.getUuid() != null)
+        val opt = Await.result(dao.runTransaction(_.findByUUID(vi.getUuid())), timeout)
+        assert(opt.isDefined)
+        val vi2 = opt.get
+        AssertUtils.assertSameVideoReferenceInfo(vi2, vi)
+        
+        dao.close()
 
     }
 

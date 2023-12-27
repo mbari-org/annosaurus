@@ -77,7 +77,7 @@ import org.mbari.annosaurus.repository.jpa.URLConverter;
                 )
         }
 )
-@org.hibernate.envers.Audited
+// @org.hibernate.envers.Audited
 public class ImageReferenceEntity implements IPersistentObject {
 
     @Id
@@ -87,7 +87,7 @@ public class ImageReferenceEntity implements IPersistentObject {
 
     /** Optimistic lock to prevent concurrent overwrites */
     @Version
-    @Column(name = "last_updated_timestamp")
+    @Column(name = "last_updated_time")
     protected Timestamp lastUpdatedTime;
 
     @Column(name = "description", length = 256, nullable = true)
@@ -99,8 +99,7 @@ public class ImageReferenceEntity implements IPersistentObject {
 
     @ManyToOne(
             cascade = {CascadeType.PERSIST, CascadeType.DETACH},
-            optional = false,
-            targetEntity = ImagedMomentEntity.class
+            optional = false
     )
     @JoinColumn(
             name = "imaged_moment_uuid",

@@ -98,7 +98,7 @@ public class CachedAncillaryDatumEntity implements IPersistentObject {
 
     /** Optimistic lock to prevent concurrent overwrites */
     @Version
-    @Column(name = "last_updated_timestamp")
+    @Column(name = "last_updated_time")
     protected Timestamp lastUpdatedTime;
 
     @Column(name = "coordinate_reference_system", length = 32, nullable = true)

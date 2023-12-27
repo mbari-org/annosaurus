@@ -40,6 +40,7 @@ object SqlServerTestDAOFactory extends TestDAOFactory:
         TestDAOFactory.TestProperties ++
             Map(
                 "hibernate.dialect"            -> "org.hibernate.dialect.SQLServerDialect",
+                "hibernate.hbm2ddl.auto"       -> "validate",
                 "hibernate.hikari.idleTimeout" -> "1000",
                 "hibernate.hikari.maxLifetime" -> "3000",
                 "jakarta.persistence.schema-generation.scripts.action" -> "drop-and-create"

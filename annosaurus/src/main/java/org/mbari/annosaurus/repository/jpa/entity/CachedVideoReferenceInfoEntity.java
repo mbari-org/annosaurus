@@ -17,6 +17,8 @@
 package org.mbari.annosaurus.repository.jpa.entity;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 import org.mbari.annosaurus.repository.jpa.TransactionLogger;
 import org.mbari.annosaurus.repository.jpa.UUIDConverter;
 
@@ -95,7 +97,7 @@ public class CachedVideoReferenceInfoEntity implements IPersistentObject {
 
     /** Optimistic lock to prevent concurrent overwrites */
     @Version
-    @Column(name = "last_updated_timestamp")
+    @Column(name = "last_updated_time")
     protected Timestamp lastUpdatedTime;
 
     /** typically this will be the chief scientist
@@ -106,13 +108,12 @@ public class CachedVideoReferenceInfoEntity implements IPersistentObject {
     @Column(name = "platform_name", nullable = false, length = 64)
     String platformName;
 
+    @Basic(optional = false)
     @Column(
             name = "video_reference_uuid",
-            nullable = true,
-            unique = true,
-            columnDefinition = "varchar(36)"
+            unique = true
     )
-    @Convert(converter = UUIDConverter.class)
+    @JdbcTypeCode(SqlTypes.UUID)
     UUID videoReferenceUuid;
 
     @Column(name = "mission_id", nullable = false, length = 256)

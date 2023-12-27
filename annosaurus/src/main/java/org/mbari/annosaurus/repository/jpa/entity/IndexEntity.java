@@ -22,6 +22,9 @@ import org.mbari.annosaurus.repository.jpa.InstantConverter;
 import org.mbari.annosaurus.repository.jpa.TimecodeConverter;
 import org.mbari.vcr4j.time.Timecode;
 import org.mbari.annosaurus.repository.jpa.TransactionLogger;
+import org.hibernate.annotations.Type;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import java.sql.Timestamp;
 import java.time.Duration;
@@ -48,10 +51,14 @@ public class IndexEntity implements IPersistentObject {
 
     /** Optimistic lock to prevent concurrent overwrites */
     @Version
-    @Column(name = "last_updated_timestamp")
+    @Column(name = "last_updated_time")
     protected Timestamp lastUpdatedTime;
 
-    @Column(name = "video_reference_uuid", nullable = true)
+    @Basic(optional = false)
+    @Column(
+            name = "video_reference_uuid"
+    )
+    @JdbcTypeCode(SqlTypes.UUID)
     UUID videoReferenceUuid;
 
     @Column(name = "elapsed_time_millis", nullable = true)
@@ -60,7 +67,6 @@ public class IndexEntity implements IPersistentObject {
 
     @Column(name = "recorded_timestamp", nullable = true)
     @Temporal(value = TemporalType.TIMESTAMP)
-    @Convert(converter = InstantConverter.class)
     Instant recordedDate;
 
     @Column(name = "timecode", nullable = true)

@@ -96,6 +96,7 @@ lazy val annosaurus = (project in file("annosaurus"))
             slf4j,
             slf4jJul,
             slf4jLog4j,
+            slf4jSystem,
             tapirCirce,
             tapirPrometheus,
             tapirServerStub   % Test,
@@ -170,6 +171,17 @@ lazy val integrationTests = (project in file("it"))
 //       testcontainersScalatest  % Test
 //     )
 //   )
+
+lazy val itPostgres = (project in file("it-postgres"))
+  .dependsOn(integrationTests)
+  .enablePlugins(
+    AutomateHeaderPlugin
+  )
+  .settings(
+    libraryDependencies ++= Seq(
+      testcontainersPostgres
+    )
+  )
 
 lazy val itSqlserver = (project in file("it-sqlserver"))
   .dependsOn(integrationTests)

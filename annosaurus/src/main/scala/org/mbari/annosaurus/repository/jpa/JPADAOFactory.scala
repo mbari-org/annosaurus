@@ -41,51 +41,51 @@ trait JPADAOFactory {
     private def extractEntityManager(dao: DAO[_]): EntityManager =
         dao.asInstanceOf[BaseDAO[_]].entityManager
 
-    def newAssociationDAO(): AssociationDAO[AssociationEntity] =
+    def newAssociationDAO(): AssociationDAOImpl =
         new AssociationDAOImpl(entityManagerFactory.createEntityManager())
 
-    def newAssociationDAO(dao: DAO[_]): AssociationDAO[AssociationEntity] =
+    def newAssociationDAO(dao: DAO[_]): AssociationDAOImpl =
         new AssociationDAOImpl(extractEntityManager(dao))
 
-    def newCachedAncillaryDatumDAO(): CachedAncillaryDatumDAO[CachedAncillaryDatumEntity] =
+    def newCachedAncillaryDatumDAO(): CachedAncillaryDatumDAOImpl =
         new CachedAncillaryDatumDAOImpl(entityManagerFactory.createEntityManager())
 
     def newCachedAncillaryDatumDAO(
         dao: DAO[_]
-    ): CachedAncillaryDatumDAO[CachedAncillaryDatumEntity] =
+    ): CachedAncillaryDatumDAOImpl =
         new CachedAncillaryDatumDAOImpl(extractEntityManager(dao))
 
-    def newObservationDAO(): ObservationDAO[ObservationEntity] =
+    def newObservationDAO(): ObservationDAOImpl =
         new ObservationDAOImpl(entityManagerFactory.createEntityManager())
 
-    def newObservationDAO(dao: DAO[_]): ObservationDAO[ObservationEntity] =
+    def newObservationDAO(dao: DAO[_]): ObservationDAOImpl =
         new ObservationDAOImpl(extractEntityManager(dao))
 
     def newCachedVideoReferenceInfoDAO()
-        : CachedVideoReferenceInfoDAO[CachedVideoReferenceInfoEntity] =
+        : CachedVideoReferenceInfoDAOImpl =
         new CachedVideoReferenceInfoDAOImpl(entityManagerFactory.createEntityManager())
 
     def newCachedVideoReferenceInfoDAO(
         dao: DAO[_]
-    ): CachedVideoReferenceInfoDAO[CachedVideoReferenceInfoEntity] =
+    ): CachedVideoReferenceInfoDAOImpl =
         new CachedVideoReferenceInfoDAOImpl(extractEntityManager(dao))
 
-    def newIndexDAO(): IndexDAO[IndexEntity] =
+    def newIndexDAO(): IndexDAOImpl =
         new IndexDAOImpl(entityManagerFactory.createEntityManager())
 
-    def newIndexDAO(dao: DAO[_]): IndexDAO[IndexEntity] =
+    def newIndexDAO(dao: DAO[_]): IndexDAOImpl =
         new IndexDAOImpl(extractEntityManager(dao))
 
-    def newImageReferenceDAO(): ImageReferenceDAO[ImageReferenceEntity] =
+    def newImageReferenceDAO(): ImageReferenceDAOImpl =
         new ImageReferenceDAOImpl(entityManagerFactory.createEntityManager())
 
-    def newImageReferenceDAO(dao: DAO[_]): ImageReferenceDAO[ImageReferenceEntity] =
+    def newImageReferenceDAO(dao: DAO[_]): ImageReferenceDAOImpl =
         new ImageReferenceDAOImpl(extractEntityManager(dao))
 
-    def newImagedMomentDAO(): ImagedMomentDAO[ImagedMomentEntity] =
+    def newImagedMomentDAO(): ImagedMomentDAOImpl =
         new ImagedMomentDAOImpl(entityManagerFactory.createEntityManager())
 
-    def newImagedMomentDAO(dao: DAO[_]): ImagedMomentDAO[ImagedMomentEntity] =
+    def newImagedMomentDAO(dao: DAO[_]): ImagedMomentDAOImpl =
         new ImagedMomentDAOImpl(extractEntityManager(dao))
 
 }
