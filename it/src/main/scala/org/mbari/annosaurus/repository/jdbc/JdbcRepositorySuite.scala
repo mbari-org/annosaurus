@@ -117,10 +117,17 @@ trait JdbcRepositorySuite extends BaseDAOSuite {
         val ts = xs.map(im => im.getRecordedTimestamp()).sorted
         val ts0 = ts.head.minus(Duration.ofSeconds(1))
         val ts1 = ts(2).plus(Duration.ofSeconds(1))
-        val xs2 = repository.findByVideoReferenceUuidAndTimestamps(x.getVideoReferenceUuid(),
+
+        val expected = xs.filter(im => {
+            val t = im.getRecordedTimestamp()
+            im.getVideoReferenceUuid() == x.getVideoReferenceUuid() &&
+            t.isAfter(ts0) && t.isBefore(ts1)
+        })
+
+        val obtained = repository.findByVideoReferenceUuidAndTimestamps(x.getVideoReferenceUuid(),
             ts0, ts1)
-        println("-------- " + xs2)
-        assertEquals(xs2.size, 3)
+        println("-------- " + obtained)
+        assertEquals(obtained.size, expected.size)
     }
 
     test("findGeographicRangeByQueryConstraint") {}

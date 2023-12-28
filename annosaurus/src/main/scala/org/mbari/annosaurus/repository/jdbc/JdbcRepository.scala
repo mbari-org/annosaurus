@@ -54,12 +54,12 @@ class JdbcRepository(entityManagerFactory: EntityManagerFactory) {
             ImagedMomentSQL.deleteByVideoReferenceUuid
         ).map(entityManager.createNativeQuery)
         queries.foreach(q => {
-            if (DatabaseProductName.isPostgreSQL()) {
-                q.setParameter(1, videoReferenceUuid)
-            }
-            else {
-                q.setParameter(1, videoReferenceUuid.toString)
-            }
+            // if (DatabaseProductName.isPostgreSQL()) {
+            //     q.setParameter(1, videoReferenceUuid)
+            // }
+            // else {
+            q.setParameter(1, videoReferenceUuid.toString)
+            // }
         })
         var deleteCount                           = DeleteCount(videoReferenceUuid)
         try {
@@ -163,12 +163,12 @@ class JdbcRepository(entityManagerFactory: EntityManagerFactory) {
     def countImagesByVideoReferenceUuid(videoReferenceUuid: UUID): Long = {
         implicit val entityManager: EntityManager = entityManagerFactory.createEntityManager()
         val query                                 = entityManager.createNativeQuery(ImageReferenceSQL.countByVideoReferenceUuid)
-        if (DatabaseProductName.isPostgreSQL()) {
-            query.setParameter(1, videoReferenceUuid)
-        }
-        else {
-            query.setParameter(1, videoReferenceUuid.toString())
-        }
+        // if (DatabaseProductName.isPostgreSQL()) {
+        //     query.setParameter(1, videoReferenceUuid)
+        // }
+        // else {
+        query.setParameter(1, videoReferenceUuid.toString())
+        // }
         val result                                = query.getSingleResult
         // SQL Server returns Int, Postgresql returns Long
         val count                                 = Try(result.asInstanceOf[Int].toLong)
@@ -194,12 +194,12 @@ class JdbcRepository(entityManagerFactory: EntityManagerFactory) {
         )
 
         queries.foreach(q => {
-            if (DatabaseProductName.isPostgreSQL()) {
-                q.setParameter(1, videoReferenceUuid)
-            }
-            else {
-                q.setParameter(1, videoReferenceUuid.toString)
-            }
+            // if (DatabaseProductName.isPostgreSQL()) {
+            //     q.setParameter(1, videoReferenceUuid)
+            // }
+            // else {
+            q.setParameter(1, videoReferenceUuid.toString)
+            // }
         })
 
         val annos =
@@ -225,12 +225,12 @@ class JdbcRepository(entityManagerFactory: EntityManagerFactory) {
         )
 
         queries.foreach(q => {
-            if (DatabaseProductName.isPostgreSQL()) {
-                q.setParameter(1, videoReferenceUuid)
-            }
-            else {
-                q.setParameter(1, videoReferenceUuid.toString)
-            }
+            // if (DatabaseProductName.isPostgreSQL()) {
+            //     q.setParameter(1, videoReferenceUuid)
+            // }
+            // else {
+            q.setParameter(1, videoReferenceUuid.toString)
+            // }
             q.setParameter(1, videoReferenceUuid.toString)
             q.setParameter(2, Timestamp.from(startTimestamp))
             q.setParameter(3, Timestamp.from(endTimestamp))
@@ -392,12 +392,12 @@ class JdbcRepository(entityManagerFactory: EntityManagerFactory) {
     ): Seq[Image] = {
         implicit val entityManager: EntityManager = entityManagerFactory.createEntityManager()
         val query                                 = entityManager.createNativeQuery(ImagedMomentSQL.byVideoReferenceUuid)
-        if (DatabaseProductName.isPostgreSQL()) {
-            query.setParameter(1, videoReferenceUuid)
-        }
-        else {
-            query.setParameter(1, videoReferenceUuid.toString)
-        }
+        // if (DatabaseProductName.isPostgreSQL()) {
+        //     query.setParameter(1, videoReferenceUuid)
+        // }
+        // else {
+        query.setParameter(1, videoReferenceUuid.toString)
+        // }
         limit.foreach(query.setMaxResults)
         offset.foreach(query.setFirstResult)
         val results                               = query.getResultList.asScala.toList

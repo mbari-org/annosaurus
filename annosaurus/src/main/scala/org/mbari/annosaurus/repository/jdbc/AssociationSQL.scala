@@ -28,22 +28,22 @@ object AssociationSQL {
             row <- rows
         } yield {
             val xs               = row.asInstanceOf[Array[Object]]
-            val uuid             = UUID.fromString(xs(0).toString)
-            val observationUuid  = UUID.fromString(xs(1).toString)
-            val linkName         = Option(xs(2)).map(_.toString)
-            val toConcept        = Option(xs(3)).map(_.toString)
-            val linkValue        = Option(xs(4)).map(_.toString)
-            val mimeType         = Option(xs(5)).map(_.toString)
-            val imagedMomentUuid = UUID.fromString(xs(6).toString)
+            val uuid             = xs(0).asUUID
+            val observationUuid  = xs(1).asUUID
+            val linkName         = xs(2).asString
+            val toConcept        = xs(3).asString
+            val linkValue        = xs(4).asString
+            val mimeType         = xs(5).asString
+            val imagedMomentUuid = xs(6).asUUID
             Association(
                 linkName.getOrElse(""),
                 toConcept.getOrElse(""),
                 linkValue.getOrElse(""),
                 mimeType,
-                Option(uuid),
+                uuid,
                 None,
-                Option(observationUuid),
-                Option(imagedMomentUuid)
+                observationUuid,
+                imagedMomentUuid
             )
             // val a  = new MutableAssociationExt
             // a.uuid = UUID.fromString(xs(0).toString)

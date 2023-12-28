@@ -27,12 +27,6 @@ import java.time.Instant
   */
 object AnnotationSQL {
 
-    def instantConverter(obj: Object): Option[Instant] =
-        obj match
-            case null => None
-            case ts: Timestamp => Some(ts.toInstant)
-            case m: microsoft.sql.DateTimeOffset => Some(m.getOffsetDateTime().toInstant())
-            case _ => None // TODO handle postgres
 
 
     def resultListToAnnotations(rows: List[_]): Seq[Annotation] = {
@@ -41,58 +35,19 @@ object AnnotationSQL {
         } yield {
             val xs = row.asInstanceOf[Array[Object]]
             Annotation(
-                imagedMomentUuid = Some(UUID.fromString(xs(0).toString)),
-                videoReferenceUuid = Some(UUID.fromString(xs(1).toString)),
-                elapsedTimeMillis = Option(xs(2))
-                    .map(v => v.asInstanceOf[Number].longValue()),
-                recordedTimestamp = instantConverter(xs(3)),
-                // recordedTimestamp = Option(xs(3))
-                //     .map(v => v.asInstanceOf[Timestamp])
-                //     .map(v => v.toInstant),
-                timecode = Option(xs(4)).map(_.toString()),
-                observationUuid = Some(UUID.fromString(xs(5).toString)),
-                concept = Option(xs(6)).map(_.toString),
-                activity = Option(xs(7)).map(_.toString()),
-                durationMillis = Option(xs(8))
-                    .map(v => v.asInstanceOf[Number].longValue()),
-                group = Option(xs(9)).map(_.toString()),
-                observationTimestamp = instantConverter(xs(10)),
-                // observationTimestamp = Option(xs(10))
-                //     .map(v => v.asInstanceOf[Timestamp])
-                //     .map(v => v.toInstant),
-                observer = Option(xs(11)).map(_.toString())
+                imagedMomentUuid = xs(0).asUUID,
+                videoReferenceUuid = xs(1).asUUID,
+                elapsedTimeMillis = xs(2).asLong,
+                recordedTimestamp = xs(3).asInstant,
+                timecode = xs(4).asString,
+                observationUuid = xs(5).asUUID,
+                concept = xs(6).asString,
+                activity = xs(7).asString,
+                durationMillis = xs(8).asLong,
+                group = xs(9).asString,
+                observationTimestamp = xs(10).asInstant,
+                observer = xs(11).asString
             )
-
-            // ORIGINAL CODE
-            // val a  = new MutableAnnotationExt
-            // a.imagedMomentUuid = UUID.fromString(xs(0).toString)
-            // a.videoReferenceUuid = UUID.fromString(xs(1).toString)
-            // Option(xs(2))
-            //     .map(v => v.asInstanceOf[Number].longValue())
-            //     .map(Duration.ofMillis)
-            //     .foreach(v => a.elapsedTime = v)
-            // Option(xs(3))
-            //     .map(v => v.asInstanceOf[Timestamp])
-            //     .map(v => v.toInstant)
-            //     .foreach(v => a.recordedTimestamp = v)
-            // Option(xs(4))
-            //     .map(v => v.toString)
-            //     .map(v => new Timecode(v))
-            //     .foreach(v => a.timecode = v)
-            // a.observationUuid = UUID.fromString(xs(5).toString)
-            // a.concept = xs(6).toString
-            // Option(xs(7)).foreach(v => a.activity = v.toString)
-            // Option(xs(8))
-            //     .map(v => v.asInstanceOf[Number].longValue())
-            //     .map(Duration.ofMillis)
-            //     .foreach(v => a.duration = v)
-            // Option(xs(9)).foreach(v => a.group = v.toString)
-            // Option(xs(10)).foreach(v =>
-            //     a.observationTimestamp = v.asInstanceOf[Timestamp].toInstant
-            // )
-            // // a.observationTimestamp = xs(10).asInstanceOf[Timestamp].toInstant
-            // a.observer = xs(11).toString
-            // a
         }
     }
 

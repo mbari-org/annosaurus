@@ -74,32 +74,15 @@ object ImageReferenceSQL {
         } yield {
             val xs = row.asInstanceOf[Array[Object]]
             ImageReference(
-                url = URI.create(xs(4).toString).toURL,
-                format = Option(xs(2)).map(_.toString),
-                widthPixels = Option(xs(5)).map(_.asInstanceOf[Number].intValue()),
-                heightPixels = Option(xs(3)).map(_.asInstanceOf[Number].intValue()),
-                description = Option(xs(1)).map(_.toString),
-                uuid = Option(xs(0)).map(_.toString).map(UUID.fromString),
-                imagedMomentUuid = Option(xs(6)).map(_.toString).map(UUID.fromString)
+                url = xs(4).asUrl.orNull,
+                format = xs(2).asString,
+                widthPixels = xs(5).asInt,
+                heightPixels = xs(3).asInt,
+                description = xs(1).asString,
+                uuid = xs(0).asUUID,
+                imagedMomentUuid = xs(6).asUUID
             )
 
-            // val i  = new MutableImageReferenceExt
-            // i.uuid = UUID.fromString(xs(0).toString)
-            // Option(xs(1))
-            //     .map(_.toString)
-            //     .foreach(v => i.description = v)
-            // Option(xs(2))
-            //     .map(_.toString)
-            //     .foreach(v => i.format = v)
-            // Option(xs(3))
-            //     .map(_.asInstanceOf[Number].intValue())
-            //     .foreach(v => i.height = v)
-            // i.url = URI.create(xs(4).toString).toURL
-            // Option(xs(5))
-            //     .map(_.asInstanceOf[Number].intValue())
-            //     .foreach(v => i.width = v)
-            // i.imagedMomentUuid = UUID.fromString(xs(6).toString)
-            // i
         }
     }
 
