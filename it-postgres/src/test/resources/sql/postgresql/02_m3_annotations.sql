@@ -206,9 +206,12 @@ CREATE  INDEX "idx_video_reference_information__video_reference_uuid"
 --         LEFT JOIN video_reference_information info ON info.video_reference_uuid = im.video_reference_uuid;
 
 -- JPA Fix for UUIDs on Postgres - https://www.eclipse.org/forums/index.php?t=msg&th=1073632&goto=1719530&#msg_1719530
-drop cast if exists (character varying as uuid);
-create or replace function uuid(_text character varying) returns uuid language sql as 'select uuid_in(_text::cstring)';
-create cast (character varying as uuid) with function uuid(character varying) as assignment;
+CREATE CAST (varchar AS uuid)
+  WITH INOUT
+  AS IMPLICIT;
+-- drop cast if exists (character varying as uuid);
+-- create or replace function uuid(_text character varying) returns uuid language sql as 'select uuid_in(_text::cstring)';
+-- create cast (character varying as uuid) with function uuid(character varying) as assignment;
 
 -- FIX To allow cast of smallint to boolean for database migration
 -- CREATE OR REPLACE FUNCTION boolean1(i smallint) RETURNS boolean AS $$

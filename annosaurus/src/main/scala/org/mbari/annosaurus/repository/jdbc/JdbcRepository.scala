@@ -155,7 +155,7 @@ class JdbcRepository(entityManagerFactory: EntityManagerFactory) {
     def countAll(): Long = {
         implicit val entityManager: EntityManager = entityManagerFactory.createEntityManager()
         val query                                 = entityManager.createNativeQuery(ObservationSQL.countAll)
-        val count                                 = query.getSingleResult.asInstanceOf[Int].toLong
+        val count                                 = query.getSingleResult.asInstanceOf[Number].longValue()
         entityManager.close()
         count
     }

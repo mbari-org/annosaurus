@@ -32,10 +32,7 @@ object AnnotationSQL {
             case null => None
             case ts: Timestamp => Some(ts.toInstant)
             case m: microsoft.sql.DateTimeOffset => Some(m.getOffsetDateTime().toInstant())
-            case _ => None
-
-
-        
+            case _ => None // TODO handle postgres
 
 
     def resultListToAnnotations(rows: List[_]): Seq[Annotation] = {
