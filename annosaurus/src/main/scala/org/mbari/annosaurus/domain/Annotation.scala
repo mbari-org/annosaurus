@@ -96,7 +96,7 @@ object Annotation extends FromEntity[ObservationEntity, Annotation] {
             Option(entity.getGroup),
             imOpt.map(_.getUuid),
             irs,
-            Option(entity.getObservationDate),
+            Option(entity.getObservationTimestamp),
             Option(entity.getUuid),
             Option(entity.getObserver),
             imOpt.map(_.getRecordedTimestamp),

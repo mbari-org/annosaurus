@@ -4,7 +4,7 @@ Global / onChangedBuildSource := ReloadOnSourceChanges
 
 ThisBuild / javacOptions ++= Seq("-target", "21", "-source", "21")
 ThisBuild / licenses         := Seq("Apache-2.0" -> url("http://www.apache.org/licenses/LICENSE-2.0"))
-ThisBuild / organization     := "org.mbari.vars"
+ThisBuild / organization     := "org.mbari"
 ThisBuild / organizationName := "Monterey Bay Aquarium Research Institute"
 ThisBuild / resolvers ++= Seq(Resolver.githubPackages("mbari-org", "maven"))
 ThisBuild / scalaVersion     := "3.3.1"
@@ -21,12 +21,15 @@ ThisBuild / scalacOptions ++= Seq(
     "-unchecked"
 )
 ThisBuild / startYear        := Some(2017)
-ThisBuild / updateOptions    := updateOptions.value.withCachedResolution(true)
+//ThisBuild / updateOptions    := updateOptions.value.withCachedResolution(true)
 ThisBuild / versionScheme    := Some("semver-spec")
 
 ThisBuild / Test / fork              := true
 ThisBuild / Test / parallelExecution := false
 ThisBuild / Test / testOptions += Tests.Argument(TestFrameworks.MUnit, "-b")
+ThisBuild / Test / javaOptions ++= Seq(
+    "-Duser.timeszone=UTC"
+)
 
 lazy val annosaurus = (project in file("annosaurus"))
     .enablePlugins(

@@ -54,7 +54,7 @@ final case class Observation(
         group.foreach(entity.setGroup)
         activity.foreach(entity.setActivity)
         observer.foreach(entity.setObserver)
-        observationTimestamp.foreach(entity.setObservationDate)
+        observationTimestamp.foreach(entity.setObservationTimestamp)
         associations.foreach(a => entity.addAssociation(a.toEntity))
         uuid.foreach(entity.setUuid)
         entity
@@ -71,7 +71,7 @@ object Observation extends FromEntity[ObservationEntity, Observation] {
             Option(entity.getGroup),
             Option(entity.getActivity),
             Option(entity.getObserver),
-            Option(entity.getObservationDate),
+            Option(entity.getObservationTimestamp),
             entity.getAssociations.asScala.map(x => Association.from(x, false)).toSeq,
             entity.primaryKey,
             entity.lastUpdated

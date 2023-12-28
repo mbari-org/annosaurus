@@ -19,6 +19,7 @@ package org.mbari.annosaurus.repository.jpa.entity;
 import java.util.List;
 import java.util.UUID;
 import java.time.Instant;
+import java.time.Duration;
 
 record AnnotationDTO(
     UUID observationUuid,
@@ -28,13 +29,28 @@ record AnnotationDTO(
     UUID videoReferenceUuid,
     UUID imagedMomentUuid,
     String timecode,
-    Long elapsedTimeMillis,
+    Duration elapsedTime,
     Instant recordedTimestamp,
-    Long durationMillis,
+    Duration duration,
     String group,
     String activity,
     List<AssociationDTO> associations,
     List<ImageReferenceDTO> imageReferences
 ) {
+
+    public AnnotationDTO(UUID observationUuid,
+    String concept,
+    String observer,
+    Instant observationTimestamp,
+    UUID videoReferenceUuid,
+    UUID imagedMomentUuid,
+    String timecode,
+    Duration elapsedTime,
+    Instant recordedTimestamp,
+    Duration duration,
+    String group,
+    String activity) {
+        this(observationUuid, concept, observer, observationTimestamp, videoReferenceUuid, imagedMomentUuid, timecode, elapsedTime, recordedTimestamp, duration, group, activity, List.of(), List.of());
+    }
 
 }

@@ -47,7 +47,7 @@ class ObservationDAOImpl(entityManager: EntityManager)
         val observation = new ObservationEntity
         observation.setConcept(concept)
         observation.setObserver(observer)
-        observation.setObservationDate(observationDate)
+        observation.setObservationTimestamp(observationDate)
         group.foreach(observation.setGroup)
         duration.foreach(observation.setDuration)
         observation

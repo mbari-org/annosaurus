@@ -557,7 +557,7 @@ class AnnotationController(val daoFactory: JPADAOFactory, bus: Subject[Any] = Me
             duration.foreach(obs.setDuration)
             group.foreach(obs.setGroup)
             activity.foreach(obs.setActivity)
-            obs.setObservationDate(observationDate)
+            obs.setObservationTimestamp(observationDate)
             obs
         })
     }

@@ -56,7 +56,6 @@ trait TestUtilsSuite extends BaseDAOSuite{
         val x = xs.head
         assert(x.getUuid() != null)
         val dao = daoFactory.newImagedMomentDAO()
-        // Await.ready(dao.runTransaction(_.create(x)), timeout)
         val opt = Await.result(dao.runTransaction(_.findByUUID(x.getUuid())), timeout)
         assert(opt.isDefined)
         AssertUtils.assertSameImagedMoment(x, opt.get)
@@ -70,7 +69,6 @@ trait TestUtilsSuite extends BaseDAOSuite{
         val x = xs.head
         assert(x.getUuid() != null)
         val dao = daoFactory.newImagedMomentDAO()
-        // Await.ready(dao.runTransaction(_.create(x)), timeout)
         val opt = Await.result(dao.runTransaction(_.findByUUID(x.getUuid())), timeout)
         assert(opt.isDefined)
         AssertUtils.assertSameImagedMoment(x, opt.get)

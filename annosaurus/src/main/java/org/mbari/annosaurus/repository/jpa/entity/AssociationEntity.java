@@ -71,31 +71,31 @@ import java.util.UUID;
                 ),
                  @NamedQuery(
                      name = "Association.findByConceptAssociationRequest",
-                     query = "SELECT new org.mbari.annosaurus.repository.jpa.entity.ConceptAssociationDTO(a.linkName, a.toConcept, a.linkValue, a.mimeType, a.uuid, o.concept, im.videoReferenceUuid) FROM Association a RIGHT JOIN a.observation o RIGHT JOIN o.imagedMoment im WHERE im.videoReferenceUuid IN :uuids AND a.linkName = :linkName ORDER BY a.uuid"
+                     query = "SELECT new org.mbari.annosaurus.repository.jpa.entity.ConceptAssociationDTO(a.linkName, a.toConcept, a.linkValue, a.mimeType, a.uuid, o.concept, im.videoReferenceUuid) FROM Association a JOIN a.observation o JOIN o.imagedMoment im WHERE im.videoReferenceUuid IN :uuids AND a.linkName = :linkName ORDER BY a.uuid"
                  ),
                  @NamedQuery(
                      name = "Association.findDTOByVideoReferenceUuid",
-                     query = "SELECT new org.mbari.annosaurus.repository.jpa.entity.AssociationDTO(a.linkName, a.toConcept, a.linkValue, a.mimeType, a.uuid, o.uuid, im.uuid) FROM Association a RIGHT JOIN a.observation o RIGHT JOIN o.imagedMoment im WHERE im.videoReferenceUuid = :videoReferenceUuid AND a.linkName = :linkName ORDER BY a.uuid"
+                     query = "SELECT new org.mbari.annosaurus.repository.jpa.entity.AssociationDTO(a.linkName, a.toConcept, a.linkValue, a.mimeType, a.uuid, o.uuid, im.uuid) FROM Association a JOIN a.observation o JOIN o.imagedMoment im WHERE im.videoReferenceUuid = :videoReferenceUuid AND a.linkName = :linkName ORDER BY a.uuid"
                  ),
                  @NamedQuery(
                      name = "Association.findDTOByVideoReferenceUuidBetweenDates",
-                     query = "SELECT new org.mbari.annosaurus.repository.jpa.entity.AssociationDTO(a.linkName, a.toConcept, a.linkValue, a.mimeType, a.uuid, o.uuid, im.uuid) FROM Association a RIGHT JOIN a.observation o RIGHT JOIN o.imagedMoment im WHERE im.videoReferenceUuid = :videoReferenceUuid AND im.recordedTimestamp BETWEEN :start AND :end ORDER BY a.uuid"
+                     query = "SELECT new org.mbari.annosaurus.repository.jpa.entity.AssociationDTO(a.linkName, a.toConcept, a.linkValue, a.mimeType, a.uuid, o.uuid, im.uuid) FROM Association a JOIN a.observation o JOIN o.imagedMoment im WHERE im.videoReferenceUuid = :videoReferenceUuid AND im.recordedTimestamp BETWEEN :start AND :end ORDER BY a.uuid"
                  ),
                  @NamedQuery(
                      name = "Association.findDTOByConcurrentRequest",
-                     query = "SELECT new org.mbari.annosaurus.repository.jpa.entity.AssociationDTO(a.linkName, a.toConcept, a.linkValue, a.mimeType, a.uuid, o.uuid, im.uuid) FROM Association a RIGHT JOIN a.observation o RIGHT JOIN o.imagedMoment im WHERE im.videoReferenceUuid IN :uuids AND im.recordedTimestamp BETWEEN :start AND :end ORDER BY a.uuid"
+                     query = "SELECT new org.mbari.annosaurus.repository.jpa.entity.AssociationDTO(a.linkName, a.toConcept, a.linkValue, a.mimeType, a.uuid, o.uuid, im.uuid) FROM Association a JOIN a.observation o JOIN o.imagedMoment im WHERE im.videoReferenceUuid IN :uuids AND im.recordedTimestamp BETWEEN :start AND :end ORDER BY a.uuid"
                  ),
                  @NamedQuery(
                      name = "Association.findCDTOByMultiRequest",
-                     query = "SELECT new org.mbari.annosaurus.repository.jpa.entity.AssociationDTO(a.linkName, a.toConcept, a.linkValue, a.mimeType, a.uuid, o.uuid, im.uuid) FROM Association a RIGHT JOIN a.observation o RIGHT JOIN o.imagedMoment im WHERE im.videoReferenceUuid IN :uuids ORDER BY a.uuid"
+                     query = "SELECT new org.mbari.annosaurus.repository.jpa.entity.AssociationDTO(a.linkName, a.toConcept, a.linkValue, a.mimeType, a.uuid, o.uuid, im.uuid) FROM Association a JOIN a.observation o JOIN o.imagedMoment im WHERE im.videoReferenceUuid IN :uuids ORDER BY a.uuid"
                  ),
                  @NamedQuery(
                      name = "Association.findDTOByObservationUuids",
-                     query = "SELECT new org.mbari.annosaurus.repository.jpa.entity.AssociationDTO(a.linkName, a.toConcept, a.linkValue, a.mimeType, a.uuid, o.uuid, im.uuid) FROM Association a RIGHT JOIN a.observation o RIGHT JOIN o.imagedMoment im WHERE o.uuid IN :uuids ORDER BY a.uuid"
+                     query = "SELECT new org.mbari.annosaurus.repository.jpa.entity.AssociationDTO(a.linkName, a.toConcept, a.linkValue, a.mimeType, a.uuid, o.uuid, im.uuid) FROM Association a JOIN a.observation o JOIN o.imagedMoment im WHERE o.uuid IN :uuids ORDER BY a.uuid"
                  ),
                  @NamedQuery(
                      name = "Association.findDTOByLinkNameAndValue",
-                     query = "SELECT new org.mbari.annosaurus.repository.jpa.entity.AssociationDTO(a.linkName, a.toConcept, a.linkValue, a.mimeType, a.uuid, o.uuid, im.uuid) FROM Association a RIGHT JOIN a.observation o RIGHT JOIN o.imagedMoment im WHERE a.linkName = :linkName AND a.linkValue = :linkValue ORDER BY a.uuid"
+                     query = "SELECT new org.mbari.annosaurus.repository.jpa.entity.AssociationDTO(a.linkName, a.toConcept, a.linkValue, a.mimeType, a.uuid, o.uuid, im.uuid) FROM Association a JOIN a.observation o JOIN o.imagedMoment im WHERE a.linkName = :linkName AND a.linkValue = :linkValue ORDER BY a.uuid"
                  )
 
         }

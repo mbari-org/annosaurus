@@ -213,7 +213,7 @@ class JdbcRepository(entityManagerFactory: EntityManagerFactory) {
         startTimestamp: Instant,
         endTimestamp: Instant,
         limit: Option[Int] = None,
-        offset: Option[Int],
+        offset: Option[Int] = None,
         includeAncillaryData: Boolean = false
     ): Seq[Annotation] = {
 
@@ -452,7 +452,7 @@ class JdbcRepository(entityManagerFactory: EntityManagerFactory) {
     )(implicit entityManager: EntityManager): Seq[Annotation] = {
 
         // lookup associations
-        val observationUuids = annotations.map(_.observationUuid.toString).distinct
+        val observationUuids = annotations.flatMap(_.observationUuid.map(_.toString())).distinct
         for (obs <- observationUuids.grouped(200)) {
             val sql2         = inClause(AssociationSQL.byObservationUuids, obs)
             val query2       = entityManager.createNativeQuery(sql2)
@@ -462,7 +462,7 @@ class JdbcRepository(entityManagerFactory: EntityManagerFactory) {
         }
 
         // lookup imageMoments
-        val imagedMomentUuids = annotations.map(_.imagedMomentUuid.toString).distinct
+        val imagedMomentUuids = annotations.flatMap(_.imagedMomentUuid.map(_.toString())).distinct
         for (im <- imagedMomentUuids.grouped(200)) {
             val sql3             = inClause(ImageReferenceSQL.byImagedMomentUuids, im)
             val query3           = entityManager.createNativeQuery(sql3)
@@ -517,7 +517,7 @@ class JdbcRepository(entityManagerFactory: EntityManagerFactory) {
     )(implicit entityManager: EntityManager): Seq[Annotation] = {
 
         for (annos <- annotations.grouped(200)) {
-            val ims   = annos.map(_.imagedMomentUuid.toString).distinct
+            val ims   = annos.flatMap(_.imagedMomentUuid.map(_.toString())).distinct
             val sql   = inClause(AncillaryDatumSQL.byImagedMomentUuid, ims)
             val query = entityManager.createNativeQuery(sql)
             val rows  = query.getResultList.asScala.toList

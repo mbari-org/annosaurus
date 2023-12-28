@@ -20,7 +20,7 @@ import java.util.UUID
 import org.mbari.annosaurus.domain.Association
 import org.mbari.annosaurus.domain.Annotation
 
-@deprecated("Use Association's NamedQueries instead", "2023-12-18")
+// @deprecated("Use Association's NamedQueries instead", "2023-12-18")
 object AssociationSQL {
 
     def resultListToAssociations(rows: List[_]): Seq[Association] = {

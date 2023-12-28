@@ -16,7 +16,8 @@
 
 package org.mbari.annosaurus.repository.jpa
 
-class SqlServerImagedMomentDAOSuite extends ImagedMomentDAOITSuite {
-    given daoFactory: TestDAOFactory = SqlServerTestDAOFactory
+class PostgresImagedMomentDAOSuite extends ImagedMomentDAOITSuite {
 
+    given daoFactory: TestDAOFactory = PostgresqlTestDAOFactory
+  
 }

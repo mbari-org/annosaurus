@@ -43,10 +43,10 @@ trait AnnotationControllerITSuite extends BaseDAOSuite {
         opt match
             case None => fail("findByUUID returned None")
             case Some(anno) =>
+                // NOTE: this anno is only 1 observations. THe source imagedMoment has two.
+                // this is ok and expected. An annotation maps to a single observation!!
                 val im2 = Annotation.toEntities(Seq(anno)).head
-                AssertUtils.assertSameImagedMoment(im1, im2)
-        
-
+                AssertUtils.assertSameImagedMoment(im1, im2, false)
     }
 
     test("countByVideoReferenceUUID") {}

@@ -71,9 +71,45 @@ trait ImagedMomentDAOITSuite extends BaseDAOSuite {
         assert(im.getUuid() != null)
     }
 
-    test("update") {
-
-    }
+    test("update") {}
+    test("delete") {}
+    test("deleteByUUID") {}
+    test("findByUUID") {}
+    test("findAll") {}
+    test("findBetweenUpdatedDates") {}
+    test("streamBetweenUpdatedDates") {}
+    test("streamByVideoReferenceUUIDAndTimestamps") {}
+    test("streamVideoReferenceUuidsBetweenUpdateDates") {}
+    test("countAll") {}
+    test("countWithImages") {}
+    test("findWithImages") {}
+    test("countByLinkName") {}
+    test("findByLinkName") {}
+    test("countByConcept") {}
+    test("findByConcept") {}
+    test("streamByConcept") {}
+    test("countByConceptWithImages") {}
+    test("countModifiedBeforeDate") {}
+    test("findByConceptWithImages") {}
+    test("countBetweenUpdatedDates") {}
+    test("countAllByVideoReferenceUuids") {}
+    test("findAllVideoReferenceUUIDs") {}
+    test("findBYVideoReferenceUUID") {}
+    test("streamByVideoReferenceUUID") {}
+    test("countByVideoReferenceUUID") {}
+    test("countByVideoReferenceUUIDWithImages") {}
+    test("findWithImageReferences") {}
+    test("findByImageReferenceUUID") {}
+    test("findByVideoReferenceUUIDAndTimecode") {}
+    test("findByVideoReferenceUUIDAndRecordedDate") {}
+    test("findByVideoReferenceUUIDAndElapsedTime") {}
+    test("findByWindowRequest") {}
+    test("findByVideoReferenceUUIDAndIndex") {}
+    test("findByObservationUUID") {}
+    test("updateRecordedTimestampByObservationUuid") {}
+    test("deleteByVideoReferenceUUUID") {}
+    test("deleteIfEmpty") {}
+    test("deleteIfEmptyByUUID") {}
 
 
   

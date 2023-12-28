@@ -17,10 +17,7 @@
 package org.mbari.annosaurus.repository.jpa.entity;
 
 import jakarta.persistence.*;
-import org.hibernate.envers.Audited;
-import org.hibernate.envers.RelationTargetAuditMode;
 import org.mbari.annosaurus.repository.jpa.DurationConverter;
-import org.mbari.annosaurus.repository.jpa.InstantConverter;
 import org.mbari.annosaurus.repository.jpa.TransactionLogger;
 
 import java.sql.Timestamp;
@@ -167,7 +164,7 @@ public class ObservationEntity implements IPersistentObject {
 
     @Column(name = "observation_timestamp", nullable = false)
     @Temporal(value = TemporalType.TIMESTAMP)
-    Instant observationDate = Instant.now();
+    Instant observationTimestamp = Instant.now();
 
     @Column(name = "observer", length = 128, nullable = true)
     String observer;
@@ -192,7 +189,7 @@ public class ObservationEntity implements IPersistentObject {
     public ObservationEntity(String concept, Duration duration, Instant observationTimestamp, String observer, String group, String activity) {
         this.concept = concept;
         this.duration = duration;
-        this.observationDate = observationTimestamp;
+        this.observationTimestamp = observationTimestamp;
         this.observer = observer;
         this.group = group;
         this.activity = activity;
@@ -201,7 +198,7 @@ public class ObservationEntity implements IPersistentObject {
     public ObservationEntity(String concept, String observer) {
         this.concept = concept;
         this.observer = observer;
-        this.observationDate = Instant.now();
+        this.observationTimestamp = Instant.now();
     }
 
     @Override
@@ -245,12 +242,12 @@ public class ObservationEntity implements IPersistentObject {
         this.imagedMoment = imagedMoment;
     }
 
-    public Instant getObservationDate() {
-        return observationDate;
+    public Instant getObservationTimestamp() {
+        return observationTimestamp;
     }
 
-    public void setObservationDate(Instant observationDate) {
-        this.observationDate = observationDate;
+    public void setObservationTimestamp(Instant observationTimestamp) {
+        this.observationTimestamp = observationTimestamp;
     }
 
     public String getObserver() {
@@ -302,7 +299,7 @@ public class ObservationEntity implements IPersistentObject {
                 ", concept='" + concept + '\'' +
                 ", duration=" + duration +
                 ", imagedMoment=" + imagedMoment +
-                ", observationDate=" + observationDate +
+                ", observationDate=" + observationTimestamp +
                 ", observer='" + observer + '\'' +
                 ", group='" + group + '\'' +
                 ", activity='" + activity + '\'' +

@@ -21,10 +21,22 @@ import java.util.UUID
 import java.sql.Timestamp
 import org.mbari.vcr4j.time.Timecode
 import org.mbari.annosaurus.domain.Annotation
+import java.time.Instant
 
 /** Object that contains the SQL and methods to build annotations
   */
 object AnnotationSQL {
+
+    def instantConverter(obj: Object): Option[Instant] =
+        obj match
+            case null => None
+            case ts: Timestamp => Some(ts.toInstant)
+            case m: microsoft.sql.DateTimeOffset => Some(m.getOffsetDateTime().toInstant())
+            case _ => None
+
+
+        
+
 
     def resultListToAnnotations(rows: List[_]): Seq[Annotation] = {
         for {
@@ -36,9 +48,10 @@ object AnnotationSQL {
                 videoReferenceUuid = Some(UUID.fromString(xs(1).toString)),
                 elapsedTimeMillis = Option(xs(2))
                     .map(v => v.asInstanceOf[Number].longValue()),
-                recordedTimestamp = Option(xs(3))
-                    .map(v => v.asInstanceOf[Timestamp])
-                    .map(v => v.toInstant),
+                recordedTimestamp = instantConverter(xs(3)),
+                // recordedTimestamp = Option(xs(3))
+                //     .map(v => v.asInstanceOf[Timestamp])
+                //     .map(v => v.toInstant),
                 timecode = Option(xs(4)).map(_.toString()),
                 observationUuid = Some(UUID.fromString(xs(5).toString)),
                 concept = Option(xs(6)).map(_.toString),
@@ -46,9 +59,10 @@ object AnnotationSQL {
                 durationMillis = Option(xs(8))
                     .map(v => v.asInstanceOf[Number].longValue()),
                 group = Option(xs(9)).map(_.toString()),
-                observationTimestamp = Option(xs(10))
-                    .map(v => v.asInstanceOf[Timestamp])
-                    .map(v => v.toInstant),
+                observationTimestamp = instantConverter(xs(10)),
+                // observationTimestamp = Option(xs(10))
+                //     .map(v => v.asInstanceOf[Timestamp])
+                //     .map(v => v.toInstant),
                 observer = Option(xs(11)).map(_.toString())
             )
 

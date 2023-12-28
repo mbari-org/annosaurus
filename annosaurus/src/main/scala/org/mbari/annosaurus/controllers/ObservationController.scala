@@ -94,7 +94,7 @@ class ObservationController(
             observation.map(obs => {
                 concept.foreach(obs.setConcept)
                 observer.foreach(obs.setObserver)
-                obs.setObservationDate(observationDate)
+                obs.setObservationTimestamp(observationDate)
                 duration.foreach(obs.setDuration)
                 group.foreach(obs.setGroup)
                 activity.foreach(obs.setActivity)

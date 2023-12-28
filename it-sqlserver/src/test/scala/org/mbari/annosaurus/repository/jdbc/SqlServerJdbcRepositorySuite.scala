@@ -14,9 +14,12 @@
  * limitations under the License.
  */
 
-package org.mbari.annosaurus.repository.jpa
+package org.mbari.annosaurus.repository.jdbc
 
-class SqlServerImagedMomentDAOSuite extends ImagedMomentDAOITSuite {
+import org.mbari.annosaurus.repository.jpa.TestDAOFactory
+import org.mbari.annosaurus.repository.jpa.SqlServerTestDAOFactory
+
+class SqlServerJdbcRepositorySuite extends JdbcRepositorySuite {
     given daoFactory: TestDAOFactory = SqlServerTestDAOFactory
-
+  
 }

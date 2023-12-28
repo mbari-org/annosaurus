@@ -235,7 +235,14 @@ import org.mbari.vcr4j.time.Timecode;
                                 "SELECT new org.mbari.annosaurus.repository.jpa.entity.ImageDTO(i.uuid, i.elapsedTime, i.videoReferenceUuid, i.recordedTimestamp, i.timecode, ir.description, ir.format, ir.height, ir.width, ir.url, ir.uuid) " +
                                         "FROM ImagedMoment i LEFT JOIN i.imageReferences ir " +
                                         "WHERE ir.url IS NOT NULL AND i.videoReferenceUuid = :uuid ORDER BY i.uuid"
+                ),
+                @NamedQuery(
+                        name = "Annotation.findByVideoReferenceUuid",
+                        query = "SELECT new org.mbari.annosaurus.repository.jpa.entity.AnnotationDTO(o.uuid, o.concept, o.observer, o.observationTimestamp, i.videoReferenceUuid, i.uuid, i.timecode, i.elapsedTime, i.recordedTimestamp, o.duration, o.group, o.activity) " +
+                                "FROM ImagedMoment i LEFT JOIN i.observations o " +
+                                "WHERE i.videoReferenceUuid = :uuid ORDER BY i.uuid"
                 )
+                
         }
 )
 // @org.hibernate.envers.Audited
