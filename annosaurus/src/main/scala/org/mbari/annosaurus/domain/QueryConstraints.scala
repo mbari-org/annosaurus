@@ -22,11 +22,11 @@ import org.mbari.annosaurus.repository.jdbc.QueryConstraintsSqlBuilder
 import scala.jdk.CollectionConverters.*
 
 final case class QueryConstraints(
-    videoReferenceUuids: List[UUID] = Nil,
-    concepts: List[String] = Nil,
-    observers: List[String] = Nil,
-    groups: List[String] = Nil,
-    activities: List[String] = Nil,
+    videoReferenceUuids: Seq[UUID] = Nil,
+    concepts: Seq[String] = Nil,
+    observers: Seq[String] = Nil,
+    groups: Seq[String] = Nil,
+    activities: Seq[String] = Nil,
     minDepth: Option[Double] = None,
     maxDepth: Option[Double] = None,
     minLat: Option[Double] = None,
@@ -40,7 +40,7 @@ final case class QueryConstraints(
     limit: Option[Int] = Some(5000),
     offset: Option[Int] = Some(0),
     data: Option[Boolean] = Some(false),
-    missionContacts: List[String] = Nil,
+    missionContacts: Seq[String] = Nil,
     platformName: Option[String] = None,
     missionId: Option[String] = None
 ) extends ToSnakeCase[QueryConstraintsSC] {
@@ -77,11 +77,11 @@ final case class QueryConstraints(
 }
 
 final case class QueryConstraintsSC(
-    video_reference_uuids: List[UUID] = Nil,
-    concepts: List[String] = Nil,
-    observers: List[String] = Nil,
-    groups: List[String] = Nil,
-    activities: List[String] = Nil,
+    video_reference_uuids: Seq[UUID] = Nil,
+    concepts: Seq[String] = Nil,
+    observers: Seq[String] = Nil,
+    groups: Seq[String] = Nil,
+    activities: Seq[String] = Nil,
     min_depth: Option[Double] = None,
     max_depth: Option[Double] = None,
     min_lat: Option[Double] = None,
@@ -95,7 +95,7 @@ final case class QueryConstraintsSC(
     limit: Option[Int] = Some(5000),
     offset: Option[Int] = Some(0),
     data: Option[Boolean] = Some(false),
-    mission_contacts: List[String] = Nil,
+    mission_contacts: Seq[String] = Nil,
     platform_name: Option[String] = None,
     mission_id: Option[String] = None
 ) extends ToCamelCase[QueryConstraints] {

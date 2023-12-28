@@ -82,6 +82,14 @@ object TestUtils {
             )
     }
 
+    def create(entities: Seq[ImagedMomentEntity])(using daoFactory: JPADAOFactory, ec: ExecutionContext): Seq[ImagedMomentEntity] = {
+        log.atInfo.log(s"Creating ${entities.size} ImagedMoments: $entities")
+        val dao = daoFactory.newImagedMomentDAO()
+        Await.ready(dao.runTransaction(d => entities.foreach(x => d.create(x))), Timeout)
+        dao.close()
+        entities
+    }
+
     def create(
         nImagedMoments: Int = 1,
         nObservations: Int = 0,
@@ -131,7 +139,7 @@ object TestUtils {
         val duration        =
             if (random.nextBoolean()) Some(Duration.ofMillis(random.nextInt(5000))) else None
         val observationDate = Instant.now()
-        val observer        = if (random.nextBoolean()) Some(Strings.random(32)) else None
+        val observer        = Some(Strings.random(32))
         val group           = if (random.nextBoolean()) Some(Strings.random(32)) else None
         val activity        = if (random.nextBoolean()) Some(Strings.random(32)) else None
         val obs             = ObservationEntity(concept, 

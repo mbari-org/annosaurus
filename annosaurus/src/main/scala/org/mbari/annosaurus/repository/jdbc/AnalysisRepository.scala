@@ -57,7 +57,7 @@ class AnalysisRepository(entityManagerFactory: EntityManagerFactory) {
         val values  = results
             .head
             .asInstanceOf[Array[Object]]
-            .map(s => s.toString.toInt)
+            .map(s => s.asInt.getOrElse(0))
             .toIndexedSeq
 
         val intervalMillis = binSizeDays * 24 * 60 * 60 * 1000L
