@@ -27,8 +27,6 @@ import java.time.Instant
   */
 object AnnotationSQL {
 
-
-
     def resultListToAnnotations(rows: List[_]): Seq[Annotation] = {
         for {
             row <- rows
