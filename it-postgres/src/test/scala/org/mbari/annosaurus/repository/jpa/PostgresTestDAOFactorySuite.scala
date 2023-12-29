@@ -14,12 +14,9 @@
  * limitations under the License.
  */
 
-package org.mbari.annosaurus.repository.jpa.entity;
+package org.mbari.annosaurus.repository.jpa
 
-import java.util.UUID;
-import java.sql.Timestamp;
-
-public record AssociationDTO(String linkName, String toConcept, String linkValue, String mimeType, UUID uuid,
-		UUID observationUuid, UUID imagedMomentUuid) {
-
+class PostgresTestDAOFactorySuite extends TestDAOFactorySuite {
+  given daoFactory: TestDAOFactory = PostgresqlTestDAOFactory
+  
 }

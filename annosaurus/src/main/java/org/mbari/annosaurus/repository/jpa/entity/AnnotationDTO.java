@@ -21,7 +21,7 @@ import java.util.UUID;
 import java.time.Instant;
 import java.time.Duration;
 
-record AnnotationDTO(
+public record AnnotationDTO(
     UUID observationUuid,
     String concept,
     String observer,

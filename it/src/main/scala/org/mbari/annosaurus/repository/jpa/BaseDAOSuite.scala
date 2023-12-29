@@ -23,7 +23,7 @@ import scala.concurrent.duration.{Duration => SDuration}
 
 trait BaseDAOSuite extends munit.FunSuite {
 
-    implicit val ec: ExecutionContext = ExecutionContext.global
+    given ec: ExecutionContext = ExecutionContext.global
 
     def daoFactory: TestDAOFactory
     private val timeout = SDuration(2, TimeUnit.SECONDS)

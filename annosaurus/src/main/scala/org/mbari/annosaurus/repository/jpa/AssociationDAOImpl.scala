@@ -20,7 +20,7 @@ import java.util.UUID
 import jakarta.persistence.EntityManager
 
 import org.mbari.annosaurus.repository.AssociationDAO
-import org.mbari.annosaurus.repository.jpa.entity.AssociationEntity
+import org.mbari.annosaurus.repository.jpa.entity.{AssociationEntity, ConceptAssociationDTO}
 
 import scala.jdk.CollectionConverters._
 import org.mbari.annosaurus.domain.{ConceptAssociation, ConceptAssociationRequest}
@@ -113,13 +113,15 @@ class AssociationDAOImpl(entityManager: EntityManager)
         request: ConceptAssociationRequest
     ): Iterable[ConceptAssociation] = {
 
-        findByTypedNamedQuery[ConceptAssociation](
+        val xs = findByTypedNamedQuery[ConceptAssociationDTO](
             "Association.findByConceptAssociationRequest",
             Map(
                 "uuids"    -> request.videoReferenceUuids.toList.asJava,
                 "linkName" -> request.linkName
             )
         )
+
+        xs.map(ConceptAssociation.fromDto)
 
     }
 

@@ -53,11 +53,7 @@ trait ImagedMomentDAOITSuite extends BaseDAOSuite {
             Some(Duration.ofSeconds(10)),
             Some(Instant.now))
         run(() => dao.create(im))
-        // dao.runTransaction(_.create(im))
-        // val t = em.getTransaction()
-        // t.begin()
-        // dao.create(im)
-        // t.commit()
+
         dao.close()
         assert(im.getUuid() != null)
 

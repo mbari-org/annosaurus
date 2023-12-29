@@ -22,7 +22,7 @@ import java.time.Duration;
 import java.util.UUID;
 import org.mbari.vcr4j.time.Timecode;
 
-record ImageDTO(
+public record ImageDTO(
     UUID imagedMomentUuid,
     UUID videoReferenceUuid,
     Duration elapsedTime,

@@ -18,7 +18,7 @@ package org.mbari.annosaurus.repository.jpa.entity;
 
 import java.util.UUID;
 
-record ConceptAssociationDTO(
+public record ConceptAssociationDTO(
         String linkName, 
         String toConcept, 
         String linkValue, 

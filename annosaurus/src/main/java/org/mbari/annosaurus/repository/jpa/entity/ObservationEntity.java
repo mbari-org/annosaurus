@@ -19,6 +19,8 @@ package org.mbari.annosaurus.repository.jpa.entity;
 import jakarta.persistence.*;
 import org.mbari.annosaurus.repository.jpa.DurationConverter;
 import org.mbari.annosaurus.repository.jpa.TransactionLogger;
+import org.hibernate.envers.Audited;
+import org.hibernate.envers.RelationTargetAuditMode;
 
 import java.sql.Timestamp;
 import java.time.Duration;

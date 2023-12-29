@@ -20,7 +20,7 @@ import java.util.UUID;
 import java.sql.Timestamp;
 import java.time.Instant;
 
-record AncillaryDatumDTO(
+public record AncillaryDatumDTO(
     Double latitude,
     Double longitude,
     Double depthMeters,

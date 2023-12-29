@@ -19,7 +19,7 @@ package org.mbari.annosaurus.repository.jpa.entity;
 import java.net.URL;
 import java.util.UUID;
 
-record ImageReferenceDTO(
+public record ImageReferenceDTO(
     URL url, 
     Integer width,
     Integer height,
