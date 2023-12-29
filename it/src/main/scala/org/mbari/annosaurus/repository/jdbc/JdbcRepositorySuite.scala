@@ -24,6 +24,7 @@ import scala.jdk.CollectionConverters.*
 import org.mbari.annosaurus.domain.Annotation
 import java.time.Duration
 import org.mbari.annosaurus.domain.QueryConstraints
+import org.mbari.annosaurus.domain.MultiRequest
 
 trait JdbcRepositorySuite extends BaseDAOSuite {
 
@@ -94,11 +95,15 @@ trait JdbcRepositorySuite extends BaseDAOSuite {
         assertEquals(xs2.size, 1)
     }
 
-    test("findByMultiRequest") {}
+    test("findByMultiRequest") {
+        val xs = TestUtils.create(8, 1)
+        val mr = MultiRequest(Seq(xs.head.getVideoReferenceUuid()))
+        val ys = repository.findByMultiRequest(mr)
+        assertEquals(ys.size, 8)
+    }
 
     test("findByQueryConstraint") {
 
-        val group = "group-foo"
         val seed = TestUtils.build(50, 1, 1, 1, true)
             .map(im => {
                 val os = im.getObservations().asScala
@@ -203,10 +208,21 @@ trait JdbcRepositorySuite extends BaseDAOSuite {
     }
 
     test("findGeographicRangeByQueryConstraint") {
-        // val xs = TestUtils.create(40, 1, 0, 0, true)
-        // val qc = new QueryConstraints()
-        // val xs2 = repository.findGeographicRangeByQueryConstraint()
-        // assertEquals(xs2.size, 1)
+        val xs = TestUtils.create(40, 1, 0, 0, true)
+        val qc = new QueryConstraints(videoReferenceUuids = Seq(xs.head.getVideoReferenceUuid()))
+        val opt = repository.findGeographicRangeByQueryConstraint(qc)
+        assert(opt.isDefined)
+        val g = opt.get
+
+        val lats = xs.map(im => im.getAncillaryDatum().getLatitude())
+        val lons = xs.map(im => im.getAncillaryDatum().getLongitude())
+        val depths = xs.map(im => im.getAncillaryDatum().getDepthMeters())
+        assertEqualsDouble(g.minLatitude, lats.min, 0.0001)
+        assertEqualsDouble(g.maxLatitude, lats.max, 0.0001)
+        assertEqualsDouble(g.minLongitude, lons.min, 0.0001)
+        assertEqualsDouble(g.maxLongitude, lons.max, 0.0001)
+        assertEqualsDouble(g.minDepthMeters, depths.min, 0.0001)
+        assertEqualsDouble(g.maxDepthMeters, depths.max, 0.0001)
     }
 
     test("findImagedMomentUuidsByConceptWithImages") {

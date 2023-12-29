@@ -139,8 +139,6 @@ object QueryConstraintsSqlBuilder {
             qc.maxLat,
             qc.minTimestamp,
             qc.maxTimestamp,
-            // qc.minTimestamp.map(Timestamp.from), // FIXME: This is a hack. We need to use Instant   
-            // qc.maxTimestamp.map(Timestamp.from), // FIXME: This is a hack. We need to use Instant
             qc.linkName,
             qc.linkValue,
             qc.platformName,

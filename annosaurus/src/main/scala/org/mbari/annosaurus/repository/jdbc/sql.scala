@@ -22,9 +22,8 @@ import scala.util.Try
 import java.net.URL
 import java.net.URI
 
-/**
-  * This is a collection of implicit conversions to convert from java.sql.ResultSet to  
-  * various types. This is used in the JdbcRepository and associatited SQL classes.
+/** This is a collection of explicit conversions to convert from java.sql.ResultSet to various
+  * types. This is used in the JdbcRepository and associatited SQL classes.
   */
 extension (obj: Object)
     def asDouble: Option[Double]   = doubleConverter(obj)
@@ -52,9 +51,9 @@ def stringConverter(obj: Object): Option[String] =
     obj match
         case null      => None
         case s: String => Some(s)
-        case o: Object => Some(o.toString)
+        case _         => Some(obj.toString)
 
-def doubleConverter(obj: Object): Option[Double] = 
+def doubleConverter(obj: Object): Option[Double] =
     obj match
         case null      => None
         case n: Number => Some(n.doubleValue())

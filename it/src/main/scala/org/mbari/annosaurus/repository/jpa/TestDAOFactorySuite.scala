@@ -16,11 +16,57 @@
 
 package org.mbari.annosaurus.repository.jpa
 
+import org.mbari.annosaurus.controllers.TestUtils
+import java.sql.DriverManager
+import scala.jdk.CollectionConverters.*
+import java.util.UUID
+import org.hibernate.Session
+import org.hibernate.jdbc.Work
+
+
+
 trait TestDAOFactorySuite extends BaseDAOSuite {
 
-  test("TestDAOFactory") {
+  test("DAOFactory connects to database") {
     val dao = daoFactory.newImagedMomentDAO();
     val i = exec(dao.runTransaction(d => d.countAll()))
     dao.close()
   }
+
+  test("UUIDs survive round trip to database") {
+    val im = TestUtils.randomImagedMoment()
+    val dao = daoFactory.newImagedMomentDAO()
+    exec(dao.runTransaction(d => d.create(im)))
+    assert(im.getUuid() != null)
+    val uuids = dao.findAllVideoReferenceUUIDs()
+    assert(uuids.exists(u => u == im.getVideoReferenceUuid()))
+  }
+
+  test("UUIDs do not have endianness issues in database") {
+    val im = TestUtils.randomImagedMoment()
+    val dao = daoFactory.newImagedMomentDAO()
+    exec(dao.runTransaction(d => d.create(im)))
+    assert(im.getUuid() != null)
+
+    // We use straight JDBC to get a UUID from the database as a string
+    // This is to avoid any endianness issues that might occur through JPA/Hibernate
+    val em = daoFactory.entityManagerFactory.createEntityManager();
+    val tx = em.getTransaction()
+    tx.begin();
+
+    val session = em.unwrap(classOf[Session]);
+    session.doWork(connection => {
+      val statement = connection.createStatement()
+      val rs = statement.executeQuery(s"select uuid from imaged_moments where uuid = '${im.getUuid()}'")
+      rs.next()
+      val uuid = UUID.fromString(rs.getString("uuid"))
+      println(s"uuid: $uuid  ---- ${im.getUuid()}")
+      assert(uuid == im.getUuid())
+    })
+
+    tx.commit()
+    dao.close()
+    
+  }
+
 }

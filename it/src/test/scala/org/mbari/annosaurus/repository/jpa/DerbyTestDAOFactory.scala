@@ -28,6 +28,7 @@ object DerbyTestDAOFactory extends TestDAOFactory {
             Map(
                 "hibernate.dialect"                                     -> "org.hibernate.dialect.DerbyDialect",
                 "hibernate.hbm2ddl.auto"                                -> "create",
+                "hibernate.type.preferred_uuid_jdbc_type"                -> "CHAR",
                 "jakarta.persistence.schema-generation.database.action" -> "create",
                 "jakarta.persistence.schema-generation.scripts.action"  -> "drop-and-create"
             )
@@ -45,6 +46,8 @@ object DerbyTestDAOFactory extends TestDAOFactory {
         em.close()
         emf
     }
+
+    
 
     private def init(entityManager: EntityManager): Unit = 
         val ddl = getClass.getResource("/sql/derby/02_m3_annotations.sql")
