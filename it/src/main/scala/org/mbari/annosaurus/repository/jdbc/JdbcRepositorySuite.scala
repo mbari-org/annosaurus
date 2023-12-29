@@ -25,6 +25,7 @@ import org.mbari.annosaurus.domain.Annotation
 import java.time.Duration
 import org.mbari.annosaurus.domain.QueryConstraints
 import org.mbari.annosaurus.domain.MultiRequest
+import org.mbari.annosaurus.domain.ConcurrentRequest
 
 trait JdbcRepositorySuite extends BaseDAOSuite {
 
@@ -39,7 +40,10 @@ trait JdbcRepositorySuite extends BaseDAOSuite {
     }
 
     test("countByQueryConstraint") {
-
+        val xs = TestUtils.create(8, 1)
+        val qc = new QueryConstraints(videoReferenceUuids = Seq(xs.head.getVideoReferenceUuid()))
+        val n = repository.countByQueryConstraint(qc)
+        assertEquals(n, 8)
     }
     test("countImagesByVideoReferenceUuid") {
         // Create 16 using 2 different videoReferenceUuids
@@ -85,7 +89,16 @@ trait JdbcRepositorySuite extends BaseDAOSuite {
         assertEquals(ys.size, 1)
     }
 
-    test("findByConcurrentRequest") {}
+    test("findByConcurrentRequest") {
+        val xs = TestUtils.create(8, 1) ++ TestUtils.create(8, 1)
+        val uuids = xs.map(im => im.getVideoReferenceUuid()).distinct   
+        val ts = xs.map(im => im.getRecordedTimestamp()).sortBy(_.toEpochMilli())
+        val ts0 = ts.head.minus(Duration.ofSeconds(1))
+        val ts1 = ts.last.plus(Duration.ofSeconds(1))
+        val cr = ConcurrentRequest(ts0, ts1, uuids)
+        val ys = repository.findByConcurrentRequest(cr)
+        assertEquals(ys.size, 16)
+    }
 
     test("findByLinkNameAndLinkValue") {
         val xs = TestUtils.create(2, 1, 1)
