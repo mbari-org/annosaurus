@@ -16,29 +16,24 @@
 
 package org.mbari.annosaurus.repository.jpa
 
-import org.testcontainers.utility.DockerImageName
-import java.sql.DriverManager
-import org.testcontainers.containers.PostgreSQLContainer
-import scala.util.Random
 import scala.jdk.CollectionConverters.*
 
-class PostgresSuite extends munit.FunSuite:
+class SqlServerSuite extends munit.FunSuite:
 
-    val daoFactory = PostgresqlTestDAOFactory
+    val daoFactory = SqlServerTestDAOFactory
 
     override def beforeAll(): Unit = daoFactory.beforeAll()
     override def afterAll(): Unit  = daoFactory.afterAll()
 
-    test("Postgres container should be started"):
+    test("SqlServer container should be started"):
         assert(daoFactory.container.isRunning())
         val dao = daoFactory.newImagedMomentDAO()
         val all = dao.findAll(Some(0), Some(100))
         assert(all.isEmpty)
         dao.close()
 
-    test("Postgres init script should have been run"):
+    test("SqlServer init script should have been run"):
         val em = daoFactory.entityManagerFactory.createEntityManager()
         val q  = em.createNativeQuery("SELECT COUNT(*) FROM imaged_moments")
         val r  = q.getResultList().asScala.toList.head.asInstanceOf[Number].longValue()
         assert(r == 0)
-

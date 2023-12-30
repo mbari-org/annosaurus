@@ -67,13 +67,13 @@ object Dependencies {
 
     lazy val scilube = "org.mbari.scilube" %% "scilube" % "3.0.1"
 
-    val slf4jVersion    = "2.0.9"
+    val slf4jVersion    = "2.0.10"
     lazy val slf4j      = "org.slf4j" % "slf4j-api"        % slf4jVersion
     lazy val slf4jJul   = "org.slf4j" % "jul-to-slf4j"     % slf4jVersion
     lazy val slf4jLog4j = "org.slf4j" % "log4j-over-slf4j" % slf4jVersion
     lazy val slf4jSystem = "org.slf4j" % "slf4j-jdk-platform-logging" % slf4jVersion
 
-    private val tapirVersion = "1.9.5"
+    private val tapirVersion = "1.9.6"
     lazy val tapirCirce      = "com.softwaremill.sttp.tapir"   %% "tapir-json-circe"         % tapirVersion
     lazy val tapirHelidon    = "com.softwaremill.sttp.tapir"   %% "tapir-nima-server"        % tapirVersion
     lazy val tapirPrometheus = "com.softwaremill.sttp.tapir"   %% "tapir-prometheus-metrics" % tapirVersion
