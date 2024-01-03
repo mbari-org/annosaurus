@@ -77,7 +77,7 @@ trait TestUtilsSuite extends BaseDAOSuite{
 
     test("create video reference info") {
         given df: TestDAOFactory = daoFactory
-        val vi = TestUtils.createVideoReferenceInfo()
+        val vi = TestUtils.randomVideoReferenceInfo()
         val dao = daoFactory.newCachedVideoReferenceInfoDAO()
         Await.ready(dao.runTransaction(_.create(vi)), timeout)
         assert(vi.getUuid() != null)

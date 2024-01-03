@@ -70,7 +70,7 @@ class CachedVideoReferenceInfoDAOImpl(entityManager: EntityManager)
         fetchUsing("VideoReferenceInfo.findAllMissionContacts")
 
     override def findAllPlatformNames(): Iterable[String] =
-        fetchUsing("VideoReferenceInfo.findAllVideoReferenceUUIDs")
+        fetchUsing("VideoReferenceInfo.findAllPlatformNames")
 
     override def findAllMissionIDs(): Iterable[String] =
         fetchUsing("VideoReferenceInfo.findAllMissionIDs")

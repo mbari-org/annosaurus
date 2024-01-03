@@ -209,9 +209,9 @@ object TestUtils {
         datum
     }
 
-    def createVideoReferenceInfo(videoReferenceUuid: UUID = UUID.randomUUID()): CachedVideoReferenceInfoEntity = {
+    def randomVideoReferenceInfo(videoReferenceUuid: UUID = UUID.randomUUID()): CachedVideoReferenceInfoEntity = {
         
-        return CachedVideoReferenceInfoEntity(
+        CachedVideoReferenceInfoEntity(
             videoReferenceUuid,
             "p-" + Strings.random(10),
             "missionId" + Strings.random(10),

@@ -18,7 +18,6 @@ package org.mbari.annosaurus.repository.jpa
 
 import java.util.UUID
 import jakarta.persistence.EntityManager
-import org.slf4j.LoggerFactory
 
 import scala.jdk.CollectionConverters._
 import scala.concurrent.{ExecutionContext, Future}
@@ -29,6 +28,9 @@ import org.mbari.annosaurus.repository.DAO
 import org.mbari.annosaurus.repository.jpa.entity.IPersistentObject
 import org.mbari.annosaurus.repository.jpa.entity.extensions.*
 import org.mbari.annosaurus.repository.jpa.extensions.*
+import org.mbari.annosaurus.etc.jdk.Logging.given
+import java.lang.System.Logger.Level
+
 
 /** @author
   *   Brian Schlining
@@ -36,12 +38,13 @@ import org.mbari.annosaurus.repository.jpa.extensions.*
   */
 abstract class BaseDAO[B <: IPersistentObject: ClassTag](val entityManager: EntityManager)
     extends DAO[B] {
-    private[this] val log = LoggerFactory.getLogger(getClass)
+    
+    private val log = System.getLogger(getClass.getName)
 
-    if (log.isInfoEnabled) {
+    if (log.isLoggable(Level.DEBUG)) {
         val props = entityManager.getProperties
         if (props.containsKey(BaseDAO.JDBC_URL_KEY)) {
-            log.debug(
+            log.atDebug.log(
                 s"Wrapping EntityManager with DAO for database: ${props.get(BaseDAO.JDBC_URL_KEY)}"
             )
         }
@@ -65,8 +68,8 @@ abstract class BaseDAO[B <: IPersistentObject: ClassTag](val entityManager: Enti
         limit: Option[Int] = None,
         offset: Option[Int] = None
     ): List[C] = {
-        if (log.isDebugEnabled()) {
-            log.debug(s"JPA Query => $name using $namedParameters")
+        if (log.isLoggable(Level.DEBUG)) {
+            log.atDebug.log(s"JPA Query => $name using $namedParameters")
         }
         val query = entityManager.createNamedQuery(name)
         limit.foreach(query.setMaxResults)
