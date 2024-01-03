@@ -85,7 +85,7 @@ import org.mbari.vcr4j.time.Timecode;
                                 "obs.last_updated_time BETWEEN ?1 AND ?2"
                 ),
                 @NamedNativeQuery(
-                        name = "ImageMoment.updateRecordedTimestampByObservationUuid",
+                        name = "ImagedMoment.updateRecordedTimestampByObservationUuid",
                         query = "UPDATE imaged_moments SET recorded_timestamp = ?1 WHERE " +
                                 "uuid IN (SELECT obs.imaged_moment_uuid FROM observations obs WHERE obs.uuid = ?2)"
                 ),

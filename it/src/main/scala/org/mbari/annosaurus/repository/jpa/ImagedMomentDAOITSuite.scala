@@ -26,6 +26,7 @@ import org.mbari.annosaurus.controllers.TestUtils
 import junit.framework.Assert
 import org.mbari.annosaurus.AssertUtils
 import scala.jdk.CollectionConverters.*
+import org.mbari.annosaurus.domain.WindowRequest
 
 
 
@@ -161,7 +162,7 @@ trait ImagedMomentDAOITSuite extends BaseDAOSuite {
         val im0 = TestUtils.create(1, 1, 1, 1).head
         given dao: ImagedMomentDAOImpl = daoFactory.newImagedMomentDAO()
         val linkName = im0.getObservations().asScala.head.getAssociations().asScala.head.getLinkName()
-        val n = run(() => dao.countByLinkName("foo"))
+        val n = run(() => dao.countByLinkName(linkName))
         assert(n >= 1)
     }
 
@@ -283,10 +284,13 @@ trait ImagedMomentDAOITSuite extends BaseDAOSuite {
     test("findByVideoReferenceUUIDAndTimecode") {
         val xs = TestUtils.create(1)
         given dao: ImagedMomentDAOImpl = daoFactory.newImagedMomentDAO()
-        val t = xs.head.getTimecode()
-        val opt = run(() => dao.findByVideoReferenceUUIDAndTimecode(xs.head.getVideoReferenceUuid(), t))
+        val im = xs.head
+        im.setTimecode(Timecode("01:02:03:04"))
+        run(() => dao.update(im))
+        val t = im.getTimecode()
+        val opt = run(() => dao.findByVideoReferenceUUIDAndTimecode(im.getVideoReferenceUuid(), t))
         assert(opt.isDefined)
-        AssertUtils.assertSameImagedMoment(opt.get, xs.head)
+        AssertUtils.assertSameImagedMoment(opt.get, im)
     }
 
     test("findByVideoReferenceUUIDAndRecordedDate") {
@@ -306,14 +310,112 @@ trait ImagedMomentDAOITSuite extends BaseDAOSuite {
         assert(opt.isDefined)
         AssertUtils.assertSameImagedMoment(opt.get, xs.head)
     }
+
+    test("findByWindowRequest") {
+        val xs = TestUtils.create(1)
+        given dao: ImagedMomentDAOImpl = daoFactory.newImagedMomentDAO()
+        val t0 = xs.head.getRecordedTimestamp().minus(Duration.ofSeconds(1))
+        val t1 = xs.head.getRecordedTimestamp().plus(Duration.ofSeconds(1))
+        val r = WindowRequest(Seq(xs.head.getVideoReferenceUuid()), xs.head.getUuid(), 2000L)
+        val ys = run(() => dao.findByWindowRequest(r))
+        assert(ys.size == 1)
+        AssertUtils.assertSameImagedMoment(ys.head, xs.head)
+    }
+    test("findByVideoReferenceUUIDAndIndex") {
+        val im0 = TestUtils.create(1).head
+
+        // Make sure it has a timecode
+        im0.setTimecode(Timecode("01:02:03:04"))
+        given dao: ImagedMomentDAOImpl = daoFactory.newImagedMomentDAO()
+        run(() => dao.update(im0))
+
+        val timecode = im0.getTimecode()
+        val im1 = run(() => dao.findByVideoReferenceUUIDAndIndex(im0.getVideoReferenceUuid(), Some(timecode)))
+        assert(im1.isDefined)
+        AssertUtils.assertSameImagedMoment(im1.get, im0)
+
+        val elapsedTime = im0.getElapsedTime()
+        val im2 = run(() => dao.findByVideoReferenceUUIDAndIndex(im0.getVideoReferenceUuid(), None, Some(elapsedTime)))
+        assert(im2.isDefined)
+        AssertUtils.assertSameImagedMoment(im2.get, im0)
+
+        val recordedTimestamp = im0.getRecordedTimestamp()
+        val im3 = run(() => dao.findByVideoReferenceUUIDAndIndex(im0.getVideoReferenceUuid(), None, None, Some(recordedTimestamp)))
+        assert(im3.isDefined)
+        AssertUtils.assertSameImagedMoment(im3.get, im0)
+
+    }
+
+    test("findByObservationUUID") {
+        val im0 = TestUtils.create(1, 1, 1, 1).head
+        val o = im0.getObservations().asScala.head
+        given dao: ImagedMomentDAOImpl = daoFactory.newImagedMomentDAO()
+        val im1 = run(() => dao.findByObservationUUID(o.getUuid()))
+        assert(im1.isDefined)
+        AssertUtils.assertSameImagedMoment(im1.get, im0)
+    }
+
+    test("updateRecordedTimestampByObservationUuid") {
+        val im0 = TestUtils.create(1, 1, 1, 1).head
+        val o = im0.getObservations().asScala.head
+        given dao: ImagedMomentDAOImpl = daoFactory.newImagedMomentDAO()
+        val t = Instant.now()
+        val b = run(() => dao.updateRecordedTimestampByObservationUuid(o.getUuid(), t))
+        assert(b)
+        val im1 = run(() => dao.findByObservationUUID(o.getUuid()))
+        assert(im1.isDefined)
+        assertEquals(t, im1.get.getRecordedTimestamp())
+    }
+
+    test("deleteByVideoReferenceUUUID") {
+        val xs = TestUtils.create(2, 1, 1, 1)
+        val videoReferenceUuid = xs.head.getVideoReferenceUuid()
+        given dao: ImagedMomentDAOImpl = daoFactory.newImagedMomentDAO()
+        val b = run(() => dao.deleteByVideoReferenceUUUID(videoReferenceUuid))
+        println(b)
+        assert(b == 2)
+        val im1 = run(() => dao.findByVideoReferenceUUID(videoReferenceUuid))
+        assert(im1.isEmpty)
+    }
+
+    test("deleteIfEmpty") {
+
+        // Should not delete because it has an observation
+        val xs = TestUtils.create(1, 1, 1, 1)
+        val im0 = xs.head
+        val o = im0.getObservations().asScala.head
+        val a = o.getAssociations().asScala.head
+        given dao: ImagedMomentDAOImpl = daoFactory.newImagedMomentDAO()
+        run(() => dao.deleteIfEmpty(im0))
+        val im1 = run(() => dao.findByUUID(im0.getUuid()))
+        assert(im1.isDefined)
+
+        // Should delete because it has no observations
+        val im3 = TestUtils.create(1).head
+        run(() => dao.deleteIfEmpty(im3))
+        val im4 = run(() => dao.findByUUID(im3.getUuid()))
+        assert(im4.isEmpty)
+
+    }
+
+    test("deleteIfEmptyByUUID") {
+            
+            // Should not delete because it has an observation
+            val xs = TestUtils.create(1, 1, 1, 1)
+            val im0 = xs.head
+            val o = im0.getObservations().asScala.head
+            val a = o.getAssociations().asScala.head
+            given dao: ImagedMomentDAOImpl = daoFactory.newImagedMomentDAO()
+            run(() => dao.deleteIfEmptyByUUID(im0.getUuid()))
+            val im1 = run(() => dao.findByUUID(im0.getUuid()))
+            assert(im1.isDefined)
     
-    test("findByWindowRequest") {}
-    test("findByVideoReferenceUUIDAndIndex") {}
-    test("findByObservationUUID") {}
-    test("updateRecordedTimestampByObservationUuid") {}
-    test("deleteByVideoReferenceUUUID") {}
-    test("deleteIfEmpty") {}
-    test("deleteIfEmptyByUUID") {}
+            // Should delete because it has no observations
+            val im3 = TestUtils.create(1).head
+            run(() => dao.deleteIfEmptyByUUID(im3.getUuid()))
+            val im4 = run(() => dao.findByUUID(im3.getUuid()))
+            assert(im4.isEmpty)
+    }
 
 
   

@@ -431,9 +431,10 @@ class ImagedMomentDAOImpl(entityManager: EntityManager)
       *   The UUID of the VideoReference. WARNING!! All annotation data associated to this
       *   videoReference will be deleted.
       */
-    @deprecated(message = "JPQL doesn't cascade. Don't use this", since = "2019-10-22")
     override def deleteByVideoReferenceUUUID(uuid: UUID): Int =
-        executeNamedQuery("ImagedMoment.deleteByVideoReferenceUUID", Map("uuid" -> uuid))
+        val xs = findByVideoReferenceUUID(uuid)
+        xs.foreach(delete)
+        xs.size
 
 //  override def delete(entity: ImagedMomentImpl): Unit = {
 //    Option(entity.ancillaryDatum).foreach(entityManager.remove)
