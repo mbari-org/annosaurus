@@ -23,12 +23,15 @@ import java.time.Duration
 import java.time.Instant
 import junit.framework.Test
 import org.mbari.annosaurus.controllers.TestUtils
+import junit.framework.Assert
+import org.mbari.annosaurus.AssertUtils
+import scala.jdk.CollectionConverters.*
 
 
 
 trait ImagedMomentDAOITSuite extends BaseDAOSuite {
 
-
+    given JPADAOFactory = daoFactory
 
     test("create w/ manual transaction") {
         val em = daoFactory.entityManagerFactory.createEntityManager()
@@ -67,38 +70,243 @@ trait ImagedMomentDAOITSuite extends BaseDAOSuite {
         assert(im.getUuid() != null)
     }
 
-    test("update") {}
-    test("delete") {}
-    test("deleteByUUID") {}
-    test("findByUUID") {}
-    test("findAll") {}
-    test("findBetweenUpdatedDates") {}
+    test("update") {
+        given dao: ImagedMomentDAOImpl = daoFactory.newImagedMomentDAO()
+        val im0 = TestUtils.create(1).head
+        val d = Duration.ofSeconds(1000)
+        im0.setElapsedTime(d)
+        run(() => dao.update(im0))
+        val opt = run(() => dao.findByUUID(im0.getUuid()))
+        assert(opt.isDefined)
+        assertEquals(d, opt.get.getElapsedTime())
+    }
+
+    test("delete") {
+        val im0 = TestUtils.create(1).head
+        given dao: ImagedMomentDAOImpl = daoFactory.newImagedMomentDAO()
+        val opt0 = run(() => dao.findByUUID(im0.getUuid()))
+        assert(opt0.isDefined)
+        run(() => {
+            dao.findByUUID(im0.getUuid()) match {
+                case Some(x) => dao.delete(x)
+                case None => fail("Could not find imaged moment")
+            }
+        })
+        val opt1 = run(() => dao.findByUUID(im0.getUuid()))
+        assert(opt1.isEmpty)
+    }
+
+    test("deleteByUUID") {
+        val im0 = TestUtils.create(1).head
+        given dao: ImagedMomentDAOImpl = daoFactory.newImagedMomentDAO()
+        val opt0 = run(() => dao.findByUUID(im0.getUuid()))
+        assert(opt0.isDefined)
+        run(() => dao.deleteByUUID(im0.getUuid()))
+        val opt1 = run(() => dao.findByUUID(im0.getUuid()))
+        assert(opt1.isEmpty)
+    }
+
+    test("findByUUID") {
+        val im0 = TestUtils.create(1).head
+        given dao: ImagedMomentDAOImpl = daoFactory.newImagedMomentDAO()
+        val opt0 = run(() => dao.findByUUID(im0.getUuid()))
+        assert(opt0.isDefined)
+        AssertUtils.assertSameImagedMoment(opt0.get, im0)
+    }
+
+    test("findAll") {
+        val im0 = TestUtils.create(1).head
+        given dao: ImagedMomentDAOImpl = daoFactory.newImagedMomentDAO()
+        val xs = run(() => dao.findAll())
+        assert(xs.size >= 1)
+    }
+
+    test("findBetweenUpdatedDates") {
+        val im0 = TestUtils.create(1).head
+        given dao: ImagedMomentDAOImpl = daoFactory.newImagedMomentDAO()
+        val dt = Duration.ofSeconds(1)
+        val t0 = im0.getLastUpdatedTime().toInstant().minus(dt)
+        val t1 = im0.getLastUpdatedTime().toInstant().plus(dt)
+        val xs = run(() => dao.findBetweenUpdatedDates(t0, t1))
+        assert(xs.size >= 1)
+    }
+
     test("streamBetweenUpdatedDates") {}
+
     test("streamByVideoReferenceUUIDAndTimestamps") {}
     test("streamVideoReferenceUuidsBetweenUpdateDates") {}
-    test("countAll") {}
-    test("countWithImages") {}
-    test("findWithImages") {}
-    test("countByLinkName") {}
-    test("findByLinkName") {}
-    test("countByConcept") {}
-    test("findByConcept") {}
+
+    test("countAll") {
+        val im0 = TestUtils.create(1).head
+        given dao: ImagedMomentDAOImpl = daoFactory.newImagedMomentDAO()
+        val n = run(() => dao.countAll())
+        assert(n >= 1)
+    }
+    test("countWithImages") {
+        val im0 = TestUtils.create(1, 0, 0, 1).head
+        given dao: ImagedMomentDAOImpl = daoFactory.newImagedMomentDAO()
+        val n = run(() => dao.countWithImages())
+        assert(n >= 1)
+    }
+
+    test("findWithImages") {
+        val im0 = TestUtils.create(1, 0, 0, 1).head
+        given dao: ImagedMomentDAOImpl = daoFactory.newImagedMomentDAO()
+        val xs = run(() => dao.findWithImages())
+        assert(xs.size >= 1)
+        xs.filter(_.getUuid() == im0.getUuid()).foreach(x => AssertUtils.assertSameImagedMoment(x, im0))
+    }
+
+    test("countByLinkName") {
+        val im0 = TestUtils.create(1, 1, 1, 1).head
+        given dao: ImagedMomentDAOImpl = daoFactory.newImagedMomentDAO()
+        val linkName = im0.getObservations().asScala.head.getAssociations().asScala.head.getLinkName()
+        val n = run(() => dao.countByLinkName("foo"))
+        assert(n >= 1)
+    }
+
+    test("findByLinkName") {
+        val im0 = TestUtils.create(1, 1, 1, 1).head
+        given dao: ImagedMomentDAOImpl = daoFactory.newImagedMomentDAO()
+        val linkName = im0.getObservations().asScala.head.getAssociations().asScala.head.getLinkName()
+        val xs = run(() => dao.findByLinkName(linkName))
+        assert(xs.size == 1)
+        AssertUtils.assertSameImagedMoment(xs.head, im0)
+
+    }
+    test("countByConcept") {
+        val im0 = TestUtils.create(1, 1, 1, 1).head
+        given dao: ImagedMomentDAOImpl = daoFactory.newImagedMomentDAO()
+        val concept = im0.getObservations().asScala.head.getConcept()
+        val n = run(() => dao.countByConcept(concept))
+        assert(n == 1)
+    }
+    test("findByConcept") {
+        val im0 = TestUtils.create(1, 1, 1, 1).head
+        given dao: ImagedMomentDAOImpl = daoFactory.newImagedMomentDAO()
+        val concept = im0.getObservations().asScala.head.getConcept()
+        val xs = run(() => dao.findByConcept(concept))
+        assert(xs.size == 1)
+        AssertUtils.assertSameImagedMoment(xs.head, im0)
+    }
     test("streamByConcept") {}
-    test("countByConceptWithImages") {}
-    test("countModifiedBeforeDate") {}
-    test("findByConceptWithImages") {}
-    test("countBetweenUpdatedDates") {}
-    test("countAllByVideoReferenceUuids") {}
-    test("findAllVideoReferenceUUIDs") {}
-    test("findBYVideoReferenceUUID") {}
+    test("countByConceptWithImages") {
+        val im0 = TestUtils.create(1, 1, 1, 1).head
+        given dao: ImagedMomentDAOImpl = daoFactory.newImagedMomentDAO()
+        val concept = im0.getObservations().asScala.head.getConcept()
+        val n = run(() => dao.countByConceptWithImages(concept))
+        assert(n == 1)
+    }
+
+    test("countModifiedBeforeDate") {
+        val xs = TestUtils.create(10, 1)
+        given dao: ImagedMomentDAOImpl = daoFactory.newImagedMomentDAO()
+        val t = xs.head.getLastUpdatedTime().toInstant().plus(Duration.ofSeconds(1))
+        val n = run(() => dao.countModifiedBeforeDate(xs.head.getVideoReferenceUuid(), t))
+        assert(n >= 1)
+    }
+
+    test("findByConceptWithImages") {
+        val im0 = TestUtils.create(1, 1, 1, 1).head
+        given dao: ImagedMomentDAOImpl = daoFactory.newImagedMomentDAO()
+        val concept = im0.getObservations().asScala.head.getConcept()
+        val xs = run(() => dao.findByConceptWithImages(concept))
+        assert(xs.size == 1)
+        AssertUtils.assertSameImagedMoment(xs.head, im0)
+    }
+
+    test("countBetweenUpdatedDates") {
+        val im0 = TestUtils.create(1, 1, 1, 1).head
+        given dao: ImagedMomentDAOImpl = daoFactory.newImagedMomentDAO()
+        val dt = Duration.ofSeconds(1)
+        val t0 = im0.getLastUpdatedTime().toInstant().minus(dt)
+        val t1 = im0.getLastUpdatedTime().toInstant().plus(dt)
+        val n = run(() => dao.countBetweenUpdatedDates(t0, t1))
+        assert(n >= 1)
+    }
+
+    test("countAllByVideoReferenceUuids") {
+        val xs = TestUtils.create(1)
+        given dao: ImagedMomentDAOImpl = daoFactory.newImagedMomentDAO()
+        val m = run(() => dao.countAllByVideoReferenceUuids())
+        assert(m.size >= 1)
+    }
+
+    test("findAllVideoReferenceUUIDs") {
+        val xs = TestUtils.create(1)
+        given dao: ImagedMomentDAOImpl = daoFactory.newImagedMomentDAO()
+        val m = run(() => dao.findAllVideoReferenceUUIDs())
+        assert(m.size >= 1)
+        assert(m.find(_ == xs.head.getVideoReferenceUuid()).isDefined)
+    }
+
+    test("findByVideoReferenceUUID") {
+        val xs = TestUtils.create(1)
+        given dao: ImagedMomentDAOImpl = daoFactory.newImagedMomentDAO()
+        val m = run(() => dao.findByVideoReferenceUUID(xs.head.getVideoReferenceUuid()))
+        assert(m.size >= 1)
+        AssertUtils.assertSameImagedMoment(m.head, xs.head)
+    }
+
     test("streamByVideoReferenceUUID") {}
-    test("countByVideoReferenceUUID") {}
-    test("countByVideoReferenceUUIDWithImages") {}
-    test("findWithImageReferences") {}
-    test("findByImageReferenceUUID") {}
-    test("findByVideoReferenceUUIDAndTimecode") {}
-    test("findByVideoReferenceUUIDAndRecordedDate") {}
-    test("findByVideoReferenceUUIDAndElapsedTime") {}
+    test("countByVideoReferenceUUID") {
+        val xs = TestUtils.create(10)
+        given dao: ImagedMomentDAOImpl = daoFactory.newImagedMomentDAO()
+        val m = run(() => dao.countByVideoReferenceUUID(xs.head.getVideoReferenceUuid()))
+        assertEquals(m, 10)
+    }
+
+    test("countByVideoReferenceUUIDWithImages") {
+        val xs = TestUtils.create(10, 0, 0, 1)
+        given dao: ImagedMomentDAOImpl = daoFactory.newImagedMomentDAO()
+        val m = run(() => dao.countByVideoReferenceUUIDWithImages(xs.head.getVideoReferenceUuid()))
+        assertEquals(m, 10)
+    }
+
+    test("findWithImageReferences") {
+        val xs = TestUtils.create(1, 0, 0, 3)
+        given dao: ImagedMomentDAOImpl = daoFactory.newImagedMomentDAO()
+        val m = run(() => dao.findWithImageReferences(xs.head.getVideoReferenceUuid()))
+        assert(m.size >= 1)
+        AssertUtils.assertSameImagedMoment(m.head, xs.head)
+    }
+
+    test("findByImageReferenceUUID") {
+        val xs = TestUtils.create(1, 0, 0, 1)
+        given dao: ImagedMomentDAOImpl = daoFactory.newImagedMomentDAO()
+        val imageRefUuid = xs.head.getImageReferences().asScala.head.getUuid()
+        val opt = run(() => dao.findByImageReferenceUUID(imageRefUuid))
+        assert(opt.isDefined)
+        AssertUtils.assertSameImagedMoment(opt.get, xs.head)
+    }
+
+    test("findByVideoReferenceUUIDAndTimecode") {
+        val xs = TestUtils.create(1)
+        given dao: ImagedMomentDAOImpl = daoFactory.newImagedMomentDAO()
+        val t = xs.head.getTimecode()
+        val opt = run(() => dao.findByVideoReferenceUUIDAndTimecode(xs.head.getVideoReferenceUuid(), t))
+        assert(opt.isDefined)
+        AssertUtils.assertSameImagedMoment(opt.get, xs.head)
+    }
+
+    test("findByVideoReferenceUUIDAndRecordedDate") {
+        val xs = TestUtils.create(1)
+        given dao: ImagedMomentDAOImpl = daoFactory.newImagedMomentDAO()
+        val t = xs.head.getRecordedTimestamp()
+        val opt = run(() => dao.findByVideoReferenceUUIDAndRecordedDate(xs.head.getVideoReferenceUuid(), t))
+        assert(opt.isDefined)
+        AssertUtils.assertSameImagedMoment(opt.get, xs.head)
+    }
+
+    test("findByVideoReferenceUUIDAndElapsedTime") {
+        val xs = TestUtils.create(1)
+        given dao: ImagedMomentDAOImpl = daoFactory.newImagedMomentDAO()
+        val t = xs.head.getElapsedTime()
+        val opt = run(() => dao.findByVideoReferenceUUIDAndElapsedTime(xs.head.getVideoReferenceUuid(), t))
+        assert(opt.isDefined)
+        AssertUtils.assertSameImagedMoment(opt.get, xs.head)
+    }
+    
     test("findByWindowRequest") {}
     test("findByVideoReferenceUUIDAndIndex") {}
     test("findByObservationUUID") {}

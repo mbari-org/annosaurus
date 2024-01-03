@@ -192,8 +192,8 @@ class ImagedMomentDAOImpl(entityManager: EntityManager)
 
     override def findByConcept(
         concept: String,
-        limit: Option[Int],
-        offset: Option[Int]
+        limit: Option[Int] = None,
+        offset: Option[Int] = None
     ): Iterable[ImagedMomentEntity] =
         findByNamedQuery("ImagedMoment.findByConcept", Map("concept" -> concept), limit, offset)
 
@@ -227,8 +227,8 @@ class ImagedMomentDAOImpl(entityManager: EntityManager)
 
     override def findByConceptWithImages(
         concept: String,
-        limit: Option[Int],
-        offset: Option[Int]
+        limit: Option[Int] = None,
+        offset: Option[Int] = None
     ): Iterable[ImagedMomentEntity] =
         findByNamedQuery(
             "ImagedMoment.findByConceptWithImages",
@@ -344,8 +344,8 @@ class ImagedMomentDAOImpl(entityManager: EntityManager)
             .head
 
     override def findWithImages(
-        limit: Option[Int],
-        offset: Option[Int]
+        limit: Option[Int] = None,
+        offset: Option[Int] = None
     ): Iterable[ImagedMomentEntity] =
         findByNamedQuery("ImagedMoment.findWithImages", limit = limit, offset = offset)
 
@@ -359,8 +359,8 @@ class ImagedMomentDAOImpl(entityManager: EntityManager)
 
     override def findByLinkName(
         linkName: String,
-        limit: Option[Int],
-        offset: Option[Int]
+        limit: Option[Int] = None,
+        offset: Option[Int] = None
     ): Iterable[ImagedMomentEntity] =
         findByNamedQuery(
             "ImagedMoment.findByLinkName",
