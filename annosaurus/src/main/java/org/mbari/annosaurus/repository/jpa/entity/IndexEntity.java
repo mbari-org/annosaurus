@@ -18,11 +18,9 @@ package org.mbari.annosaurus.repository.jpa.entity;
 
 import jakarta.persistence.*;
 import org.mbari.annosaurus.repository.jpa.DurationConverter;
-import org.mbari.annosaurus.repository.jpa.InstantConverter;
 import org.mbari.annosaurus.repository.jpa.TimecodeConverter;
 import org.mbari.vcr4j.time.Timecode;
 import org.mbari.annosaurus.repository.jpa.TransactionLogger;
-import org.hibernate.annotations.Type;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
@@ -67,7 +65,7 @@ public class IndexEntity implements IPersistentObject {
 
     @Column(name = "recorded_timestamp", nullable = true)
     @Temporal(value = TemporalType.TIMESTAMP)
-    Instant recordedDate;
+    Instant recordedTimestamp;
 
     @Column(name = "timecode", nullable = true)
     @Convert(converter = TimecodeConverter.class)
@@ -77,6 +75,23 @@ public class IndexEntity implements IPersistentObject {
     CachedAncillaryDatumEntity ancillaryDatum;
 
     public IndexEntity() {
+    }
+
+    public IndexEntity(UUID uuid, UUID videoReferenceUuid, Duration elapsedTime, Instant recordedTimestamp, Timecode timecode) {
+        this.uuid = uuid;
+        this.videoReferenceUuid = videoReferenceUuid;
+        this.elapsedTime = elapsedTime;
+        this.recordedTimestamp = recordedTimestamp;
+        this.timecode = timecode;
+    }
+
+    public IndexEntity(ImagedMomentEntity imagedMomentEntity) {
+        this.uuid = imagedMomentEntity.getUuid();
+        this.videoReferenceUuid = imagedMomentEntity.getVideoReferenceUuid();
+        this.elapsedTime = imagedMomentEntity.getElapsedTime();
+        this.recordedTimestamp = imagedMomentEntity.getRecordedTimestamp();
+        this.timecode = imagedMomentEntity.getTimecode();
+        this.lastUpdatedTime = imagedMomentEntity.getLastUpdatedTime();
     }
 
     @Override
@@ -112,12 +127,12 @@ public class IndexEntity implements IPersistentObject {
         this.elapsedTime = elapsedTime;
     }
 
-    public Instant getRecordedDate() {
-        return recordedDate;
+    public Instant getRecordedTimestamp() {
+        return recordedTimestamp;
     }
 
-    public void setRecordedDate(Instant recordedDate) {
-        this.recordedDate = recordedDate;
+    public void setRecordedTimestamp(Instant recordedTimestamp) {
+        this.recordedTimestamp = recordedTimestamp;
     }
 
     public Timecode getTimecode() {
@@ -135,4 +150,6 @@ public class IndexEntity implements IPersistentObject {
     public void setAncillaryDatum(CachedAncillaryDatumEntity ancillaryDatum) {
         this.ancillaryDatum = ancillaryDatum;
     }
+
+    
 }

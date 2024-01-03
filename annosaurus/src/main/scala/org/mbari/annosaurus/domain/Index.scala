@@ -46,7 +46,7 @@ final case class Index(
         entity.setVideoReferenceUuid(videoReferenceUuid)
         timecode.foreach(tc => entity.setTimecode(org.mbari.vcr4j.time.Timecode(tc)))
         elapsedTimeMillis.foreach(t => entity.setElapsedTime(java.time.Duration.ofMillis(t)))
-        recordedTimestamp.foreach(entity.setRecordedDate)
+        recordedTimestamp.foreach(entity.setRecordedTimestamp)
         uuid.foreach(entity.setUuid)
         entity
     }
@@ -58,7 +58,7 @@ object Index extends FromEntity[IndexEntity, Index] {
             entity.getVideoReferenceUuid,
             Option(entity.getTimecode).map(_.toString()),
             Option(entity.getElapsedTime).map(_.toMillis),
-            Option(entity.getRecordedDate),
+            Option(entity.getRecordedTimestamp),
             entity.primaryKey,
             entity.lastUpdated
         )

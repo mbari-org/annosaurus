@@ -57,8 +57,8 @@ class IndexController(val daoFactory: JPADAOFactory)
                 .map(im => {
                     if (im.getElapsedTime != null) {
                         val newRecordedDate = newStartTimestamp.plus(im.getElapsedTime)
-                        if (newRecordedDate != im.getRecordedDate) {
-                            im.setRecordedDate(newRecordedDate)
+                        if (newRecordedDate != im.getRecordedTimestamp) {
+                            im.setRecordedTimestamp(newRecordedDate)
                         }
                     }
                     im
@@ -75,7 +75,7 @@ class IndexController(val daoFactory: JPADAOFactory)
                 dao
                     .findByUUID(im.getUuid)
                     .map(i => {
-                        Option(im.getRecordedDate).foreach(i.setRecordedDate)
+                        Option(im.getRecordedTimestamp).foreach(i.setRecordedTimestamp)
                         i
                     })
             }).flatten

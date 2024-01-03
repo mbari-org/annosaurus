@@ -37,7 +37,7 @@ class IndexSuite extends munit.FunSuite {
         assertEquals(e2.getVideoReferenceUuid(), cc1.videoReferenceUuid)
         assertEquals(e2.getTimecode().toString(), cc1.timecode.get)
         assertEquals(Option(e2.getElapsedTime()), cc1.elapsedTime)
-        assertEquals(Option(e2.getRecordedDate()), cc1.recordedTimestamp)
+        assertEquals(Option(e2.getRecordedTimestamp()), cc1.recordedTimestamp)
         assertEquals(Option(e2.getUuid()), cc1.uuid)
     }
 }

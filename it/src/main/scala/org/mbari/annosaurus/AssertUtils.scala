@@ -26,6 +26,7 @@ import org.mbari.annosaurus.repository.jpa.entity.CachedAncillaryDatumEntity
 import scala.jdk.CollectionConverters.*
 import org.mbari.annosaurus.domain.CachedVideoReferenceInfo
 import org.mbari.annosaurus.repository.jpa.entity.CachedVideoReferenceInfoEntity
+import org.mbari.annosaurus.repository.jpa.entity.IndexEntity
 
 object AssertUtils {
 
@@ -41,6 +42,12 @@ object AssertUtils {
             // assertEquals(a.getTimecode(), b.getTimecode())
             if (a.getTimecode() != null && b.getTimecode() != null) {
                 assertEquals(a.getTimecode().toString(), b.getTimecode().toString())
+            }
+            else if (a.getTimecode() == null && b.getTimecode() == null) {
+                // do nothing
+            }
+            else {
+                fail("One of the timecodes is null")
             }
             assertEquals(a.getElapsedTime(), b.getElapsedTime())
             assertEquals(a.getRecordedTimestamp(), b.getRecordedTimestamp())
@@ -171,4 +178,28 @@ object AssertUtils {
        }
     }
 
+    def assertSameIndex(
+        a: IndexEntity,
+        b: IndexEntity
+    ): Unit = {
+        if (a == null && b == null) {
+            // do nothing
+        }
+        else if (a != null && b != null) {
+            assertEquals(a.getUuid(), b.getUuid())
+            assertEquals(a.getVideoReferenceUuid(), b.getVideoReferenceUuid())
+            assertEquals(a.getElapsedTime(), b.getElapsedTime())
+            assertEquals(a.getRecordedTimestamp(), b.getRecordedTimestamp())
+            if (a.getTimecode() != null && b.getTimecode() != null) {
+                assertEquals(a.getTimecode().toString(), b.getTimecode().toString())
+            }
+            else if (a.getTimecode() == null && b.getTimecode() == null) {
+                // do nothing
+            }
+            else {
+                fail("One of the timecodes is null")
+            }
+        }
+    }
+    
 }
