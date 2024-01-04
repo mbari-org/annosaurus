@@ -92,9 +92,9 @@ class JdbcRepository(entityManagerFactory: EntityManagerFactory) {
 
     def findByQueryConstraint(constraints: QueryConstraints): Seq[Annotation] = {
         given entityManager: EntityManager = entityManagerFactory.createEntityManager()
-        val query1      = QueryConstraintsSqlBuilder.toQuery(constraints, entityManager)
-        val r1          = query1.getResultList.asScala.toList
-        val annotations = AnnotationSQL.resultListToAnnotations(r1)
+        val query1                         = QueryConstraintsSqlBuilder.toQuery(constraints, entityManager)
+        val r1                             = query1.getResultList.asScala.toList
+        val annotations                    = AnnotationSQL.resultListToAnnotations(r1)
         executeQueryForAnnotations(annotations, constraints.includeData)
         entityManager.close()
         annotations
@@ -102,9 +102,9 @@ class JdbcRepository(entityManagerFactory: EntityManagerFactory) {
 
     def countByQueryConstraint(constraints: QueryConstraints): Int = {
         given entityManager: EntityManager = entityManagerFactory.createEntityManager()
-        val query                                 = QueryConstraintsSqlBuilder.toCountQuery(constraints, entityManager)
+        val query                          = QueryConstraintsSqlBuilder.toCountQuery(constraints, entityManager)
         // Postgresql returns a Long, Everything else returns an Int
-        val count                                 = query.getResultList.get(0).toString().toInt
+        val count                          = query.getResultList.get(0).toString().toInt
         entityManager.close()
         count
     }
@@ -113,9 +113,9 @@ class JdbcRepository(entityManagerFactory: EntityManagerFactory) {
         constraints: QueryConstraints
     ): Option[GeographicRange] = {
         given entityManager: EntityManager = entityManagerFactory.createEntityManager()
-        val query                                 = QueryConstraintsSqlBuilder.toGeographicRangeQuery(constraints, entityManager)
+        val query                          = QueryConstraintsSqlBuilder.toGeographicRangeQuery(constraints, entityManager)
         // Queries return java.util.List[Array[Object]]
-        val count                                 = query.getResultList.asScala.toList
+        val count                          = query.getResultList.asScala.toList
         if (count.nonEmpty) {
             val head = count.head.asInstanceOf[Array[_]]
             Some(
@@ -139,7 +139,7 @@ class JdbcRepository(entityManagerFactory: EntityManagerFactory) {
     ): Seq[Annotation] = {
 
         given entityManager: EntityManager = entityManagerFactory.createEntityManager()
-        val query1                                = entityManager.createNativeQuery(AnnotationSQL.all)
+        val query1                         = entityManager.createNativeQuery(AnnotationSQL.all)
         limit.foreach(query1.setMaxResults)
         offset.foreach(query1.setFirstResult)
 
@@ -153,20 +153,20 @@ class JdbcRepository(entityManagerFactory: EntityManagerFactory) {
 
     def countAll(): Long = {
         given entityManager: EntityManager = entityManagerFactory.createEntityManager()
-        val query                                 = entityManager.createNativeQuery(ObservationSQL.countAll)
+        val query                          = entityManager.createNativeQuery(ObservationSQL.countAll)
         // This will throw and exception if nothing is returned. That's ok.
-        val count                                 = query.getSingleResult.asLong.get
+        val count                          = query.getSingleResult.asLong.get
         entityManager.close()
         count
     }
 
     def countImagesByVideoReferenceUuid(videoReferenceUuid: UUID): Long = {
         given entityManager: EntityManager = entityManagerFactory.createEntityManager()
-        val query                                 = entityManager.createNativeQuery(ImageReferenceSQL.countByVideoReferenceUuid)
+        val query                          = entityManager.createNativeQuery(ImageReferenceSQL.countByVideoReferenceUuid)
         query.setParameter(1, videoReferenceUuid.toString())
         // This will throw and exception if nothing is returned. That's ok.
         // SQL Server returns Int, Postgresql returns Long
-        val count                                 = query.getSingleResult.asLong.get
+        val count                          = query.getSingleResult.asLong.get
         entityManager.close()
         count
     }
@@ -207,7 +207,7 @@ class JdbcRepository(entityManagerFactory: EntityManagerFactory) {
     ): Seq[Annotation] = {
 
         given entityManager: EntityManager = entityManagerFactory.createEntityManager()
-        val queries                               = List(
+        val queries                        = List(
             entityManager.createNativeQuery(AnnotationSQL.byVideoReferenceUuidBetweenDates),
             entityManager.createNativeQuery(AssociationSQL.byVideoReferenceUuidBetweenDates),
             entityManager.createNativeQuery(ImageReferenceSQL.byVideoReferenceUuidBetweenDates)
@@ -237,7 +237,7 @@ class JdbcRepository(entityManagerFactory: EntityManagerFactory) {
         val videoReferenceUuids = request.videoReferenceUuids.map(_.toString)
 
         given entityManager: EntityManager = entityManagerFactory.createEntityManager()
-        val queries                               = List(
+        val queries                        = List(
             AnnotationSQL.byConcurrentRequest,
             AssociationSQL.byConcurrentRequest,
             ImageReferenceSQL.byConcurrentRequest
@@ -264,9 +264,9 @@ class JdbcRepository(entityManagerFactory: EntityManagerFactory) {
         offset: Option[Int] = None,
         includeAncillaryData: Boolean = false
     ): Seq[Annotation] = {
-        val uuids                                 = request.videoReferenceUuids.map(_.toString)
+        val uuids                          = request.videoReferenceUuids.map(_.toString)
         given entityManager: EntityManager = entityManagerFactory.createEntityManager()
-        val queries                               = List(
+        val queries                        = List(
             AnnotationSQL.byMultiRequest,
             AssociationSQL.byMultiRequest,
             ImageReferenceSQL.byMultiRequest
@@ -286,7 +286,7 @@ class JdbcRepository(entityManagerFactory: EntityManagerFactory) {
         includeAncillaryData: Boolean = false
     ): Seq[Annotation] = {
         given entityManager: EntityManager = entityManagerFactory.createEntityManager()
-        val query1                                = entityManager.createNativeQuery(AnnotationSQL.byConcept)
+        val query1                         = entityManager.createNativeQuery(AnnotationSQL.byConcept)
         query1.setParameter(1, concept)
         limit.foreach(query1.setMaxResults)
         offset.foreach(query1.setFirstResult)
@@ -305,12 +305,12 @@ class JdbcRepository(entityManagerFactory: EntityManagerFactory) {
         includeAncillaryData: Boolean = false
     ): Seq[Annotation] = {
         given entityManager: EntityManager = entityManagerFactory.createEntityManager()
-        val query1                                = entityManager.createNativeQuery(AnnotationSQL.byConceptWithImages)
+        val query1                         = entityManager.createNativeQuery(AnnotationSQL.byConceptWithImages)
         query1.setParameter(1, concept)
         limit.foreach(query1.setMaxResults)
         offset.foreach(query1.setFirstResult)
-        val r1                                    = query1.getResultList.asScala.toList
-        val annotations                           = AnnotationSQL.resultListToAnnotations(r1).distinct
+        val r1                             = query1.getResultList.asScala.toList
+        val annotations                    = AnnotationSQL.resultListToAnnotations(r1).distinct
         executeQueryForAnnotations(annotations, includeAncillaryData)
         entityManager.close()
         annotations
@@ -323,12 +323,12 @@ class JdbcRepository(entityManagerFactory: EntityManagerFactory) {
         includeAncillaryData: Boolean = false
     ): Seq[Annotation] = {
         given entityManager: EntityManager = entityManagerFactory.createEntityManager()
-        val query1                                = entityManager.createNativeQuery(AnnotationSQL.byToConceptWithImages)
+        val query1                         = entityManager.createNativeQuery(AnnotationSQL.byToConceptWithImages)
         query1.setParameter(1, toConcept)
         limit.foreach(query1.setMaxResults)
         offset.foreach(query1.setFirstResult)
-        val r1                                    = query1.getResultList.asScala.toList
-        val annotations                           = AnnotationSQL.resultListToAnnotations(r1).distinct
+        val r1                             = query1.getResultList.asScala.toList
+        val annotations                    = AnnotationSQL.resultListToAnnotations(r1).distinct
         executeQueryForAnnotations(annotations, includeAncillaryData)
         entityManager.close()
         annotations
@@ -340,11 +340,12 @@ class JdbcRepository(entityManagerFactory: EntityManagerFactory) {
         offset: Option[Int] = None
     ): Seq[UUID] = {
         given entityManager: EntityManager = entityManagerFactory.createEntityManager()
-        val query                                 = entityManager.createNativeQuery(ImagedMomentSQL.byConceptWithImages)
+        val query                          = entityManager.createNativeQuery(ImagedMomentSQL.byConceptWithImages)
         query.setParameter(1, concept)
         limit.foreach(query.setMaxResults)
         offset.foreach(query.setFirstResult)
-        val uuids = query.getResultList()
+        val uuids                          = query
+            .getResultList()
             .asScala
             .flatMap(_.asUUID)
             .toSeq
@@ -362,7 +363,8 @@ class JdbcRepository(entityManagerFactory: EntityManagerFactory) {
         query.setParameter(1, toConcept)
         limit.foreach(query.setMaxResults)
         offset.foreach(query.setFirstResult)
-        val uuids = query.getResultList()
+        val uuids                                 = query
+            .getResultList()
             .asScala
             .flatMap(_.asUUID)
             .toSeq

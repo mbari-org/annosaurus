@@ -61,8 +61,7 @@ trait JPADAOFactory {
     def newObservationDAO(dao: DAO[_]): ObservationDAOImpl =
         new ObservationDAOImpl(extractEntityManager(dao))
 
-    def newCachedVideoReferenceInfoDAO()
-        : CachedVideoReferenceInfoDAOImpl =
+    def newCachedVideoReferenceInfoDAO(): CachedVideoReferenceInfoDAOImpl =
         new CachedVideoReferenceInfoDAOImpl(entityManagerFactory.createEntityManager())
 
     def newCachedVideoReferenceInfoDAO(

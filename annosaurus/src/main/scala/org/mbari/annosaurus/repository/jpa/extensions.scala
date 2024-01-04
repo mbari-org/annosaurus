@@ -22,11 +22,10 @@ import scala.concurrent.{ExecutionContext, Future}
 import org.mbari.annosaurus.etc.jdk.Logging.given
 import scala.util.control.NonFatal
 
-/**
-  * Implicits used in this package
+/** Implicits used in this package
   *
   * @author
-  * Brian Schlining
+  *   Brian Schlining
   * @since 2016-05-06T13:34:00
   */
 object extensions:

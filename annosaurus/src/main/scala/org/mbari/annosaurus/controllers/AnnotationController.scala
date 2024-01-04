@@ -42,13 +42,18 @@ import scala.jdk.CollectionConverters.*
   *   Brian Schlining
   * @since 2016-06-25T20:28:00
   */
-class AnnotationController(val daoFactory: JPADAOFactory, bus: Subject[Any] = MessageBus.RxSubject) {
+class AnnotationController(
+    val daoFactory: JPADAOFactory,
+    bus: Subject[Any] = MessageBus.RxSubject
+) {
 
     private[this] val imagedMomentController = new ImagedMomentController(daoFactory)
     private[this] val annotationPublisher    = new AnnotationPublisher(bus)
-    private val log = System.getLogger(getClass.getName())
+    private val log                          = System.getLogger(getClass.getName())
 
-    protected def exec[T](fn: ObservationDAO[ObservationEntity] => T)(implicit ec: ExecutionContext): Future[T] = {
+    protected def exec[T](
+        fn: ObservationDAO[ObservationEntity] => T
+    )(implicit ec: ExecutionContext): Future[T] = {
         val dao = daoFactory.newObservationDAO()
         val f   = dao.runTransaction(fn)
         f.onComplete(_ => dao.close())
@@ -63,7 +68,6 @@ class AnnotationController(val daoFactory: JPADAOFactory, bus: Subject[Any] = Me
         log.atWarn.log("-----" + uuid)
         exec(d => d.findByUUID(uuid).map(Annotation.from(_, true)))
 
-    
     }
 
     def countByVideoReferenceUuid(uuid: UUID)(implicit ec: ExecutionContext): Future[Int] = {
@@ -571,7 +575,9 @@ class AnnotationController(val daoFactory: JPADAOFactory, bus: Subject[Any] = Me
                 case Some(v) =>
                     val imagedMoment = v.getImagedMoment
                     if (
-                        imagedMoment.getObservations.size == 1 && imagedMoment.getImageReferences.isEmpty
+                        imagedMoment.getObservations.size == 1 && imagedMoment
+                            .getImageReferences
+                            .isEmpty
                     ) {
                         imDao.delete(imagedMoment)
                     }

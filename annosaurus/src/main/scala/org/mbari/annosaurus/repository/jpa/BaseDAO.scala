@@ -31,22 +31,22 @@ import org.mbari.annosaurus.repository.jpa.extensions.*
 import org.mbari.annosaurus.etc.jdk.Logging.given
 import java.lang.System.Logger.Level
 
-
 /** @author
   *   Brian Schlining
   * @since 2016-05-06T11:18:00
   */
 abstract class BaseDAO[B <: IPersistentObject: ClassTag](val entityManager: EntityManager)
     extends DAO[B] {
-    
+
     private val log = System.getLogger(getClass.getName)
 
     if (log.isLoggable(Level.DEBUG)) {
         val props = entityManager.getProperties
         if (props.containsKey(BaseDAO.JDBC_URL_KEY)) {
-            log.atDebug.log(
-                s"Wrapping EntityManager with DAO for database: ${props.get(BaseDAO.JDBC_URL_KEY)}"
-            )
+            log.atDebug
+                .log(
+                    s"Wrapping EntityManager with DAO for database: ${props.get(BaseDAO.JDBC_URL_KEY)}"
+                )
         }
     }
 
@@ -126,7 +126,7 @@ abstract class BaseDAO[B <: IPersistentObject: ClassTag](val entityManager: Enti
         findByUUID(primaryKey).foreach(delete)
 
     override def runTransaction[R](fn: this.type => R)(implicit ec: ExecutionContext): Future[R] = {
-        
+
         def fn2(em: EntityManager): R = fn.apply(this)
         entityManager.runTransaction(fn2)
     }
@@ -146,7 +146,7 @@ abstract class BaseDAO[B <: IPersistentObject: ClassTag](val entityManager: Enti
         //     query.setParameter(position, uuid)
         // }
         // else {
-            query.setParameter(position, uuid.toString.toLowerCase())
+        query.setParameter(position, uuid.toString.toLowerCase())
         // }
     }
 

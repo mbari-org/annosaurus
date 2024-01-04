@@ -98,9 +98,11 @@ final case class CachedAncillaryDatum(
 object CachedAncillaryDatum extends FromEntity[CachedAncillaryDatumEntity, CachedAncillaryDatum] {
     def from(entity: CachedAncillaryDatumEntity, extend: Boolean = false): CachedAncillaryDatum =
         val opt =
-            if extend && entity.getImagedMoment != null then entity.getImagedMoment.primaryKey else None
+            if extend && entity.getImagedMoment != null then entity.getImagedMoment.primaryKey
+            else None
         val rt  =
-            if extend && entity.getImagedMoment != null then Option(entity.getImagedMoment.getRecordedTimestamp)
+            if extend && entity.getImagedMoment != null then
+                Option(entity.getImagedMoment.getRecordedTimestamp)
             else None
         CachedAncillaryDatum(
             Option(entity.getLatitude),

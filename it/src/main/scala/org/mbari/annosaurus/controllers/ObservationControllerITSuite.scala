@@ -16,6 +16,4 @@
 
 package org.mbari.annosaurus.controllers
 
-class ObservationControllerITSuite extends munit.FunSuite {
-  
-}
+class ObservationControllerITSuite extends munit.FunSuite {}

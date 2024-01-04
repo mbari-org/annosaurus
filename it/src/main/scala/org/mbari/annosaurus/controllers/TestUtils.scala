@@ -44,9 +44,9 @@ import scala.concurrent.Await
 
 object TestUtils {
 
-    val Timeout        = duration.Duration(3, TimeUnit.SECONDS)
-    val Digest         = MessageDigest.getInstance("SHA-512")
-    private val random = Random
+    val Timeout            = duration.Duration(3, TimeUnit.SECONDS)
+    val Digest             = MessageDigest.getInstance("SHA-512")
+    private val random     = Random
     given ExecutionContext = ExecutionContext.global
 
     private val log = System.getLogger(getClass.getName)
@@ -82,7 +82,9 @@ object TestUtils {
             )
     }
 
-    def create(entities: Seq[ImagedMomentEntity])(using daoFactory: JPADAOFactory, ec: ExecutionContext): Seq[ImagedMomentEntity] = {
+    def create(
+        entities: Seq[ImagedMomentEntity]
+    )(using daoFactory: JPADAOFactory, ec: ExecutionContext): Seq[ImagedMomentEntity] = {
         log.atInfo.log(s"Creating ${entities.size} ImagedMoments: $entities")
         val dao = daoFactory.newImagedMomentDAO()
         Await.ready(dao.runTransaction(d => entities.foreach(x => d.create(x))), Timeout)
@@ -102,7 +104,7 @@ object TestUtils {
         val dao = daoFactory.newImagedMomentDAO()
         Await.ready(dao.runTransaction(d => xs.foreach(x => d.create(x))), Timeout)
         // for (x <- xs)
-        // do 
+        // do
         //     val f = dao.runTransaction(d => d.create(x))
         //     Await.result(f, Timeout)
         dao.close()
@@ -142,12 +144,14 @@ object TestUtils {
         val observer        = Some(Strings.random(32))
         val group           = if (random.nextBoolean()) Some(Strings.random(32)) else None
         val activity        = if (random.nextBoolean()) Some(Strings.random(32)) else None
-        val obs             = ObservationEntity(concept, 
-                duration.orNull, 
-                observationDate, 
-                observer.orNull, 
-                group.orNull, 
-                activity.orNull)
+        val obs             = ObservationEntity(
+            concept,
+            duration.orNull,
+            observationDate,
+            observer.orNull,
+            group.orNull,
+            activity.orNull
+        )
         for (_ <- 0 until nAssociations) {
             obs.addAssociation(randomAssociation())
         }
@@ -179,17 +183,17 @@ object TestUtils {
         val depth    = Ocean.depth(pressure.toDouble, lat)
         val salinity = random.nextInt(3600) / 100d
         val temp     = random.nextInt(1500) / 100d
-        val oxygen   = random.nextDouble() * 10D
+        val oxygen   = random.nextDouble() * 10d
         val crs      = "EPSG:4326"
-        val x        = random.nextInt(1000) * 1D
-        val y        = random.nextInt(1000) * 1D
-        val z        = random.nextInt(1000) * 1D
+        val x        = random.nextInt(1000) * 1d
+        val y        = random.nextInt(1000) * 1d
+        val z        = random.nextInt(1000) * 1d
         val pose     = "XYZ"
         val phi      = random.nextInt(36000) / 100d
         val theta    = random.nextInt(36000) / 100d
         val psi      = random.nextInt(36000) / 100d
-        val trans    = random.nextInt(100) * 1D
-        val datum = new CachedAncillaryDatumEntity()
+        val trans    = random.nextInt(100) * 1d
+        val datum    = new CachedAncillaryDatumEntity()
         datum.setLatitude(lat)
         datum.setLongitude(lon)
         datum.setDepthMeters(depth)
@@ -209,8 +213,10 @@ object TestUtils {
         datum
     }
 
-    def randomVideoReferenceInfo(videoReferenceUuid: UUID = UUID.randomUUID()): CachedVideoReferenceInfoEntity = {
-        
+    def randomVideoReferenceInfo(
+        videoReferenceUuid: UUID = UUID.randomUUID()
+    ): CachedVideoReferenceInfoEntity = {
+
         CachedVideoReferenceInfoEntity(
             videoReferenceUuid,
             "p-" + Strings.random(10),

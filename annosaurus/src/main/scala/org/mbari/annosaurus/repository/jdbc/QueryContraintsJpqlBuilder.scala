@@ -16,7 +16,6 @@
 
 package org.mbari.annosaurus.repository.jdbc
 
-
 object QueryContraintsJpqlBuilder {
 
     def buildJpql(select: JpqlSelect, from: JpqlFrom, where: JpqlWhere, order: JpqlOrder): String =
@@ -29,45 +28,83 @@ object QueryContraintsJpqlBuilder {
 
         val Order: JpqlOrder = JpqlOrder("ORDER BY obs.observationTimestamp")
 
-        val Select: JpqlSelect = JpqlSelect("SELECT new org.mbari.annosaurus.repository.jpa.entity.AnnotationDTO(o.uuid, o.concept, o.observer, o.observationTimestamp, i.videoReferenceUuid, i.uuid, i.timecode, i.elapsedTime, i.recordedTimestamp, o.duration, o.group, o.activity)")
+        val Select: JpqlSelect = JpqlSelect(
+            "SELECT new org.mbari.annosaurus.repository.jpa.entity.AnnotationDTO(o.uuid, o.concept, o.observer, o.observationTimestamp, i.videoReferenceUuid, i.uuid, i.timecode, i.elapsedTime, i.recordedTimestamp, o.duration, o.group, o.activity)"
+        )
 
         val SelectCount: JpqlSelect = JpqlSelect("SELECT COUNT(o)")
 
         // https://www.baeldung.com/jpa-join-types
-        val From: JpqlFrom = JpqlFrom("FROM ImagedMoment i JOIN i.observations o JOIN CachedVideoReferenceInfo vi ON i.videoReferenceUuid = vi.videoReferenceUuid")
+        val From: JpqlFrom = JpqlFrom(
+            "FROM ImagedMoment i JOIN i.observations o JOIN CachedVideoReferenceInfo vi ON i.videoReferenceUuid = vi.videoReferenceUuid"
+        )
 
         val FromWithImages: JpqlFrom = JpqlFrom(s"$From JOIN i.imageReferences ir")
 
-        val FromWithImagesAndAssociations: JpqlFrom = JpqlFrom(s"$FromWithImages JOIN o.associations a")
+        val FromWithImagesAndAssociations: JpqlFrom = JpqlFrom(
+            s"$FromWithImages JOIN o.associations a"
+        )
 
-        val FromWithData: JpqlFrom = JpqlFrom(s"$FromWithImagesAndAssociations JOIN i.ancillaryData d")
-
+        val FromWithData: JpqlFrom = JpqlFrom(
+            s"$FromWithImagesAndAssociations JOIN i.ancillaryData d"
+        )
 
         val QueryAll: String = buildJpql(Select, From, Order)
 
-        val QueryByVideoReferenceUuid: String = buildJpql(Select, From, JpqlWhere("WHERE i.videoReferenceUuid = :videoReferenceUuid"), Order)
+        val QueryByVideoReferenceUuid: String = buildJpql(
+            Select,
+            From,
+            JpqlWhere("WHERE i.videoReferenceUuid = :videoReferenceUuid"),
+            Order
+        )
 
-        val QueryByConcept: String = buildJpql(Select, From, JpqlWhere("WHERE o.concept = :concept"), Order)
+        val QueryByConcept: String =
+            buildJpql(Select, From, JpqlWhere("WHERE o.concept = :concept"), Order)
 
-        val QueryByConceptWithImage: String = buildJpql(Select, FromWithImages, JpqlWhere("WHERE ir.url IS NOT NULL and o.concept = :concept"), Order)
+        val QueryByConceptWithImage: String = buildJpql(
+            Select,
+            FromWithImages,
+            JpqlWhere("WHERE ir.url IS NOT NULL and o.concept = :concept"),
+            Order
+        )
 
-        val QueryBetweenDates: String = buildJpql(Select, From, JpqlWhere("WHERE i.recordedTimestamp BETWEEN :start AND :end"), Order)
+        val QueryBetweenDates: String = buildJpql(
+            Select,
+            From,
+            JpqlWhere("WHERE i.recordedTimestamp BETWEEN :start AND :end"),
+            Order
+        )
 
-        val QueryByVideoReferenceUuidBetweenDates: String = buildJpql(Select, From,
-            JpqlWhere("WHERE i.videoReferenceUuid = :uuid AND i.recordedTimestamp BETWEEN :start AND :end"), Order)
+        val QueryByVideoReferenceUuidBetweenDates: String = buildJpql(
+            Select,
+            From,
+            JpqlWhere(
+                "WHERE i.videoReferenceUuid = :uuid AND i.recordedTimestamp BETWEEN :start AND :end"
+            ),
+            Order
+        )
 
-        val QueryByVideoReferenceUuidsBetweenDates: String = buildJpql(Select, From,
-            JpqlWhere("WHERE i.videoReferenceUuid IN :uuids AND i.recordedTimestamp BETWEEN :start AND :end"), Order)
+        val QueryByVideoReferenceUuidsBetweenDates: String = buildJpql(
+            Select,
+            From,
+            JpqlWhere(
+                "WHERE i.videoReferenceUuid IN :uuids AND i.recordedTimestamp BETWEEN :start AND :end"
+            ),
+            Order
+        )
 
-        val QueryByVideoReferenceUuids: String = buildJpql(Select, From,
-            JpqlWhere("WHERE i.videoReferenceUuid IN :uuids"), Order)
+        val QueryByVideoReferenceUuids: String =
+            buildJpql(Select, From, JpqlWhere("WHERE i.videoReferenceUuid IN :uuids"), Order)
 
-        val QueryByImagedMomentUuids: String = buildJpql(Select, From,
-            JpqlWhere("WHERE i.uuid in :uuids"), Order)
+        val QueryByImagedMomentUuids: String =
+            buildJpql(Select, From, JpqlWhere("WHERE i.uuid in :uuids"), Order)
 
-        val QueryByToConceptWithImages: String = buildJpql(Select, FromWithImagesAndAssociations,
-            JpqlWhere("WHERE a.toConcept = :toConcept AND ir.url IS NOT NULL"), Order)
-
+        val QueryByToConceptWithImages: String = buildJpql(
+            Select,
+            FromWithImagesAndAssociations,
+            JpqlWhere("WHERE a.toConcept = :toConcept AND ir.url IS NOT NULL"),
+            Order
+        )
 
     }
 

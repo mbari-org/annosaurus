@@ -26,7 +26,7 @@ trait CachedVideoReferenceInfoDAOITSuite extends BaseDAOSuite {
     given JPADAOFactory = daoFactory
 
     test("create") {
-        val vi = TestUtils.randomVideoReferenceInfo()
+        val vi                                     = TestUtils.randomVideoReferenceInfo()
         given dao: CachedVideoReferenceInfoDAOImpl = daoFactory.newCachedVideoReferenceInfoDAO()
         run(() => dao.create(vi))
         dao.close()
@@ -34,7 +34,7 @@ trait CachedVideoReferenceInfoDAOITSuite extends BaseDAOSuite {
     }
 
     def createTestData(): CachedVideoReferenceInfoEntity = {
-        val vi = TestUtils.randomVideoReferenceInfo()
+        val vi                                     = TestUtils.randomVideoReferenceInfo()
         given dao: CachedVideoReferenceInfoDAOImpl = daoFactory.newCachedVideoReferenceInfoDAO()
         run(() => dao.create(vi))
         dao.close()
@@ -42,116 +42,116 @@ trait CachedVideoReferenceInfoDAOITSuite extends BaseDAOSuite {
 
     }
     test("update") {
-        val vi = createTestData()
+        val vi                                     = createTestData()
         given dao: CachedVideoReferenceInfoDAOImpl = daoFactory.newCachedVideoReferenceInfoDAO()
         vi.setMissionContact("newMissionContact")
         run(() => dao.update(vi))
         run(() => dao.findByUUID(vi.getUuid())) match
-            case None => fail("should have found the entity")
+            case None        => fail("should have found the entity")
             case Some(value) => AssertUtils.assertSameVideoReferenceInfo(value, vi)
         dao.close()
     }
 
     test("delete") {
-        val vi = createTestData()
+        val vi                                     = createTestData()
         given dao: CachedVideoReferenceInfoDAOImpl = daoFactory.newCachedVideoReferenceInfoDAO()
         run(() => {
             // update brings entity into transactional context
             dao.delete(dao.update(vi))
         })
         run(() => dao.findByUUID(vi.getUuid())) match
-            case None => // ok
+            case None        => // ok
             case Some(value) => fail("should not have found the entity")
         dao.close()
     }
 
     test("findByUUID") {
-        val vi = createTestData()
+        val vi                                     = createTestData()
         given dao: CachedVideoReferenceInfoDAOImpl = daoFactory.newCachedVideoReferenceInfoDAO()
         run(() => dao.findByUUID(vi.getUuid())) match
-            case None => fail("should have found the entity")
+            case None        => fail("should have found the entity")
             case Some(value) => AssertUtils.assertSameVideoReferenceInfo(value, vi)
         dao.close()
     }
 
     test("deleteByUUID") {
-        val vi = createTestData()
+        val vi                                     = createTestData()
         given dao: CachedVideoReferenceInfoDAOImpl = daoFactory.newCachedVideoReferenceInfoDAO()
         run(() => dao.deleteByUUID(vi.getUuid()))
         run(() => dao.findByUUID(vi.getUuid())) match
-            case None => // ok
+            case None        => // ok
             case Some(value) => fail("should not have found the entity")
     }
-    
+
     test("findByMissionContact") {
-        val vi = createTestData()
+        val vi                                     = createTestData()
         given dao: CachedVideoReferenceInfoDAOImpl = daoFactory.newCachedVideoReferenceInfoDAO()
         run(() => dao.findByMissionContact(vi.getMissionContact())) match
             case Nil => fail("should have found the entity")
-            case xs => AssertUtils.assertSameVideoReferenceInfo(xs.head, vi)
+            case xs  => AssertUtils.assertSameVideoReferenceInfo(xs.head, vi)
         dao.close()
     }
 
     test("findByPlatformName") {
-        val vi = createTestData()
+        val vi                                     = createTestData()
         given dao: CachedVideoReferenceInfoDAOImpl = daoFactory.newCachedVideoReferenceInfoDAO()
         run(() => dao.findByPlatformName(vi.getPlatformName())) match
             case Nil => fail("should have found the entity")
-            case xs => AssertUtils.assertSameVideoReferenceInfo(xs.head, vi)
+            case xs  => AssertUtils.assertSameVideoReferenceInfo(xs.head, vi)
         dao.close()
     }
 
     test("findByMissionID") {
-        val vi = createTestData()
+        val vi                                     = createTestData()
         given dao: CachedVideoReferenceInfoDAOImpl = daoFactory.newCachedVideoReferenceInfoDAO()
         run(() => dao.findByMissionID(vi.getMissionId())) match
             case Nil => fail("should have found the entity")
-            case xs => AssertUtils.assertSameVideoReferenceInfo(xs.head, vi)
+            case xs  => AssertUtils.assertSameVideoReferenceInfo(xs.head, vi)
         dao.close()
     }
 
     test("findByVideoReferenceUUID") {
-        val vi = createTestData()
+        val vi                                     = createTestData()
         given dao: CachedVideoReferenceInfoDAOImpl = daoFactory.newCachedVideoReferenceInfoDAO()
         run(() => dao.findByVideoReferenceUUID(vi.getVideoReferenceUuid())) match
-            case None => fail("should have found the entity")
+            case None        => fail("should have found the entity")
             case Some(value) => AssertUtils.assertSameVideoReferenceInfo(value, vi)
         dao.close()
     }
 
     test("findAll") {
-        val vi = createTestData()
+        val vi                                     = createTestData()
         given dao: CachedVideoReferenceInfoDAOImpl = daoFactory.newCachedVideoReferenceInfoDAO()
-        val xs = run(() => dao.findAll())
+        val xs                                     = run(() => dao.findAll())
         assert(xs.size >= 1)
-        val opt = xs.filter(_.getUuid() == vi.getUuid()).headOption
+        val opt                                    = xs.filter(_.getUuid() == vi.getUuid()).headOption
         assert(opt.isDefined)
         AssertUtils.assertSameVideoReferenceInfo(opt.get, vi)
         dao.close()
     }
 
     test("findAllVideoReferenceUUIDs") {
-        val vi = createTestData()
+        val vi                                     = createTestData()
         given dao: CachedVideoReferenceInfoDAOImpl = daoFactory.newCachedVideoReferenceInfoDAO()
-        val xs = run(() => dao.findAllVideoReferenceUUIDs()).toSeq
+        val xs                                     = run(() => dao.findAllVideoReferenceUUIDs()).toSeq
         assert(xs.size >= 1)
         assert(xs.contains(vi.getVideoReferenceUuid()))
         dao.close()
     }
 
     test("findAllMissionContacts") {
-        val vi = createTestData()
+        val vi                                     = createTestData()
         given dao: CachedVideoReferenceInfoDAOImpl = daoFactory.newCachedVideoReferenceInfoDAO()
-        val xs = run(() => dao.findAllMissionContacts()).toSeq
+        val xs                                     = run(() => dao.findAllMissionContacts()).toSeq
         assert(xs.size >= 1)
         assert(xs.contains(vi.getMissionContact()))
         dao.close()
     }
 
     test("findAllPlatformNames") {
-        val vi = createTestData()
+        val vi                                     = createTestData()
         given dao: CachedVideoReferenceInfoDAOImpl = daoFactory.newCachedVideoReferenceInfoDAO()
-        val xs = run(() => dao.findAllPlatformNames()).toSeq
+        val xs                                     = run(() => dao.findAllPlatformNames()).toSeq
         println(xs)
         println(vi.getPlatformName())
         assert(xs.size >= 1)
@@ -160,9 +160,9 @@ trait CachedVideoReferenceInfoDAOITSuite extends BaseDAOSuite {
     }
 
     test("findAllMissionIDs") {
-        val vi = createTestData()
+        val vi                                     = createTestData()
         given dao: CachedVideoReferenceInfoDAOImpl = daoFactory.newCachedVideoReferenceInfoDAO()
-        val xs = run(() => dao.findAllMissionIDs()).toSeq
+        val xs                                     = run(() => dao.findAllMissionIDs()).toSeq
         assert(xs.size >= 1)
         assert(xs.contains(vi.getMissionId()))
         dao.close()

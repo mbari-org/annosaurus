@@ -16,7 +16,6 @@
 
 package org.mbari.annosaurus.repository
 
-
 import org.mbari.annosaurus.repository.jpa.entity.ImageReferenceEntity
 import org.mbari.annosaurus.repository.jpa.entity.IPersistentObject
 

@@ -26,6 +26,7 @@ import java.time.{Duration, Instant}
 import java.util.{stream, UUID}
 import scala.jdk.CollectionConverters._
 import java.{util => ju}
+import org.mbari.annosaurus.repository.jdbc.*
 
 /** @author
   *   Brian Schlining
@@ -193,13 +194,7 @@ class ObservationDAOImpl(entityManager: EntityManager)
 
     override def findAllConceptsByVideoReferenceUUID(uuid: UUID): Seq[String] = {
         val query = entityManager.createNamedQuery("Observation.findAllNamesByVideoReferenceUUID")
-//    if (DatabaseProductName.isPostgreSQL()) {
-//      query.setParameter(1, uuid)
-//    }
-//    else {
-//      query.setParameter(1, uuid.toString().toLowerCase())
-//    }
-        setUuidParameter(query, 1, uuid)
+        query.setParameter(1, uuid)
         query
             .getResultList
             .asScala
@@ -229,14 +224,6 @@ class ObservationDAOImpl(entityManager: EntityManager)
 
     override def countByVideoReferenceUUID(uuid: UUID): Int = {
         val query = entityManager.createNamedQuery("Observation.countByVideoReferenceUUID")
-        // Postgres handles UUIDs natively
-//    if (DatabaseProductName.isPostgreSQL()) {
-//      query.setParameter(1, uuid)
-//    }
-//    else {
-//      query.setParameter(1, uuid.toString().toLowerCase())
-//    }
-        // setUuidParameter(query, 1, uuid)
         query.setParameter(1, uuid)
         query
             .getResultList
@@ -252,8 +239,8 @@ class ObservationDAOImpl(entityManager: EntityManager)
             .asScala
             .map(_.asInstanceOf[Array[Object]])
             .map(xs => {
-                val uuid = UUID.fromString(xs(0).toString) // Postgres returns a UUID, SQL Server returns a string here
-                val count = xs(1).asInstanceOf[Number].intValue()
+                val uuid  = xs(0).asUUID.getOrElse(throw new RuntimeException("UUID is null"))
+                val count = xs(1).asInt.getOrElse(0)
                 uuid -> count
             })
             .toMap
@@ -268,10 +255,9 @@ class ObservationDAOImpl(entityManager: EntityManager)
 
     override def changeImageMoment(imagedMomentUuid: UUID, observationUuid: UUID): Int = {
         val query = entityManager.createNamedQuery("Observation.updateImagedMomentUUID")
-        setUuidParameter(query, 1, imagedMomentUuid)
-        setUuidParameter(query, 2, observationUuid)
-        // query.setParameter(1, imagedMomentUuid.toString)
-        // query.setParameter(2, observationUuid.toString)
+        query
+            .setParameter(1, imagedMomentUuid)
+            .setParameter(2, observationUuid)
         query.executeUpdate()
     }
 

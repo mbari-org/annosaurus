@@ -22,7 +22,7 @@ import java.util.UUID
 object extensions {
 
     extension (po: IPersistentObject)
-        def primaryKey: Option[UUID] = Option(po.getUuid)
+        def primaryKey: Option[UUID]     = Option(po.getUuid)
         def lastUpdated: Option[Instant] = Option(po.getLastUpdatedTime).map(_.toInstant)
 
 }

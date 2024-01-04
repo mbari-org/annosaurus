@@ -16,8 +16,6 @@
 
 package org.mbari.annosaurus.repository
 
-
-
 import org.mbari.annosaurus.repository.jpa.entity.IPersistentObject
 import org.mbari.annosaurus.repository.jpa.entity.ObservationEntity
 import org.mbari.annosaurus.domain.{ConcurrentRequest, MultiRequest}

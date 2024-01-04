@@ -28,7 +28,8 @@ final case class CachedVideoReferenceInfo(
     missionId: Option[String] = None,
     missionContact: Option[String] = None,
     lastUpdated: Option[java.time.Instant] = None
-) extends ToSnakeCase[CachedVideoReferenceInfoSC] with ToEntity[CachedVideoReferenceInfoEntity] {
+) extends ToSnakeCase[CachedVideoReferenceInfoSC]
+    with ToEntity[CachedVideoReferenceInfoEntity] {
     override def toSnakeCase: CachedVideoReferenceInfoSC = CachedVideoReferenceInfoSC(
         uuid,
         videoReferenceUuid,
@@ -43,15 +44,19 @@ final case class CachedVideoReferenceInfo(
             videoReferenceUuid,
             missionId.orNull,
             platformName.orNull,
-            missionContact.orNull,
+            missionContact.orNull
         )
         entity.setUuid(uuid)
         entity
     }
 }
 
-object CachedVideoReferenceInfo extends FromEntity[CachedVideoReferenceInfoEntity, CachedVideoReferenceInfo] {
-    override def from(entity: CachedVideoReferenceInfoEntity, extend: Boolean = false): CachedVideoReferenceInfo = {
+object CachedVideoReferenceInfo
+    extends FromEntity[CachedVideoReferenceInfoEntity, CachedVideoReferenceInfo] {
+    override def from(
+        entity: CachedVideoReferenceInfoEntity,
+        extend: Boolean = false
+    ): CachedVideoReferenceInfo = {
         CachedVideoReferenceInfo(
             entity.getUuid,
             entity.getVideoReferenceUuid,

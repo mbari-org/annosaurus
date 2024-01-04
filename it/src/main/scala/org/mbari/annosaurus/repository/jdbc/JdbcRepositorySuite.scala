@@ -35,22 +35,22 @@ trait JdbcRepositorySuite extends BaseDAOSuite {
 
     test("countAll") {
         val xs = TestUtils.create(8, 1)
-        val n = repository.countAll()
+        val n  = repository.countAll()
         assertEquals(n, 8L)
     }
 
     test("countByQueryConstraint") {
         val xs = TestUtils.create(8, 1)
         val qc = new QueryConstraints(videoReferenceUuids = Seq(xs.head.getVideoReferenceUuid()))
-        val n = repository.countByQueryConstraint(qc)
+        val n  = repository.countByQueryConstraint(qc)
         assertEquals(n, 8)
     }
     test("countImagesByVideoReferenceUuid") {
         // Create 16 using 2 different videoReferenceUuids
         TestUtils.create(8, 1)
         val xs = TestUtils.create(8, 1, 0, 1)
-        val x = xs.head
-        val n = repository.countImagesByVideoReferenceUuid(x.getVideoReferenceUuid())
+        val x  = xs.head
+        val n  = repository.countImagesByVideoReferenceUuid(x.getVideoReferenceUuid())
         assertEquals(n, 8L)
     }
 
@@ -58,8 +58,8 @@ trait JdbcRepositorySuite extends BaseDAOSuite {
         // Create 16 using 2 different videoReferenceUuids
         TestUtils.create(8, 1)
         val xs = TestUtils.create(8, 1, 1, 1, true)
-        val x = xs.head
-        val n = repository.deleteByVideoReferenceUuid(x.getVideoReferenceUuid())
+        val x  = xs.head
+        val n  = repository.deleteByVideoReferenceUuid(x.getVideoReferenceUuid())
         assertEquals(n.imagedMomentCount, 8)
         assertEquals(n.observationCount, 8)
         assertEquals(n.ancillaryDataCount, 8)
@@ -69,42 +69,42 @@ trait JdbcRepositorySuite extends BaseDAOSuite {
     }
 
     test("findAll") {
-        val xs = TestUtils.create(8, 1)
+        val xs  = TestUtils.create(8, 1)
         val xs2 = repository.findAll()
         assert(xs2.size >= 8)
     }
 
     test("findByConcept") {
-        val xs = TestUtils.create(1, 1)
-        val x = xs.head
+        val xs  = TestUtils.create(1, 1)
+        val x   = xs.head
         val obs = x.getObservations().asScala.head
         val xs2 = repository.findByConcept(obs.getConcept())
         assertEquals(xs2.size, 1)
     }
 
     test("findByConceptWithImages") {
-        val xs = TestUtils.create(3, 1, 0, 1, true) ++ TestUtils.create(3, 1)
+        val xs  = TestUtils.create(3, 1, 0, 1, true) ++ TestUtils.create(3, 1)
         val obs = xs.head.getObservations().asScala.head
-        val ys = repository.findByConceptWithImages(obs.getConcept())
+        val ys  = repository.findByConceptWithImages(obs.getConcept())
         assertEquals(ys.size, 1)
     }
 
     test("findByConcurrentRequest") {
-        val xs = TestUtils.create(8, 1) ++ TestUtils.create(8, 1)
-        val uuids = xs.map(im => im.getVideoReferenceUuid()).distinct   
-        val ts = xs.map(im => im.getRecordedTimestamp()).sortBy(_.toEpochMilli())
-        val ts0 = ts.head.minus(Duration.ofSeconds(1))
-        val ts1 = ts.last.plus(Duration.ofSeconds(1))
-        val cr = ConcurrentRequest(ts0, ts1, uuids)
-        val ys = repository.findByConcurrentRequest(cr)
+        val xs    = TestUtils.create(8, 1) ++ TestUtils.create(8, 1)
+        val uuids = xs.map(im => im.getVideoReferenceUuid()).distinct
+        val ts    = xs.map(im => im.getRecordedTimestamp()).sortBy(_.toEpochMilli())
+        val ts0   = ts.head.minus(Duration.ofSeconds(1))
+        val ts1   = ts.last.plus(Duration.ofSeconds(1))
+        val cr    = ConcurrentRequest(ts0, ts1, uuids)
+        val ys    = repository.findByConcurrentRequest(cr)
         assertEquals(ys.size, 16)
     }
 
     test("findByLinkNameAndLinkValue") {
-        val xs = TestUtils.create(2, 1, 1)
-        val obs = xs.head.getObservations().asScala.head
+        val xs   = TestUtils.create(2, 1, 1)
+        val obs  = xs.head.getObservations().asScala.head
         val anno = obs.getAssociations().asScala.head
-        val xs2 = repository.findByLinkNameAndLinkValue(anno.getLinkName(), anno.getLinkValue())
+        val xs2  = repository.findByLinkNameAndLinkValue(anno.getLinkName(), anno.getLinkValue())
         assertEquals(xs2.size, 1)
     }
 
@@ -117,7 +117,8 @@ trait JdbcRepositorySuite extends BaseDAOSuite {
 
     test("findByQueryConstraint") {
 
-        val seed = TestUtils.build(50, 1, 1, 1, true)
+        val seed = TestUtils
+            .build(50, 1, 1, 1, true)
             .map(im => {
                 val os = im.getObservations().asScala
                 os.foreach(o => {
@@ -127,84 +128,91 @@ trait JdbcRepositorySuite extends BaseDAOSuite {
                 })
                 im
             })
-        val xs = TestUtils.create(seed)
-        val ys = TestUtils.create(50, 1, 1, 1, true)
-        val x = xs.head
-        val o = x.getObservations().asScala.head
-        val a = o.getAssociations().asScala.head
-        val d = x.getAncillaryDatum()
+        val xs   = TestUtils.create(seed)
+        val ys   = TestUtils.create(50, 1, 1, 1, true)
+        val x    = xs.head
+        val o    = x.getObservations().asScala.head
+        val a    = o.getAssociations().asScala.head
+        val d    = x.getAncillaryDatum()
 
         val vru1 = xs.head.getVideoReferenceUuid()
         val vru2 = ys.head.getVideoReferenceUuid()
-        val qc1 = new QueryConstraints(videoReferenceUuids = Seq(vru1, vru2))
-        val o1 = repository.findByQueryConstraint(qc1)
+        val qc1  = new QueryConstraints(videoReferenceUuids = Seq(vru1, vru2))
+        val o1   = repository.findByQueryConstraint(qc1)
         assertEquals(o1.size, 100)
 
         val qc2 = new QueryConstraints(videoReferenceUuids = Seq(vru1), data = Some(true))
-        val o2 = repository.findByQueryConstraint(qc2)
+        val o2  = repository.findByQueryConstraint(qc2)
         assertEquals(o2.size, 50)
 
         val qc3 = qc2.copy(concepts = Seq(o.getConcept()))
-        val o3 = repository.findByQueryConstraint(qc3)
+        val o3  = repository.findByQueryConstraint(qc3)
         assertEquals(o3.size, 1)
 
         val qc4 = qc2.copy(observers = Seq(o.getObserver()))
-        val o4 = repository.findByQueryConstraint(qc4)
+        val o4  = repository.findByQueryConstraint(qc4)
         assertEquals(o4.size, 50)
 
         val qc5 = qc3.copy(observers = Seq(o.getObserver()))
-        val o5 = repository.findByQueryConstraint(qc5)
+        val o5  = repository.findByQueryConstraint(qc5)
         assertEquals(o5.size, 1)
 
         val qc6 = qc5.copy(groups = Seq(o.getGroup()))
-        val o6 = repository.findByQueryConstraint(qc6)
+        val o6  = repository.findByQueryConstraint(qc6)
         assertEquals(o6.size, 1)
 
         val qc7 = qc6.copy(activities = Seq(o.getActivity()))
-        val o7 = repository.findByQueryConstraint(qc7)
+        val o7  = repository.findByQueryConstraint(qc7)
         assertEquals(o7.size, 1)
 
-        val qc8 = qc7.copy(minDepth = Some(d.getDepthMeters() - 1), maxDepth = Some(d.getDepthMeters() + 1))
-        val o8 = repository.findByQueryConstraint(qc8)
+        val qc8 = qc7.copy(
+            minDepth = Some(d.getDepthMeters() - 1),
+            maxDepth = Some(d.getDepthMeters() + 1)
+        )
+        val o8  = repository.findByQueryConstraint(qc8)
         assertEquals(o8.size, 1)
 
         val qc9 = qc8.copy(minLat = Some(d.getLatitude() - 1), maxLat = Some(d.getLatitude() + 1))
-        val o9 = repository.findByQueryConstraint(qc9)
+        val o9  = repository.findByQueryConstraint(qc9)
         assertEquals(o9.size, 1)
 
-        val qc10 = qc9.copy(minLon = Some(d.getLongitude() - 1), maxLon = Some(d.getLongitude() + 1))
-        val o10 = repository.findByQueryConstraint(qc10)
+        val qc10 =
+            qc9.copy(minLon = Some(d.getLongitude() - 1), maxLon = Some(d.getLongitude() + 1))
+        val o10  = repository.findByQueryConstraint(qc10)
         assertEquals(o10.size, 1)
 
-        val qc11 = qc10.copy(minTimestamp = Some(x.getRecordedTimestamp().minusSeconds(1)), maxTimestamp = Some(x.getRecordedTimestamp().plusSeconds(1)))
-        val o11 = repository.findByQueryConstraint(qc11)
+        val qc11 = qc10.copy(
+            minTimestamp = Some(x.getRecordedTimestamp().minusSeconds(1)),
+            maxTimestamp = Some(x.getRecordedTimestamp().plusSeconds(1))
+        )
+        val o11  = repository.findByQueryConstraint(qc11)
         assertEquals(o11.size, 1)
 
         val qc12 = qc11.copy(linkName = Some(a.getLinkName()), linkValue = Some(a.getLinkValue()))
-        val o12 = repository.findByQueryConstraint(qc12)
+        val o12  = repository.findByQueryConstraint(qc12)
         assertEquals(o12.size, 1)
 
     }
 
     test("findByToConceptWithImages") {
-        val xs = TestUtils.create(4, 1, 1)
-        val obs = xs.head.getObservations().asScala.head
+        val xs   = TestUtils.create(4, 1, 1)
+        val obs  = xs.head.getObservations().asScala.head
         val anno = obs.getAssociations().asScala.head
-        val xs2 = repository.findByToConceptWithImages(anno.getToConcept())
+        val xs2  = repository.findByToConceptWithImages(anno.getToConcept())
         assertEquals(xs2.size, 1)
     }
 
     test("findByVideoReferenceUuid") {
-        val xs = TestUtils.create(8, 1)
-        val x = xs.head
+        val xs  = TestUtils.create(8, 1)
+        val x   = xs.head
         val xs2 = repository.findByVideoReferenceUuid(x.getVideoReferenceUuid())
         assertEquals(xs2.size, 8)
     }
 
     test("findByVideoReferenceUuidAndTimestamps") {
-        val xs = TestUtils.create(8, 1)
-        val x = xs.head
-        val ts = xs.map(im => im.getRecordedTimestamp()).sortBy(_.toEpochMilli())
+        val xs  = TestUtils.create(8, 1)
+        val x   = xs.head
+        val ts  = xs.map(im => im.getRecordedTimestamp()).sortBy(_.toEpochMilli())
         val ts0 = ts.head.minus(Duration.ofSeconds(1))
         val ts1 = ts(2).plus(Duration.ofSeconds(1))
 
@@ -214,21 +222,21 @@ trait JdbcRepositorySuite extends BaseDAOSuite {
             t.isAfter(ts0) && t.isBefore(ts1)
         })
 
-        val obtained = repository.findByVideoReferenceUuidAndTimestamps(x.getVideoReferenceUuid(),
-            ts0, ts1)
+        val obtained =
+            repository.findByVideoReferenceUuidAndTimestamps(x.getVideoReferenceUuid(), ts0, ts1)
         println("-------- " + obtained)
         assertEquals(obtained.size, expected.size)
     }
 
     test("findGeographicRangeByQueryConstraint") {
-        val xs = TestUtils.create(40, 1, 0, 0, true)
-        val qc = new QueryConstraints(videoReferenceUuids = Seq(xs.head.getVideoReferenceUuid()))
+        val xs  = TestUtils.create(40, 1, 0, 0, true)
+        val qc  = new QueryConstraints(videoReferenceUuids = Seq(xs.head.getVideoReferenceUuid()))
         val opt = repository.findGeographicRangeByQueryConstraint(qc)
         assert(opt.isDefined)
-        val g = opt.get
+        val g   = opt.get
 
-        val lats = xs.map(im => im.getAncillaryDatum().getLatitude())
-        val lons = xs.map(im => im.getAncillaryDatum().getLongitude())
+        val lats   = xs.map(im => im.getAncillaryDatum().getLatitude())
+        val lons   = xs.map(im => im.getAncillaryDatum().getLongitude())
         val depths = xs.map(im => im.getAncillaryDatum().getDepthMeters())
         assertEqualsDouble(g.minLatitude, lats.min, 0.0001)
         assertEqualsDouble(g.maxLatitude, lats.max, 0.0001)
@@ -239,30 +247,30 @@ trait JdbcRepositorySuite extends BaseDAOSuite {
     }
 
     test("findImagedMomentUuidsByConceptWithImages") {
-        val xs = TestUtils.create(4, 1, 0, 1)
+        val xs  = TestUtils.create(4, 1, 0, 1)
         val obs = xs.head.getObservations().asScala.head
         val xs2 = repository.findImagedMomentUuidsByConceptWithImages(obs.getConcept())
         assertEquals(xs2.size, 1)
     }
 
     test("findImagedMomentUuidsByToConceptWithImages") {
-        val xs = TestUtils.create(4, 1, 1, 1)
-        val x = xs.head
-        val a = x.getObservations().asScala.head.getAssociations().asScala.head
+        val xs  = TestUtils.create(4, 1, 1, 1)
+        val x   = xs.head
+        val a   = x.getObservations().asScala.head.getAssociations().asScala.head
         val xs2 = repository.findImagedMomentUuidsByToConceptWithImages(a.getToConcept())
         assertEquals(xs2.size, 1)
     }
 
     test("findImagesByVideoReferenceUuid") {
-        val xs = TestUtils.create(8, 1)
-        val x = xs.head
+        val xs  = TestUtils.create(8, 1)
+        val x   = xs.head
         val xs2 = repository.findImagesByVideoReferenceUuid(x.getVideoReferenceUuid())
         assertEquals(xs2.size, 0)
 
-        val ys = TestUtils.create(8, 1, 1, 2)
-        val y = ys.head
+        val ys  = TestUtils.create(8, 1, 1, 2)
+        val y   = ys.head
         val ys2 = repository.findImagesByVideoReferenceUuid(y.getVideoReferenceUuid())
         assertEquals(ys2.size, 16)
     }
-  
+
 }

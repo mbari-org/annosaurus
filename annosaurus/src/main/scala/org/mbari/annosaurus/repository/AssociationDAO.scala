@@ -16,7 +16,6 @@
 
 package org.mbari.annosaurus.repository
 
-
 import org.mbari.annosaurus.domain.{ConceptAssociation, ConceptAssociationRequest}
 
 import java.util.UUID

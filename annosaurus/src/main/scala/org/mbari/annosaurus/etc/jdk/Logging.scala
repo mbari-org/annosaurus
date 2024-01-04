@@ -67,5 +67,3 @@ object Logging:
 
     given Conversion[Logger, LoggerBuilder] with
         def apply(logger: Logger): LoggerBuilder = LoggerBuilder(logger)
-
-

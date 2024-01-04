@@ -225,7 +225,11 @@ class ObservationController(
             case Some(observation) =>
                 val imagedMoment = observation.getImagedMoment
                 // If this is the only observation and there are no imagerefs, delete the imagemoment
-                if (imagedMoment.getObservations.size == 1 && imagedMoment.getImageReferences.isEmpty) {
+                if (
+                    imagedMoment.getObservations.size == 1 && imagedMoment
+                        .getImageReferences
+                        .isEmpty
+                ) {
                     val imDao = daoFactory.newImagedMomentDAO(dao)
                     imDao.delete(imagedMoment)
                 }

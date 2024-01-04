@@ -117,7 +117,9 @@ class ImageReferenceController(val daoFactory: JPADAOFactory)
                     val imagedMoment = imageReference.getImagedMoment
                     // If this is the only imageref and there are no observations, delete the imagemoment
                     if (
-                        imagedMoment.getImageReferences.size == 1 && imagedMoment.getObservations.isEmpty
+                        imagedMoment.getImageReferences.size == 1 && imagedMoment
+                            .getObservations
+                            .isEmpty
                     ) {
                         val imDao = daoFactory.newImagedMomentDAO(dao)
                         imDao.delete(imagedMoment)

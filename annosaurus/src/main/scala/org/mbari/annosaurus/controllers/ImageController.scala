@@ -163,10 +163,10 @@ class ImageController(daoFactory: JPADAOFactory) {
                 else if (videoReferenceUUID.isDefined) {
                     val imagedMoment = ir.getImagedMoment
                     // move to new video-reference/imaged-moment using the existing images
-                    val tc    = Option(imagedMoment.getTimecode)
-                    val rd    = Option(imagedMoment.getRecordedTimestamp)
-                    val et    = Option(imagedMoment.getElapsedTime)
-                    val newIm =
+                    val tc           = Option(imagedMoment.getTimecode)
+                    val rd           = Option(imagedMoment.getRecordedTimestamp)
+                    val et           = Option(imagedMoment.getElapsedTime)
+                    val newIm        =
                         ImagedMomentController.findOrCreateImagedMoment(imDao, vrUUID, tc, rd, et)
                     move(imDao, newIm, ir)
                 }
@@ -192,7 +192,9 @@ class ImageController(daoFactory: JPADAOFactory) {
                 case Some(imageReference) =>
                     val imagedMoment = imageReference.getImagedMoment
                     if (
-                        imagedMoment.getImageReferences.size == 1 && imagedMoment.getObservations.isEmpty
+                        imagedMoment.getImageReferences.size == 1 && imagedMoment
+                            .getObservations
+                            .isEmpty
                     ) {
                         val imDao = daoFactory.newImagedMomentDAO(d)
                         imDao.delete(imagedMoment)

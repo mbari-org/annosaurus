@@ -21,16 +21,15 @@ import org.mbari.annosaurus.repository.jpa.entity.ImageReferenceEntity
 import org.mbari.annosaurus.AssertUtils
 import java.net.URI
 
-
-trait  ImageReferenceDAOITSuite extends BaseDAOSuite {
+trait ImageReferenceDAOITSuite extends BaseDAOSuite {
 
     given JPADAOFactory = daoFactory
 
     test("create") {
-        val im = TestUtils.create(1).head
-        val ir = TestUtils.randomImageReference()
+        val im                           = TestUtils.create(1).head
+        val ir                           = TestUtils.randomImageReference()
         given dao: ImageReferenceDAOImpl = daoFactory.newImageReferenceDAO()
-        val imDao = daoFactory.newImagedMomentDAO(dao)
+        val imDao                        = daoFactory.newImagedMomentDAO(dao)
         run(() => {
             val im1 = imDao.update(im)
             im1.addImageReference(ir)
@@ -38,25 +37,25 @@ trait  ImageReferenceDAOITSuite extends BaseDAOSuite {
         })
         run(() => dao.findByUUID(ir.getUuid())) match
             case Some(ir1) => AssertUtils.assertSameImageReference(ir1, ir)
-            case None => fail("Failed to find image reference")
+            case None      => fail("Failed to find image reference")
         dao.close()
     }
 
     test("update") {
-        val im = TestUtils.create(1, nImageReferences = 1).head
-        val ir = im.getImageReferences.iterator().next()
+        val im                           = TestUtils.create(1, nImageReferences = 1).head
+        val ir                           = im.getImageReferences.iterator().next()
         given dao: ImageReferenceDAOImpl = daoFactory.newImageReferenceDAO()
         ir.setUrl(URI.create("http://foo.com").toURL)
         run(() => dao.update(ir))
         run(() => dao.findByUUID(ir.getUuid())) match
-            case None => fail("should have found the entity")
+            case None        => fail("should have found the entity")
             case Some(value) => AssertUtils.assertSameImageReference(value, ir)
         dao.close()
     }
 
     test("delete") {
-        val im = TestUtils.create(1, nImageReferences = 1).head
-        val ir = im.getImageReferences.iterator().next()
+        val im                           = TestUtils.create(1, nImageReferences = 1).head
+        val ir                           = im.getImageReferences.iterator().next()
         given dao: ImageReferenceDAOImpl = daoFactory.newImageReferenceDAO()
         run(() => {
             // update brings entity into transactional context
@@ -66,64 +65,62 @@ trait  ImageReferenceDAOITSuite extends BaseDAOSuite {
         })
         run(() => dao.findByUUID(ir.getUuid())) match
             case Some(_) => fail("should not have found the entity")
-            case None => // good
+            case None    => // good
         dao.close()
     }
 
     test("deleteByUUID") {
-        val im = TestUtils.create(1, nImageReferences = 1).head
-        val ir = im.getImageReferences.iterator().next()
+        val im                           = TestUtils.create(1, nImageReferences = 1).head
+        val ir                           = im.getImageReferences.iterator().next()
         given dao: ImageReferenceDAOImpl = daoFactory.newImageReferenceDAO()
         run(() => dao.deleteByUUID(ir.getUuid()))
         run(() => dao.findByUUID(ir.getUuid())) match
             case Some(_) => fail("should not have found the entity")
-            case None => // good
+            case None    => // good
         dao.close()
     }
 
     test("findByUUID") {
-        val im = TestUtils.create(1, nImageReferences = 1).head
-        val ir = im.getImageReferences.iterator().next()
+        val im                           = TestUtils.create(1, nImageReferences = 1).head
+        val ir                           = im.getImageReferences.iterator().next()
         given dao: ImageReferenceDAOImpl = daoFactory.newImageReferenceDAO()
         run(() => dao.findByUUID(ir.getUuid())) match
-            case None => fail("should have found the entity")
+            case None        => fail("should have found the entity")
             case Some(value) => AssertUtils.assertSameImageReference(value, ir)
         dao.close()
     }
 
     test("findAll") {
-        val im = TestUtils.create(1, nImageReferences = 1).head
-        val ir = im.getImageReferences.iterator().next()
+        val im                           = TestUtils.create(1, nImageReferences = 1).head
+        val ir                           = im.getImageReferences.iterator().next()
         given dao: ImageReferenceDAOImpl = daoFactory.newImageReferenceDAO()
-        val ys = run(() => dao.findAll())
+        val ys                           = run(() => dao.findAll())
         dao.close()
         assert(ys.size >= 1)
-        val opt = ys.filter(_.getUuid() == ir.getUuid()).headOption
+        val opt                          = ys.filter(_.getUuid() == ir.getUuid()).headOption
         assert(opt.isDefined)
         AssertUtils.assertSameImageReference(opt.get, ir)
     }
 
     test("findByURL") {
-        val im = TestUtils.create(1, nImageReferences = 1).head
-        val ir = im.getImageReferences.iterator().next()
+        val im                           = TestUtils.create(1, nImageReferences = 1).head
+        val ir                           = im.getImageReferences.iterator().next()
         given dao: ImageReferenceDAOImpl = daoFactory.newImageReferenceDAO()
         run(() => dao.findByURL(ir.getUrl())) match
-            case None => fail("should have found the entity")
+            case None        => fail("should have found the entity")
             case Some(value) => AssertUtils.assertSameImageReference(value, ir)
         dao.close()
     }
 
     test("findByImageName") {
-        val im = TestUtils.create(1, nImageReferences = 1).head
-        val ir = im.getImageReferences.iterator().next()
+        val im                           = TestUtils.create(1, nImageReferences = 1).head
+        val ir                           = im.getImageReferences.iterator().next()
         given dao: ImageReferenceDAOImpl = daoFactory.newImageReferenceDAO()
-        val imageName = ir.getUrl().getPath().split("/").last
-        val xs = run(() => dao.findByImageName(imageName))
+        val imageName                    = ir.getUrl().getPath().split("/").last
+        val xs                           = run(() => dao.findByImageName(imageName))
         assertEquals(xs.size, 1)
         AssertUtils.assertSameImageReference(xs.head, ir)
         dao.close()
     }
 
-
-  
 }

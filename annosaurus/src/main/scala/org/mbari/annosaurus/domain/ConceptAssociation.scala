@@ -40,9 +40,6 @@ final case class ConceptAssociation(
     )
 }
 
-
-    
-
 object ConceptAssociation extends FromEntity[AssociationEntity, ConceptAssociation] {
     def from(entity: AssociationEntity, extend: Boolean = false): ConceptAssociation = {
         ConceptAssociation(

@@ -22,8 +22,7 @@ object JpqlSelect:
     def apply(s: String): JpqlSelect =
         if !s.trim.toLowerCase.startsWith("select") then
             throw new IllegalArgumentException(s"Unexpected SELECT statement: $s")
-        else
-            s
+        else s
 
 opaque type JpqlFrom = String
 
@@ -31,8 +30,7 @@ object JpqlFrom:
     def apply(s: String): JpqlFrom =
         if !s.trim.toLowerCase.startsWith("from") then
             throw new IllegalArgumentException(s"Unexpected FROM statement: $s")
-        else
-            s
+        else s
 
 opaque type JpqlWhere = String
 
@@ -40,8 +38,7 @@ object JpqlWhere:
     def apply(s: String): JpqlWhere =
         if !s.trim.toLowerCase.startsWith("where") then
             throw new IllegalArgumentException(s"Unexpected WHERE statement: $s")
-        else
-            s
+        else s
 
 opaque type JpqlOrder = String
 
@@ -49,8 +46,4 @@ object JpqlOrder:
     def apply(s: String): JpqlOrder =
         if !s.trim.toLowerCase.startsWith("order by") then
             throw new IllegalArgumentException(s"Unexpected ORDER statement: $s")
-        else
-            s
-
-
-
+        else s

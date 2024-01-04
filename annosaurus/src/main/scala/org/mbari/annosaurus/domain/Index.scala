@@ -30,7 +30,7 @@ final case class Index(
 ) extends ToSnakeCase[IndexSC]
     with ToEntity[IndexEntity] {
 
-    lazy val elapsedTime = elapsedTimeMillis.map(java.time.Duration.ofMillis)
+    lazy val elapsedTime              = elapsedTimeMillis.map(java.time.Duration.ofMillis)
     override def toSnakeCase: IndexSC =
         IndexSC(
             videoReferenceUuid,

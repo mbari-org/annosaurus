@@ -40,7 +40,7 @@ trait IndexDAOITSuite extends BaseDAOSuite {
 
     test("create") {
         intercept[Exception] {
-            val idx = new IndexEntity(TestUtils.create().head)
+            val idx                 = new IndexEntity(TestUtils.create().head)
             given dao: IndexDAOImpl = daoFactory.newIndexDAO()
             run(() => dao.create(idx))
             dao.close()
@@ -48,12 +48,12 @@ trait IndexDAOITSuite extends BaseDAOSuite {
     }
 
     test("update") {
-        val idx = new IndexEntity(TestUtils.create().head)
+        val idx                 = new IndexEntity(TestUtils.create().head)
         given dao: IndexDAOImpl = daoFactory.newIndexDAO()
         idx.setTimecode(new Timecode("00:11:22:33"))
         run(() => dao.update(idx))
         run(() => dao.findByUUID(idx.getUuid())) match
-            case None => fail("should have found the entity")
+            case None        => fail("should have found the entity")
             case Some(value) => AssertUtils.assertSameIndex(value, idx)
         dao.close()
     }
@@ -61,7 +61,7 @@ trait IndexDAOITSuite extends BaseDAOSuite {
     test("delete") {
         // This test should fail. The delete method is not implemented
         intercept[Exception] {
-            val idx = new IndexEntity(TestUtils.create().head)
+            val idx                 = new IndexEntity(TestUtils.create().head)
             given dao: IndexDAOImpl = daoFactory.newIndexDAO()
             run(() => dao.delete(idx))
             dao.close()
@@ -71,7 +71,7 @@ trait IndexDAOITSuite extends BaseDAOSuite {
     test("deleteByUUID") {
         // This test should fail. The deleteByUUID method is not implemented
         intercept[Exception] {
-            val idx = new IndexEntity(TestUtils.create().head)
+            val idx                 = new IndexEntity(TestUtils.create().head)
             given dao: IndexDAOImpl = daoFactory.newIndexDAO()
             run(() => dao.deleteByUUID(idx.getUuid()))
             dao.close()
@@ -101,17 +101,17 @@ trait IndexDAOITSuite extends BaseDAOSuite {
     // }
 
     test("findByUUID") {
-        val idx = new IndexEntity(TestUtils.create().head)
+        val idx                 = new IndexEntity(TestUtils.create().head)
         given dao: IndexDAOImpl = daoFactory.newIndexDAO()
         run(() => dao.findByUUID(idx.getUuid())) match
-            case None => fail("should have found the entity")
+            case None        => fail("should have found the entity")
             case Some(value) => AssertUtils.assertSameIndex(value, idx)
         dao.close()
     }
 
     test("findAll") {
         intercept[Exception] {
-            val idx = new IndexEntity(TestUtils.create().head)
+            val idx                 = new IndexEntity(TestUtils.create().head)
             given dao: IndexDAOImpl = daoFactory.newIndexDAO()
             run(() => dao.findAll())
             dao.close()
@@ -131,16 +131,14 @@ trait IndexDAOITSuite extends BaseDAOSuite {
     // }
 
     test("findByVideoReferenceUuid") {
-        val idx = new IndexEntity(TestUtils.create().head)
+        val idx                 = new IndexEntity(TestUtils.create().head)
         given dao: IndexDAOImpl = daoFactory.newIndexDAO()
-        val xs = run(() => dao.findByVideoReferenceUuid(idx.getVideoReferenceUuid()))
+        val xs                  = run(() => dao.findByVideoReferenceUuid(idx.getVideoReferenceUuid()))
         assert(xs.size >= 1)
-        val opt = xs.filter(_.getUuid() == idx.getUuid()).headOption
+        val opt                 = xs.filter(_.getUuid() == idx.getUuid()).headOption
         assert(opt.isDefined)
         AssertUtils.assertSameIndex(opt.get, idx)
         dao.close()
     }
-
-
 
 }

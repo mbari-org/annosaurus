@@ -426,7 +426,12 @@ object ImagedMomentController {
                     s"Creating new imaged moment at timecode = ${timecode.getOrElse("")}, recordedDate = ${recordedDate
                             .getOrElse("")}, elapsedTime = ${elapsedTime.getOrElse("")}"
                 )
-                val imagedMoment = new ImagedMomentEntity(videoReferenceUUID, recordedDate.orNull, timecode.orNull, elapsedTime.orNull)
+                val imagedMoment = new ImagedMomentEntity(
+                    videoReferenceUUID,
+                    recordedDate.orNull,
+                    timecode.orNull,
+                    elapsedTime.orNull
+                )
                 dao.create(imagedMoment)
                 imagedMoment
         }

@@ -108,7 +108,10 @@ object Annotation extends FromEntity[ObservationEntity, Annotation] {
         entity.getObservations.asScala.map(x => from(x, extend)).toSeq
     }
 
-    def toEntities(annotations: Seq[Annotation], extend: Boolean = false): Seq[ImagedMomentEntity] = {
+    def toEntities(
+        annotations: Seq[Annotation],
+        extend: Boolean = false
+    ): Seq[ImagedMomentEntity] = {
 
         // TODO add ancillary data
 
@@ -124,12 +127,18 @@ object Annotation extends FromEntity[ObservationEntity, Annotation] {
                 val a  = annos.head
                 val tc = a.timecode.map(Timecode(_)).orNull
                 val et = a.elapsedTimeMillis.map(Duration.ofMillis(_)).orNull
-                val im = ImagedMomentEntity(a.videoReferenceUuid.orNull, a.recordedTimestamp.orNull, tc, et)
+                val im = ImagedMomentEntity(
+                    a.videoReferenceUuid.orNull,
+                    a.recordedTimestamp.orNull,
+                    tc,
+                    et
+                )
                 im.setUuid(imagedMomentUuid)
 
-                if extend then annos.find(_.ancillaryData.isDefined).foreach { a =>
-                    im.setAncillaryDatum(a.ancillaryData.get.toEntity)
-                }
+                if extend then
+                    annos.find(_.ancillaryData.isDefined).foreach { a =>
+                        im.setAncillaryDatum(a.ancillaryData.get.toEntity)
+                    }
 
                 for a <- annos
                 do

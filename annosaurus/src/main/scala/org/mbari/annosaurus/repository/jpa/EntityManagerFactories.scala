@@ -92,10 +92,10 @@ object EntityManagerFactories {
         val props       = Map(
             "hibernate.dialect"                 -> productName,
             // "jakarta.persistence.database-product-name" -> productName,
-            "jakarta.persistence.jdbc.driver"           -> driver,
-            "jakarta.persistence.jdbc.password"         -> password,
-            "jakarta.persistence.jdbc.url"              -> url,
-            "jakarta.persistence.jdbc.user"             -> user
+            "jakarta.persistence.jdbc.driver"   -> driver,
+            "jakarta.persistence.jdbc.password" -> password,
+            "jakarta.persistence.jdbc.url"      -> url,
+            "jakarta.persistence.jdbc.user"     -> user
         )
         apply(props)
     }

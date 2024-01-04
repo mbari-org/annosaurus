@@ -32,7 +32,6 @@ object SqlFileParser:
         parseStatements(sql)
 
     def parseStatements(sql: String): Seq[String] =
-
         sql.split(";").toSeq.map(_.trim()).filter(_.nonEmpty)
 
         // val lines = sql.split("\n")
@@ -62,9 +61,9 @@ object SqlRunner:
         val statements = SqlFileParser.parseUrl(sqlUrl)
         run(statements, entityManager)
 
-    def run(statements: Seq[String], entityManager: EntityManager): Unit = 
+    def run(statements: Seq[String], entityManager: EntityManager): Unit =
         val transaction = entityManager.getTransaction()
-        
+
         statements.foreach { sql =>
             log.atInfo.log(s"Running: $sql")
             transaction.begin()
@@ -72,4 +71,3 @@ object SqlRunner:
             statement.executeUpdate()
             transaction.commit()
         }
-        

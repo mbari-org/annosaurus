@@ -89,7 +89,7 @@ class AssociationController(
         mimeType: Option[String] = None
     )(implicit ec: ExecutionContext): Future[Option[AssociationEntity]] = {
 
-        def fn(dao: ADAO): Option[AssociationEntity] = { 
+        def fn(dao: ADAO): Option[AssociationEntity] = {
             dao
                 .findByUUID(uuid)
                 .map(association => {

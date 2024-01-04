@@ -24,15 +24,14 @@ import scala.concurrent.{Await, ExecutionContext}
 import scala.jdk.CollectionConverters.*
 import org.mbari.annosaurus.repository.jpa.BaseDAOSuite
 
-trait TestUtilsSuite extends BaseDAOSuite{
-
+trait TestUtilsSuite extends BaseDAOSuite {
 
     val timeout = scala.concurrent.duration.Duration(10, TimeUnit.SECONDS)
 
     test("build") {
         val xs = TestUtils.build()
         assertEquals(xs.size, 1)
-        val x = xs.head
+        val x  = xs.head
         assertEquals(x.getImageReferences().size, 0)
         assertEquals(x.getObservations().size, 0)
         assert(x.getAncillaryDatum() == null)
@@ -41,7 +40,7 @@ trait TestUtilsSuite extends BaseDAOSuite{
     test("build(2, 2, 2, 2, true)") {
         val xs = TestUtils.build(2, 2, 2, 2, true)
         assertEquals(xs.size, 2)
-        val x = xs.head
+        val x  = xs.head
         println(x)
         assertEquals(x.getImageReferences().size, 2)
         assertEquals(x.getObservations().size, 2)
@@ -51,12 +50,12 @@ trait TestUtilsSuite extends BaseDAOSuite{
 
     test("create") {
         given df: TestDAOFactory = daoFactory
-        val xs = TestUtils.create(1, 2, 2, 2, true)
+        val xs                   = TestUtils.create(1, 2, 2, 2, true)
         assertEquals(xs.size, 1)
-        val x = xs.head
+        val x                    = xs.head
         assert(x.getUuid() != null)
-        val dao = daoFactory.newImagedMomentDAO()
-        val opt = Await.result(dao.runTransaction(_.findByUUID(x.getUuid())), timeout)
+        val dao                  = daoFactory.newImagedMomentDAO()
+        val opt                  = Await.result(dao.runTransaction(_.findByUUID(x.getUuid())), timeout)
         assert(opt.isDefined)
         AssertUtils.assertSameImagedMoment(x, opt.get)
 
@@ -64,12 +63,12 @@ trait TestUtilsSuite extends BaseDAOSuite{
 
     test("create imagedMoment") {
         given df: TestDAOFactory = daoFactory
-        val xs = TestUtils.create(1)
+        val xs                   = TestUtils.create(1)
         assertEquals(xs.size, 1)
-        val x = xs.head
+        val x                    = xs.head
         assert(x.getUuid() != null)
-        val dao = daoFactory.newImagedMomentDAO()
-        val opt = Await.result(dao.runTransaction(_.findByUUID(x.getUuid())), timeout)
+        val dao                  = daoFactory.newImagedMomentDAO()
+        val opt                  = Await.result(dao.runTransaction(_.findByUUID(x.getUuid())), timeout)
         assert(opt.isDefined)
         AssertUtils.assertSameImagedMoment(x, opt.get)
 
@@ -77,18 +76,17 @@ trait TestUtilsSuite extends BaseDAOSuite{
 
     test("create video reference info") {
         given df: TestDAOFactory = daoFactory
-        val vi = TestUtils.randomVideoReferenceInfo()
-        val dao = daoFactory.newCachedVideoReferenceInfoDAO()
+        val vi                   = TestUtils.randomVideoReferenceInfo()
+        val dao                  = daoFactory.newCachedVideoReferenceInfoDAO()
         Await.ready(dao.runTransaction(_.create(vi)), timeout)
         assert(vi.getUuid() != null)
-        val opt = Await.result(dao.runTransaction(_.findByUUID(vi.getUuid())), timeout)
+        val opt                  = Await.result(dao.runTransaction(_.findByUUID(vi.getUuid())), timeout)
         assert(opt.isDefined)
-        val vi2 = opt.get
+        val vi2                  = opt.get
         AssertUtils.assertSameVideoReferenceInfo(vi2, vi)
-        
+
         dao.close()
 
     }
-
 
 }

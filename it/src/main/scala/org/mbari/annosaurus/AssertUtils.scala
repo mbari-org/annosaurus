@@ -175,7 +175,7 @@ object AssertUtils {
             assertEquals(a.getMissionContact(), b.getMissionContact())
             assertEquals(a.getMissionId(), b.getMissionId())
             assertEquals(a.getPlatformName(), b.getPlatformName())
-       }
+        }
     }
 
     def assertSameIndex(
@@ -201,5 +201,5 @@ object AssertUtils {
             }
         }
     }
-    
+
 }
