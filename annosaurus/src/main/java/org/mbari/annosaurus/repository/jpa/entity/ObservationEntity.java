@@ -65,12 +65,12 @@ import java.util.UUID;
                                 "SELECT COUNT(obs.uuid) FROM observations obs RIGHT JOIN imaged_moments im ON obs.imaged_moment_uuid = im.uuid " +
                                         "WHERE im.video_reference_uuid = ?1"
                 ),
-                @NamedNativeQuery(
-                        name = "Observation.countByVideoReferenceUUIDAndTimestamps",
-                        query =
-                                "SELECT COUNT(obs.uuid) FROM observations obs RIGHT JOIN imaged_moments im ON obs.imaged_moment_uuid = im.uuid " +
-                                        "WHERE im.uuid = ?1 AND im.recorded_timestamp BETWEEN ?2 AND ?3"
-                ),
+                // @NamedNativeQuery(
+                //         name = "Observation.countByVideoReferenceUUIDAndTimestamps",
+                //         query =
+                //                 "SELECT COUNT(obs.uuid) FROM observations obs RIGHT JOIN imaged_moments im ON obs.imaged_moment_uuid = im.uuid " +
+                //                         "WHERE im.video_reference_uuid = ?1 AND im.recorded_timestamp BETWEEN ?2 AND ?3"
+                // ),
                 @NamedNativeQuery(
                         name = "Observation.countAllByVideoReferenceUUIDs",
                         query =
@@ -181,7 +181,8 @@ public class ObservationEntity implements IPersistentObject {
             targetEntity = AssociationEntity.class,
             cascade = {CascadeType.ALL},
             fetch = FetchType.LAZY,
-            mappedBy = "observation"
+            mappedBy = "observation",
+            orphanRemoval = true
     )
     Set<AssociationEntity> associations = new HashSet<>();
 

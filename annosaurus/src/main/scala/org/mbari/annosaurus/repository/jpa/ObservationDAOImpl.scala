@@ -25,6 +25,7 @@ import java.sql.Timestamp
 import java.time.{Duration, Instant}
 import java.util.{stream, UUID}
 import scala.jdk.CollectionConverters._
+import java.{util => ju}
 
 /** @author
   *   Brian Schlining
@@ -93,14 +94,21 @@ class ObservationDAOImpl(entityManager: EntityManager)
         startTimestamp: Instant,
         endTimestamp: Instant
     ): Int = {
-        val query =
-            entityManager.createNamedQuery("Observation.countByVideoReferenceUUIDAndTimestamps")
-        setUuidParameter(query, 1, uuid)
-            // query.setParameter(1, uuid.toString().toLowerCase())
-            .setParameter(2, Timestamp.from(startTimestamp))
-            .setParameter(3, Timestamp.from(endTimestamp))
-            .getSingleResult
-            .asInstanceOf[Int]
+        // val query =
+        //     entityManager.createNamedQuery("Observation.countByVideoReferenceUUIDAndTimestamps")
+        // // setUuidParameter(query, 1, uuid)
+        //     // query.setParameter(1, uuid.toString().toLowerCase())
+        // query.setParameter(1, uuid)
+        //     .setParameter(2, Timestamp.from(startTimestamp))
+        //     .setParameter(3, Timestamp.from(endTimestamp))
+        //     .getSingleResult
+        //     .asInstanceOf[Number]
+        //     .intValue()
+        val query = entityManager.createNamedQuery("Observation.countByConcurrentRequest")
+        query.setParameter("uuids", ju.List.of(uuid))
+        query.setParameter("start", startTimestamp)
+        query.setParameter("end", endTimestamp)
+        query.getSingleResult.asInstanceOf[Number].intValue()
     }
 
     override def streamByConcurrentRequest(
@@ -122,10 +130,10 @@ class ObservationDAOImpl(entityManager: EntityManager)
 
     override def countByConcurrentRequest(request: ConcurrentRequest): Long = {
         val query = entityManager.createNamedQuery("Observation.countByConcurrentRequest")
-        query.setParameter("uuids", request.videoReferenceUuids)
+        query.setParameter("uuids", request.videoReferenceUuids.asJava)
         query.setParameter("start", request.startTimestamp)
         query.setParameter("end", request.endTimestamp)
-        query.getSingleResult.asInstanceOf[Long]
+        query.getSingleResult.asInstanceOf[Number].longValue()
     }
 
     override def streamByMultiRequest(
@@ -143,8 +151,8 @@ class ObservationDAOImpl(entityManager: EntityManager)
 
     override def countByMultiRequest(request: MultiRequest): Long = {
         val query = entityManager.createNamedQuery("Observation.countByMultiRequest")
-        query.setParameter("uuids", request.videoReferenceUuids)
-        query.getSingleResult.asInstanceOf[Long]
+        query.setParameter("uuids", request.videoReferenceUuids.asJava)
+        query.getSingleResult.asInstanceOf[Number].longValue()
     }
 
     /** @return
@@ -205,7 +213,7 @@ class ObservationDAOImpl(entityManager: EntityManager)
         query
             .getResultList
             .asScala
-            .map(_.toString().toInt)
+            .map(_.asInstanceOf[Number].intValue())
             .head
     }
 
@@ -215,8 +223,7 @@ class ObservationDAOImpl(entityManager: EntityManager)
         query
             .getResultList
             .asScala
-            .map(_.asInstanceOf[Number])
-            .map(_.intValue())
+            .map(_.asInstanceOf[Number].intValue())
             .head
     }
 
@@ -229,12 +236,12 @@ class ObservationDAOImpl(entityManager: EntityManager)
 //    else {
 //      query.setParameter(1, uuid.toString().toLowerCase())
 //    }
-        setUuidParameter(query, 1, uuid)
+        // setUuidParameter(query, 1, uuid)
+        query.setParameter(1, uuid)
         query
             .getResultList
             .asScala
-            .map(_.asInstanceOf[Number])
-            .map(_.intValue())
+            .map(_.asInstanceOf[Number].intValue())
             .head
     }
 
@@ -245,7 +252,7 @@ class ObservationDAOImpl(entityManager: EntityManager)
             .asScala
             .map(_.asInstanceOf[Array[Object]])
             .map(xs => {
-                val uuid  = UUID.fromString(xs(0).asInstanceOf[String])
+                val uuid = UUID.fromString(xs(0).toString) // Postgres returns a UUID, SQL Server returns a string here
                 val count = xs(1).asInstanceOf[Number].intValue()
                 uuid -> count
             })

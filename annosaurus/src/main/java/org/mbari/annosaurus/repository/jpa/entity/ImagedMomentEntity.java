@@ -301,7 +301,8 @@ public class ImagedMomentEntity implements IPersistentObject {
             cascade = {CascadeType.ALL},
             optional = true,
             fetch = FetchType.LAZY,
-            targetEntity = CachedAncillaryDatumEntity.class
+            targetEntity = CachedAncillaryDatumEntity.class,
+            orphanRemoval = true
     )
     CachedAncillaryDatumEntity ancillaryDatum;
 

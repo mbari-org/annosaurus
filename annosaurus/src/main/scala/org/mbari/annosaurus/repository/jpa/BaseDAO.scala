@@ -142,12 +142,12 @@ abstract class BaseDAO[B <: IPersistentObject: ClassTag](val entityManager: Enti
     }
 
     def setUuidParameter(query: Query, position: Int, uuid: UUID): Query = {
-        if (DatabaseProductName.isPostgreSQL()) {
-            query.setParameter(position, uuid)
-        }
-        else {
+        // if (DatabaseProductName.isPostgreSQL()) {
+        //     query.setParameter(position, uuid)
+        // }
+        // else {
             query.setParameter(position, uuid.toString.toLowerCase())
-        }
+        // }
     }
 
 }
