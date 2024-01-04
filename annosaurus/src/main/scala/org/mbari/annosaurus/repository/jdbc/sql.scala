@@ -45,7 +45,7 @@ def uuidConverter(obj: Object): Option[UUID] =
     obj match
         case null      => None
         case u: UUID   => Some(u)
-        case s: String => Try(UUID.fromString(s)).toOption
+        case s: String => Try(UUID.fromString(s)).toOption // TODO this could swallow errors
 
 def stringConverter(obj: Object): Option[String] =
     obj match

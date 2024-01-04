@@ -78,7 +78,7 @@ class AnnotationControllerSpec extends AnyFlatSpec with Matchers with BeforeAndA
       )
     )
 
-    val b = exec(() => controller.findByVideoReferenceUUID(a.videoReferenceUuid.get))
+    val b = exec(() => controller.findByVideoReferenceUuid(a.videoReferenceUuid.get))
     b should not be empty
     b.size should be(1)
     b.head.concept should be("Slime mold")

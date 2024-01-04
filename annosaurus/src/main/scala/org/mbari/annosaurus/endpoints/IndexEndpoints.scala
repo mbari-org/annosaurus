@@ -50,7 +50,7 @@ class IndexEndpoints(controller: IndexController, jwtService: JwtService)(implic
     val findByVideoReferenceUUIDImpl = findByVideoReferenceUUID.serverLogic { (paging, uuid) =>
         val f = controller
             .findByVideoReferenceUUID(uuid, paging.limit, paging.offset)
-            .map(xs => xs.map(toEntity).map(_.toSnakeCase).toList)
+            .map(xs => xs.map(_.toSnakeCase).toList)
         handleErrors(f)
     }
 
@@ -68,7 +68,7 @@ class IndexEndpoints(controller: IndexController, jwtService: JwtService)(implic
                 val im = indices.map(_.toEntity)
                 val f  = controller
                     .bulkUpdateRecordedTimestamps(im)
-                    .map(xs => xs.map(toEntity).map(_.toSnakeCase).toList)
+                    .map(xs => xs.map(_.toSnakeCase).toList)
                 handleErrors(f)
         )
 

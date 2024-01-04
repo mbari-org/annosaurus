@@ -84,7 +84,7 @@ class AnnotationController(
       (i.e. MutableAnnotation). So this call will appear to return more rows than limit and offest
       specify.
      */
-    def findByVideoReferenceUUID(
+    def findByVideoReferenceUuid(
         videoReferenceUUID: UUID,
         limit: Option[Int] = None,
         offset: Option[Int] = None,
@@ -93,9 +93,12 @@ class AnnotationController(
 
         val dao = daoFactory.newObservationDAO()
         val f   =
-            dao.runTransaction(d => d.findByVideoReferenceUUID(videoReferenceUUID, limit, offset))
+            dao.runTransaction(d => d.findByVideoReferenceUuid(videoReferenceUUID, limit, offset)
+                .map(obs => Annotation.from(obs, includedAncillaryData))
+                .toSeq)
         f.onComplete(_ => dao.close())
-        f.map(_.map(obs => Annotation.from(obs, true)).toSeq)
+        f
+        // f.map(_.map(obs => Annotation.from(obs, true)).toSeq)
     }
 
     /** @param videoReferenceUuid
@@ -191,12 +194,12 @@ class AnnotationController(
     )(implicit ec: ExecutionContext): Future[Iterable[Annotation]] = {
 
         val imDao = daoFactory.newImagedMomentDAO()
-        val f     = imDao.runTransaction(d => d.findByImageReferenceUUID(imageReferenceUUID))
+        val f     = imDao.runTransaction(d => d.findByImageReferenceUUID(imageReferenceUUID) match
+            case None => Nil
+            case Some(im) => im.getObservations.asScala.map(Annotation.from(_))
+        )
         f.onComplete(t => imDao.close())
-        f.map {
-            case None     => Nil
-            case Some(im) => im.getObservations.asScala
-        }.map(obs => obs.map(Annotation.from(_)))
+        f
     }
 
     def create(
@@ -257,12 +260,11 @@ class AnnotationController(
         val futures = imagedMoments
             .grouped(50)
             .map(imagedMoments => {
-                val f =
-                    obsDao.runTransaction(d =>
-                        imagedMoments.map(i => imagedMomentController.create(d, i))
-                    )
-                f.map(imagedMomentList =>
-                    imagedMomentList.flatMap(i => Annotation.fromImagedMoment(i, true))
+                obsDao.runTransaction(d =>
+                    imagedMoments.flatMap(i => {
+                        val im = imagedMomentController.create(d, i)
+                        Annotation.fromImagedMoment(im, true) 
+                    })
                 )
             })
         val future  = Future.sequence(futures)

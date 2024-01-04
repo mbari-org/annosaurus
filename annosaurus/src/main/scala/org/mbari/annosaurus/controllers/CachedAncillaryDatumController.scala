@@ -35,15 +35,18 @@ import org.mbari.annosaurus.repository.jpa.entity.ImagedMomentEntity
   * @since 2017-05-01T10:53:00
   */
 class CachedAncillaryDatumController(val daoFactory: JPADAOFactory)
-    extends BaseController[CachedAncillaryDatumEntity, CachedAncillaryDatumDAO[
-        CachedAncillaryDatumEntity
-    ]] {
+    extends BaseController[CachedAncillaryDatumEntity, 
+        CachedAncillaryDatumDAO[CachedAncillaryDatumEntity],
+        CachedAncillaryDatum] {
 
     protected type ADDAO = CachedAncillaryDatumDAO[CachedAncillaryDatumEntity]
     LoggerFactory.getLogger(getClass)
 
     override def newDAO(): CachedAncillaryDatumDAO[CachedAncillaryDatumEntity] =
         daoFactory.newCachedAncillaryDatumDAO()
+
+    override def transform(a: CachedAncillaryDatumEntity): CachedAncillaryDatum =
+        CachedAncillaryDatum.from(a, true)
 
     def create(
         imagedMomentUuid: UUID,
@@ -64,9 +67,9 @@ class CachedAncillaryDatumController(val daoFactory: JPADAOFactory)
         phi: Option[Double] = None,
         theta: Option[Double] = None,
         psi: Option[Double] = None
-    )(implicit ec: ExecutionContext): Future[CachedAncillaryDatumEntity] = {
+    )(implicit ec: ExecutionContext): Future[CachedAncillaryDatum] = {
 
-        def fn(dao: ADDAO): CachedAncillaryDatumEntity = {
+        def fn(dao: ADDAO): CachedAncillaryDatum = {
             val imDao = daoFactory.newImagedMomentDAO(dao)
             imDao.findByUUID(imagedMomentUuid) match {
                 case None               =>
@@ -100,7 +103,7 @@ class CachedAncillaryDatumController(val daoFactory: JPADAOFactory)
                             psi
                         )
                         imagedMoment.setAncillaryDatum(cad)
-                        cad
+                        transform(cad)
                     }
             }
         }
@@ -110,8 +113,8 @@ class CachedAncillaryDatumController(val daoFactory: JPADAOFactory)
 
     def create(imagedMomentUuid: UUID, datum: CachedAncillaryDatum)(implicit
         ec: ExecutionContext
-    ): Future[CachedAncillaryDatumEntity] = {
-        def fn(dao: ADDAO): CachedAncillaryDatumEntity = {
+    ): Future[CachedAncillaryDatum] = {
+        def fn(dao: ADDAO): CachedAncillaryDatum = {
             val imDao = daoFactory.newImagedMomentDAO(dao)
             imDao.findByUUID(imagedMomentUuid) match {
                 case None               =>
@@ -127,7 +130,7 @@ class CachedAncillaryDatumController(val daoFactory: JPADAOFactory)
                     else {
                         val entity = datum.toEntity
                         imagedMoment.setAncillaryDatum(entity)
-                        entity
+                        transform(entity)
                     }
             }
         }
@@ -137,7 +140,7 @@ class CachedAncillaryDatumController(val daoFactory: JPADAOFactory)
 
     def create(
         datum: CachedAncillaryDatum
-    )(implicit ec: ExecutionContext): Future[CachedAncillaryDatumEntity] =
+    )(implicit ec: ExecutionContext): Future[CachedAncillaryDatum] =
         datum.imagedMomentUuid match {
             case None       =>
                 Future.failed(
@@ -167,9 +170,9 @@ class CachedAncillaryDatumController(val daoFactory: JPADAOFactory)
         phi: Option[Double] = None,
         theta: Option[Double] = None,
         psi: Option[Double] = None
-    )(implicit ec: ExecutionContext): Future[Option[CachedAncillaryDatumEntity]] = {
+    )(implicit ec: ExecutionContext): Future[Option[CachedAncillaryDatum]] = {
 
-        def fn(dao: ADDAO): Option[CachedAncillaryDatumEntity] = {
+        def fn(dao: ADDAO): Option[CachedAncillaryDatum] = {
             dao
                 .findByUUID(uuid)
                 .map(cad => {
@@ -192,6 +195,7 @@ class CachedAncillaryDatumController(val daoFactory: JPADAOFactory)
                     psi.foreach(cad.setPsi(_))
                     cad
                 })
+                .map(transform)
         }
 
         exec(fn)
@@ -199,13 +203,13 @@ class CachedAncillaryDatumController(val daoFactory: JPADAOFactory)
 
     def findByVideoReferenceUUID(
         uuid: UUID
-    )(implicit ec: ExecutionContext): Future[Seq[CachedAncillaryDatumEntity]] = {
-        def fn(dao: ADDAO): Seq[CachedAncillaryDatumEntity] = {
+    )(implicit ec: ExecutionContext): Future[Seq[CachedAncillaryDatum]] = {
+        def fn(dao: ADDAO): Seq[CachedAncillaryDatum] = {
             val imDao   = daoFactory.newImagedMomentDAO(dao)
             val moments = imDao.findByVideoReferenceUUID(uuid)
             moments
                 .filter(_.getAncillaryDatum != null)
-                .map(im => CachedAncillaryDatumEntity(im.getAncillaryDatum))
+                .map(im => CachedAncillaryDatum.from(im.getAncillaryDatum, true))
                 .toSeq
         }
 
@@ -214,16 +218,16 @@ class CachedAncillaryDatumController(val daoFactory: JPADAOFactory)
 
     def findByObservationUUID(
         uuid: UUID
-    )(implicit ec: ExecutionContext): Future[Option[CachedAncillaryDatumEntity]] = {
-        def fn(dao: ADDAO): Option[CachedAncillaryDatumEntity] = dao.findByObservationUUID(uuid)
+    )(implicit ec: ExecutionContext): Future[Option[CachedAncillaryDatum]] = {
+        def fn(dao: ADDAO): Option[CachedAncillaryDatum] = dao.findByObservationUUID(uuid).map(transform)
 
         exec(fn)
     }
 
     def findByImagedMomentUUID(
         uuid: UUID
-    )(implicit ec: ExecutionContext): Future[Option[CachedAncillaryDatumEntity]] = {
-        def fn(dao: ADDAO): Option[CachedAncillaryDatumEntity] = dao.findByImagedMomentUUID(uuid)
+    )(implicit ec: ExecutionContext): Future[Option[CachedAncillaryDatum]] = {
+        def fn(dao: ADDAO): Option[CachedAncillaryDatum] = dao.findByImagedMomentUUID(uuid).map(transform)
 
         exec(fn)
     }
@@ -276,9 +280,9 @@ class CachedAncillaryDatumController(val daoFactory: JPADAOFactory)
         data: Iterable[CachedAncillaryDatum],
         videoReferenceUuid: UUID,
         tolerance: Duration = Duration.ofMillis(7500)
-    )(implicit ec: ExecutionContext): Future[Seq[CachedAncillaryDatumEntity]] = {
+    )(implicit ec: ExecutionContext): Future[Seq[CachedAncillaryDatum]] = {
 
-        def fn(dao: ADDAO): Seq[CachedAncillaryDatumEntity] = {
+        def fn(dao: ADDAO): Seq[CachedAncillaryDatum] = {
             val imDao         = daoFactory.newImagedMomentDAO(dao)
             val imagedMoments = imDao
                 .findByVideoReferenceUUID(videoReferenceUuid)
@@ -305,7 +309,7 @@ class CachedAncillaryDatumController(val daoFactory: JPADAOFactory)
                 cad       <- opt
             } yield {
                 val d = dao.newPersistentObject(cad.toEntity)
-                createOrUpdate(d, im)
+                transform(createOrUpdate(d, im))
             }
         }
 

@@ -24,17 +24,20 @@ import java.util.UUID
 import scala.concurrent.{ExecutionContext, Future}
 import org.mbari.annosaurus.repository.jpa.entity.ImageReferenceEntity
 import org.mbari.annosaurus.repository.jpa.JPADAOFactory
+import org.mbari.annosaurus.domain.ImageReference
 
 /** @author
   *   Brian Schlining
   * @since 2016-07-04T22:15:00
   */
 class ImageReferenceController(val daoFactory: JPADAOFactory)
-    extends BaseController[ImageReferenceEntity, ImageReferenceDAO[ImageReferenceEntity]] {
+    extends BaseController[ImageReferenceEntity, ImageReferenceDAO[ImageReferenceEntity], ImageReference] {
 
     type IRDAO = ImageReferenceDAO[ImageReferenceEntity]
 
     override def newDAO(): IRDAO = daoFactory.newImageReferenceDAO()
+
+    override def transform(a: ImageReferenceEntity): ImageReference = ImageReference.from(a, true)
 
     def create(
         imagedMomentUUID: UUID,
@@ -43,9 +46,9 @@ class ImageReferenceController(val daoFactory: JPADAOFactory)
         heightPixels: Option[Int],
         widthPixels: Option[Int],
         format: Option[String]
-    )(implicit ec: ExecutionContext): Future[ImageReferenceEntity] = {
+    )(implicit ec: ExecutionContext): Future[ImageReference] = {
 
-        def fn(dao: IRDAO): ImageReferenceEntity = {
+        def fn(dao: IRDAO): ImageReference = {
             val imDao = daoFactory.newImagedMomentDAO()
             imDao.findByUUID(imagedMomentUUID) match {
                 case None               =>
@@ -56,7 +59,7 @@ class ImageReferenceController(val daoFactory: JPADAOFactory)
                     val imageReference =
                         dao.newPersistentObject(url, description, heightPixels, widthPixels, format)
                     imagedMoment.addImageReference(imageReference)
-                    imageReference
+                    transform(imageReference)
             }
         }
 
@@ -71,9 +74,9 @@ class ImageReferenceController(val daoFactory: JPADAOFactory)
         widthPixels: Option[Int] = None,
         format: Option[String] = None,
         imagedMomentUUID: Option[UUID] = None
-    )(implicit ec: ExecutionContext): Future[Option[ImageReferenceEntity]] = {
+    )(implicit ec: ExecutionContext): Future[Option[ImageReference]] = {
 
-        def fn(dao: IRDAO): Option[ImageReferenceEntity] = {
+        def fn(dao: IRDAO): Option[ImageReference] = {
             dao
                 .findByUUID(uuid)
                 .map(imageReference => {
@@ -95,7 +98,7 @@ class ImageReferenceController(val daoFactory: JPADAOFactory)
                                 imagedMoment.addImageReference(imageReference)
                         }
                     })
-                    imageReference
+                    transform(imageReference)
                 })
         }
 

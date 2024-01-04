@@ -36,6 +36,8 @@ final case class ImagedMoment(
     lastUpdated: Option[java.time.Instant] = None
 ) extends ToSnakeCase[ImagedMomentSC]
     with ToEntity[ImagedMomentEntity] {
+
+    lazy val validTimecode: Option[Timecode] = timecode.map(Timecode(_))
     override def toSnakeCase: ImagedMomentSC =
         ImagedMomentSC(
             videoReferenceUuid,

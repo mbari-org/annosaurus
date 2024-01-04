@@ -24,22 +24,25 @@ import scala.concurrent.{ExecutionContext, Future}
 import org.mbari.annosaurus.repository.jpa.entity.ImagedMomentEntity
 import org.mbari.annosaurus.repository.jpa.JPADAOFactory
 import org.mbari.annosaurus.repository.jpa.entity.IndexEntity
+import org.mbari.annosaurus.domain.Index
 
 /** @author
   *   Brian Schlining
   * @since 2019-02-08T11:00:00
   */
 class IndexController(val daoFactory: JPADAOFactory)
-    extends BaseController[IndexEntity, IndexDAO[IndexEntity]] {
+    extends BaseController[IndexEntity, IndexDAO[IndexEntity], Index] {
 
     protected type IDDAO = IndexDAO[IndexEntity]
 
     override def newDAO(): IndexDAO[IndexEntity] = daoFactory.newIndexDAO()
 
+    override def transform(a: IndexEntity): Index = Index.from(a, true)
+
     def findByVideoReferenceUUID(uuid: UUID, limit: Option[Int] = None, offset: Option[Int] = None)(
         implicit ec: ExecutionContext
-    ): Future[Iterable[IndexEntity]] =
-        exec(d => d.findByVideoReferenceUuid(uuid, limit, offset))
+    ): Future[Iterable[Index]] =
+        exec(d => d.findByVideoReferenceUuid(uuid, limit, offset).map(transform))
 
     /** Updates all recordedTimestamps thave have an elapsed time using the updated video
       * starttimestamp
@@ -50,8 +53,8 @@ class IndexController(val daoFactory: JPADAOFactory)
       */
     def updateRecordedTimestamps(videoReferenceUuid: UUID, newStartTimestamp: Instant)(implicit
         ec: ExecutionContext
-    ): Future[Iterable[IndexEntity]] = {
-        def fn(dao: IDDAO): Iterable[IndexEntity] = {
+    ): Future[Iterable[Index]] = {
+        def fn(dao: IDDAO): Iterable[Index] = {
             dao
                 .findByVideoReferenceUuid(videoReferenceUuid)
                 .map(im => {
@@ -61,7 +64,7 @@ class IndexController(val daoFactory: JPADAOFactory)
                             im.setRecordedTimestamp(newRecordedDate)
                         }
                     }
-                    im
+                    transform(im)
                 })
         }
         exec(fn)
@@ -69,14 +72,14 @@ class IndexController(val daoFactory: JPADAOFactory)
 
     def bulkUpdateRecordedTimestamps(
         imagedMoments: Iterable[IndexEntity]
-    )(implicit ec: ExecutionContext): Future[Iterable[IndexEntity]] = {
-        def fn(dao: IDDAO): Iterable[IndexEntity] = {
+    )(implicit ec: ExecutionContext): Future[Iterable[Index]] = {
+        def fn(dao: IDDAO): Iterable[Index] = {
             (for (im <- imagedMoments) yield {
                 dao
                     .findByUUID(im.getUuid)
                     .map(i => {
                         Option(im.getRecordedTimestamp).foreach(i.setRecordedTimestamp)
-                        i
+                        transform(i)
                     })
             }).flatten
         }

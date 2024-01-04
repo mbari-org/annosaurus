@@ -14,9 +14,13 @@
  * limitations under the License.
  */
 
-package org.mbari.annosaurus.repository.jpa
+package org.mbari.annosaurus.controllers
 
-class PostgresAssociationDAOSuite extends AssociationDAOITSuite {
-    given daoFactory: TestDAOFactory = PostgresqlTestDAOFactory
+import org.mbari.annosaurus.repository.jpa.PostgresqlTestDAOFactory
+import org.mbari.annosaurus.repository.jpa.TestDAOFactory
 
+class PostgresImagedMomentControllerSuite extends ImagedMomentContollerITSuite {
+    
+        given daoFactory: TestDAOFactory = PostgresqlTestDAOFactory
+  
 }

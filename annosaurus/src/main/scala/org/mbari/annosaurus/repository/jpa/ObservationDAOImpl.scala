@@ -55,7 +55,7 @@ class ObservationDAOImpl(entityManager: EntityManager)
         observation
     }
 
-    override def findByVideoReferenceUUID(
+    override def findByVideoReferenceUuid(
         uuid: UUID,
         limit: Option[Int] = None,
         offset: Option[Int] = None

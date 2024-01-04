@@ -96,7 +96,7 @@ trait ObservationDAOITSuite extends BaseDAOSuite {
         val im                        = TestUtils.create(1, 1).head
         val obs                       = im.getObservations().iterator().next()
         given dao: ObservationDAOImpl = daoFactory.newObservationDAO()
-        val xs                        = run(() => dao.findByVideoReferenceUUID(im.getVideoReferenceUuid()))
+        val xs                        = run(() => dao.findByVideoReferenceUuid(im.getVideoReferenceUuid()))
         assert(xs.size >= 1)
         val opt                       = xs.filter(_.getUuid() == obs.getUuid()).headOption
         assert(opt.isDefined)

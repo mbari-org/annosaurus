@@ -24,6 +24,10 @@ import org.mbari.annosaurus.domain.ImagedMoment
 import org.mbari.annosaurus.domain.Annotation
 import scala.jdk.CollectionConverters.*
 import org.mbari.annosaurus.etc.jdk.Logging.given
+import org.mbari.annosaurus.domain.ConcurrentRequest
+import junit.framework.Test
+import java.time.Duration
+import org.mbari.annosaurus.domain.MultiRequest
 
 trait AnnotationControllerITSuite extends BaseDAOSuite {
     given JPADAOFactory    = daoFactory
@@ -48,9 +52,32 @@ trait AnnotationControllerITSuite extends BaseDAOSuite {
                 AssertUtils.assertSameImagedMoment(im1, im2, false)
     }
 
-    test("countByVideoReferenceUUID") {}
+    test("countByVideoReferenceUUID") {
+        val xs = TestUtils.create(5, 2)
+        val e  = xs.flatMap(_.getObservations.asScala)
+        val n  = exec(controller.countByVideoReferenceUuid(xs.head.getVideoReferenceUuid))
+        assertEquals(n, e.size)
+    }
 
-    test("findByVideoReferenceUUID") {}
+    test("findByVideoReferenceUUID") {
+
+        val xs = TestUtils.create(2, 2, includeData = true)
+        val e  = xs.flatMap(_.getObservations.asScala)
+        val n  = exec(controller.findByVideoReferenceUuid(xs.head.getVideoReferenceUuid))
+        assertEquals(n.size, e.size)
+        assert(n.head.ancillaryData.isEmpty)
+
+        val m = exec(
+            controller.findByVideoReferenceUuid(
+                xs.head.getVideoReferenceUuid,
+                Some(1),
+                Some(1),
+                true
+            )
+        )
+        assertEquals(m.size, 1)
+        assert(m.head.ancillaryData.isDefined)
+    }
 
     test("streamByVideoReferenceUUID") {}
 
@@ -58,15 +85,79 @@ trait AnnotationControllerITSuite extends BaseDAOSuite {
 
     test("streamByConcurrentRequest") {}
 
-    test("countByConcurrentRequest") {}
+    test("countByConcurrentRequest") {
+        val dt = Duration.ofSeconds(1)
+
+        val xs  = TestUtils.create(2, 2) ++ TestUtils.create(2, 2)
+        val obs = xs.flatMap(_.getObservations.asScala)
+        val ts  = xs.map(_.getRecordedTimestamp())
+        val t0  = ts.min.minus(dt)
+        val t1  = ts.max.plus(dt)
+
+        val vru = xs.map(_.getVideoReferenceUuid()).distinct
+        assertEquals(vru.size, 2)
+
+        val cr0 = new ConcurrentRequest(t0, t1, Seq(vru.head))
+        val n   = exec(controller.countByConcurrentRequest(cr0)).intValue()
+        assertEquals(n, 4)
+
+        val cr1 = new ConcurrentRequest(t0, t1, vru)
+        val m   = exec(controller.countByConcurrentRequest(cr1)).intValue()
+        assertEquals(m, 8)
+
+        val cr3 = new ConcurrentRequest(t1, t1.plus(dt), vru)
+        val p   = exec(controller.countByConcurrentRequest(cr3)).intValue()
+        assertEquals(p, 0)
+
+        // val cr1 = new ConcurrentRequest(t0, t1, Seq(a.head.getVideoReferenceUuid(), b.head.getVideoReferenceUuid()))
+        // val m = exec(controller.countByConcurrentRequest(cr1)).intValue()
+        // assertEquals(m, ea.size + eb.size)
+    }
 
     test("streamByMultiRequest") {}
 
-    test("countByMultiRequest") {}
+    test("countByMultiRequest") {
+        val xs  = TestUtils.create(2, 2) ++ TestUtils.create(2, 2)
+        val obs = xs.flatMap(_.getObservations.asScala)
+        val vru = xs.map(_.getVideoReferenceUuid()).distinct
 
-    test("findByImageReferenceUUID") {}
+        val mr = new MultiRequest(vru)
+        val n  = exec(controller.countByMultiRequest(mr)).intValue()
+        assertEquals(n, obs.size)
 
-    test("create") {}
+        val mr2 = new MultiRequest(Seq(vru.head))
+        val m   = exec(controller.countByMultiRequest(mr2)).intValue()
+        assertEquals(m, obs.size / 2)
+    }
+
+    test("findByImageReferenceUUID") {
+        val xs       = TestUtils.create(1, 1, 0, 1).head
+        val obs      = xs.getObservations.asScala.head
+        val imr      = xs.getImageReferences().asScala.head
+        val obtained = exec(controller.findByImageReferenceUUID(imr.getUuid)).head
+        val expected = Annotation.from(obs, true)
+        assertEquals(obtained, expected)
+    }
+
+    test("create") {
+        val im       = TestUtils.build(1, 1).head
+        val anno     = Annotation.from(im.getObservations.asScala.head, true)
+        val obtained = exec(
+            controller.create(
+                anno.videoReferenceUuid.get,
+                anno.concept.get,
+                anno.observer.get,
+                anno.observationTimestamp.get,
+                anno.validTimecode,
+                anno.elapsedTime,
+                anno.recordedTimestamp,
+                anno.duration,
+                anno.group,
+                anno.activity
+            )
+        )
+        assertEquals(obtained, anno)
+    }
 
     test("bulkCreate") {}
 

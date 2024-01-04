@@ -34,13 +34,15 @@ import org.mbari.annosaurus.domain.Observation
 class ObservationController(
     val daoFactory: JPADAOFactory,
     bus: Subject[Any] = MessageBus.RxSubject
-) extends BaseController[ObservationEntity, ObservationDAO[ObservationEntity]] {
+) extends BaseController[ObservationEntity, ObservationDAO[ObservationEntity], Observation] {
 
     type ODAO = ObservationDAO[ObservationEntity]
 
     private[this] val annotationPublisher = new AnnotationPublisher(bus)
 
     override def newDAO(): ODAO = daoFactory.newObservationDAO()
+
+    override def transform(a: ObservationEntity): Observation = Observation.from(a, true)
 
     def create(
         imagedMomentUUID: UUID,
@@ -49,9 +51,9 @@ class ObservationController(
         observationDate: Instant = Instant.now(),
         duration: Option[Duration] = None,
         group: Option[String] = None
-    )(implicit ec: ExecutionContext): Future[ObservationEntity] = {
+    )(implicit ec: ExecutionContext): Future[Observation] = {
 
-        def fn(dao: ODAO): ObservationEntity = {
+        def fn(dao: ODAO): Observation = {
             val imDao = daoFactory.newImagedMomentDAO(dao)
             imDao.findByUUID(imagedMomentUUID) match {
                 case None               =>
@@ -69,7 +71,7 @@ class ObservationController(
                     )
                     observation.setImagedMoment(imagedMoment)
                     annotationPublisher.publish(Observation.from(observation))
-                    observation
+                    transform(observation)
             }
         }
 
@@ -85,9 +87,9 @@ class ObservationController(
         group: Option[String] = None,
         activity: Option[String] = None,
         imagedMomentUUID: Option[UUID] = None
-    )(implicit ec: ExecutionContext): Future[Option[ObservationEntity]] = {
+    )(implicit ec: ExecutionContext): Future[Option[Observation]] = {
 
-        def fn(dao: ODAO): Option[ObservationEntity] = {
+        def fn(dao: ODAO): Option[Observation] = {
             // --- 1. Does uuid exist?
             val observation = dao.findByUUID(uuid)
 
@@ -108,7 +110,7 @@ class ObservationController(
                 }
 
                 annotationPublisher.publish(Observation.from(obs))
-                obs
+                transform(obs)
             })
         }
 
@@ -140,18 +142,18 @@ class ObservationController(
 
     def findByVideoReferenceUUID(uuid: UUID, limit: Option[Int] = None, offset: Option[Int] = None)(
         implicit ec: ExecutionContext
-    ): Future[Iterable[ObservationEntity]] = {
-        def fn(dao: ODAO): Iterable[ObservationEntity] =
-            dao.findByVideoReferenceUUID(uuid, limit, offset)
+    ): Future[Iterable[Observation]] = {
+        def fn(dao: ODAO): Iterable[Observation] =
+            dao.findByVideoReferenceUuid(uuid, limit, offset).map(transform)
         exec(fn)
     }
 
     def findByAssociationUUID(
         uuid: UUID
-    )(implicit ec: ExecutionContext): Future[Option[ObservationEntity]] = {
-        def fn(dao: ODAO): Option[ObservationEntity] = {
+    )(implicit ec: ExecutionContext): Future[Option[Observation]] = {
+        def fn(dao: ODAO): Option[Observation] = {
             val adao = daoFactory.newAssociationDAO(dao)
-            adao.findByUUID(uuid).map(_.getObservation)
+            adao.findByUUID(uuid).map(_.getObservation).map(transform)
         }
         exec(fn)
     }
@@ -170,13 +172,13 @@ class ObservationController(
 
     def deleteDuration(
         uuid: UUID
-    )(implicit ec: ExecutionContext): Future[Option[ObservationEntity]] = {
-        def fn(dao: ODAO): Option[ObservationEntity] =
+    )(implicit ec: ExecutionContext): Future[Option[Observation]] = {
+        def fn(dao: ODAO): Option[Observation] =
             dao
                 .findByUUID(uuid)
                 .map(obs => {
                     obs.setDuration(null)
-                    obs
+                    transform(obs)
                 })
         exec(fn)
     }

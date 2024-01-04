@@ -23,6 +23,7 @@ import scala.concurrent.{ExecutionContext, Future}
 import org.mbari.annosaurus.repository.jpa.entity.CachedVideoReferenceInfoEntity
 import org.mbari.annosaurus.repository.jpa.JPADAOFactory
 import org.mbari.annosaurus.domain.CachedVideoReferenceInfo
+import org.checkerframework.checker.units.qual.C
 
 /** @author
   *   Brian Schlining
@@ -31,43 +32,45 @@ import org.mbari.annosaurus.domain.CachedVideoReferenceInfo
 class CachedVideoReferenceInfoController(val daoFactory: JPADAOFactory)
     extends BaseController[CachedVideoReferenceInfoEntity, CachedVideoReferenceInfoDAO[
         CachedVideoReferenceInfoEntity
-    ]] {
+    ], CachedVideoReferenceInfo] {
 
     protected type VRDAO = CachedVideoReferenceInfoDAO[CachedVideoReferenceInfoEntity]
 
     override def newDAO(): CachedVideoReferenceInfoDAO[CachedVideoReferenceInfoEntity] =
         daoFactory.newCachedVideoReferenceInfoDAO()
 
+    override def transform(a: CachedVideoReferenceInfoEntity): CachedVideoReferenceInfo = CachedVideoReferenceInfo.from(a, true)
+
     //  def findAll(limit: Int, offset: Int)(implicit ec: ExecutionContext): Future[Iterable[CachedVideoReferenceInfo]] =
     //    exec(d => d.findAll(limit, offset))
 
     def findByVideoReferenceUUID(
         uuid: UUID
-    )(implicit ec: ExecutionContext): Future[Option[CachedVideoReferenceInfoEntity]] = {
-        def fn(dao: VRDAO): Option[CachedVideoReferenceInfoEntity] =
-            dao.findByVideoReferenceUUID(uuid)
+    )(implicit ec: ExecutionContext): Future[Option[CachedVideoReferenceInfo]] = {
+        def fn(dao: VRDAO): Option[CachedVideoReferenceInfo] =
+            dao.findByVideoReferenceUUID(uuid).map(transform)
         exec(fn)
     }
 
     def findByPlatformName(
         name: String
-    )(implicit ec: ExecutionContext): Future[Iterable[CachedVideoReferenceInfoEntity]] = {
-        def fn(dao: VRDAO): Iterable[CachedVideoReferenceInfoEntity] = dao.findByPlatformName(name)
+    )(implicit ec: ExecutionContext): Future[Iterable[CachedVideoReferenceInfo]] = {
+        def fn(dao: VRDAO): Iterable[CachedVideoReferenceInfo] = dao.findByPlatformName(name).map(transform)
         exec(fn)
     }
 
     def findByMissionID(
         id: String
-    )(implicit ec: ExecutionContext): Future[Iterable[CachedVideoReferenceInfoEntity]] = {
-        def fn(dao: VRDAO): Iterable[CachedVideoReferenceInfoEntity] = dao.findByMissionID(id)
+    )(implicit ec: ExecutionContext): Future[Iterable[CachedVideoReferenceInfo]] = {
+        def fn(dao: VRDAO): Iterable[CachedVideoReferenceInfo] = dao.findByMissionID(id).map(transform)
         exec(fn)
     }
 
     def findByMissionContact(
         contact: String
-    )(implicit ec: ExecutionContext): Future[Iterable[CachedVideoReferenceInfoEntity]] = {
-        def fn(dao: VRDAO): Iterable[CachedVideoReferenceInfoEntity] =
-            dao.findByMissionContact(contact)
+    )(implicit ec: ExecutionContext): Future[Iterable[CachedVideoReferenceInfo]] = {
+        def fn(dao: VRDAO): Iterable[CachedVideoReferenceInfo] =
+            dao.findByMissionContact(contact).map(transform)
         exec(fn)
     }
 
@@ -96,16 +99,16 @@ class CachedVideoReferenceInfoController(val daoFactory: JPADAOFactory)
         platformName: String,
         missionID: String,
         missionContact: Option[String] = None
-    )(implicit ec: ExecutionContext): Future[CachedVideoReferenceInfoEntity] = {
+    )(implicit ec: ExecutionContext): Future[CachedVideoReferenceInfo] = {
 
-        def fn(dao: VRDAO): CachedVideoReferenceInfoEntity = {
+        def fn(dao: VRDAO): CachedVideoReferenceInfo = {
             val v = new CachedVideoReferenceInfoEntity
             v.setVideoReferenceUuid(videoReferenceUUID)
             v.setPlatformName(platformName)
             v.setMissionId(missionID)
             missionContact.foreach(v.setMissionContact)
             dao.create(v)
-            v
+            transform(v)
         }
         exec(fn)
     }
@@ -116,16 +119,16 @@ class CachedVideoReferenceInfoController(val daoFactory: JPADAOFactory)
         platformName: Option[String] = None,
         missionID: Option[String] = None,
         missionContact: Option[String] = None
-    )(implicit ec: ExecutionContext): Future[Option[CachedVideoReferenceInfoEntity]] = {
+    )(implicit ec: ExecutionContext): Future[Option[CachedVideoReferenceInfo]] = {
 
-        def fn(dao: VRDAO): Option[CachedVideoReferenceInfoEntity] = dao.findByUUID(uuid) match {
+        def fn(dao: VRDAO): Option[CachedVideoReferenceInfo] = dao.findByUUID(uuid) match {
             case None    => None
             case Some(v) =>
                 videoReferenceUUID.foreach(v.setVideoReferenceUuid)
                 platformName.foreach(v.setPlatformName)
                 missionID.foreach(v.setMissionId)
                 missionContact.foreach(v.setMissionContact)
-                Some(v)
+                Some(transform(v))
         }
         exec(fn)
     }

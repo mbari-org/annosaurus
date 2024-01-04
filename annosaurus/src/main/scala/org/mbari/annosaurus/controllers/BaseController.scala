@@ -28,11 +28,13 @@ import org.mbari.annosaurus.repository.jpa.entity.IPersistentObject
   *   Brian Schlining
   * @since 2016-06-25T17:17:00
   */
-trait BaseController[A <: IPersistentObject, B <: DAO[A]] {
+trait BaseController[A <: IPersistentObject, B <: DAO[A], C] {
 
     def daoFactory: JPADAOFactory
 
     def newDAO(): B
+
+    def transform(a: A): C
 
     protected def exec[T](fn: B => T)(implicit ec: ExecutionContext): Future[T] = {
         val dao = newDAO()
@@ -56,10 +58,10 @@ trait BaseController[A <: IPersistentObject, B <: DAO[A]] {
 
     def findAll(limit: Option[Int] = None, offset: Option[Int] = None)(implicit
         ec: ExecutionContext
-    ): Future[Iterable[A]] =
-        exec(d => d.findAll(limit, offset))
+    ): Future[Iterable[C]] =
+        exec(d => d.findAll(limit, offset).map(transform))
 
-    def findByUUID(uuid: UUID)(implicit ec: ExecutionContext): Future[Option[A]] =
-        exec(d => d.findByUUID(uuid))
+    def findByUUID(uuid: UUID)(implicit ec: ExecutionContext): Future[Option[C]] =
+        exec(d => d.findByUUID(uuid).map(transform))
 
 }
