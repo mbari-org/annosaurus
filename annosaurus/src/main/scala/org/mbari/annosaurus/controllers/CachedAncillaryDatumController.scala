@@ -35,9 +35,9 @@ import org.mbari.annosaurus.repository.jpa.entity.ImagedMomentEntity
   * @since 2017-05-01T10:53:00
   */
 class CachedAncillaryDatumController(val daoFactory: JPADAOFactory)
-    extends BaseController[CachedAncillaryDatumEntity, 
-        CachedAncillaryDatumDAO[CachedAncillaryDatumEntity],
-        CachedAncillaryDatum] {
+    extends BaseController[CachedAncillaryDatumEntity, CachedAncillaryDatumDAO[
+        CachedAncillaryDatumEntity
+    ], CachedAncillaryDatum] {
 
     protected type ADDAO = CachedAncillaryDatumDAO[CachedAncillaryDatumEntity]
     LoggerFactory.getLogger(getClass)
@@ -219,7 +219,8 @@ class CachedAncillaryDatumController(val daoFactory: JPADAOFactory)
     def findByObservationUUID(
         uuid: UUID
     )(implicit ec: ExecutionContext): Future[Option[CachedAncillaryDatum]] = {
-        def fn(dao: ADDAO): Option[CachedAncillaryDatum] = dao.findByObservationUUID(uuid).map(transform)
+        def fn(dao: ADDAO): Option[CachedAncillaryDatum] =
+            dao.findByObservationUUID(uuid).map(transform)
 
         exec(fn)
     }
@@ -227,7 +228,8 @@ class CachedAncillaryDatumController(val daoFactory: JPADAOFactory)
     def findByImagedMomentUUID(
         uuid: UUID
     )(implicit ec: ExecutionContext): Future[Option[CachedAncillaryDatum]] = {
-        def fn(dao: ADDAO): Option[CachedAncillaryDatum] = dao.findByImagedMomentUUID(uuid).map(transform)
+        def fn(dao: ADDAO): Option[CachedAncillaryDatum] =
+            dao.findByImagedMomentUUID(uuid).map(transform)
 
         exec(fn)
     }

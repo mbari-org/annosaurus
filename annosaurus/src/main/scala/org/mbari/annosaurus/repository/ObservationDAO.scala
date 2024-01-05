@@ -42,7 +42,7 @@ trait ObservationDAO[T <: IPersistentObject] extends DAO[T] {
         limit: Option[Int] = None,
         offset: Option[Int] = None
     ): Iterable[T]
-    
+
     def streamByVideoReferenceUUID(
         uuid: UUID,
         limit: Option[Int] = None,

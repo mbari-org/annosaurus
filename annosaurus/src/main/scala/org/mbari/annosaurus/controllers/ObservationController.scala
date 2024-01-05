@@ -50,7 +50,8 @@ class ObservationController(
         observer: String,
         observationDate: Instant = Instant.now(),
         duration: Option[Duration] = None,
-        group: Option[String] = None
+        group: Option[String] = None,
+        activity: Option[String] = None
     )(implicit ec: ExecutionContext): Future[Observation] = {
 
         def fn(dao: ODAO): Observation = {
@@ -67,9 +68,10 @@ class ObservationController(
                         observationDate,
                         observer,
                         group.orNull,
-                        null
+                        activity.orNull
                     )
-                    observation.setImagedMoment(imagedMoment)
+                    imagedMoment.addObservation(observation)
+                    // observation.setImagedMoment(imagedMoment)
                     annotationPublisher.publish(Observation.from(observation))
                     transform(observation)
             }
@@ -133,14 +135,14 @@ class ObservationController(
         exec(fn)
     }
 
-    def findAllConceptsByVideoReferenceUUID(
+    def findAllConceptsByVideoReferenceUuid(
         uuid: UUID
     )(implicit ec: ExecutionContext): Future[Iterable[String]] = {
         def fn(dao: ODAO): Iterable[String] = dao.findAllConceptsByVideoReferenceUUID(uuid)
         exec(fn)
     }
 
-    def findByVideoReferenceUUID(uuid: UUID, limit: Option[Int] = None, offset: Option[Int] = None)(
+    def findByVideoReferenceUuid(uuid: UUID, limit: Option[Int] = None, offset: Option[Int] = None)(
         implicit ec: ExecutionContext
     ): Future[Iterable[Observation]] = {
         def fn(dao: ODAO): Iterable[Observation] =
@@ -148,7 +150,7 @@ class ObservationController(
         exec(fn)
     }
 
-    def findByAssociationUUID(
+    def findByAssociationUuid(
         uuid: UUID
     )(implicit ec: ExecutionContext): Future[Option[Observation]] = {
         def fn(dao: ODAO): Option[Observation] = {
@@ -199,19 +201,19 @@ class ObservationController(
         exec(fn)
     }
 
-    def countByVideoReferenceUUID(uuid: UUID)(implicit ec: ExecutionContext): Future[Int] = {
+    def countByVideoReferenceUuid(uuid: UUID)(implicit ec: ExecutionContext): Future[Int] = {
         def fn(dao: ODAO): Int = dao.countByVideoReferenceUUID(uuid)
         exec(fn)
     }
 
-    def countByVideoReferenceUUIDAndTimestamps(uuid: UUID, start: Instant, end: Instant)(implicit
+    def countByVideoReferenceUuidAndTimestamps(uuid: UUID, start: Instant, end: Instant)(implicit
         ec: ExecutionContext
     ): Future[Int] = {
         def fn(dao: ODAO): Int = dao.countByVideoReferenceUUIDAndTimestamps(uuid, start, end)
         exec(fn)
     }
 
-    def countAllGroupByVideoReferenceUUID()(implicit ec: ExecutionContext): Future[Map[UUID, Int]] =
+    def countAllGroupByVideoReferenceUuid()(implicit ec: ExecutionContext): Future[Map[UUID, Int]] =
         exec(dao => dao.countAllByVideoReferenceUuids())
 
     def updateConcept(oldConcept: String, newConcept: String)(implicit
@@ -236,6 +238,7 @@ class ObservationController(
                     imDao.delete(imagedMoment)
                 }
                 else {
+                    imagedMoment.removeObservation(observation)
                     dao.delete(observation)
                 }
                 true

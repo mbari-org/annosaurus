@@ -39,7 +39,8 @@ class CachedVideoReferenceInfoController(val daoFactory: JPADAOFactory)
     override def newDAO(): CachedVideoReferenceInfoDAO[CachedVideoReferenceInfoEntity] =
         daoFactory.newCachedVideoReferenceInfoDAO()
 
-    override def transform(a: CachedVideoReferenceInfoEntity): CachedVideoReferenceInfo = CachedVideoReferenceInfo.from(a, true)
+    override def transform(a: CachedVideoReferenceInfoEntity): CachedVideoReferenceInfo =
+        CachedVideoReferenceInfo.from(a, true)
 
     //  def findAll(limit: Int, offset: Int)(implicit ec: ExecutionContext): Future[Iterable[CachedVideoReferenceInfo]] =
     //    exec(d => d.findAll(limit, offset))
@@ -55,14 +56,16 @@ class CachedVideoReferenceInfoController(val daoFactory: JPADAOFactory)
     def findByPlatformName(
         name: String
     )(implicit ec: ExecutionContext): Future[Iterable[CachedVideoReferenceInfo]] = {
-        def fn(dao: VRDAO): Iterable[CachedVideoReferenceInfo] = dao.findByPlatformName(name).map(transform)
+        def fn(dao: VRDAO): Iterable[CachedVideoReferenceInfo] =
+            dao.findByPlatformName(name).map(transform)
         exec(fn)
     }
 
     def findByMissionID(
         id: String
     )(implicit ec: ExecutionContext): Future[Iterable[CachedVideoReferenceInfo]] = {
-        def fn(dao: VRDAO): Iterable[CachedVideoReferenceInfo] = dao.findByMissionID(id).map(transform)
+        def fn(dao: VRDAO): Iterable[CachedVideoReferenceInfo] =
+            dao.findByMissionID(id).map(transform)
         exec(fn)
     }
 

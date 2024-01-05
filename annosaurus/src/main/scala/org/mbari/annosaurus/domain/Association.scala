@@ -48,9 +48,8 @@ object Association extends FromEntity[AssociationEntity, Association] {
         val (optObs, optIm) =
             if extend then
                 val obsUuid = Option(entity.getObservation()).map(_.getUuid())
-                val imUuid = Try(entity.getObservation().getImagedMoment().getUuid()).toOption
+                val imUuid  = Try(entity.getObservation().getImagedMoment().getUuid()).toOption
                 (obsUuid, imUuid)
-
             else (None, None)
         Association(
             entity.getLinkName,

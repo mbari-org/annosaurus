@@ -161,7 +161,8 @@ class AssociationController(
         concept: Option[String] = None
     )(implicit ec: ExecutionContext): Future[Iterable[Association]] = {
         def fn(dao: ADAO): Iterable[Association] =
-            dao.findByLinkNameAndVideoReferenceUUIDAndConcept(linkName, videoReferenceUUID, concept).map(transform)
+            dao.findByLinkNameAndVideoReferenceUUIDAndConcept(linkName, videoReferenceUUID, concept)
+                .map(transform)
         exec(fn)
     }
 

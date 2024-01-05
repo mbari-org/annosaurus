@@ -31,7 +31,9 @@ import org.mbari.annosaurus.domain.ImageReference
   * @since 2016-07-04T22:15:00
   */
 class ImageReferenceController(val daoFactory: JPADAOFactory)
-    extends BaseController[ImageReferenceEntity, ImageReferenceDAO[ImageReferenceEntity], ImageReference] {
+    extends BaseController[ImageReferenceEntity, ImageReferenceDAO[
+        ImageReferenceEntity
+    ], ImageReference] {
 
     type IRDAO = ImageReferenceDAO[ImageReferenceEntity]
 

@@ -93,9 +93,11 @@ class AnnotationController(
 
         val dao = daoFactory.newObservationDAO()
         val f   =
-            dao.runTransaction(d => d.findByVideoReferenceUuid(videoReferenceUUID, limit, offset)
-                .map(obs => Annotation.from(obs, includedAncillaryData))
-                .toSeq)
+            dao.runTransaction(d =>
+                d.findByVideoReferenceUuid(videoReferenceUUID, limit, offset)
+                    .map(obs => Annotation.from(obs, includedAncillaryData))
+                    .toSeq
+            )
         f.onComplete(_ => dao.close())
         f
         // f.map(_.map(obs => Annotation.from(obs, true)).toSeq)
@@ -194,9 +196,10 @@ class AnnotationController(
     )(implicit ec: ExecutionContext): Future[Iterable[Annotation]] = {
 
         val imDao = daoFactory.newImagedMomentDAO()
-        val f     = imDao.runTransaction(d => d.findByImageReferenceUUID(imageReferenceUUID) match
-            case None => Nil
-            case Some(im) => im.getObservations.asScala.map(Annotation.from(_))
+        val f     = imDao.runTransaction(d =>
+            d.findByImageReferenceUUID(imageReferenceUUID) match
+                case None     => Nil
+                case Some(im) => im.getObservations.asScala.map(Annotation.from(_))
         )
         f.onComplete(t => imDao.close())
         f
@@ -263,7 +266,7 @@ class AnnotationController(
                 obsDao.runTransaction(d =>
                     imagedMoments.flatMap(i => {
                         val im = imagedMomentController.create(d, i)
-                        Annotation.fromImagedMoment(im, true) 
+                        Annotation.fromImagedMoment(im, true)
                     })
                 )
             })

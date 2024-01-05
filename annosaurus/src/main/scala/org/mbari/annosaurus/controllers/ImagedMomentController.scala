@@ -140,7 +140,9 @@ class ImagedMomentController(val daoFactory: JPADAOFactory)
         offset: Option[Int] = None
     )(implicit ec: ExecutionContext): Future[Seq[ImagedMoment]] = {
         val imDao = daoFactory.newImagedMomentDAO()
-        val f     = imDao.runTransaction(d => d.findBetweenUpdatedDates(start, end, limit, offset).map(transform))
+        val f     = imDao.runTransaction(d =>
+            d.findBetweenUpdatedDates(start, end, limit, offset).map(transform)
+        )
         f.onComplete(_ => imDao.close())
         f.map(_.toSeq)
     }
@@ -214,7 +216,9 @@ class ImagedMomentController(val daoFactory: JPADAOFactory)
         offset: Option[Int] = None
     )(implicit ec: ExecutionContext): Future[Iterable[ImagedMoment]] = {
         val imDao = daoFactory.newImagedMomentDAO()
-        val f     = imDao.runTransaction(d => d.findByConceptWithImages(concept, limit, offset).map(transform))
+        val f     = imDao.runTransaction(d =>
+            d.findByConceptWithImages(concept, limit, offset).map(transform)
+        )
         f.onComplete(_ => imDao.close())
         f
     }
