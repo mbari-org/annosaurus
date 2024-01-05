@@ -37,6 +37,7 @@ extension (obj: Object)
 def instantConverter(obj: Object): Option[Instant] =
     obj match
         case null                            => None
+        case i: Instant                      => Some(i)
         case ts: java.sql.Timestamp          => Some(ts.toInstant)
         case m: microsoft.sql.DateTimeOffset => Some(m.getOffsetDateTime().toInstant())
         case _                               => None // TODO handle postgres
@@ -78,5 +79,6 @@ def urlConverter(obj: Object): Option[URL] =
     obj match
         case null      => None
         case u: URL    => Some(u)
+        case uri: URI  => Try(uri.toURL()).toOption
         case s: String => Try(URI.create(s).toURL()).toOption
         case _         => None

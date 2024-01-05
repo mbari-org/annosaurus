@@ -36,7 +36,7 @@ case class Association(
     override def toSnakeCase: AssociationSC =
         AssociationSC(linkName, toConcept, linkValue, mimeType, uuid, lastUpdated)
 
-    def toEntity: AssociationEntity = {
+    override def toEntity: AssociationEntity = {
         val a = AssociationEntity(linkName, toConcept, linkValue, mimeType.orNull)
         uuid.foreach(a.setUuid)
         a

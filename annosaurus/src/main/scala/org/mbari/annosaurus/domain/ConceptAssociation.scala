@@ -28,7 +28,8 @@ final case class ConceptAssociation(
     toConcept: String,
     linkValue: String,
     mimeType: String
-) extends ToSnakeCase[ConceptAssociationSC] {
+) extends ToSnakeCase[ConceptAssociationSC]
+    with ToEntity[AssociationEntity] {
     def toSnakeCase: ConceptAssociationSC = ConceptAssociationSC(
         uuid,
         videoReferenceUuid,
@@ -38,6 +39,12 @@ final case class ConceptAssociation(
         linkValue,
         mimeType
     )
+
+    override def toEntity: AssociationEntity = {
+        val a = AssociationEntity(linkName, toConcept, linkValue, mimeType)
+        a.setUuid(uuid)
+        a
+    }
 }
 
 object ConceptAssociation extends FromEntity[AssociationEntity, ConceptAssociation] {

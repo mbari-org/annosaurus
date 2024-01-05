@@ -24,6 +24,7 @@ import org.mbari.annosaurus.repository.jpa.entity.{AssociationEntity, ConceptAss
 
 import scala.jdk.CollectionConverters._
 import org.mbari.annosaurus.domain.{ConceptAssociation, ConceptAssociationRequest}
+import org.mbari.annosaurus.repository.jdbc.*
 
 /** @author
   *   Brian Schlining
@@ -91,13 +92,13 @@ class AssociationDAOImpl(entityManager: EntityManager)
             .map(obj =>
                 obj(0) -> {
                     val ass = newPersistentObject(
-                        obj(2).asInstanceOf[String],
-                        Option(obj(3).asInstanceOf[String]),
-                        Option(obj(4).asInstanceOf[String]),
-                        Option(obj(5).asInstanceOf[String])
+                        obj(2).asString.orNull,
+                        obj(3).asString,
+                        obj(4).asString,
+                        obj(5).asString
                     )
 
-                    ass.setUuid(UUID.fromString(obj(1).toString))
+                    ass.setUuid(obj(1).asUUID.orNull)
                     ass
                 }
             )
@@ -138,7 +139,7 @@ class AssociationDAOImpl(entityManager: EntityManager)
         query
             .getResultList
             .asScala
-            .map(_.toString().toLong)
+            .map(_.asLong.getOrElse(0L))
             .head
 
     }

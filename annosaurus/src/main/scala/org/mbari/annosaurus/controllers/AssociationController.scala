@@ -150,7 +150,7 @@ class AssociationController(
         exec(fn)
     }
 
-    def findByLinkNameAndVideoReferenceUUID(linkName: String, videoReferenceUUID: UUID)(implicit
+    def findByLinkNameAndVideoReferenceUuid(linkName: String, videoReferenceUUID: UUID)(implicit
         ec: ExecutionContext
     ): Future[Iterable[Association]] = {
         def fn(dao: ADAO): Iterable[Association] =
@@ -158,7 +158,7 @@ class AssociationController(
         exec(fn)
     }
 
-    def findByLinkNameAndVideoReferenceUUIDAndConcept(
+    def findByLinkNameAndVideoReferenceUuidAndConcept(
         linkName: String,
         videoReferenceUUID: UUID,
         concept: Option[String] = None
