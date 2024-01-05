@@ -31,6 +31,22 @@ trait ObservationControllerITSuite extends BaseDAOSuite {
     lazy val controller    = ObservationController(daoFactory)
     private val log        = System.getLogger(getClass.getName)
 
+    test("findAll") {
+        val xs       = TestUtils.create(1, 1)
+        val expected = xs.flatMap(im => im.getObservations().asScala).toSet
+        val obtained = exec(controller.findAll())
+        assertEquals(obtained.size, 1)
+        AssertUtils.assertSameObservation(expected.head, obtained.head.toEntity)
+    }
+
+    test("findByUUID") {
+        val xs       = TestUtils.create(1, 1)
+        val expected = xs.flatMap(im => im.getObservations().asScala).toSet
+        val obtained = exec(controller.findByUUID(expected.head.getUuid()))
+        assertEquals(obtained.size, 1)
+        AssertUtils.assertSameObservation(expected.head, obtained.head.toEntity)
+    }
+
     test("create using params") {
         val im   = TestUtils.create(1).head
         val obs0 = TestUtils.randomObservation()

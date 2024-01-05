@@ -59,7 +59,7 @@ class AssociationController(
         mimeType: String,
         associationUuid: Option[UUID] = None
     )(implicit ec: ExecutionContext): Future[Association] = {
-        def fn(dao: ADAO): Association = {
+        def fn(dao: ADAO): AssociationEntity = {
             val obsDao = daoFactory.newObservationDAO(dao)
             obsDao.findByUUID(observationUuid) match {
                 case None              =>
@@ -76,11 +76,14 @@ class AssociationController(
                         )
                     associationUuid.foreach(association.setUuid)
                     observation.addAssociation(association)
-                    associationPublisher.publish(Association.from(association))
-                    transform(association)
+                    association
             }
         }
-        exec(fn)
+        exec(fn).map(entity => {
+            val a = transform(entity) // transform after transaction is committed or UUID isn't set
+            associationPublisher.publish(a)
+            a
+        })
     }
 
     def update(

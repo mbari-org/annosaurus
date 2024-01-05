@@ -23,6 +23,7 @@ import org.mbari.annosaurus.repository.jpa.JPADAOFactory
 import scala.concurrent.ExecutionContext
 import scala.jdk.CollectionConverters.*
 import org.mbari.annosaurus.domain.Association
+import junit.framework.Test
 
 trait AssociationControllerITSuite extends BaseDAOSuite {
 
@@ -33,6 +34,62 @@ trait AssociationControllerITSuite extends BaseDAOSuite {
     override def afterAll(): Unit  = daoFactory.afterAll()
 
     lazy val controller = new AssociationController(daoFactory)
+
+    test("delete") {}
+
+    test("findAll") {}
+
+    test("findByUUID") {}
+
+    test("create") {
+        val x = TestUtils.create(1, 1).head
+        val obs = x.getObservations.asScala.head
+        val a = TestUtils.randomAssociation()
+        val b = exec(
+            controller.create(
+                obs.getUuid,
+                a.getLinkName(),
+                a.getToConcept(),
+                a.getLinkValue(),
+                a.getMimeType(),
+                Option.empty
+            )
+        )
+        assert(b.uuid.isDefined)
+        a.setUuid(b.uuid.orNull)
+        AssertUtils.assertSameAssociation(b.toEntity, a)
+    }
+
+    test("update") {
+        val im = TestUtils.create(1, 2, 1).head
+        val xs = im.getObservations.asScala
+        val obs = xs.head
+        val other = xs.last
+        val a = obs.getAssociations.iterator().next()
+
+        val c = TestUtils.randomAssociation()
+        val opt = exec(
+            controller.update(
+                a.getUuid(),
+                Some(other.getUuid()), // Move to a different observation
+                Some(c.getLinkName()),
+                Some(c.getToConcept()),
+                Some(c.getLinkValue()),
+                Some(c.getMimeType())
+            )
+        )
+        assert(opt.isDefined)
+        val d = opt.get
+        assertEquals(d.uuid.orNull, a.getUuid())
+        assertEquals(d.linkName, c.getLinkName())
+        assertEquals(d.toConcept, c.getToConcept())
+        assertEquals(d.linkValue, c.getLinkValue())
+        assertEquals(d.mimeType.orNull, c.getMimeType())
+
+        // TODO Make sure it moved to the other observation
+
+        
+    }
 
     test("bulkUpdate") {
         val x               = TestUtils.create(1, 1, 8, 0).head
