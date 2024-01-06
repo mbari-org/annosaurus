@@ -57,9 +57,9 @@ final case class ImagedMoment(
         timecode.foreach(tc => entity.setTimecode(Timecode(tc)))
         elapsedTimeMillis.foreach(t => entity.setElapsedTime(Duration.ofMillis(t)))
         recordedTimestamp.foreach(entity.setRecordedTimestamp)
-        observations.foreach(obs => entity.addObservation(obs.toEntity))
-        imageReferences.foreach(ir => entity.addImageReference(ir.toEntity))
-        ancillaryData.foreach(d => entity.setAncillaryDatum(d.toEntity))
+        observations.map(_.toEntity).foreach(entity.addObservation)
+        imageReferences.map(_.toEntity).foreach(entity.addImageReference)
+        ancillaryData.map(_.toEntity).foreach(entity.setAncillaryDatum)
         uuid.foreach(entity.setUuid)
         entity
 
@@ -68,14 +68,31 @@ final case class ImagedMoment(
 
 object ImagedMoment extends FromEntity[ImagedMomentEntity, ImagedMoment] {
     def from(entity: ImagedMomentEntity, extend: Boolean = false): ImagedMoment = {
+
+        val observations =
+            if extend && !entity.getObservations().isEmpty()
+            then entity.getObservations.asScala.map(Observation.from(_, extend)).toSeq
+            else Nil
+
+        // Do not extend image references here. As that would include redundant information
+        val imageReferences =
+            if extend && !entity.getImageReferences().isEmpty()
+            then entity.getImageReferences.asScala.map(ImageReference.from(_, false)).toSeq
+            else Nil
+
+        // Do not extend data here. As that would include redundant information
+        val data =
+            if extend then Option(entity.getAncillaryDatum).map(CachedAncillaryDatum.from(_, false))
+            else None
+
         ImagedMoment(
             entity.getVideoReferenceUuid,
             Option(entity.getTimecode).map(_.toString()),
             Option(entity.getElapsedTime).map(_.toMillis),
             Option(entity.getRecordedTimestamp),
-            entity.getObservations.asScala.map(x => Observation.from(x, false)).toSeq,
-            entity.getImageReferences.asScala.map(x => ImageReference.from(x, false)).toSeq,
-            Option(entity.getAncillaryDatum).map(x => CachedAncillaryDatum.from(x, false)),
+            observations,
+            imageReferences,
+            data,
             entity.primaryKey,
             entity.lastUpdated
         )

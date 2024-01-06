@@ -37,6 +37,9 @@ import org.mbari.annosaurus.domain.Annotation
 import org.mbari.annosaurus.repository.ObservationDAO
 import org.mbari.annosaurus.etc.jdk.Logging.given
 import scala.jdk.CollectionConverters.*
+import org.mbari.annosaurus.etc.circe.CirceCodecs.{*, given}
+
+import scala.util.chaining.*
 
 /** @author
   *   Brian Schlining
@@ -65,7 +68,6 @@ class AnnotationController(
         // val f      = obsDao.runTransaction(d => obsDao.findByUUID(uuid))
         // f.onComplete(_ => obsDao.close())
         // f.map(_.map(obs => Annotation.from(obs, true)))
-        log.atWarn.log("-----" + uuid)
         exec(d => d.findByUUID(uuid).map(Annotation.from(_, true)))
 
     }
@@ -220,8 +222,7 @@ class AnnotationController(
         // We need to assign a UUID first so that we can find the correct
         // observation. This is only needed if more than one observation
         // exists at the same timestamp
-        val observationUuid = UUID.randomUUID()
-        val annotation      = Annotation(
+        val annotation = Annotation(
             videoReferenceUuid = Option(videoReferenceUUID),
             concept = Some(concept),
             observer = Some(observer),
@@ -231,13 +232,18 @@ class AnnotationController(
             recordedTimestamp = recordedDate,
             durationMillis = duration.map(_.toMillis),
             group = group,
-            activity = activity,
-            observationUuid = Some(observationUuid)
+            activity = activity
         )
 
         bulkCreate(Seq(annotation))
-            .map(xs => xs.find(_.observationUuid == observationUuid).get)
-
+            .map(xs =>
+                xs.find(a =>
+                    a.concept.orNull == concept
+                        && a.videoReferenceUuid.orNull == videoReferenceUUID
+                        && a.observer.orNull == observer
+                        && a.observationTimestamp.orNull == observationDate
+                ).orNull
+            )
     }
 
     /** Bulk create annotations
@@ -247,96 +253,33 @@ class AnnotationController(
       *   The newly created annotations along with any existing ones that share the same
       *   imagedMoment
       */
-    def bulkCreate(annotations: Iterable[Annotation]): Future[Seq[Annotation]] = {
+    def bulkCreate(
+        annotations: Iterable[Annotation]
+    )(using ec: ExecutionContext): Future[Seq[Annotation]] = {
 
-        // We're inserting the annotations using a fixed thread executor
-        // grouping them into 50 annotation chunks (ie. 50 annotations per
-        // database transactions
-
-        implicit val ec: ExecutionContext =
-            ExecutionContext.fromExecutor(Executors.newSingleThreadExecutor())
+        // TODO need to stress test this to find the maximum number oa annotations that can be inserted at once
+        log.atTrace.log(() => s"Creating ${annotations.size} Annotations: ${annotations.stringify}")
+        val imagedMoments = Annotation.toEntities(annotations.toSeq, true)
 
         val obsDao = daoFactory.newObservationDAO()
+        val imDao  = daoFactory.newImagedMomentDAO(obsDao)
 
-        val imagedMoments = Annotation.toEntities(annotations.toSeq)
-
-        val futures = imagedMoments
-            .grouped(50)
-            .map(imagedMoments => {
-                obsDao.runTransaction(d =>
-                    imagedMoments.flatMap(i => {
-                        val im = imagedMomentController.create(d, i)
-                        Annotation.fromImagedMoment(im, true)
-                    })
-                )
+        val future = obsDao
+            .runTransaction(d => {
+                for im <- imagedMoments
+                yield imagedMomentController.create(d, im)
             })
-        val future  = Future.sequence(futures)
+            .map(entities =>
+                // We map to annotations outside of a transaction. They should already be fully loaded
+                // so no lazy loading issues. The primary keys aren't set until the transaction is
+                // completed and we need those!!
+                entities.flatMap(im => Annotation.fromImagedMoment(im, true))
+            )
+
         future.onComplete(_ => obsDao.close())
-        val rf      = future.map(_.flatten.toSeq)
-        rf.foreach(annotationPublisher.publish) // publish new annotations
-        rf
-
+        future.foreach(annotationPublisher.publish) // publish new annotations
+        future
     }
-
-//  @deprecated(message = "Use ImagedMomentController.create instead", since = "2019-10-21")
-//  private def create(dao: DAO[_], annotation: MutableAnnotation): MutableObservation = {
-//    val imDao  = daoFactory.newImagedMomentDAO(dao)
-//    val obsDao = daoFactory.newObservationDAO(dao)
-//    val assDao = daoFactory.newAssociationDAO(dao)
-//    val irDao  = daoFactory.newImageReferenceDAO(dao)
-//    val imagedMoment = ImagedMomentController.findOrCreateImagedMoment(
-//      imDao,
-//      annotation.videoReferenceUuid,
-//      Option(annotation.timecode),
-//      Option(annotation.recordedTimestamp),
-//      Option(annotation.elapsedTime)
-//    )
-//    val observation = obsDao.newPersistentObject()
-//    observation.concept = annotation.concept
-//    observation.observer = annotation.observer
-//    observation.observationDate = annotation.observationTimestamp
-//    Option(annotation.duration).foreach(observation.duration = _)
-//    Option(annotation.group).foreach(observation.group = _)
-//    Option(annotation.activity).foreach(observation.activity = _)
-//    obsDao.create(observation)
-//    imagedMoment.addObservation(observation)
-//
-//    // Add associations
-//    annotation
-//      .associations
-//      .foreach(a => {
-//        val newA = assDao.newPersistentObject(
-//          a.linkName,
-//          Option(a.toConcept),
-//          Option(a.linkValue),
-//          Option(a.mimeType)
-//        )
-//        newA.uuid = a.uuid
-//        observation.addAssociation(newA)
-//      })
-//
-//    // Add imagereferences
-//    annotation
-//      .imageReferences
-//      .foreach(i => {
-//        irDao.findByURL(i.url) match {
-//          case Some(v) => // Do nothing. It should already be attached to the imagedmoment
-//          case None =>
-//            val newI = irDao.newPersistentObject(
-//              i.url,
-//              Option(i.description),
-//              Option(i.height),
-//              Option(i.width),
-//              Option(i.format)
-//            )
-//            newI.uuid = i.uuid
-//            imagedMoment.addImageReference(newI)
-//        }
-//      })
-//
-//    annotationPublisher.publish(observation)
-//    observation
-//  }
 
     def update(
         uuid: UUID,

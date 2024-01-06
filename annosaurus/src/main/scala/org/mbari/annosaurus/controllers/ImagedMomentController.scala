@@ -28,11 +28,11 @@ import org.slf4j.LoggerFactory
 import scala.concurrent.{ExecutionContext, Future}
 import org.mbari.annosaurus.repository.jpa.JPADAOFactory
 import org.mbari.annosaurus.repository.jpa.entity.ImagedMomentEntity
-import java.awt.Window
-import java.awt.Image
+
 import scala.jdk.CollectionConverters.*
 import org.mbari.annosaurus.domain.ImagedMoment
-import org.checkerframework.checker.units.qual.t
+
+import org.mbari.annosaurus.etc.jdk.Logging.given
 
 /** @author
   *   Brian Schlining
@@ -42,6 +42,8 @@ class ImagedMomentController(val daoFactory: JPADAOFactory)
     extends BaseController[ImagedMomentEntity, ImagedMomentDAO[ImagedMomentEntity], ImagedMoment] {
 
     protected type IMDAO = ImagedMomentDAO[ImagedMomentEntity]
+
+    private val log = System.getLogger(getClass.getName)
 
 //  // HACK. Assumes daoFactory is JPA
 //  private[this] val jdbcRepository = new JdbcRepository(
@@ -306,40 +308,59 @@ class ImagedMomentController(val daoFactory: JPADAOFactory)
         val targetImagedMoment =
             ImagedMomentController.findOrCreateImagedMoment(imDao, sourceImagedMoment)
 
-        // Transform source to correct types and remove any existing image references
-        val mockImagedMoment        = imDao.newPersistentObject(sourceImagedMoment)
-        val existingImageReferences = sourceImagedMoment
+        // Filter out imagereferences taht already exist
+        val existingUrls = targetImagedMoment
+            .getImageReferences
+            .stream() // using java stream
+            .map(_.getUrl)
+            .toList()
+
+        val duplicateImageReferences = sourceImagedMoment
             .getImageReferences
             .asScala
-            .filter(i => irDao.findByURL(i.getUrl).isDefined)
+            .filter(ir => existingUrls.contains(ir.getUrl))
             .toSeq
-        existingImageReferences.foreach(ir => mockImagedMoment.removeImageReference(ir))
 
-        Option(mockImagedMoment.getAncillaryDatum).foreach(ad => {
-            ad.setImagedMoment(null)
-            adDao.create(ad)
-            targetImagedMoment.setAncillaryDatum(ad)
-        })
+        for ir <- duplicateImageReferences
+        do sourceImagedMoment.removeImageReference(ir)
 
-        mockImagedMoment
+        // Create new image references
+        sourceImagedMoment
             .getImageReferences
-            .asScala
-            .toArray
-            .foreach(ir => {
-                mockImagedMoment.removeImageReference(ir)
-                irDao.create(ir)
-                targetImagedMoment.addImageReference(ir)
+            .forEach(imageReference => {
+                if (imageReference.getUuid != null) {
+                    log.atDebug
+                        .log(
+                            s"An imageReference uuid was found. Setting to null as they need to be generated in the database: ${imageReference.getUuid}"
+                        )
+                    imageReference.setUuid(null)
+                }
+                targetImagedMoment.addImageReference(imageReference)
+//                irDao.create(imageReference)
             })
 
-        mockImagedMoment
+        // Create new observations
+        sourceImagedMoment
             .getObservations
-            .asScala
-            .toArray
-            .foreach(obs => {
-                mockImagedMoment.removeObservation(obs)
-                obsDao.create(obs)
-                targetImagedMoment.addObservation(obs)
+            .forEach(observation => {
+                if (observation.getUuid != null) {
+                    log.atDebug
+                        .log(
+                            s"An observation uuid was found. Setting to null as they need to be generated in the database: ${observation.getUuid}"
+                        )
+                    observation.setUuid(null)
+                }
+                targetImagedMoment.addObservation(observation)
+//                obsDao.create(observation)
             })
+
+        if sourceImagedMoment.getAncillaryDatum != null then
+            val ad = sourceImagedMoment.getAncillaryDatum
+            ad.setUuid(null)
+            targetImagedMoment.setAncillaryDatum(ad)
+//            adDao.create(ad)
+        log.atTrace
+            .log(() => "Created " + sourceImagedMoment.getObservations.size() + " observations")
 
         targetImagedMoment
     }
@@ -400,7 +421,7 @@ class ImagedMomentController(val daoFactory: JPADAOFactory)
 
 object ImagedMomentController {
 
-    private[this] val log = LoggerFactory.getLogger(getClass)
+    private val log = System.getLogger(getClass.getName)
 
     /** This method will find or create (if a matching one is not found in the datastore)
       * @param dao
@@ -426,10 +447,11 @@ object ImagedMomentController {
         ) match {
             case Some(imagedMoment) => imagedMoment
             case None               =>
-                log.debug(
-                    s"Creating new imaged moment at timecode = ${timecode.getOrElse("")}, recordedDate = ${recordedDate
-                            .getOrElse("")}, elapsedTime = ${elapsedTime.getOrElse("")}"
-                )
+                log.atDebug
+                    .log(() =>
+                        s"Creating new imaged moment at timecode = ${timecode.getOrElse("")}, recordedDate = ${recordedDate
+                                .getOrElse("")}, elapsedTime = ${elapsedTime.getOrElse("")}"
+                    )
                 val imagedMoment = new ImagedMomentEntity(
                     videoReferenceUUID,
                     recordedDate.orNull,

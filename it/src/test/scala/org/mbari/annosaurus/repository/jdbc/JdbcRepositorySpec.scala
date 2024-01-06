@@ -27,7 +27,7 @@ import org.scalatest.matchers.should.Matchers
 
 import java.util.concurrent.TimeUnit
 import scala.concurrent.duration.Duration as SDuration
-import scala.concurrent.{Await, Future}
+import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.io.Source
 
 /**
@@ -39,6 +39,8 @@ class JdbcRepositorySpec extends AnyFunSpec with Matchers with BeforeAndAfterAll
   private[this] val daoFactory    = DerbyTestDAOFactory
   private[this] val controller    = new AnnotationController(daoFactory)
   private[this] val entityFactory = new TestEntityFactory(daoFactory)
+  given ExecutionContext = ExecutionContext.global
+  
   // HACK Assumes where using JDADAPFactory!
   private[this] val repository: JdbcRepository = {
     val entityManagerFactory = daoFactory.asInstanceOf[JPADAOFactory].entityManagerFactory

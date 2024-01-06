@@ -65,6 +65,11 @@ final case class Observation(
 
 object Observation extends FromEntity[ObservationEntity, Observation] {
     override def from(entity: ObservationEntity, extend: Boolean = false): Observation =
+
+        // DO not extend associations here. As that would include redundant information
+        val associations =
+            if extend then entity.getAssociations.asScala.map(Association.from(_)).toSeq else Nil
+
         Observation(
             entity.getConcept,
             Option(entity.getDuration).map(_.toMillis),
@@ -72,7 +77,7 @@ object Observation extends FromEntity[ObservationEntity, Observation] {
             Option(entity.getActivity),
             Option(entity.getObserver),
             Option(entity.getObservationTimestamp),
-            entity.getAssociations.asScala.map(x => Association.from(x, false)).toSeq,
+            associations,
             entity.primaryKey,
             entity.lastUpdated
         )

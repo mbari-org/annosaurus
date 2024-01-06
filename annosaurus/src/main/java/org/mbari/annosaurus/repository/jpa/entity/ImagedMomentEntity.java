@@ -444,6 +444,23 @@ public class ImagedMomentEntity implements IPersistentObject {
         return sb.toString();
     }
 
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof ImagedMomentEntity)) return false;
+        ImagedMomentEntity that = (ImagedMomentEntity) o;
+        String thisTc = timecode == null ? "" : timecode.toString();
+        String thatTc = that.timecode == null ? "" : that.timecode.toString();
 
+        return Objects.equals(uuid, that.uuid) &&
+                Objects.equals(videoReferenceUuid, that.videoReferenceUuid) &&
+                Objects.equals(recordedTimestamp, that.recordedTimestamp) &&
+                Objects.equals(thisTc, thatTc) &&
+                Objects.equals(elapsedTime, that.elapsedTime);
+    }
 
+    @Override
+    public int hashCode() {
+        var tc = timecode == null ? "" : timecode.toString();
+        return Objects.hash(uuid, elapsedTime, recordedTimestamp, tc, videoReferenceUuid);
+    }
 }

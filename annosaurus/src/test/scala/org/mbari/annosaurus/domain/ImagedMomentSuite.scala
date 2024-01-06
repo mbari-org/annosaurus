@@ -30,7 +30,7 @@ class ImagedMomentSuite extends munit.FunSuite {
 
     test("camelCase/Entity round trip") {
         val e1 = cc1.toEntity
-        val cc2 = ImagedMoment.from(e1).copy(lastUpdated = None)
+        val cc2 = ImagedMoment.from(e1, true).copy(lastUpdated = None)
         val e2 = cc2.toEntity
         assertEquals(cc2, cc1)
         // assertEquals(e1, e2)

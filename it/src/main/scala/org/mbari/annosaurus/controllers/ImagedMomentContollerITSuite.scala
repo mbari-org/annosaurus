@@ -28,6 +28,8 @@ import java.time.Instant
 import java.util.UUID
 import org.mbari.annosaurus.repository.jpa.ImagedMomentDAOImpl
 
+import org.mbari.annosaurus.etc.circe.CirceCodecs.{*, given}
+
 trait ImagedMomentContollerITSuite extends BaseDAOSuite {
 
     given JPADAOFactory    = daoFactory
@@ -137,7 +139,8 @@ trait ImagedMomentContollerITSuite extends BaseDAOSuite {
         im2.find(im => im.videoReferenceUuid == im1.getVideoReferenceUuid()) match
             case None        => // ok
             case Some(value) =>
-                fail("Found  imagedMoment without images")
+                log.atError.log("Found imagedMoment with images: " + value.stringify)
+                fail("Found imagedMoment without images")
 
         val im3 = TestUtils.create(1, 0, 0, 1).head
         val im4 = exec(controller.findWithImageReferences(im3.getVideoReferenceUuid()))

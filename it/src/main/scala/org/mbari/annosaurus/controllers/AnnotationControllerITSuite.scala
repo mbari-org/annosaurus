@@ -28,6 +28,7 @@ import org.mbari.annosaurus.domain.ConcurrentRequest
 import junit.framework.Test
 import java.time.Duration
 import org.mbari.annosaurus.domain.MultiRequest
+import org.mbari.annosaurus.etc.circe.CirceCodecs.{*, given}
 
 trait AnnotationControllerITSuite extends BaseDAOSuite {
     given JPADAOFactory    = daoFactory
@@ -40,7 +41,6 @@ trait AnnotationControllerITSuite extends BaseDAOSuite {
 
     test("findByUUID") {
         val im1 = TestUtils.create(1, 2, 3, 2, true).head
-        log.atInfo.log("im1: " + im1)
         val obs = im1.getObservations.asScala.head
         val opt = exec(controller.findByUUID(obs.getUuid))
         opt match
@@ -156,10 +156,26 @@ trait AnnotationControllerITSuite extends BaseDAOSuite {
                 anno.activity
             )
         )
-        assertEquals(obtained, anno)
+
+        // Our source anno doesn't have UUIDS set, we remove those to compare the rest of the values
+        val corrected = obtained.copy(observationUuid = None, imagedMomentUuid = None)
+        assertEquals(corrected, anno)
     }
 
-    test("bulkCreate") {}
+    test("bulkCreate a single annotation") {
+        // test minimal
+        val xs0       = TestUtils.build(1, 1)
+        val annos0    = Annotation.fromImagedMoment(xs0.head, true)
+        assertEquals(annos0.size, 1)
+        val n         = exec(controller.bulkCreate(annos0))
+        assertEquals(n.size, xs0.size)
+        val obtained  = n.head
+        assert(obtained.imagedMomentUuid.isDefined)
+        assert(obtained.observationUuid.isDefined)
+        val corrected = obtained.copy(imagedMomentUuid = None, observationUuid = None)
+//        log.atWarn.log(n.head.stringify)
+        assertEquals(corrected, annos0.head)
+    }
 
     test("update") {}
 

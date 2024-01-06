@@ -28,6 +28,7 @@ import java.time.Instant;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
+import java.util.Objects;
 
 @Entity(name = "Observation")
 @Table(
@@ -307,5 +308,18 @@ public class ObservationEntity implements IPersistentObject {
                 ", group='" + group + '\'' +
                 ", activity='" + activity + '\'' +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ObservationEntity that = (ObservationEntity) o;
+        return Objects.equals(uuid, that.uuid) && Objects.equals(concept, that.concept) && Objects.equals(observationTimestamp, that.observationTimestamp) && Objects.equals(observer, that.observer);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(uuid, concept, observationTimestamp, observer);
     }
 }

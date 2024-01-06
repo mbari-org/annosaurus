@@ -21,6 +21,7 @@ import jakarta.persistence.*;
 import java.net.URL;
 import java.sql.Timestamp;
 import java.util.UUID;
+import java.util.Objects;
 import org.mbari.annosaurus.repository.jpa.TransactionLogger;
 import org.mbari.annosaurus.repository.jpa.URLConverter;
 
@@ -206,5 +207,17 @@ public class ImageReferenceEntity implements IPersistentObject {
                 ", width=" + width +
                 ", format='" + format + '\'' +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+
+        if (!(o instanceof ImageReferenceEntity)) return false;
+
+        ImageReferenceEntity that = (ImageReferenceEntity) o;
+
+        return Objects.equals(uuid, that.uuid) &&
+                Objects.equals(url, that.url);
     }
 }

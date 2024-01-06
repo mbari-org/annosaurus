@@ -85,7 +85,7 @@ object TestUtils {
     def create(
         entities: Seq[ImagedMomentEntity]
     )(using daoFactory: JPADAOFactory, ec: ExecutionContext): Seq[ImagedMomentEntity] = {
-        log.atInfo.log(s"Creating ${entities.size} ImagedMoments: $entities")
+        log.atDebug.log(s"Creating ${entities.size} ImagedMoments: $entities")
         val dao = daoFactory.newImagedMomentDAO()
         Await.ready(dao.runTransaction(d => entities.foreach(x => d.create(x))), Timeout)
         dao.close()
@@ -100,7 +100,7 @@ object TestUtils {
         includeData: Boolean = false
     )(using daoFactory: JPADAOFactory, ec: ExecutionContext): Seq[ImagedMomentEntity] = {
         val xs  = build(nImagedMoments, nObservations, nAssociations, nImageReferences, includeData)
-        log.atInfo.log(s"Creating ${xs.size} ImagedMoments: $xs")
+        log.atDebug.log(s"Creating ${xs.size} ImagedMoments: $xs")
         val dao = daoFactory.newImagedMomentDAO()
         Await.ready(dao.runTransaction(d => xs.foreach(x => d.create(x))), Timeout)
         // for (x <- xs)

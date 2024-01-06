@@ -54,7 +54,7 @@ class ImagedMomentDAOImpl(entityManager: EntityManager)
     }
 
     override def newPersistentObject(imagedMoment: ImagedMomentEntity): ImagedMomentEntity =
-        ImagedMoment.from(imagedMoment).toEntity
+        ImagedMoment.from(imagedMoment, true).toEntity
 
     def deleteIfEmptyByUUID(uuid: UUID): Boolean = {
         findByUUID(uuid).exists(imagedMoment => {

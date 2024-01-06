@@ -17,6 +17,9 @@
 package org.mbari.annosaurus.domain
 
 import org.mbari.annosaurus.etc.circe.CirceCodecs.{*, given}
+
+import java.time.Instant
+import java.util.UUID
 import scala.jdk.CollectionConverters.*
 
 class AnnotationSuite extends munit.FunSuite {
@@ -63,7 +66,30 @@ class AnnotationSuite extends munit.FunSuite {
         assertEquals(e2.getVideoReferenceUuid(), e1.getVideoReferenceUuid())
         assertEquals(e2.getUuid(), e1.getUuid())
         assertEquals(e2.getObservations().size, e1.getObservations().size)
-
     }
+
+    test("toEntities") {
+        val e1 = Annotation.toEntities(Seq(cc1, cc1), true)
+        print(e1)
+        assertEquals(e1.size, 1)
+        assertEquals(e1.head.getObservations.size(), 1)
+
+        val cc2 = cc1.copy(observationUuid = Some(UUID.randomUUID()))
+        val e2 = Annotation.toEntities(Seq(cc1, cc2), true)
+        print(e1)
+        assertEquals(e2.size, 1)
+        assertEquals(e2.head.getObservations.size(), 2)
+
+        val cc3 = cc2.copy(observationUuid = Some(UUID.randomUUID()),
+            imagedMomentUuid = Some(UUID.randomUUID()), recordedTimestamp = Some(Instant.EPOCH))
+        val e3 = Annotation.toEntities(Seq(cc1, cc2, cc3), true).sortBy(_.getObservations.size())
+        assertEquals(e3.size, 2)
+        e3.sortBy(_.getObservations.size())
+        assertEquals(e3.head.getObservations.size(), 1)
+        assertEquals(e3.head.getObservations.iterator().next().getUuid, cc3.observationUuid.orNull)
+        assertEquals(e3.last.getObservations.size(), 2)
+    }
+
+
 
 }

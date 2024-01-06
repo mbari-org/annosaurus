@@ -20,6 +20,7 @@ import jakarta.persistence.*;
 import org.mbari.annosaurus.repository.jpa.TransactionLogger;
 
 import java.sql.Timestamp;
+import java.util.Objects;
 import java.util.UUID;
 
 @Entity(name = "Association")
@@ -230,5 +231,18 @@ public class AssociationEntity implements IPersistentObject {
                 ", toConcept='" + toConcept + '\'' +
                 ", mimeType='" + mimeType + '\'' +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        AssociationEntity that = (AssociationEntity) o;
+        return Objects.equals(uuid, that.uuid) && Objects.equals(linkName, that.linkName) && Objects.equals(linkValue, that.linkValue) && Objects.equals(toConcept, that.toConcept);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(uuid, linkName, linkValue, toConcept);
     }
 }
