@@ -381,7 +381,7 @@ class AnnotationController(
     def bulkUpdateRecordedTimestampOnly(
         annotations: Iterable[Annotation]
     )(implicit ec: ExecutionContext): Future[Iterable[Annotation]] = {
-        if (annotations.isEmpty) return Future.successful(Nil)
+        if (annotations.isEmpty) Future.successful(Nil)
         else
             val goodAnnos = annotations.filter(x => x.observationUuid.isDefined)
             val dao       = daoFactory.newObservationDAO()
@@ -482,26 +482,23 @@ class AnnotationController(
 
             val imagedMoment = obs.getImagedMoment
 
-            val vrChanged = videoReferenceUUID.isDefined &&
-                videoReferenceUUID.get != imagedMoment.getVideoReferenceUuid
+            val vrSame = videoReferenceUUID.contains(imagedMoment.getVideoReferenceUuid)
+            val tcSame = timecode.map(_.toString)
+                .contains(Option(imagedMoment.getTimecode).map(_.toString).getOrElse(""))
+            val etSame = elapsedTime.contains(imagedMoment.getElapsedTime)
+            val rtSame = recordedDate.contains(imagedMoment.getRecordedTimestamp)
 
-            val tcChanged = timecode.isDefined &&
-                timecode.get != imagedMoment.getTimecode
-
-            val etChanged = elapsedTime.isDefined &&
-                elapsedTime.get != imagedMoment.getElapsedTime
-
-            val rdChanged = recordedDate.isDefined &&
-                recordedDate.get != imagedMoment.getRecordedTimestamp
-
-            if (vrChanged || tcChanged || etChanged || rdChanged) {
+            if (!vrSame || !tcSame || !etSame || !rtSame) {
                 val vrUUID = videoReferenceUUID.getOrElse(imagedMoment.getVideoReferenceUuid)
                 val tc     = Option(timecode.getOrElse(imagedMoment.getTimecode))
                 val rd     = Option(recordedDate.getOrElse(imagedMoment.getRecordedTimestamp))
                 val et     = Option(elapsedTime.getOrElse(imagedMoment.getElapsedTime))
                 val newIm  =
                     ImagedMomentController.findOrCreateImagedMoment(imDao, vrUUID, tc, rd, et)
-                obsDao.changeImageMoment(newIm.getUuid, obs.getUuid)
+                log.atDebug.log(() => s"Moving observation ${obs.getUuid} to imagedMoment ${newIm.getUuid}")
+                imDao.update(imagedMoment)
+//                imagedMoment.removeObservation(obs) // This causes a delete which messes up the transaction as the observation becomes detached
+                newIm.addObservation(obs)
             }
 
             concept.foreach(obs.setConcept)
@@ -510,6 +507,8 @@ class AnnotationController(
             group.foreach(obs.setGroup)
             activity.foreach(obs.setActivity)
             obs.setObservationTimestamp(observationDate)
+//            obsDao.update(obs)
+            dao.flush()
             obs
         })
     }
@@ -530,7 +529,8 @@ class AnnotationController(
                         imDao.delete(imagedMoment)
                     }
                     else {
-                        d.delete(v)
+                        imagedMoment.removeObservation(v)
+//                        d.delete(v)
                     }
                     true
             }

@@ -17,18 +17,18 @@
 package org.mbari.annosaurus.repository.jpa
 
 import java.util.UUID
-import jakarta.persistence.EntityManager
+import jakarta.persistence.{Entity, EntityManager, Query}
 
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 import scala.concurrent.{ExecutionContext, Future}
 import scala.reflect.ClassTag
 import scala.reflect.classTag
-import jakarta.persistence.Query
 import org.mbari.annosaurus.repository.DAO
 import org.mbari.annosaurus.repository.jpa.entity.IPersistentObject
 import org.mbari.annosaurus.repository.jpa.entity.extensions.*
 import org.mbari.annosaurus.repository.jpa.extensions.*
 import org.mbari.annosaurus.etc.jdk.Logging.given
+
 import java.lang.System.Logger.Level
 
 /** @author
@@ -140,6 +140,16 @@ abstract class BaseDAO[B <: IPersistentObject: ClassTag](val entityManager: Enti
     def close(): Unit = if (entityManager.isOpen) {
         entityManager.close()
     }
+
+    override def flush(): Unit = if (entityManager.isOpen) {
+        entityManager.flush()
+    }
+
+    override def isDetached(entity: B): Boolean =
+        entity.primaryKey.isEmpty // must not be transient
+            && !entityManager.contains(entity) // must not be managed
+            && find(entity).isDefined // must not have been removed
+
 
     def setUuidParameter(query: Query, position: Int, uuid: UUID): Query = {
         // if (DatabaseProductName.isPostgreSQL()) {

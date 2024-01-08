@@ -17,18 +17,21 @@
 package org.mbari.annosaurus.repository.jpa
 
 import org.mbari.annosaurus.repository.DAO
+
+import java.time.Duration
 import java.util.concurrent.TimeUnit
 import scala.concurrent.{Await, ExecutionContext, Future}
-import scala.concurrent.duration.{Duration => SDuration}
+import scala.concurrent.duration.Duration as SDuration
+import scala.jdk.DurationConverters.*
 
 trait BaseDAOSuite extends munit.FunSuite {
 
     given ec: ExecutionContext = ExecutionContext.global
 
     def daoFactory: TestDAOFactory
-    private val timeout = SDuration(2, TimeUnit.SECONDS)
+    private val Timeout = Duration.ofSeconds(2)
 
-    def exec[T](future: Future[T]): T = Await.result(future, timeout)
+    def exec[T](future: Future[T], timeout: Duration = Timeout): T = Await.result(future, timeout.toScala)
 
     def run[T](thunk: () => T)(implicit dao: DAO[_]): T =
         exec(dao.runTransaction(_ => thunk.apply()))

@@ -459,6 +459,7 @@ object ImagedMomentController {
                     elapsedTime.orNull
                 )
                 dao.create(imagedMoment)
+                dao.flush()
                 imagedMoment
         }
     }

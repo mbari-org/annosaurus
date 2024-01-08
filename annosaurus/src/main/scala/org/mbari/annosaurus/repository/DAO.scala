@@ -16,6 +16,7 @@
 
 package org.mbari.annosaurus.repository
 
+import jakarta.persistence.Entity
 import org.mbari.annosaurus.repository.jpa.entity.IPersistentObject
 
 import java.util.UUID
@@ -40,5 +41,7 @@ trait DAO[A <: IPersistentObject] extends AutoCloseable {
     def findAll(limit: Option[Int] = None, offset: Option[Int] = None): Iterable[A]
     def runTransaction[R](fn: this.type => R)(implicit ec: ExecutionContext): Future[R]
     def close(): Unit
+    def flush(): Unit
+    def isDetached(entity: A): Boolean
 
 }
