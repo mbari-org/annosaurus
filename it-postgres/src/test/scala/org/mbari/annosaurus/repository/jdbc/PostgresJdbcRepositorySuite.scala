@@ -16,9 +16,9 @@
 
 package org.mbari.annosaurus.repository.jdbc
 
-import org.mbari.annosaurus.repository.jpa.PostgresqlTestDAOFactory
+import org.mbari.annosaurus.repository.jpa.PostgresTestDAOFactory
 import org.mbari.annosaurus.repository.jpa.TestDAOFactory
 
 class PostgresJdbcRepositorySuite extends JdbcRepositorySuite {
-    given daoFactory: TestDAOFactory = PostgresqlTestDAOFactory
+    given daoFactory: TestDAOFactory = PostgresTestDAOFactory
 }

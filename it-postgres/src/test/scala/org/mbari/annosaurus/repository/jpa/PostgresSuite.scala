@@ -24,7 +24,7 @@ import scala.jdk.CollectionConverters.*
 
 class PostgresSuite extends munit.FunSuite:
 
-    val daoFactory = PostgresqlTestDAOFactory
+    val daoFactory = PostgresTestDAOFactory
 
     override def beforeAll(): Unit = daoFactory.beforeAll()
     override def afterAll(): Unit  = daoFactory.afterAll()

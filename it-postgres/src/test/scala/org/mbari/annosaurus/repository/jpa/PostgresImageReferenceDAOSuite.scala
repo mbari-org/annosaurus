@@ -17,6 +17,6 @@
 package org.mbari.annosaurus.repository.jpa
 
 class PostgresImageReferenceDAOSuite extends ImageReferenceDAOITSuite {
-  given daoFactory: TestDAOFactory = PostgresqlTestDAOFactory
+  given daoFactory: TestDAOFactory = PostgresTestDAOFactory
   
 }

@@ -17,10 +17,10 @@
 package org.mbari.annosaurus.controllers
 
 import org.mbari.annosaurus.repository.jpa.TestDAOFactory
-import org.mbari.annosaurus.repository.jpa.PostgresqlTestDAOFactory
+import org.mbari.annosaurus.repository.jpa.PostgresTestDAOFactory
 
 class PostgresAnnotationControllerSuite extends AnnotationControllerITSuite {
 
-    given daoFactory: TestDAOFactory = PostgresqlTestDAOFactory
+    given daoFactory: TestDAOFactory = PostgresTestDAOFactory
 
 }

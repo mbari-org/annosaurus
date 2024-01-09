@@ -20,7 +20,7 @@ import jakarta.persistence.EntityManagerFactory
 
 import org.testcontainers.containers.PostgreSQLContainer
 
-object PostgresqlTestDAOFactory extends TestDAOFactory:
+object PostgresTestDAOFactory extends TestDAOFactory:
 
     // TODO - intialize the container with SQL so UUID type gets correctly created
     val container = new PostgreSQLContainer("postgres:16")
