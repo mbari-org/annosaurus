@@ -27,48 +27,55 @@ import org.slf4j.LoggerFactory
 import scala.concurrent.{ExecutionContext, Future}
 import scala.jdk.CollectionConverters._
 import org.mbari.annosaurus.domain.CachedAncillaryDatum
+import org.mbari.annosaurus.repository.jpa.extensions.*
 
 /** @author
   *   Brian Schlining
   * @since 2019-02-13T14:35:00
   */
-class FastAncillaryDataController(entityManager: EntityManager) {
+class FastAncillaryDataController(val entityManager: EntityManager) {
 
     private[this] val tableName = "ancillary_data"
 
     private[this] val log = LoggerFactory.getLogger(getClass)
 
-    def createAsync(data: Seq[CachedAncillaryDatum])(implicit
-        ec: ExecutionContext
-    ): Future[Unit] = Future(createOrUpdate(data))
-
-    def createOrUpdate(data: Seq[CachedAncillaryDatum]): Unit = for (d <- data) {
-        val ok = createOrUpdate(d)
-        if (!ok) {
-            val msg =
-                "Failed to create or update ancillary data with imagedMomentUuid = " + d.imagedMomentUuid
-            log.error(msg)
-            throw new RuntimeException(msg)
+    // Needs to be called in a transaction
+    def createOrUpdate(data: Seq[CachedAncillaryDatum])(using ec: ExecutionContext): Unit =
+        for (d <- data) {
+            val ok = createOrUpdate(d)
+            if (!ok) {
+                val msg =
+                    "Failed to create or update ancillary data with imagedMomentUuid = " + d.imagedMomentUuid
+                log.error(msg)
+                throw new RuntimeException(msg)
+            }
         }
-    }
 
-    def createOrUpdate(data: CachedAncillaryDatum): Boolean =
+    protected def createOrUpdate(data: CachedAncillaryDatum): Boolean =
         if (exists(data)) update(data) else create(data)
 
-    def exists(data: CachedAncillaryDatum): Boolean = {
-        if (data.imagedMomentUuid.isEmpty) false
-        else
-            val sql   =
-                s"SELECT uuid FROM $tableName WHERE imaged_moment_uuid = '${data.imagedMomentUuid.get}'"
-            val query = entityManager.createNativeQuery(sql)
-            query.setParameter("uuid", data.imagedMomentUuid)
-            val n     = query
-                .getResultList
-                .asScala
-                .size
-            n > 0
+    protected def exists(data: CachedAncillaryDatum): Boolean = {
+        data.imagedMomentUuid match
+            case None   => false
+            case Some(imagedMomentUuid) =>
+                val sql   =
+                    s"SELECT uuid FROM $tableName WHERE imaged_moment_uuid = :uuid"
+                val query = entityManager.createNativeQuery(sql)
+                query.setParameter("uuid", imagedMomentUuid)
+                log.atWarn.log("SQL: " + sql)
+                val n     = query
+                    .getResultList
+                    .asScala
+                    .size
+                n > 0
     }
 
+    /**
+     * Creates a new AncillaryData record. Must be called in a transaction!! In general you should
+     * use createOrUpdate instead.
+     * @param data
+     * @return
+     */
     def create(data: CachedAncillaryDatum): Boolean = {
         if (data.imagedMomentUuid.isEmpty) false
         else
@@ -80,27 +87,29 @@ class FastAncillaryDataController(entityManager: EntityManager) {
             val cols   = keys.mkString("(", ", ", ")")
             val values = keys.map(k => sqlData(k)).mkString("(", ", ", ")")
             val sql    = s"INSERT INTO $tableName $cols VALUES $values"
+            log.atWarn.log("SQL: " + sql)
             val n      = entityManager
                 .createNativeQuery(sql)
                 .executeUpdate()
             n == 1
     }
 
-    def update(data: CachedAncillaryDatum): Boolean = {
+    protected def update(data: CachedAncillaryDatum): Boolean = {
         val values = dataAsSql(data)
             .map { case (a, b) => s"$a = $b" }
             .mkString(", ")
         val sql    =
-            s"UPDATE $tableName SET $values WHERE imaged_moment_uuid = '${data.imagedMomentUuid}'"
+            s"UPDATE $tableName SET $values WHERE imaged_moment_uuid = '${data.imagedMomentUuid.get}'"
         val n      = entityManager
             .createNativeQuery(sql)
             .executeUpdate()
         n == 1
     }
 
-    def dataAsSql(datum: CachedAncillaryDatum): Map[String, String] = {
+    private def dataAsSql(datum: CachedAncillaryDatum): Map[String, String] = {
         require(datum.imagedMomentUuid != null)
         val lastUpdated = Timestamp.from(Instant.now())
+
         (datum.altitude.map(v => "altitude" -> s"$v") ::
             datum.crs.map(v => "coordinate_reference_system" -> s"'$v'") ::
             datum.depthMeters.map(v => "depth_meters" -> s"$v") ::
@@ -118,7 +127,7 @@ class FastAncillaryDataController(entityManager: EntityManager) {
             datum.salinity.map(v => "salinity" -> s"$v") ::
             datum.temperatureCelsius.map(v => "temperature_celsius" -> s"$v") ::
             datum.pressureDbar.map(v => "pressure_dbar" -> s"$v") ::
-            Some("last_updated_timestamp" -> s"'$lastUpdated'") ::
+            Some("last_updated_time" -> s"'$lastUpdated'") ::
             Nil).flatten.toMap
     }
 

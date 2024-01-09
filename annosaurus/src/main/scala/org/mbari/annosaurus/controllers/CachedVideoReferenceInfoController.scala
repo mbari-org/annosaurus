@@ -61,7 +61,7 @@ class CachedVideoReferenceInfoController(val daoFactory: JPADAOFactory)
         exec(fn)
     }
 
-    def findByMissionID(
+    def findByMissionId(
         id: String
     )(implicit ec: ExecutionContext): Future[Iterable[CachedVideoReferenceInfo]] = {
         def fn(dao: VRDAO): Iterable[CachedVideoReferenceInfo] =
@@ -77,22 +77,22 @@ class CachedVideoReferenceInfoController(val daoFactory: JPADAOFactory)
         exec(fn)
     }
 
-    def findAllMissionContacts(implicit ec: ExecutionContext): Future[Iterable[String]] = {
+    def findAllMissionContacts()(implicit ec: ExecutionContext): Future[Iterable[String]] = {
         def fn(dao: VRDAO): Iterable[String] = dao.findAllMissionContacts()
         exec(fn)
     }
 
-    def findAllPlatformNames(implicit ec: ExecutionContext): Future[Iterable[String]] = {
+    def findAllPlatformNames()(implicit ec: ExecutionContext): Future[Iterable[String]] = {
         def fn(dao: VRDAO): Iterable[String] = dao.findAllPlatformNames()
         exec(fn)
     }
 
-    def findAllMissionIDs(implicit ec: ExecutionContext): Future[Iterable[String]] = {
+    def findAllMissionIds()(implicit ec: ExecutionContext): Future[Iterable[String]] = {
         def fn(dao: VRDAO): Iterable[String] = dao.findAllMissionIDs()
         exec(fn)
     }
 
-    def findAllVideoReferenceUUIDs(implicit ec: ExecutionContext): Future[Iterable[UUID]] = {
+    def findAllVideoReferenceUUIDs()(implicit ec: ExecutionContext): Future[Iterable[UUID]] = {
         def fn(dao: VRDAO): Iterable[UUID] = dao.findAllVideoReferenceUUIDs()
         exec(fn)
     }
@@ -114,6 +114,10 @@ class CachedVideoReferenceInfoController(val daoFactory: JPADAOFactory)
             transform(v)
         }
         exec(fn)
+    }
+
+    def update(info: CachedVideoReferenceInfo)(using ec: ExecutionContext) : Future[Option[CachedVideoReferenceInfo]] = {
+        update(info.uuid, Option(info.videoReferenceUuid), info.platformName, info.missionId, info.missionContact)
     }
 
     def update(
