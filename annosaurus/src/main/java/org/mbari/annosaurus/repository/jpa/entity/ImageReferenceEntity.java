@@ -199,7 +199,7 @@ public class ImageReferenceEntity implements IPersistentObject {
 
     @Override
     public String toString() {
-        return "ImageReference2{" +
+        return "ImageReferenceEntity{" +
                 "uuid=" + uuid +
                 ", description='" + description + '\'' +
                 ", url=" + url +

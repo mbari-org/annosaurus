@@ -87,8 +87,7 @@ class ImageController(daoFactory: JPADAOFactory) {
         format: Option[String] = None,
         width: Option[Int] = None,
         height: Option[Int] = None,
-        description: Option[String] = None,
-        imageReferenceUUID: Option[UUID] = None
+        description: Option[String] = None
     )(implicit ec: ExecutionContext): Future[Image] = {
 
         val imDao = daoFactory.newImagedMomentDAO()
@@ -103,10 +102,10 @@ class ImageController(daoFactory: JPADAOFactory) {
                     elapsedTime
                 )
             val imageReference = irDao.newPersistentObject(url, description, height, width, format)
-            imageReferenceUUID.foreach(imageReference.setUuid)
-            irDao.create(imageReference)
+//            imageReferenceUUID.foreach(imageReference.setUuid)
+//            irDao.create(imageReference)
             imagedMoment.addImageReference(imageReference)
-            Image.from(imageReference)
+            Image.from(imageReference, true)
         })
         f.onComplete(t => irDao.close())
         f
@@ -130,15 +129,15 @@ class ImageController(daoFactory: JPADAOFactory) {
       */
     def update(
         uuid: UUID,
-        url: Option[URL] = None,
         videoReferenceUUID: Option[UUID] = None,
+        url: Option[URL] = None,
         timecode: Option[Timecode] = None,
         elapsedTime: Option[Duration] = None,
         recordedDate: Option[Instant] = None,
-        format: Option[String],
-        width: Option[Int],
-        height: Option[Int],
-        description: Option[String]
+        format: Option[String] = None,
+        width: Option[Int] = None,
+        height: Option[Int] = None,
+        description: Option[String] = None
     )(implicit ec: ExecutionContext): Future[Option[Image]] = {
 
         val imDao = daoFactory.newImagedMomentDAO()
@@ -176,7 +175,7 @@ class ImageController(daoFactory: JPADAOFactory) {
                 width.foreach(ir.setWidth(_))
                 height.foreach(ir.setHeight(_))
                 description.foreach(ir.setDescription)
-                Image.from(ir)
+                Image.from(ir, true)
             })
         })
         f.onComplete(_ => irDao.close())
@@ -200,7 +199,8 @@ class ImageController(daoFactory: JPADAOFactory) {
                         imDao.delete(imagedMoment)
                     }
                     else {
-                        d.delete(imageReference)
+                        imagedMoment.removeImageReference(imageReference)
+//                        d.delete(imageReference)
                     }
                     true
             }

@@ -18,7 +18,7 @@ package org.mbari.annosaurus.domain
 
 import java.util.UUID
 import java.net.URL
-import java.time.Instant
+import java.time.{Duration, Instant}
 import org.mbari.annosaurus.repository.jpa.entity.ImageReferenceEntity
 
 final case class Image(
@@ -47,6 +47,8 @@ final case class Image(
         elapsedTimeMillis,
         recordedTimestamp
     )
+
+    lazy val elapsedTime: Option[Duration] = elapsedTimeMillis.map(Duration.ofMillis)
 }
 
 object Image extends FromEntity[ImageReferenceEntity, Image] {
