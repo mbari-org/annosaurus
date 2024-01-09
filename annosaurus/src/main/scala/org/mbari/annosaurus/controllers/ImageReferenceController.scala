@@ -44,10 +44,10 @@ class ImageReferenceController(val daoFactory: JPADAOFactory)
     def create(
         imagedMomentUUID: UUID,
         url: URL,
-        description: Option[String],
-        heightPixels: Option[Int],
-        widthPixels: Option[Int],
-        format: Option[String]
+        description: Option[String] = None,
+        heightPixels: Option[Int] = None,
+        widthPixels: Option[Int] = None,
+        format: Option[String] = None
     )(implicit ec: ExecutionContext): Future[ImageReference] = {
 
         def fn(dao: IRDAO): ImageReference = {
@@ -130,7 +130,8 @@ class ImageReferenceController(val daoFactory: JPADAOFactory)
                         imDao.delete(imagedMoment)
                     }
                     else {
-                        dao.delete(imageReference)
+                        imagedMoment.removeImageReference(imageReference)
+//                        dao.delete(imageReference)
                     }
                     true
             }
