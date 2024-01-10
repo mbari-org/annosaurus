@@ -71,17 +71,18 @@ class IndexController(val daoFactory: JPADAOFactory)
     }
 
     def bulkUpdateRecordedTimestamps(
-        imagedMoments: Iterable[IndexEntity]
+        imagedMoments: Iterable[Index]
     )(implicit ec: ExecutionContext): Future[Iterable[Index]] = {
         def fn(dao: IDDAO): Iterable[Index] = {
-            (for (im <- imagedMoments) yield {
-                dao
-                    .findByUUID(im.getUuid)
-                    .map(i => {
-                        Option(im.getRecordedTimestamp).foreach(i.setRecordedTimestamp)
-                        transform(i)
-                    })
-            }).flatten
+            for {
+                im   <- imagedMoments
+                uuid <- im.uuid
+                rt   <- im.recordedTimestamp
+                i    <- dao.findByUUID(uuid)
+            } yield {
+                i.setRecordedTimestamp(rt)
+                transform(i)
+            }
         }
         exec(fn)
     }

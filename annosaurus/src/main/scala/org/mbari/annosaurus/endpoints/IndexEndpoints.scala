@@ -65,9 +65,8 @@ class IndexEndpoints(controller: IndexController, jwtService: JwtService)(implic
         .serverSecurityLogic(jwtOpt => verify(jwtOpt))
         .serverLogic(_ =>
             indices =>
-                val im = indices.map(_.toEntity)
                 val f  = controller
-                    .bulkUpdateRecordedTimestamps(im)
+                    .bulkUpdateRecordedTimestamps(indices)
                     .map(xs => xs.map(_.toSnakeCase).toList)
                 handleErrors(f)
         )
