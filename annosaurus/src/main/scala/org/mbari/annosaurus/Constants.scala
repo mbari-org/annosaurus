@@ -16,7 +16,6 @@
 
 package org.mbari.annosaurus
 
-import com.fatboyindustrial.gsonjavatime.Converters
 
 import com.typesafe.config.ConfigFactory
 
