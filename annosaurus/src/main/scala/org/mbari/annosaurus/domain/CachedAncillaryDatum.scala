@@ -20,6 +20,8 @@ import java.util.UUID
 
 import org.mbari.annosaurus.repository.jpa.entity.CachedAncillaryDatumEntity
 import org.mbari.annosaurus.repository.jpa.entity.extensions.*
+import scala.jdk.OptionConverters.*
+import extensions.*
 
 final case class CachedAncillaryDatum(
     latitude: Option[Double] = None,
@@ -71,7 +73,7 @@ final case class CachedAncillaryDatum(
         )
 
     override def toEntity: CachedAncillaryDatumEntity =
-        var entity = new CachedAncillaryDatumEntity
+        val entity = new CachedAncillaryDatumEntity
         latitude.foreach(entity.setLatitude(_))
         longitude.foreach(entity.setLongitude(_))
         depthMeters.foreach(entity.setDepthMeters(_))
@@ -105,23 +107,23 @@ object CachedAncillaryDatum extends FromEntity[CachedAncillaryDatumEntity, Cache
                 Option(entity.getImagedMoment.getRecordedTimestamp)
             else None
         CachedAncillaryDatum(
-            Option(entity.getLatitude),
-            Option(entity.getLongitude),
-            Option(entity.getDepthMeters),
-            Option(entity.getAltitude),
+            entity.getLatitude.toOption,
+            entity.getLongitude.toOption,
+            entity.getDepthMeters.toOption,
+            entity.getAltitude.toOption,
             Option(entity.getCrs),
-            Option(entity.getSalinity),
-            Option(entity.getTemperatureCelsius),
-            Option(entity.getOxygenMlL),
-            Option(entity.getPressureDbar),
-            Option(entity.getLightTransmission),
-            Option(entity.getX),
-            Option(entity.getY),
-            Option(entity.getZ),
+            entity.getSalinity.toOption,
+            entity.getTemperatureCelsius.toOption,
+            entity.getOxygenMlL.toOption,
+            entity.getPressureDbar.toOption,
+            entity.getLightTransmission.toOption,
+            entity.getX.toOption,
+            entity.getY.toOption,
+            entity.getZ.toOption,
             Option(entity.getPosePositionUnits),
-            Option(entity.getPhi),
-            Option(entity.getTheta),
-            Option(entity.getPsi),
+            entity.getPhi.toOption,
+            entity.getTheta.toOption,
+            entity.getPsi.toOption,
             Option(entity.getUuid),
             entity.lastUpdated,
             opt,

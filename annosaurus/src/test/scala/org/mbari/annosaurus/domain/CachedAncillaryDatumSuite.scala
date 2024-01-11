@@ -40,4 +40,13 @@ class CachedAncillaryDatumSuite extends munit.FunSuite {
         assertEquals(cc2, cc1)
         // assertEquals(e1, e2)
     }
+
+    test("double round/trip") {
+        val cc2 = cc1.copy(depthMeters = None)
+        val e1 = cc2.toEntity
+        assertEquals(e1.getDepthMeters, null)
+        val cc3 = CachedAncillaryDatum.from(e1)
+        assertEquals(cc3.depthMeters, None)
+        // assertEquals(e1, e2)
+    }
 }

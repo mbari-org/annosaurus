@@ -39,14 +39,16 @@ object EntityManagerFactories {
 
     private lazy val config = ConfigFactory.load()
 
-    // <property name="eclipselink.weaving" value="static"/>
     // https://juliuskrah.com/tutorial/2017/02/16/getting-started-with-hikaricp-hibernate-and-jpa/
     val PRODUCTION_PROPS = Map(
         "hibernate.connection.provider_class" -> "org.hibernate.hikaricp.internal.HikariCPConnectionProvider",
         "hibernate.hbm2ddl.auto"              -> "validate",
         "hibernate.hikari.idleTimeout"        -> "30000",
+        "hibernate.jdbc.batch_size"           -> "100",
         "hibernate.hikari.maximumPoolSize"    -> "16",
-        "hibernate.hikari.minimumIdle"        -> "2"
+        "hibernate.hikari.minimumIdle"        -> "2",
+        "hibernate.order_inserts"             -> "true",
+        "hibernate.order_updates"             -> "true"
     )
 
     def apply(properties: Map[String, String]): EntityManagerFactory = {

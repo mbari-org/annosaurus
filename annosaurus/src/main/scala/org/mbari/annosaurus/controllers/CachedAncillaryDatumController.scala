@@ -205,7 +205,7 @@ class CachedAncillaryDatumController(val daoFactory: JPADAOFactory)
                 })
                 .map(transform)
         }
-
+        
         exec(fn)
     }
 

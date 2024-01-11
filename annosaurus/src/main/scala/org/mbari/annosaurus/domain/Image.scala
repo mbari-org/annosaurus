@@ -20,6 +20,7 @@ import java.util.UUID
 import java.net.URL
 import java.time.{Duration, Instant}
 import org.mbari.annosaurus.repository.jpa.entity.ImageReferenceEntity
+import extensions.*
 
 final case class Image(
     imageReferenceUuid: UUID,
@@ -68,8 +69,8 @@ object Image extends FromEntity[ImageReferenceEntity, Image] {
             im.getVideoReferenceUuid,
             im.getUuid,
             Option(entity.getFormat),
-            Option(entity.getWidth),
-            Option(entity.getHeight),
+            entity.getWidth.toOption,
+            entity.getHeight.toOption,
             Option(entity.getUrl),
             Option(entity.getDescription),
             tc,

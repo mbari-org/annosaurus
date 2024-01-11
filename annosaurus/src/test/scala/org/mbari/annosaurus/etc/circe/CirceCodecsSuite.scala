@@ -192,4 +192,14 @@ class CirceCodecsSuite extends munit.FunSuite {
         }
     }
 
+    test("round trip Option[Double]") {
+        val a = Some(1.0)
+        val b = a.stringify.reify[Option[Double]].toOption.flatten
+        assertEquals(a, b)
+
+        val c = None
+        val d = c.stringify.reify[Option[Double]].toOption.flatten
+        assertEquals(c, d)
+    }
+
 }

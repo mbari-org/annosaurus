@@ -357,7 +357,7 @@ public class CachedAncillaryDatumEntity implements IPersistentObject {
 
     @Override
     public String toString() {
-        return "CachedAncillaryDatumEntity2{" +
+        return "CachedAncillaryDatumEntity{" +
                 "uuid=" + uuid +
                 ", altitude=" + altitude +
                 ", crs='" + crs + '\'' +

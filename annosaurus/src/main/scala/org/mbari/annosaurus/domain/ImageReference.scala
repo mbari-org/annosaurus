@@ -20,6 +20,7 @@ import java.util.UUID
 import java.net.URL
 import org.mbari.annosaurus.repository.jpa.entity.ImageReferenceEntity
 import org.mbari.annosaurus.repository.jpa.entity.extensions.*
+import extensions.*
 
 case class ImageReference(
     url: URL,
@@ -61,8 +62,8 @@ object ImageReference extends FromEntity[ImageReferenceEntity, ImageReference] {
         ImageReference(
             entity.getUrl,
             Option(entity.getFormat),
-            Option(entity.getWidth),
-            Option(entity.getHeight),
+            entity.getWidth.toOption,
+            entity.getHeight.toOption,
             Option(entity.getDescription),
             entity.primaryKey,
             entity.lastUpdated,
