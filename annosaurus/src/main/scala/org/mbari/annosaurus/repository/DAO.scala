@@ -42,6 +42,7 @@ trait DAO[A <: IPersistentObject] extends AutoCloseable {
     def runTransaction[R](fn: this.type => R)(implicit ec: ExecutionContext): Future[R]
     def close(): Unit
     def flush(): Unit
+    def commit(): Unit
     def isDetached(entity: A): Boolean
 
 }

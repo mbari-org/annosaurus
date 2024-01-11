@@ -17,22 +17,34 @@
 package org.mbari.annosaurus.controllers
 
 import org.mbari.annosaurus.domain.CachedAncillaryDatum
-import org.mbari.annosaurus.repository.jpa.{BaseDAOSuite, JPADAOFactory}
+import org.mbari.annosaurus.repository.jpa.{BaseDAOSuite, CachedAncillaryDatumDAOImpl, JPADAOFactory}
 import org.mbari.annosaurus.etc.jdk.Logging.given
 import org.mbari.annosaurus.repository.jpa.extensions.runTransaction
-import org.mbari.annosaurus.etc.circe.CirceCodecs.{given, *}
+import org.mbari.annosaurus.etc.circe.CirceCodecs.{*, given}
+
+import scala.concurrent.ExecutionContext
 
 trait FastAncillaryDataControllerITSuite extends BaseDAOSuite {
 
     given JPADAOFactory         = daoFactory
+    given ExecutionContext = ExecutionContext.global
     private val log             = System.getLogger(getClass.getName)
-    private lazy val controller = FastAncillaryDataController(
-        daoFactory.entityManagerFactory.createEntityManager()
-    )
+
 
     override def beforeAll(): Unit = daoFactory.beforeAll()
 
     override def afterAll(): Unit = daoFactory.afterAll()
+
+    private def runTransaction[A](fn: FastAncillaryDataController => A): A = {
+        val dao = daoFactory.newCachedAncillaryDatumDAO()
+        val em = dao.entityManager
+        val controller = FastAncillaryDataController(em)
+        em.getTransaction.begin()
+        val result = fn(controller)
+        em.getTransaction.commit()
+        dao.close()
+        result
+    }
 
     test("createOrUpdate") {
         val xs = TestUtils.create(2, includeData = true) ++ TestUtils.create(2)
@@ -48,7 +60,7 @@ trait FastAncillaryDataControllerITSuite extends BaseDAOSuite {
             assertEquals(im.getUuid, ad.imagedMomentUuid.get)
 
         // Make the magic happen
-        controller.createOrUpdate(pairs.values.toSeq)
+        runTransaction(controller => controller.createOrUpdate(pairs.values.toSeq))
 
         // did we get magic?
         for
@@ -63,20 +75,24 @@ trait FastAncillaryDataControllerITSuite extends BaseDAOSuite {
                     log.atWarn.log(im.stringify)
                     val actual = im.ancillaryData.get
                     val expected = pairs(x)
-                    assertEquals(actual, expected)
+                    val corrected = expected.copy(uuid = actual.uuid, imagedMomentUuid = None, lastUpdated = actual.lastUpdated)
+                    assertEquals(actual, corrected)
     }
 
-    test("createAsync") {}
 
-    test("exists") {}
+    test("exists") {
+        val im = TestUtils.create(1, includeData = true).head
+        val cad = im.getAncillaryDatum
+        val dto = CachedAncillaryDatum.from(cad).copy(imagedMomentUuid = Some(im.getUuid))
+        val exists = runTransaction(controller => controller.exists(dto))
+        assert(exists)
+    }
 
     test("create") {
         val im = TestUtils.create(1).head
         val ad = TestUtils.randomData()
         val expected = CachedAncillaryDatum.from(ad).copy(imagedMomentUuid = Some(im.getUuid))
-        val ok = exec(controller.entityManager.runTransaction { em =>
-            controller.create(expected)
-        })
+        val ok = runTransaction(controller => controller.create(expected))
         assert(ok)
         val imController = ImagedMomentController(daoFactory)
         val opt = exec(imController.findByUUID(im.getUuid))
@@ -89,6 +105,22 @@ trait FastAncillaryDataControllerITSuite extends BaseDAOSuite {
         assertEquals(actual2, expected2)
     }
 
-    test("update") {}
+    test("update") {
+        val im = TestUtils.create(1, 1, 1, includeData = true).head
+        val cad = im.getAncillaryDatum
+        val dto = CachedAncillaryDatum.from(cad).copy(imagedMomentUuid = Some(im.getUuid), salinity = Some(34))
+        val ok = runTransaction(controller => controller.update(dto))
+        assert(ok)
+
+        val imController = ImagedMomentController(daoFactory)
+        val opt = exec(imController.findByUUID(im.getUuid))
+        opt match
+            case None =>
+                fail(s"Failed to find imagedMoment with uuid ${im.getUuid}")
+            case Some(im) =>
+                val obtained = im.ancillaryData.get
+                assertEquals(obtained.salinity, dto.salinity)
+
+    }
 
 }

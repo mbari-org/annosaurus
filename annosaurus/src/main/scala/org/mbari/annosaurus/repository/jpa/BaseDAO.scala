@@ -145,6 +145,11 @@ abstract class BaseDAO[B <: IPersistentObject: ClassTag](val entityManager: Enti
         entityManager.flush()
     }
 
+    override def commit(): Unit = if (entityManager.isOpen) {
+        entityManager.getTransaction.commit()
+    }
+
+
     override def isDetached(entity: B): Boolean =
         entity.primaryKey.isEmpty // must not be transient
             && !entityManager.contains(entity) // must not be managed

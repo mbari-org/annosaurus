@@ -194,6 +194,7 @@ object TestUtils {
         val psi      = random.nextInt(36000) / 100d
         val trans    = random.nextInt(100) * 1d
         val datum    = new CachedAncillaryDatumEntity()
+        datum.setAltitude(null)
         datum.setLatitude(lat)
         datum.setLongitude(lon)
         datum.setDepthMeters(depth)

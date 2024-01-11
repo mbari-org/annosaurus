@@ -28,8 +28,12 @@ import org.mbari.annosaurus.domain.ConcurrentRequest
 
 import java.time.{Duration, Instant}
 import org.mbari.annosaurus.domain.MultiRequest
-import org.mbari.annosaurus.etc.circe.CirceCodecs.{*, given}
+import org.mbari.annosaurus.etc.circe.CirceCodecs.{given, *}
 import org.mbari.vcr4j.time.Timecode
+
+import java.util.UUID
+import scala.io.Source
+import scala.util.{Failure, Success, Using}
 
 trait AnnotationControllerITSuite extends BaseDAOSuite {
     given JPADAOFactory    = daoFactory
@@ -159,9 +163,26 @@ trait AnnotationControllerITSuite extends BaseDAOSuite {
         )
 
         // Our source anno doesn't have UUIDS set, we remove those to compare the rest of the values
+        assert(obtained.observationUuid.isDefined)
+        assert(obtained.imagedMomentUuid.isDefined)
         val corrected = obtained.copy(observationUuid = None, imagedMomentUuid = None)
         assertEquals(corrected, anno)
     }
+
+    test("create by recordedTimestamp") {
+        val recordedDate  = Instant.now()
+        val concept = "Nanomia bijuga"
+        val observer = "brian"
+        val a = exec(
+            controller
+                .create(UUID.randomUUID(), concept, observer, recordedDate = Some(recordedDate))
+        )
+        assert(a.observationUuid.isDefined)
+        assertEquals(a.recordedTimestamp, Some(recordedDate))
+        assertEquals(a.concept, Some(concept))
+        assertEquals(a.observer, Some(observer))
+    }
+
 
     test("bulkCreate a single annotation") {
         // test minimal
@@ -176,6 +197,45 @@ trait AnnotationControllerITSuite extends BaseDAOSuite {
         val corrected = obtained.copy(imagedMomentUuid = None, observationUuid = None)
 //        log.atWarn.log(n.head.stringify)
         assertEquals(corrected, annos0.head)
+    }
+
+    test("bulkCreate a 200 annotations") {
+        import org.mbari.annosaurus.etc.circe.CirceCodecs.{*, given}
+        val url = this.getClass.getResource("/json/annotation_full_dive.json").toURI
+        Using(Source.fromFile(url)) { source =>
+            val json = source.getLines().mkString("\n")
+            val annos = json.reify[Array[Annotation]]
+                .getOrElse(throw new RuntimeException("Failed to parse json"))
+                .take(200)
+            assert(annos.nonEmpty)
+            val n = exec(controller.bulkCreate(annos), Duration.ofSeconds(120))
+            assertEquals(n.size, annos.size)
+
+        } match {
+            case Failure(e) => fail(e.toString)
+            case Success(_) =>
+            // trust but verify
+        }
+    }
+
+    test("bulkCreate a 200 annotations with imageReferences") {
+        import org.mbari.annosaurus.etc.circe.CirceCodecs.{*, given}
+        val url = this.getClass.getResource("/json/annotation_full_dive.json").toURI
+        Using(Source.fromFile(url)) { source =>
+            val json = source.getLines().mkString("\n")
+            val annos = json.reify[Array[Annotation]]
+                .getOrElse(throw new RuntimeException("Failed to parse json"))
+                .filter(_.imageReferences.nonEmpty)
+                .take(200)
+            assert(annos.nonEmpty)
+            val n = exec(controller.bulkCreate(annos), Duration.ofSeconds(120))
+            assertEquals(n.size, annos.size)
+
+        } match {
+            case Failure(e) => fail(e.toString)
+            case Success(_) =>
+            // trust but verify
+        }
     }
 
     test("update") {

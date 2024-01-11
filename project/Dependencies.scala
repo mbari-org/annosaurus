@@ -67,7 +67,7 @@ object Dependencies {
 
     lazy val scilube = "org.mbari.scilube" %% "scilube" % "3.0.1"
 
-    val slf4jVersion    = "2.0.10"
+    val slf4jVersion    = "2.0.11"
     lazy val slf4j      = "org.slf4j" % "slf4j-api"        % slf4jVersion
     lazy val slf4jJul   = "org.slf4j" % "jul-to-slf4j"     % slf4jVersion
     lazy val slf4jLog4j = "org.slf4j" % "log4j-over-slf4j" % slf4jVersion

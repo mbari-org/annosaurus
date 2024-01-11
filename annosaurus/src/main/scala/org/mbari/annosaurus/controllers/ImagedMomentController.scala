@@ -19,7 +19,6 @@ package org.mbari.annosaurus.controllers
 import java.io.Closeable
 import java.time.{Duration, Instant}
 import java.util.UUID
-
 import org.mbari.annosaurus.domain.WindowRequest
 import org.mbari.annosaurus.repository.{DAO, ImagedMomentDAO, NotFoundInDatastoreException}
 import org.mbari.vcr4j.time.Timecode
@@ -27,12 +26,13 @@ import org.slf4j.LoggerFactory
 
 import scala.concurrent.{ExecutionContext, Future}
 import org.mbari.annosaurus.repository.jpa.JPADAOFactory
-import org.mbari.annosaurus.repository.jpa.entity.ImagedMomentEntity
+import org.mbari.annosaurus.repository.jpa.entity.{AssociationEntity, ImagedMomentEntity}
 
 import scala.jdk.CollectionConverters.*
 import org.mbari.annosaurus.domain.ImagedMoment
-
 import org.mbari.annosaurus.etc.jdk.Logging.given
+
+import java.util
 
 /** @author
   *   Brian Schlining
@@ -287,9 +287,14 @@ class ImagedMomentController(val daoFactory: JPADAOFactory)
         imagedMoments: Seq[ImagedMomentEntity]
     )(implicit ex: ExecutionContext): Future[Seq[ImagedMoment]] = {
         val dao    = daoFactory.newImagedMomentDAO()
-        val future = dao.runTransaction(d => imagedMoments.map(im => create(d, im)).map(transform))
-        future.onComplete(_ => dao.close())
-        future
+        val future = dao.runTransaction(d => imagedMoments.map(im => create(d, im)))
+        val future1 = future.flatMap(xs =>
+            dao.runTransaction(d => {
+                xs.flatMap(x => Option(x.getUuid).flatMap(d.findByUUID).map(transform))
+            })
+        )
+        future1.onComplete(_ => dao.close())
+        future1
     }
 
     /** This needs to be called inside a transaction. creates a new imaged moment base on the
@@ -351,6 +356,17 @@ class ImagedMomentController(val daoFactory: JPADAOFactory)
                     observation.setUuid(null)
                 }
                 targetImagedMoment.addObservation(observation)
+                val associations = observation.getAssociations.asScala
+                observation.setAssociations(new util.HashSet[AssociationEntity]())
+                associations.foreach(a =>
+                    if (a.getUuid != null) {
+                        log.atDebug
+                            .log(
+                                s"An association uuid was found. Setting to null as they need to be generated in the database: ${a.getUuid}"
+                            )
+                        a.setUuid(null)
+                    }
+                    observation.addAssociation(a))
 //                obsDao.create(observation)
             })
 

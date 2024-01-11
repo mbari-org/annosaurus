@@ -257,6 +257,8 @@ class AnnotationController(
         annotations: Iterable[Annotation]
     )(using ec: ExecutionContext): Future[Seq[Annotation]] = {
 
+        // TODO add prefilter to remove duplicate image references
+
         // TODO need to stress test this to find the maximum number oa annotations that can be inserted at once
         log.atTrace.log(() => s"Creating ${annotations.size} Annotations: ${annotations.stringify}")
         val imagedMoments = Annotation.toEntities(annotations.toSeq, true)

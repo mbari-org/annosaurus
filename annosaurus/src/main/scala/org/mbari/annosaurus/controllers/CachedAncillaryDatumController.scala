@@ -29,6 +29,7 @@ import org.mbari.annosaurus.repository.jpa.JPADAOFactory
 import org.mbari.annosaurus.repository.jpa.entity.CachedAncillaryDatumEntity
 import org.mbari.annosaurus.domain.CachedAncillaryDatum
 import org.mbari.annosaurus.repository.jpa.entity.ImagedMomentEntity
+import org.mbari.annosaurus.etc.jdk.Logging.given
 
 /** @author
   *   Brian Schlining
@@ -40,7 +41,7 @@ class CachedAncillaryDatumController(val daoFactory: JPADAOFactory)
     ], CachedAncillaryDatum] {
 
     protected type ADDAO = CachedAncillaryDatumDAO[CachedAncillaryDatumEntity]
-    LoggerFactory.getLogger(getClass)
+    private val log = System.getLogger(getClass.getName)
 
     override def newDAO(): CachedAncillaryDatumDAO[CachedAncillaryDatumEntity] =
         daoFactory.newCachedAncillaryDatumDAO()
@@ -67,20 +68,21 @@ class CachedAncillaryDatumController(val daoFactory: JPADAOFactory)
         phi: Option[Double] = None,
         theta: Option[Double] = None,
         psi: Option[Double] = None
-    )(implicit ec: ExecutionContext): Future[CachedAncillaryDatum] = {
+    )(implicit ec: ExecutionContext): Future[Option[CachedAncillaryDatum]] = {
 
-        def fn(dao: ADDAO): CachedAncillaryDatum = {
+        def fn(dao: ADDAO): Option[CachedAncillaryDatumEntity] = {
             val imDao = daoFactory.newImagedMomentDAO(dao)
             imDao.findByUUID(imagedMomentUuid) match {
                 case None               =>
-                    throw new NotFoundInDatastoreException(
-                        s"ImagedMoment with UUID of $imagedMomentUuid was no found"
-                    )
+                    log.atDebug.log(s"ImagedMoment with UUID of $imagedMomentUuid was no found")
+                    None
                 case Some(imagedMoment) =>
                     if (imagedMoment.getAncillaryDatum != null) {
-                        throw new RuntimeException(
+                        log.atDebug.log(
                             s"ImagedMoment with UUID of $imagedMomentUuid already has ancillary data"
                         )
+                        // TODO should this return the existing data?
+                        None
                     }
                     else {
                         val cad = dao.newPersistentObject(
@@ -103,18 +105,21 @@ class CachedAncillaryDatumController(val daoFactory: JPADAOFactory)
                             psi
                         )
                         imagedMoment.setAncillaryDatum(cad)
-                        transform(cad)
+                        Some(cad)
                     }
             }
         }
 
-        exec(fn)
+        for
+            entity <- exec(fn)
+            dto <- findByImagedMomentUUID(imagedMomentUuid) if entity.isDefined
+        yield dto
     }
 
     def create(imagedMomentUuid: UUID, datum: CachedAncillaryDatum)(implicit
         ec: ExecutionContext
-    ): Future[CachedAncillaryDatum] = {
-        def fn(dao: ADDAO): CachedAncillaryDatum = {
+    ): Future[Option[CachedAncillaryDatum]] = {
+        def fn(dao: ADDAO): CachedAncillaryDatumEntity = {
             val imDao = daoFactory.newImagedMomentDAO(dao)
             imDao.findByUUID(imagedMomentUuid) match {
                 case None               =>
@@ -130,17 +135,20 @@ class CachedAncillaryDatumController(val daoFactory: JPADAOFactory)
                     else {
                         val entity = datum.toEntity
                         imagedMoment.setAncillaryDatum(entity)
-                        transform(entity)
+                        entity
                     }
             }
         }
 
-        exec(fn)
+        for
+            entity <- exec(fn)
+            dto <- findByImagedMomentUUID(imagedMomentUuid)
+        yield dto
     }
 
     def create(
         datum: CachedAncillaryDatum
-    )(implicit ec: ExecutionContext): Future[CachedAncillaryDatum] =
+    )(implicit ec: ExecutionContext): Future[Option[CachedAncillaryDatum]] =
         datum.imagedMomentUuid match {
             case None       =>
                 Future.failed(

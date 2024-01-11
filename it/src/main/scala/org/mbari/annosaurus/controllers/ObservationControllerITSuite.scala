@@ -61,6 +61,7 @@ trait ObservationControllerITSuite extends BaseDAOSuite {
                 Option(obs0.getActivity())
             )
         )
+        assert(obs1.uuid.isDefined)
         obs0.setUuid(obs1.uuid.orNull)
         AssertUtils.assertSameObservation(obs0, obs1.toEntity)
     }

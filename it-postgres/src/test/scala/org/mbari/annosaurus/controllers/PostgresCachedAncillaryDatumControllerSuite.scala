@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package org.mbari.annosaurus.endpoints
+package org.mbari.annosaurus.controllers
 
-import org.mbari.annosaurus.repository.jpa.{DerbyTestDAOFactory, TestDAOFactory}
+import org.mbari.annosaurus.repository.jpa.{PostgresTestDAOFactory, TestDAOFactory}
 
-class DerbyIndexEndpointsSuite extends IndexEndpointsITSuite {
+class PostgresCachedAncillaryDatumControllerSuite extends CachedAncillaryDatumControllerITSuite {
 
-    given daoFactory: TestDAOFactory = DerbyTestDAOFactory
-  
+    override given daoFactory: TestDAOFactory = PostgresTestDAOFactory
+
 }

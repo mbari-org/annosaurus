@@ -81,6 +81,8 @@ trait ImageControllerITSuite extends BaseDAOSuite {
             Option(i.getHeight),
             Option(i.getDescription)
         ))
+        assert(j.imageReferenceUuid != null)
+        assert(j.imagedMomentUuid != null)
         assertEquals(j.videoReferenceUuid, im.getVideoReferenceUuid)
         assertEquals(j.url.orNull, i.getUrl)
         assertEquals(j.timecode.orNull, Option(im.getTimecode).map(_.toString).orNull)

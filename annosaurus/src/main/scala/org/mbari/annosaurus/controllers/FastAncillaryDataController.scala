@@ -54,7 +54,7 @@ class FastAncillaryDataController(val entityManager: EntityManager) {
     protected def createOrUpdate(data: CachedAncillaryDatum): Boolean =
         if (exists(data)) update(data) else create(data)
 
-    protected def exists(data: CachedAncillaryDatum): Boolean = {
+    def exists(data: CachedAncillaryDatum): Boolean = {
         data.imagedMomentUuid match
             case None   => false
             case Some(imagedMomentUuid) =>
@@ -94,7 +94,7 @@ class FastAncillaryDataController(val entityManager: EntityManager) {
             n == 1
     }
 
-    protected def update(data: CachedAncillaryDatum): Boolean = {
+    def update(data: CachedAncillaryDatum): Boolean = {
         val values = dataAsSql(data)
             .map { case (a, b) => s"$a = $b" }
             .mkString(", ")
