@@ -17,10 +17,8 @@
 package org.mbari.annosaurus.endpoints
 
 import java.net.URI
-
-import org.mbari.annosaurus.domain.{BadRequest, ErrorMsg, NotFound, ServerError, Unauthorized}
+import org.mbari.annosaurus.domain.*
 import org.mbari.annosaurus.etc.circe.CirceCodecs.{*, given}
-
 import org.mbari.annosaurus.etc.jwt.JwtService
 import org.mbari.annosaurus.etc.jdk.Logging.given
 
@@ -37,41 +35,51 @@ import sttp.tapir.json.circe.*
 import sttp.tapir.server.ServerEndpoint
 
 import java.time.Instant
-import org.mbari.annosaurus.domain.{
-    DepthHistogram,
-    Image,
-    QueryConstraints,
-    QueryConstraintsResponse
-}
-import org.mbari.annosaurus.domain.ImagedMoment
-import org.mbari.annosaurus.domain.Observation
-import org.mbari.annosaurus.domain.Association
-
-import org.mbari.annosaurus.domain.ImageReference
 import java.net.URL
-import org.mbari.annosaurus.domain.CachedAncillaryDatum
 
 case class Paging(offset: Option[Int] = Some(0), limit: Option[Int] = Some(100))
 
 trait Endpoints:
+
     val log = System.getLogger(getClass.getName)
 
-    given Schema[URI]                                      = Schema.string
-    given Schema[URL]                                      = Schema.string
-    given Schema[Option[URI]]                              = Schema.string
-    given Schema[QueryConstraints]                         = Schema.derived[QueryConstraints]
-    given Schema[DepthHistogram]                           = Schema.derived[DepthHistogram]
-    given Schema[QueryConstraintsResponse[DepthHistogram]] =
-        Schema.derived[QueryConstraintsResponse[DepthHistogram]]
-    given Schema[Association]                              = Schema.derived[Association]
-    given Schema[Observation]                              = Schema.derived[Observation]
-    given Schema[ImageReference]                           = Schema.derived[ImageReference]
-    given Schema[CachedAncillaryDatum]                     = Schema.derived[CachedAncillaryDatum]
-    given Schema[ImagedMoment]                             = Schema.derived[ImagedMoment]
-    // given Schema[VideoReference]  = Schema.derived[VideoReference]
-    // given Schema[Video]           = Schema.derived[Video]
-    // given Schema[Media]           = Schema.derived[Media]
-    // given Schema[MoveVideoParams] = Schema.derived[MoveVideoParams]
+    implicit lazy val sAnnotation: Schema[Annotation]                                   = Schema.derived[Annotation]
+    implicit lazy val sAnnotationSc: Schema[AnnotationSC]                               = Schema.derived[AnnotationSC]
+    implicit lazy val sAnnotationCreateSc: Schema[AnnotationCreateSC]                   = Schema.derived[AnnotationCreateSC]
+    implicit lazy val sAssociation: Schema[Association]                                 = Schema.derived[Association]
+    implicit lazy val sAssociationSc: Schema[AssociationSC]                             = Schema.derived[AssociationSC]
+    implicit lazy val sCachedAncillaryDatum: Schema[CachedAncillaryDatum]               = Schema.derived[CachedAncillaryDatum]
+    implicit lazy val sCachedAncillaryDatumSC: Schema[CachedAncillaryDatumSC]           = Schema.derived[CachedAncillaryDatumSC]
+    implicit lazy val sCachedVideoReferenceInfo: Schema[CachedVideoReferenceInfo]       = Schema.derived[CachedVideoReferenceInfo]
+    implicit lazy val sCachedVideoReferenceInfoSc: Schema[CachedVideoReferenceInfoSC]   = Schema.derived[CachedVideoReferenceInfoSC]
+    implicit lazy val sConceptAssociationRequest: Schema[ConceptAssociationRequest]     = Schema.derived[ConceptAssociationRequest]
+    implicit lazy val sConceptAssociationRequestSc: Schema[ConceptAssociationRequestSC] = Schema.derived[ConceptAssociationRequestSC]
+    implicit lazy val sConcurrentRequest: Schema[ConcurrentRequest]                     = Schema.derived[ConcurrentRequest]
+    implicit lazy val sConcurrentRequestSc: Schema[ConcurrentRequestSC]                 = Schema.derived[ConcurrentRequestSC]
+    implicit lazy val sDepthHistogram: Schema[DepthHistogram]                           = Schema.derived[DepthHistogram]
+    implicit lazy val sGeographicRange: Schema[GeographicRange]                         = Schema.derived[GeographicRange]
+    implicit lazy val sGeographicRangeSc: Schema[GeographicRangeSC]                     = Schema.derived[GeographicRangeSC]
+    implicit lazy val sImageReference: Schema[ImageReference]                           = Schema.derived[ImageReference]
+    implicit lazy val sImageReferenceSc: Schema[ImageReferenceSC]                       = Schema.derived[ImageReferenceSC]
+    implicit lazy val sImagedMoment: Schema[ImagedMoment]                               = Schema.derived[ImagedMoment]
+    implicit lazy val sImagedMomentSc: Schema[ImagedMomentSC]                           = Schema.derived[ImagedMomentSC]
+    implicit lazy val sMultiRequest: Schema[MultiRequest]                               = Schema.derived[MultiRequest]
+    implicit lazy val sMultiRequestSc: Schema[MultiRequestSC]                           = Schema.derived[MultiRequestSC]
+    implicit lazy val sObservation: Schema[Observation]                                 = Schema.derived[Observation]
+    implicit lazy val sObservationSc: Schema[ObservationSC]                             = Schema.derived[ObservationSC]
+    implicit lazy val sQCR: Schema[QueryConstraintsResponse[DepthHistogram]]            = Schema.derived[QueryConstraintsResponse[DepthHistogram]]
+    implicit lazy val sQueryContraints: Schema[QueryConstraints]                        = Schema.derived[QueryConstraints]
+    implicit lazy val sURI: Schema[URI]                                                 = Schema.string
+    implicit lazy val sURL: Schema[URL]                                                 = Schema.string
+    implicit lazy val sInstant: Schema[Instant]                                         = Schema.string
+//    given Schema[Option[URL]]                              = Schema.string
+//    implicit lazy val sOptCAD: Schema[Option[CachedAncillaryDatumSC]]                     = Schema.derived[Option[CachedAncillaryDatumSC]]
+//    implicit lazy val sOptDouble: Schema[Option[Double]]                                 = Schema.derived[Option[Double]]
+//    implicit lazy val sOptIR: Schema[Option[ImageReferenceSC]]                           = Schema.derived[Option[ImageReferenceSC]]
+//    implicit lazy val sOptInt: Schema[Option[Int]]                                       = Schema.derived[Option[Int]]
+//    implicit lazy val sOptString: Schema[Option[String]]                                 = Schema.derived[Option[String]]
+//    implicit lazy val sOptURI: Schema[Option[URI]]                                       = Schema.derived[Option[URI]]
+//    implicit lazy val sOptInstant: Schema[Option[Instant]]                               = Schema.derived[Option[Instant]]
 
     def all: List[Endpoint[?, ?, ?, ?, ?]]
     def allImpl: List[ServerEndpoint[Any, Future]]

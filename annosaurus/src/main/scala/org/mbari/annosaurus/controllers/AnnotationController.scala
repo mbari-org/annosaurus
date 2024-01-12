@@ -165,6 +165,7 @@ class AnnotationController(
         )
     }
 
+
     def countByConcurrentRequest(
         request: ConcurrentRequest
     )(implicit ec: ExecutionContext): Future[Long] = {
@@ -281,6 +282,22 @@ class AnnotationController(
         future.onComplete(_ => obsDao.close())
         future.foreach(annotationPublisher.publish) // publish new annotations
         future
+    }
+
+    def update(observationUuid: UUID, annotation: Annotation)(implicit ec: ExecutionContext): Future[Option[Annotation]] = {
+        update(
+            observationUuid,
+            annotation.videoReferenceUuid,
+            annotation.concept,
+            annotation.observer,
+            annotation.observationTimestamp.getOrElse(Instant.now()),
+            annotation.validTimecode,
+            annotation.elapsedTime,
+            annotation.recordedTimestamp,
+            annotation.duration,
+            annotation.group,
+            annotation.activity
+        )
     }
 
     def update(

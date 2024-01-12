@@ -25,43 +25,40 @@ import sttp.tapir.json.circe.*
 import sttp.tapir.server.ServerEndpoint
 
 import java.util.UUID
-import org.mbari.annosaurus.domain.ImagedMoment
+import org.mbari.annosaurus.domain.{ErrorMsg, ImagedMoment, Index, IndexSC}
 import org.mbari.annosaurus.etc.circe.CirceCodecs.{*, given}
 import org.mbari.annosaurus.etc.jwt.JwtService
-import org.mbari.annosaurus.domain.Index
-import org.mbari.annosaurus.domain.IndexSC
 import org.mbari.annosaurus.repository.jpa.entity.IndexEntity
 
-class IndexEndpoints(controller: IndexController, jwtService: JwtService)(implicit
-    val executor: ExecutionContext
+class IndexEndpoints(controller: IndexController)(using
+    val executor: ExecutionContext, jwtService: JwtService
 ) extends Endpoints {
 
-    given givenJwtService: JwtService = jwtService
 
     private val toEntity = Index.from(_: IndexEntity, false) // curried function
 
-    val findByVideoReferenceUUID = openEndpoint
+    val findByVideoReferenceUUID: Endpoint[Unit, (Paging, UUID), ErrorMsg, List[IndexSC], Any] = openEndpoint
         .get
         .in(paging)
         .in("v1" / "index" / "videoreference" / path[UUID]("uuid"))
         .out(jsonBody[List[IndexSC]].description("The IndexEntity objects"))
         .tag("Index")
 
-    val findByVideoReferenceUUIDImpl = findByVideoReferenceUUID.serverLogic { (paging, uuid) =>
+    val findByVideoReferenceUUIDImpl: ServerEndpoint[Any, Future] = findByVideoReferenceUUID.serverLogic { (paging, uuid) =>
         val f = controller
             .findByVideoReferenceUUID(uuid, paging.limit, paging.offset)
             .map(xs => xs.map(_.toSnakeCase).toList)
         handleErrors(f)
     }
 
-    val bulkUpdateRecordedTimestamps = secureEndpoint
+    val bulkUpdateRecordedTimestamps: Endpoint[Option[String], List[Index], ErrorMsg, List[IndexSC], Any] = secureEndpoint
         .put
         .in("v1" / "index" / "tapetime")
         .in(jsonBody[List[Index]].description("The IndexEntity objects"))
         .out(jsonBody[List[IndexSC]].description("The IndexEntity objects"))
         .tag("Index")
 
-    val bulkUpdateRecordedTimestampsImpl = bulkUpdateRecordedTimestamps
+    val bulkUpdateRecordedTimestampsImpl: ServerEndpoint[Any, Future] = bulkUpdateRecordedTimestamps
         .serverSecurityLogic(jwtOpt => verify(jwtOpt))
         .serverLogic(_ =>
             indices =>

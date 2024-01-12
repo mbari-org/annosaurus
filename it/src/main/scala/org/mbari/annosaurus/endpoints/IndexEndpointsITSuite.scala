@@ -19,7 +19,6 @@ package org.mbari.annosaurus.endpoints
 import org.mbari.annosaurus.controllers.IndexController
 import org.mbari.annosaurus.controllers.TestUtils
 import org.mbari.annosaurus.domain.ImagedMoment
-import org.mbari.annosaurus.etc.jdk.Logging
 import sttp.model.StatusCode
 import org.mbari.annosaurus.repository.jpa.JPADAOFactory
 import org.mbari.annosaurus.etc.jwt.JwtService
@@ -30,9 +29,9 @@ trait IndexEndpointsITSuite extends EndpointsSuite {
     private val log = System.getLogger(getClass.getName)
 
     given JPADAOFactory         = daoFactory
-    private val jwtService      = new JwtService("mbari", "foo", "bar")
+    given JwtService      = new JwtService("mbari", "foo", "bar")
     private lazy val controller = new IndexController(daoFactory)
-    private lazy val endpoints  = new IndexEndpoints(controller, jwtService)
+    private lazy val endpoints  = new IndexEndpoints(controller)
 
     test("findByVideoReferenceUUID") {
         val im = TestUtils.create(1, 1).head

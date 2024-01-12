@@ -27,25 +27,22 @@ import java.net.{URI, URL}
 import scala.util.Try
 
 object CirceCodecs {
-    implicit val byteArrayEncoder: Encoder[Array[Byte]] = new Encoder[Array[Byte]] {
-        final def apply(xs: Array[Byte]): Json =
-            Json.fromString(HexUtil.toHex(xs))
-    }
-    implicit val byteArrayDecoder: Decoder[Array[Byte]] = Decoder
+    given Encoder[Array[Byte]] = (xs: Array[Byte]) => Json.fromString(HexUtil.toHex(xs))
+    given Decoder[Array[Byte]] = Decoder
         .decodeString
         .emapTry(str => Try(HexUtil.fromHex(str)))
 
-    implicit val urlDecoder: Decoder[URL] = Decoder
+    given Decoder[URL] = Decoder
         .decodeString
-        .emapTry(str => Try(new URL(str)))
-    implicit val urlEncoder: Encoder[URL] = Encoder
+        .emapTry(str => Try(URI.create(str).toURL))
+    given Encoder[URL] = Encoder
         .encodeString
         .contramap(_.toString)
 
-    implicit val uriDecoder: Decoder[URI] = Decoder
+    given Decoder[URI] = Decoder
         .decodeString
         .emapTry(s => Try(URI.create(s)))
-    implicit val uriEncoder: Encoder[URI] = Encoder
+    given Encoder[URI] = Encoder
         .encodeString
         .contramap[URI](_.toString)
 
@@ -154,6 +151,13 @@ object CirceCodecs {
     given annotationEncoder: Encoder[Annotation]         = deriveEncoder
     given annotationDecoder: Decoder[Annotation]         =
         annotationCcDecoder or annotationScDecoder.map(_.toCamelCase)
+        
+    given annotationCreateScDecoder: Decoder[AnnotationCreateSC]     = deriveDecoder
+    given annotationCreateScEncoder: Encoder[AnnotationCreateSC]     = deriveEncoder
+    private val annotationCreateCcDecoder: Decoder[AnnotationCreate] = deriveDecoder
+    given annotationCreateEncoder: Encoder[AnnotationCreate]         = deriveEncoder
+    given annotationCreateDecoder: Decoder[AnnotationCreate]         =
+        annotationCreateCcDecoder or annotationCreateScDecoder.map(_.toCamelCase)
 
     given imageScDecoder: Decoder[ImageSC]     = deriveDecoder
     given imageScEncoder: Encoder[ImageSC]     = deriveEncoder

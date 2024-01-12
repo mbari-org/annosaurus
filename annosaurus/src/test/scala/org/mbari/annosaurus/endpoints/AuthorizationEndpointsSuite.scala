@@ -40,8 +40,8 @@ import scala.concurrent.duration.Duration
 class AuthorizationEndpointsSuite extends munit.FunSuite:
 
     given ExecutionContext     = ExecutionContext.global
-    val jwtService             = new JwtService("mbari", "foo", "bar")
-    val authorizationEndpoints = new AuthorizationEndpoints(jwtService)
+    given jwtService: JwtService            = new JwtService("mbari", "foo", "bar")
+    val authorizationEndpoints = new AuthorizationEndpoints()
 
     test("auth"):
 

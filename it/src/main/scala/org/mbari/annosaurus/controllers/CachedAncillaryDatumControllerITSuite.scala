@@ -298,7 +298,7 @@ trait CachedAncillaryDatumControllerITSuite extends BaseDAOSuite {
                     assertEquals(obtained.recordedTimestamp.orNull, x.getRecordedTimestamp)
     }
 
-    test("deleteByVideoReferenceUuid") {
+    test( "deleteByVideoReferenceUuid") {
         val xs = TestUtils.create(4, 1, 1, 1, includeData = true)
         val ok = exec(controller.deleteByVideoReferenceUuid(xs.head.getVideoReferenceUuid))
         val obtained = exec(controller.findByVideoReferenceUUID(xs.head.getVideoReferenceUuid))
