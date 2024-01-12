@@ -64,10 +64,11 @@ class AnnotationEndpoints(controller: AnnotationController)(using
                 handleErrors(controller.findByImageReferenceUUID(uuid).map(xs => xs.map(_.toSnakeCase).toSeq))
             }
 
-    val findAnnotationsByVideoReferenceUuid: Endpoint[Unit, UUID, ErrorMsg, Seq[AnnotationSC], Any] =
+    val findAnnotationsByVideoReferenceUuid: Endpoint[Unit, (UUID, Paging), ErrorMsg, Seq[AnnotationSC], Any] =
         openEndpoint
             .get
             .in("v1" / "annotations" / "videoreference" / path[UUID]("uuid"))
+            .in(paging)
             .out(jsonBody[Seq[AnnotationSC]])
             .name("findAnnotationsByVideoReferenceUuid")
             .description("Find annotations by its video reference UUID")
@@ -75,9 +76,10 @@ class AnnotationEndpoints(controller: AnnotationController)(using
 
     val findAnnotationsByVideoReferenceUuidImpl: ServerEndpoint[Any, Future] =
         findAnnotationsByVideoReferenceUuid
-            .serverLogic { uuid =>
-                handleErrors(controller.findByVideoReferenceUuid(uuid).map(xs => xs.map(_.toSnakeCase)))
+            .serverLogic { (uuid, page) =>
+                handleErrors(controller.findByVideoReferenceUuid(uuid, page.limit, page.offset).map(xs => xs.map(_.toSnakeCase)))
             }
+
 
     //    GET / videoreference / chunked /: uuid
     // TOOD do we need this endpoint anymore?
