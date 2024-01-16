@@ -32,7 +32,7 @@ import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
 
 // Endpoint[SECURITY_INPUT, INPUT, ERROR_OUTPUT, OUTPUT, -R]
-class AnalysisEndpoint(repository: AnalysisRepository)(implicit val executor: ExecutionContext)
+class AnalysisEndpoints(repository: AnalysisRepository)(implicit val executor: ExecutionContext)
     extends Endpoints {
 
     val depthHistogram: Endpoint[Unit, (Int, QueryConstraints), ErrorMsg, QueryConstraintsResponse[

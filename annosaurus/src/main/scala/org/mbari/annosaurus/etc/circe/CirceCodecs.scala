@@ -67,6 +67,9 @@ object CirceCodecs {
     given Decoder[Unauthorized] = deriveDecoder
     given Encoder[Unauthorized] = deriveEncoder
 
+    given Decoder[Count] = deriveDecoder
+    given Encoder[Count] = deriveEncoder
+
     given queryConstraintsScDecoder: Decoder[QueryConstraintsSC]     = deriveDecoder
     given queryConstraintsScEncoder: Encoder[QueryConstraintsSC]     = deriveEncoder
     private val queryConstraintsCcDecoder: Decoder[QueryConstraints] = deriveDecoder
@@ -87,6 +90,23 @@ object CirceCodecs {
     given timeHistogramEncoder: Encoder[TimeHistogram]         = deriveEncoder
     given timeHistogramDecoder: Decoder[TimeHistogram]         =
         timeHistogramCcDecoder or timeHistogramScDecoder.map(_.toCamelCase)
+
+    given qcrCountScDecoder: Decoder[QueryConstraintsResponseSC[Count]] = deriveDecoder
+    given qcrCountScEncoder: Encoder[QueryConstraintsResponseSC[Count]] = deriveEncoder
+
+    given qcrAnnotationsScDecoder: Decoder[QueryConstraintsResponseSC[Seq[AnnotationSC]]] =
+        deriveDecoder
+    given qcrAnnotationsScEncoder: Encoder[QueryConstraintsResponseSC[Seq[AnnotationSC]]] =
+        deriveEncoder
+
+    given qcrGeographicRangeScDecoder: Decoder[QueryConstraintsResponseSC[GeographicRangeSC]] =
+        deriveDecoder
+    given qcrGeographicRangeScEncoder: Encoder[QueryConstraintsResponseSC[GeographicRangeSC]] =
+        deriveEncoder
+    given qcrGeographicRangeDecoder: Decoder[QueryConstraintsResponse[GeographicRange]]       =
+        deriveDecoder
+    given qcrGeographicRangeEncoder: Encoder[QueryConstraintsResponse[GeographicRange]]       =
+        deriveEncoder
 
     given qcrDepthHistogramScDecoder: Decoder[QueryConstraintsResponseSC[DepthHistogramSC]] =
         deriveDecoder
@@ -225,7 +245,9 @@ object CirceCodecs {
     given windowRequestDecoder: Decoder[WindowRequest]         =
         windowRequestCcDecoder or windowRequestScDecoder.map(_.toCamelCase)
 
+    given deleteCOuntScDecoder: Decoder[DeleteCountSC]     = deriveDecoder
     given deleteCountScEncoder: Encoder[DeleteCountSC] = deriveEncoder
+    given deleteCountDecoder: Decoder[DeleteCount]     = deriveDecoder
     given deleteCountEncoder: Encoder[DeleteCount]     = deriveEncoder
 
     given geographicRangeScEncoder: Encoder[GeographicRangeSC] = deriveEncoder
@@ -233,6 +255,7 @@ object CirceCodecs {
 
     given healthStatusEncoder: Encoder[HealthStatus] = deriveEncoder
     given healthStatusDecoder: Decoder[HealthStatus] = deriveDecoder
+
 
     private val printer = Printer.noSpaces.copy(dropNullValues = true)
 

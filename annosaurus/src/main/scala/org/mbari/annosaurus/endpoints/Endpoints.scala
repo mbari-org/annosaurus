@@ -41,7 +41,7 @@ case class Paging(offset: Option[Int] = Some(0), limit: Option[Int] = Some(100))
 
 trait Endpoints:
 
-    val log = System.getLogger(getClass.getName)
+    val log: System.Logger = System.getLogger(getClass.getName)
 
     implicit lazy val sAnnotation: Schema[Annotation]                                   = Schema.derived[Annotation]
     implicit lazy val sAnnotationSc: Schema[AnnotationSC]                               = Schema.derived[AnnotationSC]
@@ -56,9 +56,12 @@ trait Endpoints:
     implicit lazy val sConceptAssociationRequestSc: Schema[ConceptAssociationRequestSC] = Schema.derived[ConceptAssociationRequestSC]
     implicit lazy val sConcurrentRequest: Schema[ConcurrentRequest]                     = Schema.derived[ConcurrentRequest]
     implicit lazy val sConcurrentRequestSc: Schema[ConcurrentRequestSC]                 = Schema.derived[ConcurrentRequestSC]
+    implicit lazy val sCount: Schema[Count]                                             = Schema.derived[Count]
+    implicit lazy val sDeleteCountSc: Schema[DeleteCountSC]                               = Schema.derived[DeleteCountSC]
     implicit lazy val sDepthHistogram: Schema[DepthHistogram]                           = Schema.derived[DepthHistogram]
     implicit lazy val sGeographicRange: Schema[GeographicRange]                         = Schema.derived[GeographicRange]
     implicit lazy val sGeographicRangeSc: Schema[GeographicRangeSC]                     = Schema.derived[GeographicRangeSC]
+    implicit lazy val sImageSc: Schema[ImageSC]                                         = Schema.derived[ImageSC]
     implicit lazy val sImageReference: Schema[ImageReference]                           = Schema.derived[ImageReference]
     implicit lazy val sImageReferenceSc: Schema[ImageReferenceSC]                       = Schema.derived[ImageReferenceSC]
     implicit lazy val sImagedMoment: Schema[ImagedMoment]                               = Schema.derived[ImagedMoment]
@@ -67,8 +70,12 @@ trait Endpoints:
     implicit lazy val sMultiRequestSc: Schema[MultiRequestSC]                           = Schema.derived[MultiRequestSC]
     implicit lazy val sObservation: Schema[Observation]                                 = Schema.derived[Observation]
     implicit lazy val sObservationSc: Schema[ObservationSC]                             = Schema.derived[ObservationSC]
-    implicit lazy val sQCR: Schema[QueryConstraintsResponse[DepthHistogram]]            = Schema.derived[QueryConstraintsResponse[DepthHistogram]]
+    implicit lazy val sQcrC: Schema[QueryConstraintsResponseSC[Count]]                  = Schema.derived[QueryConstraintsResponseSC[Count]]
+    implicit lazy val sQcrA: Schema[QueryConstraintsResponseSC[Seq[AnnotationSC]]]      = Schema.derived[QueryConstraintsResponseSC[Seq[AnnotationSC]]]
+    implicit lazy val sQcrDh: Schema[QueryConstraintsResponseSC[DepthHistogramSC]]      = Schema.derived[QueryConstraintsResponseSC[DepthHistogramSC]]
+    implicit lazy val sQcrGr: Schema[QueryConstraintsResponseSC[GeographicRangeSC]]     = Schema.derived[QueryConstraintsResponseSC[GeographicRangeSC]]
     implicit lazy val sQueryContraints: Schema[QueryConstraints]                        = Schema.derived[QueryConstraints]
+    implicit lazy val sQueryContraintsSc: Schema[QueryConstraintsSC]                    = Schema.derived[QueryConstraintsSC]
     implicit lazy val sURI: Schema[URI]                                                 = Schema.string
     implicit lazy val sURL: Schema[URL]                                                 = Schema.string
     implicit lazy val sInstant: Schema[Instant]                                         = Schema.string

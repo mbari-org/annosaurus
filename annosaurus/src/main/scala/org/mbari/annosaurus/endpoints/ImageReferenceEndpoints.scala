@@ -30,8 +30,8 @@ import sttp.tapir.server.ServerEndpoint
 import java.util.UUID
 import scala.concurrent.{ExecutionContext, Future}
 
-class ImageReferenceEndpoint(controller: ImageReferenceController)(using
-    val executor: ExecutionContext, jwtService: JwtService
+class ImageReferenceEndpoints(controller: ImageReferenceController)(using
+                                                                    val executor: ExecutionContext, jwtService: JwtService
 ) extends Endpoints {
 
 
