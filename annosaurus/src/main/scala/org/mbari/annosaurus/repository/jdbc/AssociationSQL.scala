@@ -65,18 +65,14 @@ object AssociationSQL {
         annotations: Seq[Annotation],
         associations: Seq[Association]
     ): Seq[Annotation] = {
-        val mergedAnnos = for {
-            a <- associations
-        } yield {
-            annotations.find(anno => anno.observationUuid == a.observationUuid) match {
-                case None       =>
-                // TODO warn of missing match?
-                case Some(anno) =>
-                    anno.copy(associations = anno.associations :+ a)
-                // anno.javaAssociations.add(a)
+        for
+            a <- annotations
+        yield
+            associations.find(anno => anno.observationUuid == a.observationUuid) match {
+                case None       => a
+                case Some(ass) => a.copy(associations = a.associations :+ ass)
             }
-        }
-        annotations.distinctBy(_.observationUuid)
+
     }
 
     val SELECT: String =

@@ -40,7 +40,7 @@ trait IndexEndpointsITSuite extends EndpointsSuite {
             s"http://test.com/v1/index/videoreference/${im.getVideoReferenceUuid}",
             response =>
                 assertEquals(response.code, StatusCode.Ok)
-                val imagedMoments = checkResponse[List[ImagedMoment]](response.body)
+                val imagedMoments = checkResponse[Seq[ImagedMoment]](response.body)
                 // assertSameMedia(media, media0)
         )
 

@@ -26,7 +26,6 @@ import sttp.tapir.server.ServerEndpoint
 import sttp.tapir.server.stub.TapirStubInterpreter
 
 import scala.concurrent.Future
-import sttp.capabilities.WebSockets
 import sttp.tapir.server.vertx.VertxFutureServerOptions
 import sttp.tapir.server.interceptor.exception.ExceptionHandler
 import sttp.tapir.server.interceptor.CustomiseInterceptors

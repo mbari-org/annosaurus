@@ -116,14 +116,13 @@ object AncillaryDatumSQL {
         annotations: Seq[Annotation],
         data: Seq[CachedAncillaryDatum]
     ): Seq[Annotation] = {
-        val resolvedAnnos = for {
-            d <- data
-        } yield {
-            annotations
-                .filter(anno => anno.imagedMomentUuid == d.imagedMomentUuid)
-                .map(anno => anno.copy(ancillaryData = Some(d)))
-        }
-        resolvedAnnos.flatten.toSeq
+        for
+            a <- annotations
+        yield
+            data.find(_.imagedMomentUuid == a.imagedMomentUuid) match {
+                case Some(d) => a.copy(ancillaryData = Some(d))
+                case None    => a
+            }
     }
 
 }

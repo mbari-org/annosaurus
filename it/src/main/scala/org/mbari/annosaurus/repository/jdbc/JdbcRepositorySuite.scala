@@ -26,6 +26,7 @@ import java.time.Duration
 import org.mbari.annosaurus.domain.QueryConstraints
 import org.mbari.annosaurus.domain.MultiRequest
 import org.mbari.annosaurus.domain.ConcurrentRequest
+import org.mbari.annosaurus.etc.circe.CirceCodecs.{*, given}
 
 trait JdbcRepositorySuite extends BaseDAOSuite {
 
@@ -109,10 +110,15 @@ trait JdbcRepositorySuite extends BaseDAOSuite {
     }
 
     test("findByMultiRequest") {
-        val xs = TestUtils.create(8, 1)
+        val xs = TestUtils.create(8, 1, 1, 1, true)
         val mr = MultiRequest(Seq(xs.head.getVideoReferenceUuid()))
-        val ys = repository.findByMultiRequest(mr)
+        val ys = repository.findByMultiRequest(mr, includeAncillaryData = true)
         assertEquals(ys.size, 8)
+        for (y <- ys) {
+            assert(y.ancillaryData.isDefined)
+            assertEquals(y.imageReferences.size, 1)
+            assertEquals(y.associations.size, 1)
+        }
     }
 
     test("findByQueryConstraint") {
@@ -137,13 +143,21 @@ trait JdbcRepositorySuite extends BaseDAOSuite {
 
         val vru1 = xs.head.getVideoReferenceUuid()
         val vru2 = ys.head.getVideoReferenceUuid()
-        val qc1  = new QueryConstraints(videoReferenceUuids = Seq(vru1, vru2))
+        val qc1  = new QueryConstraints(videoReferenceUuids = Seq(vru1, vru2), data = Some(true))
         val o1   = repository.findByQueryConstraint(qc1)
-        assertEquals(o1.size, 100)
+        assertEquals(o1.size, xs.size + ys.size)
+        for
+            a <- o1
+        do
+            println(a.stringify)
+            assert(a.ancillaryData.isDefined)
+            assertEquals(a.imageReferences.size, 1)
+            assertEquals(a.associations.size, 1)
 
-        val qc2 = new QueryConstraints(videoReferenceUuids = Seq(vru1), data = Some(true))
+        val qc2 = new QueryConstraints(videoReferenceUuids = Seq(vru1))
         val o2  = repository.findByQueryConstraint(qc2)
-        assertEquals(o2.size, 50)
+        assertEquals(o2.size, xs.size)
+
 
         val qc3 = qc2.copy(concepts = Seq(o.getConcept()))
         val o3  = repository.findByQueryConstraint(qc3)
@@ -151,7 +165,7 @@ trait JdbcRepositorySuite extends BaseDAOSuite {
 
         val qc4 = qc2.copy(observers = Seq(o.getObserver()))
         val o4  = repository.findByQueryConstraint(qc4)
-        assertEquals(o4.size, 50)
+        assertEquals(o4.size, xs.size)
 
         val qc5 = qc3.copy(observers = Seq(o.getObserver()))
         val o5  = repository.findByQueryConstraint(qc5)

@@ -52,7 +52,6 @@ class AnnotationSuite extends munit.FunSuite {
         assertEquals(sc2.recorded_timestamp, cc1.recordedTimestamp)
         assertEquals(sc2.timecode, cc1.timecode)
         assertEquals(sc2.video_reference_uuid, cc1.videoReferenceUuid)
-        // println(cc2.stringify)
     }
 
     test("camelCase/Entity round trip") {
@@ -66,6 +65,9 @@ class AnnotationSuite extends munit.FunSuite {
         assertEquals(e2.getVideoReferenceUuid(), e1.getVideoReferenceUuid())
         assertEquals(e2.getUuid(), e1.getUuid())
         assertEquals(e2.getObservations().size, e1.getObservations().size)
+//
+//        val cc3 = Annotation.from(e2.getObservations().asScala.head, true)
+//        println(cc2.stringify)
     }
 
     test("toEntities") {
@@ -76,7 +78,7 @@ class AnnotationSuite extends munit.FunSuite {
 
         val cc2 = cc1.copy(observationUuid = Some(UUID.randomUUID()))
         val e2 = Annotation.toEntities(Seq(cc1, cc2), true)
-        print(e1)
+        println(e1)
         assertEquals(e2.size, 1)
         assertEquals(e2.head.getObservations.size(), 2)
 
@@ -88,6 +90,7 @@ class AnnotationSuite extends munit.FunSuite {
         assertEquals(e3.head.getObservations.size(), 1)
         assertEquals(e3.head.getObservations.iterator().next().getUuid, cc3.observationUuid.orNull)
         assertEquals(e3.last.getObservations.size(), 2)
+        println(cc3.stringify)
     }
 
 

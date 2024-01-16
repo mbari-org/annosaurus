@@ -16,21 +16,18 @@
 
 package org.mbari.annosaurus.repository.jdbc
 
-import java.sql.Timestamp
 import java.time.Instant
 import java.util.UUID
 import jakarta.persistence.{EntityManager, EntityManagerFactory, Query}
-import org.mbari.annosaurus.repository.jpa.DatabaseProductName
-import org.slf4j.LoggerFactory
 
 import scala.jdk.CollectionConverters._
 import scala.util.control.NonFatal
-import scala.util.Try
 import org.mbari.annosaurus.domain.{ConcurrentRequest, DeleteCount, MultiRequest}
 import org.mbari.annosaurus.domain.QueryConstraints
 import org.mbari.annosaurus.domain.Annotation
 import org.mbari.annosaurus.domain.GeographicRange
 import org.mbari.annosaurus.domain.Image
+import org.mbari.annosaurus.etc.jdk.Logging.given
 
 /** Database access (read-only) provider that uses SQL for fast lookups. WHY? JPA makes about 1 +
   * (rows * 4) database requests when looking up annotations. For 1000 rows that 4001 database calls
@@ -40,7 +37,7 @@ import org.mbari.annosaurus.domain.Image
   */
 class JdbcRepository(entityManagerFactory: EntityManagerFactory) {
 
-    private[this] val log = LoggerFactory.getLogger(getClass)
+    private[this] val log = System.getLogger(getClass.getName)
 
     def deleteByVideoReferenceUuid(videoReferenceUuid: UUID): DeleteCount = {
         implicit val entityManager: EntityManager = entityManagerFactory.createEntityManager()
@@ -95,9 +92,9 @@ class JdbcRepository(entityManagerFactory: EntityManagerFactory) {
         val query1                         = QueryConstraintsSqlBuilder.toQuery(constraints, entityManager)
         val r1                             = query1.getResultList.asScala.toList
         val annotations                    = AnnotationSQL.resultListToAnnotations(r1)
-        executeQueryForAnnotations(annotations, constraints.includeData)
+        val resolvedAnnotations            = executeQueryForAnnotations(annotations, constraints.includeData)
         entityManager.close()
-        annotations
+        resolvedAnnotations
     }
 
     def countByQueryConstraint(constraints: QueryConstraints): Int = {
@@ -434,27 +431,39 @@ class JdbcRepository(entityManagerFactory: EntityManagerFactory) {
     )(implicit entityManager: EntityManager): Seq[Annotation] = {
 
         // lookup associations
+
         val observationUuids = annotations.flatMap(_.observationUuid.map(_.toString())).distinct
-        for (obs <- observationUuids.grouped(200)) {
+        val assocTemp = for (obs <- observationUuids.grouped(200)) yield {
             val sql2         = inClause(AssociationSQL.byObservationUuids, obs)
             val query2       = entityManager.createNativeQuery(sql2)
             val r2           = query2.getResultList.asScala.toList
-            val associations = AssociationSQL.resultListToAssociations(r2)
-            AssociationSQL.join(annotations, associations)
+            AssociationSQL.resultListToAssociations(r2)
+//            AssociationSQL.join(annotations, associations)
         }
+        val associations = assocTemp.flatten.toSeq
+//        val a1 = group1.flatten
 
         // lookup imageMoments
         val imagedMomentUuids = annotations.flatMap(_.imagedMomentUuid.map(_.toString())).distinct
-        for (im <- imagedMomentUuids.grouped(200)) {
+        val irTemp = for (im <- imagedMomentUuids.grouped(200)) yield {
             val sql3             = inClause(ImageReferenceSQL.byImagedMomentUuids, im)
             val query3           = entityManager.createNativeQuery(sql3)
             val r3               = query3.getResultList.asScala.toList
-            val imagedReferences = ImageReferenceSQL.resultListToImageReferences(r3)
-            ImageReferenceSQL.join(annotations, imagedReferences)
+            ImageReferenceSQL.resultListToImageReferences(r3)
+//            ImageReferenceSQL.join(annotations, imagedReferences)
         }
+        val imageReferences = irTemp.flatten.toSeq
+//        val a2 = group2.flatten.toSeq
 
-        if (includeAncillaryData) findAncillaryData(annotations)
-        annotations
+        val a2 = for
+            a <- annotations
+        yield
+            val assocs = associations.filter(_.observationUuid == a.observationUuid)
+            val irs = imageReferences.filter(_.imagedMomentUuid == a.imagedMomentUuid)
+            a.copy(associations = assocs, imageReferences = irs)
+
+        if (includeAncillaryData) findAncillaryData(a2)
+        else a2
 
     }
 
@@ -470,35 +479,38 @@ class JdbcRepository(entityManagerFactory: EntityManagerFactory) {
         limit.foreach(annotationQuery.setMaxResults)
         offset.foreach(annotationQuery.setFirstResult)
 
-        log.debug("Running annotation query")
+        log.atDebug.log("Running annotation query")
         val r0          = annotationQuery.getResultList.asScala.toList
-        log.debug(s"Transforming ${r0.size} annotations")
-        val annotations = AnnotationSQL.resultListToAnnotations(r0)
+        log.atDebug.log(s"Transforming ${r0.size} annotations")
+        val a1 = AnnotationSQL.resultListToAnnotations(r0)
 
-        log.debug("Running association query")
+        log.atDebug.log("Running association query")
         val r1           = associationQuery.getResultList.asScala.toList
-        log.debug(s"Transforming ${r1.size} associations")
+        log.atDebug.log(s"Transforming ${r1.size} associations")
         val associations = AssociationSQL.resultListToAssociations(r1)
-        log.debug("Joining annotations to associations")
-        AssociationSQL.join(annotations, associations)
+        log.atDebug.log("Joining annotations to associations")
+        val a2 = AssociationSQL.join(a1, associations)
 
-        log.debug("Running imageReference query")
+        log.atDebug.log("Running imageReference query")
         val r2              = imageReferenceQuery.getResultList.asScala.toList
-        log.debug(s"Transforming ${r2.size} imageReferences")
+        log.atDebug.log(s"Transforming ${r2.size} imageReferences")
         val imageReferences = ImageReferenceSQL.resultListToImageReferences(r2)
-        log.debug("Joining annotations to imageReferences")
-        ImageReferenceSQL.join(annotations, imageReferences)
+        log.atDebug.log("Joining annotations to imageReferences")
+        val a3 = ImageReferenceSQL.join(a2, imageReferences)
 
-        if (includeAncillaryData) findAncillaryData(annotations)
+        if (includeAncillaryData)
+            findAncillaryData(a3)
+        else
+            a3
 
-        annotations
     }
 
     private def findAncillaryData(
         annotations: Seq[Annotation]
     )(implicit entityManager: EntityManager): Seq[Annotation] = {
 
-        for (annos <- annotations.grouped(200)) {
+        log.atDebug.log(() => s"Running ancillaryData queries for ${annotations.size} annotations")
+        val groups = for (annos <- annotations.grouped(200)) yield {
             val ims   = annos.flatMap(_.imagedMomentUuid.map(_.toString())).distinct
             val sql   = inClause(AncillaryDatumSQL.byImagedMomentUuid, ims)
             val query = entityManager.createNativeQuery(sql)
@@ -506,7 +518,7 @@ class JdbcRepository(entityManagerFactory: EntityManagerFactory) {
             val data  = AncillaryDatumSQL.resultListToAnncillaryData(rows)
             AncillaryDatumSQL.join(annos, data)
         }
-        annotations
+        groups.flatten.toSeq
     }
 
 }

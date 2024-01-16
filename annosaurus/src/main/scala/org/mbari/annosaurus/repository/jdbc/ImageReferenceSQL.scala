@@ -90,15 +90,15 @@ object ImageReferenceSQL {
         annotations: Seq[Annotation],
         images: Seq[ImageReference]
     ): Seq[Annotation] = {
-        val mergedAnnos = for {
-            i <- images
-        } yield {
-            annotations
-                .filter(anno => anno.imagedMomentUuid == i.imagedMomentUuid)
-                .map(anno => anno.copy(imageReferences = anno.imageReferences :+ i))
 
-        }
-        mergedAnnos.flatten
+        for
+            a <- annotations
+        yield
+            images.find(_.imagedMomentUuid == a.imagedMomentUuid) match {
+                case Some(image) => a.copy(imageReferences = a.imageReferences :+ image)
+                case None => a
+            }
+
     }
 
 }
