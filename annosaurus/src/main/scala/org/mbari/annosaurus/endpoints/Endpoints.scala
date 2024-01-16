@@ -54,6 +54,7 @@ trait Endpoints:
     implicit lazy val sCachedVideoReferenceInfoSc: Schema[CachedVideoReferenceInfoSC]   = Schema.derived[CachedVideoReferenceInfoSC]
     implicit lazy val sConceptAssociationRequest: Schema[ConceptAssociationRequest]     = Schema.derived[ConceptAssociationRequest]
     implicit lazy val sConceptAssociationRequestSc: Schema[ConceptAssociationRequestSC] = Schema.derived[ConceptAssociationRequestSC]
+    implicit lazy val sConceptCount: Schema[ConceptCount]                               = Schema.derived[ConceptCount]
     implicit lazy val sConcurrentRequest: Schema[ConcurrentRequest]                     = Schema.derived[ConcurrentRequest]
     implicit lazy val sConcurrentRequestSc: Schema[ConcurrentRequestSC]                 = Schema.derived[ConcurrentRequestSC]
     implicit lazy val sCount: Schema[Count]                                             = Schema.derived[Count]
@@ -76,6 +77,7 @@ trait Endpoints:
     implicit lazy val sQcrGr: Schema[QueryConstraintsResponseSC[GeographicRangeSC]]     = Schema.derived[QueryConstraintsResponseSC[GeographicRangeSC]]
     implicit lazy val sQueryContraints: Schema[QueryConstraints]                        = Schema.derived[QueryConstraints]
     implicit lazy val sQueryContraintsSc: Schema[QueryConstraintsSC]                    = Schema.derived[QueryConstraintsSC]
+    implicit lazy val sRenameConcept: Schema[RenameConcept]                             = Schema.derived[RenameConcept]
     implicit lazy val sURI: Schema[URI]                                                 = Schema.string
     implicit lazy val sURL: Schema[URL]                                                 = Schema.string
     implicit lazy val sInstant: Schema[Instant]                                         = Schema.string

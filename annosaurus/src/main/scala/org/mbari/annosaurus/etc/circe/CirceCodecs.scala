@@ -256,6 +256,15 @@ object CirceCodecs {
     given healthStatusEncoder: Encoder[HealthStatus] = deriveEncoder
     given healthStatusDecoder: Decoder[HealthStatus] = deriveDecoder
 
+    given conceptCountEncoder: Encoder[ConceptCount] = deriveEncoder
+    given conceptCountDecoder: Decoder[ConceptCount] = deriveDecoder
+
+    given renameCountScEncoder: Encoder[RenameCountSC] = deriveEncoder
+    given renameCountScDecoder: Decoder[RenameCountSC] = deriveDecoder
+
+    given renameConceptEncoder: Encoder[RenameConcept] = deriveEncoder
+    given renameConceptDecoder: Decoder[RenameConcept] = deriveDecoder
+
 
     private val printer = Printer.noSpaces.copy(dropNullValues = true)
 

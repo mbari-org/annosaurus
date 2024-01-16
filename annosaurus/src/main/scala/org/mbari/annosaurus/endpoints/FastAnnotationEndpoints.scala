@@ -340,7 +340,43 @@ class FastAnnotationEndpoints(jdbcRepository: JdbcRepository)(using
             )
         }
 
-    override def all: List[Endpoint[_, _, _, _, _]] = ???
+    override def all: List[Endpoint[_, _, _, _, _]] = List(
+        findAllAnnotations,
+        findAnnotationsByQueryConstraints,
+        findGeoRangeByQueryConstraints,
+        countAnnotationsByQueryConstraints,
+        countAllAnnotations,
+        findAnnotationsByVideoReferenceUuid,
+        findImagesByVideoReferenceUuid,
+        countImagesByVideoReferenceUuid,
+        findAnnotationsByConcept,
+        findAnnotationsWithImagesByConcept,
+        findAnnotationsWithImagesByToConcept,
+        findImageMomentUuidsByConcept,
+        findImagedMomentUuidsByToConcept,
+        findAnnotationsByLinkNameAndLinkValue,
+        deleteAnnotationsByVideoReferenceUuid,
+        findAnnotationsByConcurrentRequest,
+        findAnnotationsByMultiRequest
+    )
 
-    override def allImpl: List[ServerEndpoint[Any, Future]] = ???
+    override def allImpl: List[ServerEndpoint[Any, Future]] = List(
+        findAllAnnotationsImpl,
+        findAnnotationsByQueryConstraintsImpl,
+        findGeoRangeByQueryConstraintsImpl,
+        countAnnotationsByQueryConstraintsImpl,
+        countAllAnnotationsImpl,
+        findAnnotationsByVideoReferenceUuidImpl,
+        findImagesByVideoReferenceUuidImpl,
+        countImagesByVideoReferenceUuidImpl,
+        findAnnotationsByConceptImpl,
+        findAnnotationsWithImagesByConceptImpl,
+        findAnnotationsWithImagesByToConceptImpl,
+        findImagedMomentUuidsByConceptImpl,
+        findImagedMomentUuidsByToConceptImpl,
+        findDetailsByLinkNameAndLinkValueImpl,
+        deleteAnnotationsByVideoReferenceUuidImpl,
+        findAnnotationsByConcurrentRequestImpl,
+        findAnnotationsByMultiRequestImpl
+    )
 }
