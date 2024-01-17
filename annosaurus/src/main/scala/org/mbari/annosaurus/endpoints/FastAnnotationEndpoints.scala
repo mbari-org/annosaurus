@@ -276,7 +276,7 @@ class FastAnnotationEndpoints(jdbcRepository: JdbcRepository)(using
         .name("findAnnotationsByLinkNameAndLinkValue")
         .description("Find annotations by link name and link value")
 
-    val findDetailsByLinkNameAndLinkValueImpl: ServerEndpoint[Any, Future] = findAnnotationsByLinkNameAndLinkValue
+    val findAnnotationsByLinkNameAndLinkValueImpl: ServerEndpoint[Any, Future] = findAnnotationsByLinkNameAndLinkValue
         .serverLogic { (linkName, linkValue, data) =>
             handleErrors(
                 Future(jdbcRepository.findByLinkNameAndLinkValue(linkName, linkValue, data.getOrElse(false)).map(_.toSnakeCase))
@@ -374,7 +374,7 @@ class FastAnnotationEndpoints(jdbcRepository: JdbcRepository)(using
         findAnnotationsWithImagesByToConceptImpl,
         findImagedMomentUuidsByConceptImpl,
         findImagedMomentUuidsByToConceptImpl,
-        findDetailsByLinkNameAndLinkValueImpl,
+        findAnnotationsByLinkNameAndLinkValueImpl,
         deleteAnnotationsByVideoReferenceUuidImpl,
         findAnnotationsByConcurrentRequestImpl,
         findAnnotationsByMultiRequestImpl

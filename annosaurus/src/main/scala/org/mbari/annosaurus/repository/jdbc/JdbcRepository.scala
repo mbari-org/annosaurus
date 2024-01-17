@@ -141,10 +141,10 @@ class JdbcRepository(entityManagerFactory: EntityManagerFactory) {
         offset.foreach(query1.setFirstResult)
 
         val r1          = query1.getResultList.asScala.toList
-        val annotations = AnnotationSQL.resultListToAnnotations(r1)
-        executeQueryForAnnotations(annotations, includeAncillaryData)
+        val a1 = AnnotationSQL.resultListToAnnotations(r1)
+        val a2 = executeQueryForAnnotations(a1, includeAncillaryData)
         entityManager.close()
-        annotations
+        a2
 
     }
 
@@ -289,10 +289,10 @@ class JdbcRepository(entityManagerFactory: EntityManagerFactory) {
         offset.foreach(query1.setFirstResult)
 
         val r1          = query1.getResultList.asScala.toList
-        val annotations = AnnotationSQL.resultListToAnnotations(r1)
-        executeQueryForAnnotations(annotations, includeAncillaryData)
+        val a1 = AnnotationSQL.resultListToAnnotations(r1)
+        val a2 = executeQueryForAnnotations(a1, includeAncillaryData)
         entityManager.close()
-        annotations
+        a2
     }
 
     def findByConceptWithImages(
@@ -307,10 +307,10 @@ class JdbcRepository(entityManagerFactory: EntityManagerFactory) {
         limit.foreach(query1.setMaxResults)
         offset.foreach(query1.setFirstResult)
         val r1                             = query1.getResultList.asScala.toList
-        val annotations                    = AnnotationSQL.resultListToAnnotations(r1).distinct
-        executeQueryForAnnotations(annotations, includeAncillaryData)
+        val a1                    = AnnotationSQL.resultListToAnnotations(r1).distinct
+        val a2 = executeQueryForAnnotations(a1, includeAncillaryData)
         entityManager.close()
-        annotations
+        a2
     }
 
     def findByToConceptWithImages(
@@ -325,10 +325,10 @@ class JdbcRepository(entityManagerFactory: EntityManagerFactory) {
         limit.foreach(query1.setMaxResults)
         offset.foreach(query1.setFirstResult)
         val r1                             = query1.getResultList.asScala.toList
-        val annotations                    = AnnotationSQL.resultListToAnnotations(r1).distinct
-        executeQueryForAnnotations(annotations, includeAncillaryData)
+        val a1                    = AnnotationSQL.resultListToAnnotations(r1).distinct
+        val a2 = executeQueryForAnnotations(a1, includeAncillaryData)
         entityManager.close()
-        annotations
+        a2
     }
 
     def findImagedMomentUuidsByConceptWithImages(
@@ -431,17 +431,14 @@ class JdbcRepository(entityManagerFactory: EntityManagerFactory) {
     )(implicit entityManager: EntityManager): Seq[Annotation] = {
 
         // lookup associations
-
         val observationUuids = annotations.flatMap(_.observationUuid.map(_.toString())).distinct
         val assocTemp = for (obs <- observationUuids.grouped(200)) yield {
             val sql2         = inClause(AssociationSQL.byObservationUuids, obs)
             val query2       = entityManager.createNativeQuery(sql2)
             val r2           = query2.getResultList.asScala.toList
             AssociationSQL.resultListToAssociations(r2)
-//            AssociationSQL.join(annotations, associations)
         }
         val associations = assocTemp.flatten.toSeq
-//        val a1 = group1.flatten
 
         // lookup imageMoments
         val imagedMomentUuids = annotations.flatMap(_.imagedMomentUuid.map(_.toString())).distinct
@@ -450,11 +447,10 @@ class JdbcRepository(entityManagerFactory: EntityManagerFactory) {
             val query3           = entityManager.createNativeQuery(sql3)
             val r3               = query3.getResultList.asScala.toList
             ImageReferenceSQL.resultListToImageReferences(r3)
-//            ImageReferenceSQL.join(annotations, imagedReferences)
         }
         val imageReferences = irTemp.flatten.toSeq
-//        val a2 = group2.flatten.toSeq
 
+        // join associations and imageReferences to annotations
         val a2 = for
             a <- annotations
         yield

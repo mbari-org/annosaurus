@@ -217,10 +217,15 @@ trait JdbcRepositorySuite extends BaseDAOSuite {
     }
 
     test("findByVideoReferenceUuid") {
-        val xs  = TestUtils.create(8, 1)
+        val xs  = TestUtils.create(8, 1, 1, 1, true)
         val x   = xs.head
-        val xs2 = repository.findByVideoReferenceUuid(x.getVideoReferenceUuid())
-        assertEquals(xs2.size, 8)
+        val xs2 = repository.findByVideoReferenceUuid(x.getVideoReferenceUuid(), includeAncillaryData = true)
+        assertEquals(xs2.size, xs.size)
+        for (x <- xs2) {
+            assert(x.ancillaryData.isDefined)
+            assertEquals(x.imageReferences.size, 1)
+            assertEquals(x.associations.size, 1)
+        }
     }
 
     test("findByVideoReferenceUuidAndTimestamps") {
