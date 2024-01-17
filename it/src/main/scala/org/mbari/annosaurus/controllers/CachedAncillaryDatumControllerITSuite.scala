@@ -133,7 +133,7 @@ trait CachedAncillaryDatumControllerITSuite extends BaseDAOSuite {
                 im.getAncillaryDatum.getUuid,
                 Some(12.3456),
                 Some(123.4567),
-                Some(-1000.0),
+                Some(-1000.0f),
             )
         )
         obtained match
@@ -144,7 +144,7 @@ trait CachedAncillaryDatumControllerITSuite extends BaseDAOSuite {
                 assertEquals(obtained.imagedMomentUuid.orNull, im.getUuid)
                 assertEquals(obtained.latitude.orNull, 12.3456)
                 assertEquals(obtained.longitude.orNull, 123.4567)
-                assertEquals(obtained.depthMeters.orNull, -1000.0)
+                assertEquals(obtained.depthMeters.orNull, -1000.0f)
     }
 
     test("findByVideoReferenceUUID") {
@@ -294,7 +294,7 @@ trait CachedAncillaryDatumControllerITSuite extends BaseDAOSuite {
                     assert(obtained.uuid.isDefined)
                     assert(obtained.imagedMomentUuid.isDefined)
                     assertEquals(obtained.imagedMomentUuid.orNull, x.getUuid)
-                    assertEquals(obtained.depthMeters.orNull, 1000.0)
+                    assertEquals(obtained.depthMeters.orNull, 1000.0f)
                     assertEquals(obtained.recordedTimestamp.orNull, x.getRecordedTimestamp)
     }
 
@@ -318,7 +318,7 @@ trait CachedAncillaryDatumControllerITSuite extends BaseDAOSuite {
                 assertEquals(obtained.imagedMomentUuid.orNull, im.getUuid)
                 assertEquals(obtained.latitude.orNull, 12.345)
                 assertEquals(obtained.longitude.orNull, 123.456)
-                assertEquals(obtained.depthMeters.orNull, 1000.0)
+                assertEquals(obtained.depthMeters.orNull, 1000.0f)
                 assert(obtained.altitude.isEmpty)
                 println(obtained.stringify)
                 assert(obtained.crs.isEmpty)

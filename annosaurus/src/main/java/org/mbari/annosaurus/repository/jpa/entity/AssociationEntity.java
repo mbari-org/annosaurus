@@ -129,7 +129,11 @@ public class AssociationEntity implements IPersistentObject {
             optional = false,
             targetEntity = ObservationEntity.class
     )
-    @JoinColumn(name = "observation_uuid", nullable = false)
+    @JoinColumn(
+            name = "observation_uuid",
+            nullable = false,
+            foreignKey = @ForeignKey(name = "fk_associations__observation_uuid")
+    )
     ObservationEntity observation;
 
     @Column(name = "to_concept", length = 128, nullable = true)

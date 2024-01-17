@@ -34,6 +34,12 @@ import org.mbari.annosaurus.repository.jpa.TransactionLogger;
                         name = "idx_ancillary_data__position",
                         columnList = "latitude,longitude,depth_meters"
                 )
+        },
+        uniqueConstraints = {
+                @UniqueConstraint(
+                        name = "uk_ancillary_data__imaged_moment_uuid",
+                        columnNames = {"imaged_moment_uuid"}
+                )
         }
 ) //idx_ancillary_data_fk_im
 @EntityListeners({TransactionLogger.class})
@@ -105,10 +111,10 @@ public class CachedAncillaryDatumEntity implements IPersistentObject {
     String crs;
 
     @Column(name = "oxygen_ml_per_l", nullable = true)
-    Double oxygenMlL;
+    Float oxygenMlL;
 
     @Column(name = "depth_meters", nullable = true)
-    Double depthMeters;
+    Float depthMeters;
 
     @Column(name = "z", nullable = true)
     Double z;
@@ -125,14 +131,18 @@ public class CachedAncillaryDatumEntity implements IPersistentObject {
             fetch = FetchType.LAZY,
             targetEntity = ImagedMomentEntity.class
     )
-    @JoinColumn(name = "imaged_moment_uuid", nullable = false)
+    @JoinColumn(
+            name = "imaged_moment_uuid",
+            nullable = false,
+            foreignKey = @ForeignKey(name = "fk_ancillary_data__imaged_moment_uuid")
+    )
     ImagedMomentEntity imagedMoment;
 
     @Column(name = "y", nullable = true)
     Double y;
 
     @Column(name = "temperature_celsius", nullable = true)
-    Double temperatureCelsius;
+    Float temperatureCelsius;
 
     @Column(name = "x", nullable = true)
     Double x;
@@ -150,21 +160,21 @@ public class CachedAncillaryDatumEntity implements IPersistentObject {
     Double psi;
 
     @Column(name = "pressure_dbar", nullable = true)
-    Double pressureDbar;
+    Float pressureDbar;
 
     @Column(name = "salinity", nullable = true)
-    Double salinity;
+    Float salinity;
 
     @Column(name = "altitude", nullable = true)
-    Double altitude;
+    Float altitude;
 
     @Column(name = "light_transmission", nullable = true)
-    Double lightTransmission;
+    Float lightTransmission;
 
     public CachedAncillaryDatumEntity() {
     }
 
-    public CachedAncillaryDatumEntity(Double lat, Double lon, Double depth) {
+    public CachedAncillaryDatumEntity(Double lat, Double lon, Float depth) {
         this.latitude = lat;
         this.longitude = lon;
         this.depthMeters = depth;
@@ -219,19 +229,19 @@ public class CachedAncillaryDatumEntity implements IPersistentObject {
         this.crs = crs;
     }
 
-    public Double getOxygenMlL() {
+    public Float getOxygenMlL() {
         return oxygenMlL;
     }
 
-    public void setOxygenMlL(Double oxygenMlL) {
+    public void setOxygenMlL(Float oxygenMlL) {
         this.oxygenMlL = oxygenMlL;
     }
 
-    public Double getDepthMeters() {
+    public Float getDepthMeters() {
         return depthMeters;
     }
 
-    public void setDepthMeters(Double depthMeters) {
+    public void setDepthMeters(Float depthMeters) {
         this.depthMeters = depthMeters;
     }
 
@@ -275,11 +285,11 @@ public class CachedAncillaryDatumEntity implements IPersistentObject {
         this.y = y;
     }
 
-    public Double getTemperatureCelsius() {
+    public Float getTemperatureCelsius() {
         return temperatureCelsius;
     }
 
-    public void setTemperatureCelsius(Double temperatureCelsius) {
+    public void setTemperatureCelsius(Float temperatureCelsius) {
         this.temperatureCelsius = temperatureCelsius;
     }
 
@@ -323,35 +333,35 @@ public class CachedAncillaryDatumEntity implements IPersistentObject {
         this.psi = psi;
     }
 
-    public Double getPressureDbar() {
+    public Float getPressureDbar() {
         return pressureDbar;
     }
 
-    public void setPressureDbar(Double pressureDbar) {
+    public void setPressureDbar(Float pressureDbar) {
         this.pressureDbar = pressureDbar;
     }
 
-    public Double getSalinity() {
+    public Float getSalinity() {
         return salinity;
     }
 
-    public void setSalinity(Double salinity) {
+    public void setSalinity(Float salinity) {
         this.salinity = salinity;
     }
 
-    public Double getAltitude() {
+    public Float getAltitude() {
         return altitude;
     }
 
-    public void setAltitude(Double altitude) {
+    public void setAltitude(Float altitude) {
         this.altitude = altitude;
     }
 
-    public Double getLightTransmission() {
+    public Float getLightTransmission() {
         return lightTransmission;
     }
 
-    public void setLightTransmission(Double lightTransmission) {
+    public void setLightTransmission(Float lightTransmission) {
         this.lightTransmission = lightTransmission;
     }
 

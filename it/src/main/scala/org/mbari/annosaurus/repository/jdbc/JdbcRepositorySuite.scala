@@ -261,8 +261,8 @@ trait JdbcRepositorySuite extends BaseDAOSuite {
         assertEqualsDouble(g.maxLatitude, lats.max, 0.0001)
         assertEqualsDouble(g.minLongitude, lons.min, 0.0001)
         assertEqualsDouble(g.maxLongitude, lons.max, 0.0001)
-        assertEqualsDouble(g.minDepthMeters, depths.min, 0.0001)
-        assertEqualsDouble(g.maxDepthMeters, depths.max, 0.0001)
+        assertEqualsDouble(g.minDepthMeters, depths.min.doubleValue(), 0.0001)
+        assertEqualsDouble(g.maxDepthMeters, depths.max.doubleValue(), 0.0001)
     }
 
     test("findImagedMomentUuidsByConceptWithImages") {

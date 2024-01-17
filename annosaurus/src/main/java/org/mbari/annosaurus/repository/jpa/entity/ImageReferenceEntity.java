@@ -34,6 +34,12 @@ import org.mbari.annosaurus.repository.jpa.URLConverter;
                         name = "idx_image_references__imaged_moment_uuid",
                         columnList = "imaged_moment_uuid"
                 )
+        },
+        uniqueConstraints = {
+                @UniqueConstraint(
+                        name = "uk_image_references__url",
+                        columnNames = {"url"}
+                )
         }
 )
 @EntityListeners({TransactionLogger.class})
@@ -104,7 +110,8 @@ public class ImageReferenceEntity implements IPersistentObject {
     )
     @JoinColumn(
             name = "imaged_moment_uuid",
-            nullable = false
+            nullable = false,
+            foreignKey = @ForeignKey(name = "fk_image_references__imaged_moment_uuid")
     )
     ImagedMomentEntity imagedMoment;
 

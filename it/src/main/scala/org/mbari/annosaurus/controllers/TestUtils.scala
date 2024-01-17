@@ -180,10 +180,10 @@ object TestUtils {
         val lat      = (random.nextInt(18000) / 100d) - 90.0
         val lon      = (random.nextInt(36000) / 100d) - 180.0
         val pressure = random.nextInt(20000) / 10d
-        val depth    = Ocean.depth(pressure.toDouble, lat)
-        val salinity = random.nextInt(3600) / 100d
-        val temp     = random.nextInt(1500) / 100d
-        val oxygen   = random.nextDouble() * 10d
+        val depth    = Ocean.depth(pressure, lat).floatValue
+        val salinity = random.nextInt(3600) / 100f
+        val temp     = random.nextInt(1500) / 100f
+        val oxygen   = random.nextDouble() * 10f
         val crs      = "EPSG:4326"
         val x        = random.nextInt(1000) * 1d
         val y        = random.nextInt(1000) * 1d
@@ -192,16 +192,16 @@ object TestUtils {
         val phi      = random.nextInt(36000) / 100d
         val theta    = random.nextInt(36000) / 100d
         val psi      = random.nextInt(36000) / 100d
-        val trans    = random.nextInt(100) * 1d
+        val trans    = random.nextInt(100) * 1f
         val datum    = new CachedAncillaryDatumEntity()
         datum.setAltitude(null)
         datum.setLatitude(lat)
         datum.setLongitude(lon)
         datum.setDepthMeters(depth)
-        datum.setPressureDbar(pressure)
+        datum.setPressureDbar(pressure.toFloat)
         datum.setSalinity(salinity)
         datum.setTemperatureCelsius(temp)
-        datum.setOxygenMlL(oxygen)
+        datum.setOxygenMlL(oxygen.toFloat)
         datum.setCrs(crs)
         datum.setX(x)
         datum.setY(y)

@@ -53,6 +53,13 @@ class SqlSuite extends munit.FunSuite {
         assert(null.asDouble.isEmpty)
     }
 
+    test("asFloat") {
+        assert(java.lang.Float.valueOf(1.0F).asFloat.get.isInstanceOf[Float])
+        assert(java.lang.Integer.valueOf(1).asFloat.get.isInstanceOf[Float])
+        assert("1.0".asFloat.get.isInstanceOf[Float])
+        assert(null.asFloat.isEmpty)
+    }
+
     test("asLong") {
         assert(java.lang.Double.valueOf(1.0).asLong.get.isInstanceOf[Long])
         assert(java.lang.Integer.valueOf(1).asLong.get.isInstanceOf[Long])

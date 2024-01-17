@@ -11,7 +11,7 @@ CREATE TABLE "imaged_moments"  (
 	"uuid"             	      uuid PRIMARY KEY NOT NULL DEFAULT uuid_generate_v4(),
 	"video_reference_uuid"  	uuid NOT NULL,
 	"elapsed_time_millis"   	numeric(19,0) NULL,
-	"recorded_timestamp"    	timestamp NULL,
+	"recorded_timestamp"    	timestamp with time zone NULL,
 	"timecode"              	varchar(255) NULL,
 	"last_updated_time"	timestamp NOT NULL DEFAULT now());
 

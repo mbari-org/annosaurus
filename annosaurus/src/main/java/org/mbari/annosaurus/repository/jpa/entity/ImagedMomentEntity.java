@@ -267,7 +267,7 @@ public class ImagedMomentEntity implements IPersistentObject {
 //     @Convert(converter = InstantConverter.class)
     Instant recordedTimestamp;
 
-    @Column(name = "timecode", nullable = true)
+    @Column(name = "timecode", nullable = true, length = 11)
     @Convert(converter = TimecodeConverter.class)
     Timecode timecode;
 

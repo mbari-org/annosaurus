@@ -25,6 +25,7 @@ import sttp.model.StatusCode
 import org.mbari.annosaurus.etc.circe.CirceCodecs.{*, given}
 import sttp.client3.*
 import org.mbari.annosaurus.etc.sdk.Futures.*
+import org.junit.Assert.*
 
 import java.util.UUID
 import scala.jdk.CollectionConverters.*
@@ -113,15 +114,15 @@ trait FastAnnotationEndpointsITSuite extends EndpointsSuite {
         val maxLat = data.map(_.latitude).max.getOrElse(-1)
         val minLon = data.map(_.longitude).min.getOrElse(-1)
         val maxLon = data.map(_.longitude).max.getOrElse(-1)
-        val minDepth = data.map(_.depthMeters).min.getOrElse(-1)
-        val maxDepth = data.map(_.depthMeters).max.getOrElse(-1)
+        val minDepth = data.map(_.depthMeters).min.getOrElse(-1F)
+        val maxDepth = data.map(_.depthMeters).max.getOrElse(-1F)
 
         assertEquals(gr.minLatitude, minLat)
         assertEquals(gr.maxLatitude, maxLat)
         assertEquals(gr.minLongitude, minLon)
         assertEquals(gr.maxLongitude, maxLon)
-        assertEquals(gr.minDepthMeters, minDepth)
-        assertEquals(gr.maxDepthMeters, maxDepth)
+        assertEqualsFloat(gr.minDepthMeters.floatValue(), minDepth, 0.00001)
+        assertEqualsFloat(gr.maxDepthMeters.floatValue(), maxDepth, 0.0001)
 
     }
 

@@ -31,23 +31,23 @@ object AncillaryDatumSQL {
 
             CachedAncillaryDatum(
                 uuid = xs(0).asUUID,
-                altitude = xs(1).asDouble,
+                altitude = xs(1).asFloat,
                 crs = xs(2).asString,
-                depthMeters = xs(3).asDouble,
+                depthMeters = xs(3).asFloat,
                 latitude = xs(4).asDouble,
                 longitude = xs(5).asDouble,
-                oxygenMlL = xs(6).asDouble,
+                oxygenMlL = xs(6).asFloat,
                 phi = xs(7).asDouble,
                 posePositionUnits = xs(8).asString,
-                pressureDbar = xs(9).asDouble,
+                pressureDbar = xs(9).asFloat,
                 psi = xs(10).asDouble,
-                salinity = xs(11).asDouble,
-                temperatureCelsius = xs(12).asDouble,
+                salinity = xs(11).asFloat,
+                temperatureCelsius = xs(12).asFloat,
                 theta = xs(13).asDouble,
                 x = xs(14).asDouble,
                 y = xs(15).asDouble,
                 z = xs(16).asDouble,
-                lightTransmission = xs(17).asDouble,
+                lightTransmission = xs(17).asFloat,
                 imagedMomentUuid = xs(18).asUUID
             )
         }

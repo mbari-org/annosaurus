@@ -61,7 +61,7 @@ class TestEntityFactory(daoFactory: JPADAOFactory) {
     val data = dataDao.newPersistentObject(
       Random.nextDouble() * 90,
       Random.nextDouble() * 180,
-      Random.nextDouble() * 2000
+      Random.nextFloat() * 2000
     )
 
     imagedMoment.setAncillaryDatum(data)

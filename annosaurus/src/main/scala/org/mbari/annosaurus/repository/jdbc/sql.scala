@@ -27,6 +27,7 @@ import java.net.URI
   */
 extension (obj: Object)
     def asDouble: Option[Double]   = doubleConverter(obj)
+    def asFloat: Option[Float]     = floatConverter(obj)
     def asInstant: Option[Instant] = instantConverter(obj)
     def asInt: Option[Int]         = intConverter(obj)
     def asLong: Option[Long]       = longConverter(obj)
@@ -60,6 +61,13 @@ def doubleConverter(obj: Object): Option[Double] =
         case n: Number => Some(n.doubleValue())
         case s: String => Try(s.toDouble).toOption
         case _         => None
+
+def floatConverter(obj: Object): Option[Float] =
+    obj match
+        case null => None
+        case n: Number => Some(n.floatValue())
+        case s: String => Try(s.toFloat).toOption
+        case _ => None
 
 def longConverter(obj: Object): Option[Long] =
     obj match

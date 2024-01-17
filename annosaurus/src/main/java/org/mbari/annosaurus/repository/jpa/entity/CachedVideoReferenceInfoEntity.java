@@ -33,6 +33,12 @@ import java.util.UUID;
                         name = "idx_video_reference_information__video_reference_uuid",
                         columnList = "video_reference_uuid"
                 )
+        },
+        uniqueConstraints = {
+                @UniqueConstraint(
+                        name = "uk_video_reference_information__video_reference_uuid",
+                        columnNames = {"video_reference_uuid"}
+                )
         }
 )
 @EntityListeners({TransactionLogger.class})
