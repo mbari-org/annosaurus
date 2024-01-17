@@ -264,6 +264,9 @@ object CirceCodecs {
 
     given renameConceptEncoder: Encoder[RenameConcept] = deriveEncoder
     given renameConceptDecoder: Decoder[RenameConcept] = deriveDecoder
+    
+    given dataDeleteCountScEncoder: Encoder[DataDeleteCountSC] = deriveEncoder
+    given dataDeleteCountScDecoder: Decoder[DataDeleteCountSC] = deriveDecoder
 
 
     private val printer = Printer.noSpaces.copy(dropNullValues = true)

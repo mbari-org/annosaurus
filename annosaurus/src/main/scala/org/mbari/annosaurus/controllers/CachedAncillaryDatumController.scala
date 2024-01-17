@@ -160,6 +160,33 @@ class CachedAncillaryDatumController(val daoFactory: JPADAOFactory)
         }
 
     def update(
+        datum: CachedAncillaryDatum
+    )(implicit ec: ExecutionContext): Future[Option[CachedAncillaryDatum]] =
+        datum.uuid match {
+            case None       =>
+                Future.failed(
+                    new RuntimeException(
+                        s"UUID is required but it was missing from $datum"
+                    )
+                )
+            case Some(uuid) => update(uuid, datum)
+        }
+
+    def update(uuid: UUID, datum: CachedAncillaryDatum)(implicit ec: ExecutionContext): Future[Option[CachedAncillaryDatum]] = {
+        def fn(dao: ADDAO): Option[CachedAncillaryDatum] = {
+            dao
+                .findByUUID(uuid)
+                .map(cad => {
+                    updateValues(cad, datum.toEntity)
+                    cad
+                })
+                .map(transform)
+        }
+
+        exec(fn)
+    }
+
+    def update(
         uuid: UUID,
         latitude: Option[Double] = None,
         longitude: Option[Double] = None,

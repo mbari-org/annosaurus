@@ -41,6 +41,7 @@ class AssociationEndpoints(controller: AssociationController)(using
         .out(jsonBody[AssociationSC])
         .name("findAssociationByUuid")
         .description("Find an association by its UUID")
+        .tag("association")
 
     val findAssociationByUuidImpl: ServerEndpoint[Any, Future] = findAssociationByUuid
         .serverLogic { uuid => handleOption(controller.findByUUID(uuid).map(_.map(_.toSnakeCase))) }
@@ -55,6 +56,7 @@ class AssociationEndpoints(controller: AssociationController)(using
             .out(jsonBody[Seq[AssociationSC]])
             .name("findAssociationsByVideoReferenceUuidAndLinkName")
             .description("Find associations by its videoReferenceUuid and linkName")
+            .tag("association")
 
     val findAssociationsByVideoReferenceUuidAndLinkNameImpl: ServerEndpoint[Any, Future] =
         findAssociationsByVideoReferenceUuidAndLinkName
@@ -79,6 +81,7 @@ class AssociationEndpoints(controller: AssociationController)(using
             .out(jsonBody[AssociationSC])
             .name("createAssociation")
             .description("Create an association")
+            .tag("association")
 
     val createAssociationImpl: ServerEndpoint[Any, Future] = createAssociation
         .serverSecurityLogic(jwtOpt => verify(jwtOpt))
@@ -106,6 +109,7 @@ class AssociationEndpoints(controller: AssociationController)(using
             .out(jsonBody[AssociationSC])
             .name("updateAssociation")
             .description("Update an association")
+            .tag("association")
 
     val updateAssociationImpl: ServerEndpoint[Any, Future] = updateAssociation
         .serverSecurityLogic(jwtOpt => verify(jwtOpt))
@@ -135,6 +139,7 @@ class AssociationEndpoints(controller: AssociationController)(using
             .out(jsonBody[Seq[AssociationSC]])
             .name("updateAssociations")
             .description("Update a list of associations")
+            .tag("association")
 
     val updateAssociationsImpl: ServerEndpoint[Any, Future] = updateAssociations
         .serverSecurityLogic(jwtOpt => verify(jwtOpt))
@@ -152,6 +157,7 @@ class AssociationEndpoints(controller: AssociationController)(using
             .out(statusCode(StatusCode.NoContent).and(emptyOutput))
             .name("deleteAssociations")
             .description("Delete a list of associations")
+            .tag("association")
 
     val deleteAssociationsImpl: ServerEndpoint[Any, Future] = deleteAssociations
         .serverSecurityLogic(jwtOpt => verify(jwtOpt))
@@ -167,6 +173,7 @@ class AssociationEndpoints(controller: AssociationController)(using
         .out(statusCode(StatusCode.NoContent).and(emptyOutput))
         .name("deleteAssociation")
         .description("Delete an association")
+        .tag("association")
 
     val deleteAssociationImpl: ServerEndpoint[Any, Future] = deleteAssociation
         .serverSecurityLogic(jwtOpt => verify(jwtOpt))
@@ -181,6 +188,7 @@ class AssociationEndpoints(controller: AssociationController)(using
         .out(jsonBody[ConceptCount])
         .name("countAssociationsByToConcept")
         .description("Count associations by toConcept")
+        .tag("association")
 
     val countAssociationsByToConceptImpl: ServerEndpoint[Any, Future] = countAssociationsByToConcept
         .serverLogic { concept =>
@@ -196,6 +204,7 @@ class AssociationEndpoints(controller: AssociationController)(using
             .out(jsonBody[RenameCountSC])
             .name("renameToConcept")
             .description("Rename toConcept")
+            .tag("association")
 
     val renameToConceptImpl: ServerEndpoint[Any, Future] = renameToConcept
         .serverSecurityLogic(jwtOpt => verify(jwtOpt))
@@ -216,6 +225,7 @@ class AssociationEndpoints(controller: AssociationController)(using
             .out(jsonBody[ConceptAssociationResponseSC])
             .name("findAssociationsByConceptAssociationRequest")
             .description("Find associations by concept association request")
+            .tag("association")
 
     val findAssociationsByConceptAssociationRequestImpl: ServerEndpoint[Any, Future] =
         findAssociationsByConceptAssociationRequest
