@@ -17,7 +17,7 @@
 package org.mbari.annosaurus.endpoints
 
 import org.mbari.annosaurus.controllers.CachedAncillaryDatumController
-import org.mbari.annosaurus.domain.{CachedAncillaryDatumSC, DataDeleteCountSC, ErrorMsg}
+import org.mbari.annosaurus.domain.{CachedAncillaryDatumSC, CountForVideoReferenceSC, ErrorMsg}
 import org.mbari.annosaurus.etc.jwt.JwtService
 import sttp.tapir.*
 import sttp.tapir.json.circe.*
@@ -96,7 +96,7 @@ class CachedAncillaryDatumEndpoints(controller: CachedAncillaryDatumController)(
         .description("Create one ancillary data")
         .tag("Ancillary Data")
 
-    val createDataImpl: ServerEndpoint[Any, Future] =
+    val createOneDatumImpl: ServerEndpoint[Any, Future] =
         createOneDatum
             .serverSecurityLogic(jwtOpt => verify(jwtOpt))
             .serverLogic { - => data =>
@@ -164,10 +164,10 @@ class CachedAncillaryDatumEndpoints(controller: CachedAncillaryDatumController)(
                         .map(_.map(_.toSnakeCase)))}
 
     // DELETE /videoreference/:uuid
-    val deleteDataByVideoReferenceUuid: Endpoint[Option[String], UUID, ErrorMsg, DataDeleteCountSC, Any] = secureEndpoint
+    val deleteDataByVideoReferenceUuid: Endpoint[Option[String], UUID, ErrorMsg, CountForVideoReferenceSC, Any] = secureEndpoint
         .delete
         .in("v1" / "ancillarydata" / "videoreference" / path[UUID]("videoReferenceUuid"))
-        .out(jsonBody[DataDeleteCountSC])
+        .out(jsonBody[CountForVideoReferenceSC])
         .name("deleteDataByVideoReferenceUuid")
         .description("Delete ancillary data by video reference UUID")
         .tag("Ancillary Data")
@@ -178,7 +178,7 @@ class CachedAncillaryDatumEndpoints(controller: CachedAncillaryDatumController)(
             .serverLogic { - => uuid =>
                 handleErrors(
                     controller.deleteByVideoReferenceUuid(uuid)
-                        .map(n => DataDeleteCountSC(uuid, n)))}
+                        .map(n => CountForVideoReferenceSC(uuid, n)))}
 
 
 
@@ -200,7 +200,7 @@ class CachedAncillaryDatumEndpoints(controller: CachedAncillaryDatumController)(
         findDataByVideoReferenceUuidImpl,
         findDataByImagedMomentUuidImpl,
         findDataByObservationUuidImpl,
-        createDataImpl,
+        createOneDatumImpl,
         createOrUpdateManyDataImpl,
         mergeManyDataImpl,
         updateOneDatumImpl,

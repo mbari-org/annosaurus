@@ -16,6 +16,4 @@
 
 package org.mbari.annosaurus.domain
 
-import java.util.UUID
-
-case class DataDeleteCountSC(video_reference_uuid: UUID, count: Int)
+case class ImagedMomentTimestampUpdateSC(annotation_count: Int, timestamps_updated: Int)

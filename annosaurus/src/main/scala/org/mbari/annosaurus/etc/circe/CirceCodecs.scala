@@ -264,9 +264,15 @@ object CirceCodecs {
 
     given renameConceptEncoder: Encoder[RenameConcept] = deriveEncoder
     given renameConceptDecoder: Decoder[RenameConcept] = deriveDecoder
-    
-    given dataDeleteCountScEncoder: Encoder[DataDeleteCountSC] = deriveEncoder
-    given dataDeleteCountScDecoder: Decoder[DataDeleteCountSC] = deriveDecoder
+
+    given dataDeleteCountScEncoder: Encoder[CountForVideoReferenceSC] = deriveEncoder
+    given dataDeleteCountScDecoder: Decoder[CountForVideoReferenceSC] = deriveDecoder
+
+    given imagedMomentUpdateScEncoder: Encoder[ImagedMomentUpdateSC] = deriveEncoder
+    given imagedMomentUpdateScDecoder: Decoder[ImagedMomentUpdateSC] = deriveDecoder
+
+    given imagedMomentTimestampUpdateScEncoder: Encoder[ImagedMomentTimestampUpdateSC] = deriveEncoder
+    given imagedMomentTimestampUpdateScDecoder: Decoder[ImagedMomentTimestampUpdateSC] = deriveDecoder
 
 
     private val printer = Printer.noSpaces.copy(dropNullValues = true)
