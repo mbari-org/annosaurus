@@ -25,7 +25,7 @@ object Dependencies {
     lazy val gson             = "com.google.code.gson" % "gson"              % "2.10.1"
     lazy val h2               = "com.h2database"       % "h2"                % "2.2.224"
 
-    val hibernateVersion     = "6.4.1.Final"
+    val hibernateVersion     = "6.4.2.Final"
     lazy val hibernateCore   = "org.hibernate.orm" % "hibernate-core"     % hibernateVersion
     lazy val hibernateEnvers = "org.hibernate.orm" % "hibernate-envers"   % hibernateVersion
     lazy val hibernateHikari = "org.hibernate.orm" % "hibernate-hikaricp" % hibernateVersion
@@ -81,7 +81,7 @@ object Dependencies {
     lazy val tapirSwagger    = "com.softwaremill.sttp.tapir"   %% "tapir-swagger-ui-bundle"  % tapirVersion
     lazy val tapirVertex     = "com.softwaremill.sttp.tapir"   %% "tapir-vertx-server"       % tapirVersion
 
-    lazy val tapirSttpCirce  = "com.softwaremill.sttp.client3" %% "circe"                    % "3.9.1"
+    lazy val tapirSttpCirce  = "com.softwaremill.sttp.client3" %% "circe"                    % "3.9.2"
 
     // val testcontainersScalaVersion = "0.41.0"
     // lazy val testcontainersPostgresql =

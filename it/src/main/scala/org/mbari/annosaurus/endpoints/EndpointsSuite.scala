@@ -35,6 +35,40 @@ import sttp.tapir.server.model.ValuedEndpointOutput
 
 trait EndpointsSuite extends BaseDAOSuite:
 
+    def runDelete(
+        ep: ServerEndpoint[Any, Future],
+        uri: String,
+        assertions: Response[Either[String, String]] => Unit): Unit =
+        val backendStub = newBackendStub(ep)
+        val u           = uri"$uri"
+        val request     = basicRequest.delete(u)
+        val response    = request.send(backendStub).join
+        assertions(response)
+
+    def runPut(
+        ep: ServerEndpoint[Any, Future],
+        uri: String,
+        body: String,
+        assertions: Response[Either[String, String]] => Unit
+    ): Unit =
+        val backendStub = newBackendStub(ep)
+        val u           = uri"$uri"
+        val request     = basicRequest.put(u).body(body)
+        val response    = request.send(backendStub).join
+        assertions(response)
+
+    def runPost(
+                   ep: ServerEndpoint[Any, Future],
+                   uri: String,
+                   body: String,
+                   assertions: Response[Either[String, String]] => Unit
+               ): Unit =
+        val backendStub = newBackendStub(ep)
+        val u = uri"$uri"
+        val request = basicRequest.post(u).body(body)
+        val response = request.send(backendStub).join
+        assertions(response)
+
     def runGet(
         ep: ServerEndpoint[Any, Future],
         uri: String,
@@ -42,7 +76,6 @@ trait EndpointsSuite extends BaseDAOSuite:
     ): Unit =
         val backendStub = newBackendStub(ep)
         val u           = uri"$uri"
-//    println(u)
         val request     = basicRequest.get(u)
         val response    = request.send(backendStub).join
         assertions(response)

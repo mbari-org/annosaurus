@@ -25,7 +25,7 @@ import org.mbari.annosaurus.repository.{NotFoundInDatastoreException, Observatio
 import scala.concurrent.{ExecutionContext, Future}
 import org.mbari.annosaurus.repository.jpa.entity.{ImagedMomentEntity, ObservationEntity}
 import org.mbari.annosaurus.repository.jpa.JPADAOFactory
-import org.mbari.annosaurus.domain.Observation
+import org.mbari.annosaurus.domain.{ImagedMoment, Observation}
 
 /** @author
   *   Brian Schlining
@@ -79,7 +79,7 @@ class ObservationController(
 
         exec(fn)
     }
-
+    
     def update(
         uuid: UUID,
         concept: Option[String] = None,

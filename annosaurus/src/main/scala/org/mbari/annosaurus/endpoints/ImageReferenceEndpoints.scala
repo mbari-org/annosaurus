@@ -20,7 +20,7 @@ import org.mbari.annosaurus.controllers.ImageReferenceController
 import org.mbari.annosaurus.domain.{ErrorMsg, ImageReferenceSC}
 import org.mbari.annosaurus.etc.jwt.JwtService
 import org.mbari.annosaurus.etc.circe.CirceCodecs.{*, given}
-import org.mbari.annosaurus.etc.TapirCodecs.given
+import org.mbari.annosaurus.etc.tapir.TapirCodecs.given
 import sttp.model.StatusCode
 import sttp.tapir.Endpoint
 import sttp.tapir.*

@@ -20,7 +20,7 @@ import org.mbari.annosaurus.controllers.AnnotationController
 import org.mbari.annosaurus.domain.{Annotation, AnnotationCreateSC, AnnotationSC, ConcurrentRequest, ErrorMsg, MultiRequest}
 import org.mbari.annosaurus.etc.jwt.JwtService
 import org.mbari.annosaurus.etc.circe.CirceCodecs.{*, given}
-import org.mbari.annosaurus.etc.TapirCodecs.given
+import org.mbari.annosaurus.etc.tapir.TapirCodecs.given
 import sttp.tapir.*
 import sttp.tapir.json.circe.*
 import sttp.tapir.server.ServerEndpoint

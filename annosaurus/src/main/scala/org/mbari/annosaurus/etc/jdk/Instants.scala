@@ -37,3 +37,6 @@ object Instants:
             Try(Instant.from(CompactTimeFormatterMs.parse(s))) orElse
             Try(Instant.from(CompactTimeFormatterNs.parse(s)))
         tried.toEither
+
+    def formatCompactIso8601(instant: Instant): String =
+        CompactTimeFormatter.format(instant)

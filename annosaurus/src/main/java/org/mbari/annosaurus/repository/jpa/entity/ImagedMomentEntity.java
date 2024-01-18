@@ -72,7 +72,7 @@ import org.mbari.vcr4j.time.Timecode;
                 ),
                 @NamedNativeQuery(
                         name = "ImagedMoment.countByConceptWithImages",
-                        query = "SELECT COUNT(*) FROM imaged_moments im LEFT JOIN " +
+                        query = "SELECT COUNT(DISTINCT im.uuid) FROM imaged_moments im LEFT JOIN " +
                                 "observations obs ON obs.imaged_moment_uuid = im.uuid RIGHT JOIN " +
                                 "image_references ir ON ir.imaged_moment_uuid = im.uuid " +
                                 "WHERE obs.concept = ?1 AND ir.url IS NOT NULL"

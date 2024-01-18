@@ -14,16 +14,16 @@
  * limitations under the License.
  */
 
-package org.mbari.annosaurus.etc
+package org.mbari.annosaurus.etc.tapir
 
 import org.mbari.annosaurus.etc.jdk.Instants
-import sttp.tapir.{Codec, DecodeResult}
 import sttp.tapir.CodecFormat.TextPlain
+import sttp.tapir.{Codec, DecodeResult}
 
 import java.net.{URI, URL}
 import java.time.Instant
-import scala.util.{Failure, Success, Try}
 import java.util.HexFormat
+import scala.util.{Failure, Success, Try}
 
 object TapirCodecs:
 

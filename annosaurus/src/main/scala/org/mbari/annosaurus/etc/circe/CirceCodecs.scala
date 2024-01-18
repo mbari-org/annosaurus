@@ -274,6 +274,9 @@ object CirceCodecs {
     given imagedMomentTimestampUpdateScEncoder: Encoder[ImagedMomentTimestampUpdateSC] = deriveEncoder
     given imagedMomentTimestampUpdateScDecoder: Decoder[ImagedMomentTimestampUpdateSC] = deriveDecoder
 
+    given observationUpdateScEncoder: Encoder[ObservationUpdateSC] = deriveEncoder
+    given observationUpdateScDecoder: Decoder[ObservationUpdateSC] = deriveDecoder
+
 
     private val printer = Printer.noSpaces.copy(dropNullValues = true)
 

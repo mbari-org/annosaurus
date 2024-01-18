@@ -19,7 +19,7 @@ package org.mbari.annosaurus.controllers
 import org.mbari.annosaurus.repository.jpa.JPADAOFactory
 import org.mbari.annosaurus.repository.jpa.entity.ImagedMomentEntity
 
-import java.net.URL
+import java.net.{URI, URL}
 import java.time.Instant
 import java.util.UUID
 import scala.util.Random
@@ -54,7 +54,7 @@ class TestEntityFactory(daoFactory: JPADAOFactory) {
       }
 
       val imageReference =
-        irDao.newPersistentObject(new URL("http://www.mbari.org/path/name/" + concept + "/" + i))
+        irDao.newPersistentObject(URI.create("http://www.mbari.org/path/name/" + concept + "/" + i).toURL)
       imagedMoment.addImageReference(imageReference)
     }
 

@@ -22,6 +22,7 @@ import org.mbari.annosaurus.etc.circe.CirceCodecs.{*, given}
 import org.mbari.annosaurus.etc.jwt.JwtService
 import org.mbari.annosaurus.etc.jdk.Logging.given
 
+
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
 import scala.util.Failure
@@ -58,7 +59,7 @@ trait Endpoints:
     implicit lazy val sConcurrentRequest: Schema[ConcurrentRequest]                     = Schema.derived[ConcurrentRequest]
     implicit lazy val sConcurrentRequestSc: Schema[ConcurrentRequestSC]                 = Schema.derived[ConcurrentRequestSC]
     implicit lazy val sCount: Schema[Count]                                             = Schema.derived[Count]
-    implicit lazy val sDeleteCountSc: Schema[DeleteCountSC]                               = Schema.derived[DeleteCountSC]
+    implicit lazy val sDeleteCountSc: Schema[DeleteCountSC]                             = Schema.derived[DeleteCountSC]
     implicit lazy val sDepthHistogram: Schema[DepthHistogram]                           = Schema.derived[DepthHistogram]
     implicit lazy val sGeographicRange: Schema[GeographicRange]                         = Schema.derived[GeographicRange]
     implicit lazy val sGeographicRangeSc: Schema[GeographicRangeSC]                     = Schema.derived[GeographicRangeSC]
@@ -71,6 +72,7 @@ trait Endpoints:
     implicit lazy val sMultiRequestSc: Schema[MultiRequestSC]                           = Schema.derived[MultiRequestSC]
     implicit lazy val sObservation: Schema[Observation]                                 = Schema.derived[Observation]
     implicit lazy val sObservationSc: Schema[ObservationSC]                             = Schema.derived[ObservationSC]
+    implicit lazy val sObservationUpdateSc: Schema[ObservationUpdateSC]                 = Schema.derived[ObservationUpdateSC]
     implicit lazy val sQcrC: Schema[QueryConstraintsResponseSC[Count]]                  = Schema.derived[QueryConstraintsResponseSC[Count]]
     implicit lazy val sQcrA: Schema[QueryConstraintsResponseSC[Seq[AnnotationSC]]]      = Schema.derived[QueryConstraintsResponseSC[Seq[AnnotationSC]]]
     implicit lazy val sQcrDh: Schema[QueryConstraintsResponseSC[DepthHistogramSC]]      = Schema.derived[QueryConstraintsResponseSC[DepthHistogramSC]]
