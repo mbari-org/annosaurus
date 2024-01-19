@@ -19,12 +19,14 @@ import sttp.tapir.json.circe.*
 import sttp.tapir.generic.auto.*
 import sttp.tapir.server.ServerEndpoint
 import org.mbari.annosaurus.etc.circe.CirceCodecs.{*, given}
+import org.mbari.annosaurus.etc.sdk.Reflect
 import sttp.client3.*
 import sttp.model.StatusCode
 
 import java.time.Duration
 import java.util.UUID
 import scala.jdk.CollectionConverters.*
+import scala.util.Random
 
 trait ObservationEndpointsITSuite extends EndpointsSuite {
 
@@ -325,17 +327,17 @@ trait ObservationEndpointsITSuite extends EndpointsSuite {
     }
 
     test("updateOneObservation (json)") {
-        val obs    = TestUtils.create(1, 1).head.getObservations.iterator().next()
-        val update = ObservationUpdateSC(
+        val obs       = TestUtils.create(1, 1).head.getObservations.iterator().next()
+        val update    = ObservationUpdateSC(
             concept = Some("new-concept"),
             observer = Some("new-observer"),
             activity = Some("new-activity"),
             group = Some("new-group"),
             duration_millis = Some(10L)
         )
-        val jwt    = jwtService.authorize("foo").orNull
+        val jwt       = jwtService.authorize("foo").orNull
         assert(jwt != null)
-        val backend = newBackendStub(endpoints.updateOneObservationImpl)
+        val backend   = newBackendStub(endpoints.updateOneObservationImpl)
         val response0 = basicRequest
             .put(uri"http://test.com/v1/observations/${obs.getUuid}")
             .header("Authorization", s"Bearer $jwt")
@@ -344,7 +346,7 @@ trait ObservationEndpointsITSuite extends EndpointsSuite {
             .send(backend)
             .join
         assertEquals(response0.code, StatusCode.Ok)
-        val obtained = checkResponse[ObservationSC](response0.body)
+        val obtained  = checkResponse[ObservationSC](response0.body)
         assertEquals(obtained.concept, update.concept.get)
         assertEquals(obtained.observer, update.observer)
         assertEquals(obtained.activity, update.activity)
@@ -356,7 +358,73 @@ trait ObservationEndpointsITSuite extends EndpointsSuite {
     }
 
     test("updateOneObservation (form)") {
-        fail("TODO")
+        val obs       = TestUtils.create(1, 1).head.getObservations.iterator().next()
+        val n         = Random.nextInt(100000)
+        val d         = Random.nextLong()
+        val update    = ObservationUpdateSC(
+            concept = Some("new-concept" + n),
+            observer = Some("new-observer" + n),
+            activity = Some("new-activity" + n),
+            group = Some("new-group" + n),
+            duration_millis = Some(d)
+        )
+        val formData  = Reflect.toFormBody(update)
+        val jwt       = jwtService.authorize("foo").orNull
+        assert(jwt != null)
+        val backend   = newBackendStub(endpoints.updateOneObservationImpl)
+        val response0 = basicRequest
+            .put(uri"http://test.com/v1/observations/${obs.getUuid}")
+            .header("Authorization", s"Bearer $jwt")
+            .header("Content-Type", "application/x-www-form-urlencoded")
+            .body(formData)
+            .send(backend)
+            .join
+        assertEquals(response0.code, StatusCode.Ok)
+        val obtained  = checkResponse[ObservationSC](response0.body)
+        assertEquals(obtained.concept, update.concept.get)
+        assertEquals(obtained.observer, update.observer)
+        assertEquals(obtained.activity, update.activity)
+        assertEquals(obtained.group, update.group)
+        assertEquals(obtained.duration_millis, update.duration_millis)
+        assertEquals(obtained.uuid.get, obs.getUuid)
+    }
+
+    test("deleteDuration") {
+        val xs = TestUtils.build(1, 1).head
+        val obs = xs.getObservations.iterator().next()
+        obs.setDuration(Duration.ofSeconds(100L))
+        val c = ImagedMomentController(daoFactory)
+        val im = c.create(Seq(xs)).join.head
+        assert(im.observations.head.duration.isDefined)
+        val jwt = jwtService.authorize("foo").orNull
+        assert(jwt != null)
+        val backend = newBackendStub(endpoints.deleteDurationImpl)
+        val response = basicRequest
+            .put(uri"http://test.com/v1/observations/delete/duration/${obs.getUuid}")
+            .header("Authorization", s"Bearer $jwt")
+            .send(backend)
+            .join
+        assertEquals(response.code, StatusCode.Ok)
+        val obtained = checkResponse[ObservationSC](response.body)
+        assertEquals(obtained.duration_millis, None)
+    }
+
+    test("deleteOneObservation") {
+        val im = TestUtils.create(1, 1).head
+        val obs = im.getObservations.iterator().next()
+        val jwt = jwtService.authorize("foo").orNull
+        assert(jwt != null)
+        val backend = newBackendStub(endpoints.deleteOneObservationImpl)
+        val response = basicRequest
+            .delete(uri"http://test.com/v1/observations/${obs.getUuid}")
+            .header("Authorization", s"Bearer $jwt")
+            .send(backend)
+            .join
+        assertEquals(response.code, StatusCode.NoContent)
+
+        val c = ObservationController(daoFactory)
+        val obtained = c.findByUUID(obs.getUuid).join
+        assertEquals(obtained, None)
     }
 
 }
