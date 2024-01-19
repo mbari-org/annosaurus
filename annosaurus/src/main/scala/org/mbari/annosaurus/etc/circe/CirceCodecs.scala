@@ -276,12 +276,18 @@ object CirceCodecs {
 
     given observationUpdateScEncoder: Encoder[ObservationUpdateSC] = deriveEncoder
     given observationUpdateScDecoder: Decoder[ObservationUpdateSC] = deriveDecoder
-    
+
     given imageCreateScEncoder: Encoder[ImageCreateSC] = deriveEncoder
     given imageCreateScDecoder: Decoder[ImageCreateSC] = deriveDecoder
-    
+
     given imageUpdateScEncoder: Encoder[ImageUpdateSC] = deriveEncoder
     given imageUpdateScDecoder: Decoder[ImageUpdateSC] = deriveDecoder
+
+    given videoInfoCreateScEncoder: Encoder[CachedVideoReferenceInfoCreateSC] = deriveEncoder
+    given videoInfoCreateScDecoder: Decoder[CachedVideoReferenceInfoCreateSC] = deriveDecoder
+
+    given videoInfoUpdateScEncoder: Encoder[CachedVideoReferenceInfoUpdateSC] = deriveEncoder
+    given videoInfoUpdateScDecoder: Decoder[CachedVideoReferenceInfoUpdateSC] = deriveDecoder
 
 
     private val printer = Printer.noSpaces.copy(dropNullValues = true)

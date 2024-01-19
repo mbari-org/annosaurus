@@ -157,7 +157,21 @@ class ImageEndpoints(controller: ImageController)(using
         }
 
 
-    override def all: List[Endpoint[_, _, _, _, _]] = ???
+    override def all: List[Endpoint[_, _, _, _, _]] = List(
+        findOneImage,
+        findByVideoReferenceUUID,
+        findByImageName,
+        findByImageUrl,
+        createOneImage,
+        updateOneImage
+    )
 
-    override def allImpl: List[ServerEndpoint[Any, Future]] = ???
+    override def allImpl: List[ServerEndpoint[Any, Future]] = List(
+        findOneImageImpl,
+        findByVideoReferenceUUIDImpl,
+        findByImageNameImpl,
+        findByImageUrlImpl,
+        createOneImageImpl,
+        updateOneImageImpl
+    )
 }
