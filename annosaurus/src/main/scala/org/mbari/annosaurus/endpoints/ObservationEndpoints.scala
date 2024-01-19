@@ -106,17 +106,17 @@ class ObservationEndpoints(controller: ObservationController)(using
             }
 
     // GET /concepts
-    val findConcepts: Endpoint[Unit, Unit, ErrorMsg, Seq[String], Any] =
+    val findAllConcepts: Endpoint[Unit, Unit, ErrorMsg, Seq[String], Any] =
         openEndpoint
             .get
             .in("v1" / "observations" / "concepts")
             .out(jsonBody[Seq[String]])
-            .name("findConcepts")
+            .name("findAllConcepts")
             .description("List all concepts found in the database")
             .tag("observations")
 
-    val findConceptsImpl: ServerEndpoint[Any, Future] =
-        findConcepts
+    val findAllConceptsImpl: ServerEndpoint[Any, Future] =
+        findAllConcepts
             .serverLogic { paging =>
                 handleErrors(controller.findAllConcepts.map(_.toSeq))
             }
@@ -125,7 +125,7 @@ class ObservationEndpoints(controller: ObservationController)(using
     val findConceptsByVideoReferenceUuid: Endpoint[Unit, UUID, ErrorMsg, Seq[String], Any] =
         openEndpoint
             .get
-            .in("v1" / "observations" / "concept" / path[UUID]("videoReferenceUuid"))
+            .in("v1" / "observations" / "concepts" / path[UUID]("videoReferenceUuid"))
             .out(jsonBody[Seq[String]])
             .name("findConceptsByVideoReferenceUuid")
             .description("List all concepts used to annotation in a given video reference UUID")
@@ -226,17 +226,17 @@ class ObservationEndpoints(controller: ObservationController)(using
             }
 
     // GET/ counts
-    val countAllByVideoReferenceUuid: Endpoint[Unit, Unit, ErrorMsg, Seq[CountForVideoReferenceSC], Any] =
+    val countAllGroupByVideoReferenceUuid: Endpoint[Unit, Unit, ErrorMsg, Seq[CountForVideoReferenceSC], Any] =
         openEndpoint
             .get
             .in("v1" / "observations" / "counts")
             .out(jsonBody[Seq[CountForVideoReferenceSC]])
-            .name("countAllByVideoReferenceUuid")
+            .name("countAllGroupByVideoReferenceUuid")
             .description("Count the number of observations for all video reference UUIDs")
             .tag("observations")
 
-    val countAllByVideoReferenceUuidImpl: ServerEndpoint[Any, Future] =
-        countAllByVideoReferenceUuid
+    val countAllGroupByVideoReferenceUuidImpl: ServerEndpoint[Any, Future] =
+        countAllGroupByVideoReferenceUuid
             .serverLogic { paging =>
                 handleErrors(
                     controller
@@ -340,13 +340,13 @@ class ObservationEndpoints(controller: ObservationController)(using
         findObservationsByVideoReferenceUuid,
         findObservationByAssociationUuid,
         findActivities,
-        findConcepts,
+        findAllConcepts,
         findConceptsByVideoReferenceUuid,
         countObservationsByConcept,
         countImagesByConcept,
         findGroups,
         countByVideoReferenceUuid,
-        countAllByVideoReferenceUuid,
+        countAllGroupByVideoReferenceUuid,
         renameConcept,
         updateOneObservation,
         deleteDuration,
@@ -358,13 +358,13 @@ class ObservationEndpoints(controller: ObservationController)(using
         findObservationsByVideoReferenceUuidImpl,
         findObservationByAssociationUuidImpl,
         findActivitiesImpl,
-        findConceptsImpl,
+        findAllConceptsImpl,
         findConceptsByVideoReferenceUuidImpl,
         countObservationsByConceptImpl,
         countImagesByConceptImpl,
         findGroupsImpl,
         countByVideoReferenceUuidImpl,
-        countAllByVideoReferenceUuidImpl,
+        countAllGroupByVideoReferenceUuidImpl,
         renameConceptImpl,
         updateOneObservationImpl,
         deleteDurationImpl,
