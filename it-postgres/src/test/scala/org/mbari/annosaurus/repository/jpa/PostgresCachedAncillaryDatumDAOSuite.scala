@@ -16,7 +16,7 @@
 
 package org.mbari.annosaurus.repository.jpa
 
-class PostgresCachedAncillaryDatumDAOSuite extends CachedAncillaryDatumDAOITSuite {
+class PostgresCachedAncillaryDatumDAOSuite extends CachedAncillaryDatumDAOSuite {
     given daoFactory: TestDAOFactory = PostgresTestDAOFactory
   
 }

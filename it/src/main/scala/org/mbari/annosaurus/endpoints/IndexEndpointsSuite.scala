@@ -24,7 +24,7 @@ import org.mbari.annosaurus.repository.jpa.JPADAOFactory
 import org.mbari.annosaurus.etc.jwt.JwtService
 import org.mbari.annosaurus.etc.circe.CirceCodecs.given
 
-trait IndexEndpointsITSuite extends EndpointsSuite {
+trait IndexEndpointsSuite extends EndpointsSuite {
 
     private val log = System.getLogger(getClass.getName)
 

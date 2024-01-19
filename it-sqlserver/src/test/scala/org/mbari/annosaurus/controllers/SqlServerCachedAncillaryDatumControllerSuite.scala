@@ -17,7 +17,7 @@
 package org.mbari.annosaurus.controllers
 import org.mbari.annosaurus.repository.jpa.{SqlServerTestDAOFactory, TestDAOFactory}
 
-class SqlServerCachedAncillaryDatumControllerSuite extends CachedAncillaryDatumControllerITSuite  {
+class SqlServerCachedAncillaryDatumControllerSuite extends CachedAncillaryDatumControllerSuite  {
 
     override given daoFactory: TestDAOFactory = SqlServerTestDAOFactory
 

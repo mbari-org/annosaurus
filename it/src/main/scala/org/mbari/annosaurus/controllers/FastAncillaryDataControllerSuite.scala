@@ -24,7 +24,7 @@ import org.mbari.annosaurus.etc.circe.CirceCodecs.{*, given}
 
 import scala.concurrent.ExecutionContext
 
-trait FastAncillaryDataControllerITSuite extends BaseDAOSuite {
+trait FastAncillaryDataControllerSuite extends BaseDAOSuite {
 
     given JPADAOFactory         = daoFactory
     given ExecutionContext = ExecutionContext.global

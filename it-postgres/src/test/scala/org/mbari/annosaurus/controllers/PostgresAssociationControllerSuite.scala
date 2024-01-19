@@ -19,7 +19,7 @@ package org.mbari.annosaurus.controllers
 import org.mbari.annosaurus.repository.jpa.PostgresTestDAOFactory
 import org.mbari.annosaurus.repository.jpa.TestDAOFactory
 
-class PostgresAssociationControllerSuite extends AssociationControllerITSuite {
+class PostgresAssociationControllerSuite extends AssociationControllerSuite {
     given daoFactory: TestDAOFactory = PostgresTestDAOFactory
   
 }

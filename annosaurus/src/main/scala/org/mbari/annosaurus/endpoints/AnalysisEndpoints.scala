@@ -16,10 +16,7 @@
 
 package org.mbari.annosaurus.endpoints
 
-import org.mbari.annosaurus.domain.{DepthHistogram, TimeHistogram}
-import org.mbari.annosaurus.domain.ErrorMsg
-import org.mbari.annosaurus.domain.QueryConstraints
-import org.mbari.annosaurus.domain.QueryConstraintsResponse
+import org.mbari.annosaurus.domain.{DepthHistogram, DepthHistogramSC, ErrorMsg, QueryConstraints, QueryConstraintsResponse, QueryConstraintsResponseSC, QueryConstraintsSC, TimeHistogram, TimeHistogramSC}
 import org.mbari.annosaurus.etc.circe.CirceCodecs.given
 import org.mbari.annosaurus.repository.jdbc.AnalysisRepository
 import org.mbari.annosaurus.repository.jpa.JPADAOFactory
@@ -35,36 +32,36 @@ import scala.concurrent.Future
 class AnalysisEndpoints(repository: AnalysisRepository)(implicit val executor: ExecutionContext)
     extends Endpoints {
 
-    val depthHistogram: Endpoint[Unit, (Int, QueryConstraints), ErrorMsg, QueryConstraintsResponse[
-        DepthHistogram
+    val depthHistogram: Endpoint[Unit, (Option[Int], QueryConstraintsSC), ErrorMsg, QueryConstraintsResponseSC[
+        DepthHistogramSC
     ], Any] = openEndpoint
         .post
         .in("v1" / "histogram" / "depth")
-        .in(query[Int]("size").description("Bin size in meters").example(50))
-        .in(jsonBody[QueryConstraints].description("Query constraints"))
-        .out(jsonBody[QueryConstraintsResponse[DepthHistogram]].description("Histogram of depths"))
+        .in(query[Option[Int]]("size").description("Bin size in meters"))
+        .in(jsonBody[QueryConstraintsSC].description("Query constraints"))
+        .out(jsonBody[QueryConstraintsResponseSC[DepthHistogramSC]].description("Histogram of depths"))
 
     val depthHistogramImpl: ServerEndpoint[Any, Future] =
         depthHistogram.serverLogic { case (binSizeMeters, constraints) =>
-            val f = Future(repository.depthHistogram(constraints, binSizeMeters)).map(dh =>
-                QueryConstraintsResponse(constraints, dh)
+            val f = Future(repository.depthHistogram(constraints.toCamelCase, binSizeMeters.getOrElse(50))).map(dh =>
+                QueryConstraintsResponseSC(constraints, dh.toSnakeCase)
             )
             handleErrors(f)
         }
 
-    val timeHistogram: Endpoint[Unit, (Int, QueryConstraints), ErrorMsg, QueryConstraintsResponse[
-        TimeHistogram
+    val timeHistogram: Endpoint[Unit, (Option[Int], QueryConstraintsSC), ErrorMsg, QueryConstraintsResponseSC[
+        TimeHistogramSC
     ], Any] = openEndpoint
         .post
         .in("v1" / "histogram" / "time")
-        .in(query[Int]("size").description("Bin size in days").example(50))
-        .in(jsonBody[QueryConstraints].description("Query constraints"))
-        .out(jsonBody[QueryConstraintsResponse[TimeHistogram]].description("Histogram of time"))
+        .in(query[Option[Int]]("size").description("Bin size in days").default(Some(50)))
+        .in(jsonBody[QueryConstraintsSC].description("Query constraints"))
+        .out(jsonBody[QueryConstraintsResponseSC[TimeHistogramSC]].description("Histogram of time"))
 
     val timeHistogramImpl: ServerEndpoint[Any, Future] =
         timeHistogram.serverLogic { case (binSizeDays, constraints) =>
-            val f = Future(repository.timeHistogram(constraints, binSizeDays)).map(dh =>
-                QueryConstraintsResponse(constraints, dh)
+            val f = Future(repository.timeHistogram(constraints.toCamelCase, binSizeDays.getOrElse(50))).map(dh =>
+                QueryConstraintsResponseSC(constraints, dh.toSnakeCase)
             )
             handleErrors(f)
         }

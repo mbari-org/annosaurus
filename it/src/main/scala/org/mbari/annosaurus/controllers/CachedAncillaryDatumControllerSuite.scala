@@ -24,7 +24,7 @@ import java.sql.Timestamp
 import java.time.{Duration, Instant}
 import scala.util.Random
 
-trait CachedAncillaryDatumControllerITSuite extends BaseDAOSuite {
+trait CachedAncillaryDatumControllerSuite extends BaseDAOSuite {
 
     given JPADAOFactory = daoFactory
 

@@ -21,7 +21,7 @@ import org.mbari.annosaurus.repository.jpa.{BaseDAOSuite, JPADAOFactory}
 
 import scala.concurrent.ExecutionContext
 
-trait CachedVideoReferenceInfoControllerITSuite extends BaseDAOSuite {
+trait CachedVideoReferenceInfoControllerSuite extends BaseDAOSuite {
 
     given JPADAOFactory = daoFactory
     given ExecutionContext = ExecutionContext.global

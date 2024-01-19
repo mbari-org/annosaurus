@@ -14,11 +14,20 @@
  * limitations under the License.
  */
 
-package org.mbari.annosaurus.controllers
-import org.mbari.annosaurus.repository.jpa.{SqlServerTestDAOFactory, TestDAOFactory}
+package org.mbari.annosaurus.domain
 
-class SqlServerObservationControllerSuite extends ObservationControllerSuite {
+import java.net.URL
+import java.time.Instant
+import java.util.UUID
 
-    override given daoFactory: TestDAOFactory = SqlServerTestDAOFactory
-
-}
+case class ImageCreateSC(
+    video_reference_uuid: UUID,
+    url: URL,
+    timecode: Option[String] = None,
+    elapsed_time_millis: Option[Long] = None,
+    recorded_timestamp: Option[Instant] = None,
+    format: Option[String] = None,
+    width_pixels: Option[Int] = None,
+    height_pixels: Option[Int] = None,
+    description: Option[String] = None,
+)

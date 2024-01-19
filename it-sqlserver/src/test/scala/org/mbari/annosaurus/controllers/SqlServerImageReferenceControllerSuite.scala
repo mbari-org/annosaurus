@@ -17,7 +17,7 @@
 package org.mbari.annosaurus.controllers
 import org.mbari.annosaurus.repository.jpa.{SqlServerTestDAOFactory, TestDAOFactory}
 
-class SqlServerImageReferenceControllerSuite extends ImageReferenceControllerITSuite {
+class SqlServerImageReferenceControllerSuite extends ImageReferenceControllerSuite {
 
     override given daoFactory: TestDAOFactory = SqlServerTestDAOFactory
 

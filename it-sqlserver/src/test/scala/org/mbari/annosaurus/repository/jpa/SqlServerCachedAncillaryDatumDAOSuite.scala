@@ -16,7 +16,7 @@
 
 package org.mbari.annosaurus.repository.jpa
 
-class SqlServerCachedAncillaryDatumDAOSuite extends CachedAncillaryDatumDAOITSuite {
+class SqlServerCachedAncillaryDatumDAOSuite extends CachedAncillaryDatumDAOSuite {
   given daoFactory: TestDAOFactory = SqlServerTestDAOFactory
   
 }

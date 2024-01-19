@@ -18,7 +18,7 @@ package org.mbari.annosaurus.controllers
 
 import org.mbari.annosaurus.repository.jpa.{PostgresTestDAOFactory, TestDAOFactory}
 
-class PostgresCachedAncillaryDatumControllerSuite extends CachedAncillaryDatumControllerITSuite {
+class PostgresCachedAncillaryDatumControllerSuite extends CachedAncillaryDatumControllerSuite {
 
     override given daoFactory: TestDAOFactory = PostgresTestDAOFactory
 

@@ -20,7 +20,7 @@ import org.mbari.annosaurus.AssertUtils
 import org.mbari.annosaurus.domain.Image
 import org.mbari.annosaurus.repository.jpa.{BaseDAOSuite, JPADAOFactory}
 
-trait ImageControllerITSuite extends BaseDAOSuite {
+trait ImageControllerSuite extends BaseDAOSuite {
 
     given JPADAOFactory = daoFactory
 

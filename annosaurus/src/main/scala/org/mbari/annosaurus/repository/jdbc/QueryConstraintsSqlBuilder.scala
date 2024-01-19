@@ -22,8 +22,11 @@ import org.mbari.annosaurus.domain.QueryConstraints
 import jakarta.persistence.EntityManager
 import jakarta.persistence.Query
 import java.sql.Timestamp
+import org.mbari.annosaurus.etc.jdk.Logging.given
 
 object QueryConstraintsSqlBuilder {
+
+    private val log = System.getLogger(getClass.getName)
 
     /** Generates a SQL template for use to build a query. It's not executable SQL though!
       * @param qc
@@ -91,6 +94,7 @@ object QueryConstraintsSqlBuilder {
         orderStatment: String = AnnotationSQL.ORDER
     ): Query = {
         val sql = toSql(qc, selectStatement, orderStatment)
+        log.atDebug.log(() => "SQL: " + sql)
         buildQuery(qc, entityManager, sql)
     }
 

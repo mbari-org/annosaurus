@@ -35,7 +35,7 @@ import java.util.UUID
 import scala.io.Source
 import scala.util.{Failure, Success, Using}
 
-trait AnnotationControllerITSuite extends BaseDAOSuite {
+trait AnnotationControllerSuite extends BaseDAOSuite {
     given JPADAOFactory    = daoFactory
     given ExecutionContext = ExecutionContext.global
     lazy val controller    = AnnotationController(daoFactory)

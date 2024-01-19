@@ -16,6 +16,6 @@
 
 package org.mbari.annosaurus.repository.jpa
 
-class SqlServerCachedVideoReferenceInfoDAOSuite extends CachedVideoReferenceInfoDAOITSuite {
+class SqlServerCachedVideoReferenceInfoDAOSuite extends CachedVideoReferenceInfoDAOSuite {
     given daoFactory: TestDAOFactory = SqlServerTestDAOFactory
 }

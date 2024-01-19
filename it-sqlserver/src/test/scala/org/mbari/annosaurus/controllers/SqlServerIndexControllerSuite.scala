@@ -17,7 +17,7 @@
 package org.mbari.annosaurus.controllers
 import org.mbari.annosaurus.repository.jpa.{SqlServerTestDAOFactory, TestDAOFactory}
 
-class SqlServerIndexControllerSuite extends IndexControllerITSuite {
+class SqlServerIndexControllerSuite extends IndexControllerSuite {
 
     override given daoFactory: TestDAOFactory = SqlServerTestDAOFactory
 

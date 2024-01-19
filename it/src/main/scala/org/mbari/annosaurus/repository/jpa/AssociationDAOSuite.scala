@@ -21,7 +21,7 @@ import scala.jdk.CollectionConverters.*
 import org.mbari.annosaurus.AssertUtils
 import org.mbari.annosaurus.domain.ConceptAssociationRequest
 
-trait AssociationDAOITSuite extends BaseDAOSuite {
+trait AssociationDAOSuite extends BaseDAOSuite {
 
     given JPADAOFactory = daoFactory
 

@@ -16,7 +16,7 @@
 
 package org.mbari.annosaurus.repository.jpa
 
-class SqlServerObservationDAOSuite extends ObservationDAOITSuite {
+class SqlServerObservationDAOSuite extends ObservationDAOSuite {
   given daoFactory: TestDAOFactory = SqlServerTestDAOFactory
   
 }

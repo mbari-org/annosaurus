@@ -17,7 +17,7 @@
 package org.mbari.annosaurus.endpoints
 
 import org.mbari.annosaurus.controllers.ImagedMomentController
-import org.mbari.annosaurus.domain.{AnnotationSC, ConceptCount, Count, CountForVideoReferenceSC, ErrorMsg, ImagedMomentSC, ImagedMomentTimestampUpdateSC, ImagedMomentUpdateSC, WindowRequestSC}
+import org.mbari.annosaurus.domain.{AnnotationSC, ConceptCount, Count, CountForVideoReferenceSC, ErrorMsg, ImagedMomentSC, ImagedMomentTimestampUpdateSC, VideoTimestampSC, WindowRequestSC}
 import org.mbari.annosaurus.etc.jwt.JwtService
 import org.mbari.annosaurus.etc.tapir.TapirCodecs.given
 import sttp.tapir.*
@@ -385,10 +385,10 @@ class ImagedMomentEndpoints(controller: ImagedMomentController)(using
             }
 
     // PUT /:uuid
-    val updateImagedMoment: Endpoint[Option[String], (UUID, ImagedMomentUpdateSC), ErrorMsg, ImagedMomentSC, Any] = secureEndpoint
+    val updateImagedMoment: Endpoint[Option[String], (UUID, VideoTimestampSC), ErrorMsg, ImagedMomentSC, Any] = secureEndpoint
         .put
         .in("v1" / "imagedmoments" / path[UUID]("uuid"))
-        .in(oneOfBody(jsonBody[ImagedMomentUpdateSC], formBody[ImagedMomentUpdateSC]))
+        .in(oneOfBody(jsonBody[VideoTimestampSC], formBody[VideoTimestampSC]))
         .out(jsonBody[ImagedMomentSC])
         .name("updateImagedMoment")
         .description("Update an imaged moment")

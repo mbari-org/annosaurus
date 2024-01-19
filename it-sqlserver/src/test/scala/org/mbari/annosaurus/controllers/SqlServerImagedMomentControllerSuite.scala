@@ -19,7 +19,7 @@ package org.mbari.annosaurus.controllers
 import org.mbari.annosaurus.repository.jpa.SqlServerTestDAOFactory
 import org.mbari.annosaurus.repository.jpa.TestDAOFactory
 
-class SqlServerImagedMomentControllerSuite extends ImagedMomentContollerITSuite {
+class SqlServerImagedMomentControllerSuite extends ImagedMomentContollerSuite {
         
     given daoFactory: TestDAOFactory = SqlServerTestDAOFactory
 }

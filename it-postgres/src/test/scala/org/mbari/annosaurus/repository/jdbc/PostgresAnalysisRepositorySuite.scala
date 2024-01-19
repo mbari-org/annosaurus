@@ -14,12 +14,11 @@
  * limitations under the License.
  */
 
-package org.mbari.annosaurus.domain
+package org.mbari.annosaurus.repository.jdbc
+import org.mbari.annosaurus.repository.jpa.{PostgresTestDAOFactory, TestDAOFactory}
 
-import java.time.Instant
-import java.util.UUID
+class PostgresAnalysisRepositorySuite extends AnalysisRepositorySuite {
 
-case class ImagedMomentUpdateSC(timecode: Option[String],
-                                elapsed_time_millis: Option[Long],
-                                recorded_timestamp: Option[Instant],
-                                video_reference_uuid: Option[UUID])
+    override given daoFactory: TestDAOFactory = PostgresTestDAOFactory
+
+}

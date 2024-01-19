@@ -117,9 +117,9 @@ object TestUtils {
         nImageReferences: Int = 0,
         includeData: Boolean = false,
         videoReferenceUuid: UUID = UUID.randomUUID(),
-        startDate: Instant = Instant.now()
+        startDate: Instant = Instant.now().minus(Duration.ofDays(30))
     ): ImagedMomentEntity = {
-        val et           = random.nextInt()
+        val et           = random.nextLong(2592000000L) // 30 days
         val elapsedTime  = Duration.ofMillis(et)
         val recordedDate = Some(startDate.plusMillis(et)).orNull
         val timecode     =

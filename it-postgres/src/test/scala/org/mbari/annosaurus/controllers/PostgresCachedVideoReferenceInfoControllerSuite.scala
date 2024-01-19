@@ -17,7 +17,7 @@
 package org.mbari.annosaurus.controllers
 import org.mbari.annosaurus.repository.jpa.{PostgresTestDAOFactory, TestDAOFactory}
 
-class PostgresCachedVideoReferenceInfoControllerSuite extends CachedVideoReferenceInfoControllerITSuite {
+class PostgresCachedVideoReferenceInfoControllerSuite extends CachedVideoReferenceInfoControllerSuite {
 
     override given daoFactory: TestDAOFactory = PostgresTestDAOFactory
 

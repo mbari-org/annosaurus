@@ -30,7 +30,7 @@ import org.mbari.annosaurus.etc.sdk.Futures.*
 import java.time.{Duration, Instant}
 import scala.jdk.CollectionConverters.*
 
-trait ImagedMomentEndpointsITSuite extends EndpointsSuite {
+trait ImagedMomentEndpointsSuite extends EndpointsSuite {
 
     private val log              = System.getLogger(getClass.getName)
     given JPADAOFactory          = daoFactory

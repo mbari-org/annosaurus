@@ -16,7 +16,7 @@
 
 package org.mbari.annosaurus.repository.jpa
 
-class PostgresObservationDAOSuite extends ObservationDAOITSuite {
+class PostgresObservationDAOSuite extends ObservationDAOSuite {
     given daoFactory: TestDAOFactory = PostgresTestDAOFactory
   
 }

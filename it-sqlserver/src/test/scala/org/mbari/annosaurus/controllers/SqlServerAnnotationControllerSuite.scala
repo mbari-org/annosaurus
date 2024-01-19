@@ -19,7 +19,7 @@ package org.mbari.annosaurus.controllers
 import org.mbari.annosaurus.repository.jpa.TestDAOFactory
 import org.mbari.annosaurus.repository.jpa.SqlServerTestDAOFactory
 
-class SqlServerAnnotationControllerSuite extends AnnotationControllerITSuite {
+class SqlServerAnnotationControllerSuite extends AnnotationControllerSuite {
 
     override def daoFactory: TestDAOFactory = SqlServerTestDAOFactory
   

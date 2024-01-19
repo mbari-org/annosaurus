@@ -17,7 +17,7 @@
 package org.mbari.annosaurus.controllers
 import org.mbari.annosaurus.repository.jpa.{SqlServerTestDAOFactory, TestDAOFactory}
 
-class SqlServerFastAncillaryDataControllerSuite extends FastAncillaryDataControllerITSuite {
+class SqlServerFastAncillaryDataControllerSuite extends FastAncillaryDataControllerSuite {
 
     override given daoFactory: TestDAOFactory = SqlServerTestDAOFactory
 

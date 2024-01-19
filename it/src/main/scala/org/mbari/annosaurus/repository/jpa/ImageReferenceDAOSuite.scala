@@ -21,7 +21,7 @@ import org.mbari.annosaurus.repository.jpa.entity.ImageReferenceEntity
 import org.mbari.annosaurus.AssertUtils
 import java.net.URI
 
-trait ImageReferenceDAOITSuite extends BaseDAOSuite {
+trait ImageReferenceDAOSuite extends BaseDAOSuite {
 
     given JPADAOFactory = daoFactory
 

@@ -19,9 +19,13 @@ package org.mbari.annosaurus.domain
 case class DepthHistogram(binsMin: List[Int], binsMax: List[Int], values: List[Int])
     extends ToSnakeCase[DepthHistogramSC] {
     override def toSnakeCase: DepthHistogramSC = DepthHistogramSC(binsMin, binsMax, values)
+
+    def count: Int = values.sum
 }
 
 case class DepthHistogramSC(bins_min: List[Int], bins_max: List[Int], values: List[Int])
     extends ToCamelCase[DepthHistogram] {
     override def toCamelCase: DepthHistogram = DepthHistogram(bins_min, bins_max, values)
+
+    def count: Int = values.sum
 }

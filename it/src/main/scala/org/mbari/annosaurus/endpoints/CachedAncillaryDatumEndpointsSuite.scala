@@ -27,7 +27,7 @@ import org.mbari.annosaurus.etc.jwt.JwtService
 import org.mbari.annosaurus.repository.jpa.JPADAOFactory
 import sttp.model.StatusCode
 
-trait CachedAncillaryDatumEndpointsITSuite extends EndpointsSuite {
+trait CachedAncillaryDatumEndpointsSuite extends EndpointsSuite {
 
     private val log = System.getLogger(getClass.getName)
 

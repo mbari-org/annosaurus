@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 
-package org.mbari.annosaurus.controllers
-import org.mbari.annosaurus.repository.jpa.{SqlServerTestDAOFactory, TestDAOFactory}
+package org.mbari.annosaurus.domain
 
-class SqlServerObservationControllerSuite extends ObservationControllerSuite {
+import java.time.Instant
+import java.util.UUID
 
-    override given daoFactory: TestDAOFactory = SqlServerTestDAOFactory
-
-}
+case class VideoTimestampSC(timecode: Option[String],
+                            elapsed_time_millis: Option[Long],
+                            recorded_timestamp: Option[Instant],
+                            video_reference_uuid: Option[UUID])

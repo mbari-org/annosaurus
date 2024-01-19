@@ -24,7 +24,7 @@ import org.mbari.annosaurus.domain.ConcurrentRequest
 import org.mbari.annosaurus.domain.MultiRequest
 import scala.jdk.CollectionConverters.*
 
-trait ObservationDAOITSuite extends BaseDAOSuite {
+trait ObservationDAOSuite extends BaseDAOSuite {
     given JPADAOFactory = daoFactory
 
     test("create") {

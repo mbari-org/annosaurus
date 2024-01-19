@@ -19,7 +19,7 @@ package org.mbari.annosaurus.controllers
 import org.mbari.annosaurus.repository.jpa.PostgresTestDAOFactory
 import org.mbari.annosaurus.repository.jpa.TestDAOFactory
 
-class PostgresImagedMomentControllerSuite extends ImagedMomentContollerITSuite {
+class PostgresImagedMomentControllerSuite extends ImagedMomentContollerSuite {
     
         given daoFactory: TestDAOFactory = PostgresTestDAOFactory
   

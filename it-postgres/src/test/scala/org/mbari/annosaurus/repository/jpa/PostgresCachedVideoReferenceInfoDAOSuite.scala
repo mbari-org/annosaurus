@@ -16,7 +16,7 @@
 
 package org.mbari.annosaurus.repository.jpa
 
-class PostgresCachedVideoReferenceInfoDAOSuite extends CachedVideoReferenceInfoDAOITSuite {
+class PostgresCachedVideoReferenceInfoDAOSuite extends CachedVideoReferenceInfoDAOSuite {
     given daoFactory: TestDAOFactory = PostgresTestDAOFactory
     
 }

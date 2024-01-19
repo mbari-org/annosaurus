@@ -24,7 +24,7 @@ import scala.jdk.CollectionConverters.*
 import junit.framework.Assert
 import java.time.Duration
 
-trait ObservationControllerITSuite extends BaseDAOSuite {
+trait ObservationControllerSuite extends BaseDAOSuite {
 
     given JPADAOFactory    = daoFactory
     given ExecutionContext = ExecutionContext.global

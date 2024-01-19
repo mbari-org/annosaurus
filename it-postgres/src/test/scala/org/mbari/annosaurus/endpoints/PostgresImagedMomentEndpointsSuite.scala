@@ -17,7 +17,7 @@
 package org.mbari.annosaurus.endpoints
 import org.mbari.annosaurus.repository.jpa.{PostgresTestDAOFactory, TestDAOFactory}
 
-class PostgresImagedMomentEndpointsSuite extends ImagedMomentEndpointsITSuite {
+class PostgresImagedMomentEndpointsSuite extends ImagedMomentEndpointsSuite {
     override given daoFactory: TestDAOFactory = PostgresTestDAOFactory
 
 }

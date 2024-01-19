@@ -17,7 +17,7 @@
 package org.mbari.annosaurus.endpoints
 import org.mbari.annosaurus.repository.jpa.{SqlServerTestDAOFactory, TestDAOFactory}
 
-class SqlServerIndexEndpointsSuite extends IndexEndpointsITSuite {
+class SqlServerIndexEndpointsSuite extends IndexEndpointsSuite {
 
     override given daoFactory: TestDAOFactory = SqlServerTestDAOFactory
 

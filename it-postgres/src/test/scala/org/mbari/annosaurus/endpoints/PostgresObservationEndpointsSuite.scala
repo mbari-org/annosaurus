@@ -14,11 +14,10 @@
  * limitations under the License.
  */
 
-package org.mbari.annosaurus.controllers
-import org.mbari.annosaurus.repository.jpa.{SqlServerTestDAOFactory, TestDAOFactory}
+package org.mbari.annosaurus.endpoints
+import org.mbari.annosaurus.repository.jpa.{PostgresTestDAOFactory, TestDAOFactory}
 
-class SqlServerObservationControllerSuite extends ObservationControllerSuite {
-
-    override given daoFactory: TestDAOFactory = SqlServerTestDAOFactory
+class PostgresObservationEndpointsSuite extends ObservationEndpointsSuite {
+    override given daoFactory: TestDAOFactory = PostgresTestDAOFactory
 
 }

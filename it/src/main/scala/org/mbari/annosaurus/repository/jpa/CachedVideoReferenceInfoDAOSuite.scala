@@ -21,7 +21,7 @@ import org.mbari.annosaurus.AssertUtils
 import org.mbari.annosaurus.domain.CachedVideoReferenceInfo
 import org.mbari.annosaurus.repository.jpa.entity.CachedVideoReferenceInfoEntity
 
-trait CachedVideoReferenceInfoDAOITSuite extends BaseDAOSuite {
+trait CachedVideoReferenceInfoDAOSuite extends BaseDAOSuite {
 
     given JPADAOFactory = daoFactory
 

@@ -30,7 +30,7 @@ import org.junit.Assert.*
 import java.util.UUID
 import scala.jdk.CollectionConverters.*
 
-trait FastAnnotationEndpointsITSuite extends EndpointsSuite {
+trait FastAnnotationEndpointsSuite extends EndpointsSuite {
 
     private val log = System.getLogger(getClass.getName)
     given JPADAOFactory = daoFactory

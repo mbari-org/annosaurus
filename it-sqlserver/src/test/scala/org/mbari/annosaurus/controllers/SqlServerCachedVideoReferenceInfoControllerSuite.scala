@@ -18,7 +18,7 @@ package org.mbari.annosaurus.controllers
 
 import org.mbari.annosaurus.repository.jpa.{SqlServerTestDAOFactory, TestDAOFactory}
 
-class SqlServerCachedVideoReferenceInfoControllerSuite extends CachedVideoReferenceInfoControllerITSuite {
+class SqlServerCachedVideoReferenceInfoControllerSuite extends CachedVideoReferenceInfoControllerSuite {
     override given daoFactory: TestDAOFactory = SqlServerTestDAOFactory
 
 }

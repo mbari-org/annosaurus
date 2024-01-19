@@ -36,7 +36,7 @@ import org.mbari.annosaurus.repository.jpa.entity.ImagedMomentEntity
 import java.net.URI
 import scala.util.Random
 
-trait ImagedMomentContollerITSuite extends BaseDAOSuite {
+trait ImagedMomentContollerSuite extends BaseDAOSuite {
 
     given JPADAOFactory    = daoFactory
     given ExecutionContext = ExecutionContext.global

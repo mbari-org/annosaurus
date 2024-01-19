@@ -28,7 +28,7 @@ import org.mbari.annosaurus.AssertUtils
 import scala.jdk.CollectionConverters.*
 import org.mbari.annosaurus.domain.WindowRequest
 
-trait ImagedMomentDAOITSuite extends BaseDAOSuite {
+trait ImagedMomentDAOSuite extends BaseDAOSuite {
 
     given JPADAOFactory = daoFactory
 

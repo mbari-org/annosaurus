@@ -23,7 +23,7 @@ import org.mbari.annosaurus.controllers.TestUtils
 import org.mbari.annosaurus.AssertUtils
 import org.mbari.annosaurus.controllers.TestUtils.create
 
-trait IndexDAOITSuite extends BaseDAOSuite {
+trait IndexDAOSuite extends BaseDAOSuite {
 
     given JPADAOFactory = daoFactory
 

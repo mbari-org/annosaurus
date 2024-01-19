@@ -21,7 +21,7 @@ import org.mbari.annosaurus.repository.jpa.{BaseDAOSuite, JPADAOFactory}
 
 import scala.jdk.CollectionConverters.*
 
-trait ImageReferenceControllerITSuite extends BaseDAOSuite {
+trait ImageReferenceControllerSuite extends BaseDAOSuite {
 
     given JPADAOFactory = daoFactory
 
