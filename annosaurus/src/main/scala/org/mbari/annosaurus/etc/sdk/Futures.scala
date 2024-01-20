@@ -29,4 +29,6 @@ object Futures:
       * @return
       *   The result of the future
       */
-    extension [T](t: Future[T]) def join: T = Await.result(t, Timeout)
+    extension [T](t: Future[T])
+        def join: T = Await.result(t, Timeout)
+        def join(duration: Duration): T = Await.result(t, duration)
