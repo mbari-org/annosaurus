@@ -82,7 +82,7 @@ case class AnnotationCreateSC(
     observation_uuid: Option[UUID] = None,
     observer: Option[String] = None,
     recorded_timestamp: Option[Instant] = None,
-    timecode: Option[String] = None,
+    timecode: Option[String] = None
 ) extends ToCamelCase[AnnotationCreate] {
 
     def toCamelCase: AnnotationCreate = {

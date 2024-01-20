@@ -17,7 +17,17 @@
 package org.mbari.annosaurus.endpoints
 
 import org.mbari.annosaurus.controllers.ImagedMomentController
-import org.mbari.annosaurus.domain.{AnnotationSC, ConceptCount, Count, CountForVideoReferenceSC, ErrorMsg, ImagedMomentSC, ImagedMomentTimestampUpdateSC, VideoTimestampSC, WindowRequestSC}
+import org.mbari.annosaurus.domain.{
+    AnnotationSC,
+    ConceptCount,
+    Count,
+    CountForVideoReferenceSC,
+    ErrorMsg,
+    ImagedMomentSC,
+    ImagedMomentTimestampUpdateSC,
+    VideoTimestampSC,
+    WindowRequestSC
+}
 import org.mbari.annosaurus.etc.jwt.JwtService
 import org.mbari.annosaurus.etc.tapir.TapirCodecs.given
 import sttp.tapir.*
@@ -51,7 +61,9 @@ class ImagedMomentEndpoints(controller: ImagedMomentController)(using
     val findAllImagedMomentsImpl: ServerEndpoint[Any, Future] =
         findAllImagedMoments
             .serverLogic { paging =>
-                handleErrors(controller.findAll(paging.limit, paging.offset).map(_.map(_.toSnakeCase).toSeq))
+                handleErrors(
+                    controller.findAll(paging.limit, paging.offset).map(_.map(_.toSnakeCase).toSeq)
+                )
             }
 
     val countAllImagedMoments: Endpoint[Unit, Unit, ErrorMsg, Count, Any] =
@@ -79,7 +91,11 @@ class ImagedMomentEndpoints(controller: ImagedMomentController)(using
     val findImagedMomentsWithImagesImpl: ServerEndpoint[Any, Future] =
         findImagedMomentsWithImages
             .serverLogic { paging =>
-                handleErrors(controller.findWithImages(paging.limit, paging.offset).map(_.map(_.toSnakeCase).toSeq))
+                handleErrors(
+                    controller
+                        .findWithImages(paging.limit, paging.offset)
+                        .map(_.map(_.toSnakeCase).toSeq)
+                )
             }
 
     val countImagedMomentsWithImages: Endpoint[Unit, Unit, ErrorMsg, Count, Any] =
@@ -104,11 +120,16 @@ class ImagedMomentEndpoints(controller: ImagedMomentController)(using
     val countImagesForVideoReferenceImpl: ServerEndpoint[Any, Future] =
         countImagesForVideoReference
             .serverLogic { videoReferenceUuid =>
-                handleErrors(controller.countByVideoReferenceUUIDWithImages(videoReferenceUuid).map(i => Count(i)))
+                handleErrors(
+                    controller
+                        .countByVideoReferenceUUIDWithImages(videoReferenceUuid)
+                        .map(i => Count(i))
+                )
             }
 
     // GET /find/linkname/:linkName
-    val findImagedMomentsByLinkName: Endpoint[Unit, (String, Paging), ErrorMsg, Seq[ImagedMomentSC], Any] =
+    val findImagedMomentsByLinkName
+        : Endpoint[Unit, (String, Paging), ErrorMsg, Seq[ImagedMomentSC], Any] =
         openEndpoint
             .get
             .in("v1" / "imagedmoments" / "find" / "linkname" / path[String]("linkName"))
@@ -121,7 +142,11 @@ class ImagedMomentEndpoints(controller: ImagedMomentController)(using
     val findImagedMomentsByLinkNameImpl: ServerEndpoint[Any, Future] =
         findImagedMomentsByLinkName
             .serverLogic { case (linkName, paging) =>
-                handleErrors(controller.findByLinkName(linkName, paging.limit, paging.offset).map(_.map(_.toSnakeCase).toSeq))
+                handleErrors(
+                    controller
+                        .findByLinkName(linkName, paging.limit, paging.offset)
+                        .map(_.map(_.toSnakeCase).toSeq)
+                )
             }
 
     // GET /count/linkname/:linkName
@@ -154,7 +179,8 @@ class ImagedMomentEndpoints(controller: ImagedMomentController)(using
             }
 
     // get /concept/:name
-    val findImagedMomentsByConceptName: Endpoint[Unit, (String, Paging), ErrorMsg, Seq[ImagedMomentSC], Any] =
+    val findImagedMomentsByConceptName
+        : Endpoint[Unit, (String, Paging), ErrorMsg, Seq[ImagedMomentSC], Any] =
         openEndpoint
             .get
             .in("v1" / "imagedmoments" / "concept" / path[String]("conceptName"))
@@ -167,11 +193,16 @@ class ImagedMomentEndpoints(controller: ImagedMomentController)(using
     val findImagedMomentsByConceptNameImpl: ServerEndpoint[Any, Future] =
         findImagedMomentsByConceptName
             .serverLogic { case (conceptName, paging) =>
-                handleErrors(controller.findByConcept(conceptName, paging.limit, paging.offset).map(_.map(_.toSnakeCase).toSeq))
+                handleErrors(
+                    controller
+                        .findByConcept(conceptName, paging.limit, paging.offset)
+                        .map(_.map(_.toSnakeCase).toSeq)
+                )
             }
 
     // GET /concept/images/:name
-    val findImagedMomentsByConceptNameWithImages: Endpoint[Unit, (String, Paging), ErrorMsg, Seq[ImagedMomentSC], Any] =
+    val findImagedMomentsByConceptNameWithImages
+        : Endpoint[Unit, (String, Paging), ErrorMsg, Seq[ImagedMomentSC], Any] =
         openEndpoint
             .get
             .in("v1" / "imagedmoments" / "concept" / "images" / path[String]("conceptName"))
@@ -181,14 +212,17 @@ class ImagedMomentEndpoints(controller: ImagedMomentController)(using
             .description("Find all imaged moments with a given concept name that have images")
             .tag("imagedmoments")
 
-
     // I think this is fixed but I'm keeping this note:  This returns an imagedmoment for EACH image. If there are
     // two images for a moment, you'll get the image moment twice
     // This needs a distinct modifier
     val findImagedMomentsByConceptNameWithImagesImpl: ServerEndpoint[Any, Future] =
         findImagedMomentsByConceptNameWithImages
             .serverLogic { case (conceptName, paging) =>
-                handleErrors(controller.findByConceptWithImages(conceptName, paging.limit, paging.offset).map(_.map(_.toSnakeCase).toSeq))
+                handleErrors(
+                    controller
+                        .findByConceptWithImages(conceptName, paging.limit, paging.offset)
+                        .map(_.map(_.toSnakeCase).toSeq)
+                )
             }
 
     // GET /videoreference/chunked/:uuid (skip)
@@ -203,24 +237,36 @@ class ImagedMomentEndpoints(controller: ImagedMomentController)(using
     val countImagedMomentsByConceptNameImpl: ServerEndpoint[Any, Future] =
         countImagedMomentsByConceptName
             .serverLogic { conceptName =>
-                handleErrors(controller.countByConcept(conceptName).map(i => ConceptCount(conceptName, i)))
+                handleErrors(
+                    controller.countByConcept(conceptName).map(i => ConceptCount(conceptName, i))
+                )
             }
 
     // GET /concept/images/count/:name
-    val countImagedMomentsByConceptNameWithImages: Endpoint[Unit, String, ErrorMsg, ConceptCount, Any] =
+    val countImagedMomentsByConceptNameWithImages
+        : Endpoint[Unit, String, ErrorMsg, ConceptCount, Any] =
         openEndpoint
             .get
-            .in("v1" / "imagedmoments" / "concept" / "images" / "count" / path[String]("conceptName"))
+            .in(
+                "v1" / "imagedmoments" / "concept" / "images" / "count" / path[String](
+                    "conceptName"
+                )
+            )
             .out(jsonBody[ConceptCount])
 
     val countImagedMomentsByConceptNameWithImagesImpl: ServerEndpoint[Any, Future] =
         countImagedMomentsByConceptNameWithImages
             .serverLogic { conceptName =>
-                handleErrors(controller.countByConceptWithImages(conceptName).map(i => ConceptCount(conceptName, i)))
+                handleErrors(
+                    controller
+                        .countByConceptWithImages(conceptName)
+                        .map(i => ConceptCount(conceptName, i))
+                )
             }
 
     // GET /modified/:start/:end
-    val findImagedMomentsBetweenModifiedDates: Endpoint[Unit, (Instant, Instant, Paging), ErrorMsg, Seq[ImagedMomentSC], Any] =
+    val findImagedMomentsBetweenModifiedDates
+        : Endpoint[Unit, (Instant, Instant, Paging), ErrorMsg, Seq[ImagedMomentSC], Any] =
         openEndpoint
             .get
             .in("v1" / "imagedmoments" / "modified" / path[Instant]("start") / path[Instant]("end"))
@@ -233,14 +279,23 @@ class ImagedMomentEndpoints(controller: ImagedMomentController)(using
     val findImagedMomentsBetweenModifiedDatesImpl: ServerEndpoint[Any, Future] =
         findImagedMomentsBetweenModifiedDates
             .serverLogic { case (start, end, paging) =>
-                handleErrors(controller.findBetweenUpdatedDates(start, end, paging.limit, paging.offset).map(_.map(_.toSnakeCase).toSeq))
+                handleErrors(
+                    controller
+                        .findBetweenUpdatedDates(start, end, paging.limit, paging.offset)
+                        .map(_.map(_.toSnakeCase).toSeq)
+                )
             }
 
     // GET /modified/count/:start/:end
-    val countImagedMomentsBetweenModifiedDates: Endpoint[Unit, (Instant, Instant), ErrorMsg, Count, Any] =
+    val countImagedMomentsBetweenModifiedDates
+        : Endpoint[Unit, (Instant, Instant), ErrorMsg, Count, Any] =
         openEndpoint
             .get
-            .in("v1" / "imagedmoments" / "modified" / "count" / path[Instant]("start") / path[Instant]("end"))
+            .in(
+                "v1" / "imagedmoments" / "modified" / "count" / path[Instant]("start") / path[
+                    Instant
+                ]("end")
+            )
             .out(jsonBody[Count])
             .name("countImagedMomentsBetweenModifiedDates")
             .description("Count all imaged moments modified between two dates")
@@ -254,7 +309,8 @@ class ImagedMomentEndpoints(controller: ImagedMomentController)(using
             }
 
     // GET /counts
-    val countsPerVideoReference: Endpoint[Unit, Unit, ErrorMsg, Seq[CountForVideoReferenceSC], Any] =
+    val countsPerVideoReference
+        : Endpoint[Unit, Unit, ErrorMsg, Seq[CountForVideoReferenceSC], Any] =
         openEndpoint
             .get
             .in("v1" / "imagedmoments" / "counts")
@@ -266,8 +322,11 @@ class ImagedMomentEndpoints(controller: ImagedMomentController)(using
     val countsPerVideoReferenceImpl: ServerEndpoint[Any, Future] =
         countsPerVideoReference
             .serverLogic { _ =>
-                handleErrors(controller.countAllGroupByVideoReferenceUUID()
-                    .map(_.map(c => CountForVideoReferenceSC(c._1, c._2)).toSeq))
+                handleErrors(
+                    controller
+                        .countAllGroupByVideoReferenceUUID()
+                        .map(_.map(c => CountForVideoReferenceSC(c._1, c._2)).toSeq)
+                )
             }
 
     // GET /videoreference
@@ -299,27 +358,41 @@ class ImagedMomentEndpoints(controller: ImagedMomentController)(using
     val findByVideoReferenceUuidImpl: ServerEndpoint[Any, Future] =
         findByVideoReferenceUuid
             .serverLogic { uuid =>
-                handleErrors(controller.findByVideoReferenceUUID(uuid).map(_.map(_.toSnakeCase).toSeq))
+                handleErrors(
+                    controller.findByVideoReferenceUUID(uuid).map(_.map(_.toSnakeCase).toSeq)
+                )
             }
 
     // GET /videoreference/modified/:uuid/:date
-    val countModifiedBeforeDate: Endpoint[Unit, (UUID, Instant), ErrorMsg, CountForVideoReferenceSC, Any] =
+    val countModifiedBeforeDate
+        : Endpoint[Unit, (UUID, Instant), ErrorMsg, CountForVideoReferenceSC, Any] =
         openEndpoint
             .get
-            .in("v1" / "imagedmoments" / "videoreference" / "modified" / path[UUID]("uuid") / path[Instant]("date"))
+            .in(
+                "v1" / "imagedmoments" / "videoreference" / "modified" / path[UUID]("uuid") / path[
+                    Instant
+                ]("date")
+            )
             .out(jsonBody[CountForVideoReferenceSC])
             .name("countModifiedBeforeDate")
-            .description("Count all imaged moments modifed before a given date for a given video reference UUID")
+            .description(
+                "Count all imaged moments modifed before a given date for a given video reference UUID"
+            )
             .tag("imagedmoments")
 
     val countModifiedBeforeDateImpl: ServerEndpoint[Any, Future] =
         countModifiedBeforeDate
             .serverLogic { case (uuid, date) =>
-                handleErrors(controller.countModifiedBeforeDate(uuid, date).map(i => CountForVideoReferenceSC(uuid, i)))
+                handleErrors(
+                    controller
+                        .countModifiedBeforeDate(uuid, date)
+                        .map(i => CountForVideoReferenceSC(uuid, i))
+                )
             }
 
     // POST /windowrequest
-    val findImagedMomentsByWindowRequest: Endpoint[Unit, (Paging, WindowRequestSC), ErrorMsg, Seq[ImagedMomentSC], Any] =
+    val findImagedMomentsByWindowRequest
+        : Endpoint[Unit, (Paging, WindowRequestSC), ErrorMsg, Seq[ImagedMomentSC], Any] =
         openEndpoint
             .post
             .in("v1" / "imagedmoments" / "windowrequest")
@@ -333,7 +406,11 @@ class ImagedMomentEndpoints(controller: ImagedMomentController)(using
     val findImagedMomentsByWindowRequestImpl: ServerEndpoint[Any, Future] =
         findImagedMomentsByWindowRequest
             .serverLogic { case (paging, windowRequest) =>
-                handleErrors(controller.findByWindowRequest(windowRequest.toCamelCase, paging.limit, paging.offset).map(_.map(_.toSnakeCase).toSeq))
+                handleErrors(
+                    controller
+                        .findByWindowRequest(windowRequest.toCamelCase, paging.limit, paging.offset)
+                        .map(_.map(_.toSnakeCase).toSeq)
+                )
             }
 
     // DELETE /videoreference/:uuid
@@ -349,7 +426,11 @@ class ImagedMomentEndpoints(controller: ImagedMomentController)(using
     val deleteByVideoReferenceUUIDImpl: ServerEndpoint[Any, Future] =
         deleteByVideoReferenceUUID
             .serverLogic { uuid =>
-                handleErrors(controller.deleteByVideoReferenceUUID(uuid).map(i => CountForVideoReferenceSC(uuid, i)))
+                handleErrors(
+                    controller
+                        .deleteByVideoReferenceUUID(uuid)
+                        .map(i => CountForVideoReferenceSC(uuid, i))
+                )
             }
 
     // GET /imagereference/:uuid
@@ -385,49 +466,76 @@ class ImagedMomentEndpoints(controller: ImagedMomentController)(using
             }
 
     // PUT /:uuid
-    val updateImagedMoment: Endpoint[Option[String], (UUID, VideoTimestampSC), ErrorMsg, ImagedMomentSC, Any] = secureEndpoint
-        .put
-        .in("v1" / "imagedmoments" / path[UUID]("uuid"))
-        .in(oneOfBody(jsonBody[VideoTimestampSC], formBody[VideoTimestampSC]))
-        .out(jsonBody[ImagedMomentSC])
-        .name("updateImagedMoment")
-        .description("Update an imaged moment")
-        .tag("imagedmoments")
+    val updateImagedMoment
+        : Endpoint[Option[String], (UUID, VideoTimestampSC), ErrorMsg, ImagedMomentSC, Any] =
+        secureEndpoint
+            .put
+            .in("v1" / "imagedmoments" / path[UUID]("uuid"))
+            .in(oneOfBody(jsonBody[VideoTimestampSC], formBody[VideoTimestampSC]))
+            .out(jsonBody[ImagedMomentSC])
+            .name("updateImagedMoment")
+            .description("Update an imaged moment")
+            .tag("imagedmoments")
 
     val updateImagedMomentImpl: ServerEndpoint[Any, Future] =
         updateImagedMoment
             .serverSecurityLogic(jwtOpt => verify(jwtOpt))
-            .serverLogic { _ =>  (uuid, dto) =>
-                val timecode = dto.timecode.map(s => Timecode(s))
+            .serverLogic { _ => (uuid, dto) =>
+                val timecode    = dto.timecode.map(s => Timecode(s))
                 val elapsedTime = dto.elapsed_time_millis.map(t => Duration.ofMillis(t))
-                handleErrors(controller.update(uuid, dto.video_reference_uuid, timecode, dto.recorded_timestamp, elapsedTime).map(_.toSnakeCase))
+                handleErrors(
+                    controller
+                        .update(
+                            uuid,
+                            dto.video_reference_uuid,
+                            timecode,
+                            dto.recorded_timestamp,
+                            elapsedTime
+                        )
+                        .map(_.toSnakeCase)
+                )
             }
 
     // PUT /newtime/:uuid/:time
-    val updateRecordedTimestampsForVideoReference: Endpoint[Option[String], (UUID, Instant), ErrorMsg, Seq[ImagedMomentSC], Any] = secureEndpoint
+    val updateRecordedTimestampsForVideoReference: Endpoint[Option[
+        String
+    ], (UUID, Instant), ErrorMsg, Seq[ImagedMomentSC], Any] = secureEndpoint
         .put
-        .in("v1" / "imagedmoments" / "newtime" / path[UUID]("videoReferenceUuid") / path[Instant]("time").description("Use compact iso8601"))
+        .in(
+            "v1" / "imagedmoments" / "newtime" / path[UUID]("videoReferenceUuid") / path[Instant](
+                "time"
+            ).description("Use compact iso8601")
+        )
         .out(jsonBody[Seq[ImagedMomentSC]])
         .name("updateRecordedTimestampsForVideoReference")
-        .description("Recalculate recorded timestamps for a given video reference UUID using a new start time and the imagedmoments elapsed time")
+        .description(
+            "Recalculate recorded timestamps for a given video reference UUID using a new start time and the imagedmoments elapsed time"
+        )
         .tag("imagedmoments")
 
     val updateRecordedTimestampsForVideoReferenceImpl: ServerEndpoint[Any, Future] =
         updateRecordedTimestampsForVideoReference
             .serverSecurityLogic(jwtOpt => verify(jwtOpt))
             .serverLogic { _ => (videoReferenceUuid, time) =>
-                handleErrors(controller.updateRecordedTimestamps(videoReferenceUuid, time)
-                    .map(_.map(_.toSnakeCase).toSeq))
+                handleErrors(
+                    controller
+                        .updateRecordedTimestamps(videoReferenceUuid, time)
+                        .map(_.map(_.toSnakeCase).toSeq)
+                )
             }
 
     // PUT /tapetime with json body
-    val updateRecordedTimestampForObservationUuid: Endpoint[Option[String], Seq[AnnotationSC], ErrorMsg, ImagedMomentTimestampUpdateSC, Any] = secureEndpoint
+    val updateRecordedTimestampForObservationUuid: Endpoint[Option[String], Seq[
+        AnnotationSC
+    ], ErrorMsg, ImagedMomentTimestampUpdateSC, Any] = secureEndpoint
         .put
         .in("v1" / "imagedmoments" / "tapetime")
         .in(jsonBody[Seq[AnnotationSC]])
         .out(jsonBody[ImagedMomentTimestampUpdateSC])
         .name("updateRecordedTimestampForObservationUuid")
-        .description("Recalculate recorded timestamps for a given video reference UUID using a new start time and the imagedmoments elapsed time. Annotations need observation_uuid and recorded_timestamp fields. This is not an atomic operation")
+        .description(
+            "Recalculate recorded timestamps for a given video reference UUID using a new start time and the imagedmoments elapsed time. Annotations need observation_uuid and recorded_timestamp fields. This is not an atomic operation"
+        )
         .tag("imagedmoments")
 
     val updateRecordedTimestampForObservationUuidImpl: ServerEndpoint[Any, Future] =
@@ -436,11 +544,16 @@ class ImagedMomentEndpoints(controller: ImagedMomentController)(using
             .serverLogic { _ => annotations =>
                 var n = 0
                 for
-                    a <- annotations
-                    observationUuid <- a.observation_uuid
+                    a                 <- annotations
+                    observationUuid   <- a.observation_uuid
                     recordedTimestamp <- a.recorded_timestamp
                 do
-                    controller.updateRecordedTimestampByObservationUuid(observationUuid, recordedTimestamp).join
+                    controller
+                        .updateRecordedTimestampByObservationUuid(
+                            observationUuid,
+                            recordedTimestamp
+                        )
+                        .join
                     n = n + 1
                 handleErrors(Future.successful(ImagedMomentTimestampUpdateSC(annotations.size, n)))
             }
@@ -458,10 +571,12 @@ class ImagedMomentEndpoints(controller: ImagedMomentController)(using
         deleteImagedMoment
             .serverSecurityLogic(jwtOpt => verify(jwtOpt))
             .serverLogic { _ => uuid =>
-                handleErrors(controller.delete(uuid).map(b => if (b) StatusCode.NoContent else StatusCode.NotFound))
+                handleErrors(
+                    controller
+                        .delete(uuid)
+                        .map(b => if (b) StatusCode.NoContent else StatusCode.NotFound)
+                )
             }
-
-
 
     override def all: List[Endpoint[_, _, _, _, _]] = List(
         findAllImagedMoments,

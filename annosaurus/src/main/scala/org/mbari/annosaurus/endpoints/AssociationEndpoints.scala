@@ -17,7 +17,17 @@
 package org.mbari.annosaurus.endpoints
 
 import org.mbari.annosaurus.controllers.AssociationController
-import org.mbari.annosaurus.domain.{Association, AssociationSC, BadRequest, ConceptAssociationRequest, ConceptAssociationResponseSC, ConceptCount, ErrorMsg, RenameConcept, RenameCountSC}
+import org.mbari.annosaurus.domain.{
+    Association,
+    AssociationSC,
+    BadRequest,
+    ConceptAssociationRequest,
+    ConceptAssociationResponseSC,
+    ConceptCount,
+    ErrorMsg,
+    RenameConcept,
+    RenameCountSC
+}
 import org.mbari.annosaurus.etc.jwt.JwtService
 import sttp.tapir.*
 import sttp.tapir.json.circe.*
@@ -182,13 +192,14 @@ class AssociationEndpoints(controller: AssociationController)(using
         }
 
     // GET /toconcept/count/:concept
-    val countAssociationsByToConcept: Endpoint[Unit, String, ErrorMsg, ConceptCount, Any] = openEndpoint
-        .get
-        .in("v1" / "associations" / "toconcept" / "count" / path[String])
-        .out(jsonBody[ConceptCount])
-        .name("countAssociationsByToConcept")
-        .description("Count associations by toConcept")
-        .tag("association")
+    val countAssociationsByToConcept: Endpoint[Unit, String, ErrorMsg, ConceptCount, Any] =
+        openEndpoint
+            .get
+            .in("v1" / "associations" / "toconcept" / "count" / path[String])
+            .out(jsonBody[ConceptCount])
+            .name("countAssociationsByToConcept")
+            .description("Count associations by toConcept")
+            .tag("association")
 
     val countAssociationsByToConceptImpl: ServerEndpoint[Any, Future] = countAssociationsByToConcept
         .serverLogic { concept =>
@@ -234,7 +245,6 @@ class AssociationEndpoints(controller: AssociationController)(using
                     controller
                         .findByConceptAssociationRequest(conceptAssociationRequest)
                         .map(_.toSnakeCase)
-
                 )
             }
 

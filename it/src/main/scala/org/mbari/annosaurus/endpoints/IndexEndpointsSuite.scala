@@ -29,7 +29,7 @@ trait IndexEndpointsSuite extends EndpointsSuite {
     private val log = System.getLogger(getClass.getName)
 
     given JPADAOFactory         = daoFactory
-    given JwtService      = new JwtService("mbari", "foo", "bar")
+    given JwtService            = new JwtService("mbari", "foo", "bar")
     private lazy val controller = new IndexController(daoFactory)
     private lazy val endpoints  = new IndexEndpoints(controller)
 

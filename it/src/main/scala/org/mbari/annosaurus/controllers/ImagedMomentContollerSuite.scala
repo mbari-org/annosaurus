@@ -281,7 +281,9 @@ trait ImagedMomentContollerSuite extends BaseDAOSuite {
         AssertUtils.assertSameImagedMoment(im0, im1.toEntity)
     }
 
-    test("create one imagedmoment if multiple imagedmoments are created with same recordedTimestamp") {
+    test(
+        "create one imagedmoment if multiple imagedmoments are created with same recordedTimestamp"
+    ) {
         val im0 = TestUtils.build(1).head
         im0.setTimecode(null)
         im0.setElapsedTime(null)
@@ -302,9 +304,12 @@ trait ImagedMomentContollerSuite extends BaseDAOSuite {
         val url                = URI.create("http://www.mbari.org/foo/image.png").toURL
         intercept[Exception] {
             for (i <- 0 until 2) {
-                val source = new ImagedMomentEntity(videoReferenceUuid,
+                val source         = new ImagedMomentEntity(
+                    videoReferenceUuid,
                     Instant.now().plus(Duration.ofSeconds(Random.nextInt())),
-                    null, null)
+                    null,
+                    null
+                )
                 val imageReference = TestUtils.randomImageReference()
                 imageReference.setUrl(url)
                 source.addImageReference(imageReference)
@@ -317,8 +322,8 @@ trait ImagedMomentContollerSuite extends BaseDAOSuite {
         val xs = TestUtils.build(2, 1)
         val ys = exec(controller.create(xs))
         assertEquals(ys.size, 2)
-        val x = xs.head
-        val y = ys.head
+        val x  = xs.head
+        val y  = ys.head
         x.setUuid(y.uuid.get)
         AssertUtils.assertSameImagedMoment(x, y.toEntity)
     }

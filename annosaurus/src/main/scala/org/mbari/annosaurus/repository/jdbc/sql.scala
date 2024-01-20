@@ -64,10 +64,10 @@ def doubleConverter(obj: Object): Option[Double] =
 
 def floatConverter(obj: Object): Option[Float] =
     obj match
-        case null => None
+        case null      => None
         case n: Number => Some(n.floatValue())
         case s: String => Try(s.toFloat).toOption
-        case _ => None
+        case _         => None
 
 def longConverter(obj: Object): Option[Long] =
     obj match

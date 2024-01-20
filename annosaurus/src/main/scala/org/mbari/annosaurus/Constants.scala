@@ -16,7 +16,6 @@
 
 package org.mbari.annosaurus
 
-
 import com.typesafe.config.ConfigFactory
 
 import org.mbari.vcr4j.time.Timecode

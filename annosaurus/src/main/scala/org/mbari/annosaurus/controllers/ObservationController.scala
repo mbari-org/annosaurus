@@ -79,7 +79,7 @@ class ObservationController(
 
         exec(fn)
     }
-    
+
     def update(
         uuid: UUID,
         concept: Option[String] = None,

@@ -286,8 +286,8 @@ class ImagedMomentController(val daoFactory: JPADAOFactory)
     def create(
         imagedMoments: Seq[ImagedMomentEntity]
     )(implicit ex: ExecutionContext): Future[Seq[ImagedMoment]] = {
-        val dao    = daoFactory.newImagedMomentDAO()
-        val future = dao.runTransaction(d => imagedMoments.map(im => create(d, im)))
+        val dao     = daoFactory.newImagedMomentDAO()
+        val future  = dao.runTransaction(d => imagedMoments.map(im => create(d, im)))
         val future1 = future.flatMap(xs =>
             dao.runTransaction(d => {
                 xs.flatMap(x => Option(x.getUuid).flatMap(d.findByUUID).map(transform))
@@ -366,7 +366,8 @@ class ImagedMomentController(val daoFactory: JPADAOFactory)
                             )
                         a.setUuid(null)
                     }
-                    observation.addAssociation(a))
+                    observation.addAssociation(a)
+                )
 //                obsDao.create(observation)
             })
 

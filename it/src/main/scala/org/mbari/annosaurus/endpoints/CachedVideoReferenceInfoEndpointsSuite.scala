@@ -17,7 +17,12 @@
 package org.mbari.annosaurus.endpoints
 
 import org.mbari.annosaurus.controllers.{CachedVideoReferenceInfoController, TestUtils}
-import org.mbari.annosaurus.domain.{CachedVideoReferenceInfo, CachedVideoReferenceInfoCreateSC, CachedVideoReferenceInfoSC, CachedVideoReferenceInfoUpdateSC}
+import org.mbari.annosaurus.domain.{
+    CachedVideoReferenceInfo,
+    CachedVideoReferenceInfoCreateSC,
+    CachedVideoReferenceInfoSC,
+    CachedVideoReferenceInfoUpdateSC
+}
 import org.mbari.annosaurus.etc.circe.CirceCodecs.{*, given}
 import org.mbari.annosaurus.etc.jdk.Instants
 import org.mbari.annosaurus.etc.jdk.Logging.{*, given}
@@ -81,8 +86,7 @@ trait CachedVideoReferenceInfoEndpointsSuite extends EndpointsSuite {
                 assert(response.code == StatusCode.Ok)
                 val ys = checkResponse[Seq[UUID]](response.body)
                 for x <- xs
-                do
-                    assert(ys.contains(x.videoReferenceUuid))
+                do assert(ys.contains(x.videoReferenceUuid))
             }
         )
     }
@@ -122,8 +126,7 @@ trait CachedVideoReferenceInfoEndpointsSuite extends EndpointsSuite {
                 assert(response.code == StatusCode.Ok)
                 val ys = checkResponse[Seq[String]](response.body)
                 for x <- xs
-                do
-                    assert(ys.contains(x.missionId.get))
+                do assert(ys.contains(x.missionId.get))
             }
         )
     }
@@ -135,7 +138,8 @@ trait CachedVideoReferenceInfoEndpointsSuite extends EndpointsSuite {
             s"http://test.com/v1/videoreferences/missionid/${x.missionId.get}",
             response => {
                 assertEquals(response.code, StatusCode.Ok)
-                val y = checkResponse[Seq[CachedVideoReferenceInfoSC]](response.body).map(_.toCamelCase)
+                val y =
+                    checkResponse[Seq[CachedVideoReferenceInfoSC]](response.body).map(_.toCamelCase)
                 assertEquals(y.size, 1)
                 assertEquals(y.head, x)
             }
@@ -151,8 +155,7 @@ trait CachedVideoReferenceInfoEndpointsSuite extends EndpointsSuite {
                 assert(response.code == StatusCode.Ok)
                 val ys = checkResponse[Seq[String]](response.body)
                 for x <- xs
-                do
-                    assert(ys.contains(x.missionContact.get))
+                do assert(ys.contains(x.missionContact.get))
             }
         )
     }
@@ -164,7 +167,8 @@ trait CachedVideoReferenceInfoEndpointsSuite extends EndpointsSuite {
             s"http://test.com/v1/videoreferences/missioncontact/${x.missionContact.get}",
             response => {
                 assertEquals(response.code, StatusCode.Ok)
-                val y = checkResponse[Seq[CachedVideoReferenceInfoSC]](response.body).map(_.toCamelCase)
+                val y =
+                    checkResponse[Seq[CachedVideoReferenceInfoSC]](response.body).map(_.toCamelCase)
                 assertEquals(y.size, 1)
                 assertEquals(y.head, x)
             }
@@ -172,16 +176,16 @@ trait CachedVideoReferenceInfoEndpointsSuite extends EndpointsSuite {
     }
 
     test("createOneVideoReferenceInfo (json)") {
-        val x = TestUtils.randomVideoReferenceInfo()
-        val c = CachedVideoReferenceInfoCreateSC(
+        val x         = TestUtils.randomVideoReferenceInfo()
+        val c         = CachedVideoReferenceInfoCreateSC(
             x.getVideoReferenceUuid,
             x.getPlatformName,
             x.getMissionId,
             Option(x.getMissionContact)
         )
-        val jwt = jwtService.authorize("foo").orNull
+        val jwt       = jwtService.authorize("foo").orNull
         assert(jwt != null)
-        val backend = newBackendStub(endpoints.createOneVideoReferenceInfoImpl)
+        val backend   = newBackendStub(endpoints.createOneVideoReferenceInfoImpl)
         val responese = basicRequest
             .post(uri"http://test.com/v1/videoreferences")
             .header("Authorization", s"Bearer $jwt")
@@ -190,7 +194,7 @@ trait CachedVideoReferenceInfoEndpointsSuite extends EndpointsSuite {
             .send(backend)
             .join
         assertEquals(responese.code, StatusCode.Ok)
-        val y = checkResponse[CachedVideoReferenceInfoSC](responese.body).toCamelCase
+        val y         = checkResponse[CachedVideoReferenceInfoSC](responese.body).toCamelCase
         assertEquals(y.videoReferenceUuid, x.getVideoReferenceUuid)
         assertEquals(y.platformName.orNull, x.getPlatformName)
         assertEquals(y.missionId.orNull, x.getMissionId)
@@ -205,16 +209,16 @@ trait CachedVideoReferenceInfoEndpointsSuite extends EndpointsSuite {
     }
 
     test("createOneVideoReferenceInfo (form)") {
-        val x = TestUtils.randomVideoReferenceInfo()
-        val c = CachedVideoReferenceInfoCreateSC(
+        val x         = TestUtils.randomVideoReferenceInfo()
+        val c         = CachedVideoReferenceInfoCreateSC(
             x.getVideoReferenceUuid,
             x.getPlatformName,
             x.getMissionId,
             Option(x.getMissionContact)
         )
-        val jwt = jwtService.authorize("foo").orNull
+        val jwt       = jwtService.authorize("foo").orNull
         assert(jwt != null)
-        val backend = newBackendStub(endpoints.createOneVideoReferenceInfoImpl)
+        val backend   = newBackendStub(endpoints.createOneVideoReferenceInfoImpl)
         val responese = basicRequest
             .post(uri"http://test.com/v1/videoreferences")
             .header("Authorization", s"Bearer $jwt")
@@ -223,7 +227,7 @@ trait CachedVideoReferenceInfoEndpointsSuite extends EndpointsSuite {
             .send(backend)
             .join
         assertEquals(responese.code, StatusCode.Ok)
-        val y = checkResponse[CachedVideoReferenceInfoSC](responese.body).toCamelCase
+        val y         = checkResponse[CachedVideoReferenceInfoSC](responese.body).toCamelCase
         assertEquals(y.videoReferenceUuid, x.getVideoReferenceUuid)
         assertEquals(y.platformName.orNull, x.getPlatformName)
         assertEquals(y.missionId.orNull, x.getMissionId)
@@ -232,22 +236,22 @@ trait CachedVideoReferenceInfoEndpointsSuite extends EndpointsSuite {
         controller.findByUUID(y.uuid).join match
             case Some(z) =>
                 assertEquals(z, y)
-            case None =>
+            case None    =>
                 fail(s"Could not find ${y.uuid}")
 
     }
 
     test("updateOneVideoReferenceInfo (json)") {
-        val x = createVideoReferenceInfo()
-        val u = CachedVideoReferenceInfoUpdateSC(
+        val x         = createVideoReferenceInfo()
+        val u         = CachedVideoReferenceInfoUpdateSC(
             Some(UUID.randomUUID()),
             Some("newPlatformName"),
             Some("newMissionId"),
-            Some("newMissionContact"),
+            Some("newMissionContact")
         )
-        val jwt = jwtService.authorize("foo").orNull
+        val jwt       = jwtService.authorize("foo").orNull
         assert(jwt != null)
-        val backend = newBackendStub(endpoints.updateOneVideoReferenceInfoImpl)
+        val backend   = newBackendStub(endpoints.updateOneVideoReferenceInfoImpl)
         val responese = basicRequest
             .put(uri"http://test.com/v1/videoreferences/${x.uuid}")
             .header("Authorization", s"Bearer $jwt")
@@ -256,7 +260,7 @@ trait CachedVideoReferenceInfoEndpointsSuite extends EndpointsSuite {
             .send(backend)
             .join
         assertEquals(responese.code, StatusCode.Ok)
-        val y = checkResponse[CachedVideoReferenceInfoSC](responese.body).toCamelCase
+        val y         = checkResponse[CachedVideoReferenceInfoSC](responese.body).toCamelCase
         assertEquals(y.videoReferenceUuid, u.video_reference_uuid.orNull)
         assertEquals(y.platformName.orNull, u.platform_name.orNull)
         assertEquals(y.missionId.orNull, u.mission_id.orNull)
@@ -267,21 +271,21 @@ trait CachedVideoReferenceInfoEndpointsSuite extends EndpointsSuite {
                 val obtained = z.copy(lastUpdated = None)
                 val expected = y.copy(lastUpdated = None)
                 assertEquals(obtained, expected)
-            case None =>
+            case None    =>
                 fail(s"Could not find ${y.uuid}")
     }
 
     test("updateOneVideoReferenceInfo (form)") {
-        val x = createVideoReferenceInfo()
-        val u = CachedVideoReferenceInfoUpdateSC(
+        val x         = createVideoReferenceInfo()
+        val u         = CachedVideoReferenceInfoUpdateSC(
             Some(UUID.randomUUID()),
             Some("newPlatformName2"),
             Some("newMissionId2"),
-            Some("newMissionContact2"),
+            Some("newMissionContact2")
         )
-        val jwt = jwtService.authorize("foo").orNull
+        val jwt       = jwtService.authorize("foo").orNull
         assert(jwt != null)
-        val backend = newBackendStub(endpoints.updateOneVideoReferenceInfoImpl)
+        val backend   = newBackendStub(endpoints.updateOneVideoReferenceInfoImpl)
         val responese = basicRequest
             .put(uri"http://test.com/v1/videoreferences/${x.uuid}")
             .header("Authorization", s"Bearer $jwt")
@@ -290,7 +294,7 @@ trait CachedVideoReferenceInfoEndpointsSuite extends EndpointsSuite {
             .send(backend)
             .join
         assertEquals(responese.code, StatusCode.Ok)
-        val y = checkResponse[CachedVideoReferenceInfoSC](responese.body).toCamelCase
+        val y         = checkResponse[CachedVideoReferenceInfoSC](responese.body).toCamelCase
         assertEquals(y.videoReferenceUuid, u.video_reference_uuid.orNull)
         assertEquals(y.platformName.orNull, u.platform_name.orNull)
         assertEquals(y.missionId.orNull, u.mission_id.orNull)
@@ -301,15 +305,15 @@ trait CachedVideoReferenceInfoEndpointsSuite extends EndpointsSuite {
                 val obtained = z.copy(lastUpdated = None)
                 val expected = y.copy(lastUpdated = None)
                 assertEquals(obtained, expected)
-            case None =>
+            case None    =>
                 fail(s"Could not find ${y.uuid}")
     }
 
     test("deleteOneVideoReferenceInfo") {
-        val x = createVideoReferenceInfo()
-        val jwt = jwtService.authorize("foo").orNull
+        val x         = createVideoReferenceInfo()
+        val jwt       = jwtService.authorize("foo").orNull
         assert(jwt != null)
-        val backend = newBackendStub(endpoints.deleteOneVideoReferenceInfoImpl)
+        val backend   = newBackendStub(endpoints.deleteOneVideoReferenceInfoImpl)
         val responese = basicRequest
             .delete(uri"http://test.com/v1/videoreferences/${x.uuid}")
             .header("Authorization", s"Bearer $jwt")
@@ -319,9 +323,8 @@ trait CachedVideoReferenceInfoEndpointsSuite extends EndpointsSuite {
         controller.findByUUID(x.uuid).join match
             case Some(_) =>
                 fail(s"Found ${x.uuid} after delete")
-            case None =>
-                // pass
+            case None    =>
+            // pass
     }
-
 
 }

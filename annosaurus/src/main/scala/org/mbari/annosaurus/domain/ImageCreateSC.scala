@@ -29,5 +29,5 @@ case class ImageCreateSC(
     format: Option[String] = None,
     width_pixels: Option[Int] = None,
     height_pixels: Option[Int] = None,
-    description: Option[String] = None,
+    description: Option[String] = None
 )

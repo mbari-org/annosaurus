@@ -17,7 +17,14 @@
 package org.mbari.annosaurus.endpoints
 
 import org.mbari.annosaurus.controllers.ObservationController
-import org.mbari.annosaurus.domain.{ConceptCount, CountForVideoReferenceSC, ErrorMsg, ObservationSC, ObservationUpdateSC, RenameCountSC}
+import org.mbari.annosaurus.domain.{
+    ConceptCount,
+    CountForVideoReferenceSC,
+    ErrorMsg,
+    ObservationSC,
+    ObservationUpdateSC,
+    RenameCountSC
+}
 import org.mbari.annosaurus.etc.jwt.JwtService
 import org.mbari.annosaurus.etc.tapir.TapirCodecs.given
 import sttp.tapir.*
@@ -53,7 +60,8 @@ class ObservationEndpoints(controller: ObservationController)(using
             }
 
     // GET /videoreference/:uuid
-    val findObservationsByVideoReferenceUuid: Endpoint[Unit, (UUID, Paging), ErrorMsg, Seq[ObservationSC], Any] =
+    val findObservationsByVideoReferenceUuid
+        : Endpoint[Unit, (UUID, Paging), ErrorMsg, Seq[ObservationSC], Any] =
         openEndpoint
             .get
             .in("v1" / "observations" / "videoreference" / path[UUID]("videoReferenceUuid"))
@@ -188,7 +196,13 @@ class ObservationEndpoints(controller: ObservationController)(using
             }
 
     // GET /videoreferene/count/:videoReferenceUuid optional start and end query params
-    val countByVideoReferenceUuid: Endpoint[Unit, (UUID, Option[Instant], Option[Instant]), ErrorMsg, CountForVideoReferenceSC, Any] =
+    val countByVideoReferenceUuid: Endpoint[
+        Unit,
+        (UUID, Option[Instant], Option[Instant]),
+        ErrorMsg,
+        CountForVideoReferenceSC,
+        Any
+    ] =
         openEndpoint
             .get
             .in(
@@ -226,7 +240,8 @@ class ObservationEndpoints(controller: ObservationController)(using
             }
 
     // GET/ counts
-    val countAllGroupByVideoReferenceUuid: Endpoint[Unit, Unit, ErrorMsg, Seq[CountForVideoReferenceSC], Any] =
+    val countAllGroupByVideoReferenceUuid
+        : Endpoint[Unit, Unit, ErrorMsg, Seq[CountForVideoReferenceSC], Any] =
         openEndpoint
             .get
             .in("v1" / "observations" / "counts")
@@ -269,14 +284,17 @@ class ObservationEndpoints(controller: ObservationController)(using
             }
 
     // PUT /:uuid
-    val updateOneObservation: Endpoint[Option[String], (UUID, ObservationUpdateSC), ErrorMsg, ObservationSC, Any] =
+    val updateOneObservation
+        : Endpoint[Option[String], (UUID, ObservationUpdateSC), ErrorMsg, ObservationSC, Any] =
         secureEndpoint
             .put
             .in("v1" / "observations" / path[UUID]("uuid"))
             .in(oneOfBody(jsonBody[ObservationUpdateSC], formBody[ObservationUpdateSC]))
             .out(jsonBody[ObservationSC])
             .name("updateOneObservation")
-            .description("Update an observation. If the observation timestamp is not provided, then it will be set to the current time")
+            .description(
+                "Update an observation. If the observation timestamp is not provided, then it will be set to the current time"
+            )
             .tag("observations")
 
     val updateOneObservationImpl: ServerEndpoint[Any, Future] =

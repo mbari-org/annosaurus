@@ -56,7 +56,7 @@ class FastAncillaryDataController(val entityManager: EntityManager) {
 
     def exists(data: CachedAncillaryDatum): Boolean = {
         data.imagedMomentUuid match
-            case None   => false
+            case None                   => false
             case Some(imagedMomentUuid) =>
                 val sql   =
                     s"SELECT uuid FROM $tableName WHERE imaged_moment_uuid = :uuid"
@@ -70,12 +70,11 @@ class FastAncillaryDataController(val entityManager: EntityManager) {
                 n > 0
     }
 
-    /**
-     * Creates a new AncillaryData record. Must be called in a transaction!! In general you should
-     * use createOrUpdate instead.
-     * @param data
-     * @return
-     */
+    /** Creates a new AncillaryData record. Must be called in a transaction!! In general you should
+      * use createOrUpdate instead.
+      * @param data
+      * @return
+      */
     def create(data: CachedAncillaryDatum): Boolean = {
         if (data.imagedMomentUuid.isEmpty) false
         else

@@ -31,7 +31,8 @@ trait BaseDAOSuite extends munit.FunSuite {
     def daoFactory: TestDAOFactory
     private val Timeout = Duration.ofSeconds(2)
 
-    def exec[T](future: Future[T], timeout: Duration = Timeout): T = Await.result(future, timeout.toScala)
+    def exec[T](future: Future[T], timeout: Duration = Timeout): T =
+        Await.result(future, timeout.toScala)
 
     def run[T](thunk: () => T)(implicit dao: DAO[_]): T =
         exec(dao.runTransaction(_ => thunk.apply()))

@@ -146,8 +146,7 @@ trait JdbcRepositorySuite extends BaseDAOSuite {
         val qc1  = new QueryConstraints(videoReferenceUuids = Seq(vru1, vru2), data = Some(true))
         val o1   = repository.findByQueryConstraint(qc1)
         assertEquals(o1.size, xs.size + ys.size)
-        for
-            a <- o1
+        for a <- o1
         do
             println(a.stringify)
             assert(a.ancillaryData.isDefined)
@@ -157,7 +156,6 @@ trait JdbcRepositorySuite extends BaseDAOSuite {
         val qc2 = new QueryConstraints(videoReferenceUuids = Seq(vru1))
         val o2  = repository.findByQueryConstraint(qc2)
         assertEquals(o2.size, xs.size)
-
 
         val qc3 = qc2.copy(concepts = Seq(o.getConcept()))
         val o3  = repository.findByQueryConstraint(qc3)
@@ -219,7 +217,10 @@ trait JdbcRepositorySuite extends BaseDAOSuite {
     test("findByVideoReferenceUuid") {
         val xs  = TestUtils.create(8, 1, 1, 1, true)
         val x   = xs.head
-        val xs2 = repository.findByVideoReferenceUuid(x.getVideoReferenceUuid(), includeAncillaryData = true)
+        val xs2 = repository.findByVideoReferenceUuid(
+            x.getVideoReferenceUuid(),
+            includeAncillaryData = true
+        )
         assertEquals(xs2.size, xs.size)
         for (x <- xs2) {
             assert(x.ancillaryData.isDefined)

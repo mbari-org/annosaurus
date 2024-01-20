@@ -31,27 +31,30 @@ import org.mbari.annosaurus.etc.jwt.JwtService
 import org.mbari.annosaurus.repository.jpa.entity.IndexEntity
 
 class IndexEndpoints(controller: IndexController)(using
-    val executor: ExecutionContext, jwtService: JwtService
+    val executor: ExecutionContext,
+    jwtService: JwtService
 ) extends Endpoints {
-
 
     private val toEntity = Index.from(_: IndexEntity, false) // curried function
 
-    val findByVideoReferenceUUID: Endpoint[Unit, (Paging, UUID), ErrorMsg, List[IndexSC], Any] = openEndpoint
-        .get
-        .in(paging)
-        .in("v1" / "index" / "videoreference" / path[UUID]("uuid"))
-        .out(jsonBody[List[IndexSC]].description("The IndexEntity objects"))
-        .tag("Index")
+    val findByVideoReferenceUUID: Endpoint[Unit, (Paging, UUID), ErrorMsg, List[IndexSC], Any] =
+        openEndpoint
+            .get
+            .in(paging)
+            .in("v1" / "index" / "videoreference" / path[UUID]("uuid"))
+            .out(jsonBody[List[IndexSC]].description("The IndexEntity objects"))
+            .tag("Index")
 
-    val findByVideoReferenceUUIDImpl: ServerEndpoint[Any, Future] = findByVideoReferenceUUID.serverLogic { (paging, uuid) =>
-        val f = controller
-            .findByVideoReferenceUUID(uuid, paging.limit, paging.offset)
-            .map(xs => xs.map(_.toSnakeCase).toList)
-        handleErrors(f)
-    }
+    val findByVideoReferenceUUIDImpl: ServerEndpoint[Any, Future] =
+        findByVideoReferenceUUID.serverLogic { (paging, uuid) =>
+            val f = controller
+                .findByVideoReferenceUUID(uuid, paging.limit, paging.offset)
+                .map(xs => xs.map(_.toSnakeCase).toList)
+            handleErrors(f)
+        }
 
-    val bulkUpdateRecordedTimestamps: Endpoint[Option[String], List[Index], ErrorMsg, List[IndexSC], Any] = secureEndpoint
+    val bulkUpdateRecordedTimestamps
+        : Endpoint[Option[String], List[Index], ErrorMsg, List[IndexSC], Any] = secureEndpoint
         .put
         .in("v1" / "index" / "tapetime")
         .in(jsonBody[List[Index]].description("The IndexEntity objects"))
@@ -62,7 +65,7 @@ class IndexEndpoints(controller: IndexController)(using
         .serverSecurityLogic(jwtOpt => verify(jwtOpt))
         .serverLogic(_ =>
             indices =>
-                val f  = controller
+                val f = controller
                     .bulkUpdateRecordedTimestamps(indices)
                     .map(xs => xs.map(_.toSnakeCase).toList)
                 handleErrors(f)

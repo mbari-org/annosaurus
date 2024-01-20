@@ -28,23 +28,20 @@ trait AnalysisRepositorySuite extends BaseDAOSuite {
     lazy val repository = new AnalysisRepository(daoFactory.entityManagerFactory)
 
     test("depthHistogram") {
-        val xs = TestUtils.create(5, 5, includeData = true)
-        val expected = xs.flatMap(_.getObservations.asScala).size
-        val qcr = QueryConstraints(videoReferenceUuids = Seq(xs.head.getVideoReferenceUuid))
+        val xs        = TestUtils.create(5, 5, includeData = true)
+        val expected  = xs.flatMap(_.getObservations.asScala).size
+        val qcr       = QueryConstraints(videoReferenceUuids = Seq(xs.head.getVideoReferenceUuid))
         val histogram = repository.depthHistogram(qcr)
         assertEquals(histogram.count, expected)
 
     }
 
     test("timeHistogram") {
-        val xs = TestUtils.create(5, 5, includeData = true)
-        val expected = xs.flatMap(_.getObservations.asScala).size
-        val qcr = QueryConstraints(videoReferenceUuids = Seq(xs.head.getVideoReferenceUuid))
+        val xs        = TestUtils.create(5, 5, includeData = true)
+        val expected  = xs.flatMap(_.getObservations.asScala).size
+        val qcr       = QueryConstraints(videoReferenceUuids = Seq(xs.head.getVideoReferenceUuid))
         val histogram = repository.timeHistogram(qcr)
         assertEquals(histogram.count, expected)
     }
-
-
-
 
 }

@@ -406,15 +406,15 @@ trait ObservationEndpointsSuite extends EndpointsSuite {
     }
 
     test("deleteDuration") {
-        val xs = TestUtils.build(1, 1).head
-        val obs = xs.getObservations.iterator().next()
+        val xs       = TestUtils.build(1, 1).head
+        val obs      = xs.getObservations.iterator().next()
         obs.setDuration(Duration.ofSeconds(100L))
-        val c = ImagedMomentController(daoFactory)
-        val im = c.create(Seq(xs)).join.head
+        val c        = ImagedMomentController(daoFactory)
+        val im       = c.create(Seq(xs)).join.head
         assert(im.observations.head.duration.isDefined)
-        val jwt = jwtService.authorize("foo").orNull
+        val jwt      = jwtService.authorize("foo").orNull
         assert(jwt != null)
-        val backend = newBackendStub(endpoints.deleteDurationImpl)
+        val backend  = newBackendStub(endpoints.deleteDurationImpl)
         val response = basicRequest
             .put(uri"http://test.com/v1/observations/delete/duration/${obs.getUuid}")
             .header("Authorization", s"Bearer $jwt")
@@ -426,11 +426,11 @@ trait ObservationEndpointsSuite extends EndpointsSuite {
     }
 
     test("deleteOneObservation") {
-        val im = TestUtils.create(1, 1).head
-        val obs = im.getObservations.iterator().next()
-        val jwt = jwtService.authorize("foo").orNull
+        val im       = TestUtils.create(1, 1).head
+        val obs      = im.getObservations.iterator().next()
+        val jwt      = jwtService.authorize("foo").orNull
         assert(jwt != null)
-        val backend = newBackendStub(endpoints.deleteOneObservationImpl)
+        val backend  = newBackendStub(endpoints.deleteOneObservationImpl)
         val response = basicRequest
             .delete(uri"http://test.com/v1/observations/${obs.getUuid}")
             .header("Authorization", s"Bearer $jwt")
@@ -438,7 +438,7 @@ trait ObservationEndpointsSuite extends EndpointsSuite {
             .join
         assertEquals(response.code, StatusCode.NoContent)
 
-        val c = ObservationController(daoFactory)
+        val c        = ObservationController(daoFactory)
         val obtained = c.findByUUID(obs.getUuid).join
         assertEquals(obtained, None)
     }

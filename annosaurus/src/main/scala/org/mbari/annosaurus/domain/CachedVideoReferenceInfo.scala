@@ -90,11 +90,12 @@ final case class CachedVideoReferenceInfoCreateSC(
     video_reference_uuid: UUID,
     platform_name: String,
     mission_id: String,
-    mission_contact: Option[String] = None)
+    mission_contact: Option[String] = None
+)
 
 final case class CachedVideoReferenceInfoUpdateSC(
     video_reference_uuid: Option[UUID] = None,
     platform_name: Option[String] = None,
     mission_id: Option[String] = None,
-    mission_contact: Option[String] = None)
-
+    mission_contact: Option[String] = None
+)

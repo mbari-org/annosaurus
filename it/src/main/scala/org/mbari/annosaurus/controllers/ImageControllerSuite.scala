@@ -31,9 +31,9 @@ trait ImageControllerSuite extends BaseDAOSuite {
     lazy val controller = new ImageController(daoFactory)
 
     test("findByUUID") {
-        val im = TestUtils.create(nImageReferences = 1).head
-        val i = im.getImageReferences.iterator().next()
-        val opt = exec(controller.findByUUID(i.getUuid))
+        val im       = TestUtils.create(nImageReferences = 1).head
+        val i        = im.getImageReferences.iterator().next()
+        val opt      = exec(controller.findByUUID(i.getUuid))
         assert(opt.isDefined)
         val expected = Image.from(i)
         val obtained = opt.get
@@ -42,15 +42,15 @@ trait ImageControllerSuite extends BaseDAOSuite {
 
     test("findByVideoReferenceUUID") {
         val im = TestUtils.create(nImageReferences = 2).head
-        val i = im.getImageReferences.iterator().next()
+        val i  = im.getImageReferences.iterator().next()
         val xs = exec(controller.findByVideoReferenceUUID(im.getVideoReferenceUuid))
         assertEquals(xs.size, im.getImageReferences.size())
     }
 
     test("findByURL") {
-        val im = TestUtils.create(nImageReferences = 2).head
-        val i = im.getImageReferences.iterator().next()
-        val opt = exec(controller.findByURL(i.getUrl))
+        val im       = TestUtils.create(nImageReferences = 2).head
+        val i        = im.getImageReferences.iterator().next()
+        val opt      = exec(controller.findByURL(i.getUrl))
         assert(opt.isDefined)
         val expected = Image.from(i)
         val obtained = opt.get
@@ -58,29 +58,32 @@ trait ImageControllerSuite extends BaseDAOSuite {
     }
 
     test("findByImageName") {
-        val im = TestUtils.create(nImageReferences = 2).head
-        val i = im.getImageReferences.iterator().next()
+        val im        = TestUtils.create(nImageReferences = 2).head
+        val i         = im.getImageReferences.iterator().next()
         val imageName = i.getUrl.toExternalForm.split("/").last
-        val xs = exec(controller.findByImageName(imageName))
+        val xs        = exec(controller.findByImageName(imageName))
         assertEquals(xs.size, 1)
-        val expected = Image.from(i)
-        val obtained = xs.head
+        val expected  = Image.from(i)
+        val obtained  = xs.head
         assertEquals(expected, obtained)
     }
 
     test("create") {
         val im = TestUtils.create().head
-        val i = TestUtils.randomImageReference()
-        val j = exec(controller.create(im.getVideoReferenceUuid,
-            i.getUrl,
-            Option(im.getTimecode),
-            Option(im.getElapsedTime),
-            Option(im.getRecordedTimestamp),
-            Option(i.getFormat),
-            Option(i.getWidth),
-            Option(i.getHeight),
-            Option(i.getDescription)
-        ))
+        val i  = TestUtils.randomImageReference()
+        val j  = exec(
+            controller.create(
+                im.getVideoReferenceUuid,
+                i.getUrl,
+                Option(im.getTimecode),
+                Option(im.getElapsedTime),
+                Option(im.getRecordedTimestamp),
+                Option(i.getFormat),
+                Option(i.getWidth),
+                Option(i.getHeight),
+                Option(i.getDescription)
+            )
+        )
         assert(j.imageReferenceUuid != null)
         assert(j.imagedMomentUuid != null)
         assertEquals(j.videoReferenceUuid, im.getVideoReferenceUuid)
@@ -96,22 +99,25 @@ trait ImageControllerSuite extends BaseDAOSuite {
     }
 
     test("update (fields)") {
-        val im = TestUtils.create(nImageReferences = 1).head
-        val i = im.getImageReferences.iterator().next()
-        val j = TestUtils.randomImageReference()
-        val opt = exec(controller.update(i.getUuid,
-            Some(im.getVideoReferenceUuid),
-            Some(j.getUrl),
-            Option(im.getTimecode),
-            Option(im.getElapsedTime),
-            Option(im.getRecordedTimestamp),
-            Option(j.getFormat),
-            Option(j.getWidth),
-            Option(j.getHeight),
-            Option(j.getDescription)
-        ))
+        val im  = TestUtils.create(nImageReferences = 1).head
+        val i   = im.getImageReferences.iterator().next()
+        val j   = TestUtils.randomImageReference()
+        val opt = exec(
+            controller.update(
+                i.getUuid,
+                Some(im.getVideoReferenceUuid),
+                Some(j.getUrl),
+                Option(im.getTimecode),
+                Option(im.getElapsedTime),
+                Option(im.getRecordedTimestamp),
+                Option(j.getFormat),
+                Option(j.getWidth),
+                Option(j.getHeight),
+                Option(j.getDescription)
+            )
+        )
         assert(opt.isDefined)
-        val k = opt.get
+        val k   = opt.get
         assertEquals(k.videoReferenceUuid, im.getVideoReferenceUuid)
         assertEquals(k.url.orNull, j.getUrl)
         assertEquals(k.timecode.orNull, Option(im.getTimecode).map(_.toString).orNull)
@@ -126,22 +132,25 @@ trait ImageControllerSuite extends BaseDAOSuite {
     test("update (videoReferenceUuid") {
         val im0 = TestUtils.create(nImageReferences = 1).head
         val im1 = TestUtils.create().head
-        val i = im0.getImageReferences.iterator().next()
-        val opt = exec(controller.update(i.getUuid,
-            videoReferenceUUID = Some(im1.getVideoReferenceUuid),
-            elapsedTime = Some(im1.getElapsedTime)
-        ))
+        val i   = im0.getImageReferences.iterator().next()
+        val opt = exec(
+            controller.update(
+                i.getUuid,
+                videoReferenceUUID = Some(im1.getVideoReferenceUuid),
+                elapsedTime = Some(im1.getElapsedTime)
+            )
+        )
         assert(opt.isDefined)
-        val k = opt.get
+        val k   = opt.get
         assertEquals(k.videoReferenceUuid, im1.getVideoReferenceUuid)
         assertEquals(k.url.orNull, i.getUrl)
         assertEquals(k.elapsedTime.orNull, im1.getElapsedTime)
     }
 
     test("delete") {
-        val im = TestUtils.create(nImageReferences = 1).head
-        val i = im.getImageReferences.iterator().next()
-        val ok = exec(controller.delete(i.getUuid))
+        val im  = TestUtils.create(nImageReferences = 1).head
+        val i   = im.getImageReferences.iterator().next()
+        val ok  = exec(controller.delete(i.getUuid))
         assert(ok)
         val opt = exec(controller.findByUUID(i.getUuid))
         assert(opt.isEmpty)

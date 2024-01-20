@@ -133,7 +133,7 @@ trait CachedAncillaryDatumControllerSuite extends BaseDAOSuite {
                 im.getAncillaryDatum.getUuid,
                 Some(12.3456),
                 Some(123.4567),
-                Some(-1000.0f),
+                Some(-1000.0f)
             )
         )
         obtained match
@@ -148,7 +148,7 @@ trait CachedAncillaryDatumControllerSuite extends BaseDAOSuite {
     }
 
     test("findByVideoReferenceUUID") {
-        val im = TestUtils.create(1, includeData = true).head
+        val im       = TestUtils.create(1, includeData = true).head
         val obtained = exec(controller.findByVideoReferenceUUID(im.getVideoReferenceUuid)).head
         val expected = CachedAncillaryDatum
             .from(im.getAncillaryDatum)
@@ -163,8 +163,8 @@ trait CachedAncillaryDatumControllerSuite extends BaseDAOSuite {
     }
 
     test("findByObservationUUID") {
-        val im = TestUtils.create(1, 1, includeData = true).head
-        val obs = im.getObservations.iterator().next()
+        val im       = TestUtils.create(1, 1, includeData = true).head
+        val obs      = im.getObservations.iterator().next()
         val obtained = exec(controller.findByObservationUUID(obs.getUuid)).head
         val expected = CachedAncillaryDatum
             .from(im.getAncillaryDatum)
@@ -178,7 +178,7 @@ trait CachedAncillaryDatumControllerSuite extends BaseDAOSuite {
     }
 
     test("findByImagedMomentUUID") {
-        val im = TestUtils.create(1, includeData = true).head
+        val im       = TestUtils.create(1, includeData = true).head
         val obtained = exec(controller.findByImagedMomentUUID(im.getUuid)).head
         val expected = CachedAncillaryDatum
             .from(im.getAncillaryDatum)
@@ -191,10 +191,10 @@ trait CachedAncillaryDatumControllerSuite extends BaseDAOSuite {
         assertEquals(obtained, expected)
     }
 
-
     test("bulkCreateOrUpdate (create)") {
         // test create
-        val s0 = TestUtils.create(4, 1, 1, 1, false)
+        val s0 = TestUtils
+            .create(4, 1, 1, 1, false)
             .map(x => {
                 val ad = TestUtils.randomData()
                 ad.setDepthMeters(1000)
@@ -202,11 +202,10 @@ trait CachedAncillaryDatumControllerSuite extends BaseDAOSuite {
                 CachedAncillaryDatum.from(ad, true)
             })
         val a0 = exec(controller.bulkCreateOrUpdate(s0))
-        for
-            s <- s0
+        for s <- s0
         do
             assert(s.imagedMomentUuid.isDefined)
-            val opt = exec(controller.findByImagedMomentUUID(s.imagedMomentUuid.get))
+            val opt      = exec(controller.findByImagedMomentUUID(s.imagedMomentUuid.get))
             assert(opt.isDefined)
             val obtained = opt.get
             val expected = s.copy(
@@ -221,18 +220,18 @@ trait CachedAncillaryDatumControllerSuite extends BaseDAOSuite {
 
     test("bulkCreateOrUpdate (update)") {
         // test update
-        val s0 = TestUtils.create(4, 1, 1, 1, true)
+        val s0 = TestUtils
+            .create(4, 1, 1, 1, true)
             .map(x => {
                 val ad = x.getAncillaryDatum
                 ad.setDepthMeters(1000)
                 CachedAncillaryDatum.from(ad, true)
             })
         val a0 = exec(controller.bulkCreateOrUpdate(s0))
-        for
-            s <- s0
+        for s <- s0
         do
             assert(s.imagedMomentUuid.isDefined)
-            val opt = exec(controller.findByImagedMomentUUID(s.imagedMomentUuid.get))
+            val opt      = exec(controller.findByImagedMomentUUID(s.imagedMomentUuid.get))
             assert(opt.isDefined)
             val obtained = opt.get
             val expected = s.copy(
@@ -245,24 +244,26 @@ trait CachedAncillaryDatumControllerSuite extends BaseDAOSuite {
     }
 
     test("bulkCreateOrUpdate (mixed create/update") {
-        val s0 = TestUtils.create(4, 1, 1, 1, true)
+        val s0 = TestUtils
+            .create(4, 1, 1, 1, true)
             .map(x => {
                 val ad = x.getAncillaryDatum
                 ad.setDepthMeters(1000)
                 CachedAncillaryDatum.from(ad, true)
-            }) ++ TestUtils.create(4, 1, 1, 1, false).map(x => {
-            val ad = TestUtils.randomData()
-            ad.setDepthMeters(1000)
-            x.setAncillaryDatum(ad)
-            CachedAncillaryDatum.from(ad, true)
-        })
+            }) ++ TestUtils
+            .create(4, 1, 1, 1, false)
+            .map(x => {
+                val ad = TestUtils.randomData()
+                ad.setDepthMeters(1000)
+                x.setAncillaryDatum(ad)
+                CachedAncillaryDatum.from(ad, true)
+            })
 
         val a0 = exec(controller.bulkCreateOrUpdate(s0))
-        for
-            s <- s0
+        for s <- s0
         do
             assert(s.imagedMomentUuid.isDefined)
-            val opt = exec(controller.findByImagedMomentUUID(s.imagedMomentUuid.get))
+            val opt      = exec(controller.findByImagedMomentUUID(s.imagedMomentUuid.get))
             assert(opt.isDefined)
             val obtained = opt.get
             val expected = s.copy(
@@ -275,17 +276,19 @@ trait CachedAncillaryDatumControllerSuite extends BaseDAOSuite {
     }
 
     test("merge") {
-        val xs = TestUtils.create(10)
+        val xs             = TestUtils.create(10)
         val minEpochMillis = xs.map(_.getRecordedTimestamp.toEpochMilli).min
-        val s0 = xs.zipWithIndex
+        val s0             = xs
+            .zipWithIndex
             .map((im, idx) => {
-                val ts = Instant.ofEpochMilli(im.getRecordedTimestamp.toEpochMilli + Random.nextInt(14000))
-                CachedAncillaryDatum.from(TestUtils.randomData())
+                val ts = Instant
+                    .ofEpochMilli(im.getRecordedTimestamp.toEpochMilli + Random.nextInt(14000))
+                CachedAncillaryDatum
+                    .from(TestUtils.randomData())
                     .copy(recordedTimestamp = Some(ts), depthMeters = Some(1000))
-        })
+            })
         exec(controller.merge(s0, xs.head.getVideoReferenceUuid, Duration.ofSeconds(15)))
-        for
-            x <- xs
+        for x <- xs
         do
             val opt = exec(controller.findByImagedMomentUUID(x.getUuid))
             opt match
@@ -298,17 +301,21 @@ trait CachedAncillaryDatumControllerSuite extends BaseDAOSuite {
                     assertEquals(obtained.recordedTimestamp.orNull, x.getRecordedTimestamp)
     }
 
-    test( "deleteByVideoReferenceUuid") {
-        val xs = TestUtils.create(4, 1, 1, 1, includeData = true)
-        val ok = exec(controller.deleteByVideoReferenceUuid(xs.head.getVideoReferenceUuid))
+    test("deleteByVideoReferenceUuid") {
+        val xs       = TestUtils.create(4, 1, 1, 1, includeData = true)
+        val ok       = exec(controller.deleteByVideoReferenceUuid(xs.head.getVideoReferenceUuid))
         val obtained = exec(controller.findByVideoReferenceUUID(xs.head.getVideoReferenceUuid))
         assertEquals(obtained.size, 0)
     }
 
     // TOOD: verify that null fields do not come back as zero
     test("inserted null fields should not be zero") {
-        val im = TestUtils.create(1, includeData = false).head
-        val ad = CachedAncillaryDatum(latitude = Some(12.345), longitude = Some(123.456), depthMeters = Some(1000))
+        val im  = TestUtils.create(1, includeData = false).head
+        val ad  = CachedAncillaryDatum(
+            latitude = Some(12.345),
+            longitude = Some(123.456),
+            depthMeters = Some(1000)
+        )
         val opt = exec(controller.create(im.getUuid, ad))
         opt match
             case None           => fail("Failed to create CachedAncillaryDatum")

@@ -16,13 +16,17 @@
 
 package org.mbari.annosaurus.endpoints
 
-
 import org.mbari.annosaurus.etc.circe.CirceCodecs.{*, given}
 import sttp.client3.*
 import org.mbari.annosaurus.etc.sdk.Futures.*
 import org.junit.Assert.*
 import org.mbari.annosaurus.controllers.{CachedAncillaryDatumController, TestUtils}
-import org.mbari.annosaurus.domain.{CachedAncillaryDatum, CachedAncillaryDatumSC, CountForVideoReferenceSC, DeleteCountSC}
+import org.mbari.annosaurus.domain.{
+    CachedAncillaryDatum,
+    CachedAncillaryDatumSC,
+    CountForVideoReferenceSC,
+    DeleteCountSC
+}
 import org.mbari.annosaurus.etc.jwt.JwtService
 import org.mbari.annosaurus.repository.jpa.JPADAOFactory
 import sttp.model.StatusCode
@@ -36,11 +40,11 @@ trait CachedAncillaryDatumEndpointsSuite extends EndpointsSuite {
     given jwtService: JwtService = new JwtService("mbari", "foo", "bar")
 
     private lazy val controller = new CachedAncillaryDatumController(daoFactory)
-    private lazy val endpoints = new CachedAncillaryDatumEndpoints(controller)
+    private lazy val endpoints  = new CachedAncillaryDatumEndpoints(controller)
 
     test("findDataByUuid") {
         val im = TestUtils.create(1, includeData = true).head
-        val d = im.getAncillaryDatum
+        val d  = im.getAncillaryDatum
         runGet(
             endpoints.findDataByUuidImpl,
             s"http://test.com/v1/ancillarydata/${d.getUuid}",
@@ -55,13 +59,14 @@ trait CachedAncillaryDatumEndpointsSuite extends EndpointsSuite {
 
     test("findDataByVideoReferenceUuid") {
         val im = TestUtils.create(1, includeData = true).head
-        val d = im.getAncillaryDatum
+        val d  = im.getAncillaryDatum
         runGet(
             endpoints.findDataByVideoReferenceUuidImpl,
             s"http://test.com/v1/ancillarydata/videoreference/${im.getVideoReferenceUuid}",
             response => {
                 assertEquals(response.code, StatusCode.Ok)
-                val obtained = checkResponse[List[CachedAncillaryDatumSC]](response.body).map(_.toCamelCase)
+                val obtained =
+                    checkResponse[List[CachedAncillaryDatumSC]](response.body).map(_.toCamelCase)
                 val expected = List(CachedAncillaryDatum.from(d, true))
                 assertEquals(obtained, expected)
             }
@@ -70,7 +75,7 @@ trait CachedAncillaryDatumEndpointsSuite extends EndpointsSuite {
 
     test("findDataByImagedMomentUuid") {
         val im = TestUtils.create(1, includeData = true).head
-        val d = im.getAncillaryDatum
+        val d  = im.getAncillaryDatum
         runGet(
             endpoints.findDataByImagedMomentUuidImpl,
             s"http://test.com/v1/ancillarydata/imagedmoment/${im.getUuid}",
@@ -84,9 +89,9 @@ trait CachedAncillaryDatumEndpointsSuite extends EndpointsSuite {
     }
 
     test("findDataByObservationUuid") {
-        val im = TestUtils.create(1, 1, includeData = true).head
+        val im  = TestUtils.create(1, 1, includeData = true).head
         val obs = im.getObservations.iterator().next()
-        val d = im.getAncillaryDatum
+        val d   = im.getAncillaryDatum
         runGet(
             endpoints.findDataByObservationUuidImpl,
             s"http://test.com/v1/ancillarydata/observation/${obs.getUuid}",
@@ -100,14 +105,15 @@ trait CachedAncillaryDatumEndpointsSuite extends EndpointsSuite {
     }
 
     test("createOneDatum") {
-        val im = TestUtils.create(1).head
-        val d = CachedAncillaryDatum.from(TestUtils.randomData())
+        val im          = TestUtils.create(1).head
+        val d           = CachedAncillaryDatum
+            .from(TestUtils.randomData())
             .copy(imagedMomentUuid = Some(im.getUuid))
             .toSnakeCase
-        val jwt = jwtService.authorize("foo").orNull
+        val jwt         = jwtService.authorize("foo").orNull
         assert(jwt != null)
         val backendStub = newBackendStub(endpoints.createOneDatumImpl)
-        val response = basicRequest
+        val response    = basicRequest
             .post(uri"http://test.com/v1/ancillarydata")
             .header("Authorization", s"Bearer $jwt")
             .header("Content-Type", "application/json")
@@ -120,17 +126,22 @@ trait CachedAncillaryDatumEndpointsSuite extends EndpointsSuite {
 
     test("createorUpdateManyData") {
         val xs = TestUtils.create(2, includeData = true) ++ TestUtils.create(2)
-        val d = xs.map(im => Option(im.getAncillaryDatum) match
-            case Some(d) => CachedAncillaryDatum.from(d, true)
-            case None => CachedAncillaryDatum.from(TestUtils.randomData())
-                .copy(imagedMomentUuid = Some(im.getUuid))
-        ).map(x => x.copy(latitude = Some(25.345)))
+        val d  = xs
+            .map(im =>
+                Option(im.getAncillaryDatum) match
+                    case Some(d) => CachedAncillaryDatum.from(d, true)
+                    case None    =>
+                        CachedAncillaryDatum
+                            .from(TestUtils.randomData())
+                            .copy(imagedMomentUuid = Some(im.getUuid))
+            )
+            .map(x => x.copy(latitude = Some(25.345)))
             .map(_.toSnakeCase)
 
-        val jwt = jwtService.authorize("foo").orNull
+        val jwt         = jwtService.authorize("foo").orNull
         assert(jwt != null)
         val backendStub = newBackendStub(endpoints.createOrUpdateManyDataImpl)
-        val response = basicRequest
+        val response    = basicRequest
             .post(uri"http://test.com/v1/ancillarydata/bulk")
             .header("Authorization", s"Bearer $jwt")
             .header("Content-Type", "application/json")
@@ -138,26 +149,24 @@ trait CachedAncillaryDatumEndpointsSuite extends EndpointsSuite {
             .send(backendStub)
             .join
         assertEquals(response.code, StatusCode.Ok)
-        val obtained = checkResponse[List[CachedAncillaryDatumSC]](response.body)
+        val obtained    = checkResponse[List[CachedAncillaryDatumSC]](response.body)
         assertEquals(obtained.size, 4)
-        for
-            x <- obtained
-        do
-            assertEqualsDouble(x.latitude.getOrElse(-1000D), 25.345, 0.0001)
+        for x <- obtained
+        do assertEqualsDouble(x.latitude.getOrElse(-1000d), 25.345, 0.0001)
     }
 
-
     test("mergeManyData".flaky) {
-        val xs = TestUtils.create(4, includeData = true)
-        val d = xs.map(im => CachedAncillaryDatum.from(im.getAncillaryDatum))
+        val xs                 = TestUtils.create(4, includeData = true)
+        val d                  = xs
+            .map(im => CachedAncillaryDatum.from(im.getAncillaryDatum))
             .map(x => x.copy(latitude = Some(25.345)))
             .map(_.toSnakeCase)
         val videoReferenceUuid = xs.head.getVideoReferenceUuid
 
-        val jwt = jwtService.authorize("foo").orNull
+        val jwt         = jwtService.authorize("foo").orNull
         assert(jwt != null)
         val backendStub = newBackendStub(endpoints.mergeManyDataImpl)
-        val response = basicRequest
+        val response    = basicRequest
             .post(uri"http://test.com/v1/ancillarydata/merge/$videoReferenceUuid")
             .header("Authorization", s"Bearer $jwt")
             .header("Content-Type", "application/json")
@@ -165,23 +174,22 @@ trait CachedAncillaryDatumEndpointsSuite extends EndpointsSuite {
             .send(backendStub)
             .join
         assertEquals(response.code, StatusCode.Ok)
-        val obtained = checkResponse[List[CachedAncillaryDatumSC]](response.body)
+        val obtained    = checkResponse[List[CachedAncillaryDatumSC]](response.body)
         assertEquals(obtained.size, 4)
-        for
-            x <- obtained
-        do
-            assertEqualsDouble(x.latitude.getOrElse(-1000D), 25.345, 0.0001)
+        for x <- obtained
+        do assertEqualsDouble(x.latitude.getOrElse(-1000d), 25.345, 0.0001)
     }
 
     test("updateOneDatum") {
-        val im = TestUtils.create(1, includeData = true).head
-        val d = CachedAncillaryDatum.from(im.getAncillaryDatum)
+        val im          = TestUtils.create(1, includeData = true).head
+        val d           = CachedAncillaryDatum
+            .from(im.getAncillaryDatum)
             .copy(latitude = Some(25.345))
             .toSnakeCase
-        val jwt = jwtService.authorize("foo").orNull
+        val jwt         = jwtService.authorize("foo").orNull
         assert(jwt != null)
         val backendStub = newBackendStub(endpoints.updateOneDatumImpl)
-        val response = basicRequest
+        val response    = basicRequest
             .put(uri"http://test.com/v1/ancillarydata/${d.uuid}")
             .header("Authorization", s"Bearer $jwt")
             .header("Content-Type", "application/json")
@@ -189,27 +197,25 @@ trait CachedAncillaryDatumEndpointsSuite extends EndpointsSuite {
             .send(backendStub)
             .join
         assertEquals(response.code, StatusCode.Ok)
-        val obtained = checkResponse[CachedAncillaryDatumSC](response.body)
-        assertEqualsDouble(obtained.latitude.getOrElse(-1000D), 25.345, 0.0001)
+        val obtained    = checkResponse[CachedAncillaryDatumSC](response.body)
+        assertEqualsDouble(obtained.latitude.getOrElse(-1000d), 25.345, 0.0001)
     }
 
     test("deleteDataByVideoReferenceUuid") {
-        val xs = TestUtils.create(2, includeData = true)
+        val xs                 = TestUtils.create(2, includeData = true)
         val videoReferenceUuid = xs.head.getVideoReferenceUuid
-        val jwt = jwtService.authorize("foo").orNull
+        val jwt                = jwtService.authorize("foo").orNull
         assert(jwt != null)
-        val backendStub = newBackendStub(endpoints.deleteDataByVideoReferenceUuidImpl)
-        val response = basicRequest
+        val backendStub        = newBackendStub(endpoints.deleteDataByVideoReferenceUuidImpl)
+        val response           = basicRequest
             .delete(uri"http://test.com/v1/ancillarydata/videoreference/$videoReferenceUuid")
             .header("Authorization", s"Bearer $jwt")
             .send(backendStub)
             .join
         assertEquals(response.code, StatusCode.Ok)
         assertEquals(response.code, StatusCode.Ok)
-        val deleteCount = checkResponse[CountForVideoReferenceSC](response.body)
+        val deleteCount        = checkResponse[CountForVideoReferenceSC](response.body)
         assertEquals(deleteCount.count, 2)
     }
-
-
 
 }

@@ -17,7 +17,13 @@
 package org.mbari.annosaurus.endpoints
 
 import org.mbari.annosaurus.controllers.CachedVideoReferenceInfoController
-import org.mbari.annosaurus.domain.{CachedVideoReferenceInfo, CachedVideoReferenceInfoCreateSC, CachedVideoReferenceInfoSC, CachedVideoReferenceInfoUpdateSC, ErrorMsg}
+import org.mbari.annosaurus.domain.{
+    CachedVideoReferenceInfo,
+    CachedVideoReferenceInfoCreateSC,
+    CachedVideoReferenceInfoSC,
+    CachedVideoReferenceInfoUpdateSC,
+    ErrorMsg
+}
 import org.mbari.annosaurus.etc.jwt.JwtService
 import org.mbari.annosaurus.etc.tapir.TapirCodecs.given
 import sttp.tapir.*
@@ -31,8 +37,8 @@ import java.util.UUID
 import scala.concurrent.{ExecutionContext, Future}
 
 class CachedVideoReferenceInfoEndpoints(controller: CachedVideoReferenceInfoController)(using
-                                                                                        ec: ExecutionContext,
-                                                                                        jwtService: JwtService
+    ec: ExecutionContext,
+    jwtService: JwtService
 ) extends Endpoints {
 
     private val tag = "Video Information"
@@ -50,7 +56,9 @@ class CachedVideoReferenceInfoEndpoints(controller: CachedVideoReferenceInfoCont
     val findAllImpl: ServerEndpoint[Any, Future] =
         findAll
             .serverLogic { page =>
-                handleErrors(controller.findAll(page.limit, page.offset).map(_.map(_.toSnakeCase).toSeq))
+                handleErrors(
+                    controller.findAll(page.limit, page.offset).map(_.map(_.toSnakeCase).toSeq)
+                )
             }
 
     // GET /videoreferences
@@ -101,7 +109,6 @@ class CachedVideoReferenceInfoEndpoints(controller: CachedVideoReferenceInfoCont
                 handleOption(controller.findByVideoReferenceUUID(uuid).map(_.map(_.toSnakeCase)))
             }
 
-
     // GET /missionids
     val findAllMissionIds: Endpoint[Unit, Unit, ErrorMsg, Seq[String], Any] =
         openEndpoint
@@ -151,7 +158,8 @@ class CachedVideoReferenceInfoEndpoints(controller: CachedVideoReferenceInfoCont
             }
 
     // GET /missioncontact/:missioncontact
-    val findByMissionContact: Endpoint[Unit, String, ErrorMsg, Seq[CachedVideoReferenceInfoSC], Any] =
+    val findByMissionContact
+        : Endpoint[Unit, String, ErrorMsg, Seq[CachedVideoReferenceInfoSC], Any] =
         openEndpoint
             .get
             .in("v1" / "videoreferences" / "missioncontact" / path[String]("missioncontact"))
@@ -163,15 +171,24 @@ class CachedVideoReferenceInfoEndpoints(controller: CachedVideoReferenceInfoCont
     val findByMissionContactImpl: ServerEndpoint[Any, Future] =
         findByMissionContact
             .serverLogic { missionContact =>
-                handleErrors(controller.findByMissionContact(missionContact).map(_.map(_.toSnakeCase).toSeq))
+                handleErrors(
+                    controller.findByMissionContact(missionContact).map(_.map(_.toSnakeCase).toSeq)
+                )
             }
 
     // POST / json or form body
-    val createOneVideoReferenceInfo: Endpoint[Option[String], CachedVideoReferenceInfoCreateSC, ErrorMsg, CachedVideoReferenceInfoSC, Any] =
+    val createOneVideoReferenceInfo: Endpoint[Option[
+        String
+    ], CachedVideoReferenceInfoCreateSC, ErrorMsg, CachedVideoReferenceInfoSC, Any] =
         secureEndpoint
             .post
             .in("v1" / "videoreferences")
-            .in(oneOfBody(jsonBody[CachedVideoReferenceInfoCreateSC], formBody[CachedVideoReferenceInfoCreateSC]))
+            .in(
+                oneOfBody(
+                    jsonBody[CachedVideoReferenceInfoCreateSC],
+                    formBody[CachedVideoReferenceInfoCreateSC]
+                )
+            )
             .out(jsonBody[CachedVideoReferenceInfoSC])
             .name("createOneVideoReferenceInfo")
             .description("Create a video reference")
@@ -181,20 +198,31 @@ class CachedVideoReferenceInfoEndpoints(controller: CachedVideoReferenceInfoCont
         createOneVideoReferenceInfo
             .serverSecurityLogic(jwtOpt => verify(jwtOpt))
             .serverLogic { _ => dto =>
-                handleErrors(controller.create(
-                    dto.video_reference_uuid,
-                    dto.platform_name,
-                    dto.mission_id,
-                    dto.mission_contact
-                ).map(_.toSnakeCase))
+                handleErrors(
+                    controller
+                        .create(
+                            dto.video_reference_uuid,
+                            dto.platform_name,
+                            dto.mission_id,
+                            dto.mission_contact
+                        )
+                        .map(_.toSnakeCase)
+                )
             }
 
     // PUT /:uuid json or form body
-    val updateOneVideoReferenceInfo: Endpoint[Option[String], (UUID, CachedVideoReferenceInfoUpdateSC), ErrorMsg, CachedVideoReferenceInfoSC, Any] =
+    val updateOneVideoReferenceInfo: Endpoint[Option[
+        String
+    ], (UUID, CachedVideoReferenceInfoUpdateSC), ErrorMsg, CachedVideoReferenceInfoSC, Any] =
         secureEndpoint
             .put
             .in("v1" / "videoreferences" / path[UUID]("uuid"))
-            .in(oneOfBody(jsonBody[CachedVideoReferenceInfoUpdateSC], formBody[CachedVideoReferenceInfoUpdateSC]))
+            .in(
+                oneOfBody(
+                    jsonBody[CachedVideoReferenceInfoUpdateSC],
+                    formBody[CachedVideoReferenceInfoUpdateSC]
+                )
+            )
             .out(jsonBody[CachedVideoReferenceInfoSC])
             .name("updateOneVideoReferenceInfo")
             .description("Update a video reference")
@@ -204,13 +232,17 @@ class CachedVideoReferenceInfoEndpoints(controller: CachedVideoReferenceInfoCont
         updateOneVideoReferenceInfo
             .serverSecurityLogic(jwtOpt => verify(jwtOpt))
             .serverLogic { _ => (uuid, dto) =>
-                handleOption(controller.update(
-                    uuid,
-                    dto.video_reference_uuid,
-                    dto.platform_name,
-                    dto.mission_id,
-                    dto.mission_contact
-                ).map(_.map(_.toSnakeCase)))
+                handleOption(
+                    controller
+                        .update(
+                            uuid,
+                            dto.video_reference_uuid,
+                            dto.platform_name,
+                            dto.mission_id,
+                            dto.mission_contact
+                        )
+                        .map(_.map(_.toSnakeCase))
+                )
             }
 
     // DELETE /:uuid
@@ -227,9 +259,12 @@ class CachedVideoReferenceInfoEndpoints(controller: CachedVideoReferenceInfoCont
         deleteOneVideoReferenceInfo
             .serverSecurityLogic(jwtOpt => verify(jwtOpt))
             .serverLogic { _ => uuid =>
-                handleErrors(controller.delete(uuid).map(b => if (b) StatusCode.NoContent else StatusCode.NotFound))
+                handleErrors(
+                    controller
+                        .delete(uuid)
+                        .map(b => if (b) StatusCode.NoContent else StatusCode.NotFound)
+                )
             }
-    
 
     override def all: List[Endpoint[_, _, _, _, _]] = List(
         findAll,

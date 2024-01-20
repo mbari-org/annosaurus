@@ -18,7 +18,16 @@ package org.mbari.annosaurus.endpoints
 
 import java.time.{Duration, Instant}
 import org.mbari.annosaurus.controllers.{ImagedMomentController, TestUtils}
-import org.mbari.annosaurus.domain.{Annotation, ConceptCount, Count, CountForVideoReferenceSC, ImagedMoment, ImagedMomentSC, ImagedMomentTimestampUpdateSC, WindowRequest}
+import org.mbari.annosaurus.domain.{
+    Annotation,
+    ConceptCount,
+    Count,
+    CountForVideoReferenceSC,
+    ImagedMoment,
+    ImagedMomentSC,
+    ImagedMomentTimestampUpdateSC,
+    WindowRequest
+}
 import org.mbari.annosaurus.etc.circe.CirceCodecs.{*, given}
 import org.mbari.annosaurus.etc.jdk.Instants
 import org.mbari.annosaurus.etc.jdk.Logging.{*, given}
@@ -72,8 +81,8 @@ trait ImagedMomentEndpointsSuite extends EndpointsSuite {
                 assertEquals(response.code, StatusCode.Ok)
                 val imagedMoments = checkResponse[Seq[ImagedMomentSC]](response.body)
                 assert(imagedMoments.nonEmpty)
-                val expected = ImagedMoment.from(im, true)
-                val obtained = imagedMoments.filter(_.uuid.get == im.getUuid).head.toCamelCase
+                val expected      = ImagedMoment.from(im, true)
+                val obtained      = imagedMoments.filter(_.uuid.get == im.getUuid).head.toCamelCase
                 assertEquals(obtained, expected)
             }
         )
@@ -117,8 +126,8 @@ trait ImagedMomentEndpointsSuite extends EndpointsSuite {
     }
 
     test("findImagedMomentsByLinkName") {
-        val im = TestUtils.create(4, 1, 2).head
-        val ass = im.getObservations.iterator().next().getAssociations.iterator().next()
+        val im       = TestUtils.create(4, 1, 2).head
+        val ass      = im.getObservations.iterator().next().getAssociations.iterator().next()
         val linkName = ass.getLinkName
         runGet(
             endpoints.findImagedMomentsByLinkNameImpl,
@@ -127,8 +136,8 @@ trait ImagedMomentEndpointsSuite extends EndpointsSuite {
                 assertEquals(response.code, StatusCode.Ok)
                 val imagedMoments = checkResponse[Seq[ImagedMomentSC]](response.body)
                 assertEquals(imagedMoments.size, 1)
-                val expected = ImagedMoment.from(im, true)
-                val obtained = imagedMoments.head.toCamelCase
+                val expected      = ImagedMoment.from(im, true)
+                val obtained      = imagedMoments.head.toCamelCase
                 assertEquals(obtained, expected)
             }
         )
@@ -146,8 +155,8 @@ trait ImagedMomentEndpointsSuite extends EndpointsSuite {
     }
 
     test("countImagedMomentsByLinkName") {
-        val im = TestUtils.create(1, 1, 1).head
-        val ass = im.getObservations.iterator().next().getAssociations.iterator().next()
+        val im       = TestUtils.create(1, 1, 1).head
+        val ass      = im.getObservations.iterator().next().getAssociations.iterator().next()
         val linkName = ass.getLinkName
         runGet(
             endpoints.countImagedMomentsByLinkNameImpl,
@@ -163,7 +172,7 @@ trait ImagedMomentEndpointsSuite extends EndpointsSuite {
     test("findImagedMomentByUUID") {
         val im = TestUtils.create(1).head
         runGet(
-            endpoints.findImagedMomentByUUIDImpl, 
+            endpoints.findImagedMomentByUUIDImpl,
             s"http://test.com/v1/imagedmoments/${im.getUuid}",
             response => {
                 assertEquals(response.code, StatusCode.Ok)
@@ -175,7 +184,7 @@ trait ImagedMomentEndpointsSuite extends EndpointsSuite {
     }
 
     test("findImagedMomentsByConceptName") {
-        val im = TestUtils.create(1, 1).head
+        val im      = TestUtils.create(1, 1).head
         val concept = im.getObservations.iterator().next().getConcept
         runGet(
             endpoints.findImagedMomentsByConceptNameImpl,
@@ -184,15 +193,15 @@ trait ImagedMomentEndpointsSuite extends EndpointsSuite {
                 assertEquals(response.code, StatusCode.Ok)
                 val imagedMoments = checkResponse[Seq[ImagedMomentSC]](response.body)
                 assertEquals(imagedMoments.size, 1)
-                val expected = ImagedMoment.from(im, true)
-                val obtained = imagedMoments.head.toCamelCase
+                val expected      = ImagedMoment.from(im, true)
+                val obtained      = imagedMoments.head.toCamelCase
                 assertEquals(obtained, expected)
             }
         )
     }
 
     test("findImagedMomentsByConceptNameWithImages") {
-        val im = TestUtils.create(1, 1, 1, 2).head
+        val im      = TestUtils.create(1, 1, 1, 2).head
         val concept = im.getObservations.iterator().next().getConcept
         runGet(
             endpoints.findImagedMomentsByConceptNameWithImagesImpl,
@@ -201,13 +210,13 @@ trait ImagedMomentEndpointsSuite extends EndpointsSuite {
                 assertEquals(response.code, StatusCode.Ok)
                 val imagedMoments = checkResponse[Seq[ImagedMomentSC]](response.body)
                 assertEquals(imagedMoments.size, 1)
-                val expected = ImagedMoment.from(im, true)
-                val obtained = imagedMoments.head.toCamelCase
+                val expected      = ImagedMoment.from(im, true)
+                val obtained      = imagedMoments.head.toCamelCase
                 assertEquals(obtained, expected)
             }
         )
 
-        val im0 = TestUtils.create(1, 1).head
+        val im0      = TestUtils.create(1, 1).head
         val concept0 = im0.getObservations.iterator().next().getConcept
         runGet(
             endpoints.findImagedMomentsByConceptNameWithImagesImpl,
@@ -222,12 +231,11 @@ trait ImagedMomentEndpointsSuite extends EndpointsSuite {
 
     test("countImagedMomentsByConceptName") {
         val concept = "foo"
-        val xs = TestUtils.build(4, 1)
+        val xs      = TestUtils.build(4, 1)
         for
             x <- xs
             o <- x.getObservations.asScala
-        do
-            o.setConcept(concept)
+        do o.setConcept(concept)
         val c = ImagedMomentController(daoFactory)
         c.create(xs).join
         runGet(
@@ -244,12 +252,11 @@ trait ImagedMomentEndpointsSuite extends EndpointsSuite {
 
     test("countImagedMomentsByConceptNameWithImages") {
         val concept = "foo"
-        val xs = TestUtils.build(4, 1, 1, 2) ++ TestUtils.build(4, 1, 0, 1)
+        val xs      = TestUtils.build(4, 1, 1, 2) ++ TestUtils.build(4, 1, 0, 1)
         for
             x <- xs
             o <- x.getObservations.asScala
-        do
-            o.setConcept(concept)
+        do o.setConcept(concept)
         val c = ImagedMomentController(daoFactory)
         c.create(xs).join
         runGet(
@@ -265,13 +272,13 @@ trait ImagedMomentEndpointsSuite extends EndpointsSuite {
     }
 
     test("findImagedMomentsBetweenModifiedDates") {
-        val xs = TestUtils.create(4, 1, 1, 2)
-        val im = xs.head
-        val modified = im.getLastUpdatedTime.toInstant
-        val start = modified.minus(java.time.Duration.ofDays(1))
+        val xs          = TestUtils.create(4, 1, 1, 2)
+        val im          = xs.head
+        val modified    = im.getLastUpdatedTime.toInstant
+        val start       = modified.minus(java.time.Duration.ofDays(1))
         val startString = Instants.formatCompactIso8601(start)
-        val end = modified.plus(java.time.Duration.ofDays(1))
-        val endString = Instants.formatCompactIso8601(end)
+        val end         = modified.plus(java.time.Duration.ofDays(1))
+        val endString   = Instants.formatCompactIso8601(end)
         runGet(
             endpoints.findImagedMomentsBetweenModifiedDatesImpl,
             s"http://test.com/v1/imagedmoments/modified/$startString/$endString?limit=10&offset=0",
@@ -280,7 +287,7 @@ trait ImagedMomentEndpointsSuite extends EndpointsSuite {
                 val imagedMoments = checkResponse[Seq[ImagedMomentSC]](response.body)
                 assert(imagedMoments.size >= xs.size)
                 for
-                    x <- xs
+                    x  <- xs
                     im <- imagedMoments.find(_.uuid.get == x.getUuid)
                 do
                     val expected = ImagedMoment.from(x, true)
@@ -291,13 +298,13 @@ trait ImagedMomentEndpointsSuite extends EndpointsSuite {
     }
 
     test("countImagedMomentsBetweenModifiedDates".flaky) {
-        val xs = TestUtils.create(4, 1, 1, 2)
-        val im = xs.head
-        val modified = im.getLastUpdatedTime.toInstant
-        val start = modified.minus(java.time.Duration.ofDays(1))
+        val xs          = TestUtils.create(4, 1, 1, 2)
+        val im          = xs.head
+        val modified    = im.getLastUpdatedTime.toInstant
+        val start       = modified.minus(java.time.Duration.ofDays(1))
         val startString = Instants.formatCompactIso8601(start)
-        val end = modified.plus(java.time.Duration.ofDays(1))
-        val endString = Instants.formatCompactIso8601(end)
+        val end         = modified.plus(java.time.Duration.ofDays(1))
+        val endString   = Instants.formatCompactIso8601(end)
         runGet(
             endpoints.countImagedMomentsBetweenModifiedDatesImpl,
             s"http://test.com/v1/imagedmoments/modified/count/$startString/$endString",
@@ -320,9 +327,8 @@ trait ImagedMomentEndpointsSuite extends EndpointsSuite {
                 assert(counts.size >= 2)
                 for
                     (videoReferenceUuid, imagedMoments) <- xs.groupBy(_.getVideoReferenceUuid)
-                    count <- counts.find(_.video_reference_uuid == videoReferenceUuid)
-                do
-                    assertEquals(count.count, imagedMoments.size)
+                    count                               <- counts.find(_.video_reference_uuid == videoReferenceUuid)
+                do assertEquals(count.count, imagedMoments.size)
             }
         )
     }
@@ -336,16 +342,14 @@ trait ImagedMomentEndpointsSuite extends EndpointsSuite {
                 assertEquals(response.code, StatusCode.Ok)
                 val uuids = checkResponse[Seq[java.util.UUID]](response.body)
                 assert(uuids.size >= 2)
-                for
-                    x <- xs
-                do
-                    assert(uuids.contains(x.getVideoReferenceUuid))
+                for x <- xs
+                do assert(uuids.contains(x.getVideoReferenceUuid))
             }
         )
     }
 
     test("findByVideoReferenceUuid") {
-        val xs = TestUtils.create(2, 2, 2, 2)
+        val xs                 = TestUtils.create(2, 2, 2, 2)
         val videoReferenceUuid = xs.head.getVideoReferenceUuid
         runGet(
             endpoints.findByVideoReferenceUuidImpl,
@@ -355,7 +359,7 @@ trait ImagedMomentEndpointsSuite extends EndpointsSuite {
                 val imagedMoments = checkResponse[Seq[ImagedMomentSC]](response.body)
                 assertEquals(imagedMoments.size, xs.size)
                 for
-                    x <- xs
+                    x  <- xs
                     im <- imagedMoments.find(_.uuid.get == x.getUuid)
                 do
                     val expected = ImagedMoment.from(x, true)
@@ -366,10 +370,10 @@ trait ImagedMomentEndpointsSuite extends EndpointsSuite {
     }
 
     test("countModifiedBeforeDate") {
-        val xs = TestUtils.create(2, 2, 2, 2)
-        val im = xs.head
-        val modified = im.getLastUpdatedTime.toInstant
-        val start = modified.plus(java.time.Duration.ofSeconds(1))
+        val xs          = TestUtils.create(2, 2, 2, 2)
+        val im          = xs.head
+        val modified    = im.getLastUpdatedTime.toInstant
+        val start       = modified.plus(java.time.Duration.ofSeconds(1))
         val startString = Instants.formatCompactIso8601(start)
         runGet(
             endpoints.countModifiedBeforeDateImpl,
@@ -383,11 +387,11 @@ trait ImagedMomentEndpointsSuite extends EndpointsSuite {
     }
 
     test("findImagedMomentsByWindowRequest") {
-        val xs = TestUtils.create(2, 2, 2, 2)
+        val xs                  = TestUtils.create(2, 2, 2, 2)
         val videoReferenceUuids = xs.map(_.getVideoReferenceUuid).toSet
-        val times = xs.map(_.getRecordedTimestamp).sorted
-        val diff = Duration.between(times.head, times.last)
-        val windowRequest = WindowRequest(videoReferenceUuids.toSeq, xs.head.getUuid, diff.toMillis)
+        val times               = xs.map(_.getRecordedTimestamp).sorted
+        val diff                = Duration.between(times.head, times.last)
+        val windowRequest       = WindowRequest(videoReferenceUuids.toSeq, xs.head.getUuid, diff.toMillis)
         runPost(
             endpoints.findImagedMomentsByWindowRequestImpl,
             s"http://test.com/v1/imagedmoments/windowrequest",
@@ -397,7 +401,7 @@ trait ImagedMomentEndpointsSuite extends EndpointsSuite {
                 val imagedMoments = checkResponse[Seq[ImagedMomentSC]](response.body)
                 assertEquals(imagedMoments.size, xs.size)
                 for
-                    x <- xs
+                    x  <- xs
                     im <- imagedMoments.find(_.uuid.get == x.getUuid)
                 do
                     val expected = ImagedMoment.from(x, true).copy(lastUpdated = None)
@@ -408,7 +412,7 @@ trait ImagedMomentEndpointsSuite extends EndpointsSuite {
     }
 
     test("deleteByVideoReferenceUUID") {
-        val xs = TestUtils.create(2, 2)
+        val xs                 = TestUtils.create(2, 2)
         val videoReferenceUuid = xs.head.getVideoReferenceUuid
         runDelete(
             endpoints.deleteByVideoReferenceUUIDImpl,
@@ -420,13 +424,13 @@ trait ImagedMomentEndpointsSuite extends EndpointsSuite {
                 assertEquals(count.count, xs.size)
             }
         )
-        val c = ImagedMomentController(daoFactory)
-        val imagedMoments = c.findByVideoReferenceUUID(videoReferenceUuid).join
+        val c                  = ImagedMomentController(daoFactory)
+        val imagedMoments      = c.findByVideoReferenceUUID(videoReferenceUuid).join
         assert(imagedMoments.isEmpty)
     }
 
     test("findByImageReferenceUUID") {
-        val im = TestUtils.create(1, 0, 0, 1).head
+        val im                 = TestUtils.create(1, 0, 0, 1).head
         val imageReferenceUuid = im.getImageReferences.iterator().next().getUuid
         runGet(
             endpoints.findByImageReferenceUUIDImpl,
@@ -434,15 +438,15 @@ trait ImagedMomentEndpointsSuite extends EndpointsSuite {
             response => {
                 assertEquals(response.code, StatusCode.Ok)
                 val imagedMoment = checkResponse[ImagedMomentSC](response.body)
-                val expected = ImagedMoment.from(im, true)
-                val obtained = imagedMoment.toCamelCase
+                val expected     = ImagedMoment.from(im, true)
+                val obtained     = imagedMoment.toCamelCase
                 assertEquals(obtained, expected)
             }
         )
     }
 
     test("findByObservationUUID") {
-        val im = TestUtils.create(1, 1).head
+        val im              = TestUtils.create(1, 1).head
         val observationUuid = im.getObservations.iterator().next().getUuid
         runGet(
             endpoints.findByObservationUUIDImpl,
@@ -450,22 +454,23 @@ trait ImagedMomentEndpointsSuite extends EndpointsSuite {
             response => {
                 assertEquals(response.code, StatusCode.Ok)
                 val imagedMoment = checkResponse[ImagedMomentSC](response.body)
-                val expected = ImagedMoment.from(im, true)
-                val obtained = imagedMoment.toCamelCase
+                val expected     = ImagedMoment.from(im, true)
+                val obtained     = imagedMoment.toCamelCase
                 assertEquals(obtained, expected)
             }
         )
     }
 
     test("updateImagedMoment (json)") {
-        val im = TestUtils.create(1).head
-        val expected = ImagedMoment.from(im, true)
+        val im          = TestUtils.create(1).head
+        val expected    = ImagedMoment
+            .from(im, true)
             .copy(elapsedTimeMillis = Some(1000L))
-        val json = expected.toSnakeCase.stringify
-        val jwt = jwtService.authorize("foo").orNull
+        val json        = expected.toSnakeCase.stringify
+        val jwt         = jwtService.authorize("foo").orNull
         assert(jwt != null)
         val backendStub = newBackendStub(endpoints.updateImagedMomentImpl)
-        val response = basicRequest
+        val response    = basicRequest
             .put(uri"http://test.com/v1/imagedmoments/${im.getUuid}")
             .header("Authorization", s"Bearer $jwt")
             .header("Content-Type", "application/json")
@@ -473,18 +478,19 @@ trait ImagedMomentEndpointsSuite extends EndpointsSuite {
             .send(backendStub)
             .join
         assertEquals(response.code, StatusCode.Ok)
-        val obtained = checkResponse[ImagedMomentSC](response.body).toCamelCase
+        val obtained    = checkResponse[ImagedMomentSC](response.body).toCamelCase
         assertEquals(obtained, expected)
     }
 
     test("updateImagedMoment (form)") {
-        val im = TestUtils.create(1).head
-        val expected = ImagedMoment.from(im, true)
+        val im          = TestUtils.create(1).head
+        val expected    = ImagedMoment
+            .from(im, true)
             .copy(elapsedTimeMillis = Some(1000L))
-        val jwt = jwtService.authorize("foo").orNull
+        val jwt         = jwtService.authorize("foo").orNull
         assert(jwt != null)
         val backendStub = newBackendStub(endpoints.updateImagedMomentImpl)
-        val response = basicRequest
+        val response    = basicRequest
             .put(uri"http://test.com/v1/imagedmoments/${im.getUuid}")
             .header("Authorization", s"Bearer $jwt")
             .header("Content-Type", "application/x-www-form-urlencoded")
@@ -492,27 +498,27 @@ trait ImagedMomentEndpointsSuite extends EndpointsSuite {
             .send(backendStub)
             .join
         assertEquals(response.code, StatusCode.Ok)
-        val obtained = checkResponse[ImagedMomentSC](response.body).toCamelCase
+        val obtained    = checkResponse[ImagedMomentSC](response.body).toCamelCase
         assertEquals(obtained, expected)
     }
 
     test("updateRecordedTimestampsForVideoReference".flaky) {
-        val xs = TestUtils.create(4)
+        val xs                   = TestUtils.create(4)
         val newRecordedTimestamp = Instant.now().minus(Duration.ofDays(1))
-        val ts = Instants.formatCompactIso8601(newRecordedTimestamp)
-        val jwt = jwtService.authorize("foo").orNull
+        val ts                   = Instants.formatCompactIso8601(newRecordedTimestamp)
+        val jwt                  = jwtService.authorize("foo").orNull
         assert(jwt != null)
-        val backendStub = newBackendStub(endpoints.updateRecordedTimestampsForVideoReferenceImpl)
-        val response = basicRequest
+        val backendStub          = newBackendStub(endpoints.updateRecordedTimestampsForVideoReferenceImpl)
+        val response             = basicRequest
             .put(uri"http://test.com/v1/imagedmoments/newtime/${xs.head.getVideoReferenceUuid}/$ts")
             .header("Authorization", s"Bearer $jwt")
             .send(backendStub)
             .join
         assertEquals(response.code, StatusCode.Ok)
-        val obtained = checkResponse[Seq[ImagedMomentSC]](response.body)
+        val obtained             = checkResponse[Seq[ImagedMomentSC]](response.body)
         assertEquals(obtained.size, xs.size)
         for
-            x <- xs
+            x  <- xs
             im <- obtained.find(_.uuid.get == x.getUuid)
         do
             assert(im.recorded_date.isDefined)
@@ -522,17 +528,20 @@ trait ImagedMomentEndpointsSuite extends EndpointsSuite {
     }
 
     test("updateRecordedTimestampForObservationUuid") {
-        val xs = TestUtils.create(4, 2)
-        val annos = for
+        val xs          = TestUtils.create(4, 2)
+        val annos       = for
             x <- xs
             o <- x.getObservations.asScala
         yield
-            // We just need [{observation_uuid, recorded_timestamp}] all other fields are ignored
-            Annotation(observationUuid = Some(o.getUuid), recordedTimestamp = Some(x.getRecordedTimestamp)).toSnakeCase
-        val jwt = jwtService.authorize("foo").orNull
+        // We just need [{observation_uuid, recorded_timestamp}] all other fields are ignored
+        Annotation(
+            observationUuid = Some(o.getUuid),
+            recordedTimestamp = Some(x.getRecordedTimestamp)
+        ).toSnakeCase
+        val jwt         = jwtService.authorize("foo").orNull
         assert(jwt != null)
         val backendStub = newBackendStub(endpoints.updateRecordedTimestampForObservationUuidImpl)
-        val response = basicRequest
+        val response    = basicRequest
             .put(uri"http://test.com/v1/imagedmoments/tapetime")
             .header("Authorization", s"Bearer $jwt")
             .header("Content-Type", "application/json")
@@ -540,27 +549,25 @@ trait ImagedMomentEndpointsSuite extends EndpointsSuite {
             .send(backendStub)
             .join
         assertEquals(response.code, StatusCode.Ok)
-        val obtained = checkResponse[ImagedMomentTimestampUpdateSC](response.body)
+        val obtained    = checkResponse[ImagedMomentTimestampUpdateSC](response.body)
         assertEquals(obtained.annotation_count, annos.size)
         assertEquals(obtained.timestamps_updated, annos.size)
     }
 
     test("deleteImagedMoment") {
-        val im = TestUtils.create(1).head
-        val jwt = jwtService.authorize("foo").orNull
+        val im           = TestUtils.create(1).head
+        val jwt          = jwtService.authorize("foo").orNull
         assert(jwt != null)
-        val backendStub = newBackendStub(endpoints.deleteImagedMomentImpl)
-        val response = basicRequest
+        val backendStub  = newBackendStub(endpoints.deleteImagedMomentImpl)
+        val response     = basicRequest
             .delete(uri"http://test.com/v1/imagedmoments/${im.getUuid}")
             .header("Authorization", s"Bearer $jwt")
             .send(backendStub)
             .join
         assertEquals(response.code, StatusCode.NoContent)
-        val c = ImagedMomentController(daoFactory)
+        val c            = ImagedMomentController(daoFactory)
         val imagedMoment = c.findByUUID(im.getUuid).join
         assert(imagedMoment.isEmpty)
     }
-
-
 
 }

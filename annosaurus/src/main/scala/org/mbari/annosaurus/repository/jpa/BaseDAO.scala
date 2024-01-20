@@ -149,12 +149,10 @@ abstract class BaseDAO[B <: IPersistentObject: ClassTag](val entityManager: Enti
         entityManager.getTransaction.commit()
     }
 
-
     override def isDetached(entity: B): Boolean =
-        entity.primaryKey.isEmpty // must not be transient
+        entity.primaryKey.isEmpty              // must not be transient
             && !entityManager.contains(entity) // must not be managed
-            && find(entity).isDefined // must not have been removed
-
+            && find(entity).isDefined          // must not have been removed
 
     def setUuidParameter(query: Query, position: Int, uuid: UUID): Query = {
         // if (DatabaseProductName.isPostgreSQL()) {

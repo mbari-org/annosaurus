@@ -28,7 +28,7 @@ import org.mbari.annosaurus.domain.ConcurrentRequest
 
 import java.time.{Duration, Instant}
 import org.mbari.annosaurus.domain.MultiRequest
-import org.mbari.annosaurus.etc.circe.CirceCodecs.{given, *}
+import org.mbari.annosaurus.etc.circe.CirceCodecs.{*, given}
 import org.mbari.vcr4j.time.Timecode
 
 import java.util.UUID
@@ -170,10 +170,10 @@ trait AnnotationControllerSuite extends BaseDAOSuite {
     }
 
     test("create by recordedTimestamp") {
-        val recordedDate  = Instant.now()
-        val concept = "Nanomia bijuga"
-        val observer = "brian"
-        val a = exec(
+        val recordedDate = Instant.now()
+        val concept      = "Nanomia bijuga"
+        val observer     = "brian"
+        val a            = exec(
             controller
                 .create(UUID.randomUUID(), concept, observer, recordedDate = Some(recordedDate))
         )
@@ -182,7 +182,6 @@ trait AnnotationControllerSuite extends BaseDAOSuite {
         assertEquals(a.concept, Some(concept))
         assertEquals(a.observer, Some(observer))
     }
-
 
     test("bulkCreate a single annotation") {
         // test minimal
@@ -203,12 +202,13 @@ trait AnnotationControllerSuite extends BaseDAOSuite {
         import org.mbari.annosaurus.etc.circe.CirceCodecs.{*, given}
         val url = this.getClass.getResource("/json/annotation_full_dive.json").toURI
         Using(Source.fromFile(url)) { source =>
-            val json = source.getLines().mkString("\n")
-            val annos = json.reify[Array[Annotation]]
+            val json  = source.getLines().mkString("\n")
+            val annos = json
+                .reify[Array[Annotation]]
                 .getOrElse(throw new RuntimeException("Failed to parse json"))
                 .take(200)
             assert(annos.nonEmpty)
-            val n = exec(controller.bulkCreate(annos), Duration.ofSeconds(120))
+            val n     = exec(controller.bulkCreate(annos), Duration.ofSeconds(120))
             assertEquals(n.size, annos.size)
 
         } match {
@@ -222,13 +222,14 @@ trait AnnotationControllerSuite extends BaseDAOSuite {
         import org.mbari.annosaurus.etc.circe.CirceCodecs.{*, given}
         val url = this.getClass.getResource("/json/annotation_full_dive.json").toURI
         Using(Source.fromFile(url)) { source =>
-            val json = source.getLines().mkString("\n")
-            val annos = json.reify[Array[Annotation]]
+            val json  = source.getLines().mkString("\n")
+            val annos = json
+                .reify[Array[Annotation]]
                 .getOrElse(throw new RuntimeException("Failed to parse json"))
                 .filter(_.imageReferences.nonEmpty)
                 .take(200)
             assert(annos.nonEmpty)
-            val n = exec(controller.bulkCreate(annos), Duration.ofSeconds(120))
+            val n     = exec(controller.bulkCreate(annos), Duration.ofSeconds(120))
             assertEquals(n.size, annos.size)
 
         } match {
@@ -239,30 +240,31 @@ trait AnnotationControllerSuite extends BaseDAOSuite {
     }
 
     test("update") {
-        val im0 = TestUtils.create(1, 1).head
+        val im0  = TestUtils.create(1, 1).head
         val obs0 = im0.getObservations.asScala.head
-        val im1 = TestUtils.build(1, 1).head
+        val im1  = TestUtils.build(1, 1).head
         im1.setTimecode(im0.getTimecode)
         val obs1 = im1.getObservations.asScala.head
 
-        val opt = exec(controller.update(
-            obs0.getUuid,
-            Option(im1.getVideoReferenceUuid),
-            Option(obs1.getConcept),
-            Option(obs1.getObserver),
-            obs1.getObservationTimestamp,
-            Option(im1.getTimecode),
-            Option(im1.getElapsedTime),
-            Option(im1.getRecordedTimestamp),
-            Option(obs1.getDuration),
-            Option(obs1.getGroup),
-            Option(obs1.getActivity)
-        ))
+        val opt = exec(
+            controller.update(
+                obs0.getUuid,
+                Option(im1.getVideoReferenceUuid),
+                Option(obs1.getConcept),
+                Option(obs1.getObserver),
+                obs1.getObservationTimestamp,
+                Option(im1.getTimecode),
+                Option(im1.getElapsedTime),
+                Option(im1.getRecordedTimestamp),
+                Option(obs1.getDuration),
+                Option(obs1.getGroup),
+                Option(obs1.getActivity)
+            )
+        )
 
         opt match
             case None       => fail("update returned None")
             case Some(anno) =>
-
                 val im2 = Annotation.toEntities(Seq(anno)).head
 
                 // We need to set the UUIDs to compare the rest of the values
@@ -278,16 +280,22 @@ trait AnnotationControllerSuite extends BaseDAOSuite {
     }
 
     test("bulkUpdate") {
-        val xs = TestUtils.create(2, 2) // tested with upt to 30, 10. 100 by 10 takes more than 30sec
+        val xs =
+            TestUtils.create(2, 2) // tested with upt to 30, 10. 100 by 10 takes more than 30sec
         val videoReferenceUuid = xs.head.getVideoReferenceUuid
-        val elapsedTime = Duration.ofSeconds(1234)
-        val annos = xs.flatMap(x => Annotation.fromImagedMoment(x, false))
-            .map(x => x.copy(elapsedTimeMillis = Some(elapsedTime.toMillis),
-                timecode = Some("01:02:03:04"),
-                recordedTimestamp = Some(Instant.parse("2020-01-01T01:02:03Z")),
-                videoReferenceUuid = Some(videoReferenceUuid),
-                concept = Some("bulkUpdateTest")))
-        val n = exec(controller.bulkUpdate(annos), Duration.ofSeconds(60))
+        val elapsedTime        = Duration.ofSeconds(1234)
+        val annos              = xs
+            .flatMap(x => Annotation.fromImagedMoment(x, false))
+            .map(x =>
+                x.copy(
+                    elapsedTimeMillis = Some(elapsedTime.toMillis),
+                    timecode = Some("01:02:03:04"),
+                    recordedTimestamp = Some(Instant.parse("2020-01-01T01:02:03Z")),
+                    videoReferenceUuid = Some(videoReferenceUuid),
+                    concept = Some("bulkUpdateTest")
+                )
+            )
+        val n                  = exec(controller.bulkUpdate(annos), Duration.ofSeconds(60))
         assertEquals(n.size, annos.size)
         n.foreach { anno =>
             log.atWarn.log(anno.stringify)
@@ -299,16 +307,15 @@ trait AnnotationControllerSuite extends BaseDAOSuite {
             assertEquals(anno.elapsedTime.get, elapsedTime)
         }
 
-
     }
 
     test("bulkUpdateRecordedTimestampOnly") {
-        val xs = TestUtils.build(4, 1).zipWithIndex
-        val annos0 = for
-            (im, i) <- xs
-        yield
-            im.setTimecode(new Timecode(s"00:00:0${i}:00"))
-            Annotation.from(im.getObservations.iterator().next(), false)
+        val xs     = TestUtils.build(4, 1).zipWithIndex
+        val annos0 =
+            for (im, i) <- xs
+            yield
+                im.setTimecode(new Timecode(s"00:00:0${i}:00"))
+                Annotation.from(im.getObservations.iterator().next(), false)
 
         val annos1 = exec(controller.bulkCreate(annos0))
 
@@ -320,9 +327,11 @@ trait AnnotationControllerSuite extends BaseDAOSuite {
 
         assertEquals(annos3.size, annos2.size)
 
-        val obtained = annos3.toList
+        val obtained = annos3
+            .toList
             .sortBy(_.observationUuid)
-        val expected = annos2.toList
+        val expected = annos2
+            .toList
             .sortBy(_.observationUuid)
         obtained.zip(expected).foreach { (a, b) =>
             assertEquals(a, b)
@@ -331,10 +340,10 @@ trait AnnotationControllerSuite extends BaseDAOSuite {
     }
 
     test("delete") {
-        val im = TestUtils.create(1, 2).head
+        val im   = TestUtils.create(1, 2).head
         val obs0 = im.getObservations.asScala.head
         val obs1 = im.getObservations.asScala.last
-        val ok = exec(controller.delete(obs0.getUuid))
+        val ok   = exec(controller.delete(obs0.getUuid))
         assert(ok)
         val opt2 = exec(controller.findByUUID(obs0.getUuid))
         assert(opt2.isEmpty)
@@ -344,15 +353,15 @@ trait AnnotationControllerSuite extends BaseDAOSuite {
 
     test("delete single observation") {
         // The parent ImagedMoment should be deleted as well if it has no other observations
-        val im = TestUtils.create(1, 1).head
-        val obs = im.getObservations.asScala.head
-        val ok = exec(controller.delete(obs.getUuid))
+        val im   = TestUtils.create(1, 1).head
+        val obs  = im.getObservations.asScala.head
+        val ok   = exec(controller.delete(obs.getUuid))
         assert(ok)
         val opt2 = exec(controller.findByUUID(obs.getUuid))
         assert(opt2.isEmpty)
 
         given imDao: ImagedMomentDAOImpl = daoFactory.newImagedMomentDAO()
-        val imOpt = run(() => imDao.findByUUID(im.getUuid))
+        val imOpt                        = run(() => imDao.findByUUID(im.getUuid))
         assert(imOpt.isEmpty)
         imDao.close()
     }

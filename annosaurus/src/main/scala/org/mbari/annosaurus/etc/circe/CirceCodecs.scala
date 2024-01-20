@@ -171,7 +171,7 @@ object CirceCodecs {
     given annotationEncoder: Encoder[Annotation]         = deriveEncoder
     given annotationDecoder: Decoder[Annotation]         =
         annotationCcDecoder or annotationScDecoder.map(_.toCamelCase)
-        
+
     given annotationCreateScDecoder: Decoder[AnnotationCreateSC]     = deriveDecoder
     given annotationCreateScEncoder: Encoder[AnnotationCreateSC]     = deriveEncoder
     private val annotationCreateCcDecoder: Decoder[AnnotationCreate] = deriveDecoder
@@ -245,7 +245,7 @@ object CirceCodecs {
     given windowRequestDecoder: Decoder[WindowRequest]         =
         windowRequestCcDecoder or windowRequestScDecoder.map(_.toCamelCase)
 
-    given deleteCOuntScDecoder: Decoder[DeleteCountSC]     = deriveDecoder
+    given deleteCOuntScDecoder: Decoder[DeleteCountSC] = deriveDecoder
     given deleteCountScEncoder: Encoder[DeleteCountSC] = deriveEncoder
     given deleteCountDecoder: Decoder[DeleteCount]     = deriveDecoder
     given deleteCountEncoder: Encoder[DeleteCount]     = deriveEncoder
@@ -271,8 +271,10 @@ object CirceCodecs {
     given imagedMomentUpdateScEncoder: Encoder[VideoTimestampSC] = deriveEncoder
     given imagedMomentUpdateScDecoder: Decoder[VideoTimestampSC] = deriveDecoder
 
-    given imagedMomentTimestampUpdateScEncoder: Encoder[ImagedMomentTimestampUpdateSC] = deriveEncoder
-    given imagedMomentTimestampUpdateScDecoder: Decoder[ImagedMomentTimestampUpdateSC] = deriveDecoder
+    given imagedMomentTimestampUpdateScEncoder: Encoder[ImagedMomentTimestampUpdateSC] =
+        deriveEncoder
+    given imagedMomentTimestampUpdateScDecoder: Decoder[ImagedMomentTimestampUpdateSC] =
+        deriveDecoder
 
     given observationUpdateScEncoder: Encoder[ObservationUpdateSC] = deriveEncoder
     given observationUpdateScDecoder: Decoder[ObservationUpdateSC] = deriveDecoder
@@ -288,7 +290,6 @@ object CirceCodecs {
 
     given videoInfoUpdateScEncoder: Encoder[CachedVideoReferenceInfoUpdateSC] = deriveEncoder
     given videoInfoUpdateScDecoder: Decoder[CachedVideoReferenceInfoUpdateSC] = deriveDecoder
-
 
     private val printer = Printer.noSpaces.copy(dropNullValues = true)
 

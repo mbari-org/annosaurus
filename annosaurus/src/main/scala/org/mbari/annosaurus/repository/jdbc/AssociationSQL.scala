@@ -65,13 +65,11 @@ object AssociationSQL {
         annotations: Seq[Annotation],
         associations: Seq[Association]
     ): Seq[Annotation] = {
-        for
-            a <- annotations
-        yield
-            associations.find(anno => anno.observationUuid == a.observationUuid) match {
-                case None       => a
-                case Some(ass) => a.copy(associations = a.associations :+ ass)
-            }
+        for a <- annotations
+        yield associations.find(anno => anno.observationUuid == a.observationUuid) match {
+            case None      => a
+            case Some(ass) => a.copy(associations = a.associations :+ ass)
+        }
 
     }
 

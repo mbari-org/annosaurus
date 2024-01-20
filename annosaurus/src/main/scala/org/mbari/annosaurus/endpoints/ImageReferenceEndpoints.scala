@@ -31,9 +31,9 @@ import java.util.UUID
 import scala.concurrent.{ExecutionContext, Future}
 
 class ImageReferenceEndpoints(controller: ImageReferenceController)(using
-                                                                    val executor: ExecutionContext, jwtService: JwtService
+    val executor: ExecutionContext,
+    jwtService: JwtService
 ) extends Endpoints {
-
 
     val deleteImageByUuid: Endpoint[Option[String], UUID, ErrorMsg, Unit, Any] =
         secureEndpoint
@@ -47,8 +47,12 @@ class ImageReferenceEndpoints(controller: ImageReferenceController)(using
     val deleteImageByUuidImpl: ServerEndpoint[Any, Future] =
         deleteImageByUuid
             .serverSecurityLogic(jwtOpt => verify(jwtOpt))
-            .serverLogic(_ => uuid => handleErrors(controller.delete(uuid).map(b => if b then Right(()) else Left(()))))
-
+            .serverLogic(_ =>
+                uuid =>
+                    handleErrors(
+                        controller.delete(uuid).map(b => if b then Right(()) else Left(()))
+                    )
+            )
 
     val findImageByUuid: Endpoint[Unit, UUID, ErrorMsg, ImageReferenceSC, Any] =
         openEndpoint
@@ -59,12 +63,15 @@ class ImageReferenceEndpoints(controller: ImageReferenceController)(using
 
     val findImageByUuidImpl: ServerEndpoint[Any, Future] = findImageByUuid
         .serverLogic { uuid =>
-            handleOption(controller
-                .findByUUID(uuid)
-                .map(x => x.map(_.toSnakeCase)))
+            handleOption(
+                controller
+                    .findByUUID(uuid)
+                    .map(x => x.map(_.toSnakeCase))
+            )
         }
 
-    val updateImageReferenceByUuid: Endpoint[Option[String], (UUID, ImageReferenceSC), ErrorMsg, ImageReferenceSC, Any] =
+    val updateImageReferenceByUuid
+        : Endpoint[Option[String], (UUID, ImageReferenceSC), ErrorMsg, ImageReferenceSC, Any] =
         secureEndpoint
             .put
             .in("v1" / "imagereferences" / path[UUID]("uuid"))
@@ -77,25 +84,24 @@ class ImageReferenceEndpoints(controller: ImageReferenceController)(using
     val updateImageReferenceByUuidImpl: ServerEndpoint[Any, Future] = updateImageReferenceByUuid
         .serverSecurityLogic(jwtOpt => verify(jwtOpt))
         .serverLogic { _ => (uuid, imageReference) =>
-            handleOption(controller
-                .update(uuid,
-                    Some(imageReference.url),
-                    imageReference.description,
-                    imageReference.height_pixels,
-                    imageReference.width_pixels,
-                    imageReference.format,
-                    imageReference.imaged_moment_uuid
-                )
-                .map(x => x.map(_.toSnakeCase)))
+            handleOption(
+                controller
+                    .update(
+                        uuid,
+                        Some(imageReference.url),
+                        imageReference.description,
+                        imageReference.height_pixels,
+                        imageReference.width_pixels,
+                        imageReference.format,
+                        imageReference.imaged_moment_uuid
+                    )
+                    .map(x => x.map(_.toSnakeCase))
+            )
         }
 
-    override def all: List[Endpoint[?, ?, ?, ?, ?]] = List(
-        deleteImageByUuid,
-        findImageByUuid,
-        updateImageReferenceByUuid)
+    override def all: List[Endpoint[?, ?, ?, ?, ?]] =
+        List(deleteImageByUuid, findImageByUuid, updateImageReferenceByUuid)
 
-    override def allImpl: List[ServerEndpoint[Any, Future]] = List(
-        deleteImageByUuidImpl,
-        findImageByUuidImpl,
-        updateImageReferenceByUuidImpl)
+    override def allImpl: List[ServerEndpoint[Any, Future]] =
+        List(deleteImageByUuidImpl, findImageByUuidImpl, updateImageReferenceByUuidImpl)
 }

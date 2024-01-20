@@ -116,8 +116,16 @@ class CachedVideoReferenceInfoController(val daoFactory: JPADAOFactory)
         exec(fn)
     }
 
-    def update(info: CachedVideoReferenceInfo)(using ec: ExecutionContext) : Future[Option[CachedVideoReferenceInfo]] = {
-        update(info.uuid, Option(info.videoReferenceUuid), info.platformName, info.missionId, info.missionContact)
+    def update(
+        info: CachedVideoReferenceInfo
+    )(using ec: ExecutionContext): Future[Option[CachedVideoReferenceInfo]] = {
+        update(
+            info.uuid,
+            Option(info.videoReferenceUuid),
+            info.platformName,
+            info.missionId,
+            info.missionContact
+        )
     }
 
     def update(

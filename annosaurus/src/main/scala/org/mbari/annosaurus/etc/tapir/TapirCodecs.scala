@@ -28,7 +28,7 @@ import scala.util.{Failure, Success, Try}
 object TapirCodecs:
 
     private val hexFormat = HexFormat.of()
-    
+
     private def decodeUrl(s: String): DecodeResult[URL] =
         decodeUri(s).map(_.toURL)
     private def encodeUrl(u: URL): String               = u.toExternalForm
@@ -46,7 +46,8 @@ object TapirCodecs:
             case Right(i) => DecodeResult.Value(i)
             case Left(e)  => DecodeResult.Error("Failed to decode $s to an Instant", e)
     private def encodeInstant(i: Instant): String               = i.toString
-    given instantCodec: Codec[String, Instant, TextPlain]       = Codec.string.mapDecode(decodeInstant)(encodeInstant)
+    given instantCodec: Codec[String, Instant, TextPlain]       =
+        Codec.string.mapDecode(decodeInstant)(encodeInstant)
 
     private def decodeByteArray(s: String): DecodeResult[Array[Byte]] =
         Try(hexFormat.parseHex(s)) match

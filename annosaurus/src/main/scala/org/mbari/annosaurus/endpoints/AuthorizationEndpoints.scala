@@ -30,7 +30,8 @@ import sttp.tapir.json.circe.*
 import sttp.tapir.server.ServerEndpoint
 import org.mbari.annosaurus.domain.{BadRequest, ErrorMsg, NotFound, ServerError, Unauthorized}
 
-class AuthorizationEndpoints()(using ec: ExecutionContext, jwtService: JwtService) extends Endpoints:
+class AuthorizationEndpoints()(using ec: ExecutionContext, jwtService: JwtService)
+    extends Endpoints:
 
     private val log = System.getLogger(getClass().getName())
 

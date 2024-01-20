@@ -78,9 +78,10 @@ class CachedAncillaryDatumController(val daoFactory: JPADAOFactory)
                     None
                 case Some(imagedMoment) =>
                     if (imagedMoment.getAncillaryDatum != null) {
-                        log.atDebug.log(
-                            s"ImagedMoment with UUID of $imagedMomentUuid already has ancillary data"
-                        )
+                        log.atDebug
+                            .log(
+                                s"ImagedMoment with UUID of $imagedMomentUuid already has ancillary data"
+                            )
                         // TODO should this return the existing data?
                         None
                     }
@@ -112,7 +113,7 @@ class CachedAncillaryDatumController(val daoFactory: JPADAOFactory)
 
         for
             entity <- exec(fn)
-            dto <- findByImagedMomentUUID(imagedMomentUuid) if entity.isDefined
+            dto    <- findByImagedMomentUUID(imagedMomentUuid) if entity.isDefined
         yield dto
     }
 
@@ -142,7 +143,7 @@ class CachedAncillaryDatumController(val daoFactory: JPADAOFactory)
 
         for
             entity <- exec(fn)
-            dto <- findByImagedMomentUUID(imagedMomentUuid)
+            dto    <- findByImagedMomentUUID(imagedMomentUuid)
         yield dto
     }
 
@@ -172,7 +173,9 @@ class CachedAncillaryDatumController(val daoFactory: JPADAOFactory)
             case Some(uuid) => update(uuid, datum)
         }
 
-    def update(uuid: UUID, datum: CachedAncillaryDatum)(implicit ec: ExecutionContext): Future[Option[CachedAncillaryDatum]] = {
+    def update(uuid: UUID, datum: CachedAncillaryDatum)(implicit
+        ec: ExecutionContext
+    ): Future[Option[CachedAncillaryDatum]] = {
         def fn(dao: ADDAO): Option[CachedAncillaryDatum] = {
             dao
                 .findByUUID(uuid)
@@ -232,7 +235,7 @@ class CachedAncillaryDatumController(val daoFactory: JPADAOFactory)
                 })
                 .map(transform)
         }
-        
+
         exec(fn)
     }
 

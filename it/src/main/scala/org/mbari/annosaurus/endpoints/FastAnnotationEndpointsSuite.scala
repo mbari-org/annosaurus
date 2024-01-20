@@ -17,7 +17,19 @@
 package org.mbari.annosaurus.endpoints
 
 import org.mbari.annosaurus.controllers.TestUtils
-import org.mbari.annosaurus.domain.{Annotation, AnnotationSC, CachedAncillaryDatum, Count, DeleteCount, DeleteCountSC, GeographicRange, GeographicRangeSC, ImageSC, QueryConstraints, QueryConstraintsResponseSC}
+import org.mbari.annosaurus.domain.{
+    Annotation,
+    AnnotationSC,
+    CachedAncillaryDatum,
+    Count,
+    DeleteCount,
+    DeleteCountSC,
+    GeographicRange,
+    GeographicRangeSC,
+    ImageSC,
+    QueryConstraints,
+    QueryConstraintsResponseSC
+}
 import org.mbari.annosaurus.etc.jwt.JwtService
 import org.mbari.annosaurus.repository.jdbc.JdbcRepository
 import org.mbari.annosaurus.repository.jpa.JPADAOFactory
@@ -32,11 +44,11 @@ import scala.jdk.CollectionConverters.*
 
 trait FastAnnotationEndpointsSuite extends EndpointsSuite {
 
-    private val log = System.getLogger(getClass.getName)
-    given JPADAOFactory = daoFactory
+    private val log              = System.getLogger(getClass.getName)
+    given JPADAOFactory          = daoFactory
     given jwtService: JwtService = new JwtService("mbari", "foo", "bar")
-    private lazy val repository = new JdbcRepository(daoFactory.entityManagerFactory)
-    private lazy val endpoints = new FastAnnotationEndpoints(repository)
+    private lazy val repository  = new JdbcRepository(daoFactory.entityManagerFactory)
+    private lazy val endpoints   = new FastAnnotationEndpoints(repository)
 
     test("findAllAnnotations".flaky) {
         val xs = TestUtils.create(2, 2, 1, 1, true)
@@ -47,8 +59,7 @@ trait FastAnnotationEndpointsSuite extends EndpointsSuite {
                 assertEquals(response.code, StatusCode.Ok)
                 val annotations = checkResponse[Seq[AnnotationSC]](response.body)
                 assert(annotations.size >= 4)
-                for
-                    a <- annotations
+                for a <- annotations
                 do
                     assertEquals(a.image_references.size, 1)
                     assertEquals(a.associations.size, 1)
@@ -60,62 +71,65 @@ trait FastAnnotationEndpointsSuite extends EndpointsSuite {
     }
 
     test("findAnnotationsByQueryConstraints") {
-        val xs = TestUtils.create(2, 2, 1, 1, true) ++ TestUtils.create(2, 2, 1, 1, true)
-        val obs = xs.flatMap(_.getObservations.asScala)
+        val xs                  = TestUtils.create(2, 2, 1, 1, true) ++ TestUtils.create(2, 2, 1, 1, true)
+        val obs                 = xs.flatMap(_.getObservations.asScala)
         val videoReferenceUuids = xs.map(_.getVideoReferenceUuid).distinct
-        val qc = QueryConstraints(limit = Some(10), offset = Some(0),
+        val qc                  = QueryConstraints(
+            limit = Some(10),
+            offset = Some(0),
             videoReferenceUuids = videoReferenceUuids,
-            data = Some(true))
-        val jwt = jwtService.authorize("foo").orNull
+            data = Some(true)
+        )
+        val jwt                 = jwtService.authorize("foo").orNull
         assert(jwt != null)
-        val backendStub = newBackendStub(endpoints.findAnnotationsByQueryConstraintsImpl)
-        val response = basicRequest
-          .get(uri"http://test.com/v1/fast")
-          .header("Authorization", s"Bearer $jwt")
-          .header("Content-Type", "application/json")
-          .body(qc.toSnakeCase.stringify)
-          .send(backendStub)
-          .join
+        val backendStub         = newBackendStub(endpoints.findAnnotationsByQueryConstraintsImpl)
+        val response            = basicRequest
+            .get(uri"http://test.com/v1/fast")
+            .header("Authorization", s"Bearer $jwt")
+            .header("Content-Type", "application/json")
+            .body(qc.toSnakeCase.stringify)
+            .send(backendStub)
+            .join
         assertEquals(response.code, StatusCode.Ok)
-        val qcr = checkResponse[QueryConstraintsResponseSC[Seq[AnnotationSC]]](response.body)
+        val qcr                 = checkResponse[QueryConstraintsResponseSC[Seq[AnnotationSC]]](response.body)
         assertEquals(qcr.content.size, obs.size)
-        for
-            a <- qcr.content
+        for a <- qcr.content
         do
             assertEquals(a.image_references.size, 1)
             assertEquals(a.associations.size, 1)
             assert(a.ancillary_data.isDefined)
     }
 
-
-
     test("findGeoRangeByQueryConstraints") {
-        val xs = TestUtils.create(10, 1, includeData = true)
+        val xs                  = TestUtils.create(10, 1, includeData = true)
         val videoReferenceUuids = xs.map(_.getVideoReferenceUuid).distinct
-        val qc = QueryConstraints(limit = Some(10), offset = Some(0),
+        val qc                  = QueryConstraints(
+            limit = Some(10),
+            offset = Some(0),
             videoReferenceUuids = videoReferenceUuids,
-            data = Some(true))
-        val jwt = jwtService.authorize("foo").orNull
+            data = Some(true)
+        )
+        val jwt                 = jwtService.authorize("foo").orNull
         assert(jwt != null)
-        val backendStub = newBackendStub(endpoints.findGeoRangeByQueryConstraintsImpl)
-        val response = basicRequest
-          .get(uri"http://test.com/v1/fast/georange")
-          .header("Authorization", s"Bearer $jwt")
-          .header("Content-Type", "application/json")
-          .body(qc.toSnakeCase.stringify)
-          .send(backendStub)
-          .join
+        val backendStub         = newBackendStub(endpoints.findGeoRangeByQueryConstraintsImpl)
+        val response            = basicRequest
+            .get(uri"http://test.com/v1/fast/georange")
+            .header("Authorization", s"Bearer $jwt")
+            .header("Content-Type", "application/json")
+            .body(qc.toSnakeCase.stringify)
+            .send(backendStub)
+            .join
         assertEquals(response.code, StatusCode.Ok)
-        val qcr = checkResponse[QueryConstraintsResponseSC[GeographicRangeSC]](response.body)
-        val gr = qcr.content.toCamelCase
+        val qcr                 = checkResponse[QueryConstraintsResponseSC[GeographicRangeSC]](response.body)
+        val gr                  = qcr.content.toCamelCase
 
-        val data = xs.map(_.getAncillaryDatum).map(CachedAncillaryDatum.from(_, true))
-        val minLat = data.map(_.latitude).min.getOrElse(-1)
-        val maxLat = data.map(_.latitude).max.getOrElse(-1)
-        val minLon = data.map(_.longitude).min.getOrElse(-1)
-        val maxLon = data.map(_.longitude).max.getOrElse(-1)
-        val minDepth = data.map(_.depthMeters).min.getOrElse(-1F)
-        val maxDepth = data.map(_.depthMeters).max.getOrElse(-1F)
+        val data     = xs.map(_.getAncillaryDatum).map(CachedAncillaryDatum.from(_, true))
+        val minLat   = data.map(_.latitude).min.getOrElse(-1)
+        val maxLat   = data.map(_.latitude).max.getOrElse(-1)
+        val minLon   = data.map(_.longitude).min.getOrElse(-1)
+        val maxLon   = data.map(_.longitude).max.getOrElse(-1)
+        val minDepth = data.map(_.depthMeters).min.getOrElse(-1f)
+        val maxDepth = data.map(_.depthMeters).max.getOrElse(-1f)
 
         assertEquals(gr.minLatitude, minLat)
         assertEquals(gr.maxLatitude, maxLat)
@@ -127,25 +141,28 @@ trait FastAnnotationEndpointsSuite extends EndpointsSuite {
     }
 
     test("countAnnotationsByQueryConstraints") {
-        val xs = TestUtils.create(2, 2, 1, 1, true) ++ TestUtils.create(2, 2, 1, 1, true)
-        val expected = xs.flatMap(_.getObservations.asScala).size
+        val xs                  = TestUtils.create(2, 2, 1, 1, true) ++ TestUtils.create(2, 2, 1, 1, true)
+        val expected            = xs.flatMap(_.getObservations.asScala).size
         val videoReferenceUuids = xs.map(_.getVideoReferenceUuid).distinct
-        val qc = QueryConstraints(limit = Some(10), offset = Some(0),
+        val qc                  = QueryConstraints(
+            limit = Some(10),
+            offset = Some(0),
             videoReferenceUuids = videoReferenceUuids,
-            data = Some(true))
-        val jwt = jwtService.authorize("foo").orNull
+            data = Some(true)
+        )
+        val jwt                 = jwtService.authorize("foo").orNull
         assert(jwt != null)
-        val backendStub = newBackendStub(endpoints.countAnnotationsByQueryConstraintsImpl)
-        val response = basicRequest
-          .get(uri"http://test.com/v1/fast/count")
-          .header("Authorization", s"Bearer $jwt")
-          .header("Content-Type", "application/json")
-          .body(qc.toSnakeCase.stringify)
-          .send(backendStub)
-          .join
+        val backendStub         = newBackendStub(endpoints.countAnnotationsByQueryConstraintsImpl)
+        val response            = basicRequest
+            .get(uri"http://test.com/v1/fast/count")
+            .header("Authorization", s"Bearer $jwt")
+            .header("Content-Type", "application/json")
+            .body(qc.toSnakeCase.stringify)
+            .send(backendStub)
+            .join
         assertEquals(response.code, StatusCode.Ok)
-        val qcr = checkResponse[QueryConstraintsResponseSC[Count]](response.body)
-        val n = qcr.content.count
+        val qcr                 = checkResponse[QueryConstraintsResponseSC[Count]](response.body)
+        val n                   = qcr.content.count
         assertEquals(n, expected.longValue)
     }
 
@@ -163,7 +180,7 @@ trait FastAnnotationEndpointsSuite extends EndpointsSuite {
     }
 
     test("findAnnotationsByVideoReferenceUuid") {
-        val xs = TestUtils.create(2, 2, 1, 1, true)
+        val xs                 = TestUtils.create(2, 2, 1, 1, true)
         val videoReferenceUuid = xs.head.getVideoReferenceUuid
         runGet(
             endpoints.findAnnotationsByVideoReferenceUuidImpl,
@@ -172,8 +189,7 @@ trait FastAnnotationEndpointsSuite extends EndpointsSuite {
                 assertEquals(response.code, StatusCode.Ok)
                 val annotations = checkResponse[Seq[AnnotationSC]](response.body)
                 assertEquals(annotations.size, 4)
-                for
-                    a <- annotations
+                for a <- annotations
                 do
                     assertEquals(a.image_references.size, 1)
                     assertEquals(a.associations.size, 1)
@@ -183,7 +199,7 @@ trait FastAnnotationEndpointsSuite extends EndpointsSuite {
     }
 
     test("findImagesByVideoReferenceUuid") {
-        val xs = TestUtils.create(2, 2, 1, 1)
+        val xs                 = TestUtils.create(2, 2, 1, 1)
         val videoReferenceUuid = xs.head.getVideoReferenceUuid
         runGet(
             endpoints.findImagesByVideoReferenceUuidImpl,
@@ -197,7 +213,7 @@ trait FastAnnotationEndpointsSuite extends EndpointsSuite {
     }
 
     test("countImagesByVideoReferenceUuid") {
-        val xs = TestUtils.create(2, 2, 1, 1)
+        val xs                 = TestUtils.create(2, 2, 1, 1)
         val videoReferenceUuid = xs.head.getVideoReferenceUuid
         runGet(
             endpoints.countImagesByVideoReferenceUuidImpl,
@@ -211,7 +227,7 @@ trait FastAnnotationEndpointsSuite extends EndpointsSuite {
     }
 
     test("findAnnotationsByConcept") {
-        val xs = TestUtils.create(2, 2, 1, 1, true)
+        val xs      = TestUtils.create(2, 2, 1, 1, true)
         val concept = xs.head.getObservations.iterator().next().getConcept
         runGet(
             endpoints.findAnnotationsByConceptImpl,
@@ -220,8 +236,7 @@ trait FastAnnotationEndpointsSuite extends EndpointsSuite {
                 assertEquals(response.code, StatusCode.Ok)
                 val annotations = checkResponse[Seq[AnnotationSC]](response.body)
                 assertEquals(annotations.size, 1)
-                for
-                    a <- annotations
+                for a <- annotations
                 do
                     println(a.stringify)
                     assertEquals(a.image_references.size, 1)
@@ -232,7 +247,7 @@ trait FastAnnotationEndpointsSuite extends EndpointsSuite {
     }
 
     test("findAnnotationsWithImagesByConcept") {
-        val xs = TestUtils.create(2, 2, 1, 1, true)
+        val xs      = TestUtils.create(2, 2, 1, 1, true)
         val concept = xs.head.getObservations.iterator().next().getConcept
         runGet(
             endpoints.findAnnotationsWithImagesByConceptImpl,
@@ -241,8 +256,7 @@ trait FastAnnotationEndpointsSuite extends EndpointsSuite {
                 assertEquals(response.code, StatusCode.Ok)
                 val annotations = checkResponse[Seq[AnnotationSC]](response.body)
                 assertEquals(annotations.size, 1)
-                for
-                    a <- annotations
+                for a <- annotations
                 do
                     assertEquals(a.image_references.size, 1)
                     assertEquals(a.associations.size, 1)
@@ -252,7 +266,7 @@ trait FastAnnotationEndpointsSuite extends EndpointsSuite {
     }
 
     test("findImagedMomentUuidsByConcept") {
-        val xs = TestUtils.create(2, 2, 1, 1, true)
+        val xs      = TestUtils.create(2, 2, 1, 1, true)
         val concept = xs.head.getObservations.iterator().next().getConcept
         runGet(
             endpoints.findImagedMomentUuidsByConceptImpl,
@@ -266,9 +280,9 @@ trait FastAnnotationEndpointsSuite extends EndpointsSuite {
     }
 
     test("findImagedMomentUuidsByToConcept") {
-        val xs = TestUtils.create(2, 2, 1, 1, true)
-        val im = xs.head
-        val ass = im.getObservations.iterator().next().getAssociations.iterator().next()
+        val xs        = TestUtils.create(2, 2, 1, 1, true)
+        val im        = xs.head
+        val ass       = im.getObservations.iterator().next().getAssociations.iterator().next()
         val toConcept = ass.getToConcept
         runGet(
             endpoints.findImagedMomentUuidsByToConceptImpl,
@@ -283,7 +297,7 @@ trait FastAnnotationEndpointsSuite extends EndpointsSuite {
     }
 
     test("findAnnotationsByLinkNameAndLinkValue") {
-        val xs = TestUtils.create(1, 1, 1).head
+        val xs  = TestUtils.create(1, 1, 1).head
         val obs = xs.getObservations.iterator().next()
         val ass = obs.getAssociations.iterator().next()
         runGet(
@@ -291,7 +305,7 @@ trait FastAnnotationEndpointsSuite extends EndpointsSuite {
             s"http://test.com/v1/fast/details/${ass.getLinkName}/${ass.getLinkValue}",
             response => {
                 assertEquals(response.code, StatusCode.Ok)
-                val annos = checkResponse[Seq[AnnotationSC]](response.body)
+                val annos    = checkResponse[Seq[AnnotationSC]](response.body)
                 assertEquals(annos.size, 1)
                 val obtained = annos.head.toCamelCase
                 val expected = Annotation.from(obs, false)
@@ -302,21 +316,20 @@ trait FastAnnotationEndpointsSuite extends EndpointsSuite {
     }
 
     test("deleteAnnotationsByVideoReferenceUuid") {
-        val xs = TestUtils.create(2, 1, 1)
-        val jwt = jwtService.authorize("foo").orNull
+        val xs          = TestUtils.create(2, 1, 1)
+        val jwt         = jwtService.authorize("foo").orNull
         assert(jwt != null)
         val backendStub = newBackendStub(endpoints.deleteAnnotationsByVideoReferenceUuidImpl)
-        val response = basicRequest
+        val response    = basicRequest
             .delete(uri"http://test.com/v1/fast/videoreference/${xs.head.getVideoReferenceUuid}")
             .header("Authorization", s"Bearer $jwt")
             .send(backendStub)
             .join
         assertEquals(response.code, StatusCode.Ok)
         println(response.body)
-        val count = checkResponse[DeleteCountSC](response.body).toCamelCase
+        val count       = checkResponse[DeleteCountSC](response.body).toCamelCase
         assertEquals(count.observationCount, xs.size)
 
     }
-
 
 }

@@ -17,7 +17,14 @@
 package org.mbari.annosaurus.endpoints
 
 import org.mbari.annosaurus.controllers.AnnotationController
-import org.mbari.annosaurus.domain.{Annotation, AnnotationCreateSC, AnnotationSC, ConcurrentRequest, ErrorMsg, MultiRequest}
+import org.mbari.annosaurus.domain.{
+    Annotation,
+    AnnotationCreateSC,
+    AnnotationSC,
+    ConcurrentRequest,
+    ErrorMsg,
+    MultiRequest
+}
 import org.mbari.annosaurus.etc.jwt.JwtService
 import org.mbari.annosaurus.etc.circe.CirceCodecs.{*, given}
 import org.mbari.annosaurus.etc.tapir.TapirCodecs.given
@@ -29,7 +36,8 @@ import java.util.UUID
 import scala.concurrent.{ExecutionContext, Future}
 
 class AnnotationEndpoints(controller: AnnotationController)(using
-    ec: ExecutionContext, jwtService: JwtService
+    ec: ExecutionContext,
+    jwtService: JwtService
 ) extends Endpoints {
 
 //    GET /: uuid
@@ -61,10 +69,13 @@ class AnnotationEndpoints(controller: AnnotationController)(using
     val findAnnotationByImageReferenceUuidImpl: ServerEndpoint[Any, Future] =
         findAnnotationByImageReferenceUuid
             .serverLogic { uuid =>
-                handleErrors(controller.findByImageReferenceUUID(uuid).map(xs => xs.map(_.toSnakeCase).toSeq))
+                handleErrors(
+                    controller.findByImageReferenceUUID(uuid).map(xs => xs.map(_.toSnakeCase).toSeq)
+                )
             }
 
-    val findAnnotationsByVideoReferenceUuid: Endpoint[Unit, (UUID, Paging), ErrorMsg, Seq[AnnotationSC], Any] =
+    val findAnnotationsByVideoReferenceUuid
+        : Endpoint[Unit, (UUID, Paging), ErrorMsg, Seq[AnnotationSC], Any] =
         openEndpoint
             .get
             .in("v1" / "annotations" / "videoreference" / path[UUID]("uuid"))
@@ -77,15 +88,19 @@ class AnnotationEndpoints(controller: AnnotationController)(using
     val findAnnotationsByVideoReferenceUuidImpl: ServerEndpoint[Any, Future] =
         findAnnotationsByVideoReferenceUuid
             .serverLogic { (uuid, page) =>
-                handleErrors(controller.findByVideoReferenceUuid(uuid, page.limit, page.offset).map(xs => xs.map(_.toSnakeCase)))
+                handleErrors(
+                    controller
+                        .findByVideoReferenceUuid(uuid, page.limit, page.offset)
+                        .map(xs => xs.map(_.toSnakeCase))
+                )
             }
-
 
     //    GET / videoreference / chunked /: uuid
     // TOOD do we need this endpoint anymore?
 
     //    POST /
-    val createAnnotation: Endpoint[Option[String], AnnotationCreateSC, ErrorMsg, AnnotationSC, Any] =
+    val createAnnotation
+        : Endpoint[Option[String], AnnotationCreateSC, ErrorMsg, AnnotationSC, Any] =
         secureEndpoint
             .post
             .in("v1" / "annotations")
@@ -100,11 +115,16 @@ class AnnotationEndpoints(controller: AnnotationController)(using
             .serverSecurityLogic(jwtOpt => verify(jwtOpt))
             .serverLogic { _ => annotationCreate =>
                 val annotation = annotationCreate.toCamelCase.toAnnotation
-                handleOption(controller.bulkCreate(Seq(annotation)).map(xs => xs.headOption.map(_.toSnakeCase)))
+                handleOption(
+                    controller
+                        .bulkCreate(Seq(annotation))
+                        .map(xs => xs.headOption.map(_.toSnakeCase))
+                )
             }
 
 //        POST / bulk
-    val bulkCreateAnnotations: Endpoint[Option[String], Seq[Annotation], ErrorMsg, Seq[AnnotationSC], Any] =
+    val bulkCreateAnnotations
+        : Endpoint[Option[String], Seq[Annotation], ErrorMsg, Seq[AnnotationSC], Any] =
         secureEndpoint
             .post
             .in("v1" / "annotations" / "bulk")
@@ -192,7 +212,8 @@ class AnnotationEndpoints(controller: AnnotationController)(using
             }
 
 //    PUT /: uuid
-    val updateAnnotation: Endpoint[Option[String], (UUID, AnnotationCreateSC), ErrorMsg, AnnotationSC, Any] =
+    val updateAnnotation
+        : Endpoint[Option[String], (UUID, AnnotationCreateSC), ErrorMsg, AnnotationSC, Any] =
         secureEndpoint
             .put
             .in("v1" / "annotations" / path[UUID]("uuid"))
@@ -210,7 +231,8 @@ class AnnotationEndpoints(controller: AnnotationController)(using
                 handleOption(controller.update(uuid, annotation).map(x => x.map(_.toSnakeCase)))
             }
 //    PUT / bulk
-    val bulkUpdateAnnotations: Endpoint[Option[String], Seq[Annotation], ErrorMsg, Seq[AnnotationSC], Any] =
+    val bulkUpdateAnnotations
+        : Endpoint[Option[String], Seq[Annotation], ErrorMsg, Seq[AnnotationSC], Any] =
         secureEndpoint
             .put
             .in("v1" / "annotations" / "bulk")
@@ -224,7 +246,9 @@ class AnnotationEndpoints(controller: AnnotationController)(using
         bulkUpdateAnnotations
             .serverSecurityLogic(jwtOpt => verify(jwtOpt))
             .serverLogic { _ => annotations =>
-                handleErrors(controller.bulkUpdate(annotations).map(xs => xs.map(_.toSnakeCase).toSeq))
+                handleErrors(
+                    controller.bulkUpdate(annotations).map(xs => xs.map(_.toSnakeCase).toSeq)
+                )
             }
 //    PUT / tapetime
 // use fast annotation instead

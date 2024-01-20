@@ -165,7 +165,6 @@ class AnnotationController(
         )
     }
 
-
     def countByConcurrentRequest(
         request: ConcurrentRequest
     )(implicit ec: ExecutionContext): Future[Long] = {
@@ -284,7 +283,9 @@ class AnnotationController(
         future
     }
 
-    def update(observationUuid: UUID, annotation: Annotation)(implicit ec: ExecutionContext): Future[Option[Annotation]] = {
+    def update(observationUuid: UUID, annotation: Annotation)(implicit
+        ec: ExecutionContext
+    ): Future[Option[Annotation]] = {
         update(
             observationUuid,
             annotation.videoReferenceUuid,
@@ -502,7 +503,8 @@ class AnnotationController(
             val imagedMoment = obs.getImagedMoment
 
             val vrSame = videoReferenceUUID.contains(imagedMoment.getVideoReferenceUuid)
-            val tcSame = timecode.map(_.toString)
+            val tcSame = timecode
+                .map(_.toString)
                 .contains(Option(imagedMoment.getTimecode).map(_.toString).getOrElse(""))
             val etSame = elapsedTime.contains(imagedMoment.getElapsedTime)
             val rtSame = recordedDate.contains(imagedMoment.getRecordedTimestamp)
@@ -514,7 +516,10 @@ class AnnotationController(
                 val et     = Option(elapsedTime.getOrElse(imagedMoment.getElapsedTime))
                 val newIm  =
                     ImagedMomentController.findOrCreateImagedMoment(imDao, vrUUID, tc, rd, et)
-                log.atDebug.log(() => s"Moving observation ${obs.getUuid} to imagedMoment ${newIm.getUuid}")
+                log.atDebug
+                    .log(() =>
+                        s"Moving observation ${obs.getUuid} to imagedMoment ${newIm.getUuid}"
+                    )
                 imDao.update(imagedMoment)
 //                imagedMoment.removeObservation(obs) // This causes a delete which messes up the transaction as the observation becomes detached
                 newIm.addObservation(obs)

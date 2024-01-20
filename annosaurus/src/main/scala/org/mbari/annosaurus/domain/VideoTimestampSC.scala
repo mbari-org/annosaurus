@@ -19,7 +19,9 @@ package org.mbari.annosaurus.domain
 import java.time.Instant
 import java.util.UUID
 
-case class VideoTimestampSC(timecode: Option[String],
-                            elapsed_time_millis: Option[Long],
-                            recorded_timestamp: Option[Instant],
-                            video_reference_uuid: Option[UUID])
+case class VideoTimestampSC(
+    timecode: Option[String],
+    elapsed_time_millis: Option[Long],
+    recorded_timestamp: Option[Instant],
+    video_reference_uuid: Option[UUID]
+)

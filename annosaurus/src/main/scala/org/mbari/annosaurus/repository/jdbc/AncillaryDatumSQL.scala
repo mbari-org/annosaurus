@@ -116,13 +116,11 @@ object AncillaryDatumSQL {
         annotations: Seq[Annotation],
         data: Seq[CachedAncillaryDatum]
     ): Seq[Annotation] = {
-        for
-            a <- annotations
-        yield
-            data.find(_.imagedMomentUuid == a.imagedMomentUuid) match {
-                case Some(d) => a.copy(ancillaryData = Some(d))
-                case None    => a
-            }
+        for a <- annotations
+        yield data.find(_.imagedMomentUuid == a.imagedMomentUuid) match {
+            case Some(d) => a.copy(ancillaryData = Some(d))
+            case None    => a
+        }
     }
 
 }

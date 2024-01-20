@@ -33,8 +33,8 @@ import java.util.UUID
 import scala.concurrent.{ExecutionContext, Future}
 
 class ImageEndpoints(controller: ImageController)(using
-                                                  ec: ExecutionContext,
-                                                  jwtService: JwtService
+    ec: ExecutionContext,
+    jwtService: JwtService
 ) extends Endpoints {
 
     // GET /:uuid
@@ -110,20 +110,24 @@ class ImageEndpoints(controller: ImageController)(using
 
     val createOneImageImpl: ServerEndpoint[Any, Future] = createOneImage
         .serverSecurityLogic(jwtOpt => verify(jwtOpt))
-        .serverLogic { _ =>  dto =>
-            val timecode = dto.timecode.map(Timecode(_))
+        .serverLogic { _ => dto =>
+            val timecode    = dto.timecode.map(Timecode(_))
             val elapsedTime = dto.elapsed_time_millis.map(Duration.ofMillis)
-            handleErrors(controller.create(
-                dto.video_reference_uuid,
-                dto.url,
-                timecode,
-                elapsedTime,
-                dto.recorded_timestamp,
-                dto.format,
-                dto.width_pixels,
-                dto.height_pixels,
-                dto.description
-            ).map(_.toSnakeCase))
+            handleErrors(
+                controller
+                    .create(
+                        dto.video_reference_uuid,
+                        dto.url,
+                        timecode,
+                        elapsedTime,
+                        dto.recorded_timestamp,
+                        dto.format,
+                        dto.width_pixels,
+                        dto.height_pixels,
+                        dto.description
+                    )
+                    .map(_.toSnakeCase)
+            )
         }
 
     // PUT /:uuid
@@ -140,22 +144,25 @@ class ImageEndpoints(controller: ImageController)(using
     val updateOneImageImpl: ServerEndpoint[Any, Future] = updateOneImage
         .serverSecurityLogic(jwtOpt => verify(jwtOpt))
         .serverLogic { _ => (uuid, dto) =>
-            val timecode = dto.timecode.map(Timecode(_))
+            val timecode    = dto.timecode.map(Timecode(_))
             val elapsedTime = dto.elapsed_time_millis.map(Duration.ofMillis)
-            handleOption(controller.update(
-                uuid,
-                dto.video_reference_uuid,
-                dto.url,
-                timecode,
-                elapsedTime,
-                dto.recorded_timestamp,
-                dto.format,
-                dto.width_pixels,
-                dto.height_pixels,
-                dto.description
-            ).map(_.map(_.toSnakeCase)))
+            handleOption(
+                controller
+                    .update(
+                        uuid,
+                        dto.video_reference_uuid,
+                        dto.url,
+                        timecode,
+                        elapsedTime,
+                        dto.recorded_timestamp,
+                        dto.format,
+                        dto.width_pixels,
+                        dto.height_pixels,
+                        dto.description
+                    )
+                    .map(_.map(_.toSnakeCase))
+            )
         }
-
 
     override def all: List[Endpoint[_, _, _, _, _]] = List(
         findOneImage,

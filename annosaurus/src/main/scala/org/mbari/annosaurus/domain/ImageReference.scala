@@ -23,7 +23,7 @@ import org.mbari.annosaurus.repository.jpa.entity.extensions.*
 import extensions.*
 
 case class ImageReference(
-    url: URL,                      // TODO should this be optional to allow for partial updates?
+    url: URL, // TODO should this be optional to allow for partial updates?
     format: Option[String] = None,
     widthPixels: Option[Int] = None,
     heightPixels: Option[Int] = None,

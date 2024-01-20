@@ -38,7 +38,8 @@ trait EndpointsSuite extends BaseDAOSuite:
     def runDelete(
         ep: ServerEndpoint[Any, Future],
         uri: String,
-        assertions: Response[Either[String, String]] => Unit): Unit =
+        assertions: Response[Either[String, String]] => Unit
+    ): Unit =
         val backendStub = newBackendStub(ep)
         val u           = uri"$uri"
         val request     = basicRequest.delete(u)
@@ -58,15 +59,15 @@ trait EndpointsSuite extends BaseDAOSuite:
         assertions(response)
 
     def runPost(
-                   ep: ServerEndpoint[Any, Future],
-                   uri: String,
-                   body: String,
-                   assertions: Response[Either[String, String]] => Unit
-               ): Unit =
+        ep: ServerEndpoint[Any, Future],
+        uri: String,
+        body: String,
+        assertions: Response[Either[String, String]] => Unit
+    ): Unit =
         val backendStub = newBackendStub(ep)
-        val u = uri"$uri"
-        val request = basicRequest.post(u).body(body)
-        val response = request.send(backendStub).join
+        val u           = uri"$uri"
+        val request     = basicRequest.post(u).body(body)
+        val response    = request.send(backendStub).join
         assertions(response)
 
     def runGet(

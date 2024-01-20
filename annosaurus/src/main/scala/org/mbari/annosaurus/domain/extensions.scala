@@ -26,7 +26,7 @@ object extensions:
             else if (d.isNaN) None
             else Some(d)
 
-    extension(f: java.lang.Float)
+    extension (f: java.lang.Float)
         def toOption: Option[Float] =
             if (f == null) None
             else if (f.isNaN) None
