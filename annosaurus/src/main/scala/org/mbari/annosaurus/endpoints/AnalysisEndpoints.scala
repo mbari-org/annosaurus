@@ -43,6 +43,7 @@ class AnalysisEndpoints(repository: AnalysisRepository)(implicit val executor: E
     extends Endpoints {
 
     private val base = "histogram"
+    private val tag = "Analysis"
 
     val depthHistogram
         : Endpoint[Unit, (Option[Int], QueryConstraintsSC), ErrorMsg, QueryConstraintsResponseSC[
@@ -56,6 +57,9 @@ class AnalysisEndpoints(repository: AnalysisRepository)(implicit val executor: E
             jsonBody[QueryConstraintsResponseSC[DepthHistogramSC]]
                 .description("Histogram of depths")
         )
+        .description("Generate a histogram of depths base on the query constraints")
+        .name("depthHistogram")
+        .tag(tag)
 
     val depthHistogramImpl: ServerEndpoint[Any, Future] =
         depthHistogram.serverLogic { case (binSizeMeters, constraints) =>
@@ -74,6 +78,9 @@ class AnalysisEndpoints(repository: AnalysisRepository)(implicit val executor: E
         .in(query[Option[Int]]("size").description("Bin size in days").default(Some(50)))
         .in(jsonBody[QueryConstraintsSC].description("Query constraints"))
         .out(jsonBody[QueryConstraintsResponseSC[TimeHistogramSC]].description("Histogram of time"))
+        .description("Generate a histogram of times base on the query constraints")
+        .name("timeHistogram")
+        .tag(tag)
 
     val timeHistogramImpl: ServerEndpoint[Any, Future] =
         timeHistogram.serverLogic { case (binSizeDays, constraints) =>
@@ -84,8 +91,8 @@ class AnalysisEndpoints(repository: AnalysisRepository)(implicit val executor: E
         }
 
     override def all: List[Endpoint[?, ?, ?, ?, ?]] =
-        List(depthHistogram)
+        List(depthHistogram, timeHistogram)
 
-    override def allImpl: List[ServerEndpoint[Any, Future]] = List(depthHistogramImpl)
+    override def allImpl: List[ServerEndpoint[Any, Future]] = List(depthHistogramImpl, timeHistogramImpl)
 
 }

@@ -84,7 +84,7 @@ trait FastAnnotationEndpointsSuite extends EndpointsSuite {
         assert(jwt != null)
         val backendStub         = newBackendStub(endpoints.findAnnotationsByQueryConstraintsImpl)
         val response            = basicRequest
-            .get(uri"http://test.com/v1/fast")
+            .post(uri"http://test.com/v1/fast")
             .header("Authorization", s"Bearer $jwt")
             .header("Content-Type", "application/json")
             .body(qc.toSnakeCase.stringify)
@@ -113,7 +113,7 @@ trait FastAnnotationEndpointsSuite extends EndpointsSuite {
         assert(jwt != null)
         val backendStub         = newBackendStub(endpoints.findGeoRangeByQueryConstraintsImpl)
         val response            = basicRequest
-            .get(uri"http://test.com/v1/fast/georange")
+            .post(uri"http://test.com/v1/fast/georange")
             .header("Authorization", s"Bearer $jwt")
             .header("Content-Type", "application/json")
             .body(qc.toSnakeCase.stringify)
@@ -154,7 +154,7 @@ trait FastAnnotationEndpointsSuite extends EndpointsSuite {
         assert(jwt != null)
         val backendStub         = newBackendStub(endpoints.countAnnotationsByQueryConstraintsImpl)
         val response            = basicRequest
-            .get(uri"http://test.com/v1/fast/count")
+            .post(uri"http://test.com/v1/fast/count")
             .header("Authorization", s"Bearer $jwt")
             .header("Content-Type", "application/json")
             .body(qc.toSnakeCase.stringify)
@@ -330,6 +330,14 @@ trait FastAnnotationEndpointsSuite extends EndpointsSuite {
         val count       = checkResponse[DeleteCountSC](response.body).toCamelCase
         assertEquals(count.observationCount, xs.size)
 
+    }
+
+    test("findAnnotationsByConcurrentRequest") {
+        fail("TODO")
+    }
+
+    test("findAnnotationsByMultiRequest") {
+        fail("TODO")
     }
 
 }

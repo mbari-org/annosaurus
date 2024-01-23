@@ -36,15 +36,16 @@ class ImageReferenceEndpoints(controller: ImageReferenceController)(using
 ) extends Endpoints {
     
     private val base = "imagereferences"
+    private val tag = "Image References"
 
     val deleteImageByUuid: Endpoint[Option[String], UUID, ErrorMsg, Unit, Any] =
         secureEndpoint
             .delete
-            .in(base / path[UUID]("uuid"))
+            .in(base / path[UUID]("imageReferenceUuid"))
             .out(statusCode(StatusCode.NoContent).and(emptyOutput))
             .name("deleteImageByUuid")
             .description("Delete an image reference by its UUID")
-            .tag("ImageReference")
+            .tag(tag)
 
     val deleteImageByUuidImpl: ServerEndpoint[Any, Future] =
         deleteImageByUuid
@@ -59,9 +60,9 @@ class ImageReferenceEndpoints(controller: ImageReferenceController)(using
     val findImageByUuid: Endpoint[Unit, UUID, ErrorMsg, ImageReferenceSC, Any] =
         openEndpoint
             .get
-            .in(base / path[UUID]("uuid"))
+            .in(base / path[UUID]("imageReferenceUuid"))
             .out(jsonBody[ImageReferenceSC])
-            .tag("ImageReference")
+            .tag(tag)
 
     val findImageByUuidImpl: ServerEndpoint[Any, Future] = findImageByUuid
         .serverLogic { uuid =>
@@ -76,12 +77,12 @@ class ImageReferenceEndpoints(controller: ImageReferenceController)(using
         : Endpoint[Option[String], (UUID, ImageReferenceSC), ErrorMsg, ImageReferenceSC, Any] =
         secureEndpoint
             .put
-            .in(base / path[UUID]("uuid"))
+            .in(base / path[UUID]("imageReferenceUuid"))
             .in(oneOfBody(jsonBody[ImageReferenceSC], formBody[ImageReferenceSC]))
             .out(jsonBody[ImageReferenceSC])
             .name("updateImageReferenceByUuid")
             .description("Update an image reference by its UUID and a json or form body")
-            .tag("ImageReference")
+            .tag(tag)
 
     val updateImageReferenceByUuidImpl: ServerEndpoint[Any, Future] = updateImageReferenceByUuid
         .serverSecurityLogic(jwtOpt => verify(jwtOpt))

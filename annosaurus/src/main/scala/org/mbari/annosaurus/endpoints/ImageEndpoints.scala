@@ -38,17 +38,18 @@ class ImageEndpoints(controller: ImageController)(using
 ) extends Endpoints {
     
     
-    private val base = "image"
+    private val base = "images"
+    private val tag = "Images"
 
     // GET /:uuid
     val findOneImage =
         openEndpoint
             .get
-            .in(base / path[UUID]("uuid"))
+            .in(base / path[UUID]("imageReferenceUuid"))
             .out(jsonBody[ImageSC])
             .description("Find an image by its UUID")
             .name("findOneImage")
-            .tag("images")
+            .tag(tag)
 
     val findOneImageImpl: ServerEndpoint[Any, Future] = findOneImage
         .serverLogic { uuid =>
@@ -59,11 +60,11 @@ class ImageEndpoints(controller: ImageController)(using
     val findByVideoReferenceUUID =
         openEndpoint
             .get
-            .in(base / "videoreference" / path[UUID]("uuid"))
+            .in(base / "videoreference" / path[UUID]("videoReferenceUuid"))
             .out(jsonBody[Seq[ImageSC]])
             .description("Find images by video reference UUID")
             .name("findByVideoReferenceUUID")
-            .tag("images")
+            .tag(tag)
 
     val findByVideoReferenceUUIDImpl: ServerEndpoint[Any, Future] = findByVideoReferenceUUID
         .serverLogic { uuid =>
@@ -74,11 +75,11 @@ class ImageEndpoints(controller: ImageController)(using
     val findByImageName =
         openEndpoint
             .get
-            .in(base / "name" / path[String]("name"))
+            .in(base / "name" / path[String]("imageFileName"))
             .out(jsonBody[Seq[ImageSC]])
             .description("Find images by the image file's name")
             .name("findByImageName")
-            .tag("images")
+            .tag(tag)
 
     val findByImageNameImpl: ServerEndpoint[Any, Future] = findByImageName
         .serverLogic { name =>
@@ -93,7 +94,7 @@ class ImageEndpoints(controller: ImageController)(using
             .out(jsonBody[ImageSC])
             .description("Find images by the image file's URL")
             .name("findByImageUrl")
-            .tag("images")
+            .tag(tag)
 
     val findByImageUrlImpl: ServerEndpoint[Any, Future] = findByImageUrl
         .serverLogic { url =>
@@ -109,7 +110,7 @@ class ImageEndpoints(controller: ImageController)(using
             .out(jsonBody[ImageSC])
             .description("Create a new image")
             .name("createOneImage")
-            .tag("images")
+            .tag(tag)
 
     val createOneImageImpl: ServerEndpoint[Any, Future] = createOneImage
         .serverSecurityLogic(jwtOpt => verify(jwtOpt))
@@ -137,12 +138,12 @@ class ImageEndpoints(controller: ImageController)(using
     val updateOneImage: Endpoint[Option[String], (UUID, ImageUpdateSC), ErrorMsg, ImageSC, Any] =
         secureEndpoint
             .put
-            .in(base / path[UUID]("uuid"))
+            .in(base / path[UUID]("imageReferenceUuid"))
             .in(oneOfBody(jsonBody[ImageUpdateSC], formBody[ImageUpdateSC]))
             .out(jsonBody[ImageSC])
             .description("Update an image")
             .name("updateOneImage")
-            .tag("images")
+            .tag(tag)
 
     val updateOneImageImpl: ServerEndpoint[Any, Future] = updateOneImage
         .serverSecurityLogic(jwtOpt => verify(jwtOpt))
@@ -168,20 +169,20 @@ class ImageEndpoints(controller: ImageController)(using
         }
 
     override def all: List[Endpoint[_, _, _, _, _]] = List(
-        findOneImage,
-        findByVideoReferenceUUID,
         findByImageName,
         findByImageUrl,
-        createOneImage,
-        updateOneImage
+        findByVideoReferenceUUID,
+        findOneImage,
+        updateOneImage,
+        createOneImage
     )
 
     override def allImpl: List[ServerEndpoint[Any, Future]] = List(
-        findOneImageImpl,
-        findByVideoReferenceUUIDImpl,
         findByImageNameImpl,
         findByImageUrlImpl,
-        createOneImageImpl,
-        updateOneImageImpl
+        findByVideoReferenceUUIDImpl,
+        findOneImageImpl,
+        updateOneImageImpl,
+        createOneImageImpl
     )
 }

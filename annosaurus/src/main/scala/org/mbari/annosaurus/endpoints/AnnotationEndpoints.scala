@@ -41,17 +41,18 @@ class AnnotationEndpoints(controller: AnnotationController)(using
 ) extends Endpoints {
     
     private val base = "annotations" 
+    private val tag = "Annotations"
 
 //    GET /: uuid
     val findAnnotationByUuid: Endpoint[Unit, UUID, ErrorMsg, AnnotationSC, Any] =
         openEndpoint
             .get
-            .in(base / path[UUID]("uuid"))
+            .in(base / path[UUID]("observationUuid"))
 //            .in(oneOfBody(jsonBody[AnnotationSC], formBody[AnnotationSC]))
             .out(jsonBody[AnnotationSC])
             .name("findAnnotationByUuid")
             .description("Find an annotation by its UUID")
-            .tag("Annotation")
+            .tag(tag)
 
     val findAnnotationByUuidImpl: ServerEndpoint[Any, Future] =
         findAnnotationByUuid
@@ -62,11 +63,11 @@ class AnnotationEndpoints(controller: AnnotationController)(using
     val findAnnotationByImageReferenceUuid: Endpoint[Unit, UUID, ErrorMsg, Seq[AnnotationSC], Any] =
         openEndpoint
             .get
-            .in(base / "imagereference" / path[UUID]("uuid"))
+            .in(base / "imagereference" / path[UUID]("imageReferenceUuid"))
             .out(jsonBody[Seq[AnnotationSC]])
             .name("findAnnotationByImageReferenceUuid")
             .description("Find an annotation by its image reference UUID")
-            .tag("Annotation")
+            .tag(tag)
 
     val findAnnotationByImageReferenceUuidImpl: ServerEndpoint[Any, Future] =
         findAnnotationByImageReferenceUuid
@@ -80,12 +81,12 @@ class AnnotationEndpoints(controller: AnnotationController)(using
         : Endpoint[Unit, (UUID, Paging), ErrorMsg, Seq[AnnotationSC], Any] =
         openEndpoint
             .get
-            .in(base / "videoreference" / path[UUID]("uuid"))
+            .in(base / "videoreference" / path[UUID]("videoReferenceUuid"))
             .in(paging)
             .out(jsonBody[Seq[AnnotationSC]])
             .name("findAnnotationsByVideoReferenceUuid")
             .description("Find annotations by its video reference UUID")
-            .tag("Annotation")
+            .tag(tag)
 
     val findAnnotationsByVideoReferenceUuidImpl: ServerEndpoint[Any, Future] =
         findAnnotationsByVideoReferenceUuid
@@ -110,7 +111,7 @@ class AnnotationEndpoints(controller: AnnotationController)(using
             .out(jsonBody[AnnotationSC])
             .name("createAnnotation")
             .description("Create a new annotation")
-            .tag("Annotation")
+            .tag(tag)
 
     val createAnnotationImpl: ServerEndpoint[Any, Future] =
         createAnnotation
@@ -134,7 +135,7 @@ class AnnotationEndpoints(controller: AnnotationController)(using
             .out(jsonBody[Seq[AnnotationSC]])
             .name("bulkCreateAnnotations")
             .description("Create a new annotation")
-            .tag("Annotation")
+            .tag(tag)
 
     val bulkCreateAnnotationsImpl: ServerEndpoint[Any, Future] =
         bulkCreateAnnotations
@@ -153,7 +154,7 @@ class AnnotationEndpoints(controller: AnnotationController)(using
 //            .out(jsonBody[Seq[AnnotationSC]])
 //            .name("findConcurrentAnnotations")
 //            .description("Find concurrent annotations")
-//            .tag("Annotation")
+//            .tag(tag)
 //
 //    val findConcurrentAnnotationsImpl: ServerEndpoint[Any, Future] =
 //        findConcurrentAnnotations
@@ -170,7 +171,7 @@ class AnnotationEndpoints(controller: AnnotationController)(using
             .out(jsonBody[Long])
             .name("countConcurrentAnnotations")
             .description("Count concurrent annotations")
-            .tag("Annotation")
+            .tag(tag)
 
     val countByConcurrentRequestImpl: ServerEndpoint[Any, Future] =
         countByConcurrentRequest
@@ -188,7 +189,7 @@ class AnnotationEndpoints(controller: AnnotationController)(using
 //            .out(jsonBody[Seq[AnnotationSC]])
 //            .name("findMultiAnnotations")
 //            .description("Find multiple annotations")
-//            .tag("Annotation")
+//            .tag(tag)
 //
 //    val findMultiAnnotationsImpl: ServerEndpoint[Any, Future] =
 //        findMultiAnnotations
@@ -205,7 +206,7 @@ class AnnotationEndpoints(controller: AnnotationController)(using
             .out(jsonBody[Long])
             .name("countMultiAnnotations")
             .description("Count multiple annotations. JSON body can be snake_case or camelCase")
-            .tag("Annotation")
+            .tag(tag)
 
     val countByMultiRequestImpl: ServerEndpoint[Any, Future] =
         countByMultiRequest
@@ -218,12 +219,12 @@ class AnnotationEndpoints(controller: AnnotationController)(using
         : Endpoint[Option[String], (UUID, AnnotationCreateSC), ErrorMsg, AnnotationSC, Any] =
         secureEndpoint
             .put
-            .in(base / path[UUID]("uuid"))
+            .in(base / path[UUID]("observationUuid"))
             .in(oneOfBody(jsonBody[AnnotationCreateSC], formBody[AnnotationCreateSC]))
             .out(jsonBody[AnnotationSC])
             .name("updateAnnotation")
             .description("Update an annotation")
-            .tag("Annotation")
+            .tag(tag)
 
     val updateAnnotationImpl: ServerEndpoint[Any, Future] =
         updateAnnotation
@@ -242,7 +243,7 @@ class AnnotationEndpoints(controller: AnnotationController)(using
             .out(jsonBody[Seq[AnnotationSC]])
             .name("bulkUpdateAnnotations")
             .description("Update multiple annotations")
-            .tag("Annotation")
+            .tag(tag)
 
     val bulkUpdateAnnotationsImpl: ServerEndpoint[Any, Future] =
         bulkUpdateAnnotations
@@ -256,26 +257,26 @@ class AnnotationEndpoints(controller: AnnotationController)(using
 // use fast annotation instead
 
     override def all: List[Endpoint[?, ?, ?, ?, ?]] = List(
-        findAnnotationByUuid,
-        findAnnotationByImageReferenceUuid,
-        findAnnotationsByVideoReferenceUuid,
-        createAnnotation,
         bulkCreateAnnotations,
+        bulkUpdateAnnotations,
         countByConcurrentRequest,
+        findAnnotationByImageReferenceUuid,
         countByMultiRequest,
+        findAnnotationsByVideoReferenceUuid,
         updateAnnotation,
-        bulkUpdateAnnotations
+        findAnnotationByUuid,
+        createAnnotation
     )
 
     override def allImpl: List[ServerEndpoint[Any, Future]] = List(
-        findAnnotationByUuidImpl,
-        findAnnotationByImageReferenceUuidImpl,
-        findAnnotationsByVideoReferenceUuidImpl,
-        createAnnotationImpl,
         bulkCreateAnnotationsImpl,
+        bulkUpdateAnnotationsImpl,
         countByConcurrentRequestImpl,
+        findAnnotationByImageReferenceUuidImpl,
         countByMultiRequestImpl,
+        findAnnotationsByVideoReferenceUuidImpl,
+        findAnnotationByUuidImpl,
         updateAnnotationImpl,
-        bulkUpdateAnnotationsImpl
+        createAnnotationImpl
     )
 }

@@ -82,7 +82,7 @@ class CachedVideoReferenceInfoEndpoints(controller: CachedVideoReferenceInfoCont
     val findByUuid: Endpoint[Unit, UUID, ErrorMsg, CachedVideoReferenceInfoSC, Any] =
         openEndpoint
             .get
-            .in(base / path[UUID]("uuid"))
+            .in(base / path[UUID]("videoInfoUuid"))
             .out(jsonBody[CachedVideoReferenceInfoSC])
             .name("findByUuid")
             .description("Find a video reference by UUID")
@@ -98,10 +98,10 @@ class CachedVideoReferenceInfoEndpoints(controller: CachedVideoReferenceInfoCont
     val findByVideoReferenceUuid: Endpoint[Unit, UUID, ErrorMsg, CachedVideoReferenceInfoSC, Any] =
         openEndpoint
             .get
-            .in(base / "videoreference" / path[UUID]("uuid"))
+            .in(base / "videoreference" / path[UUID]("videoReferenceUuid"))
             .out(jsonBody[CachedVideoReferenceInfoSC])
             .name("findByVideoReferenceUuid")
-            .description("Find a video reference by a video reference UUID")
+            .description("Find a video reference info by a video reference UUID")
             .tag(tag)
 
     val findByVideoReferenceUuidImpl: ServerEndpoint[Any, Future] =
@@ -217,7 +217,7 @@ class CachedVideoReferenceInfoEndpoints(controller: CachedVideoReferenceInfoCont
     ], (UUID, CachedVideoReferenceInfoUpdateSC), ErrorMsg, CachedVideoReferenceInfoSC, Any] =
         secureEndpoint
             .put
-            .in(base / path[UUID]("uuid"))
+            .in(base / path[UUID]("videoInfoUuid"))
             .in(
                 oneOfBody(
                     jsonBody[CachedVideoReferenceInfoUpdateSC],
@@ -250,7 +250,7 @@ class CachedVideoReferenceInfoEndpoints(controller: CachedVideoReferenceInfoCont
     val deleteOneVideoReferenceInfo: Endpoint[Option[String], UUID, ErrorMsg, Unit, Any] =
         secureEndpoint
             .delete
-            .in(base / path[UUID]("uuid"))
+            .in(base / path[UUID]("videoInfoUuid"))
             .out(statusCode(StatusCode.NoContent).and(emptyOutput))
             .name("deleteOneVideoReferenceInfo")
             .description("Delete a video reference")
@@ -268,30 +268,30 @@ class CachedVideoReferenceInfoEndpoints(controller: CachedVideoReferenceInfoCont
             }
 
     override def all: List[Endpoint[_, _, _, _, _]] = List(
-        findAll,
+        findByMissionContact,
+        findAllMissionContacts,
+        findByMissionId,
+        findAllMissionIds,
+        findByVideoReferenceUuid,
         findAllVideoReferenceUuids,
         findByUuid,
-        findByVideoReferenceUuid,
-        findAllMissionIds,
-        findByMissionId,
-        findAllMissionContacts,
-        findByMissionContact,
-        createOneVideoReferenceInfo,
         updateOneVideoReferenceInfo,
-        deleteOneVideoReferenceInfo
+        deleteOneVideoReferenceInfo,
+        createOneVideoReferenceInfo,
+        findAll
     )
 
     override def allImpl: List[ServerEndpoint[Any, Future]] = List(
-        findAllImpl,
+        findByMissionContactImpl,
+        findAllMissionContactsImpl,
+        findByMissionIdImpl,
+        findAllMissionIdsImpl,
+        findByVideoReferenceUuidImpl,
         findAllVideoReferenceUuidsImpl,
         findByUuidImpl,
-        findByVideoReferenceUuidImpl,
-        findAllMissionIdsImpl,
-        findByMissionIdImpl,
-        findAllMissionContactsImpl,
-        findByMissionContactImpl,
-        createOneVideoReferenceInfoImpl,
         updateOneVideoReferenceInfoImpl,
-        deleteOneVideoReferenceInfoImpl
+        deleteOneVideoReferenceInfoImpl,
+        createOneVideoReferenceInfoImpl,
+        findAllImpl,
     )
 }

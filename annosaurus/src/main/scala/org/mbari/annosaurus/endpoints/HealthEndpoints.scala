@@ -36,7 +36,7 @@ class HealthEndpoints(using ec: ExecutionContext) extends Endpoints:
             .out(jsonBody[HealthStatus])
             .name("health")
             .description("Health check")
-            .tag("health")
+            .tag("Health")
 
     val healthEndpointImpl: ServerEndpoint[Any, Future] =
         healthEndpoint.serverLogic(_ => handleErrors(Future(HealthStatus.default)))

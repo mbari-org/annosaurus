@@ -36,6 +36,7 @@ class IndexEndpoints(controller: IndexController)(using
 ) extends Endpoints {
     
     private val base = "index"
+    private val tag = "Time Indices"
 
     private val toEntity = Index.from(_: IndexEntity, false) // curried function
 
@@ -43,9 +44,9 @@ class IndexEndpoints(controller: IndexController)(using
         openEndpoint
             .get
             .in(paging)
-            .in(base / "videoreference" / path[UUID]("uuid"))
+            .in(base / "videoreference" / path[UUID]("videoReferenceUuid"))
             .out(jsonBody[List[IndexSC]].description("The IndexEntity objects"))
-            .tag("Index")
+            .tag(tag)
 
     val findByVideoReferenceUUIDImpl: ServerEndpoint[Any, Future] =
         findByVideoReferenceUUID.serverLogic { (paging, uuid) =>
@@ -61,7 +62,7 @@ class IndexEndpoints(controller: IndexController)(using
         .in(base / "tapetime")
         .in(jsonBody[List[Index]].description("The IndexEntity objects"))
         .out(jsonBody[List[IndexSC]].description("The IndexEntity objects"))
-        .tag("Index")
+        .tag(tag)
 
     val bulkUpdateRecordedTimestampsImpl: ServerEndpoint[Any, Future] = bulkUpdateRecordedTimestamps
         .serverSecurityLogic(jwtOpt => verify(jwtOpt))

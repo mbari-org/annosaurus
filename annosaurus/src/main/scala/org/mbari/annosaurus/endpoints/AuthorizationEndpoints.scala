@@ -34,8 +34,9 @@ class AuthorizationEndpoints()(using ec: ExecutionContext, jwtService: JwtServic
     extends Endpoints:
     
     private val base = "auth"
+    private val tag = "Authorization"
 
-    private val log = System.getLogger(getClass().getName())
+//    private val log = System.getLogger(getClass.getName)
 
     val authEndpoint: Endpoint[String, Unit, ErrorMsg, Authorization, Any] =
         baseEndpoint
@@ -55,7 +56,7 @@ class AuthorizationEndpoints()(using ec: ExecutionContext, jwtService: JwtServic
             )
             .name("authenticate")
             .description("Exchange an API key for a JWT")
-            .tag("auth")
+            .tag(tag)
 
     val authEndpointImpl: ServerEndpoint[Any, Future] =
         authEndpoint

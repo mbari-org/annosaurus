@@ -49,6 +49,7 @@ class ImagedMomentEndpoints(controller: ImagedMomentController)(using
 ) extends Endpoints {
 
     private val base = "imagedmoments"
+    private val tag = "Imaged Moments"
 
     val findAllImagedMoments: Endpoint[Unit, Paging, ErrorMsg, Seq[ImagedMomentSC], Any] =
         openEndpoint
@@ -58,7 +59,7 @@ class ImagedMomentEndpoints(controller: ImagedMomentController)(using
             .out(jsonBody[Seq[ImagedMomentSC]])
             .name("findAllImagedMoments")
             .description("Find all imaged moments")
-            .tag("imagedmoments")
+            .tag(tag)
 
     val findAllImagedMomentsImpl: ServerEndpoint[Any, Future] =
         findAllImagedMoments
@@ -72,7 +73,10 @@ class ImagedMomentEndpoints(controller: ImagedMomentController)(using
         openEndpoint
             .get
             .in(base / "count" / "all")
+            .name("countAllImagedMoments")
+            .description("Count all imaged moments")
             .out(jsonBody[Count])
+            .tag(tag)
 
     val countAllImagedMomentsImpl: ServerEndpoint[Any, Future] =
         countAllImagedMoments
@@ -88,7 +92,7 @@ class ImagedMomentEndpoints(controller: ImagedMomentController)(using
             .out(jsonBody[Seq[ImagedMomentSC]])
             .name("findImagedMomentsWithImages")
             .description("Find all imaged moments with images")
-            .tag("imagedmoments")
+            .tag(tag)
 
     val findImagedMomentsWithImagesImpl: ServerEndpoint[Any, Future] =
         findImagedMomentsWithImages
@@ -105,6 +109,9 @@ class ImagedMomentEndpoints(controller: ImagedMomentController)(using
             .get
             .in(base / "count" / "images")
             .out(jsonBody[Count])
+            .description("Count all imaged moments with images")
+            .name("countImagedMomentsWithImages")
+            .tag(tag)
 
     val countImagedMomentsWithImagesImpl: ServerEndpoint[Any, Future] =
         countImagedMomentsWithImages
@@ -118,6 +125,9 @@ class ImagedMomentEndpoints(controller: ImagedMomentController)(using
             .get
             .in(base / "count" / "images" / path[UUID]("videoReferenceUuid"))
             .out(jsonBody[Count])
+            .description("Count all imaged moments with images for a given video reference UUID")
+            .name("countImagesForVideoReference")
+            .tag(tag)
 
     val countImagesForVideoReferenceImpl: ServerEndpoint[Any, Future] =
         countImagesForVideoReference
@@ -139,7 +149,7 @@ class ImagedMomentEndpoints(controller: ImagedMomentController)(using
             .out(jsonBody[Seq[ImagedMomentSC]])
             .name("findImagedMomentsByLinkName")
             .description("Find all imaged moments with a given link name")
-            .tag("imagedmoments")
+            .tag(tag)
 
     val findImagedMomentsByLinkNameImpl: ServerEndpoint[Any, Future] =
         findImagedMomentsByLinkName
@@ -157,6 +167,9 @@ class ImagedMomentEndpoints(controller: ImagedMomentController)(using
             .get
             .in(base / "count" / "linkname" / path[String]("linkName"))
             .out(jsonBody[Count])
+            .description("Count all imaged moments with an observation that has an association using the given link name")
+            .name("countImagedMomentsByLinkName")
+            .tag(tag)
 
     val countImagedMomentsByLinkNameImpl: ServerEndpoint[Any, Future] =
         countImagedMomentsByLinkName
@@ -168,11 +181,11 @@ class ImagedMomentEndpoints(controller: ImagedMomentController)(using
     val findImagedMomentByUUID: Endpoint[Unit, UUID, ErrorMsg, ImagedMomentSC, Any] =
         openEndpoint
             .get
-            .in(base / path[UUID]("uuid"))
+            .in(base / path[UUID]("imagedMomentUuid"))
             .out(jsonBody[ImagedMomentSC])
             .name("findImagedMomentByUUID")
             .description("Find an imaged moment by UUID")
-            .tag("imagedmoments")
+            .tag(tag)
 
     val findImagedMomentByUUIDImpl: ServerEndpoint[Any, Future] =
         findImagedMomentByUUID
@@ -190,7 +203,7 @@ class ImagedMomentEndpoints(controller: ImagedMomentController)(using
             .out(jsonBody[Seq[ImagedMomentSC]])
             .name("findImagedMomentsByConceptName")
             .description("Find all imaged moments with a given concept name")
-            .tag("imagedmoments")
+            .tag(tag)
 
     val findImagedMomentsByConceptNameImpl: ServerEndpoint[Any, Future] =
         findImagedMomentsByConceptName
@@ -212,7 +225,7 @@ class ImagedMomentEndpoints(controller: ImagedMomentController)(using
             .out(jsonBody[Seq[ImagedMomentSC]])
             .name("findImagedMomentsByConceptNameWithImages")
             .description("Find all imaged moments with a given concept name that have images")
-            .tag("imagedmoments")
+            .tag(tag)
 
     // I think this is fixed but I'm keeping this note:  This returns an imagedmoment for EACH image. If there are
     // two images for a moment, you'll get the image moment twice
@@ -235,6 +248,7 @@ class ImagedMomentEndpoints(controller: ImagedMomentController)(using
             .get
             .in(base / "concept" / "count" / path[String]("conceptName"))
             .out(jsonBody[ConceptCount])
+            .tag(tag)
 
     val countImagedMomentsByConceptNameImpl: ServerEndpoint[Any, Future] =
         countImagedMomentsByConceptName
@@ -255,6 +269,7 @@ class ImagedMomentEndpoints(controller: ImagedMomentController)(using
                 )
             )
             .out(jsonBody[ConceptCount])
+            .tag(tag)
 
     val countImagedMomentsByConceptNameWithImagesImpl: ServerEndpoint[Any, Future] =
         countImagedMomentsByConceptNameWithImages
@@ -276,7 +291,7 @@ class ImagedMomentEndpoints(controller: ImagedMomentController)(using
             .out(jsonBody[Seq[ImagedMomentSC]])
             .name("findImagedMomentsBetweenModifiedDates")
             .description("Find all imaged moments modified between two dates")
-            .tag("imagedmoments")
+            .tag(tag)
 
     val findImagedMomentsBetweenModifiedDatesImpl: ServerEndpoint[Any, Future] =
         findImagedMomentsBetweenModifiedDates
@@ -301,7 +316,7 @@ class ImagedMomentEndpoints(controller: ImagedMomentController)(using
             .out(jsonBody[Count])
             .name("countImagedMomentsBetweenModifiedDates")
             .description("Count all imaged moments modified between two dates")
-            .tag("imagedmoments")
+            .tag(tag)
 
     // TODO - The original returned a count with start_timestamp and end_timestamp
     val countImagedMomentsBetweenModifiedDatesImpl: ServerEndpoint[Any, Future] =
@@ -319,7 +334,7 @@ class ImagedMomentEndpoints(controller: ImagedMomentController)(using
             .out(jsonBody[Seq[CountForVideoReferenceSC]])
             .name("countsPerVideoReference")
             .description("Count all imaged moments per video reference")
-            .tag("imagedmoments")
+            .tag(tag)
 
     val countsPerVideoReferenceImpl: ServerEndpoint[Any, Future] =
         countsPerVideoReference
@@ -339,7 +354,7 @@ class ImagedMomentEndpoints(controller: ImagedMomentController)(using
             .out(jsonBody[Seq[UUID]])
             .name("findAllVideoReferenceUUIDs")
             .description("Find all video reference UUIDs")
-            .tag("imagedmoments")
+            .tag(tag)
 
     val findAllVideoReferenceUUIDsImpl: ServerEndpoint[Any, Future] =
         findAllVideoReferenceUUIDs
@@ -351,11 +366,11 @@ class ImagedMomentEndpoints(controller: ImagedMomentController)(using
     val findByVideoReferenceUuid: Endpoint[Unit, UUID, ErrorMsg, Seq[ImagedMomentSC], Any] =
         openEndpoint
             .get
-            .in(base / "videoreference" / path[UUID]("uuid"))
+            .in(base / "videoreference" / path[UUID]("videoReferenceUuid"))
             .out(jsonBody[Seq[ImagedMomentSC]])
             .name("findByVideoReferenceUuid")
             .description("Find all imaged moments for a given video reference UUID")
-            .tag("imagedmoments")
+            .tag(tag)
 
     val findByVideoReferenceUuidImpl: ServerEndpoint[Any, Future] =
         findByVideoReferenceUuid
@@ -380,7 +395,7 @@ class ImagedMomentEndpoints(controller: ImagedMomentController)(using
             .description(
                 "Count all imaged moments modifed before a given date for a given video reference UUID"
             )
-            .tag("imagedmoments")
+            .tag(tag)
 
     val countModifiedBeforeDateImpl: ServerEndpoint[Any, Future] =
         countModifiedBeforeDate
@@ -403,7 +418,7 @@ class ImagedMomentEndpoints(controller: ImagedMomentController)(using
             .out(jsonBody[Seq[ImagedMomentSC]])
             .name("findImagedMomentsByWindowRequest")
             .description("Find all imaged moments for a given window request")
-            .tag("imagedmoments")
+            .tag(tag)
 
     val findImagedMomentsByWindowRequestImpl: ServerEndpoint[Any, Future] =
         findImagedMomentsByWindowRequest
@@ -423,7 +438,7 @@ class ImagedMomentEndpoints(controller: ImagedMomentController)(using
             .out(jsonBody[CountForVideoReferenceSC])
             .name("deleteByVideoReferenceUUID")
             .description("Delete all imaged moments for a given video reference UUID")
-            .tag("imagedmoments")
+            .tag(tag)
 
     val deleteByVideoReferenceUUIDImpl: ServerEndpoint[Any, Future] =
         deleteByVideoReferenceUUID
@@ -443,7 +458,7 @@ class ImagedMomentEndpoints(controller: ImagedMomentController)(using
             .out(jsonBody[ImagedMomentSC])
             .name("findByImageReferenceUUID")
             .description("Find all imaged moments for a given image reference UUID")
-            .tag("imagedmoments")
+            .tag(tag)
 
     val findByImageReferenceUUIDImpl: ServerEndpoint[Any, Future] =
         findByImageReferenceUUID
@@ -459,7 +474,7 @@ class ImagedMomentEndpoints(controller: ImagedMomentController)(using
             .out(jsonBody[ImagedMomentSC])
             .name("findByObservationUUID")
             .description("Find an imaged moment for a given observation UUID")
-            .tag("imagedmoments")
+            .tag(tag)
 
     val findByObservationUUIDImpl: ServerEndpoint[Any, Future] =
         findByObservationUUID
@@ -472,12 +487,12 @@ class ImagedMomentEndpoints(controller: ImagedMomentController)(using
         : Endpoint[Option[String], (UUID, VideoTimestampSC), ErrorMsg, ImagedMomentSC, Any] =
         secureEndpoint
             .put
-            .in(base / path[UUID]("uuid"))
+            .in(base / path[UUID]("imagedMomentUuid"))
             .in(oneOfBody(jsonBody[VideoTimestampSC], formBody[VideoTimestampSC]))
             .out(jsonBody[ImagedMomentSC])
             .name("updateImagedMoment")
             .description("Update an imaged moment")
-            .tag("imagedmoments")
+            .tag(tag)
 
     val updateImagedMomentImpl: ServerEndpoint[Any, Future] =
         updateImagedMoment
@@ -513,7 +528,7 @@ class ImagedMomentEndpoints(controller: ImagedMomentController)(using
         .description(
             "Recalculate recorded timestamps for a given video reference UUID using a new start time and the imagedmoments elapsed time"
         )
-        .tag("imagedmoments")
+        .tag(tag)
 
     val updateRecordedTimestampsForVideoReferenceImpl: ServerEndpoint[Any, Future] =
         updateRecordedTimestampsForVideoReference
@@ -538,7 +553,7 @@ class ImagedMomentEndpoints(controller: ImagedMomentController)(using
         .description(
             "Recalculate recorded timestamps for a given video reference UUID using a new start time and the imagedmoments elapsed time. Annotations need observation_uuid and recorded_timestamp fields. This is not an atomic operation"
         )
-        .tag("imagedmoments")
+        .tag(tag)
 
     val updateRecordedTimestampForObservationUuidImpl: ServerEndpoint[Any, Future] =
         updateRecordedTimestampForObservationUuid
@@ -563,11 +578,11 @@ class ImagedMomentEndpoints(controller: ImagedMomentController)(using
     // DEELTE /:uuid
     val deleteImagedMoment: Endpoint[Option[String], UUID, ErrorMsg, Unit, Any] = secureEndpoint
         .delete
-        .in(base / path[UUID]("uuid"))
+        .in(base / path[UUID]("imagedMomentUuid"))
         .out(statusCode(StatusCode.NoContent).and(emptyOutput))
         .name("deleteImagedMoment")
         .description("Delete an imaged moment")
-        .tag("imagedmoments")
+        .tag(tag)
 
     val deleteImagedMomentImpl: ServerEndpoint[Any, Future] =
         deleteImagedMoment
@@ -581,60 +596,62 @@ class ImagedMomentEndpoints(controller: ImagedMomentController)(using
             }
 
     override def all: List[Endpoint[_, _, _, _, _]] = List(
-        findAllImagedMoments,
-        countAllImagedMoments,
-        findImagedMomentsWithImages,
-        countImagedMomentsWithImages,
-        countImagesForVideoReference,
-        findImagedMomentsByLinkName,
-        countImagedMomentsByLinkName,
-        findImagedMomentByUUID,
-        findImagedMomentsByConceptName,
-        findImagedMomentsByConceptNameWithImages,
         countImagedMomentsByConceptName,
         countImagedMomentsByConceptNameWithImages,
-        findImagedMomentsBetweenModifiedDates,
-        countImagedMomentsBetweenModifiedDates,
+        findImagedMomentsByConceptNameWithImages,
+        findImagedMomentsByConceptName,
+        countImagedMomentsByLinkName,
+        countImagesForVideoReference,
+        countImagedMomentsWithImages,
+        countAllImagedMoments,
         countsPerVideoReference,
-        findAllVideoReferenceUUIDs,
-        findByVideoReferenceUuid,
-        countModifiedBeforeDate,
+        findImagedMomentsByLinkName,
+        findImagedMomentsWithImages,
         findByImageReferenceUUID,
-        findByObservationUUID,
-        updateImagedMoment,
+        countImagedMomentsBetweenModifiedDates,
+        findImagedMomentsBetweenModifiedDates,
         updateRecordedTimestampsForVideoReference,
+        findByObservationUUID,
         updateRecordedTimestampForObservationUuid,
-        deleteImagedMoment,
+        countModifiedBeforeDate,
         deleteByVideoReferenceUUID,
-        findImagedMomentsByWindowRequest
+        findByVideoReferenceUuid,
+        findAllVideoReferenceUUIDs,
+        findImagedMomentsByWindowRequest,
+        findImagedMomentByUUID,
+        updateImagedMoment,
+        deleteImagedMoment,
+        findAllImagedMoments
     )
 
     override def allImpl: List[ServerEndpoint[Any, Future]] = List(
-        findAllImagedMomentsImpl,
-        countAllImagedMomentsImpl,
-        findImagedMomentsWithImagesImpl,
-        countImagedMomentsWithImagesImpl,
-        countImagesForVideoReferenceImpl,
-        findImagedMomentsByLinkNameImpl,
-        countImagedMomentsByLinkNameImpl,
-        findImagedMomentByUUIDImpl,
-        findImagedMomentsByConceptNameImpl,
-        findImagedMomentsByConceptNameWithImagesImpl,
+
         countImagedMomentsByConceptNameImpl,
         countImagedMomentsByConceptNameWithImagesImpl,
-        findImagedMomentsBetweenModifiedDatesImpl,
-        countImagedMomentsBetweenModifiedDatesImpl,
+        findImagedMomentsByConceptNameWithImagesImpl,
+        findImagedMomentsByConceptNameImpl,
+        countImagedMomentsByLinkNameImpl,
+        countImagesForVideoReferenceImpl,
+        countImagedMomentsWithImagesImpl,
+        countAllImagedMomentsImpl,
         countsPerVideoReferenceImpl,
-        findAllVideoReferenceUUIDsImpl,
-        findByVideoReferenceUuidImpl,
-        countModifiedBeforeDateImpl,
+        findImagedMomentsByLinkNameImpl,
+        findImagedMomentsWithImagesImpl,
         findByImageReferenceUUIDImpl,
-        findByObservationUUIDImpl,
-        updateImagedMomentImpl,
+        countsPerVideoReferenceImpl,
+        countImagedMomentsBetweenModifiedDatesImpl,
+        findImagedMomentsBetweenModifiedDatesImpl,
         updateRecordedTimestampsForVideoReferenceImpl,
+        findByObservationUUIDImpl,
         updateRecordedTimestampForObservationUuidImpl,
-        deleteImagedMomentImpl,
+        countModifiedBeforeDateImpl,
         deleteByVideoReferenceUUIDImpl,
-        findImagedMomentsByWindowRequestImpl
+        findByVideoReferenceUuidImpl,
+        findAllVideoReferenceUUIDsImpl,
+        findImagedMomentsByWindowRequestImpl,
+        findImagedMomentByUUIDImpl,
+        updateImagedMomentImpl,
+        deleteImagedMomentImpl,
+        findAllImagedMomentsImpl
     )
 }

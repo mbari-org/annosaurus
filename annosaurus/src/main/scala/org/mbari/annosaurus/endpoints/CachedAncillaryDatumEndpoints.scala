@@ -36,14 +36,16 @@ class CachedAncillaryDatumEndpoints(controller: CachedAncillaryDatumController)(
 ) extends Endpoints {
 
     private val base = "ancillarydata"
+    private val tag = "Ancillary Data"
+    
     // GET /:uuid
     val findDataByUuid: Endpoint[Unit, UUID, ErrorMsg, CachedAncillaryDatumSC, Any] = openEndpoint
         .get
-        .in(base / path[UUID]("uuid"))
+        .in(base / path[UUID]("ancillaryDataUuid"))
         .out(jsonBody[CachedAncillaryDatumSC])
         .name("findDataByUuid")
         .description("Find ancillary data by UUID")
-        .tag("Ancillary Data")
+        .tag(tag)
 
     val findDataByUuidImpl: ServerEndpoint[Any, Future] =
         findDataByUuid
@@ -59,7 +61,7 @@ class CachedAncillaryDatumEndpoints(controller: CachedAncillaryDatumController)(
         .out(jsonBody[Seq[CachedAncillaryDatumSC]])
         .name("findDataByVideoReferenceUuid")
         .description("Find ancillary data by video reference UUID")
-        .tag("Ancillary Data")
+        .tag(tag)
 
     val findDataByVideoReferenceUuidImpl: ServerEndpoint[Any, Future] =
         findDataByVideoReferenceUuid
@@ -75,7 +77,7 @@ class CachedAncillaryDatumEndpoints(controller: CachedAncillaryDatumController)(
             .out(jsonBody[CachedAncillaryDatumSC])
             .name("findDataByImagedMomentUuid")
             .description("Find ancillary data by imaged moment UUID")
-            .tag("Ancillary Data")
+            .tag(tag)
 
     val findDataByImagedMomentUuidImpl: ServerEndpoint[Any, Future] =
         findDataByImagedMomentUuid
@@ -91,7 +93,7 @@ class CachedAncillaryDatumEndpoints(controller: CachedAncillaryDatumController)(
             .out(jsonBody[CachedAncillaryDatumSC])
             .name("findDataByObservationUuid")
             .description("Find ancillary data by observation UUID")
-            .tag("Ancillary Data")
+            .tag(tag)
 
     val findDataByObservationUuidImpl: ServerEndpoint[Any, Future] =
         findDataByObservationUuid
@@ -109,7 +111,7 @@ class CachedAncillaryDatumEndpoints(controller: CachedAncillaryDatumController)(
             .out(jsonBody[CachedAncillaryDatumSC])
             .name("createOneDatum")
             .description("Create one ancillary data")
-            .tag("Ancillary Data")
+            .tag(tag)
 
     val createOneDatumImpl: ServerEndpoint[Any, Future] =
         createOneDatum
@@ -132,7 +134,7 @@ class CachedAncillaryDatumEndpoints(controller: CachedAncillaryDatumController)(
         .out(jsonBody[Seq[CachedAncillaryDatumSC]])
         .name("createOrUpdateManyData")
         .description("Create many ancillary data")
-        .tag("Ancillary Data")
+        .tag(tag)
 
     val createOrUpdateManyDataImpl: ServerEndpoint[Any, Future] =
         createOrUpdateManyData
@@ -157,7 +159,7 @@ class CachedAncillaryDatumEndpoints(controller: CachedAncillaryDatumController)(
         .out(jsonBody[Seq[CachedAncillaryDatumSC]])
         .name("mergeManyData")
         .description("Merge one ancillary data")
-        .tag("Ancillary Data")
+        .tag(tag)
 
     val mergeManyDataImpl: ServerEndpoint[Any, Future] =
         mergeManyData
@@ -177,12 +179,12 @@ class CachedAncillaryDatumEndpoints(controller: CachedAncillaryDatumController)(
         String
     ], (UUID, CachedAncillaryDatumSC), ErrorMsg, CachedAncillaryDatumSC, Any] = secureEndpoint
         .put
-        .in(base / path[UUID]("uuid"))
+        .in(base / path[UUID]("ancillaryDataUuid"))
         .in(oneOfBody(jsonBody[CachedAncillaryDatumSC], formBody[CachedAncillaryDatumSC]))
         .out(jsonBody[CachedAncillaryDatumSC])
         .name("updateOneDatum")
         .description("Update one ancillary data")
-        .tag("Ancillary Data")
+        .tag(tag)
 
     val updateOneDatumImpl: ServerEndpoint[Any, Future] =
         updateOneDatum
@@ -203,7 +205,7 @@ class CachedAncillaryDatumEndpoints(controller: CachedAncillaryDatumController)(
         .out(jsonBody[CountForVideoReferenceSC])
         .name("deleteDataByVideoReferenceUuid")
         .description("Delete ancillary data by video reference UUID")
-        .tag("Ancillary Data")
+        .tag(tag)
 
     val deleteDataByVideoReferenceUuidImpl: ServerEndpoint[Any, Future] =
         deleteDataByVideoReferenceUuid
@@ -217,26 +219,26 @@ class CachedAncillaryDatumEndpoints(controller: CachedAncillaryDatumController)(
             }
 
     override def all: List[Endpoint[_, _, _, _, _]] = List(
-        findDataByUuid,
-        findDataByVideoReferenceUuid,
-        findDataByImagedMomentUuid,
-        findDataByObservationUuid,
-        createOneDatum,
         createOrUpdateManyData,
+        findDataByImagedMomentUuid,
         mergeManyData,
+        findDataByObservationUuid,
+        findDataByVideoReferenceUuid,
+        deleteDataByVideoReferenceUuid,
+        findDataByUuid,
         updateOneDatum,
-        deleteDataByVideoReferenceUuid
+        createOneDatum
     )
 
     override def allImpl: List[ServerEndpoint[Any, Future]] = List(
-        findDataByUuidImpl,
-        findDataByVideoReferenceUuidImpl,
-        findDataByImagedMomentUuidImpl,
-        findDataByObservationUuidImpl,
-        createOneDatumImpl,
         createOrUpdateManyDataImpl,
+        findDataByImagedMomentUuidImpl,
         mergeManyDataImpl,
+        findDataByObservationUuidImpl,
+        findDataByVideoReferenceUuidImpl,
+        deleteDataByVideoReferenceUuidImpl,
+        findDataByUuidImpl,
         updateOneDatumImpl,
-        deleteDataByVideoReferenceUuidImpl
+        createOneDatumImpl
     )
 }

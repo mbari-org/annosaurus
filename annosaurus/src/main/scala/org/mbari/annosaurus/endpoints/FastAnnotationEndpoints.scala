@@ -45,6 +45,7 @@ class FastAnnotationEndpoints(jdbcRepository: JdbcRepository)(using
 ) extends Endpoints {
     
     private val base = "fast"
+    private val tag = "Fast Annotation Queries"
 
     // GET / limit offset
     val findAllAnnotations
@@ -57,6 +58,7 @@ class FastAnnotationEndpoints(jdbcRepository: JdbcRepository)(using
             .out(jsonBody[Seq[AnnotationSC]])
             .name("findAllAnnotations")
             .description("Find all annotations")
+            .tag(tag)
 
     val findAllAnnotationsImpl: ServerEndpoint[Any, Future] = findAllAnnotations
         .serverLogic { (paging, data) =>
@@ -72,12 +74,13 @@ class FastAnnotationEndpoints(jdbcRepository: JdbcRepository)(using
     // POST / queryconstranints json
     val findAnnotationsByQueryConstraints =
         openEndpoint
-            .get
+            .post
             .in(base)
             .in(jsonBody[QueryConstraintsSC])
             .out(jsonBody[QueryConstraintsResponseSC[Seq[AnnotationSC]]])
             .name("findAnnotationsByQueryConstraints")
             .description("Find annotations by query constraints")
+            .tag(tag)
 
     val findAnnotationsByQueryConstraintsImpl: ServerEndpoint[Any, Future] =
         findAnnotationsByQueryConstraints
@@ -98,11 +101,12 @@ class FastAnnotationEndpoints(jdbcRepository: JdbcRepository)(using
             GeographicRangeSC
         ], Any] =
         openEndpoint
-            .get
+            .post
             .in(base / "georange")
             .in(jsonBody[QueryConstraintsSC])
             .out(jsonBody[QueryConstraintsResponseSC[GeographicRangeSC]])
             .description("Find annotations by query constraints")
+            .tag(tag)
 
     val findGeoRangeByQueryConstraintsImpl: ServerEndpoint[Any, Future] =
         findGeoRangeByQueryConstraints
@@ -121,12 +125,13 @@ class FastAnnotationEndpoints(jdbcRepository: JdbcRepository)(using
     val countAnnotationsByQueryConstraints
         : Endpoint[Unit, QueryConstraintsSC, ErrorMsg, QueryConstraintsResponseSC[Count], Any] =
         openEndpoint
-            .get
+            .post
             .in(base / "count")
             .in(jsonBody[QueryConstraintsSC])
             .out(jsonBody[QueryConstraintsResponseSC[Count]])
             .name("countAnnotationsByQueryConstraints")
             .description("Count annotations by query constraints")
+            .tag(tag)
 
     val countAnnotationsByQueryConstraintsImpl: ServerEndpoint[Any, Future] =
         countAnnotationsByQueryConstraints
@@ -148,6 +153,7 @@ class FastAnnotationEndpoints(jdbcRepository: JdbcRepository)(using
             .out(jsonBody[Count])
             .name("countAllAnnotations")
             .description("Count all annotations")
+            .tag(tag)
 
     val countAllAnnotationsImpl: ServerEndpoint[Any, Future] = countAllAnnotations
         .serverLogic { _ =>
@@ -162,12 +168,13 @@ class FastAnnotationEndpoints(jdbcRepository: JdbcRepository)(using
     // GET /videoreference/:uuid
     val findAnnotationsByVideoReferenceUuid = openEndpoint
         .get
-        .in(base / "videoreference" / path[UUID]("uuid"))
+        .in(base / "videoreference" / path[UUID]("videoReferenceUuid"))
         .in(paging)
         .in(query[Option[Boolean]]("data"))
         .out(jsonBody[Seq[AnnotationSC]])
         .name("findAnnotationsByVideoReferenceUuid")
         .description("Find annotations by video reference UUID")
+        .tag(tag)
 
     val findAnnotationsByVideoReferenceUuidImpl: ServerEndpoint[Any, Future] =
         findAnnotationsByVideoReferenceUuid
@@ -190,11 +197,12 @@ class FastAnnotationEndpoints(jdbcRepository: JdbcRepository)(using
     val findImagesByVideoReferenceUuid
         : Endpoint[Unit, (UUID, Paging), ErrorMsg, Seq[ImageSC], Any] = openEndpoint
         .get
-        .in(base / "images" / "videoreference" / path[UUID]("uuid"))
+        .in(base / "images" / "videoreference" / path[UUID]("videoReferenceUuid"))
         .in(paging)
         .out(jsonBody[Seq[ImageSC]])
         .name("findImagesByVideoReferenceUuid")
         .description("Find annotations with images by video reference UUID")
+        .tag(tag)
 
     val findImagesByVideoReferenceUuidImpl: ServerEndpoint[Any, Future] =
         findImagesByVideoReferenceUuid
@@ -211,10 +219,11 @@ class FastAnnotationEndpoints(jdbcRepository: JdbcRepository)(using
     // GET /images/count/videoreference/:uuid/
     val countImagesByVideoReferenceUuid: Endpoint[Unit, UUID, ErrorMsg, Count, Any] = openEndpoint
         .get
-        .in(base / "images" / "count" / "videoreference" / path[UUID]("uuid"))
+        .in(base / "images" / "count" / "videoreference" / path[UUID]("videoReferenceUuid"))
         .out(jsonBody[Count])
         .name("countImagesByVideoReferenceUuid")
         .description("Count annotations with images by video reference UUID")
+        .tag(tag)
 
     val countImagesByVideoReferenceUuidImpl: ServerEndpoint[Any, Future] =
         countImagesByVideoReferenceUuid
@@ -238,6 +247,7 @@ class FastAnnotationEndpoints(jdbcRepository: JdbcRepository)(using
             .out(jsonBody[Seq[AnnotationSC]])
             .name("findAnnotationsByConcept")
             .description("Find annotations by concept")
+            .tag(tag)
 
     val findAnnotationsByConceptImpl: ServerEndpoint[Any, Future] = findAnnotationsByConcept
         .serverLogic { (concept, paging, data) =>
@@ -261,6 +271,7 @@ class FastAnnotationEndpoints(jdbcRepository: JdbcRepository)(using
             .out(jsonBody[Seq[AnnotationSC]])
             .name("findAnnotationsWithImagesByConcept")
             .description("Find annotations with images by concept")
+            .tag(tag)
 
     val findAnnotationsWithImagesByConceptImpl: ServerEndpoint[Any, Future] =
         findAnnotationsWithImagesByConcept
@@ -290,6 +301,7 @@ class FastAnnotationEndpoints(jdbcRepository: JdbcRepository)(using
             .out(jsonBody[Seq[AnnotationSC]])
             .name("findAnnotationsWithImagesByToConcept")
             .description("Find annotations with images by to concept")
+            .tag(tag)
 
     val findAnnotationsWithImagesByToConceptImpl: ServerEndpoint[Any, Future] =
         findAnnotationsWithImagesByToConcept
@@ -317,6 +329,7 @@ class FastAnnotationEndpoints(jdbcRepository: JdbcRepository)(using
             .out(jsonBody[Seq[UUID]])
             .name("findImageMomentUuidsByConcept")
             .description("Find image moment UUIDs by concept")
+            .tag(tag)
 
     val findImagedMomentUuidsByConceptImpl: ServerEndpoint[Any, Future] =
         findImageMomentUuidsByConcept
@@ -344,6 +357,7 @@ class FastAnnotationEndpoints(jdbcRepository: JdbcRepository)(using
             .out(jsonBody[Seq[UUID]])
             .name("findImagedMomentUuidsByToConcept")
             .description("Find image moment UUIDs by to concept")
+            .tag(tag)
 
     val findImagedMomentUuidsByToConceptImpl: ServerEndpoint[Any, Future] =
         findImagedMomentUuidsByToConcept
@@ -369,6 +383,7 @@ class FastAnnotationEndpoints(jdbcRepository: JdbcRepository)(using
             .in(query[Option[Boolean]]("data"))
             .name("findAnnotationsByLinkNameAndLinkValue")
             .description("Find annotations by link name and link value")
+            .tag(tag)
 
     val findAnnotationsByLinkNameAndLinkValueImpl: ServerEndpoint[Any, Future] =
         findAnnotationsByLinkNameAndLinkValue
@@ -386,10 +401,11 @@ class FastAnnotationEndpoints(jdbcRepository: JdbcRepository)(using
     val deleteAnnotationsByVideoReferenceUuid: Endpoint[Unit, UUID, ErrorMsg, DeleteCountSC, Any] =
         openEndpoint
             .delete
-            .in(base / "videoreference" / path[UUID]("uuid"))
+            .in(base / "videoreference" / path[UUID]("videoReferenceUuid"))
             .out(jsonBody[DeleteCountSC])
             .name("deleteAnnotationsByVideoReferenceUuid")
             .description("Delete annotations by video reference UUID")
+            .tag(tag)
 
     val deleteAnnotationsByVideoReferenceUuidImpl: ServerEndpoint[Any, Future] =
         deleteAnnotationsByVideoReferenceUuid
@@ -405,7 +421,7 @@ class FastAnnotationEndpoints(jdbcRepository: JdbcRepository)(using
     // POST /concurrent limit offset concurrentrequest json
     val findAnnotationsByConcurrentRequest =
         openEndpoint
-            .get
+            .post
             .in(base / "concurrent")
             .in(paging)
             .in(query[Option[Boolean]]("data"))
@@ -413,6 +429,7 @@ class FastAnnotationEndpoints(jdbcRepository: JdbcRepository)(using
             .out(jsonBody[Seq[AnnotationSC]])
             .name("findAnnotationsByConcurrentRequest")
             .description("Find annotations by concurrent request")
+            .tag(tag)
 
     val findAnnotationsByConcurrentRequestImpl: ServerEndpoint[Any, Future] =
         findAnnotationsByConcurrentRequest
@@ -437,7 +454,7 @@ class FastAnnotationEndpoints(jdbcRepository: JdbcRepository)(using
             AnnotationSC
         ], Any] =
         openEndpoint
-            .get
+            .post
             .in(base / "multi")
             .in(paging)
             .in(query[Option[Boolean]]("data"))
@@ -445,6 +462,7 @@ class FastAnnotationEndpoints(jdbcRepository: JdbcRepository)(using
             .out(jsonBody[Seq[AnnotationSC]])
             .name("findAnnotationsByMultiRequest")
             .description("Find annotations by multi request")
+            .tag(tag)
 
     val findAnnotationsByMultiRequestImpl: ServerEndpoint[Any, Future] =
         findAnnotationsByMultiRequest
@@ -464,42 +482,42 @@ class FastAnnotationEndpoints(jdbcRepository: JdbcRepository)(using
             }
 
     override def all: List[Endpoint[_, _, _, _, _]] = List(
-        findAllAnnotations,
-        findAnnotationsByQueryConstraints,
-        findGeoRangeByQueryConstraints,
+        findAnnotationsWithImagesByConcept,
+        findAnnotationsByConcept,
+        findAnnotationsByConcurrentRequest,
         countAnnotationsByQueryConstraints,
         countAllAnnotations,
-        findAnnotationsByVideoReferenceUuid,
-        findImagesByVideoReferenceUuid,
-        countImagesByVideoReferenceUuid,
-        findAnnotationsByConcept,
-        findAnnotationsWithImagesByConcept,
-        findAnnotationsWithImagesByToConcept,
+        findAnnotationsByLinkNameAndLinkValue,
+        findGeoRangeByQueryConstraints,
         findImageMomentUuidsByConcept,
         findImagedMomentUuidsByToConcept,
-        findAnnotationsByLinkNameAndLinkValue,
+        countImagesByVideoReferenceUuid,
+        findImagesByVideoReferenceUuid,
+        findAnnotationsByMultiRequest,
+        findAnnotationsWithImagesByToConcept,
+        findAnnotationsByVideoReferenceUuid,
         deleteAnnotationsByVideoReferenceUuid,
-        findAnnotationsByConcurrentRequest,
-        findAnnotationsByMultiRequest
+        findAnnotationsByQueryConstraints,
+        findAllAnnotations,
     )
 
     override def allImpl: List[ServerEndpoint[Any, Future]] = List(
-        findAllAnnotationsImpl,
-        findAnnotationsByQueryConstraintsImpl,
-        findGeoRangeByQueryConstraintsImpl,
+        findAnnotationsWithImagesByConceptImpl,
+        findAnnotationsByConceptImpl,
+        findAnnotationsByConcurrentRequestImpl,
         countAnnotationsByQueryConstraintsImpl,
         countAllAnnotationsImpl,
-        findAnnotationsByVideoReferenceUuidImpl,
-        findImagesByVideoReferenceUuidImpl,
-        countImagesByVideoReferenceUuidImpl,
-        findAnnotationsByConceptImpl,
-        findAnnotationsWithImagesByConceptImpl,
-        findAnnotationsWithImagesByToConceptImpl,
+        findAnnotationsByLinkNameAndLinkValueImpl,
+        findGeoRangeByQueryConstraintsImpl,
         findImagedMomentUuidsByConceptImpl,
         findImagedMomentUuidsByToConceptImpl,
-        findAnnotationsByLinkNameAndLinkValueImpl,
+        countImagesByVideoReferenceUuidImpl,
+        findImagesByVideoReferenceUuidImpl,
+        findAnnotationsByMultiRequestImpl,
+        findAnnotationsWithImagesByToConceptImpl,
+        findAnnotationsByVideoReferenceUuidImpl,
         deleteAnnotationsByVideoReferenceUuidImpl,
-        findAnnotationsByConcurrentRequestImpl,
-        findAnnotationsByMultiRequestImpl
+        findAllAnnotationsImpl,
+        findAnnotationsByQueryConstraintsImpl,
     )
 }

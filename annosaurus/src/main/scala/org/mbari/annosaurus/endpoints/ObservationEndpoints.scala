@@ -44,16 +44,17 @@ class ObservationEndpoints(controller: ObservationController)(using
 ) extends Endpoints {
     
     private val base = "observations"
+    private val tag = "Observations"
 
     // GET /:uuid
     val findObservationByUuid: Endpoint[Unit, UUID, ErrorMsg, ObservationSC, Any] =
         openEndpoint
             .get
-            .in(base / path[UUID]("uuid"))
+            .in(base / path[UUID]("observationUuid"))
             .out(jsonBody[ObservationSC])
             .name("findObservationByUuid")
             .description("Find an observation by its UUID")
-            .tag("observations")
+            .tag(tag)
 
     val findObservationByUuidImpl: ServerEndpoint[Any, Future] =
         findObservationByUuid
@@ -71,7 +72,7 @@ class ObservationEndpoints(controller: ObservationController)(using
             .out(jsonBody[Seq[ObservationSC]])
             .name("findObservationsByVideoReferenceUuid")
             .description("Find observations by video reference UUID")
-            .tag("observations")
+            .tag(tag)
 
     val findObservationsByVideoReferenceUuidImpl: ServerEndpoint[Any, Future] =
         findObservationsByVideoReferenceUuid
@@ -91,7 +92,7 @@ class ObservationEndpoints(controller: ObservationController)(using
             .out(jsonBody[Seq[String]])
             .name("findActivities")
             .description("List all activities found in the database")
-            .tag("observations")
+            .tag(tag)
 
     val findActivitiesImpl: ServerEndpoint[Any, Future] =
         findActivities
@@ -107,7 +108,7 @@ class ObservationEndpoints(controller: ObservationController)(using
             .out(jsonBody[ObservationSC])
             .name("findObservationByAssociationUuid")
             .description("Find an observation by one of its association UUIDs")
-            .tag("observations")
+            .tag(tag)
 
     val findObservationByAssociationUuidImpl: ServerEndpoint[Any, Future] =
         findObservationByAssociationUuid
@@ -123,7 +124,7 @@ class ObservationEndpoints(controller: ObservationController)(using
             .out(jsonBody[Seq[String]])
             .name("findAllConcepts")
             .description("List all concepts found in the database")
-            .tag("observations")
+            .tag(tag)
 
     val findAllConceptsImpl: ServerEndpoint[Any, Future] =
         findAllConcepts
@@ -139,7 +140,7 @@ class ObservationEndpoints(controller: ObservationController)(using
             .out(jsonBody[Seq[String]])
             .name("findConceptsByVideoReferenceUuid")
             .description("List all concepts used to annotation in a given video reference UUID")
-            .tag("observations")
+            .tag(tag)
 
     val findConceptsByVideoReferenceUuidImpl: ServerEndpoint[Any, Future] =
         findConceptsByVideoReferenceUuid
@@ -155,7 +156,7 @@ class ObservationEndpoints(controller: ObservationController)(using
             .out(jsonBody[ConceptCount])
             .name("countObservationsByConcept")
             .description("Count the number of observations for a given concept")
-            .tag("observations")
+            .tag(tag)
 
     val countObservationsByConceptImpl: ServerEndpoint[Any, Future] =
         countObservationsByConcept
@@ -171,7 +172,7 @@ class ObservationEndpoints(controller: ObservationController)(using
             .out(jsonBody[ConceptCount])
             .name("countImagesByConcept")
             .description("Count the number of observations with images for a given concept")
-            .tag("observations")
+            .tag(tag)
 
     val countImagesByConceptImpl: ServerEndpoint[Any, Future] =
         countImagesByConcept
@@ -189,7 +190,7 @@ class ObservationEndpoints(controller: ObservationController)(using
             .out(jsonBody[Seq[String]])
             .name("findGroups")
             .description("List all groups found in the database")
-            .tag("observations")
+            .tag(tag)
 
     val findGroupsImpl: ServerEndpoint[Any, Future] =
         findGroups
@@ -227,7 +228,7 @@ class ObservationEndpoints(controller: ObservationController)(using
             .description(
                 "Count the number of observations for a given video reference UUID. If start and end query params are provided, then the count will be limited to observations between those timestamps"
             )
-            .tag("observations")
+            .tag(tag)
 
     val countByVideoReferenceUuidImpl: ServerEndpoint[Any, Future] =
         countByVideoReferenceUuid
@@ -250,7 +251,7 @@ class ObservationEndpoints(controller: ObservationController)(using
             .out(jsonBody[Seq[CountForVideoReferenceSC]])
             .name("countAllGroupByVideoReferenceUuid")
             .description("Count the number of observations for all video reference UUIDs")
-            .tag("observations")
+            .tag(tag)
 
     val countAllGroupByVideoReferenceUuidImpl: ServerEndpoint[Any, Future] =
         countAllGroupByVideoReferenceUuid
@@ -272,7 +273,7 @@ class ObservationEndpoints(controller: ObservationController)(using
             .out(jsonBody[RenameCountSC])
             .name("renameConcept")
             .description("Rename a concept in all observations")
-            .tag("observations")
+            .tag(tag)
 
     val renameConceptImpl: ServerEndpoint[Any, Future] =
         renameConcept
@@ -290,14 +291,14 @@ class ObservationEndpoints(controller: ObservationController)(using
         : Endpoint[Option[String], (UUID, ObservationUpdateSC), ErrorMsg, ObservationSC, Any] =
         secureEndpoint
             .put
-            .in(base / path[UUID]("uuid"))
+            .in(base / path[UUID]("observationUuid"))
             .in(oneOfBody(jsonBody[ObservationUpdateSC], formBody[ObservationUpdateSC]))
             .out(jsonBody[ObservationSC])
             .name("updateOneObservation")
             .description(
                 "Update an observation. If the observation timestamp is not provided, then it will be set to the current time"
             )
-            .tag("observations")
+            .tag(tag)
 
     val updateOneObservationImpl: ServerEndpoint[Any, Future] =
         updateOneObservation
@@ -324,11 +325,11 @@ class ObservationEndpoints(controller: ObservationController)(using
     val deleteDuration: Endpoint[Option[String], UUID, ErrorMsg, ObservationSC, Any] =
         secureEndpoint
             .put
-            .in(base / "delete" / "duration" / path[UUID]("uuid"))
+            .in(base / "delete" / "duration" / path[UUID]("observationUuid"))
             .out(jsonBody[ObservationSC])
             .name("deleteDuration")
             .description("Delete the duration of an observation")
-            .tag("observations")
+            .tag(tag)
 
     val deleteDurationImpl: ServerEndpoint[Any, Future] =
         deleteDuration
@@ -340,11 +341,11 @@ class ObservationEndpoints(controller: ObservationController)(using
     // DELETE /:uuid
     val deleteOneObservation: Endpoint[Option[String], UUID, ErrorMsg, Unit, Any] = secureEndpoint
         .delete
-        .in(base / path[UUID]("uuid"))
+        .in(base / path[UUID]("observationUuid"))
         .out(statusCode(StatusCode.NoContent).and(emptyOutput))
         .name("deleteOneObservation")
         .description("Delete an observation")
-        .tag("observations")
+        .tag(tag)
 
     val deleteOneObservationImpl: ServerEndpoint[Any, Future] =
         deleteOneObservation
@@ -356,38 +357,38 @@ class ObservationEndpoints(controller: ObservationController)(using
     // POST /delete with json body
 
     override def all: List[Endpoint[_, _, _, _, _]] = List(
-        findObservationByUuid,
-        findObservationsByVideoReferenceUuid,
-        findObservationByAssociationUuid,
         findActivities,
-        findAllConcepts,
-        findConceptsByVideoReferenceUuid,
+        findObservationByAssociationUuid,
         countObservationsByConcept,
         countImagesByConcept,
-        findGroups,
-        countByVideoReferenceUuid,
-        countAllGroupByVideoReferenceUuid,
         renameConcept,
-        updateOneObservation,
+        findConceptsByVideoReferenceUuid,
+        findAllConcepts,
+        countAllGroupByVideoReferenceUuid,
         deleteDuration,
+        countByVideoReferenceUuid,
+        findObservationsByVideoReferenceUuid,
+        findGroups,
+        findObservationByUuid,
+        updateOneObservation,
         deleteOneObservation
     )
 
     override def allImpl: List[ServerEndpoint[Any, Future]] = List(
-        findObservationByUuidImpl,
-        findObservationsByVideoReferenceUuidImpl,
-        findObservationByAssociationUuidImpl,
         findActivitiesImpl,
-        findAllConceptsImpl,
-        findConceptsByVideoReferenceUuidImpl,
+        findObservationByAssociationUuidImpl,
         countObservationsByConceptImpl,
         countImagesByConceptImpl,
-        findGroupsImpl,
-        countByVideoReferenceUuidImpl,
-        countAllGroupByVideoReferenceUuidImpl,
         renameConceptImpl,
-        updateOneObservationImpl,
+        findConceptsByVideoReferenceUuidImpl,
+        findAllConceptsImpl,
+        countAllGroupByVideoReferenceUuidImpl,
         deleteDurationImpl,
+        countByVideoReferenceUuidImpl,
+        findObservationsByVideoReferenceUuidImpl,
+        findGroupsImpl,
+        findObservationByUuidImpl,
+        updateOneObservationImpl,
         deleteOneObservationImpl
     )
 }
