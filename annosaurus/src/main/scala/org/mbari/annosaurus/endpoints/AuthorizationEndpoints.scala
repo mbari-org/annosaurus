@@ -38,7 +38,7 @@ class AuthorizationEndpoints()(using ec: ExecutionContext, jwtService: JwtServic
     private val log = System.getLogger(getClass().getName())
 
     val authEndpoint: Endpoint[String, Unit, ErrorMsg, Authorization, Any] =
-        endpoint
+        baseEndpoint
             .post
             .in(base)
             .securityIn(header[String]("APIKEY"))

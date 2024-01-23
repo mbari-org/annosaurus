@@ -62,11 +62,11 @@ object Main:
         val server = vertx.createHttpServer()
         val router = Router.router(vertx)
 
-        // Log all requests
+        // NOTE: Don't add a handler. It will intercept all requests (Originally: Log all requests)
 //        router.route()
 //            .handler(ctx => log.atInfo.log(s"${ctx.request().method()} ${ctx.request().path()}"))
 
-        val interpreter = VertxFutureServerInterpreter()
+        val interpreter = VertxFutureServerInterpreter(serverOptions)
 
         Endpoints
             .all
@@ -76,7 +76,8 @@ object Main:
                     .apply(router)  // attaches to vertx router
             )
 
-        router.getRoutes().forEach(r => log.atInfo.log(s"Route: ${r}"))
+        router.getRoutes()
+            .forEach(r => log.atInfo.log(f"Adding route: ${r.methods()}%8s ${r.getPath}%s"))
 
         val program = for
             binding <- server.requestHandler(router).listen(port).asScala

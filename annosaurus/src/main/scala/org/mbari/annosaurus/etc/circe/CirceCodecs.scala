@@ -291,7 +291,10 @@ object CirceCodecs {
     given videoInfoUpdateScEncoder: Encoder[CachedVideoReferenceInfoUpdateSC] = deriveEncoder
     given videoInfoUpdateScDecoder: Decoder[CachedVideoReferenceInfoUpdateSC] = deriveDecoder
 
-    private val printer = Printer.noSpaces.copy(dropNullValues = true)
+    private val printer = Printer(
+        dropNullValues = true,
+        indent = ""
+    )
 
 //    @deprecated("Use stringify[T: Encoder] instead", "2021-11-23T11:00:00")
 //    def print[T: Encoder](t: T): String = printer.print(t.asJson)
