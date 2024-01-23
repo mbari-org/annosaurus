@@ -17,9 +17,7 @@
 package org.mbari.annosaurus.endpoints
 
 import scala.concurrent.ExecutionContext
-import org.mbari.annosaurus.etc.sdk.Futures.join
 import sttp.client3.*
-import sttp.client3.circe.*
 import sttp.client3.SttpBackend
 import sttp.client3.testing.SttpBackendStub
 import sttp.model.StatusCode
@@ -31,7 +29,6 @@ import sttp.tapir.server.interceptor.exception.ExceptionHandler
 import sttp.tapir.server.model.ValuedEndpointOutput
 import sttp.tapir.server.interceptor.CustomiseInterceptors
 import sttp.tapir.server.vertx.VertxFutureServerOptions
-import org.mbari.annosaurus.domain.HealthStatus
 
 class HealthEndpointsSuite extends munit.FunSuite:
     given ExecutionContext = ExecutionContext.global
@@ -50,7 +47,6 @@ class HealthEndpointsSuite extends munit.FunSuite:
         )
 
         val customOptions: CustomiseInterceptors[Future, VertxFutureServerOptions] =
-            import scala.concurrent.ExecutionContext.Implicits.global
             VertxFutureServerOptions
                 .customiseInterceptors
                 .exceptionHandler(exceptionHandler)

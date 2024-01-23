@@ -17,7 +17,8 @@
 package org.mbari.annosaurus.messaging
 
 import io.reactivex.rxjava3.subjects.{PublishSubject, Subject}
-import org.slf4j.LoggerFactory
+
+import java.lang.System.Logger.Level
 
 /** This is the shared message bus. All publishers whould listen to this bus and publish the
   * appropriate events to their subscribers.
@@ -26,13 +27,13 @@ import org.slf4j.LoggerFactory
   */
 object MessageBus {
 
-    private lazy val log = LoggerFactory.getLogger(getClass)
+    private lazy val log = System.getLogger(getClass.getName)
 
     val RxSubject: Subject[Any] =
         PublishSubject.create[Any]().toSerialized
 
-    if (log.isDebugEnabled()) {
-        RxSubject.subscribe(m => log.debug(m.toString))
+    if (log.isLoggable(Level.TRACE)) {
+        RxSubject.subscribe(m => log.log(Level.TRACE, m.toString))
     }
 
 }

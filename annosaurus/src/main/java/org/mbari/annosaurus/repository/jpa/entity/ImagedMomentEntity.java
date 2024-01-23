@@ -255,7 +255,7 @@ public class ImagedMomentEntity implements IPersistentObject {
 
     /** Optimistic lock to prevent concurrent overwrites */
     @Version
-    @Column(name = "last_updated_time")
+    @Column(name = "last_updated_timestamp")
     protected Timestamp lastUpdatedTime;
 
     @Column(name = "elapsed_time_millis", nullable = true)

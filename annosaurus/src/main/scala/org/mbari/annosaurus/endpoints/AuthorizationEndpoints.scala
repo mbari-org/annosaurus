@@ -32,13 +32,15 @@ import org.mbari.annosaurus.domain.{BadRequest, ErrorMsg, NotFound, ServerError,
 
 class AuthorizationEndpoints()(using ec: ExecutionContext, jwtService: JwtService)
     extends Endpoints:
+    
+    private val base = "auth"
 
     private val log = System.getLogger(getClass().getName())
 
     val authEndpoint: Endpoint[String, Unit, ErrorMsg, Authorization, Any] =
         endpoint
             .post
-            .in("v1" / "auth")
+            .in(base)
             .securityIn(header[String]("APIKEY"))
             .out(jsonBody[Authorization])
             .errorOut(

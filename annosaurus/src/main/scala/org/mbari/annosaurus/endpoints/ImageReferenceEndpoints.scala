@@ -34,11 +34,13 @@ class ImageReferenceEndpoints(controller: ImageReferenceController)(using
     val executor: ExecutionContext,
     jwtService: JwtService
 ) extends Endpoints {
+    
+    private val base = "imagereferences"
 
     val deleteImageByUuid: Endpoint[Option[String], UUID, ErrorMsg, Unit, Any] =
         secureEndpoint
             .delete
-            .in("v1" / "imagereferences" / path[UUID]("uuid"))
+            .in(base / path[UUID]("uuid"))
             .out(statusCode(StatusCode.NoContent).and(emptyOutput))
             .name("deleteImageByUuid")
             .description("Delete an image reference by its UUID")
@@ -57,7 +59,7 @@ class ImageReferenceEndpoints(controller: ImageReferenceController)(using
     val findImageByUuid: Endpoint[Unit, UUID, ErrorMsg, ImageReferenceSC, Any] =
         openEndpoint
             .get
-            .in("v1" / "imagereferences" / path[UUID]("uuid"))
+            .in(base / path[UUID]("uuid"))
             .out(jsonBody[ImageReferenceSC])
             .tag("ImageReference")
 
@@ -74,7 +76,7 @@ class ImageReferenceEndpoints(controller: ImageReferenceController)(using
         : Endpoint[Option[String], (UUID, ImageReferenceSC), ErrorMsg, ImageReferenceSC, Any] =
         secureEndpoint
             .put
-            .in("v1" / "imagereferences" / path[UUID]("uuid"))
+            .in(base / path[UUID]("uuid"))
             .in(oneOfBody(jsonBody[ImageReferenceSC], formBody[ImageReferenceSC]))
             .out(jsonBody[ImageReferenceSC])
             .name("updateImageReferenceByUuid")

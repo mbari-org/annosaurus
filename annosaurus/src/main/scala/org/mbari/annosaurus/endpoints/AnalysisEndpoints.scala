@@ -42,12 +42,14 @@ import scala.concurrent.Future
 class AnalysisEndpoints(repository: AnalysisRepository)(implicit val executor: ExecutionContext)
     extends Endpoints {
 
+    private val base = "histogram"
+
     val depthHistogram
         : Endpoint[Unit, (Option[Int], QueryConstraintsSC), ErrorMsg, QueryConstraintsResponseSC[
             DepthHistogramSC
         ], Any] = openEndpoint
         .post
-        .in("v1" / "histogram" / "depth")
+        .in(base / "depth")
         .in(query[Option[Int]]("size").description("Bin size in meters"))
         .in(jsonBody[QueryConstraintsSC].description("Query constraints"))
         .out(
@@ -68,7 +70,7 @@ class AnalysisEndpoints(repository: AnalysisRepository)(implicit val executor: E
             TimeHistogramSC
         ], Any] = openEndpoint
         .post
-        .in("v1" / "histogram" / "time")
+        .in(base / "time")
         .in(query[Option[Int]]("size").description("Bin size in days").default(Some(50)))
         .in(jsonBody[QueryConstraintsSC].description("Query constraints"))
         .out(jsonBody[QueryConstraintsResponseSC[TimeHistogramSC]].description("Histogram of time"))

@@ -129,7 +129,11 @@ trait Endpoints:
                 log.atError.withCause(exception).log("Error")
                 Success(Left(ServerError(exception.getMessage)))
 
-    val secureEndpoint: Endpoint[Option[String], Unit, ErrorMsg, Unit, Any] = endpoint
+
+    // hard coded ATM, but could be configurable
+    val baseEndpoint: Endpoint[Unit, Unit, Unit, Unit, Any] = endpoint.in("v1")
+
+    val secureEndpoint: Endpoint[Option[String], Unit, ErrorMsg, Unit, Any] = baseEndpoint
         .securityIn(auth.bearer[Option[String]](WWWAuthenticateChallenge.bearer))
         .errorOut(
             oneOf[ErrorMsg](
@@ -145,7 +149,7 @@ trait Endpoints:
             .and(query[Option[Int]]("limit"))
             .mapTo[Paging]
 
-    val openEndpoint: Endpoint[Unit, Unit, ErrorMsg, Unit, Any] = endpoint.errorOut(
+    val openEndpoint: Endpoint[Unit, Unit, ErrorMsg, Unit, Any] = baseEndpoint.errorOut(
         oneOf[ErrorMsg](
             oneOfVariant(statusCode(StatusCode.BadRequest).and(jsonBody[BadRequest])),
             oneOfVariant(statusCode(StatusCode.NotFound).and(jsonBody[NotFound])),

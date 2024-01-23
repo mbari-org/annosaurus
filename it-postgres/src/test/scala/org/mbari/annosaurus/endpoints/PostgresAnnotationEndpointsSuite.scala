@@ -14,18 +14,8 @@
  * limitations under the License.
  */
 
-package org.mbari.annosaurus.api
+package org.mbari.annosaurus.endpoints
 
-import org.mbari.annosaurus.repository.jpa.BaseDAOSuite
-import org.scalatra.test.{EmbeddedJettyContainer, HttpComponentsClient}
-
-trait WebSuite extends BaseDAOSuite with EmbeddedJettyContainer with HttpComponentsClient {
-    override def beforeAll(): Unit = {
-        start()
-    }
-
-    override def afterAll(): Unit = {
-        stop()
-    }
+class PostgresAnnotationEndpointsSuite {
 
 }

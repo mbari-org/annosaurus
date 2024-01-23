@@ -34,6 +34,8 @@ class IndexEndpoints(controller: IndexController)(using
     val executor: ExecutionContext,
     jwtService: JwtService
 ) extends Endpoints {
+    
+    private val base = "index"
 
     private val toEntity = Index.from(_: IndexEntity, false) // curried function
 
@@ -41,7 +43,7 @@ class IndexEndpoints(controller: IndexController)(using
         openEndpoint
             .get
             .in(paging)
-            .in("v1" / "index" / "videoreference" / path[UUID]("uuid"))
+            .in(base / "videoreference" / path[UUID]("uuid"))
             .out(jsonBody[List[IndexSC]].description("The IndexEntity objects"))
             .tag("Index")
 
@@ -56,7 +58,7 @@ class IndexEndpoints(controller: IndexController)(using
     val bulkUpdateRecordedTimestamps
         : Endpoint[Option[String], List[Index], ErrorMsg, List[IndexSC], Any] = secureEndpoint
         .put
-        .in("v1" / "index" / "tapetime")
+        .in(base / "tapetime")
         .in(jsonBody[List[Index]].description("The IndexEntity objects"))
         .out(jsonBody[List[IndexSC]].description("The IndexEntity objects"))
         .tag("Index")

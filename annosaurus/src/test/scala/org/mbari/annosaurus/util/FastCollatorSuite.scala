@@ -14,12 +14,24 @@
  * limitations under the License.
  */
 
-package org.mbari.annosaurus
+package org.mbari.annosaurus.util
 
-case class HttpConfig(
-    port: Int,
-    stopTimeout: Int,
-    connectorIdleTimeout: Int,
-    webapp: String,
-    contextPath: String
-)
+class FastCollatorSuite extends munit.FunSuite {
+
+    test("collate") {
+        //outside -2, outside -1, inside - 2, inside -1, match, inside + 1, inside + 2, outside + 1, outside + 2
+        val a = Seq(8d, 9d, 13d, 14d, 15d, 16d, 17d, 21d, 22d)
+        val b = Seq(10d, 15d, 20d)
+
+        val f = FastCollator(a, b, 1d)
+
+        val expected =
+            Seq(None, Some(10d), None, Some(15.0), Some(15.0), Some(15.0), None, Some(20d), None)
+        for (i <- f.indices) {
+            val (_, actual) = f(i)
+            assertEquals(actual, expected(i))
+        }
+    }
+
+
+}

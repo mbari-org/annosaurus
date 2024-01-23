@@ -16,13 +16,10 @@
 
 package org.mbari.annosaurus
 
-import org.scalatest.matchers.should.Matchers
-import org.scalatest.flatspec.AnyFlatSpec
+class SanityCheck extends munit.FunSuite {
 
-class SanityCheck extends AnyFlatSpec with Matchers {
-
-  it should "be sane" in {
-    true should be(true)
-  }
+    test("testing framework is ok") {
+        assertEquals(1, 1)
+    }
   
 }

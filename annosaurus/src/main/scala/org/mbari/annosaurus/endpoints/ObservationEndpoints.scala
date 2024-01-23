@@ -42,12 +42,14 @@ class ObservationEndpoints(controller: ObservationController)(using
     ec: ExecutionContext,
     jwtService: JwtService
 ) extends Endpoints {
+    
+    private val base = "observations"
 
     // GET /:uuid
     val findObservationByUuid: Endpoint[Unit, UUID, ErrorMsg, ObservationSC, Any] =
         openEndpoint
             .get
-            .in("v1" / "observations" / path[UUID]("uuid"))
+            .in(base / path[UUID]("uuid"))
             .out(jsonBody[ObservationSC])
             .name("findObservationByUuid")
             .description("Find an observation by its UUID")
@@ -64,7 +66,7 @@ class ObservationEndpoints(controller: ObservationController)(using
         : Endpoint[Unit, (UUID, Paging), ErrorMsg, Seq[ObservationSC], Any] =
         openEndpoint
             .get
-            .in("v1" / "observations" / "videoreference" / path[UUID]("videoReferenceUuid"))
+            .in(base / "videoreference" / path[UUID]("videoReferenceUuid"))
             .in(paging)
             .out(jsonBody[Seq[ObservationSC]])
             .name("findObservationsByVideoReferenceUuid")
@@ -85,7 +87,7 @@ class ObservationEndpoints(controller: ObservationController)(using
     val findActivities: Endpoint[Unit, Unit, ErrorMsg, Seq[String], Any] =
         openEndpoint
             .get
-            .in("v1" / "observations" / "activities")
+            .in(base / "activities")
             .out(jsonBody[Seq[String]])
             .name("findActivities")
             .description("List all activities found in the database")
@@ -101,7 +103,7 @@ class ObservationEndpoints(controller: ObservationController)(using
     val findObservationByAssociationUuid: Endpoint[Unit, UUID, ErrorMsg, ObservationSC, Any] =
         openEndpoint
             .get
-            .in("v1" / "observations" / "association" / path[UUID]("associationUuid"))
+            .in(base / "association" / path[UUID]("associationUuid"))
             .out(jsonBody[ObservationSC])
             .name("findObservationByAssociationUuid")
             .description("Find an observation by one of its association UUIDs")
@@ -117,7 +119,7 @@ class ObservationEndpoints(controller: ObservationController)(using
     val findAllConcepts: Endpoint[Unit, Unit, ErrorMsg, Seq[String], Any] =
         openEndpoint
             .get
-            .in("v1" / "observations" / "concepts")
+            .in(base / "concepts")
             .out(jsonBody[Seq[String]])
             .name("findAllConcepts")
             .description("List all concepts found in the database")
@@ -133,7 +135,7 @@ class ObservationEndpoints(controller: ObservationController)(using
     val findConceptsByVideoReferenceUuid: Endpoint[Unit, UUID, ErrorMsg, Seq[String], Any] =
         openEndpoint
             .get
-            .in("v1" / "observations" / "concepts" / path[UUID]("videoReferenceUuid"))
+            .in(base / "concepts" / path[UUID]("videoReferenceUuid"))
             .out(jsonBody[Seq[String]])
             .name("findConceptsByVideoReferenceUuid")
             .description("List all concepts used to annotation in a given video reference UUID")
@@ -149,7 +151,7 @@ class ObservationEndpoints(controller: ObservationController)(using
     val countObservationsByConcept: Endpoint[Unit, String, ErrorMsg, ConceptCount, Any] =
         openEndpoint
             .get
-            .in("v1" / "observations" / "concept" / "count" / path[String]("concept"))
+            .in(base / "concept" / "count" / path[String]("concept"))
             .out(jsonBody[ConceptCount])
             .name("countObservationsByConcept")
             .description("Count the number of observations for a given concept")
@@ -165,7 +167,7 @@ class ObservationEndpoints(controller: ObservationController)(using
     val countImagesByConcept: Endpoint[Unit, String, ErrorMsg, ConceptCount, Any] =
         openEndpoint
             .get
-            .in("v1" / "observations" / "concept" / "images" / "count" / path[String]("concept"))
+            .in(base / "concept" / "images" / "count" / path[String]("concept"))
             .out(jsonBody[ConceptCount])
             .name("countImagesByConcept")
             .description("Count the number of observations with images for a given concept")
@@ -183,7 +185,7 @@ class ObservationEndpoints(controller: ObservationController)(using
     val findGroups: Endpoint[Unit, Unit, ErrorMsg, Seq[String], Any] =
         openEndpoint
             .get
-            .in("v1" / "observations" / "groups")
+            .in(base / "groups")
             .out(jsonBody[Seq[String]])
             .name("findGroups")
             .description("List all groups found in the database")
@@ -206,7 +208,7 @@ class ObservationEndpoints(controller: ObservationController)(using
         openEndpoint
             .get
             .in(
-                "v1" / "observations" / "videoreference" / "count" / path[UUID](
+                base / "videoreference" / "count" / path[UUID](
                     "videoReferenceUuid"
                 )
             )
@@ -244,7 +246,7 @@ class ObservationEndpoints(controller: ObservationController)(using
         : Endpoint[Unit, Unit, ErrorMsg, Seq[CountForVideoReferenceSC], Any] =
         openEndpoint
             .get
-            .in("v1" / "observations" / "counts")
+            .in(base / "counts")
             .out(jsonBody[Seq[CountForVideoReferenceSC]])
             .name("countAllGroupByVideoReferenceUuid")
             .description("Count the number of observations for all video reference UUIDs")
@@ -264,7 +266,7 @@ class ObservationEndpoints(controller: ObservationController)(using
     val renameConcept: Endpoint[Option[String], (String, String), ErrorMsg, RenameCountSC, Any] =
         secureEndpoint
             .put
-            .in("v1" / "observations" / "concept" / "rename")
+            .in(base / "concept" / "rename")
             .in(query[String]("old").description("The old concept name"))
             .in(query[String]("new").description("The new concept name"))
             .out(jsonBody[RenameCountSC])
@@ -288,7 +290,7 @@ class ObservationEndpoints(controller: ObservationController)(using
         : Endpoint[Option[String], (UUID, ObservationUpdateSC), ErrorMsg, ObservationSC, Any] =
         secureEndpoint
             .put
-            .in("v1" / "observations" / path[UUID]("uuid"))
+            .in(base / path[UUID]("uuid"))
             .in(oneOfBody(jsonBody[ObservationUpdateSC], formBody[ObservationUpdateSC]))
             .out(jsonBody[ObservationSC])
             .name("updateOneObservation")
@@ -322,7 +324,7 @@ class ObservationEndpoints(controller: ObservationController)(using
     val deleteDuration: Endpoint[Option[String], UUID, ErrorMsg, ObservationSC, Any] =
         secureEndpoint
             .put
-            .in("v1" / "observations" / "delete" / "duration" / path[UUID]("uuid"))
+            .in(base / "delete" / "duration" / path[UUID]("uuid"))
             .out(jsonBody[ObservationSC])
             .name("deleteDuration")
             .description("Delete the duration of an observation")
@@ -338,7 +340,7 @@ class ObservationEndpoints(controller: ObservationController)(using
     // DELETE /:uuid
     val deleteOneObservation: Endpoint[Option[String], UUID, ErrorMsg, Unit, Any] = secureEndpoint
         .delete
-        .in("v1" / "observations" / path[UUID]("uuid"))
+        .in(base / path[UUID]("uuid"))
         .out(statusCode(StatusCode.NoContent).and(emptyOutput))
         .name("deleteOneObservation")
         .description("Delete an observation")

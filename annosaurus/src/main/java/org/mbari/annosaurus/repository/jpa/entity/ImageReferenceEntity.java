@@ -94,7 +94,7 @@ public class ImageReferenceEntity implements IPersistentObject {
 
     /** Optimistic lock to prevent concurrent overwrites */
     @Version
-    @Column(name = "last_updated_time")
+    @Column(name = "last_updated_timestamp")
     protected Timestamp lastUpdatedTime;
 
     @Column(name = "description", length = 256, nullable = true)

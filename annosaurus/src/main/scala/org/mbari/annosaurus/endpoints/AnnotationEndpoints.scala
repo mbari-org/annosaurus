@@ -39,12 +39,14 @@ class AnnotationEndpoints(controller: AnnotationController)(using
     ec: ExecutionContext,
     jwtService: JwtService
 ) extends Endpoints {
+    
+    private val base = "annotations" 
 
 //    GET /: uuid
     val findAnnotationByUuid: Endpoint[Unit, UUID, ErrorMsg, AnnotationSC, Any] =
         openEndpoint
             .get
-            .in("v1" / "annotations" / path[UUID]("uuid"))
+            .in(base / path[UUID]("uuid"))
 //            .in(oneOfBody(jsonBody[AnnotationSC], formBody[AnnotationSC]))
             .out(jsonBody[AnnotationSC])
             .name("findAnnotationByUuid")
@@ -60,7 +62,7 @@ class AnnotationEndpoints(controller: AnnotationController)(using
     val findAnnotationByImageReferenceUuid: Endpoint[Unit, UUID, ErrorMsg, Seq[AnnotationSC], Any] =
         openEndpoint
             .get
-            .in("v1" / "annotations" / "imagereference" / path[UUID]("uuid"))
+            .in(base / "imagereference" / path[UUID]("uuid"))
             .out(jsonBody[Seq[AnnotationSC]])
             .name("findAnnotationByImageReferenceUuid")
             .description("Find an annotation by its image reference UUID")
@@ -78,7 +80,7 @@ class AnnotationEndpoints(controller: AnnotationController)(using
         : Endpoint[Unit, (UUID, Paging), ErrorMsg, Seq[AnnotationSC], Any] =
         openEndpoint
             .get
-            .in("v1" / "annotations" / "videoreference" / path[UUID]("uuid"))
+            .in(base / "videoreference" / path[UUID]("uuid"))
             .in(paging)
             .out(jsonBody[Seq[AnnotationSC]])
             .name("findAnnotationsByVideoReferenceUuid")
@@ -103,7 +105,7 @@ class AnnotationEndpoints(controller: AnnotationController)(using
         : Endpoint[Option[String], AnnotationCreateSC, ErrorMsg, AnnotationSC, Any] =
         secureEndpoint
             .post
-            .in("v1" / "annotations")
+            .in(base)
             .in(oneOfBody(jsonBody[AnnotationCreateSC], formBody[AnnotationCreateSC]))
             .out(jsonBody[AnnotationSC])
             .name("createAnnotation")
@@ -127,7 +129,7 @@ class AnnotationEndpoints(controller: AnnotationController)(using
         : Endpoint[Option[String], Seq[Annotation], ErrorMsg, Seq[AnnotationSC], Any] =
         secureEndpoint
             .post
-            .in("v1" / "annotations" / "bulk")
+            .in(base / "bulk")
             .in(jsonBody[Seq[Annotation]])
             .out(jsonBody[Seq[AnnotationSC]])
             .name("bulkCreateAnnotations")
@@ -146,7 +148,7 @@ class AnnotationEndpoints(controller: AnnotationController)(using
 //    val findConcurrentAnnotations =
 //        openEndpoint
 //            .post
-//            .in("v1" / "annotations" / "concurrent")
+//            .in(base / "concurrent")
 //            .in(jsonBody[ConcurrentRequest])
 //            .out(jsonBody[Seq[AnnotationSC]])
 //            .name("findConcurrentAnnotations")
@@ -163,7 +165,7 @@ class AnnotationEndpoints(controller: AnnotationController)(using
     val countByConcurrentRequest =
         openEndpoint
             .post
-            .in("v1" / "annotations" / "concurrent" / "count")
+            .in(base / "concurrent" / "count")
             .in(jsonBody[ConcurrentRequest])
             .out(jsonBody[Long])
             .name("countConcurrentAnnotations")
@@ -181,7 +183,7 @@ class AnnotationEndpoints(controller: AnnotationController)(using
 //    val findMultiAnnotations =
 //        openEndpoint
 //            .post
-//            .in("v1" / "annotations" / "multi")
+//            .in(base / "multi")
 //            .in(jsonBody[Seq[AnnotationSC]])
 //            .out(jsonBody[Seq[AnnotationSC]])
 //            .name("findMultiAnnotations")
@@ -198,7 +200,7 @@ class AnnotationEndpoints(controller: AnnotationController)(using
     val countByMultiRequest: Endpoint[Unit, MultiRequest, ErrorMsg, Long, Any] =
         openEndpoint
             .post
-            .in("v1" / "annotations" / "multi" / "count")
+            .in(base / "multi" / "count")
             .in(jsonBody[MultiRequest])
             .out(jsonBody[Long])
             .name("countMultiAnnotations")
@@ -216,7 +218,7 @@ class AnnotationEndpoints(controller: AnnotationController)(using
         : Endpoint[Option[String], (UUID, AnnotationCreateSC), ErrorMsg, AnnotationSC, Any] =
         secureEndpoint
             .put
-            .in("v1" / "annotations" / path[UUID]("uuid"))
+            .in(base / path[UUID]("uuid"))
             .in(oneOfBody(jsonBody[AnnotationCreateSC], formBody[AnnotationCreateSC]))
             .out(jsonBody[AnnotationSC])
             .name("updateAnnotation")
@@ -235,7 +237,7 @@ class AnnotationEndpoints(controller: AnnotationController)(using
         : Endpoint[Option[String], Seq[Annotation], ErrorMsg, Seq[AnnotationSC], Any] =
         secureEndpoint
             .put
-            .in("v1" / "annotations" / "bulk")
+            .in(base / "bulk")
             .in(jsonBody[Seq[Annotation]])
             .out(jsonBody[Seq[AnnotationSC]])
             .name("bulkUpdateAnnotations")

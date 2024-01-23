@@ -72,13 +72,11 @@ class AnnotationSuite extends munit.FunSuite {
 
     test("toEntities") {
         val e1 = Annotation.toEntities(Seq(cc1, cc1), true)
-        print(e1)
         assertEquals(e1.size, 1)
         assertEquals(e1.head.getObservations.size(), 1)
 
         val cc2 = cc1.copy(observationUuid = Some(UUID.randomUUID()))
         val e2 = Annotation.toEntities(Seq(cc1, cc2), true)
-        println(e1)
         assertEquals(e2.size, 1)
         assertEquals(e2.head.getObservations.size(), 2)
 
@@ -90,7 +88,6 @@ class AnnotationSuite extends munit.FunSuite {
         assertEquals(e3.head.getObservations.size(), 1)
         assertEquals(e3.head.getObservations.iterator().next().getUuid, cc3.observationUuid.orNull)
         assertEquals(e3.last.getObservations.size(), 2)
-        println(cc3.stringify)
     }
 
 

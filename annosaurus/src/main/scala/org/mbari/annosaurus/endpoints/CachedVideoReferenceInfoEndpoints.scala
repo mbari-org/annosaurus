@@ -42,11 +42,12 @@ class CachedVideoReferenceInfoEndpoints(controller: CachedVideoReferenceInfoCont
 ) extends Endpoints {
 
     private val tag = "Video Information"
+    private val base = "videoreferences"
 
     val findAll: Endpoint[Unit, Paging, ErrorMsg, Seq[CachedVideoReferenceInfoSC], Any] =
         openEndpoint
             .get
-            .in("v1" / "videoreferences")
+            .in(base)
             .in(paging)
             .out(jsonBody[Seq[CachedVideoReferenceInfoSC]])
             .name("findAll")
@@ -65,7 +66,7 @@ class CachedVideoReferenceInfoEndpoints(controller: CachedVideoReferenceInfoCont
     val findAllVideoReferenceUuids: Endpoint[Unit, Unit, ErrorMsg, Seq[UUID], Any] =
         openEndpoint
             .get
-            .in("v1" / "videoreferences" / "videoreferences")
+            .in(base / "videoreferences")
             .out(jsonBody[Seq[UUID]])
             .name("findAllVideoReferenceUuids")
             .description("Find all video reference UUIDs")
@@ -81,7 +82,7 @@ class CachedVideoReferenceInfoEndpoints(controller: CachedVideoReferenceInfoCont
     val findByUuid: Endpoint[Unit, UUID, ErrorMsg, CachedVideoReferenceInfoSC, Any] =
         openEndpoint
             .get
-            .in("v1" / "videoreferences" / path[UUID]("uuid"))
+            .in(base / path[UUID]("uuid"))
             .out(jsonBody[CachedVideoReferenceInfoSC])
             .name("findByUuid")
             .description("Find a video reference by UUID")
@@ -97,7 +98,7 @@ class CachedVideoReferenceInfoEndpoints(controller: CachedVideoReferenceInfoCont
     val findByVideoReferenceUuid: Endpoint[Unit, UUID, ErrorMsg, CachedVideoReferenceInfoSC, Any] =
         openEndpoint
             .get
-            .in("v1" / "videoreferences" / "videoreference" / path[UUID]("uuid"))
+            .in(base / "videoreference" / path[UUID]("uuid"))
             .out(jsonBody[CachedVideoReferenceInfoSC])
             .name("findByVideoReferenceUuid")
             .description("Find a video reference by a video reference UUID")
@@ -113,7 +114,7 @@ class CachedVideoReferenceInfoEndpoints(controller: CachedVideoReferenceInfoCont
     val findAllMissionIds: Endpoint[Unit, Unit, ErrorMsg, Seq[String], Any] =
         openEndpoint
             .get
-            .in("v1" / "videoreferences" / "missionids")
+            .in(base / "missionids")
             .out(jsonBody[Seq[String]])
             .name("findAllMissionIds")
             .description("Find all mission IDs")
@@ -129,7 +130,7 @@ class CachedVideoReferenceInfoEndpoints(controller: CachedVideoReferenceInfoCont
     val findByMissionId: Endpoint[Unit, String, ErrorMsg, Seq[CachedVideoReferenceInfoSC], Any] =
         openEndpoint
             .get
-            .in("v1" / "videoreferences" / "missionid" / path[String]("missionid"))
+            .in(base / "missionid" / path[String]("missionid"))
             .out(jsonBody[Seq[CachedVideoReferenceInfoSC]])
             .name("findByMissionId")
             .description("Find video references by mission ID")
@@ -145,7 +146,7 @@ class CachedVideoReferenceInfoEndpoints(controller: CachedVideoReferenceInfoCont
     val findAllMissionContacts: Endpoint[Unit, Unit, ErrorMsg, Seq[String], Any] =
         openEndpoint
             .get
-            .in("v1" / "videoreferences" / "missioncontacts")
+            .in(base / "missioncontacts")
             .out(jsonBody[Seq[String]])
             .name("findAllMissionContacts")
             .description("Find all mission contacts")
@@ -162,7 +163,7 @@ class CachedVideoReferenceInfoEndpoints(controller: CachedVideoReferenceInfoCont
         : Endpoint[Unit, String, ErrorMsg, Seq[CachedVideoReferenceInfoSC], Any] =
         openEndpoint
             .get
-            .in("v1" / "videoreferences" / "missioncontact" / path[String]("missioncontact"))
+            .in(base / "missioncontact" / path[String]("missioncontact"))
             .out(jsonBody[Seq[CachedVideoReferenceInfoSC]])
             .name("findByMissionContact")
             .description("Find video references by mission contact")
@@ -182,7 +183,7 @@ class CachedVideoReferenceInfoEndpoints(controller: CachedVideoReferenceInfoCont
     ], CachedVideoReferenceInfoCreateSC, ErrorMsg, CachedVideoReferenceInfoSC, Any] =
         secureEndpoint
             .post
-            .in("v1" / "videoreferences")
+            .in(base)
             .in(
                 oneOfBody(
                     jsonBody[CachedVideoReferenceInfoCreateSC],
@@ -216,7 +217,7 @@ class CachedVideoReferenceInfoEndpoints(controller: CachedVideoReferenceInfoCont
     ], (UUID, CachedVideoReferenceInfoUpdateSC), ErrorMsg, CachedVideoReferenceInfoSC, Any] =
         secureEndpoint
             .put
-            .in("v1" / "videoreferences" / path[UUID]("uuid"))
+            .in(base / path[UUID]("uuid"))
             .in(
                 oneOfBody(
                     jsonBody[CachedVideoReferenceInfoUpdateSC],
@@ -249,7 +250,7 @@ class CachedVideoReferenceInfoEndpoints(controller: CachedVideoReferenceInfoCont
     val deleteOneVideoReferenceInfo: Endpoint[Option[String], UUID, ErrorMsg, Unit, Any] =
         secureEndpoint
             .delete
-            .in("v1" / "videoreferences" / path[UUID]("uuid"))
+            .in(base / path[UUID]("uuid"))
             .out(statusCode(StatusCode.NoContent).and(emptyOutput))
             .name("deleteOneVideoReferenceInfo")
             .description("Delete a video reference")

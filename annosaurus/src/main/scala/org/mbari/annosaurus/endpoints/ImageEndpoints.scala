@@ -36,12 +36,15 @@ class ImageEndpoints(controller: ImageController)(using
     ec: ExecutionContext,
     jwtService: JwtService
 ) extends Endpoints {
+    
+    
+    private val base = "image"
 
     // GET /:uuid
     val findOneImage =
         openEndpoint
             .get
-            .in("v1" / "image" / path[UUID]("uuid"))
+            .in(base / path[UUID]("uuid"))
             .out(jsonBody[ImageSC])
             .description("Find an image by its UUID")
             .name("findOneImage")
@@ -56,7 +59,7 @@ class ImageEndpoints(controller: ImageController)(using
     val findByVideoReferenceUUID =
         openEndpoint
             .get
-            .in("v1" / "image" / "videoreference" / path[UUID]("uuid"))
+            .in(base / "videoreference" / path[UUID]("uuid"))
             .out(jsonBody[Seq[ImageSC]])
             .description("Find images by video reference UUID")
             .name("findByVideoReferenceUUID")
@@ -71,7 +74,7 @@ class ImageEndpoints(controller: ImageController)(using
     val findByImageName =
         openEndpoint
             .get
-            .in("v1" / "image" / "name" / path[String]("name"))
+            .in(base / "name" / path[String]("name"))
             .out(jsonBody[Seq[ImageSC]])
             .description("Find images by the image file's name")
             .name("findByImageName")
@@ -86,7 +89,7 @@ class ImageEndpoints(controller: ImageController)(using
     val findByImageUrl =
         openEndpoint
             .get
-            .in("v1" / "image" / "url" / path[URL]("url"))
+            .in(base / "url" / path[URL]("url"))
             .out(jsonBody[ImageSC])
             .description("Find images by the image file's URL")
             .name("findByImageUrl")
@@ -101,7 +104,7 @@ class ImageEndpoints(controller: ImageController)(using
     val createOneImage =
         secureEndpoint
             .post
-            .in("v1" / "image")
+            .in(base)
             .in(oneOfBody(jsonBody[ImageCreateSC], formBody[ImageCreateSC]))
             .out(jsonBody[ImageSC])
             .description("Create a new image")
@@ -134,7 +137,7 @@ class ImageEndpoints(controller: ImageController)(using
     val updateOneImage: Endpoint[Option[String], (UUID, ImageUpdateSC), ErrorMsg, ImageSC, Any] =
         secureEndpoint
             .put
-            .in("v1" / "image" / path[UUID]("uuid"))
+            .in(base / path[UUID]("uuid"))
             .in(oneOfBody(jsonBody[ImageUpdateSC], formBody[ImageUpdateSC]))
             .out(jsonBody[ImageSC])
             .description("Update an image")

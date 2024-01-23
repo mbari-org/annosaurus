@@ -43,13 +43,15 @@ class FastAnnotationEndpoints(jdbcRepository: JdbcRepository)(using
     ec: ExecutionContext,
     jwtService: JwtService
 ) extends Endpoints {
+    
+    private val base = "fast"
 
     // GET / limit offset
     val findAllAnnotations
         : Endpoint[Unit, (Paging, Option[Boolean]), ErrorMsg, Seq[AnnotationSC], Any] =
         openEndpoint
             .get
-            .in("v1" / "fast")
+            .in(base)
             .in(paging)
             .in(query[Option[Boolean]]("data"))
             .out(jsonBody[Seq[AnnotationSC]])
@@ -71,7 +73,7 @@ class FastAnnotationEndpoints(jdbcRepository: JdbcRepository)(using
     val findAnnotationsByQueryConstraints =
         openEndpoint
             .get
-            .in("v1" / "fast")
+            .in(base)
             .in(jsonBody[QueryConstraintsSC])
             .out(jsonBody[QueryConstraintsResponseSC[Seq[AnnotationSC]]])
             .name("findAnnotationsByQueryConstraints")
@@ -97,7 +99,7 @@ class FastAnnotationEndpoints(jdbcRepository: JdbcRepository)(using
         ], Any] =
         openEndpoint
             .get
-            .in("v1" / "fast" / "georange")
+            .in(base / "georange")
             .in(jsonBody[QueryConstraintsSC])
             .out(jsonBody[QueryConstraintsResponseSC[GeographicRangeSC]])
             .description("Find annotations by query constraints")
@@ -120,7 +122,7 @@ class FastAnnotationEndpoints(jdbcRepository: JdbcRepository)(using
         : Endpoint[Unit, QueryConstraintsSC, ErrorMsg, QueryConstraintsResponseSC[Count], Any] =
         openEndpoint
             .get
-            .in("v1" / "fast" / "count")
+            .in(base / "count")
             .in(jsonBody[QueryConstraintsSC])
             .out(jsonBody[QueryConstraintsResponseSC[Count]])
             .name("countAnnotationsByQueryConstraints")
@@ -142,7 +144,7 @@ class FastAnnotationEndpoints(jdbcRepository: JdbcRepository)(using
     val countAllAnnotations: Endpoint[Unit, Unit, ErrorMsg, Count, Any] =
         openEndpoint
             .get
-            .in("v1" / "fast" / "count")
+            .in(base / "count")
             .out(jsonBody[Count])
             .name("countAllAnnotations")
             .description("Count all annotations")
@@ -160,7 +162,7 @@ class FastAnnotationEndpoints(jdbcRepository: JdbcRepository)(using
     // GET /videoreference/:uuid
     val findAnnotationsByVideoReferenceUuid = openEndpoint
         .get
-        .in("v1" / "fast" / "videoreference" / path[UUID]("uuid"))
+        .in(base / "videoreference" / path[UUID]("uuid"))
         .in(paging)
         .in(query[Option[Boolean]]("data"))
         .out(jsonBody[Seq[AnnotationSC]])
@@ -188,7 +190,7 @@ class FastAnnotationEndpoints(jdbcRepository: JdbcRepository)(using
     val findImagesByVideoReferenceUuid
         : Endpoint[Unit, (UUID, Paging), ErrorMsg, Seq[ImageSC], Any] = openEndpoint
         .get
-        .in("v1" / "fast" / "images" / "videoreference" / path[UUID]("uuid"))
+        .in(base / "images" / "videoreference" / path[UUID]("uuid"))
         .in(paging)
         .out(jsonBody[Seq[ImageSC]])
         .name("findImagesByVideoReferenceUuid")
@@ -209,7 +211,7 @@ class FastAnnotationEndpoints(jdbcRepository: JdbcRepository)(using
     // GET /images/count/videoreference/:uuid/
     val countImagesByVideoReferenceUuid: Endpoint[Unit, UUID, ErrorMsg, Count, Any] = openEndpoint
         .get
-        .in("v1" / "fast" / "images" / "count" / "videoreference" / path[UUID]("uuid"))
+        .in(base / "images" / "count" / "videoreference" / path[UUID]("uuid"))
         .out(jsonBody[Count])
         .name("countImagesByVideoReferenceUuid")
         .description("Count annotations with images by video reference UUID")
@@ -230,7 +232,7 @@ class FastAnnotationEndpoints(jdbcRepository: JdbcRepository)(using
         : Endpoint[Unit, (String, Paging, Option[Boolean]), ErrorMsg, Seq[AnnotationSC], Any] =
         openEndpoint
             .get
-            .in("v1" / "fast" / "concept" / path[String]("concept"))
+            .in(base / "concept" / path[String]("concept"))
             .in(paging)
             .in(query[Option[Boolean]]("data"))
             .out(jsonBody[Seq[AnnotationSC]])
@@ -253,7 +255,7 @@ class FastAnnotationEndpoints(jdbcRepository: JdbcRepository)(using
         : Endpoint[Unit, (String, Paging, Option[Boolean]), ErrorMsg, Seq[AnnotationSC], Any] =
         openEndpoint
             .get
-            .in("v1" / "fast" / "concept" / "images" / path[String]("concept"))
+            .in(base / "concept" / "images" / path[String]("concept"))
             .in(paging)
             .in(query[Option[Boolean]]("data"))
             .out(jsonBody[Seq[AnnotationSC]])
@@ -282,7 +284,7 @@ class FastAnnotationEndpoints(jdbcRepository: JdbcRepository)(using
         : Endpoint[Unit, (String, Paging, Option[Boolean]), ErrorMsg, Seq[AnnotationSC], Any] =
         openEndpoint
             .get
-            .in("v1" / "fast" / "toconcept" / "images" / path[String]("toconcept"))
+            .in(base / "toconcept" / "images" / path[String]("toconcept"))
             .in(paging)
             .in(query[Option[Boolean]]("data"))
             .out(jsonBody[Seq[AnnotationSC]])
@@ -310,7 +312,7 @@ class FastAnnotationEndpoints(jdbcRepository: JdbcRepository)(using
     val findImageMomentUuidsByConcept: Endpoint[Unit, (String, Paging), ErrorMsg, Seq[UUID], Any] =
         openEndpoint
             .get
-            .in("v1" / "fast" / "imagedmoments" / "concept" / "images" / path[String]("concept"))
+            .in(base / "imagedmoments" / "concept" / "images" / path[String]("concept"))
             .in(paging)
             .out(jsonBody[Seq[UUID]])
             .name("findImageMomentUuidsByConcept")
@@ -336,7 +338,7 @@ class FastAnnotationEndpoints(jdbcRepository: JdbcRepository)(using
         openEndpoint
             .get
             .in(
-                "v1" / "fast" / "imagedmoments" / "toconcept" / "images" / path[String]("toconcept")
+                base / "imagedmoments" / "toconcept" / "images" / path[String]("toconcept")
             )
             .in(paging)
             .out(jsonBody[Seq[UUID]])
@@ -362,7 +364,7 @@ class FastAnnotationEndpoints(jdbcRepository: JdbcRepository)(using
         : Endpoint[Unit, (String, String, Option[Boolean]), ErrorMsg, Seq[AnnotationSC], Any] =
         openEndpoint
             .get
-            .in("v1" / "fast" / "details" / path[String]("link_name") / path[String]("link_value"))
+            .in(base / "details" / path[String]("link_name") / path[String]("link_value"))
             .out(jsonBody[Seq[AnnotationSC]])
             .in(query[Option[Boolean]]("data"))
             .name("findAnnotationsByLinkNameAndLinkValue")
@@ -384,7 +386,7 @@ class FastAnnotationEndpoints(jdbcRepository: JdbcRepository)(using
     val deleteAnnotationsByVideoReferenceUuid: Endpoint[Unit, UUID, ErrorMsg, DeleteCountSC, Any] =
         openEndpoint
             .delete
-            .in("v1" / "fast" / "videoreference" / path[UUID]("uuid"))
+            .in(base / "videoreference" / path[UUID]("uuid"))
             .out(jsonBody[DeleteCountSC])
             .name("deleteAnnotationsByVideoReferenceUuid")
             .description("Delete annotations by video reference UUID")
@@ -404,7 +406,7 @@ class FastAnnotationEndpoints(jdbcRepository: JdbcRepository)(using
     val findAnnotationsByConcurrentRequest =
         openEndpoint
             .get
-            .in("v1" / "fast" / "concurrent")
+            .in(base / "concurrent")
             .in(paging)
             .in(query[Option[Boolean]]("data"))
             .in(jsonBody[ConcurrentRequestSC])
@@ -436,7 +438,7 @@ class FastAnnotationEndpoints(jdbcRepository: JdbcRepository)(using
         ], Any] =
         openEndpoint
             .get
-            .in("v1" / "fast" / "multi")
+            .in(base / "multi")
             .in(paging)
             .in(query[Option[Boolean]]("data"))
             .in(jsonBody[MultiRequestSC])

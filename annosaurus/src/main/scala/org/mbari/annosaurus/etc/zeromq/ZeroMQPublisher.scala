@@ -21,7 +21,8 @@ import io.reactivex.rxjava3.schedulers.Schedulers
 import io.reactivex.rxjava3.subjects.Subject
 import org.mbari.annosaurus.messaging.{GenericMessage, MessageBus}
 import org.mbari.annosaurus.ZeroMQConfig
-import org.slf4j.LoggerFactory
+import org.mbari.annosaurus.etc.jdk.Logging
+import org.mbari.annosaurus.etc.jdk.Logging.{given, *}
 import org.zeromq.{SocketType, ZContext}
 
 import java.util.concurrent.{LinkedBlockingQueue, TimeUnit}
@@ -41,7 +42,7 @@ class ZeroMQPublisher(val topic: String, val port: Int, val subject: Subject[_])
         .observeOn(Schedulers.io())
         .distinct()
         .subscribe(m => queue.offer(m))
-    private[this] val log                    = LoggerFactory.getLogger(getClass)
+    private val log                    = Logging(getClass)
 
     @volatile
     var ok     = true
@@ -61,7 +62,7 @@ class ZeroMQPublisher(val topic: String, val port: Int, val subject: Subject[_])
                 }
                 catch {
                     case NonFatal(e) =>
-                        log.warn("An exception was thrown in ZeroMQPublishers publish thread", e)
+                        log.atWarn.withCause(e).log("An exception was thrown in ZeroMQPublishers publish thread")
                 }
             }
         },
@@ -80,7 +81,7 @@ class ZeroMQPublisher(val topic: String, val port: Int, val subject: Subject[_])
 
 object ZeroMQPublisher {
 
-    private[this] val log = LoggerFactory.getLogger(getClass)
+    private val log = Logging(getClass)
 
     /** @param opt
       *   The ZeroMQ config infor. The Config parser may not contain info for ZeroMQ. If it doesn't
@@ -104,9 +105,9 @@ object ZeroMQPublisher {
       * @param opt
       */
     def log(opt: Option[ZeroMQPublisher]): Unit = opt match {
-        case None    => log.info("ZeroMQ is not enabled/configured")
+        case None    => log.atInfo.log("ZeroMQ is not enabled/configured")
         case Some(z) =>
-            log.info(
+            log.atInfo.log(
                 s"ZeroMQ is publishing annotations on port ${z.port} using topic '${z.topic}''"
             )
     }

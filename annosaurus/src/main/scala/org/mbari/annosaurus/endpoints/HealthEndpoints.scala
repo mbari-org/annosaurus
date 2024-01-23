@@ -32,7 +32,7 @@ class HealthEndpoints(using ec: ExecutionContext) extends Endpoints:
     val healthEndpoint: Endpoint[Unit, Unit, ErrorMsg, HealthStatus, Any] =
         openEndpoint
             .get
-            .in("v1" / "health")
+            .in("health")
             .out(jsonBody[HealthStatus])
             .name("health")
             .description("Health check")

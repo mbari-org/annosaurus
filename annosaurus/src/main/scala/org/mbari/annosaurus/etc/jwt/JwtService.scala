@@ -22,7 +22,7 @@ import java.time.Instant
 import java.time.temporal.ChronoUnit
 import java.util.Date
 
-class JwtService(issuer: String, apiKey: String, signingSecret: String) {
+case class JwtService(issuer: String, apiKey: String, signingSecret: String) {
 
     private val algorithm = Algorithm.HMAC512(signingSecret)
 

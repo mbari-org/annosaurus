@@ -16,56 +16,18 @@
 
 package org.mbari.annosaurus
 
-import com.typesafe.config.Config
-import org.slf4j.LoggerFactory
+import com.typesafe.config.ConfigFactory
+import org.mbari.annosaurus.etc.jdk.Logging
+import org.mbari.annosaurus.etc.jdk.Logging.{given, *}
+import org.mbari.annosaurus.etc.jwt.JwtService
 
 import scala.util.Try
 import scala.util.control.NonFatal
 
-class AppConfig(config: Config) {
-
-    private[this] val log = LoggerFactory.getLogger(getClass)
-
-    lazy val httpConfig: HttpConfig = {
-        val port                 = config.getInt("http.port")
-        val stopTimeout          = config.getInt("http.stop.timeout")
-        val connectorIdleTimeout = config.getInt("http.connector.idle.timeout")
-        val webapp               = config.getString("http.webapp")
-        val contextPath          = config.getString("http.context.path")
-        HttpConfig(port, stopTimeout, connectorIdleTimeout, webapp, contextPath)
-    }
-
-    lazy val authenticationService: String =
-        Try(config.getString("authentication.service"))
-            .getOrElse("org.mbari.vars.annotation.auth.NoopAuthService")
-
-    lazy val basicJwtConfig: Option[JwtParams] =
-        try {
-            val issuer        = config.getString("basicjwt.issuer")
-            val clientSecret  = config.getString("basicjwt.client.secret")
-            val signingSecret = config.getString("basicjwt.signing.secret")
-            Some(JwtParams(issuer, clientSecret, signingSecret))
-        }
-        catch {
-            case NonFatal(e) => None
-        }
-
-    lazy val zeroMQConfig: Option[ZeroMQConfig] =
-        try {
-            val port   = config.getInt("messaging.zeromq.port")
-            val enable = config.getBoolean("messaging.zeromq.enable")
-            val topic  = config.getString("messaging.zeromq.topic")
-            Some(ZeroMQConfig(port, enable, topic))
-        }
-        catch {
-            case NonFatal(e) =>
-                log.warn("Failed to load ZeroMQ configuration", e)
-                None
-        }
-
-}
-
 object AppConfig {
+
+    private val log = Logging(getClass)
+
     val Name: String = "annosaurus"
 
     val Version: String = {
@@ -74,4 +36,39 @@ object AppConfig {
     }
 
     val Description: String = "Annotation Service"
+
+    private lazy val Config = ConfigFactory.load()
+
+    lazy val DefaultJwtService: JwtService = JwtService(
+        issuer = Config.getString("basicjwt.client.secret"),
+        apiKey = Config.getString("basicjwt.issuer"),
+        signingSecret = Config.getString("basicjwt.signing.secret")
+    )
+
+    lazy val DefaultHttpConfig: HttpConfig = HttpConfig(
+        port = Config.getInt("http.port"),
+        stopTimeout = Config.getInt("http.stop.timeout"),
+        connectorIdleTimeout = Config.getInt("http.connector.idle.timeout"),
+        contextPath = Config.getString("http.context.path")
+    )
+
+    lazy val DefaultZeroMQConfig: Option[ZeroMQConfig] =
+        try {
+            val port = Config.getInt("messaging.zeromq.port")
+            val enable = Config.getBoolean("messaging.zeromq.enable")
+            val topic = Config.getString("messaging.zeromq.topic")
+            Some(ZeroMQConfig(port, enable, topic))
+        }
+        catch {
+            case NonFatal(e) =>
+                log.atWarn.withCause(e).log("Failed to load ZeroMQ configuration")
+                None
+        }
 }
+
+case class HttpConfig(
+    port: Int,
+    stopTimeout: Int,
+    connectorIdleTimeout: Int,
+    contextPath: String
+)

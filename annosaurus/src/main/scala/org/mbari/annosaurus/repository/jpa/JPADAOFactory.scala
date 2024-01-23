@@ -91,16 +91,7 @@ trait JPADAOFactory {
 
 object JPADAOFactory extends JPADAOFactory {
 
-    lazy val entityManagerFactory = {
-        val config      = ConfigFactory.load()
-        val environment = config.getString("database.environment")
-        val nodeName    =
-            if (environment.equalsIgnoreCase("production"))
-                "org.mbari.vars.annotation.database.production"
-            else "org.mbari.vars.annotation.database.development"
-
-        EntityManagerFactories(nodeName)
-    }
+    lazy val entityManagerFactory = EntityManagerFactories("database")
 
 }
 

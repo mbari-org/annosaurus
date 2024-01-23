@@ -43,11 +43,13 @@ class AssociationEndpoints(controller: AssociationController)(using
     ec: ExecutionContext,
     jwtService: JwtService
 ) extends Endpoints {
+    
+    private val base = "associations"
 
     // GET /:uuid
     val findAssociationByUuid: Endpoint[Unit, UUID, ErrorMsg, AssociationSC, Any] = openEndpoint
         .get
-        .in("v1" / "associations" / path[UUID])
+        .in(base / path[UUID])
         .out(jsonBody[AssociationSC])
         .name("findAssociationByUuid")
         .description("Find an association by its UUID")
@@ -61,7 +63,7 @@ class AssociationEndpoints(controller: AssociationController)(using
         : Endpoint[Unit, (UUID, String, Option[String]), ErrorMsg, Seq[AssociationSC], Any] =
         openEndpoint
             .get
-            .in("v1" / "associations" / path[UUID] / path[String])
+            .in(base / path[UUID] / path[String])
             .in(query[Option[String]]("concept"))
             .out(jsonBody[Seq[AssociationSC]])
             .name("findAssociationsByVideoReferenceUuidAndLinkName")
@@ -86,7 +88,7 @@ class AssociationEndpoints(controller: AssociationController)(using
     val createAssociation: Endpoint[Option[String], AssociationSC, ErrorMsg, AssociationSC, Any] =
         secureEndpoint
             .post
-            .in("v1" / "associations")
+            .in(base)
             .in(oneOfBody(jsonBody[AssociationSC], formBody[AssociationSC]))
             .out(jsonBody[AssociationSC])
             .name("createAssociation")
@@ -114,7 +116,7 @@ class AssociationEndpoints(controller: AssociationController)(using
         : Endpoint[Option[String], (UUID, AssociationSC), ErrorMsg, AssociationSC, Any] =
         secureEndpoint
             .put
-            .in("v1" / "associations" / path[UUID])
+            .in(base / path[UUID])
             .in(oneOfBody(jsonBody[AssociationSC], formBody[AssociationSC]))
             .out(jsonBody[AssociationSC])
             .name("updateAssociation")
@@ -144,7 +146,7 @@ class AssociationEndpoints(controller: AssociationController)(using
         : Endpoint[Option[String], Seq[AssociationSC], ErrorMsg, Seq[AssociationSC], Any] =
         secureEndpoint
             .put
-            .in("v1" / "associations" / "bulk")
+            .in(base / "bulk")
             .in(jsonBody[Seq[AssociationSC]])
             .out(jsonBody[Seq[AssociationSC]])
             .name("updateAssociations")
@@ -162,7 +164,7 @@ class AssociationEndpoints(controller: AssociationController)(using
     val deleteAssociations: Endpoint[Option[String], Seq[UUID], ErrorMsg, Unit, Any] =
         secureEndpoint
             .delete
-            .in("v1" / "associations")
+            .in(base)
             .in(jsonBody[Seq[UUID]])
             .out(statusCode(StatusCode.NoContent).and(emptyOutput))
             .name("deleteAssociations")
@@ -179,7 +181,7 @@ class AssociationEndpoints(controller: AssociationController)(using
     // DELETE /:uuid
     val deleteAssociation: Endpoint[Option[String], UUID, ErrorMsg, Unit, Any] = secureEndpoint
         .delete
-        .in("v1" / "associations" / path[UUID])
+        .in(base / path[UUID])
         .out(statusCode(StatusCode.NoContent).and(emptyOutput))
         .name("deleteAssociation")
         .description("Delete an association")
@@ -195,7 +197,7 @@ class AssociationEndpoints(controller: AssociationController)(using
     val countAssociationsByToConcept: Endpoint[Unit, String, ErrorMsg, ConceptCount, Any] =
         openEndpoint
             .get
-            .in("v1" / "associations" / "toconcept" / "count" / path[String])
+            .in(base / "toconcept" / "count" / path[String])
             .out(jsonBody[ConceptCount])
             .name("countAssociationsByToConcept")
             .description("Count associations by toConcept")
@@ -210,7 +212,7 @@ class AssociationEndpoints(controller: AssociationController)(using
     val renameToConcept: Endpoint[Option[String], RenameConcept, ErrorMsg, RenameCountSC, Any] =
         secureEndpoint
             .put
-            .in("v1" / "associations" / "toconcept" / "rename")
+            .in(base / "toconcept" / "rename")
             .in(oneOfBody(jsonBody[RenameConcept], formBody[RenameConcept]))
             .out(jsonBody[RenameCountSC])
             .name("renameToConcept")
@@ -231,7 +233,7 @@ class AssociationEndpoints(controller: AssociationController)(using
     val findAssociationsByConceptAssociationRequest =
         openEndpoint
             .post
-            .in("v1" / "associations" / "conceptassociations")
+            .in(base / "conceptassociations")
             .in(jsonBody[ConceptAssociationRequest])
             .out(jsonBody[ConceptAssociationResponseSC])
             .name("findAssociationsByConceptAssociationRequest")
