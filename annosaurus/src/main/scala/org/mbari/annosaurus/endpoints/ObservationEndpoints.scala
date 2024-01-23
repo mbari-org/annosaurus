@@ -366,9 +366,9 @@ class ObservationEndpoints(controller: ObservationController)(using
         findAllConcepts,
         countAllGroupByVideoReferenceUuid,
         deleteDuration,
+        findGroups,
         countByVideoReferenceUuid,
         findObservationsByVideoReferenceUuid,
-        findGroups,
         findObservationByUuid,
         updateOneObservation,
         deleteOneObservation
@@ -384,9 +384,9 @@ class ObservationEndpoints(controller: ObservationController)(using
         findAllConceptsImpl,
         countAllGroupByVideoReferenceUuidImpl,
         deleteDurationImpl,
+        findGroupsImpl,
         countByVideoReferenceUuidImpl,
         findObservationsByVideoReferenceUuidImpl,
-        findGroupsImpl,
         findObservationByUuidImpl,
         updateOneObservationImpl,
         deleteOneObservationImpl
