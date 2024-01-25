@@ -161,7 +161,7 @@ trait ImageControllerSuite extends BaseDAOSuite {
         assertEquals(k.description.orNull, j.getDescription)
     }
 
-    test("update (videoReferenceUuid") {
+    test("update (videoReferenceUuid)") {
         val im0 = TestUtils.create(nImageReferences = 1).head
         val im1 = TestUtils.create().head
         val i   = im0.getImageReferences.iterator().next()

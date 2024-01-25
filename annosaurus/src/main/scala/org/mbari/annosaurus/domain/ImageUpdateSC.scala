@@ -16,6 +16,8 @@
 
 package org.mbari.annosaurus.domain
 
+import org.mbari.annosaurus.repository.jpa.entity.ImageReferenceEntity
+
 import java.net.URL
 import java.time.Instant
 import java.util.UUID
@@ -31,3 +33,24 @@ case class ImageUpdateSC(
     height_pixels: Option[Int] = None,
     description: Option[String] = None
 )
+
+object ImageUpdateSC
+    extends FromEntity[ImageReferenceEntity, ImageUpdateSC] {
+
+    override def from(entity: ImageReferenceEntity, extend: Boolean = false): ImageUpdateSC = {
+        val im = entity.getImagedMoment
+        ImageUpdateSC(
+            video_reference_uuid = Option(im.getVideoReferenceUuid),
+            url = Option(entity.getUrl),
+            timecode = Option(im.getTimecode).map(_.toString),
+            elapsed_time_millis = Option(im.getElapsedTime).map(_.toMillis),
+            recorded_timestamp = Option(im.getRecordedTimestamp),
+            format = Option(entity.getFormat),
+            width_pixels = Option(entity.getWidth),
+            height_pixels = Option(entity.getHeight),
+            description = Option(entity.getDescription)
+        )
+    }
+}
+
+

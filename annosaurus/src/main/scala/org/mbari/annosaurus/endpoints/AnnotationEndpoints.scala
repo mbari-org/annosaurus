@@ -17,7 +17,7 @@
 package org.mbari.annosaurus.endpoints
 
 import org.mbari.annosaurus.controllers.AnnotationController
-import org.mbari.annosaurus.domain.{Annotation, AnnotationCreate, AnnotationCreateSC, AnnotationSC, ConcurrentRequest, ErrorMsg, MultiRequest}
+import org.mbari.annosaurus.domain.{Annotation, AnnotationCreate, AnnotationCreateSC, AnnotationSC, AnnotationUpdateSC, ConcurrentRequest, ConcurrentRequestSC, ErrorMsg, MultiRequest}
 import org.mbari.annosaurus.etc.jwt.JwtService
 import org.mbari.annosaurus.etc.circe.CirceCodecs.{*, given}
 import org.mbari.annosaurus.etc.tapir.TapirCodecs.given
@@ -164,12 +164,13 @@ class AnnotationEndpoints(controller: AnnotationController)(using
             .in(jsonBody[ConcurrentRequest])
             .out(jsonBody[Long])
             .name("countConcurrentAnnotations")
-            .description("Count concurrent annotations")
+            .description("Count concurrent annotations. JSON body can be snake_case or camelCase")
             .tag(tag)
 
     val countByConcurrentRequestImpl: ServerEndpoint[Any, Future] =
         countByConcurrentRequest
             .serverLogic { concurrentRequest =>
+                println("---- " + concurrentRequest)
                 handleErrors(controller.countByConcurrentRequest(concurrentRequest))
             }
 
@@ -210,14 +211,14 @@ class AnnotationEndpoints(controller: AnnotationController)(using
 
 //    PUT /: uuid
     val updateAnnotation
-        : Endpoint[Option[String], (UUID, AnnotationCreateSC), ErrorMsg, AnnotationSC, Any] =
+        : Endpoint[Option[String], (UUID, AnnotationUpdateSC), ErrorMsg, AnnotationSC, Any] =
         secureEndpoint
             .put
             .in(base / path[UUID]("observationUuid"))
-            .in(oneOfBody(jsonBody[AnnotationCreateSC], formBody[AnnotationCreateSC]))
+            .in(oneOfBody(jsonBody[AnnotationUpdateSC], formBody[AnnotationUpdateSC]))
             .out(jsonBody[AnnotationSC])
             .name("updateAnnotation")
-            .description("Update an annotation")
+            .description("Update an annotation. The request body can be camelCase or snake_case")
             .tag(tag)
 
     val updateAnnotationImpl: ServerEndpoint[Any, Future] =
@@ -229,22 +230,23 @@ class AnnotationEndpoints(controller: AnnotationController)(using
             }
 //    PUT / bulk
     val bulkUpdateAnnotations
-        : Endpoint[Option[String], Seq[Annotation], ErrorMsg, Seq[AnnotationSC], Any] =
+        : Endpoint[Option[String], Seq[AnnotationUpdateSC], ErrorMsg, Seq[AnnotationSC], Any] =
         secureEndpoint
             .put
             .in(base / "bulk")
-            .in(jsonBody[Seq[Annotation]])
+            .in(jsonBody[Seq[AnnotationUpdateSC]])
             .out(jsonBody[Seq[AnnotationSC]])
             .name("bulkUpdateAnnotations")
-            .description("Update multiple annotations")
+            .description("Update multiple annotations. This will not update imageReferences, associations, or ancillary data")
             .tag(tag)
 
     val bulkUpdateAnnotationsImpl: ServerEndpoint[Any, Future] =
         bulkUpdateAnnotations
             .serverSecurityLogic(jwtOpt => verify(jwtOpt))
             .serverLogic { _ => annotations =>
+                val updates = annotations.map(_.toCamelCase.toAnnotation)
                 handleErrors(
-                    controller.bulkUpdate(annotations).map(xs => xs.map(_.toSnakeCase).toSeq)
+                    controller.bulkUpdate(updates).map(xs => xs.map(_.toSnakeCase).toSeq)
                 )
             }
 //    PUT / tapetime

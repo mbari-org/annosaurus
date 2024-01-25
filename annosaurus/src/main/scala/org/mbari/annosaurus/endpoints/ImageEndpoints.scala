@@ -27,7 +27,8 @@ import org.mbari.annosaurus.etc.circe.CirceCodecs.{*, given}
 import org.mbari.vcr4j.time.Timecode
 import CustomTapirJsonCirce.*
 
-import java.net.URL
+import java.net.{URI, URL, URLDecoder, URLEncoder}
+import java.nio.charset.StandardCharsets
 import java.time.Duration
 import java.util.UUID
 import scala.concurrent.{ExecutionContext, Future}
@@ -98,6 +99,8 @@ class ImageEndpoints(controller: ImageController)(using
 
     val findByImageUrlImpl: ServerEndpoint[Any, Future] = findByImageUrl
         .serverLogic { url =>
+//            val rawUrl = URLDecoder.decode(url, StandardCharsets.UTF_8)
+//            val actualUrl = URI.create(rawUrl).toURL
             handleOption(controller.findByURL(url).map(_.map(_.toSnakeCase)))
         }
 
@@ -147,13 +150,13 @@ class ImageEndpoints(controller: ImageController)(using
 
     val updateOneImageImpl: ServerEndpoint[Any, Future] = updateOneImage
         .serverSecurityLogic(jwtOpt => verify(jwtOpt))
-        .serverLogic { _ => (uuid, dto) =>
+        .serverLogic { _ => (imageReferenceUuid, dto) =>
             val timecode    = dto.timecode.map(Timecode(_))
             val elapsedTime = dto.elapsed_time_millis.map(Duration.ofMillis)
             handleOption(
                 controller
                     .update(
-                        uuid,
+                        imageReferenceUuid,
                         dto.video_reference_uuid,
                         dto.url,
                         timecode,

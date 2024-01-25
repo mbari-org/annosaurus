@@ -156,7 +156,7 @@ class ImageController(daoFactory: JPADAOFactory) {
       * are not updated in place as this would effect any observations or images associated with the
       * same image moment. If you want to change the indices in place, use the the
       * ImageMomentController instead.
-      * @param uuid
+      * @param imageReferenceUuid
       * @param videoReferenceUUID
       * @param timecode
       * @param elapsedTime
@@ -169,24 +169,33 @@ class ImageController(daoFactory: JPADAOFactory) {
       * @return
       */
     def update(
-        uuid: UUID,
-        videoReferenceUUID: Option[UUID] = None,
-        url: Option[URL] = None,
-        timecode: Option[Timecode] = None,
-        elapsedTime: Option[Duration] = None,
-        recordedDate: Option[Instant] = None,
-        format: Option[String] = None,
-        width: Option[Int] = None,
-        height: Option[Int] = None,
-        description: Option[String] = None
+                  imageReferenceUuid: UUID,
+                  videoReferenceUUID: Option[UUID] = None,
+                  url: Option[URL] = None,
+                  timecode: Option[Timecode] = None,
+                  elapsedTime: Option[Duration] = None,
+                  recordedDate: Option[Instant] = None,
+                  format: Option[String] = None,
+                  width: Option[Int] = None,
+                  height: Option[Int] = None,
+                  description: Option[String] = None
     )(implicit ec: ExecutionContext): Future[Option[Image]] = {
 
         val imDao = daoFactory.newImagedMomentDAO()
         val irDao = daoFactory.newImageReferenceDAO(imDao)
 
         val f = irDao.runTransaction(d => {
-            val imageReference = d.findByUUID(uuid)
-            imageReference.map(ir => {
+            val opt = d.findByUUID(imageReferenceUuid)
+
+            opt.map(ir => {
+
+                url.foreach(ir.setUrl)
+                format.foreach(ir.setFormat)
+                width.foreach(ir.setWidth(_))
+                height.foreach(ir.setHeight(_))
+                description.foreach(ir.setDescription)
+                d.flush()
+
                 val vrUUID = videoReferenceUUID.getOrElse(ir.getImagedMoment.getVideoReferenceUuid)
                 if (timecode.isDefined || elapsedTime.isDefined || recordedDate.isDefined) {
                     // change indices
@@ -211,16 +220,15 @@ class ImageController(daoFactory: JPADAOFactory) {
                     move(imDao, newIm, ir)
                 }
 
-                url.foreach(ir.setUrl)
-                format.foreach(ir.setFormat)
-                width.foreach(ir.setWidth(_))
-                height.foreach(ir.setHeight(_))
-                description.foreach(ir.setDescription)
-                Image.from(ir, true)
+
             })
         })
-        f.onComplete(_ => irDao.close())
-        f
+
+        val g = f.flatMap(opt => opt.map(i => irDao.runTransaction(d => d.findByUUID(imageReferenceUuid).map(Image.from(_, true))))
+            .getOrElse(Future(None)))
+
+        g.onComplete(_ => irDao.close())
+        g
     }
 
     def delete(uuid: UUID)(implicit ec: ExecutionContext): Future[Boolean] = {

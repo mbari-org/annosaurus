@@ -139,4 +139,18 @@ object DomainObjects {
         missionId = Some("Ventana 1234")
     )
 
+    val annotationUpdate = AnnotationUpdate(
+        observationUuid = Some(UUID.randomUUID()),
+        videoReferenceUuid = Some(UUID.randomUUID()),
+        concept = Some("Grimpoteuthis"),
+        observer = Some("brian"),
+        observationTimestamp = Some(Instant.now()),
+        timecode = Some("01:23:45:22"),
+        elapsedTimeMillis = Some(12345L),
+        recordedTimestamp = Some(Instant.now()),
+        durationMillis = Some(9876L),
+        group = Some("ROV:detailed"),
+        activity = Some("transect"),
+    )
+
 }

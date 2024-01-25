@@ -17,7 +17,7 @@
 package org.mbari.annosaurus.endpoints
 
 import org.mbari.annosaurus.controllers.{AnnotationController, TestUtils}
-import org.mbari.annosaurus.domain.{Annotation, AnnotationCreate, AnnotationSC}
+import org.mbari.annosaurus.domain.{Annotation, AnnotationCreate, AnnotationSC, ConcurrentRequest, MultiRequest}
 import org.mbari.annosaurus.repository.jpa.JPADAOFactory
 import org.mbari.annosaurus.etc.jdk.Logging.{*, given}
 import org.mbari.annosaurus.etc.jwt.JwtService
@@ -26,6 +26,8 @@ import org.mbari.annosaurus.etc.circe.CirceCodecs.{*, given}
 import sttp.client3.*
 import org.mbari.annosaurus.etc.sdk.Futures.*
 import org.mbari.annosaurus.etc.sdk.Reflect
+
+import java.time.Duration
 import scala.jdk.CollectionConverters.*
 
 trait AnnotationEndpointsSuite extends EndpointsSuite {
@@ -242,19 +244,180 @@ trait AnnotationEndpointsSuite extends EndpointsSuite {
     }
 
 
-    test("openByConcurrentRequest") {
-        fail("not implemented")
+    test("countByConcurrentRequest (CamelCase)") {
+        val xs = (0 until 5).flatMap(_ => TestUtils.create(2, 2))
+        val expected = xs.flatMap(_.getObservations.asScala).length.toLong
+        val ts = xs.map(_.getRecordedTimestamp)
+        val minTs = ts.min
+        val maxTs = ts.max.plus(Duration.ofSeconds(1))
+        val videoReferenceUuids = xs.map(_.getVideoReferenceUuid).distinct
+        val cr = ConcurrentRequest(minTs, maxTs, videoReferenceUuids)
+        runPost(
+            endpoints.countByConcurrentRequestImpl,
+            "http://test.com/v1/annotations/concurrent/count",
+            cr.stringify,
+            response => {
+                assertEquals(response.code, StatusCode.Ok)
+                val obtained = checkResponse[Long](response.body)
+                assertEquals(obtained, expected)
+            }
+        )
     }
 
-    test("countByMultiRequest") {
-        fail("not implemented")
+    test("countByConcurrentRequest (snake_case)") {
+        val xs = (0 until 5).flatMap(_ => TestUtils.create(2, 2))
+        val expected = xs.flatMap(_.getObservations.asScala).length.toLong
+        val ts = xs.map(_.getRecordedTimestamp)
+        val minTs = ts.min
+        val maxTs = ts.max.plus(Duration.ofSeconds(1))
+        val videoReferenceUuids = xs.map(_.getVideoReferenceUuid).distinct
+        val cr = ConcurrentRequest(minTs, maxTs, videoReferenceUuids).toSnakeCase
+        runPost(
+            endpoints.countByConcurrentRequestImpl,
+            "http://test.com/v1/annotations/concurrent/count",
+            cr.stringify,
+            response => {
+                assertEquals(response.code, StatusCode.Ok)
+                val obtained = checkResponse[Long](response.body)
+                assertEquals(obtained, expected)
+            }
+        )
     }
 
-    test("updateAnnotation") {
-        fail("not implemented")
+    test("countByMultiRequest (CamelCase)") {
+        val xs = (0 until 5).flatMap(_ => TestUtils.create(2, 2))
+        val expected = xs.flatMap(_.getObservations.asScala).length.toLong
+        val videoReferenceUuids = xs.map(_.getVideoReferenceUuid).distinct
+        val mr = MultiRequest(videoReferenceUuids)
+        runPost(
+            endpoints.countByMultiRequestImpl,
+            "http://test.com/v1/annotations/multi/count",
+            mr.stringify,
+            response => {
+                assertEquals(response.code, StatusCode.Ok)
+                val obtained = checkResponse[Long](response.body)
+                assertEquals(obtained, expected)
+            }
+        )
+    }
+
+    test("countByMultiRequest (snake_case)") {
+        val xs = (0 until 5).flatMap(_ => TestUtils.create(2, 2))
+        val expected = xs.flatMap(_.getObservations.asScala).length.toLong
+        val videoReferenceUuids = xs.map(_.getVideoReferenceUuid).distinct
+        val mr = MultiRequest(videoReferenceUuids).toSnakeCase
+        runPost(
+            endpoints.countByMultiRequestImpl,
+            "http://test.com/v1/annotations/multi/count",
+            mr.stringify,
+            response => {
+                assertEquals(response.code, StatusCode.Ok)
+                val obtained = checkResponse[Long](response.body)
+                assertEquals(obtained, expected)
+            }
+        )
+    }
+
+//    test("updateAnnotation (CamelCase json)") {
+//        val im = TestUtils.create(1, 1).head
+//        val expected = Annotation.from(im.getObservations.iterator.next())
+//            .copy(activity = Some("foo"), concept = Some("bar"))
+//        val au = AnnotationCreate.fromAnnotation(expected)
+//        val jwt = jwtService.authorize("foo").orNull
+//        assert(jwt != null)
+//        val backendStub = newBackendStub(endpoints.updateAnnotationImpl)
+//        val response = basicRequest
+//            .put(uri"http://test.com/v1/annotations/${expected.observationUuid}")
+//            .body(au.stringify)
+//            .auth.bearer(jwt)
+//            .contentType("application/json")
+//            .send(backendStub)
+//            .join
+//        assertEquals(response.code, StatusCode.Ok)
+//        val obtained = checkResponse[AnnotationSC](response.body).toCamelCase
+//        assertEquals(obtained, expected)
+//    }
+
+    test("updateAnnotation (snake_case json)") {
+        val im = TestUtils.create(1, 1).head
+        val expected = Annotation.from(im.getObservations.iterator.next())
+            .copy(activity = Some("foo"), concept = Some("bar"))
+        val au = AnnotationCreate.fromAnnotation(expected).toSnakeCase
+        val jwt = jwtService.authorize("foo").orNull
+        assert(jwt != null)
+        val backendStub = newBackendStub(endpoints.updateAnnotationImpl)
+        val response = basicRequest
+            .put(uri"http://test.com/v1/annotations/${expected.observationUuid}")
+            .body(au.stringify)
+            .auth.bearer(jwt)
+            .contentType("application/json")
+            .send(backendStub)
+            .join
+        assertEquals(response.code, StatusCode.Ok)
+        val obtained = checkResponse[AnnotationSC](response.body).toCamelCase
+        assertEquals(obtained, expected)
+    }
+
+//    test("updateAnnotation (CamelCase form)") {
+//        val im = TestUtils.create(1, 1).head
+//        val expected = Annotation.from(im.getObservations.iterator.next())
+//            .copy(activity = Some("foo"), concept = Some("bar"))
+//        val au = AnnotationCreate.fromAnnotation(expected)
+//        val jwt = jwtService.authorize("foo").orNull
+//        assert(jwt != null)
+//        val backendStub = newBackendStub(endpoints.updateAnnotationImpl)
+//        val body = Reflect.toFormBody(au)
+//        val response = basicRequest
+//            .put(uri"http://test.com/v1/annotations/${expected.observationUuid}")
+//            .body(body)
+//            .auth.bearer(jwt)
+//            .contentType("application/x-www-form-urlencoded")
+//            .send(backendStub)
+//            .join
+//        assertEquals(response.code, StatusCode.Ok)
+//        val obtained = checkResponse[AnnotationSC](response.body).toCamelCase
+//        assertEquals(obtained, expected)
+//    }
+
+    test("updateAnnotation (snake_case form)") {
+        val im = TestUtils.create(1, 1).head
+        val expected = Annotation.from(im.getObservations.iterator.next())
+            .copy(activity = Some("foo"), concept = Some("bar"))
+        val au = AnnotationCreate.fromAnnotation(expected).toSnakeCase
+        val jwt = jwtService.authorize("foo").orNull
+        assert(jwt != null)
+        val backendStub = newBackendStub(endpoints.updateAnnotationImpl)
+        val body = Reflect.toFormBody(au)
+        val response = basicRequest
+            .put(uri"http://test.com/v1/annotations/${expected.observationUuid}")
+            .body(body)
+            .auth.bearer(jwt)
+            .contentType("application/x-www-form-urlencoded")
+            .send(backendStub)
+            .join
+        assertEquals(response.code, StatusCode.Ok)
+        val obtained = checkResponse[AnnotationSC](response.body).toCamelCase
+        assertEquals(obtained, expected)
     }
 
     test("bulkUpdateAnnotations") {
-        fail("not implemented")
+        val xs = TestUtils.create(2, 2)
+        val expected = xs.flatMap(Annotation.fromImagedMoment(_))
+            .map(_.toSnakeCase)
+            .map(_.copy(activity = Some("foofoo"), concept = Some("barbar")))
+            .sortBy(_.concept)
+        val jwt = jwtService.authorize("foo").orNull
+        assert(jwt != null)
+        val backendStop = newBackendStub(endpoints.bulkUpdateAnnotationsImpl)
+        val response = basicRequest
+            .put(uri"http://test.com/v1/annotations/bulk")
+            .body(expected.stringify)
+            .auth.bearer(jwt)
+            .contentType("application/json")
+            .send(backendStop)
+            .join
+        assertEquals(response.code, StatusCode.Ok)
+        val obtained = checkResponse[Seq[AnnotationSC]](response.body)
+        assertEquals(obtained, expected)
     }
 }

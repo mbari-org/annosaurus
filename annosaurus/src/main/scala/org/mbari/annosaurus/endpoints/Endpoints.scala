@@ -53,10 +53,13 @@ trait Endpoints:
 
     implicit lazy val sAnnotation: Schema[Annotation]                                   = Schema.derived[Annotation]
     implicit lazy val sAnnotationSc: Schema[AnnotationSC]                               = Schema.derived[AnnotationSC]
-    implicit lazy val sAnnotationCreate: Schema[AnnotationCreate]                   =
+    implicit lazy val sAnnotationCreate: Schema[AnnotationCreate]                       =
         Schema.derived[AnnotationCreate]
-    implicit lazy val sAnnotationCreateSc: Schema[AnnotationCreateSC] =
+    implicit lazy val sAnnotationCreateSc: Schema[AnnotationCreateSC]                   =
         Schema.derived[AnnotationCreateSC]
+    implicit lazy val sAnnotationUpdate: Schema[AnnotationUpdate]                       = Schema.derived[AnnotationUpdate]
+    implicit lazy val sAnnotationUpdateSc: Schema[AnnotationUpdateSC]                   =
+        Schema.derived[AnnotationUpdateSC]
     implicit lazy val sAssociation: Schema[Association]                                 = Schema.derived[Association]
     implicit lazy val sAssociationSc: Schema[AssociationSC]                             = Schema.derived[AssociationSC]
     implicit lazy val sCachedAncillaryDatum: Schema[CachedAncillaryDatum]               =
@@ -138,7 +141,6 @@ trait Endpoints:
             case Failure(exception)   =>
                 log.atError.withCause(exception).log("Error")
                 Success(Left(ServerError(exception.getMessage)))
-
 
     // hard coded ATM, but could be configurable
     val baseEndpoint: Endpoint[Unit, Unit, Unit, Unit, Any] = endpoint.in("v1")
