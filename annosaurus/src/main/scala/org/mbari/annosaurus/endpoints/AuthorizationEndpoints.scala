@@ -16,9 +16,8 @@
 
 package org.mbari.annosaurus.endpoints
 
-import org.mbari.annosaurus.domain.{Authorization, ErrorMsg, Unauthorized}
+import org.mbari.annosaurus.domain.Authorization
 import org.mbari.annosaurus.etc.circe.CirceCodecs.given
-import org.mbari.annosaurus.etc.jdk.Logging.given
 import org.mbari.annosaurus.etc.jwt.JwtService
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future

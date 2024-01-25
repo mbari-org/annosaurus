@@ -32,12 +32,12 @@ import org.mbari.annosaurus.domain.{
 import org.mbari.annosaurus.etc.jwt.JwtService
 import org.mbari.annosaurus.repository.jdbc.JdbcRepository
 import sttp.tapir.*
-import sttp.tapir.json.circe.*
 import sttp.tapir.server.ServerEndpoint
-import org.mbari.annosaurus.etc.circe.CirceCodecs.{*, given}
 
 import java.util.UUID
 import scala.concurrent.{ExecutionContext, Future}
+import CustomTapirJsonCirce.*
+import org.mbari.annosaurus.etc.circe.CirceCodecs.given
 
 class FastAnnotationEndpoints(jdbcRepository: JdbcRepository)(using
     ec: ExecutionContext,

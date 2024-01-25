@@ -18,7 +18,6 @@ package org.mbari.annosaurus.endpoints
 
 import org.mbari.annosaurus.controllers.AssociationController
 import org.mbari.annosaurus.domain.{
-    Association,
     AssociationSC,
     BadRequest,
     ConceptAssociationRequest,
@@ -30,11 +29,11 @@ import org.mbari.annosaurus.domain.{
 }
 import org.mbari.annosaurus.etc.jwt.JwtService
 import sttp.tapir.*
-import sttp.tapir.json.circe.*
 import sttp.tapir.generic.auto.*
 import sttp.tapir.server.ServerEndpoint
 import org.mbari.annosaurus.etc.circe.CirceCodecs.{*, given}
 import sttp.model.StatusCode
+import CustomTapirJsonCirce.*
 
 import java.util.UUID
 import scala.concurrent.{ExecutionContext, Future}

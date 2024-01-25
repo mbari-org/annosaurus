@@ -21,11 +21,11 @@ import org.mbari.annosaurus.domain.{ErrorMsg, ImageCreateSC, ImageSC, ImageUpdat
 import org.mbari.annosaurus.etc.jwt.JwtService
 import org.mbari.annosaurus.etc.tapir.TapirCodecs.given
 import sttp.tapir.*
-import sttp.tapir.json.circe.*
 import sttp.tapir.generic.auto.*
 import sttp.tapir.server.ServerEndpoint
 import org.mbari.annosaurus.etc.circe.CirceCodecs.{*, given}
 import org.mbari.vcr4j.time.Timecode
+import CustomTapirJsonCirce.*
 
 import java.net.URL
 import java.time.Duration

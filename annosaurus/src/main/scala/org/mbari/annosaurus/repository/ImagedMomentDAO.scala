@@ -163,7 +163,6 @@ trait ImagedMomentDAO[T <: IPersistentObject] extends DAO[T] {
         timecode match {
             case Some(t) => findByVideoReferenceUUIDAndTimecode(uuid, t)
             case None    =>
-                None
                 val im0 = elapsedTime.flatMap(findByVideoReferenceUUIDAndElapsedTime(uuid, _))
                 if (im0.isEmpty)
                     recordedDate.flatMap(findByVideoReferenceUUIDAndRecordedDate(uuid, _))

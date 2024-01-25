@@ -31,13 +31,13 @@ import org.mbari.annosaurus.domain.{
 import org.mbari.annosaurus.etc.jwt.JwtService
 import org.mbari.annosaurus.etc.tapir.TapirCodecs.given
 import sttp.tapir.*
-import sttp.tapir.json.circe.*
 import sttp.tapir.generic.auto.*
 import sttp.tapir.server.ServerEndpoint
 import org.mbari.annosaurus.etc.circe.CirceCodecs.{*, given}
 import org.mbari.vcr4j.time.Timecode
 import org.mbari.annosaurus.etc.sdk.Futures.*
 import sttp.model.StatusCode
+import CustomTapirJsonCirce.*
 
 import java.time.{Duration, Instant}
 import java.util.UUID

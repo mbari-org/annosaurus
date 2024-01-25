@@ -291,20 +291,20 @@ object CirceCodecs {
     given videoInfoUpdateScEncoder: Encoder[CachedVideoReferenceInfoUpdateSC] = deriveEncoder
     given videoInfoUpdateScDecoder: Decoder[CachedVideoReferenceInfoUpdateSC] = deriveDecoder
 
-    private val printer = Printer(
+    val CustomPrinter: Printer = Printer(
         dropNullValues = true,
         indent = ""
     )
 
 //    @deprecated("Use stringify[T: Encoder] instead", "2021-11-23T11:00:00")
-//    def print[T: Encoder](t: T): String = printer.print(t.asJson)
+//    def print[T: Encoder](t: T): String = CustomPrinter.print(t.asJson)
 
     /** Convert a circe Json object to a JSON string
       *
       * @param value
       *   Any value with an implicit circe coder in scope
       */
-    extension (json: Json) def stringify: String = printer.print(json)
+    extension (json: Json) def stringify: String = CustomPrinter.print(json)
 
     /** Convert an object to a JSON string
       *

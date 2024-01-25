@@ -17,23 +17,18 @@
 package org.mbari.annosaurus.endpoints
 
 import org.mbari.annosaurus.domain.{
-    DepthHistogram,
     DepthHistogramSC,
     ErrorMsg,
-    QueryConstraints,
-    QueryConstraintsResponse,
     QueryConstraintsResponseSC,
     QueryConstraintsSC,
-    TimeHistogram,
     TimeHistogramSC
 }
 import org.mbari.annosaurus.etc.circe.CirceCodecs.given
 import org.mbari.annosaurus.repository.jdbc.AnalysisRepository
-import org.mbari.annosaurus.repository.jpa.JPADAOFactory
 import sttp.tapir.*
 import sttp.tapir.generic.auto.*
-import sttp.tapir.json.circe.*
 import sttp.tapir.server.ServerEndpoint
+import CustomTapirJsonCirce.*
 
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future

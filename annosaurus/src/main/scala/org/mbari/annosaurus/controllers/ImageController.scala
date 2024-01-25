@@ -19,26 +19,30 @@ package org.mbari.annosaurus.controllers
 import java.net.URL
 import java.time.{Duration, Instant}
 import java.util.UUID
-
 import org.mbari.annosaurus.repository.ImagedMomentDAO
-import org.mbari.annosaurus.domain.Image
+import org.mbari.annosaurus.domain.{Image, ImageCreateSC}
 import org.mbari.vcr4j.time.Timecode
+import org.mbari.annosaurus.etc.jdk.Logging.{given, *}
+
 
 import scala.concurrent.{ExecutionContext, Future}
 import org.mbari.annosaurus.repository.jpa.JPADAOFactory
 import org.mbari.annosaurus.repository.jpa.entity.ImagedMomentEntity
 import org.mbari.annosaurus.repository.jpa.entity.ImageReferenceEntity
+
 import scala.jdk.CollectionConverters.*
 
 /** Created by brian on 7/14/16.
   */
 class ImageController(daoFactory: JPADAOFactory) {
 
+    private val log = System.getLogger(getClass.getName)
+
     def findByUUID(uuid: UUID)(implicit ec: ExecutionContext): Future[Option[Image]] = {
         val irDao = daoFactory.newImageReferenceDAO()
         val f     = irDao.runTransaction(d => irDao.findByUUID(uuid))
         f.onComplete(t => irDao.close())
-        f.map(_.map(Image.from(_)))
+        f.map(_.map(Image.from(_, true)))
     }
 
     def findByVideoReferenceUUID(
@@ -51,7 +55,7 @@ class ImageController(daoFactory: JPADAOFactory) {
             dao.runTransaction(d =>
                 d.findByVideoReferenceUUID(videoReferenceUUID, limit, offset)
                     .flatMap(_.getImageReferences.asScala)
-                    .map(Image.from(_))
+                    .map(Image.from(_, true))
             ).map(_.toSeq)
         f.onComplete(t => dao.close())
         f
@@ -61,7 +65,7 @@ class ImageController(daoFactory: JPADAOFactory) {
         val dao = daoFactory.newImageReferenceDAO()
         val f   = dao.runTransaction(d =>
             d.findByURL(url)
-                .map(Image.from(_))
+                .map(Image.from(_, true))
         )
         f.onComplete(_ => dao.close())
         f
@@ -71,12 +75,48 @@ class ImageController(daoFactory: JPADAOFactory) {
         val dao = daoFactory.newImageReferenceDAO()
         val f   = dao.runTransaction(d =>
             d.findByImageName(name)
-                .map(Image.from(_))
-                .toSeq
+                .map(Image.from(_, true))
         )
         f.onComplete(t => dao.close())
         f
     }
+
+    /**
+     *
+     * @param imageCreates The image data to create
+     * @param ec
+     * @return Only the newly created images. If an image already exists, it is not returned.
+     */
+    def bulkCreate(imageCreates: Seq[ImageCreateSC])(using ec: ExecutionContext): Future[Seq[Image]] =
+        val imDao = daoFactory.newImagedMomentDAO()
+        val irDao = daoFactory.newImageReferenceDAO(imDao)
+        val candidates = imageCreates.distinctBy(_.url)
+        // prefilter
+        val f = for
+            newOnes <- irDao.runTransaction(d => candidates.filter(c => d.findByURL(c.url).isEmpty))
+            newlyCreated <- irDao.runTransaction(d => {
+                for
+                    ic <- newOnes
+                yield
+                    val imagedMoment = ImagedMomentController
+                        .findOrCreateImagedMoment(
+                            imDao,
+                            ic.video_reference_uuid,
+                            ic.timecode.map(new Timecode(_)),
+                            ic.recorded_timestamp,
+                            ic.elapsed_time_millis.map(Duration.ofMillis)
+                        )
+                    val imageReference = irDao.newPersistentObject(ic.url, ic.description, ic.height_pixels, ic.width_pixels, ic.format)
+                    imagedMoment.addImageReference(imageReference)
+                    irDao.flush()
+                    imageReference
+            })
+            persisted <- irDao.runTransaction(d => newlyCreated.flatMap(i => d.findByUUID(i.getUuid).map(Image.from(_, true))))
+        yield persisted
+
+        f.onComplete(t => irDao.close())
+        f
+
 
     def create(
         videoReferenceUUID: UUID,
@@ -105,6 +145,7 @@ class ImageController(daoFactory: JPADAOFactory) {
 //            imageReferenceUUID.foreach(imageReference.setUuid)
 //            irDao.create(imageReference)
             imagedMoment.addImageReference(imageReference)
+            d.flush()
             Image.from(imageReference, true)
         })
         f.onComplete(t => irDao.close())

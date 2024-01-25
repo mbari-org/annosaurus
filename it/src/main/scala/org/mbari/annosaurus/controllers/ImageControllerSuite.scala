@@ -17,8 +17,11 @@
 package org.mbari.annosaurus.controllers
 
 import org.mbari.annosaurus.AssertUtils
-import org.mbari.annosaurus.domain.Image
+import org.mbari.annosaurus.domain.{Image, ImageCreateSC}
 import org.mbari.annosaurus.repository.jpa.{BaseDAOSuite, JPADAOFactory}
+import org.mbari.annosaurus.etc.circe.CirceCodecs.{given, *}
+
+import scala.jdk.CollectionConverters.*
 
 trait ImageControllerSuite extends BaseDAOSuite {
 
@@ -30,14 +33,15 @@ trait ImageControllerSuite extends BaseDAOSuite {
 
     lazy val controller = new ImageController(daoFactory)
 
+
     test("findByUUID") {
         val im       = TestUtils.create(nImageReferences = 1).head
         val i        = im.getImageReferences.iterator().next()
         val opt      = exec(controller.findByUUID(i.getUuid))
         assert(opt.isDefined)
-        val expected = Image.from(i)
+        val expected = Image.from(i, true)
         val obtained = opt.get
-        assertEquals(expected, obtained)
+        assertEquals(obtained, expected)
     }
 
     test("findByVideoReferenceUUID") {
@@ -52,9 +56,9 @@ trait ImageControllerSuite extends BaseDAOSuite {
         val i        = im.getImageReferences.iterator().next()
         val opt      = exec(controller.findByURL(i.getUrl))
         assert(opt.isDefined)
-        val expected = Image.from(i)
+        val expected = Image.from(i, true)
         val obtained = opt.get
-        assertEquals(expected, obtained)
+        assertEquals(obtained, expected)
     }
 
     test("findByImageName") {
@@ -63,9 +67,37 @@ trait ImageControllerSuite extends BaseDAOSuite {
         val imageName = i.getUrl.toExternalForm.split("/").last
         val xs        = exec(controller.findByImageName(imageName))
         assertEquals(xs.size, 1)
-        val expected  = Image.from(i)
+        val expected  = Image.from(i, true)
         val obtained  = xs.head
-        assertEquals(expected, obtained)
+        assertEquals(obtained, expected)
+    }
+
+    test("bulkCreate") {
+        val xs = TestUtils.build(2, 2, 0, 2)
+        val seed = xs.flatMap(ImageCreateSC.from(_))
+        val imageCreates = seed ++ seed // we want to try to insert duplicates
+        val images = exec(controller.bulkCreate(imageCreates))
+        assertEquals(images.size, seed.size)
+
+        for (i <- imageCreates) {
+            exec(controller.findByURL(i.url)) match {
+                case Some(im) =>
+                    assertEquals(im.videoReferenceUuid, i.video_reference_uuid)
+                    assertEquals(im.url.orNull, i.url)
+                    assertEquals(im.timecode, i.timecode)
+                    assertEquals(im.elapsedTime.map(_.toMillis), i.elapsed_time_millis)
+                    assertEquals(im.recordedTimestamp, i.recorded_timestamp)
+                    assertEquals(im.format, i.format)
+                    assertEquals(im.width, i.width_pixels)
+                    assertEquals(im.height, i.height_pixels)
+                    assertEquals(im.description, i.description)
+                case None     => fail(s"Could not find ImageReference with url=${i.url}")
+            }
+        }
+
+        // Try to insert duplicates. None should be created
+        val images2 = exec(controller.bulkCreate(imageCreates))
+        assertEquals(images2.size, 0)
     }
 
     test("create") {

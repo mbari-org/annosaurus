@@ -70,6 +70,26 @@ case class AnnotationCreate(
 
 }
 
+object AnnotationCreate {
+    def fromAnnotation(a: Annotation): AnnotationCreate = {
+        // TODO - hack. Forcing get on concept and videoReferenceUuid
+        AnnotationCreate(
+            activity = a.activity,
+            concept = a.concept.get,
+            durationMillis = a.durationMillis,
+            elapsedTimeMillis = a.elapsedTimeMillis,
+            group = a.group,
+            imagedMomentUuid = a.imagedMomentUuid,
+            observationTimestamp = a.observationTimestamp,
+            observationUuid = a.observationUuid,
+            observer = a.observer,
+            recordedTimestamp = a.recordedTimestamp,
+            timecode = a.timecode,
+            videoReferenceUuid = a.videoReferenceUuid.get
+        )
+    }
+}
+
 case class AnnotationCreateSC(
     video_reference_uuid: UUID,
     concept: String,

@@ -24,8 +24,8 @@ import org.mbari.annosaurus.etc.tapir.TapirCodecs.given
 import sttp.model.StatusCode
 import sttp.tapir.Endpoint
 import sttp.tapir.*
-import sttp.tapir.json.circe.*
 import sttp.tapir.server.ServerEndpoint
+import CustomTapirJsonCirce.*
 
 import java.util.UUID
 import scala.concurrent.{ExecutionContext, Future}

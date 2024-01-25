@@ -54,14 +54,14 @@ object AssertUtils {
             assertEquals(a.getVideoReferenceUuid(), b.getVideoReferenceUuid())
             assertEquals(a.getUuid(), b.getUuid())
             if (cascade) {
-                assertEquals(a.getObservations().size, b.getObservations().size)
-                val ax = a.getObservations().asScala.toSeq.sortBy(_.getUuid())
-                val bx = b.getObservations().asScala.toSeq.sortBy(_.getUuid())
+                assertEquals(a.getObservations.size, b.getObservations.size)
+                val ax = a.getObservations.asScala.toSeq.sortBy(_.getUuid())
+                val bx = b.getObservations.asScala.toSeq.sortBy(_.getUuid())
                 ax.zip(bx).foreach(p => assertSameObservation(p._1, p._2, cascade))
 
-                assertEquals(a.getImageReferences().size, b.getImageReferences().size)
-                val ay = a.getImageReferences().asScala.toSeq.sortBy(_.getUuid())
-                val by = b.getImageReferences().asScala.toSeq.sortBy(_.getUuid())
+                assertEquals(a.getImageReferences.size, b.getImageReferences.size)
+                val ay = a.getImageReferences.asScala.toSeq.sortBy(_.getUuid())
+                val by = b.getImageReferences.asScala.toSeq.sortBy(_.getUuid())
                 ay.zip(by).foreach(p => assertSameImageReference(p._1, p._2))
 
                 assertSameAncillaryDatum(a.getAncillaryDatum(), b.getAncillaryDatum())

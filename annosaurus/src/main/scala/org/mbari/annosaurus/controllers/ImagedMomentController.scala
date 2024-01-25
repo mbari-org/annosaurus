@@ -19,7 +19,7 @@ package org.mbari.annosaurus.controllers
 import java.io.Closeable
 import java.time.{Duration, Instant}
 import java.util.UUID
-import org.mbari.annosaurus.domain.WindowRequest
+import org.mbari.annosaurus.domain.{Annotation, ImageCreateSC, ImagedMoment, WindowRequest}
 import org.mbari.annosaurus.repository.{DAO, ImagedMomentDAO, NotFoundInDatastoreException}
 import org.mbari.vcr4j.time.Timecode
 import org.slf4j.LoggerFactory
@@ -29,7 +29,6 @@ import org.mbari.annosaurus.repository.jpa.JPADAOFactory
 import org.mbari.annosaurus.repository.jpa.entity.{AssociationEntity, ImagedMomentEntity}
 
 import scala.jdk.CollectionConverters.*
-import org.mbari.annosaurus.domain.ImagedMoment
 import org.mbari.annosaurus.etc.jdk.Logging.given
 
 import java.util
@@ -304,6 +303,7 @@ class ImagedMomentController(val daoFactory: JPADAOFactory)
       * @return
       */
     def create(dao: DAO[_], sourceImagedMoment: ImagedMomentEntity): ImagedMomentEntity = {
+
         val imDao  = daoFactory.newImagedMomentDAO(dao)
         val irDao  = daoFactory.newImageReferenceDAO(dao)
         val adDao  = daoFactory.newCachedAncillaryDatumDAO(dao)
@@ -376,6 +376,8 @@ class ImagedMomentController(val daoFactory: JPADAOFactory)
             ad.setUuid(null)
             targetImagedMoment.setAncillaryDatum(ad)
 //            adDao.create(ad)
+
+        dao.flush()
         log.atTrace
             .log(() => "Created " + sourceImagedMoment.getObservations.size() + " observations")
 

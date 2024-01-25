@@ -21,8 +21,8 @@ import org.mbari.annosaurus.controllers.IndexController
 import scala.concurrent.{ExecutionContext, Future}
 import sttp.tapir.*
 import sttp.tapir.generic.auto.*
-import sttp.tapir.json.circe.*
 import sttp.tapir.server.ServerEndpoint
+import CustomTapirJsonCirce.*
 
 import java.util.UUID
 import org.mbari.annosaurus.domain.{ErrorMsg, ImagedMoment, Index, IndexSC}

@@ -17,20 +17,14 @@
 package org.mbari.annosaurus.endpoints
 
 import org.mbari.annosaurus.controllers.AnnotationController
-import org.mbari.annosaurus.domain.{
-    Annotation,
-    AnnotationCreateSC,
-    AnnotationSC,
-    ConcurrentRequest,
-    ErrorMsg,
-    MultiRequest
-}
+import org.mbari.annosaurus.domain.{Annotation, AnnotationCreate, AnnotationCreateSC, AnnotationSC, ConcurrentRequest, ErrorMsg, MultiRequest}
 import org.mbari.annosaurus.etc.jwt.JwtService
 import org.mbari.annosaurus.etc.circe.CirceCodecs.{*, given}
 import org.mbari.annosaurus.etc.tapir.TapirCodecs.given
 import sttp.tapir.*
-import sttp.tapir.json.circe.*
+//import sttp.tapir.json.circe.*
 import sttp.tapir.server.ServerEndpoint
+import CustomTapirJsonCirce.*
 
 import java.util.UUID
 import scala.concurrent.{ExecutionContext, Future}
@@ -48,7 +42,6 @@ class AnnotationEndpoints(controller: AnnotationController)(using
         openEndpoint
             .get
             .in(base / path[UUID]("observationUuid"))
-//            .in(oneOfBody(jsonBody[AnnotationSC], formBody[AnnotationSC]))
             .out(jsonBody[AnnotationSC])
             .name("findAnnotationByUuid")
             .description("Find an annotation by its UUID")
@@ -127,11 +120,11 @@ class AnnotationEndpoints(controller: AnnotationController)(using
 
 //        POST / bulk
     val bulkCreateAnnotations
-        : Endpoint[Option[String], Seq[Annotation], ErrorMsg, Seq[AnnotationSC], Any] =
+        : Endpoint[Option[String], Seq[AnnotationSC], ErrorMsg, Seq[AnnotationSC], Any] =
         secureEndpoint
             .post
             .in(base / "bulk")
-            .in(jsonBody[Seq[Annotation]])
+            .in(jsonBody[Seq[AnnotationSC]])
             .out(jsonBody[Seq[AnnotationSC]])
             .name("bulkCreateAnnotations")
             .description("Create a new annotation")
@@ -141,7 +134,8 @@ class AnnotationEndpoints(controller: AnnotationController)(using
         bulkCreateAnnotations
             .serverSecurityLogic(jwtOpt => verify(jwtOpt))
             .serverLogic { _ => annotations =>
-                handleErrors(controller.bulkCreate(annotations).map(xs => xs.map(_.toSnakeCase)))
+                val annosCc = annotations.map(_.toCamelCase)
+                handleErrors(controller.bulkCreate(annosCc).map(xs => xs.map(_.toSnakeCase)))
             }
 //    POST / concurrent
 

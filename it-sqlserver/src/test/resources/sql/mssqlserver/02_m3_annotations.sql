@@ -15,7 +15,7 @@ create table ancillary_data
     x                           float(53),
     y                           float(53),
     z                           float(53),
-    last_updated_time           datetime2(6),
+    last_updated_timestamp           datetime2(6),
     imaged_moment_uuid          uniqueidentifier not null,
     uuid                        uniqueidentifier not null,
     coordinate_reference_system varchar(32),
@@ -24,7 +24,7 @@ create table ancillary_data
 );
 create table associations
 (
-    last_updated_time datetime2(6),
+    last_updated_timestamp datetime2(6),
     observation_uuid  uniqueidentifier not null,
     uuid              uniqueidentifier not null,
     mime_type         varchar(64)      not null,
@@ -37,7 +37,7 @@ create table image_references
 (
     height_pixels      int,
     width_pixels       int,
-    last_updated_time  datetime2(6),
+    last_updated_timestamp  datetime2(6),
     imaged_moment_uuid uniqueidentifier not null,
     uuid               uniqueidentifier not null,
     format             varchar(64),
@@ -48,7 +48,7 @@ create table image_references
 create table imaged_moments
 (
     elapsed_time_millis  bigint,
-    last_updated_time    datetime2(6),
+    last_updated_timestamp    datetime2(6),
     recorded_timestamp   datetimeoffset(6),
     uuid                 uniqueidentifier not null,
     video_reference_uuid uniqueidentifier not null,
@@ -58,7 +58,7 @@ create table imaged_moments
 create table observations
 (
     duration_millis       bigint,
-    last_updated_time     datetime2(6),
+    last_updated_timestamp     datetime2(6),
     observation_timestamp datetimeoffset(6) not null,
     imaged_moment_uuid    uniqueidentifier  not null,
     uuid                  uniqueidentifier  not null,
@@ -70,7 +70,7 @@ create table observations
 );
 create table video_reference_information
 (
-    last_updated_time    datetime2(6),
+    last_updated_timestamp    datetime2(6),
     uuid                 uniqueidentifier not null,
     video_reference_uuid uniqueidentifier not null,
     mission_contact      varchar(64),

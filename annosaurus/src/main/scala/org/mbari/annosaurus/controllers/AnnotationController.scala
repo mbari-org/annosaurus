@@ -20,24 +20,25 @@ import java.io.Closeable
 import java.time.{Duration, Instant}
 import java.util.UUID
 import java.util.concurrent.Executors
-
 import io.reactivex.rxjava3.subjects.Subject
 import org.mbari.annosaurus.messaging.{AnnotationPublisher, MessageBus}
-import org.mbari.annosaurus.domain.{ConcurrentRequest, MultiRequest}
-
+import org.mbari.annosaurus.domain.{Annotation, ConcurrentRequest, ImageCreateSC, MultiRequest}
 import org.mbari.annosaurus.repository.DAO
 import org.mbari.annosaurus.repository.jpa.entity.{ImagedMomentEntity, ObservationEntity}
 import org.mbari.vcr4j.time.Timecode
-import org.mbari.annosaurus.repository.jpa.Implicits._
+import org.mbari.annosaurus.repository.jpa.Implicits.*
 
 import scala.concurrent.{ExecutionContext, Future}
 import org.mbari.annosaurus.repository.jpa.JPADAOFactory
 import org.mbari.annosaurus.repository.jpa.entity.ObservationEntity
-import org.mbari.annosaurus.domain.Annotation
 import org.mbari.annosaurus.repository.ObservationDAO
 import org.mbari.annosaurus.etc.jdk.Logging.given
+
 import scala.jdk.CollectionConverters.*
 import org.mbari.annosaurus.etc.circe.CirceCodecs.{*, given}
+
+import scala.collection.mutable
+import org.mbari.annosaurus.etc.sdk.Futures.*
 
 import scala.util.chaining.*
 
@@ -257,26 +258,33 @@ class AnnotationController(
         annotations: Iterable[Annotation]
     )(using ec: ExecutionContext): Future[Seq[Annotation]] = {
 
-        // TODO add prefilter to remove duplicate image references
+        val obsDao          = daoFactory.newObservationDAO()
+        val imDao           = daoFactory.newImagedMomentDAO(obsDao)
+        val imageController = new ImageController(daoFactory)
+
+        // Add prefilter to remove duplicate image references
+        val imageCreates       = annotations.flatMap(ImageCreateSC.fromAnnotation).toSeq
+        val noImageAnnotations = annotations.map(_.copy(imageReferences = Nil))
 
         // TODO need to stress test this to find the maximum number oa annotations that can be inserted at once
-        log.atTrace.log(() => s"Creating ${annotations.size} Annotations: ${annotations.stringify}")
-        val imagedMoments = Annotation.toEntities(annotations.toSeq, true)
+        val imagedMoments = Annotation.toEntities(noImageAnnotations.toSeq, true)
 
-        val obsDao = daoFactory.newObservationDAO()
-        val imDao  = daoFactory.newImagedMomentDAO(obsDao)
-
-        val future = obsDao
-            .runTransaction(d => {
-                for im <- imagedMoments
-                yield imagedMomentController.create(d, im)
-            })
-            .map(entities =>
-                // We map to annotations outside of a transaction. They should already be fully loaded
-                // so no lazy loading issues. The primary keys aren't set until the transaction is
-                // completed and we need those!!
-                entities.flatMap(im => Annotation.fromImagedMoment(im, true))
-            )
+        // We commit the images first, then the annotations
+        val future        = for
+            images               <- imageController.bulkCreate(imageCreates)
+            persistedAnnotations <-
+                obsDao
+                    .runTransaction(d => {
+                        for im <- imagedMoments
+                        yield imagedMomentController.create(d, im)
+                    })
+                    .map(entities =>
+                        // We map to annotations outside of a transaction. They should already be fully loaded
+                        // so no lazy loading issues. The primary keys aren't set until the transaction is
+                        // completed and we need those!!
+                        entities.flatMap(im => Annotation.fromImagedMoment(im, true))
+                    )
+        yield persistedAnnotations
 
         future.onComplete(_ => obsDao.close())
         future.foreach(annotationPublisher.publish) // publish new annotations

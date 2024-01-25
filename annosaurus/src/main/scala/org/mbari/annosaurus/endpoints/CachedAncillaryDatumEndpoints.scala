@@ -20,11 +20,10 @@ import org.mbari.annosaurus.controllers.CachedAncillaryDatumController
 import org.mbari.annosaurus.domain.{CachedAncillaryDatumSC, CountForVideoReferenceSC, ErrorMsg}
 import org.mbari.annosaurus.etc.jwt.JwtService
 import sttp.tapir.*
-import sttp.tapir.json.circe.*
 import sttp.tapir.generic.auto.*
 import sttp.tapir.server.ServerEndpoint
 import org.mbari.annosaurus.etc.circe.CirceCodecs.{*, given}
-import sttp.model.StatusCode
+import CustomTapirJsonCirce.*
 
 import java.time.Duration
 import java.util.UUID

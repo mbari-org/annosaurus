@@ -13,7 +13,7 @@ CREATE TABLE "imaged_moments"  (
 	"elapsed_time_millis"   	numeric(19,0) NULL,
 	"recorded_timestamp"    	timestamp with time zone NULL,
 	"timecode"              	varchar(255) NULL,
-	"last_updated_time"	timestamp NOT NULL DEFAULT now());
+	"last_updated_timestamp"	timestamp NOT NULL DEFAULT now());
 
 CREATE TABLE "ancillary_data"  ( 
 	"uuid"             	          uuid PRIMARY KEY NOT NULL DEFAULT uuid_generate_v4(),
@@ -35,7 +35,7 @@ CREATE TABLE "ancillary_data"  (
 	"y"                          	double precision NULL,
 	"z"                          	double precision NULL,
 	"light_transmission"         	real NULL,
-	"last_updated_time"     	timestamp NOT NULL DEFAULT now(),
+	"last_updated_timestamp"     	timestamp NOT NULL DEFAULT now(),
 	CONSTRAINT fk_ancillary_data__imaged_moments 
 	  FOREIGN KEY(imaged_moment_uuid) 
 		REFERENCES imaged_moments("uuid"));
@@ -49,7 +49,7 @@ CREATE TABLE "observations"  (
 	"observation_group"     	varchar(128) NULL,
 	"observation_timestamp" 	timestamp NULL,
 	"observer"              	varchar(128) NULL,
-	"last_updated_time"	timestamp NOT NULL DEFAULT now(),
+	"last_updated_timestamp"	timestamp NOT NULL DEFAULT now(),
 	CONSTRAINT fk_observations__imaged_moments 
 	  FOREIGN KEY(imaged_moment_uuid) 
 		REFERENCES imaged_moments("uuid"));
@@ -61,7 +61,7 @@ CREATE TABLE "associations"  (
 	"link_value"            	varchar(1024) NULL,
 	"to_concept"            	varchar(128) NULL,
 	"mime_type"             	varchar(64) NOT NULL,
-	"last_updated_time"	timestamp NOT NULL DEFAULT now(),
+	"last_updated_timestamp"	timestamp NOT NULL DEFAULT now(),
 	CONSTRAINT fk_associations__observations 
 	  FOREIGN KEY(observation_uuid) 
 		REFERENCES observations("uuid"));
@@ -74,7 +74,7 @@ CREATE TABLE "image_references"  (
 	"height_pixels"         	integer NULL,
 	"url"                   	varchar(1024) NOT NULL,
 	"width_pixels"          	integer NULL,
-	"last_updated_time"	timestamp NOT NULL DEFAULT now(),
+	"last_updated_timestamp"	timestamp NOT NULL DEFAULT now(),
 	UNIQUE("url"),
 	CONSTRAINT fk_image_references__imaged_moments 
 	  FOREIGN KEY(imaged_moment_uuid) 
@@ -86,7 +86,7 @@ CREATE TABLE "video_reference_information"  (
 	"mission_contact"       	varchar(64) NULL,
 	"mission_id"            	varchar(256) NOT NULL,
 	"platform_name"         	varchar(64) NOT NULL,
-	"last_updated_time"	timestamp NOT NULL DEFAULT now());
+	"last_updated_timestamp"	timestamp NOT NULL DEFAULT now());
 
 
 CREATE  INDEX "idx_ancillary_data__imaged_moment_uuid"

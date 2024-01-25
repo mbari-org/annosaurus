@@ -1,0 +1,260 @@
+/*
+ * Copyright 2017 Monterey Bay Aquarium Research Institute
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.mbari.annosaurus.endpoints
+
+import org.mbari.annosaurus.controllers.{AnnotationController, TestUtils}
+import org.mbari.annosaurus.domain.{Annotation, AnnotationCreate, AnnotationSC}
+import org.mbari.annosaurus.repository.jpa.JPADAOFactory
+import org.mbari.annosaurus.etc.jdk.Logging.{*, given}
+import org.mbari.annosaurus.etc.jwt.JwtService
+import sttp.model.StatusCode
+import org.mbari.annosaurus.etc.circe.CirceCodecs.{*, given}
+import sttp.client3.*
+import org.mbari.annosaurus.etc.sdk.Futures.*
+import org.mbari.annosaurus.etc.sdk.Reflect
+import scala.jdk.CollectionConverters.*
+
+trait AnnotationEndpointsSuite extends EndpointsSuite {
+
+    private val log              = System.getLogger(getClass.getName)
+    given JPADAOFactory = daoFactory
+    given jwtService: JwtService = new JwtService("mbari", "foo", "bar")
+    private lazy val controller = new AnnotationController(daoFactory)
+    private lazy val endpoints  = new AnnotationEndpoints(controller)
+
+    test("findAnnotationByUuid") {
+        val im = TestUtils.create(1, 1).head
+        val obs = im.getObservations.iterator.next()
+        runGet(
+            endpoints.findAnnotationByUuidImpl,
+            s"http://test.com/v1/annotations/${obs.getUuid}",
+            response => {
+                assertEquals(response.code, StatusCode.Ok)
+                val obtained = checkResponse[AnnotationSC](response.body).toCamelCase
+                val expected = Annotation.from(obs)
+                assertEquals(obtained, expected)
+            }
+        )
+    }
+
+    test("findAnnotationsByImageReferenceUuid") {
+        val im = TestUtils.create(1, 1, 0, 1).head
+        val obs = im.getObservations.iterator.next()
+        val ir = im.getImageReferences.iterator().next()
+        runGet(
+            endpoints.findAnnotationByImageReferenceUuidImpl,
+            s"http://test.com/v1/annotations/imagereference/${ir.getUuid}",
+            response => {
+                assertEquals(response.code, StatusCode.Ok)
+                val ys = checkResponse[Seq[AnnotationSC]](response.body).map(_.toCamelCase)
+                assertEquals(ys.length, 1)
+                val obtained = ys.head
+                val expected = Annotation.from(obs)
+                assertEquals(obtained, expected)
+            }
+        )
+    }
+
+    test("findAnnotationsByVideoReferenceUuid") {
+        val im = TestUtils.create(1, 1, 0, 1).head
+        val obs = im.getObservations.iterator.next()
+        runGet(
+            endpoints.findAnnotationsByVideoReferenceUuidImpl,
+            s"http://test.com/v1/annotations/videoreference/${im.getVideoReferenceUuid}",
+            response => {
+                assertEquals(response.code, StatusCode.Ok)
+                val ys = checkResponse[Seq[AnnotationSC]](response.body).map(_.toCamelCase)
+                assertEquals(ys.length, 1)
+                val obtained = ys.head
+                val expected = Annotation.from(obs)
+                assertEquals(obtained, expected)
+            }
+        )
+    }
+
+    test("createAnnotation (json)") {
+        val im = TestUtils.build(1, 1).head
+        val obs = im.getObservations.iterator.next()
+        val anno = Annotation.from(obs)
+        val jwt = jwtService.authorize("foo").orNull
+        assert(jwt != null)
+        val backendStub = newBackendStub(endpoints.createAnnotationImpl)
+        val response = basicRequest
+            .post(uri"http://test.com/v1/annotations")
+            .body(anno.toSnakeCase.stringify)
+            .auth.bearer(jwt)
+            .contentType("application/json")
+            .send(backendStub)
+            .join
+        assertEquals(response.code, StatusCode.Ok)
+        val obtained = checkResponse[AnnotationSC](response.body).toCamelCase
+        val expected = anno.copy(imagedMomentUuid = obtained.imagedMomentUuid, observationUuid = obtained.observationUuid)
+        assertEquals(obtained, expected)
+    }
+
+
+
+    test("createAnnotation (form)") {
+        val im = TestUtils.build(1, 1).head
+        val obs = im.getObservations.iterator.next()
+        val anno = Annotation.from(obs)
+        val annoCreate = AnnotationCreate.fromAnnotation(anno)
+        val formData = Reflect.toFormBody(annoCreate.toSnakeCase)
+        println(formData)
+        val jwt = jwtService.authorize("foo").orNull
+        assert(jwt != null)
+        val backendStub = newBackendStub(endpoints.createAnnotationImpl)
+        val response = basicRequest
+            .post(uri"http://test.com/v1/annotations")
+            .body(formData)
+            .auth.bearer(jwt)
+            .contentType("application/x-www-form-urlencoded")
+            .send(backendStub)
+            .join
+        assertEquals(response.code, StatusCode.Ok)
+        val obtained = checkResponse[AnnotationSC](response.body).toCamelCase
+        val expected = anno.copy(imagedMomentUuid = obtained.imagedMomentUuid, observationUuid = obtained.observationUuid)
+        assertEquals(obtained, expected)
+    }
+
+    test("bulkCreateAnnotations (simple)") {
+        val xs = TestUtils.build(2, 5)
+        val annos = xs.flatMap(Annotation.fromImagedMoment(_))
+            .map(_.toSnakeCase)
+            .sortBy(_.concept)
+        val jwt = jwtService.authorize("foo").orNull
+        assert(jwt != null)
+        val backendStop = newBackendStub(endpoints.bulkCreateAnnotationsImpl)
+        val response = basicRequest
+            .post(uri"http://test.com/v1/annotations/bulk")
+            .body(annos.stringify)
+            .auth.bearer(jwt)
+            .contentType("application/json")
+            .send(backendStop)
+            .join
+        assertEquals(response.code, StatusCode.Ok)
+        val obtained = checkResponse[Seq[AnnotationSC]](response.body).map(_.toCamelCase)
+        for
+            o <- obtained
+        do
+            assert(o.observationUuid.isDefined)
+            assert(o.imagedMomentUuid.isDefined)
+
+        val normalized = obtained.map(_.copy(observationUuid = None, imagedMomentUuid = None)).sortBy(_.concept)
+
+        for
+            (o, e) <- normalized.zip(annos)
+        do
+            assertEquals(o, e.toCamelCase)
+    }
+
+    test("bulkCreateAnnotations (with associations)") {
+        val xs = TestUtils.build(2, 5, 2)
+        val expected = xs.flatMap(Annotation.fromImagedMoment(_))
+            .map(_.toSnakeCase)
+            .sortBy(_.concept)
+        val jwt = jwtService.authorize("foo").orNull
+        assert(jwt != null)
+        val backendStop = newBackendStub(endpoints.bulkCreateAnnotationsImpl)
+        val response = basicRequest
+            .post(uri"http://test.com/v1/annotations/bulk")
+            .body(expected.stringify)
+            .auth.bearer(jwt)
+            .contentType("application/json")
+            .send(backendStop)
+            .join
+        assertEquals(response.code, StatusCode.Ok)
+
+        // Everything below is snake_case
+        val obtained = checkResponse[Seq[AnnotationSC]](response.body).sortBy(_.concept)
+        for
+            o <- obtained
+        do
+            assert(o.observation_uuid.isDefined)
+            assert(o.imaged_moment_uuid.isDefined)
+
+        for
+            (o, e) <- obtained.zip(expected)
+        do
+            // normalize the response and remove assoations
+            val e0 = e.copy(associations = Nil)
+            val o0 = o.copy(observation_uuid = None, imaged_moment_uuid = None, associations = Nil)
+            assertEquals(o0, e0)
+
+            // compare associations
+            val ea0 = e.associations.sortBy(_.to_concept)
+            val oa0 = o.associations.sortBy(_.to_concept).map(_.copy(uuid = None, last_updated_time = None))
+            assertEquals(oa0, ea0)
+
+    }
+
+    test("bulkCreateAnnotations (with images)") {
+        val xs = TestUtils.build(2, 5, 0, 2)
+        val expected = xs.flatMap(Annotation.fromImagedMoment(_))
+            .map(_.toSnakeCase)
+            .sortBy(_.concept)
+        val jwt = jwtService.authorize("foo").orNull
+        assert(jwt != null)
+        val backendStop = newBackendStub(endpoints.bulkCreateAnnotationsImpl)
+        val response = basicRequest
+            .post(uri"http://test.com/v1/annotations/bulk")
+            .body(expected.stringify)
+            .auth.bearer(jwt)
+            .contentType("application/json")
+            .send(backendStop)
+            .join
+        assertEquals(response.code, StatusCode.Ok)
+
+        // Everything below is snake_case
+        val obtained = checkResponse[Seq[AnnotationSC]](response.body).sortBy(_.concept)
+        for
+            o <- obtained
+        do
+            assert(o.observation_uuid.isDefined)
+            assert(o.imaged_moment_uuid.isDefined)
+
+        for
+            (o, e) <- obtained.zip(expected)
+        do
+            // normalize the response and remove assoations
+            val e0 = e.copy(associations = Nil)
+            val o0 = o.copy(observation_uuid = None, imaged_moment_uuid = None, associations = Nil)
+            assertEquals(o0, e0)
+
+            // compare images
+            val ea0 = e.image_references.sortBy(_.url.toExternalForm)
+            val oa0 = o.image_references.sortBy(_.url.toExternalForm).map(_.copy(uuid = None, last_updated_time = None))
+            assertEquals(oa0, ea0)
+    }
+
+
+    test("openByConcurrentRequest") {
+        fail("not implemented")
+    }
+
+    test("countByMultiRequest") {
+        fail("not implemented")
+    }
+
+    test("updateAnnotation") {
+        fail("not implemented")
+    }
+
+    test("bulkUpdateAnnotations") {
+        fail("not implemented")
+    }
+}

@@ -16,6 +16,7 @@
 
 package org.mbari.annosaurus.domain
 
+import org.apache.commons.math3.stat.inference.TestUtils
 import org.mbari.annosaurus.etc.circe.CirceCodecs.{*, given}
 
 import java.time.Instant
@@ -89,6 +90,7 @@ class AnnotationSuite extends munit.FunSuite {
         assertEquals(e3.head.getObservations.iterator().next().getUuid, cc3.observationUuid.orNull)
         assertEquals(e3.last.getObservations.size(), 2)
     }
+    
 
 
 

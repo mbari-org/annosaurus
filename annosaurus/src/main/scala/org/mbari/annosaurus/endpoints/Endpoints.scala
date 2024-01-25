@@ -16,8 +16,11 @@
 
 package org.mbari.annosaurus.endpoints
 
+import io.circe.Printer
+
 import java.net.URI
 import org.mbari.annosaurus.domain.*
+import org.mbari.annosaurus.etc.circe.CirceCodecs
 import org.mbari.annosaurus.etc.circe.CirceCodecs.{*, given}
 import org.mbari.annosaurus.etc.jwt.JwtService
 import org.mbari.annosaurus.etc.jdk.Logging.given
@@ -39,13 +42,20 @@ import java.net.URL
 
 case class Paging(offset: Option[Int] = Some(0), limit: Option[Int] = Some(100))
 
+object CustomTapirJsonCirce extends TapirJsonCirce:
+    override def jsonPrinter: Printer = CirceCodecs.CustomPrinter
+
 trait Endpoints:
+
+    import CustomTapirJsonCirce.*
 
     val log: System.Logger = System.getLogger(getClass.getName)
 
     implicit lazy val sAnnotation: Schema[Annotation]                                   = Schema.derived[Annotation]
     implicit lazy val sAnnotationSc: Schema[AnnotationSC]                               = Schema.derived[AnnotationSC]
-    implicit lazy val sAnnotationCreateSc: Schema[AnnotationCreateSC]                   =
+    implicit lazy val sAnnotationCreate: Schema[AnnotationCreate]                   =
+        Schema.derived[AnnotationCreate]
+    implicit lazy val sAnnotationCreateSc: Schema[AnnotationCreateSC] =
         Schema.derived[AnnotationCreateSC]
     implicit lazy val sAssociation: Schema[Association]                                 = Schema.derived[Association]
     implicit lazy val sAssociationSc: Schema[AssociationSC]                             = Schema.derived[AssociationSC]
