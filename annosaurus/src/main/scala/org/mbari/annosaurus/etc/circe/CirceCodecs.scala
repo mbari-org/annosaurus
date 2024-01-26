@@ -185,6 +185,8 @@ object CirceCodecs {
     given annotationUpdateEncoder: Encoder[AnnotationUpdate]         = deriveEncoder
     given annotationUpdateDecoder: Decoder[AnnotationUpdate]         =
         annotationUpdateCcDecoder or annotationUpdateScDecoder.map(_.toCamelCase)
+        
+    
 
     given imageScDecoder: Decoder[ImageSC]     = deriveDecoder
     given imageScEncoder: Encoder[ImageSC]     = deriveEncoder
