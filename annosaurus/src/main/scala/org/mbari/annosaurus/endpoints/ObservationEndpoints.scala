@@ -17,14 +17,7 @@
 package org.mbari.annosaurus.endpoints
 
 import org.mbari.annosaurus.controllers.ObservationController
-import org.mbari.annosaurus.domain.{
-    ConceptCount,
-    CountForVideoReferenceSC,
-    ErrorMsg,
-    ObservationSC,
-    ObservationUpdateSC,
-    RenameCountSC
-}
+import org.mbari.annosaurus.domain.{ConceptCount, CountForVideoReferenceSC, ErrorMsg, ObservationSC, ObservationUpdateSC, RenameConcept, RenameCountSC}
 import org.mbari.annosaurus.etc.jwt.JwtService
 import org.mbari.annosaurus.etc.tapir.TapirCodecs.given
 import sttp.tapir.*
@@ -264,12 +257,11 @@ class ObservationEndpoints(controller: ObservationController)(using
             }
 
     // PUT /concept/rename
-    val renameConcept: Endpoint[Option[String], (String, String), ErrorMsg, RenameCountSC, Any] =
+    val renameConcept: Endpoint[Option[String], RenameConcept, ErrorMsg, RenameCountSC, Any] =
         secureEndpoint
             .put
             .in(base / "concept" / "rename")
-            .in(query[String]("old").description("The old concept name"))
-            .in(query[String]("new").description("The new concept name"))
+            .in(oneOfBody(jsonBody[RenameConcept], formBody[RenameConcept]))
             .out(jsonBody[RenameCountSC])
             .name("renameConcept")
             .description("Rename a concept in all observations")
@@ -278,7 +270,9 @@ class ObservationEndpoints(controller: ObservationController)(using
     val renameConceptImpl: ServerEndpoint[Any, Future] =
         renameConcept
             .serverSecurityLogic(jwtOpt => verify(jwtOpt))
-            .serverLogic { _ => (oldConcept, newConcept) =>
+            .serverLogic { _ => renameConcept =>
+                val oldConcept = renameConcept.old
+                val newConcept = renameConcept.`new`
                 handleErrors(
                     controller
                         .updateConcept(oldConcept, newConcept)

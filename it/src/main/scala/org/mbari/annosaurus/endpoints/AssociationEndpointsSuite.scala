@@ -17,7 +17,7 @@
 package org.mbari.annosaurus.endpoints
 
 import org.mbari.annosaurus.controllers.{AssociationController, TestUtils}
-import org.mbari.annosaurus.domain.{Association, AssociationSC, ConceptAssociation, ConceptAssociationRequest, ConceptAssociationResponseSC, ConceptCount, RenameCountSC}
+import org.mbari.annosaurus.domain.{Association, AssociationSC, ConceptAssociation, ConceptAssociationRequest, ConceptAssociationResponseSC, ConceptCount, RenameConcept, RenameCountSC}
 import org.mbari.annosaurus.etc.jwt.JwtService
 import org.mbari.annosaurus.repository.jpa.JPADAOFactory
 import sttp.model.StatusCode
@@ -355,7 +355,7 @@ trait AssociationEndpointsSuite extends EndpointsSuite {
 
     }
 
-    test("renameToConcept") {
+    test("renameToConcept (json)") {
         val xs   = TestUtils.create(2, 2, 2)
         val dtos = for
             x <- xs
@@ -369,16 +369,21 @@ trait AssociationEndpointsSuite extends EndpointsSuite {
             uuid <- a.uuid
         yield controller.update(uuid, toConcept = Some(toConcept)).join).flatten
         val newToConcept = "Pandalus"
+        val dto = RenameConcept(newToConcept, toConcept)
+        val body = dto.stringify
+        println("-----" + body)
 
         val jwt         = jwtService.authorize("foo").orNull
         assert(jwt != null)
         val backendStub = newBackendStub(endpoints.renameToConceptImpl)
         val response    = basicRequest
             .put(
-                uri"http://test.com/v1/associations/toconcept/rename?old=${toConcept}&new=$newToConcept"
+                uri"http://test.com/v1/associations/toconcept/rename"
             )
             .auth
             .bearer(jwt)
+            .body(body)
+            .contentType("application/json")
             .send(backendStub)
             .join
         assertEquals(response.code, StatusCode.Ok)
@@ -389,6 +394,51 @@ trait AssociationEndpointsSuite extends EndpointsSuite {
 
         for
             a    <- dtos
+            uuid <- a.uuid
+        do
+            val b = controller.findByUUID(uuid).join
+            assertEquals(b.get.toConcept, newToConcept)
+
+    }
+
+    test("renameToConcept (form)") {
+        val xs = TestUtils.create(2, 2, 2)
+        val dtos = for
+            x <- xs
+            o <- x.getObservations.asScala
+            a <- o.getAssociations.asScala
+        yield Association.from(a, true)
+
+        val toConcept = "Pandalus platyceros"
+        val expected = (for
+            a <- dtos
+            uuid <- a.uuid
+        yield controller.update(uuid, toConcept = Some(toConcept)).join).flatten
+        val newToConcept = "Pandalus"
+        val dto = RenameConcept(newToConcept, toConcept)
+        val body = Reflect.toFormBody(dto)
+
+        val jwt = jwtService.authorize("foo").orNull
+        assert(jwt != null)
+        val backendStub = newBackendStub(endpoints.renameToConceptImpl)
+        val response = basicRequest
+            .put(
+                uri"http://test.com/v1/associations/toconcept/rename"
+            )
+            .auth
+            .bearer(jwt)
+            .body(body)
+            .contentType("application/x-www-form-urlencoded")
+            .send(backendStub)
+            .join
+        assertEquals(response.code, StatusCode.Ok)
+        val obtained = checkResponse[RenameCountSC](response.body)
+        assertEquals(obtained.count, expected.size.toLong)
+        assertEquals(obtained.old_concept, toConcept)
+        assertEquals(obtained.new_concept, newToConcept)
+
+        for
+            a <- dtos
             uuid <- a.uuid
         do
             val b = controller.findByUUID(uuid).join

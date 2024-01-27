@@ -210,12 +210,11 @@ class AssociationEndpoints(controller: AssociationController)(using
 
     // TODO mbari-org/annosaurus#18
     // PUT /toconcept/rename form or json body of oldConcept, newConcept
-    val renameToConcept: Endpoint[Option[String], (String, String), ErrorMsg, RenameCountSC, Any] =
+    val renameToConcept: Endpoint[Option[String], RenameConcept, ErrorMsg, RenameCountSC, Any] =
         secureEndpoint
             .put
             .in(base / "toconcept" / "rename")
-            .in(query[String]("old").description("The old concept name"))
-            .in(query[String]("new").description("The new concept name"))
+            .in(oneOfBody(jsonBody[RenameConcept], formBody[RenameConcept]))
             .out(jsonBody[RenameCountSC])
             .name("renameToConcept")
             .description("Rename toConcept")
@@ -223,11 +222,11 @@ class AssociationEndpoints(controller: AssociationController)(using
 
     val renameToConceptImpl: ServerEndpoint[Any, Future] = renameToConcept
         .serverSecurityLogic(jwtOpt => verify(jwtOpt))
-        .serverLogic { _ => (oldConcept, newConcept) =>
+        .serverLogic { _ => renameConcept =>
             handleErrors(
                 controller
-                    .updateToConcept(oldConcept, newConcept)
-                    .map(RenameCountSC(oldConcept, newConcept, _))
+                    .updateToConcept(renameConcept.old, renameConcept.`new`)
+                    .map(RenameCountSC(renameConcept.old, renameConcept.`new`, _))
             )
         }
 
