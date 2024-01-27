@@ -103,7 +103,7 @@ trait ImageEndpointsSuite extends EndpointsSuite {
         val im = TestUtils.create(1, 0, 0, 1).head
         val ir = im.getImageReferences.iterator.next()
         val url = URLEncoder.encode(ir.getUrl.toExternalForm, StandardCharsets.UTF_8)
-        println(url)
+//        println(url)
         runGet(
             endpoints.findByImageUrlImpl,
             s"/v1/images/url/${url}",
@@ -179,7 +179,7 @@ trait ImageEndpointsSuite extends EndpointsSuite {
             .join
 
         val a = controller.findByUUID(ir.getUuid).join
-        println(a)
+//        println(a)
 
         assertEquals(response.code, StatusCode.Ok)
         val obtained = checkResponse[ImageSC](response.body)
@@ -208,7 +208,7 @@ trait ImageEndpointsSuite extends EndpointsSuite {
             .join
 
         val a = controller.findByUUID(ir.getUuid).join
-        println(a)
+//        println(a)
 
         assertEquals(response.code, StatusCode.Ok)
         val obtained = checkResponse[ImageSC](response.body)

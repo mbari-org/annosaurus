@@ -238,7 +238,7 @@ trait FastAnnotationEndpointsSuite extends EndpointsSuite {
                 assertEquals(annotations.size, 1)
                 for a <- annotations
                 do
-                    println(a.stringify)
+//                    println(a.stringify)
                     assertEquals(a.image_references.size, 1)
                     assertEquals(a.associations.size, 1)
                     assert(a.ancillary_data.isDefined)
@@ -326,7 +326,7 @@ trait FastAnnotationEndpointsSuite extends EndpointsSuite {
             .send(backendStub)
             .join
         assertEquals(response.code, StatusCode.Ok)
-        println(response.body)
+//        println(response.body)
         val count       = checkResponse[DeleteCountSC](response.body).toCamelCase
         assertEquals(count.observationCount, xs.size)
 

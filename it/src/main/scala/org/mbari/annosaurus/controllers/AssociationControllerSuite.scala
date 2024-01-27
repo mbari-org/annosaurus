@@ -122,7 +122,8 @@ trait AssociationControllerSuite extends BaseDAOSuite {
         val x               = TestUtils.create(1, 1, 8, 0).head
         val associations    = x.getObservations.asScala.flatMap(_.getAssociations.asScala)
         associations.foreach(_.setLinkName("foobarbazbin"))
-        val newAssociations = exec(controller.bulkUpdate(associations))
+        val dtos = associations.map(Association.from(_))
+        val newAssociations = exec(controller.bulkUpdate(dtos))
         val ax              = associations.toSeq.sortBy(_.getUuid)
         val bx              = newAssociations.toSeq.sortBy(_.uuid.get)
         ax.zip(bx).foreach(p => AssertUtils.assertSameAssociation(p._1, p._2.toEntity))
@@ -210,7 +211,7 @@ trait AssociationControllerSuite extends BaseDAOSuite {
         val vrus     = im.map(_.getVideoReferenceUuid())
         val ass      = im.head.getObservations().iterator().next().getAssociations().iterator().next()
         val linkName = ass.getLinkName()
-        val cr       = new ConceptAssociationRequest(vrus, linkName)
+        val cr       = ConceptAssociationRequest(vrus, linkName)
         val response = exec(controller.findByConceptAssociationRequest(cr))
         assertEquals(response.associations.size, 1)
         val a        = response.associations.head

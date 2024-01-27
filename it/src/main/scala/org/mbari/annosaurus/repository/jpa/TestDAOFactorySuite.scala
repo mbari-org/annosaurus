@@ -60,7 +60,7 @@ trait TestDAOFactorySuite extends BaseDAOSuite {
             )
             rs.next()
             val uuid      = UUID.fromString(rs.getString("uuid"))
-            println(s"uuid: $uuid  ---- ${im.getUuid()}")
+//            println(s"uuid: $uuid  ---- ${im.getUuid()}")
             assert(uuid == im.getUuid())
         })
 

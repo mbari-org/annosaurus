@@ -45,7 +45,7 @@ trait AnalysisEndpointsSuite extends EndpointsSuite {
         val expected            = xs.flatMap(_.getObservations.asScala).size
         val videoReferenceUuids = xs.map(_.getVideoReferenceUuid).distinct
         val qcr                 = QueryConstraints(videoReferenceUuids = videoReferenceUuids)
-        println(qcr.toSnakeCase.stringify)
+//        println(qcr.toSnakeCase.stringify)
         runPost(
             endpoints.depthHistogramImpl,
             s"http://test.com/v1/histogram/depth",
@@ -65,7 +65,7 @@ trait AnalysisEndpointsSuite extends EndpointsSuite {
         val expected            = xs.flatMap(_.getObservations.asScala).size
         val videoReferenceUuids = xs.map(_.getVideoReferenceUuid).distinct
         val qcr                 = QueryConstraints(videoReferenceUuids = videoReferenceUuids)
-        println(qcr.toSnakeCase.stringify)
+//        println(qcr.toSnakeCase.stringify)
         runPost(
             endpoints.depthHistogramImpl,
             s"http://test.com/v1/histogram/depth?size=100",
@@ -87,7 +87,7 @@ trait AnalysisEndpointsSuite extends EndpointsSuite {
             xs.filter(_.getRecordedTimestamp != null).flatMap(_.getObservations.asScala).size
         val videoReferenceUuids = xs.map(_.getVideoReferenceUuid).distinct
         val qcr                 = QueryConstraints(videoReferenceUuids = videoReferenceUuids)
-        println(qcr.toSnakeCase.stringify)
+//        println(qcr.toSnakeCase.stringify)
         runPost(
             endpoints.timeHistogramImpl,
             s"http://test.com/v1/histogram/time",
@@ -107,7 +107,7 @@ trait AnalysisEndpointsSuite extends EndpointsSuite {
         val expected            = xs.flatMap(_.getObservations.asScala).size
         val videoReferenceUuids = xs.map(_.getVideoReferenceUuid).distinct
         val qcr                 = QueryConstraints(videoReferenceUuids = videoReferenceUuids)
-        println(qcr.toSnakeCase.stringify)
+//        println(qcr.toSnakeCase.stringify)
         runPost(
             endpoints.timeHistogramImpl,
             s"http://test.com/v1/histogram/time?size=100",

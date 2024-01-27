@@ -38,11 +38,18 @@ trait EndpointsSuite extends BaseDAOSuite:
     def runDelete(
         ep: ServerEndpoint[Any, Future],
         uri: String,
-        assertions: Response[Either[String, String]] => Unit
+        assertions: Response[Either[String, String]] => Unit,
+        jwt: Option[String] = None
     ): Unit =
         val backendStub = newBackendStub(ep)
         val u           = uri"$uri"
-        val request     = basicRequest.delete(u)
+        val request     = jwt match
+            case None => basicRequest.delete(u)
+            case Some(bearer) =>
+                basicRequest
+                    .delete(u)
+                    .auth
+                    .bearer(bearer)
         val response    = request.send(backendStub).join
         assertions(response)
 
@@ -50,11 +57,19 @@ trait EndpointsSuite extends BaseDAOSuite:
         ep: ServerEndpoint[Any, Future],
         uri: String,
         body: String,
-        assertions: Response[Either[String, String]] => Unit
+        assertions: Response[Either[String, String]] => Unit,
+        jwt: Option[String] = None
     ): Unit =
         val backendStub = newBackendStub(ep)
         val u           = uri"$uri"
-        val request     = basicRequest.put(u).body(body)
+        val request     = jwt match
+            case None => basicRequest.put(u).body(body)
+            case Some(bearer) =>
+                basicRequest
+                    .put(u)
+                    .body(body)
+                    .auth
+                    .bearer(bearer)
         val response    = request.send(backendStub).join
         assertions(response)
 
@@ -62,11 +77,20 @@ trait EndpointsSuite extends BaseDAOSuite:
         ep: ServerEndpoint[Any, Future],
         uri: String,
         body: String,
-        assertions: Response[Either[String, String]] => Unit
+        assertions: Response[Either[String, String]] => Unit,
+        jwt: Option[String] = None
     ): Unit =
         val backendStub = newBackendStub(ep)
         val u           = uri"$uri"
-        val request     = basicRequest.post(u).body(body)
+        val request     = jwt match
+            case None => basicRequest.post(u).body(body)
+            case Some(bearer) =>
+                basicRequest
+                    .post(u)
+                    .body(body)
+                    .auth
+                    .bearer(bearer)
+
         val response    = request.send(backendStub).join
         assertions(response)
 

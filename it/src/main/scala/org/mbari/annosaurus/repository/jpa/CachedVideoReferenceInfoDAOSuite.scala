@@ -152,8 +152,8 @@ trait CachedVideoReferenceInfoDAOSuite extends BaseDAOSuite {
         val vi                                     = createTestData()
         given dao: CachedVideoReferenceInfoDAOImpl = daoFactory.newCachedVideoReferenceInfoDAO()
         val xs                                     = run(() => dao.findAllPlatformNames()).toSeq
-        println(xs)
-        println(vi.getPlatformName())
+//        println(xs)
+//        println(vi.getPlatformName())
         assert(xs.size >= 1)
         assert(xs.contains(vi.getPlatformName()))
         dao.close()

@@ -327,7 +327,7 @@ trait CachedAncillaryDatumControllerSuite extends BaseDAOSuite {
                 assertEquals(obtained.longitude.orNull, 123.456)
                 assertEquals(obtained.depthMeters.orNull, 1000.0f)
                 assert(obtained.altitude.isEmpty)
-                println(obtained.stringify)
+//                println(obtained.stringify)
                 assert(obtained.crs.isEmpty)
                 assert(obtained.salinity.isEmpty)
                 assert(obtained.temperatureCelsius.isEmpty)

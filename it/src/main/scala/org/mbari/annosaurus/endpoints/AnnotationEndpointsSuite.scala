@@ -116,7 +116,7 @@ trait AnnotationEndpointsSuite extends EndpointsSuite {
         val anno = Annotation.from(obs)
         val annoCreate = AnnotationCreate.fromAnnotation(anno)
         val formData = Reflect.toFormBody(annoCreate.toSnakeCase)
-        println(formData)
+//        println(formData)
         val jwt = jwtService.authorize("foo").orNull
         assert(jwt != null)
         val backendStub = newBackendStub(endpoints.createAnnotationImpl)

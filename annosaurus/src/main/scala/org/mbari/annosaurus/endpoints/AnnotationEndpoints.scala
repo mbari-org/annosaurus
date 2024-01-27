@@ -170,7 +170,6 @@ class AnnotationEndpoints(controller: AnnotationController)(using
     val countByConcurrentRequestImpl: ServerEndpoint[Any, Future] =
         countByConcurrentRequest
             .serverLogic { concurrentRequest =>
-                println("---- " + concurrentRequest)
                 handleErrors(controller.countByConcurrentRequest(concurrentRequest))
             }
 

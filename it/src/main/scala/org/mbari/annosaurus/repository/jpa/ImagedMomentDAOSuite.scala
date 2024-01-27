@@ -396,7 +396,7 @@ trait ImagedMomentDAOSuite extends BaseDAOSuite {
         val videoReferenceUuid         = xs.head.getVideoReferenceUuid()
         given dao: ImagedMomentDAOImpl = daoFactory.newImagedMomentDAO()
         val b                          = run(() => dao.deleteByVideoReferenceUUUID(videoReferenceUuid))
-        println(b)
+//        println(b)
         assert(b == 2)
         val im1                        = run(() => dao.findByVideoReferenceUUID(videoReferenceUuid))
         assert(im1.isEmpty)

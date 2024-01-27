@@ -41,7 +41,6 @@ trait TestUtilsSuite extends BaseDAOSuite {
         val xs = TestUtils.build(2, 2, 2, 2, true)
         assertEquals(xs.size, 2)
         val x  = xs.head
-        println(x)
         assertEquals(x.getImageReferences().size, 2)
         assertEquals(x.getObservations().size, 2)
         x.getObservations().asScala.foreach(obs => assertEquals(obs.getAssociations().size, 2))

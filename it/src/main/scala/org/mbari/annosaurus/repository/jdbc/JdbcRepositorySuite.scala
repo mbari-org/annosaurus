@@ -148,7 +148,7 @@ trait JdbcRepositorySuite extends BaseDAOSuite {
         assertEquals(o1.size, xs.size + ys.size)
         for a <- o1
         do
-            println(a.stringify)
+//            println(a.stringify)
             assert(a.ancillaryData.isDefined)
             assertEquals(a.imageReferences.size, 1)
             assertEquals(a.associations.size, 1)
@@ -244,7 +244,7 @@ trait JdbcRepositorySuite extends BaseDAOSuite {
 
         val obtained =
             repository.findByVideoReferenceUuidAndTimestamps(x.getVideoReferenceUuid(), ts0, ts1)
-        println("-------- " + obtained)
+//        println("-------- " + obtained)
         assertEquals(obtained.size, expected.size)
     }
 

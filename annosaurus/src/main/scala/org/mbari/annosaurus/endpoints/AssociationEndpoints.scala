@@ -156,7 +156,7 @@ class AssociationEndpoints(controller: AssociationController)(using
     val updateAssociationsImpl: ServerEndpoint[Any, Future] = updateAssociations
         .serverSecurityLogic(jwtOpt => verify(jwtOpt))
         .serverLogic { _ => associations =>
-            val assocs = associations.map(_.toCamelCase).map(_.toEntity)
+            val assocs = associations.map(_.toCamelCase)
             handleErrors(controller.bulkUpdate(assocs).map(_.map(_.toSnakeCase).toSeq))
         }
 
@@ -210,11 +210,12 @@ class AssociationEndpoints(controller: AssociationController)(using
 
     // TODO mbari-org/annosaurus#18
     // PUT /toconcept/rename form or json body of oldConcept, newConcept
-    val renameToConcept: Endpoint[Option[String], RenameConcept, ErrorMsg, RenameCountSC, Any] =
+    val renameToConcept: Endpoint[Option[String], (String, String), ErrorMsg, RenameCountSC, Any] =
         secureEndpoint
             .put
             .in(base / "toconcept" / "rename")
-            .in(oneOfBody(jsonBody[RenameConcept], formBody[RenameConcept]))
+            .in(query[String]("old").description("The old concept name"))
+            .in(query[String]("new").description("The new concept name"))
             .out(jsonBody[RenameCountSC])
             .name("renameToConcept")
             .description("Rename toConcept")
@@ -222,11 +223,11 @@ class AssociationEndpoints(controller: AssociationController)(using
 
     val renameToConceptImpl: ServerEndpoint[Any, Future] = renameToConcept
         .serverSecurityLogic(jwtOpt => verify(jwtOpt))
-        .serverLogic { _ => renameConcept =>
+        .serverLogic { _ => (oldConcept, newConcept) =>
             handleErrors(
                 controller
-                    .updateToConcept(renameConcept.old, renameConcept.`new`)
-                    .map(RenameCountSC(renameConcept.old, renameConcept.`new`, _))
+                    .updateToConcept(oldConcept, newConcept)
+                    .map(RenameCountSC(oldConcept, newConcept, _))
             )
         }
 
@@ -247,7 +248,9 @@ class AssociationEndpoints(controller: AssociationController)(using
                 handleErrors(
                     controller
                         .findByConceptAssociationRequest(conceptAssociationRequest)
-                        .map(_.toSnakeCase)
+                        .map(a => {
+                            a.toSnakeCase
+                        })
                 )
             }
 

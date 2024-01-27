@@ -121,17 +121,18 @@ class AssociationController(
     }
 
     def bulkUpdate(
-        associations: Iterable[AssociationEntity]
+        associations: Iterable[Association]
     )(implicit ec: ExecutionContext): Future[Iterable[Association]] = {
         def fn(dao: ADAO): Iterable[Association] =
-            associations.flatMap(a0 => {
+            val validAssociations  = associations.filter(_.uuid.isDefined)
+            validAssociations.flatMap(a0 => {
                 dao
-                    .findByUUID(a0.getUuid)
+                    .findByUUID(a0.uuid.get)
                     .map(a1 => {
-                        a1.setLinkName(a0.getLinkName)
-                        a1.setToConcept(a0.getToConcept)
-                        a1.setLinkValue(a0.getLinkValue)
-                        a1.setMimeType(a0.getMimeType)
+                        a1.setLinkName(a0.linkName)
+                        a1.setToConcept(a0.toConcept)
+                        a1.setLinkValue(a0.linkValue)
+                        a0.mimeType.foreach(a1.setMimeType)
                         transform(a1)
                     })
             })
