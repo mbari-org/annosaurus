@@ -21,13 +21,9 @@ import sttp.client3.*
 import org.mbari.annosaurus.etc.sdk.Futures.*
 import org.junit.Assert.*
 import org.mbari.annosaurus.controllers.{CachedAncillaryDatumController, TestUtils}
-import org.mbari.annosaurus.domain.{
-    CachedAncillaryDatum,
-    CachedAncillaryDatumSC,
-    CountForVideoReferenceSC,
-    DeleteCountSC
-}
+import org.mbari.annosaurus.domain.{CachedAncillaryDatum, CachedAncillaryDatumSC, CountForVideoReferenceSC, DeleteCountSC}
 import org.mbari.annosaurus.etc.jwt.JwtService
+import org.mbari.annosaurus.etc.sdk.Reflect
 import org.mbari.annosaurus.repository.jpa.JPADAOFactory
 import sttp.model.StatusCode
 
@@ -104,7 +100,7 @@ trait CachedAncillaryDatumEndpointsSuite extends EndpointsSuite {
         )
     }
 
-    test("createOneDatum") {
+    test("createOneDatum (json)") {
         val im          = TestUtils.create(1).head
         val d           = CachedAncillaryDatum
             .from(TestUtils.randomData())
@@ -118,6 +114,27 @@ trait CachedAncillaryDatumEndpointsSuite extends EndpointsSuite {
             .header("Authorization", s"Bearer $jwt")
             .header("Content-Type", "application/json")
             .body(d.stringify)
+            .send(backendStub)
+            .join
+
+        assertEquals(response.code, StatusCode.Ok)
+    }
+
+    test("createOneDatum (form)") {
+        val im = TestUtils.create(1).head
+        val d = CachedAncillaryDatum
+            .from(TestUtils.randomData())
+            .copy(imagedMomentUuid = Some(im.getUuid))
+            .toSnakeCase
+        val body = Reflect.toFormBody(d)
+        val jwt = jwtService.authorize("foo").orNull
+        assert(jwt != null)
+        val backendStub = newBackendStub(endpoints.createOneDatumImpl)
+        val response = basicRequest
+            .post(uri"http://test.com/v1/ancillarydata")
+            .header("Authorization", s"Bearer $jwt")
+            .header("Content-Type", "application/x-www-form-urlencoded")
+            .body(body)
             .send(backendStub)
             .join
 
@@ -180,7 +197,7 @@ trait CachedAncillaryDatumEndpointsSuite extends EndpointsSuite {
         do assertEqualsDouble(x.latitude.getOrElse(-1000d), 25.345, 0.0001)
     }
 
-    test("updateOneDatum") {
+    test("updateOneDatum (json)") {
         val im          = TestUtils.create(1, includeData = true).head
         val d           = CachedAncillaryDatum
             .from(im.getAncillaryDatum)
@@ -198,6 +215,28 @@ trait CachedAncillaryDatumEndpointsSuite extends EndpointsSuite {
             .join
         assertEquals(response.code, StatusCode.Ok)
         val obtained    = checkResponse[CachedAncillaryDatumSC](response.body)
+        assertEqualsDouble(obtained.latitude.getOrElse(-1000d), 25.345, 0.0001)
+    }
+
+    test("updateOneDatum (form)") {
+        val im = TestUtils.create(1, includeData = true).head
+        val d = CachedAncillaryDatum
+            .from(im.getAncillaryDatum)
+            .copy(latitude = Some(25.345))
+            .toSnakeCase
+        val body = Reflect.toFormBody(d)
+        val jwt = jwtService.authorize("foo").orNull
+        assert(jwt != null)
+        val backendStub = newBackendStub(endpoints.updateOneDatumImpl)
+        val response = basicRequest
+            .put(uri"http://test.com/v1/ancillarydata/${d.uuid}")
+            .auth.bearer(jwt)
+            .contentType("application/x-www-form-urlencoded")
+            .body(body)
+            .send(backendStub)
+            .join
+        assertEquals(response.code, StatusCode.Ok)
+        val obtained = checkResponse[CachedAncillaryDatumSC](response.body)
         assertEqualsDouble(obtained.latitude.getOrElse(-1000d), 25.345, 0.0001)
     }
 

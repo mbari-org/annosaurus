@@ -46,4 +46,8 @@ trait IndexEndpointsSuite extends EndpointsSuite {
 
     }
 
+    test("bulkUpdateRecordedTimestamps") {
+        fail("not implemented")
+    }
+
 }
