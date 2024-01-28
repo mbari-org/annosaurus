@@ -100,6 +100,7 @@ class ImageReferenceController(val daoFactory: JPADAOFactory)
                                 imagedMoment.addImageReference(imageReference)
                         }
                     })
+                    dao.flush()
                     transform(imageReference)
                 })
         }
