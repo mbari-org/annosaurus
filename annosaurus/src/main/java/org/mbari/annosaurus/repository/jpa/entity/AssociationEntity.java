@@ -101,7 +101,7 @@ import java.util.UUID;
 
         }
 )
-// @org.hibernate.envers.Audited
+ @org.hibernate.envers.Audited
 public class AssociationEntity implements IPersistentObject {
 
     public static String TO_CONCEPT_SELF = "self";

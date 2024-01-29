@@ -136,7 +136,7 @@ import java.util.Objects;
                 )
         }
 )
-// @org.hibernate.envers.Audited
+ @org.hibernate.envers.Audited
 public class ObservationEntity implements IPersistentObject {
 
     @Id
@@ -156,7 +156,7 @@ public class ObservationEntity implements IPersistentObject {
     @Convert(converter = DurationConverter.class)
     Duration duration;
 
-//     @Audited(targetAuditMode = RelationTargetAuditMode.NOT_AUDITED)
+     @Audited(targetAuditMode = RelationTargetAuditMode.NOT_AUDITED)
     @ManyToOne(
             cascade = {CascadeType.PERSIST, CascadeType.DETACH},
             optional = false

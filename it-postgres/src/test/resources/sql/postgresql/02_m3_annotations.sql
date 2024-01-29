@@ -221,3 +221,11 @@ CREATE CAST (varchar AS uuid)
 -- $$ LANGUAGE plpgsql;
 --
 -- CREATE CAST (smallint AS boolean) WITH FUNCTION boolean1(smallint) AS ASSIGNMENT;
+
+-- AUDITING
+create sequence REVINFO_SEQ start with 1 increment by 50;
+create table REVINFO (REV integer not null, REVTSTMP bigint, primary key (REV));
+create table associations_AUD (REV integer not null, REVTYPE smallint, observation_uuid uuid, uuid uuid not null, mime_type varchar(64), link_name varchar(128), to_concept varchar(128), link_value varchar(1024), primary key (REV, uuid));
+create table observations_AUD (REV integer not null, REVTYPE smallint, duration_millis bigint, observation_timestamp timestamp(6) with time zone, imaged_moment_uuid uuid, uuid uuid not null, activity varchar(128), observation_group varchar(128), observer varchar(128), concept varchar(256), primary key (REV, uuid));
+alter table if exists associations_AUD add constraint fk_associations_aud__revinfo foreign key (REV) references REVINFO;
+alter table if exists observations_AUD add constraint fk_observations_aud_refinfo foreign key (REV) references REVINFO;

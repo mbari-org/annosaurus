@@ -170,4 +170,8 @@ CREATE TABLE "dbo"."adjust_rov_tape_histories"  (
 -- 	ON DELETE NO ACTION
 -- 	ON UPDATE NO ACTION;
 
-
+create table associations_AUD (REV int not null, REVTYPE smallint, observation_uuid uniqueidentifier, uuid uniqueidentifier not null, mime_type varchar(64), link_name varchar(128), to_concept varchar(128), link_value varchar(1024), primary key (REV, uuid));
+create table observations_AUD (REV int not null, REVTYPE smallint, duration_millis bigint, observation_timestamp datetimeoffset(6), imaged_moment_uuid uniqueidentifier, uuid uniqueidentifier not null, activity varchar(128), observation_group varchar(128), observer varchar(128), concept varchar(256), primary key (REV, uuid));
+create table REVINFO (REV int identity not null, REVTSTMP bigint, primary key (REV));
+alter table associations_AUD add constraint fk_associations_aud__revinfo foreign key (REV) references REVINFO;
+alter table observations_AUD add constraint fk_observations_aud_refinfo foreign key (REV) references REVINFO;
