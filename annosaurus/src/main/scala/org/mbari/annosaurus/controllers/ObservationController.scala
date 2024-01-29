@@ -71,6 +71,7 @@ class ObservationController(
                         activity.orNull
                     )
                     imagedMoment.addObservation(observation)
+                    dao.flush()
                     // observation.setImagedMoment(imagedMoment)
                     annotationPublisher.publish(Observation.from(observation))
                     transform(observation)

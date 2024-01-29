@@ -76,11 +76,18 @@ trait JdbcRepositorySuite extends BaseDAOSuite {
     }
 
     test("findByConcept") {
-        val xs  = TestUtils.create(1, 1)
-        val x   = xs.head
-        val obs = x.getObservations().asScala.head
-        val xs2 = repository.findByConcept(obs.getConcept())
+        val xs       = TestUtils.create(1, 1, 1, 1, true)
+        val x        = xs.head
+        val obs      = x.getObservations().asScala.head
+        val xs2      = repository.findByConcept(obs.getConcept(), includeAncillaryData = true)
         assertEquals(xs2.size, 1)
+        val expected = Annotation
+            .from(obs, true)
+            .removeForeignKeys()
+        val obtained = xs2.head.removeForeignKeys()
+//        println("OBTAINED: " + obtained.stringify)
+//        println("EXPECTED: " + expected.stringify)
+        assertEquals(expected, obtained)
     }
 
     test("findByConceptWithImages") {

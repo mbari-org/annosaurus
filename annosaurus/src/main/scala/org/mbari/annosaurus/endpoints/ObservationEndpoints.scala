@@ -17,7 +17,15 @@
 package org.mbari.annosaurus.endpoints
 
 import org.mbari.annosaurus.controllers.ObservationController
-import org.mbari.annosaurus.domain.{ConceptCount, CountForVideoReferenceSC, ErrorMsg, ObservationSC, ObservationUpdateSC, RenameConcept, RenameCountSC}
+import org.mbari.annosaurus.domain.{
+    ConceptCount,
+    CountForVideoReferenceSC,
+    ErrorMsg,
+    ObservationSC,
+    ObservationUpdateSC,
+    RenameConcept,
+    RenameCountSC
+}
 import org.mbari.annosaurus.etc.jwt.JwtService
 import org.mbari.annosaurus.etc.tapir.TapirCodecs.given
 import sttp.tapir.*
@@ -35,9 +43,9 @@ class ObservationEndpoints(controller: ObservationController)(using
     ec: ExecutionContext,
     jwtService: JwtService
 ) extends Endpoints {
-    
+
     private val base = "observations"
-    private val tag = "Observations"
+    private val tag  = "Observations"
 
     // GET /:uuid
     val findObservationByUuid: Endpoint[Unit, UUID, ErrorMsg, ObservationSC, Any] =

@@ -33,8 +33,23 @@ case class Association(
 ) extends ToSnakeCase[AssociationSC]
     with ToEntity[AssociationEntity] {
 
+    def removeForeignKeys(): Association = copy(
+        observationUuid = None,
+        imagedMomentUuid = None,
+        lastUpdated = None
+    )
+
     override def toSnakeCase: AssociationSC =
-        AssociationSC(linkName, toConcept, linkValue, mimeType, uuid, lastUpdated, observationUuid, imagedMomentUuid)
+        AssociationSC(
+            linkName,
+            toConcept,
+            linkValue,
+            mimeType,
+            uuid,
+            lastUpdated,
+            observationUuid,
+            imagedMomentUuid
+        )
 
     override def toEntity: AssociationEntity = {
         val a = AssociationEntity(linkName, toConcept, linkValue, mimeType.orNull)
@@ -47,8 +62,8 @@ object Association extends FromEntity[AssociationEntity, Association] {
     def from(entity: AssociationEntity, extend: Boolean = false): Association =
         val (optObs, optIm) =
             if extend then
-                val obs = Option(entity.getObservation)
-                val im = obs.flatMap(o => Option(o.getImagedMoment))
+                val obs     = Option(entity.getObservation)
+                val im      = obs.flatMap(o => Option(o.getImagedMoment))
                 val obsUuid = obs.map(_.getUuid())
                 val imUuid  = im.map(_.getUuid())
                 (obsUuid, imUuid)
@@ -77,5 +92,14 @@ case class AssociationSC(
 ) extends ToCamelCase[Association] {
 
     def toCamelCase: Association =
-        Association(link_name, to_concept, link_value, mime_type, uuid, last_updated_time, observation_uuid, imaged_moment_uuid)
+        Association(
+            link_name,
+            to_concept,
+            link_value,
+            mime_type,
+            uuid,
+            last_updated_time,
+            observation_uuid,
+            imaged_moment_uuid
+        )
 }

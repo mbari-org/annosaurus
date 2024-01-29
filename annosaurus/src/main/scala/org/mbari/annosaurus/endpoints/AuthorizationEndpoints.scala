@@ -31,9 +31,9 @@ import org.mbari.annosaurus.domain.{BadRequest, ErrorMsg, NotFound, ServerError,
 
 class AuthorizationEndpoints()(using ec: ExecutionContext, jwtService: JwtService)
     extends Endpoints:
-    
+
     private val base = "auth"
-    private val tag = "Authorization"
+    private val tag  = "Authorization"
 
 //    private val log = System.getLogger(getClass.getName)
 

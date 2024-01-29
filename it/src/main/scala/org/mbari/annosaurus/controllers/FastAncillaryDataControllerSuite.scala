@@ -74,7 +74,7 @@ trait FastAncillaryDataControllerSuite extends BaseDAOSuite {
                     fail(s"Failed to find imagedMoment with uuid ${x.getUuid}")
                 case Some(im) =>
                     assert(im.ancillaryData.isDefined)
-                    log.atWarn.log(im.stringify)
+//                    log.atWarn.log(im.stringify)
                     val actual    = im.ancillaryData.get
                     val expected  = pairs(x)
                     val corrected = expected.copy(

@@ -44,7 +44,7 @@ trait EndpointsSuite extends BaseDAOSuite:
         val backendStub = newBackendStub(ep)
         val u           = uri"$uri"
         val request     = jwt match
-            case None => basicRequest.delete(u)
+            case None         => basicRequest.delete(u)
             case Some(bearer) =>
                 basicRequest
                     .delete(u)
@@ -63,7 +63,7 @@ trait EndpointsSuite extends BaseDAOSuite:
         val backendStub = newBackendStub(ep)
         val u           = uri"$uri"
         val request     = jwt match
-            case None => basicRequest.put(u).body(body)
+            case None         => basicRequest.put(u).body(body)
             case Some(bearer) =>
                 basicRequest
                     .put(u)
@@ -83,7 +83,7 @@ trait EndpointsSuite extends BaseDAOSuite:
         val backendStub = newBackendStub(ep)
         val u           = uri"$uri"
         val request     = jwt match
-            case None => basicRequest.post(u).body(body)
+            case None         => basicRequest.post(u).body(body)
             case Some(bearer) =>
                 basicRequest
                     .post(u)
@@ -91,7 +91,7 @@ trait EndpointsSuite extends BaseDAOSuite:
                     .auth
                     .bearer(bearer)
 
-        val response    = request.send(backendStub).join
+        val response = request.send(backendStub).join
         assertions(response)
 
     def runGet(

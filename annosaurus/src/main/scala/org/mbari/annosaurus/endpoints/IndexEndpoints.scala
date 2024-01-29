@@ -34,9 +34,9 @@ class IndexEndpoints(controller: IndexController)(using
     val executor: ExecutionContext,
     jwtService: JwtService
 ) extends Endpoints {
-    
+
     private val base = "index"
-    private val tag = "Time Indices"
+    private val tag  = "Time Indices"
 
     private val toEntity = Index.from(_: IndexEntity, false) // curried function
 

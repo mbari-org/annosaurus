@@ -94,7 +94,7 @@ class JdbcRepository(entityManagerFactory: EntityManagerFactory) {
         val annotations                    = AnnotationSQL.resultListToAnnotations(r1)
         val resolvedAnnotations            = executeQueryForAnnotations(annotations, constraints.includeData)
         entityManager.close()
-        resolvedAnnotations
+        resolvedAnnotations.map(_.removeForeignKeys())
     }
 
     def countByQueryConstraint(constraints: QueryConstraints): Int = {
@@ -436,6 +436,8 @@ class JdbcRepository(entityManagerFactory: EntityManagerFactory) {
             val sql2   = inClause(AssociationSQL.byObservationUuids, obs)
             val query2 = entityManager.createNativeQuery(sql2)
             val r2     = query2.getResultList.asScala.toList
+
+            // Remove the observationUuid and imagedMomentUuid from the association
             AssociationSQL.resultListToAssociations(r2)
         }
         val associations     = assocTemp.flatten.toSeq
@@ -458,9 +460,12 @@ class JdbcRepository(entityManagerFactory: EntityManagerFactory) {
                 val irs    = imageReferences.filter(_.imagedMomentUuid == a.imagedMomentUuid)
                 a.copy(associations = assocs, imageReferences = irs)
 
-        if (includeAncillaryData) findAncillaryData(a2)
-        else a2
+        val xs =
+            if (includeAncillaryData) findAncillaryData(a2)
+            else a2
 
+        // IMPORTANT remove all join keys from output
+        xs.map(_.removeForeignKeys())
     }
 
     private def executeQuery(
@@ -494,10 +499,14 @@ class JdbcRepository(entityManagerFactory: EntityManagerFactory) {
         log.atDebug.log("Joining annotations to imageReferences")
         val a3              = ImageReferenceSQL.join(a2, imageReferences)
 
-        if (includeAncillaryData)
-            findAncillaryData(a3)
-        else
-            a3
+        val xs =
+            if (includeAncillaryData)
+                findAncillaryData(a3)
+            else
+                a3
+
+        // IMPORTANT remove all join keys from output
+        xs.map(_.removeForeignKeys())
 
     }
 

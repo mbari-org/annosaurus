@@ -273,7 +273,7 @@ trait ImagedMomentContollerSuite extends BaseDAOSuite {
     test("create from entity graph") {
         val im0 = TestUtils.build(1, 1, 1, 1, true).head
         val im1 = exec(controller.create(Seq(im0))).head
-        log.atWarn.log("im1: " + im1.stringify)
+//        log.atWarn.log("im1: " + im1.stringify)
         assert(im1.uuid.isDefined)
         im0.setUuid(im1.uuid.get)
         im0.getObservations.iterator().next().setUuid(im1.observations.head.uuid.get)

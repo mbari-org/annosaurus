@@ -58,7 +58,7 @@ object Main:
         val port = sys.env.get("HTTP_PORT").flatMap(_.toIntOption).getOrElse(8080)
         log.atInfo.log(s"Starting ${AppConfig.Name} v${AppConfig.Version} on port $port")
 
-        val vertx = Vertx.vertx()
+        val vertx  = Vertx.vertx()
         val server = vertx.createHttpServer()
         val router = Router.router(vertx)
 
@@ -73,26 +73,23 @@ object Main:
             .foreach(endpoint =>
                 interpreter
                     .route(endpoint)
-                    .apply(router)  // attaches to vertx router
+                    .apply(router) // attaches to vertx router
             )
 
-        router.getRoutes()
+        router
+            .getRoutes()
             .forEach(r => log.atInfo.log(f"Adding route: ${r.methods()}%8s ${r.getPath}%s"))
 
         val program = for
             binding <- server.requestHandler(router).listen(port).asScala
-            _ <- Future:
-                println(
-                    s"Go to http://localhost:${binding.actualPort()}/docs to open SwaggerUI. Press ENTER key to exit."
-                )
-                StdIn.readLine()
-            stop <- binding.close().asScala
-        yield
-            stop
+            _       <- Future:
+                           println(
+                               s"Go to http://localhost:${binding.actualPort()}/docs to open SwaggerUI. Press ENTER key to exit."
+                           )
+                           StdIn.readLine()
+            stop    <- binding.close().asScala
+        yield stop
 
         program.onComplete(_ => vertx.close())
 
         Await.result(program, Duration.Inf)
-
-
-

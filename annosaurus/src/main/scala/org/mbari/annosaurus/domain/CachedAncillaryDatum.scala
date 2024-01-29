@@ -47,6 +47,10 @@ final case class CachedAncillaryDatum(
     recordedTimestamp: Option[java.time.Instant] = None // extend
 ) extends ToSnakeCase[CachedAncillaryDatumSC]
     with ToEntity[CachedAncillaryDatumEntity] {
+
+    def removeForeignKeys(): CachedAncillaryDatum =
+        copy(imagedMomentUuid = None, recordedTimestamp = None, lastUpdated = None)
+
     override def toSnakeCase: CachedAncillaryDatumSC =
         CachedAncillaryDatumSC(
             latitude,

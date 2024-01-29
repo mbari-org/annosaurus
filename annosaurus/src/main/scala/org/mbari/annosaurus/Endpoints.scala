@@ -32,8 +32,7 @@ object Endpoints {
     // --------------------------------
     given ExecutionContext = ExecutionContext.global
     given JwtService       = AppConfig.DefaultJwtService
-    val daoFactory = JPADAOFactory
-
+    val daoFactory         = JPADAOFactory
 
     // --------------------------------
     val annotationController               = new AnnotationController(daoFactory)
@@ -90,7 +89,7 @@ object Endpoints {
     val prometheusMetrics: PrometheusMetrics[Future] = PrometheusMetrics.default[Future]()
     val metricsEndpoint: ServerEndpoint[Any, Future] = prometheusMetrics.metricsEndpoint
 
-    val all: List[ServerEndpoint[Any, Future]] = apiEndpoints ++ docEndpoints ++ List(metricsEndpoint)
-
+    val all: List[ServerEndpoint[Any, Future]] =
+        apiEndpoints ++ docEndpoints ++ List(metricsEndpoint)
 
 }

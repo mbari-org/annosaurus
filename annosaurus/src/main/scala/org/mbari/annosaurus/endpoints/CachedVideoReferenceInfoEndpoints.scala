@@ -40,7 +40,7 @@ class CachedVideoReferenceInfoEndpoints(controller: CachedVideoReferenceInfoCont
     jwtService: JwtService
 ) extends Endpoints {
 
-    private val tag = "Video Information"
+    private val tag  = "Video Information"
     private val base = "videoreferences"
 
     val findAll: Endpoint[Unit, Paging, ErrorMsg, Seq[CachedVideoReferenceInfoSC], Any] =
@@ -291,6 +291,6 @@ class CachedVideoReferenceInfoEndpoints(controller: CachedVideoReferenceInfoCont
         updateOneVideoReferenceInfoImpl,
         deleteOneVideoReferenceInfoImpl,
         createOneVideoReferenceInfoImpl,
-        findAllImpl,
+        findAllImpl
     )
 }

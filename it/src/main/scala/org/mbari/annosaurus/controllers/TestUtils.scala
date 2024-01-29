@@ -193,8 +193,9 @@ object TestUtils {
         val theta    = random.nextInt(36000) / 100d
         val psi      = random.nextInt(36000) / 100d
         val trans    = random.nextInt(100) * 1f
+        val altitude = random.nextInt(1000) * 1f
         val datum    = new CachedAncillaryDatumEntity()
-        datum.setAltitude(null)
+        datum.setAltitude(altitude)
         datum.setLatitude(lat)
         datum.setLongitude(lon)
         datum.setDepthMeters(depth)

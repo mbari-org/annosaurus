@@ -43,9 +43,9 @@ class FastAnnotationEndpoints(jdbcRepository: JdbcRepository)(using
     ec: ExecutionContext,
     jwtService: JwtService
 ) extends Endpoints {
-    
+
     private val base = "fast"
-    private val tag = "Fast Annotation Queries"
+    private val tag  = "Fast Annotation Queries"
 
     // GET / limit offset
     val findAllAnnotations
@@ -498,7 +498,7 @@ class FastAnnotationEndpoints(jdbcRepository: JdbcRepository)(using
         findAnnotationsByVideoReferenceUuid,
         deleteAnnotationsByVideoReferenceUuid,
         findAnnotationsByQueryConstraints,
-        findAllAnnotations,
+        findAllAnnotations
     )
 
     override def allImpl: List[ServerEndpoint[Any, Future]] = List(
@@ -518,6 +518,6 @@ class FastAnnotationEndpoints(jdbcRepository: JdbcRepository)(using
         findAnnotationsByVideoReferenceUuidImpl,
         deleteAnnotationsByVideoReferenceUuidImpl,
         findAllAnnotationsImpl,
-        findAnnotationsByQueryConstraintsImpl,
+        findAnnotationsByQueryConstraintsImpl
     )
 }

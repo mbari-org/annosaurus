@@ -22,7 +22,7 @@ import io.reactivex.rxjava3.subjects.Subject
 import org.mbari.annosaurus.messaging.{GenericMessage, MessageBus}
 import org.mbari.annosaurus.ZeroMQConfig
 import org.mbari.annosaurus.etc.jdk.Logging
-import org.mbari.annosaurus.etc.jdk.Logging.{given, *}
+import org.mbari.annosaurus.etc.jdk.Logging.{*, given}
 import org.zeromq.{SocketType, ZContext}
 
 import java.util.concurrent.{LinkedBlockingQueue, TimeUnit}
@@ -42,7 +42,7 @@ class ZeroMQPublisher(val topic: String, val port: Int, val subject: Subject[_])
         .observeOn(Schedulers.io())
         .distinct()
         .subscribe(m => queue.offer(m))
-    private val log                    = Logging(getClass)
+    private val log                          = Logging(getClass)
 
     @volatile
     var ok     = true
@@ -62,7 +62,9 @@ class ZeroMQPublisher(val topic: String, val port: Int, val subject: Subject[_])
                 }
                 catch {
                     case NonFatal(e) =>
-                        log.atWarn.withCause(e).log("An exception was thrown in ZeroMQPublishers publish thread")
+                        log.atWarn
+                            .withCause(e)
+                            .log("An exception was thrown in ZeroMQPublishers publish thread")
                 }
             }
         },
@@ -107,9 +109,10 @@ object ZeroMQPublisher {
     def log(opt: Option[ZeroMQPublisher]): Unit = opt match {
         case None    => log.atInfo.log("ZeroMQ is not enabled/configured")
         case Some(z) =>
-            log.atInfo.log(
-                s"ZeroMQ is publishing annotations on port ${z.port} using topic '${z.topic}''"
-            )
+            log.atInfo
+                .log(
+                    s"ZeroMQ is publishing annotations on port ${z.port} using topic '${z.topic}''"
+                )
     }
 
 }

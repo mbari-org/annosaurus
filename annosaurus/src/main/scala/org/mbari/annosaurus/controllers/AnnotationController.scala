@@ -270,7 +270,7 @@ class AnnotationController(
         val imagedMoments = Annotation.toEntities(noImageAnnotations.toSeq, true)
 
         // We commit the images first, then the annotations
-        val future        = for
+        val future = for
             images               <- imageController.bulkCreate(imageCreates)
             persistedAnnotations <-
                 obsDao
@@ -362,14 +362,14 @@ class AnnotationController(
         annotations: Iterable[Annotation]
     )(implicit ec: ExecutionContext): Future[Iterable[Annotation]] = {
 
-        val goodAnnos = annotations.filter(x =>x.observationUuid.isDefined)
+        val goodAnnos = annotations.filter(x => x.observationUuid.isDefined)
 
         // We have to do this in 2 transactions. The first makes all the changes. The second to
         // retrieve them. We have to do this because we may make a SQL call to move an observaton
         // to a new imagedmoment. The enitymanage doesn't see this change and so returns the cached
         // value which may have the wrong time index or videoreference.
-        val dao       = daoFactory.newObservationDAO()
-        val f         = dao.runTransaction(d => {
+        val dao = daoFactory.newObservationDAO()
+        val f   = dao.runTransaction(d => {
             goodAnnos.flatMap(a => {
                 _update(
                     d,
@@ -391,7 +391,9 @@ class AnnotationController(
         // --- After update find all the changes
         val h = f.flatMap(obs => {
             val dao1 = daoFactory.newObservationDAO()
-            val ff = dao.runTransaction(d => obs.flatMap(o => d.findByUUID(o.getUuid).map(Annotation.from(_, true))))
+            val ff   = dao.runTransaction(d =>
+                obs.flatMap(o => d.findByUUID(o.getUuid).map(Annotation.from(_, true)))
+            )
             ff.onComplete(_ => dao1.close())
             ff
         })

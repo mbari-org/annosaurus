@@ -37,10 +37,9 @@ class ImageEndpoints(controller: ImageController)(using
     ec: ExecutionContext,
     jwtService: JwtService
 ) extends Endpoints {
-    
-    
+
     private val base = "images"
-    private val tag = "Images"
+    private val tag  = "Images"
 
     // GET /:uuid
     val findOneImage =

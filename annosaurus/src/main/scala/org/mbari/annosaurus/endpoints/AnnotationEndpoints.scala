@@ -17,7 +17,17 @@
 package org.mbari.annosaurus.endpoints
 
 import org.mbari.annosaurus.controllers.AnnotationController
-import org.mbari.annosaurus.domain.{Annotation, AnnotationCreate, AnnotationCreateSC, AnnotationSC, AnnotationUpdateSC, ConcurrentRequest, ConcurrentRequestSC, ErrorMsg, MultiRequest}
+import org.mbari.annosaurus.domain.{
+    Annotation,
+    AnnotationCreate,
+    AnnotationCreateSC,
+    AnnotationSC,
+    AnnotationUpdateSC,
+    ConcurrentRequest,
+    ConcurrentRequestSC,
+    ErrorMsg,
+    MultiRequest
+}
 import org.mbari.annosaurus.etc.jwt.JwtService
 import org.mbari.annosaurus.etc.circe.CirceCodecs.{*, given}
 import org.mbari.annosaurus.etc.tapir.TapirCodecs.given
@@ -33,9 +43,9 @@ class AnnotationEndpoints(controller: AnnotationController)(using
     ec: ExecutionContext,
     jwtService: JwtService
 ) extends Endpoints {
-    
-    private val base = "annotations" 
-    private val tag = "Annotations"
+
+    private val base = "annotations"
+    private val tag  = "Annotations"
 
 //    GET /: uuid
     val findAnnotationByUuid: Endpoint[Unit, UUID, ErrorMsg, AnnotationSC, Any] =
@@ -236,7 +246,9 @@ class AnnotationEndpoints(controller: AnnotationController)(using
             .in(jsonBody[Seq[AnnotationUpdateSC]])
             .out(jsonBody[Seq[AnnotationSC]])
             .name("bulkUpdateAnnotations")
-            .description("Update multiple annotations. This will not update imageReferences, associations, or ancillary data")
+            .description(
+                "Update multiple annotations. This will not update imageReferences, associations, or ancillary data"
+            )
             .tag(tag)
 
     val bulkUpdateAnnotationsImpl: ServerEndpoint[Any, Future] =

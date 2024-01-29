@@ -22,21 +22,21 @@ import java.time.{Duration, Instant}
 import java.util.UUID
 
 case class AnnotationUpdate(
-                               observationUuid: Option[UUID] = None,
-                               videoReferenceUuid: Option[UUID] = None,
-                               concept: Option[String] = None,
-                               observer: Option[String] = None,
-                               observationTimestamp: Option[Instant] = None,
-                               timecode: Option[String] = None,
-                               elapsedTimeMillis: Option[Long] = None,
-                               recordedTimestamp: Option[Instant] = None,
-                               durationMillis: Option[Long] = None,
-                               group: Option[String] = None,
-                               activity: Option[String] = None
+    observationUuid: Option[UUID] = None,
+    videoReferenceUuid: Option[UUID] = None,
+    concept: Option[String] = None,
+    observer: Option[String] = None,
+    observationTimestamp: Option[Instant] = None,
+    timecode: Option[String] = None,
+    elapsedTimeMillis: Option[Long] = None,
+    recordedTimestamp: Option[Instant] = None,
+    durationMillis: Option[Long] = None,
+    group: Option[String] = None,
+    activity: Option[String] = None
 ) extends ToSnakeCase[AnnotationUpdateSC] {
 
-    lazy val elapsedTime: Option[Duration] = elapsedTimeMillis.map(Duration.ofMillis)
-    lazy val duration: Option[Duration] = durationMillis.map(Duration.ofMillis)
+    lazy val elapsedTime: Option[Duration]   = elapsedTimeMillis.map(Duration.ofMillis)
+    lazy val duration: Option[Duration]      = durationMillis.map(Duration.ofMillis)
     lazy val validTimecode: Option[Timecode] = timecode.map(Timecode(_))
 
     override def toSnakeCase: AnnotationUpdateSC = {

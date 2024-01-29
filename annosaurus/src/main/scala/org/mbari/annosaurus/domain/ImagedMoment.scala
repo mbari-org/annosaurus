@@ -37,6 +37,10 @@ final case class ImagedMoment(
 ) extends ToSnakeCase[ImagedMomentSC]
     with ToEntity[ImagedMomentEntity] {
 
+    def removeForeignKeys(): ImagedMoment = copy(
+        lastUpdated = None
+    )
+
     lazy val validTimecode: Option[Timecode] = timecode.map(Timecode(_))
     override def toSnakeCase: ImagedMomentSC =
         ImagedMomentSC(

@@ -49,7 +49,7 @@ class ImagedMomentEndpoints(controller: ImagedMomentController)(using
 ) extends Endpoints {
 
     private val base = "imagedmoments"
-    private val tag = "Imaged Moments"
+    private val tag  = "Imaged Moments"
 
     val findAllImagedMoments: Endpoint[Unit, Paging, ErrorMsg, Seq[ImagedMomentSC], Any] =
         openEndpoint
@@ -167,7 +167,9 @@ class ImagedMomentEndpoints(controller: ImagedMomentController)(using
             .get
             .in(base / "count" / "linkname" / path[String]("linkName"))
             .out(jsonBody[Count])
-            .description("Count all imaged moments with an observation that has an association using the given link name")
+            .description(
+                "Count all imaged moments with an observation that has an association using the given link name"
+            )
             .name("countImagedMomentsByLinkName")
             .tag(tag)
 
@@ -625,7 +627,6 @@ class ImagedMomentEndpoints(controller: ImagedMomentController)(using
     )
 
     override def allImpl: List[ServerEndpoint[Any, Future]] = List(
-
         countImagedMomentsByConceptNameImpl,
         countImagedMomentsByConceptNameWithImagesImpl,
         findImagedMomentsByConceptNameWithImagesImpl,

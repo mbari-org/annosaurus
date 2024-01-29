@@ -28,7 +28,7 @@ ThisBuild / Test / fork              := true
 ThisBuild / Test / parallelExecution := false
 ThisBuild / Test / testOptions += Tests.Argument(TestFrameworks.MUnit, "-b")
 ThisBuild / Test / javaOptions ++= Seq(
-    "-Duser.timeszone=UTC"
+    "-Duser.timezone=UTC"
 )
 
 lazy val annosaurus = (project in file("annosaurus"))

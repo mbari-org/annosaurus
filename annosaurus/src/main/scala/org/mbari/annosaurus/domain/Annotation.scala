@@ -48,6 +48,13 @@ final case class Annotation(
     lazy val duration: Option[Duration]      = durationMillis.map(Duration.ofMillis(_))
     lazy val validTimecode: Option[Timecode] = timecode.map(Timecode(_))
 
+    def removeForeignKeys(): Annotation =
+        copy(
+            associations = associations.map(_.removeForeignKeys()),
+            imageReferences = imageReferences.map(_.removeForeignKeys()),
+            ancillaryData = ancillaryData.map(_.removeForeignKeys())
+        )
+
     override def toSnakeCase: AnnotationSC =
         AnnotationSC(
             activity,
@@ -167,57 +174,6 @@ object Annotation extends FromEntity[ObservationEntity, Annotation] {
                 baseIm.setAncillaryDatum(x.getAncillaryDatum())
 
         imagedMomentMap.keys.toSeq
-
-        // val imagedMoments =
-        //     for (imagedMomentUuid, annos) <- annotations
-        //                                          .filter(x =>
-        //                                              x.imagedMomentUuid.isDefined && x
-        //                                                  .videoReferenceUuid
-        //                                                  .isDefined && x.concept.isDefined
-        //                                          )
-        //                                          .groupBy(_.imagedMomentUuid.get)
-        //     yield
-        //         val a  = annos.head
-        //         val tc = a.timecode.map(Timecode(_)).orNull
-        //         val et = a.elapsedTimeMillis.map(Duration.ofMillis(_)).orNull
-        //         val im = ImagedMomentEntity(
-        //             a.videoReferenceUuid.orNull,
-        //             a.recordedTimestamp.orNull,
-        //             tc,
-        //             et
-        //         )
-        //         im.setUuid(imagedMomentUuid)
-
-        //         if extend then
-        //             annos.find(_.ancillaryData.isDefined).foreach { a =>
-        //                 im.setAncillaryDatum(a.ancillaryData.get.toEntity)
-        //             }
-
-        //         for a <- annos
-        //         do
-        //             val d   = a.durationMillis.map(Duration.ofMillis(_))
-        //             val obs = ObservationEntity(
-        //                 a.concept.get,
-        //                 d.orNull,
-        //                 a.observationTimestamp.orNull,
-        //                 a.observer.orNull,
-        //                 a.group.orNull,
-        //                 a.activity.orNull
-        //             )
-        //             a.observationUuid.foreach(obs.setUuid)
-        //             im.addObservation(obs)
-
-        //             a.associations.foreach(x => obs.addAssociation(x.toEntity))
-        //             val irs = im.getImageReferences.asScala
-        //             a.imageReferences
-        //                 .foreach(x =>
-        //                     irs.find(i => i.getUrl == x.url) match
-        //                         case Some(link_value) => // Do nothing. Image already exists
-        //                         case None             => im.addImageReference(x.toEntity)
-        //                 )
-        //         im
-
-        // imagedMoments.toSeq
 
     }
 

@@ -124,7 +124,7 @@ class AssociationController(
         associations: Iterable[Association]
     )(implicit ec: ExecutionContext): Future[Iterable[Association]] = {
         def fn(dao: ADAO): Iterable[Association] =
-            val validAssociations  = associations.filter(_.uuid.isDefined)
+            val validAssociations = associations.filter(_.uuid.isDefined)
             validAssociations.flatMap(a0 => {
                 dao
                     .findByUUID(a0.uuid.get)

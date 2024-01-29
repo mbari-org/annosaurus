@@ -122,7 +122,7 @@ trait AssociationControllerSuite extends BaseDAOSuite {
         val x               = TestUtils.create(1, 1, 8, 0).head
         val associations    = x.getObservations.asScala.flatMap(_.getAssociations.asScala)
         associations.foreach(_.setLinkName("foobarbazbin"))
-        val dtos = associations.map(Association.from(_))
+        val dtos            = associations.map(Association.from(_))
         val newAssociations = exec(controller.bulkUpdate(dtos))
         val ax              = associations.toSeq.sortBy(_.getUuid)
         val bx              = newAssociations.toSeq.sortBy(_.uuid.get)

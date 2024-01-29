@@ -18,7 +18,7 @@ package org.mbari.annosaurus
 
 import com.typesafe.config.ConfigFactory
 import org.mbari.annosaurus.etc.jdk.Logging
-import org.mbari.annosaurus.etc.jdk.Logging.{given, *}
+import org.mbari.annosaurus.etc.jdk.Logging.{*, given}
 import org.mbari.annosaurus.etc.jwt.JwtService
 
 import scala.util.Try
@@ -54,9 +54,9 @@ object AppConfig {
 
     lazy val DefaultZeroMQConfig: Option[ZeroMQConfig] =
         try {
-            val port = Config.getInt("messaging.zeromq.port")
+            val port   = Config.getInt("messaging.zeromq.port")
             val enable = Config.getBoolean("messaging.zeromq.enable")
-            val topic = Config.getString("messaging.zeromq.topic")
+            val topic  = Config.getString("messaging.zeromq.topic")
             Some(ZeroMQConfig(port, enable, topic))
         }
         catch {

@@ -51,7 +51,7 @@ class AnalysisRepository(entityManagerFactory: EntityManagerFactory) {
         val entityManager: EntityManager = entityManagerFactory.createEntityManager()
         val query                        = QueryConstraintsSqlBuilder.toQuery(constraints, entityManager, select, "")
 
-        println(query)
+//        println(query)
         val results = query.getResultList.asScala.toList
         entityManager.close()
         val values  = results

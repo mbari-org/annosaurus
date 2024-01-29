@@ -42,9 +42,9 @@ class AssociationEndpoints(controller: AssociationController)(using
     ec: ExecutionContext,
     jwtService: JwtService
 ) extends Endpoints {
-    
+
     private val base = "associations"
-    private val tag = "Associations"
+    private val tag  = "Associations"
 
     // GET /:uuid
     val findAssociationByUuid: Endpoint[Unit, UUID, ErrorMsg, AssociationSC, Any] = openEndpoint

@@ -22,12 +22,11 @@ import java.util.UUID
 
 import jakarta.persistence.EntityManager
 
-import org.slf4j.LoggerFactory
-
 import scala.concurrent.{ExecutionContext, Future}
 import scala.jdk.CollectionConverters._
 import org.mbari.annosaurus.domain.CachedAncillaryDatum
 import org.mbari.annosaurus.repository.jpa.extensions.*
+import org.mbari.annosaurus.etc.jdk.Logging.{*, given}
 
 /** @author
   *   Brian Schlining
@@ -37,7 +36,7 @@ class FastAncillaryDataController(val entityManager: EntityManager) {
 
     private[this] val tableName = "ancillary_data"
 
-    private[this] val log = LoggerFactory.getLogger(getClass)
+    private val log = System.getLogger(getClass.getName)
 
     // Needs to be called in a transaction
     def createOrUpdate(data: Seq[CachedAncillaryDatum])(using ec: ExecutionContext): Unit =
@@ -46,7 +45,7 @@ class FastAncillaryDataController(val entityManager: EntityManager) {
             if (!ok) {
                 val msg =
                     "Failed to create or update ancillary data with imagedMomentUuid = " + d.imagedMomentUuid
-                log.error(msg)
+                log.atError.log(msg)
                 throw new RuntimeException(msg)
             }
         }
@@ -62,7 +61,7 @@ class FastAncillaryDataController(val entityManager: EntityManager) {
                     s"SELECT uuid FROM $tableName WHERE imaged_moment_uuid = :uuid"
                 val query = entityManager.createNativeQuery(sql)
                 query.setParameter("uuid", imagedMomentUuid)
-                log.atWarn.log("SQL: " + sql)
+                log.atDebug.log(() => "SQL: " + sql)
                 val n     = query
                     .getResultList
                     .asScala
@@ -86,7 +85,7 @@ class FastAncillaryDataController(val entityManager: EntityManager) {
             val cols   = keys.mkString("(", ", ", ")")
             val values = keys.map(k => sqlData(k)).mkString("(", ", ", ")")
             val sql    = s"INSERT INTO $tableName $cols VALUES $values"
-            log.atWarn.log("SQL: " + sql)
+            log.atDebug.log(() => "SQL: " + sql)
             val n      = entityManager
                 .createNativeQuery(sql)
                 .executeUpdate()
@@ -126,7 +125,7 @@ class FastAncillaryDataController(val entityManager: EntityManager) {
             datum.salinity.map(v => "salinity" -> s"$v") ::
             datum.temperatureCelsius.map(v => "temperature_celsius" -> s"$v") ::
             datum.pressureDbar.map(v => "pressure_dbar" -> s"$v") ::
-            Some("last_updated_time" -> s"'$lastUpdated'") ::
+            Some("last_updated_timestamp" -> s"'$lastUpdated'") ::
             Nil).flatten.toMap
     }
 

@@ -31,11 +31,11 @@ import java.nio.charset.StandardCharsets
 
 trait ImageEndpointsSuite extends EndpointsSuite {
 
-    private val log = System.getLogger(getClass.getName)
-    given JPADAOFactory = daoFactory
+    private val log              = System.getLogger(getClass.getName)
+    given JPADAOFactory          = daoFactory
     given jwtService: JwtService = new JwtService("mbari", "foo", "bar")
-    lazy val controller = new ImageController(daoFactory)
-    lazy val endpoints = new ImageEndpoints(controller)
+    lazy val controller          = new ImageController(daoFactory)
+    lazy val endpoints           = new ImageEndpoints(controller)
 
     test("findOneImage") {
         val im = TestUtils.create(1, 0, 0, 1).head
@@ -83,8 +83,8 @@ trait ImageEndpointsSuite extends EndpointsSuite {
     }
 
     test("findByImageName") {
-        val im = TestUtils.create(1, 0, 0, 1).head
-        val ir = im.getImageReferences.iterator.next()
+        val im        = TestUtils.create(1, 0, 0, 1).head
+        val ir        = im.getImageReferences.iterator.next()
         val imageName = ir.getUrl.toExternalForm.split("/").last
         runGet(
             endpoints.findByImageNameImpl,
@@ -100,8 +100,8 @@ trait ImageEndpointsSuite extends EndpointsSuite {
     }
 
     test("findByImageUrl") {
-        val im = TestUtils.create(1, 0, 0, 1).head
-        val ir = im.getImageReferences.iterator.next()
+        val im  = TestUtils.create(1, 0, 0, 1).head
+        val ir  = im.getImageReferences.iterator.next()
         val url = URLEncoder.encode(ir.getUrl.toExternalForm, StandardCharsets.UTF_8)
 //        println(url)
         runGet(
@@ -117,63 +117,72 @@ trait ImageEndpointsSuite extends EndpointsSuite {
     }
 
     test("createOne (json)") {
-        val im = TestUtils.create(1).head
-        val ir = TestUtils.randomImageReference()
+        val im          = TestUtils.create(1).head
+        val ir          = TestUtils.randomImageReference()
         im.addImageReference(ir)
-        val ic = ImageCreateSC.from(im, true).head
-        val jwt = jwtService.authorize("foo").orNull
+        val ic          = ImageCreateSC.from(im, true).head
+        val jwt         = jwtService.authorize("foo").orNull
         assert(jwt != null)
         val backendStub = newBackendStub(endpoints.createOneImageImpl)
-        val response = basicRequest
+        val response    = basicRequest
             .post(uri"http://localhost:8080/v1/images")
             .body(ic.stringify)
-            .auth.bearer(jwt)
+            .auth
+            .bearer(jwt)
             .contentType("application/json")
             .send(backendStub)
             .join
         assertEquals(response.code, StatusCode.Ok)
-        val obtained = checkResponse[ImageSC](response.body)
-        val expected = Image.from(ir, true).copy(imageReferenceUuid = obtained.image_reference_uuid).toSnakeCase
+        val obtained    = checkResponse[ImageSC](response.body)
+        val expected    = Image
+            .from(ir, true)
+            .copy(imageReferenceUuid = obtained.image_reference_uuid)
+            .toSnakeCase
         assertEquals(obtained, expected)
     }
 
     test("createOne (form)") {
-        val im = TestUtils.create(1).head
-        val ir = TestUtils.randomImageReference()
+        val im          = TestUtils.create(1).head
+        val ir          = TestUtils.randomImageReference()
         im.addImageReference(ir)
-        val ic = ImageCreateSC.from(im, true).head
-        val body = Reflect.toFormBody(ic)
-        val jwt = jwtService.authorize("foo").orNull
+        val ic          = ImageCreateSC.from(im, true).head
+        val body        = Reflect.toFormBody(ic)
+        val jwt         = jwtService.authorize("foo").orNull
         assert(jwt != null)
         val backendStub = newBackendStub(endpoints.createOneImageImpl)
-        val response = basicRequest
+        val response    = basicRequest
             .post(uri"http://localhost:8080/v1/images")
             .body(body)
-            .auth.bearer(jwt)
+            .auth
+            .bearer(jwt)
             .contentType("application/x-www-form-urlencoded")
             .send(backendStub)
             .join
         assertEquals(response.code, StatusCode.Ok)
-        val obtained = checkResponse[ImageSC](response.body)
-        val expected = Image.from(ir, true).copy(imageReferenceUuid = obtained.image_reference_uuid).toSnakeCase
+        val obtained    = checkResponse[ImageSC](response.body)
+        val expected    = Image
+            .from(ir, true)
+            .copy(imageReferenceUuid = obtained.image_reference_uuid)
+            .toSnakeCase
         assertEquals(obtained, expected)
     }
 
     test("updateOne (json)") {
 
-        val im = TestUtils.create(1, 0, 0, 1).head
-        val ir = im.getImageReferences.iterator.next()
+        val im          = TestUtils.create(1, 0, 0, 1).head
+        val ir          = im.getImageReferences.iterator.next()
         ir.setUrl(URI.create("http://foo.com/hello.png").toURL)
         ir.setDescription("foo")
-        val expected = Image.from(ir, true).toSnakeCase
-        val update = ImageUpdateSC.from(ir)
-        val jwt = jwtService.authorize("foo").orNull
+        val expected    = Image.from(ir, true).toSnakeCase
+        val update      = ImageUpdateSC.from(ir)
+        val jwt         = jwtService.authorize("foo").orNull
         assert(jwt != null)
         val backendStub = newBackendStub(endpoints.updateOneImageImpl)
-        val response = basicRequest
+        val response    = basicRequest
             .put(uri"/v1/images/${ir.getUuid}")
             .body(update.stringify)
-            .auth.bearer(jwt)
+            .auth
+            .bearer(jwt)
             .contentType("application/json")
             .send(backendStub)
             .join
@@ -189,20 +198,21 @@ trait ImageEndpointsSuite extends EndpointsSuite {
 
     test("updateOne (form)") {
 
-        val im = TestUtils.create(1, 0, 0, 1).head
-        val ir = im.getImageReferences.iterator.next()
+        val im          = TestUtils.create(1, 0, 0, 1).head
+        val ir          = im.getImageReferences.iterator.next()
         ir.setUrl(URI.create("http://foo.com/hellofoo.png").toURL)
         ir.setDescription("foofoo")
-        val expected = Image.from(ir, true).toSnakeCase
-        val update = ImageUpdateSC.from(ir)
-        val body = Reflect.toFormBody(update)
-        val jwt = jwtService.authorize("foo").orNull
+        val expected    = Image.from(ir, true).toSnakeCase
+        val update      = ImageUpdateSC.from(ir)
+        val body        = Reflect.toFormBody(update)
+        val jwt         = jwtService.authorize("foo").orNull
         assert(jwt != null)
         val backendStub = newBackendStub(endpoints.updateOneImageImpl)
-        val response = basicRequest
+        val response    = basicRequest
             .put(uri"/v1/images/${ir.getUuid}")
             .body(body)
-            .auth.bearer(jwt)
+            .auth
+            .bearer(jwt)
             .contentType("application/x-www-form-urlencoded")
             .send(backendStub)
             .join

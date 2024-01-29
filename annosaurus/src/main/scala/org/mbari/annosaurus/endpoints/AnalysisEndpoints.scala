@@ -38,7 +38,7 @@ class AnalysisEndpoints(repository: AnalysisRepository)(implicit val executor: E
     extends Endpoints {
 
     private val base = "histogram"
-    private val tag = "Analysis"
+    private val tag  = "Analysis"
 
     val depthHistogram
         : Endpoint[Unit, (Option[Int], QueryConstraintsSC), ErrorMsg, QueryConstraintsResponseSC[
@@ -88,6 +88,7 @@ class AnalysisEndpoints(repository: AnalysisRepository)(implicit val executor: E
     override def all: List[Endpoint[?, ?, ?, ?, ?]] =
         List(depthHistogram, timeHistogram)
 
-    override def allImpl: List[ServerEndpoint[Any, Future]] = List(depthHistogramImpl, timeHistogramImpl)
+    override def allImpl: List[ServerEndpoint[Any, Future]] =
+        List(depthHistogramImpl, timeHistogramImpl)
 
 }

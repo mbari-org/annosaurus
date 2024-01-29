@@ -297,8 +297,10 @@ trait FastAnnotationEndpointsSuite extends EndpointsSuite {
     }
 
     test("findAnnotationsByLinkNameAndLinkValue") {
-        val xs  = TestUtils.create(1, 1, 1).head
-        val obs = xs.getObservations.iterator().next()
+        val im  = TestUtils.create(1, 1, 1, 1).head
+        assert(im.getUuid != null)
+        val obs = im.getObservations.iterator().next()
+        assert(obs.getUuid != null)
         val ass = obs.getAssociations.iterator().next()
         runGet(
             endpoints.findAnnotationsByLinkNameAndLinkValueImpl,
@@ -308,7 +310,9 @@ trait FastAnnotationEndpointsSuite extends EndpointsSuite {
                 val annos    = checkResponse[Seq[AnnotationSC]](response.body)
                 assertEquals(annos.size, 1)
                 val obtained = annos.head.toCamelCase
-                val expected = Annotation.from(obs, false)
+                val expected = Annotation.from(obs).removeForeignKeys()
+//                println("EXPECTED: " + expected.stringify)
+//                println("OBTAINED: " + obtained.stringify)
                 assertEquals(obtained, expected)
             }
         )

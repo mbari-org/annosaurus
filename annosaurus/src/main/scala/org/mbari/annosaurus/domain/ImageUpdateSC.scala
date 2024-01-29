@@ -34,8 +34,7 @@ case class ImageUpdateSC(
     description: Option[String] = None
 )
 
-object ImageUpdateSC
-    extends FromEntity[ImageReferenceEntity, ImageUpdateSC] {
+object ImageUpdateSC extends FromEntity[ImageReferenceEntity, ImageUpdateSC] {
 
     override def from(entity: ImageReferenceEntity, extend: Boolean = false): ImageUpdateSC = {
         val im = entity.getImagedMoment
@@ -52,5 +51,3 @@ object ImageUpdateSC
         )
     }
 }
-
-

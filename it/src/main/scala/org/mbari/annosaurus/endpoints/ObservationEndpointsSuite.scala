@@ -17,7 +17,16 @@
 package org.mbari.annosaurus.endpoints
 
 import org.mbari.annosaurus.controllers.{ImagedMomentController, ObservationController, TestUtils}
-import org.mbari.annosaurus.domain.{ConceptCount, CountForVideoReferenceSC, ImagedMoment, Observation, ObservationSC, ObservationUpdateSC, RenameConcept, RenameCountSC}
+import org.mbari.annosaurus.domain.{
+    ConceptCount,
+    CountForVideoReferenceSC,
+    ImagedMoment,
+    Observation,
+    ObservationSC,
+    ObservationUpdateSC,
+    RenameConcept,
+    RenameCountSC
+}
 import org.mbari.annosaurus.etc.jwt.JwtService
 import org.mbari.annosaurus.repository.jpa.JPADAOFactory
 import org.mbari.annosaurus.etc.tapir.TapirCodecs.given
@@ -315,12 +324,13 @@ trait ObservationEndpointsSuite extends EndpointsSuite {
         val jwt        = jwtService.authorize("foo").orNull
         assert(jwt != null)
         val newConcept = s"new-concept-${seed.head.getVideoReferenceUuid}"
-        val dto = RenameConcept(newConcept, concept)
-        val body = dto.stringify
+        val dto        = RenameConcept(newConcept, concept)
+        val body       = dto.stringify
         val backend    = newBackendStub(endpoints.renameConceptImpl)
         val response   = basicRequest
             .put(uri"http://test.com/v1/observations/concept/rename?old=$concept&new=$newConcept")
-            .auth.bearer(jwt)
+            .auth
+            .bearer(jwt)
             .body(body)
             .contentType("application/json")
             .send(backend)
@@ -339,37 +349,38 @@ trait ObservationEndpointsSuite extends EndpointsSuite {
     }
 
     test("renameConcept (form)") {
-        val seed = TestUtils.build(2, 1, 0, 1)
+        val seed          = TestUtils.build(2, 1, 0, 1)
         val expectedCount = seed.flatMap(_.getObservations.asScala).size
-        val concept = s"concept-${seed.head.getVideoReferenceUuid}"
+        val concept       = s"concept-${seed.head.getVideoReferenceUuid}"
         for
-            im <- seed
+            im  <- seed
             obs <- im.getObservations.asScala
         do obs.setConcept(concept)
-        val c = ImagedMomentController(daoFactory)
+        val c  = ImagedMomentController(daoFactory)
         val xs = c.create(seed).join
 
-        val jwt = jwtService.authorize("foo").orNull
+        val jwt        = jwtService.authorize("foo").orNull
         assert(jwt != null)
         val newConcept = s"new-concept-${seed.head.getVideoReferenceUuid}"
-        val dto = RenameConcept(newConcept, concept)
-        val body = Reflect.toFormBody(dto)
-        val backend = newBackendStub(endpoints.renameConceptImpl)
-        val response = basicRequest
+        val dto        = RenameConcept(newConcept, concept)
+        val body       = Reflect.toFormBody(dto)
+        val backend    = newBackendStub(endpoints.renameConceptImpl)
+        val response   = basicRequest
             .put(uri"http://test.com/v1/observations/concept/rename?old=$concept&new=$newConcept")
-            .auth.bearer(jwt)
+            .auth
+            .bearer(jwt)
             .body(body)
             .contentType("application/x-www-form-urlencoded")
             .send(backend)
             .join
         assertEquals(response.code, StatusCode.Ok)
-        val obtained = checkResponse[RenameCountSC](response.body)
+        val obtained   = checkResponse[RenameCountSC](response.body)
         assertEquals(obtained.old_concept, concept)
         assertEquals(obtained.new_concept, newConcept)
         assertEquals(obtained.count, expectedCount.longValue)
 
         // Check that the concept was renamed
-        val d = ObservationController(daoFactory)
+        val d  = ObservationController(daoFactory)
         val v1 = d.findAllConcepts.join.toSet
         assert(v1.contains(newConcept))
         assert(!v1.contains(concept))

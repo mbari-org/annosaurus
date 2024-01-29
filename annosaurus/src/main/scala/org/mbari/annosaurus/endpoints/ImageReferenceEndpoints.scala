@@ -34,9 +34,9 @@ class ImageReferenceEndpoints(controller: ImageReferenceController)(using
     val executor: ExecutionContext,
     jwtService: JwtService
 ) extends Endpoints {
-    
+
     private val base = "imagereferences"
-    private val tag = "Image References"
+    private val tag  = "Image References"
 
     val deleteImageByUuid: Endpoint[Option[String], UUID, ErrorMsg, Unit, Any] =
         secureEndpoint

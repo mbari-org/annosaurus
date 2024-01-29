@@ -31,6 +31,7 @@ import org.mbari.annosaurus.domain.MultiRequest
 import org.mbari.annosaurus.etc.circe.CirceCodecs.{*, given}
 import org.mbari.vcr4j.time.Timecode
 
+import java.nio.file.Files
 import java.util.UUID
 import scala.io.Source
 import scala.util.{Failure, Success, Using}
@@ -210,12 +211,14 @@ trait AnnotationControllerSuite extends BaseDAOSuite {
             assert(annos.nonEmpty)
             val n     = exec(controller.bulkCreate(annos), Duration.ofSeconds(120))
             assertEquals(n.size, annos.size)
+            daoFactory.cleanup() // IMPORTANT or collides with other tests
 
         } match {
             case Failure(e) => fail(e.toString)
             case Success(_) =>
             // trust but verify
         }
+
     }
 
     test("bulkCreate a 200 annotations with imageReferences") {
@@ -229,9 +232,17 @@ trait AnnotationControllerSuite extends BaseDAOSuite {
                 .filter(_.imageReferences.nonEmpty)
                 .take(200)
             assert(annos.nonEmpty)
+//            Files.write(
+//                java.nio.file.Path.of("expected.json"),
+//                annos.sortBy(_.recordedTimestamp).stringify.getBytes()
+//            )
             val n     = exec(controller.bulkCreate(annos), Duration.ofSeconds(120))
+//            Files.write(
+//                java.nio.file.Path.of("obtained.json"),
+//                n.sortBy(_.recordedTimestamp).stringify.getBytes()
+//            )
             assertEquals(n.size, annos.size)
-
+            daoFactory.cleanup() // IMPORTANT or collides wwith other tests
         } match {
             case Failure(e) => fail(e.toString)
             case Success(_) =>
@@ -272,15 +283,15 @@ trait AnnotationControllerSuite extends BaseDAOSuite {
                 obs1.setUuid(anno.observationUuid.get)
                 val a1 = Annotation.from(obs1, true)
                 val a0 = Annotation.from(obs0, true)
-                log.atDebug.log("ORIGINAL:   " + a0.stringify)
-                log.atDebug.log("NEW VALUES: " + a1.stringify)
-                log.atDebug.log("UPDATED:    " + anno.stringify)
+//                log.atDebug.log("ORIGINAL:   " + a0.stringify)
+//                log.atDebug.log("NEW VALUES: " + a1.stringify)
+//                log.atDebug.log("UPDATED:    " + anno.stringify)
                 AssertUtils.assertSameImagedMoment(im1, im2, false)
 
     }
 
     test("bulkUpdate") {
-        val xs =
+        val xs                 =
             TestUtils.create(2, 2) // tested with upt to 30, 10. 100 by 10 takes more than 30sec
         val videoReferenceUuid = xs.head.getVideoReferenceUuid
         val elapsedTime        = Duration.ofSeconds(1234)
@@ -298,7 +309,7 @@ trait AnnotationControllerSuite extends BaseDAOSuite {
         val n                  = exec(controller.bulkUpdate(annos), Duration.ofSeconds(60))
         assertEquals(n.size, annos.size)
         n.foreach { anno =>
-            log.atWarn.log(anno.stringify)
+//            log.atWarn.log(anno.stringify)
             assert(anno.concept.isDefined)
             assert(anno.elapsedTime.isDefined)
             assert(anno.videoReferenceUuid.isDefined)

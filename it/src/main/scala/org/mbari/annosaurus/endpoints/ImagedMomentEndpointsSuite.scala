@@ -502,16 +502,18 @@ trait ImagedMomentEndpointsSuite extends EndpointsSuite {
         assertEquals(obtained, expected)
     }
 
-    test("updateRecordedTimestampsForVideoReference".flaky) {
+    test("updateRecordedTimestampsForVideoReference") {
         val xs                   = TestUtils.create(4)
         val newRecordedTimestamp = Instant.now().minus(Duration.ofDays(1))
-        val ts                   = Instants.formatCompactIso8601(newRecordedTimestamp)
+        val ts                   = Instants.CompactTimeFormatterNs.format(newRecordedTimestamp)
+//        val ts                   = Instants.formatCompactIso8601(newRecordedTimestamp)
         val jwt                  = jwtService.authorize("foo").orNull
         assert(jwt != null)
         val backendStub          = newBackendStub(endpoints.updateRecordedTimestampsForVideoReferenceImpl)
         val response             = basicRequest
             .put(uri"http://test.com/v1/imagedmoments/newtime/${xs.head.getVideoReferenceUuid}/$ts")
-            .header("Authorization", s"Bearer $jwt")
+            .auth
+            .bearer(jwt)
             .send(backendStub)
             .join
         assertEquals(response.code, StatusCode.Ok)

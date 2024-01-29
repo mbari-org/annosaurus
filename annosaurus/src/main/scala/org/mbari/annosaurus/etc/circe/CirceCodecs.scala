@@ -178,15 +178,13 @@ object CirceCodecs {
     given annotationCreateEncoder: Encoder[AnnotationCreate]         = deriveEncoder
     given annotationCreateDecoder: Decoder[AnnotationCreate]         =
         annotationCreateCcDecoder or annotationCreateScDecoder.map(_.toCamelCase)
-        
+
     given annotationUpdateScDecoder: Decoder[AnnotationUpdateSC]     = deriveDecoder
     given annotationUpdateScEncoder: Encoder[AnnotationUpdateSC]     = deriveEncoder
     private val annotationUpdateCcDecoder: Decoder[AnnotationUpdate] = deriveDecoder
     given annotationUpdateEncoder: Encoder[AnnotationUpdate]         = deriveEncoder
     given annotationUpdateDecoder: Decoder[AnnotationUpdate]         =
         annotationUpdateCcDecoder or annotationUpdateScDecoder.map(_.toCamelCase)
-        
-    
 
     given imageScDecoder: Decoder[ImageSC]     = deriveDecoder
     given imageScEncoder: Encoder[ImageSC]     = deriveEncoder
@@ -320,9 +318,11 @@ object CirceCodecs {
       * @param value
       *   Any value with an implicit circe coder in scope
       */
-    extension [T: Encoder](value: T) def stringify: String = Encoder[T].apply(value)
-        .deepDropNullValues
-        .stringify
+    extension [T: Encoder](value: T)
+        def stringify: String = Encoder[T]
+            .apply(value)
+            .deepDropNullValues
+            .stringify
 
     extension [T: Decoder](jsonString: String)
         def toJson: Either[ParsingFailure, Json] = parser.parse(jsonString);

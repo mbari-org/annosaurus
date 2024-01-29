@@ -105,6 +105,7 @@ class CachedAncillaryDatumController(val daoFactory: JPADAOFactory)
                             theta,
                             psi
                         )
+//                        println("---- " + cad)
                         imagedMoment.setAncillaryDatum(cad)
                         Some(cad)
                     }
@@ -336,20 +337,25 @@ class CachedAncillaryDatumController(val daoFactory: JPADAOFactory)
             def datumToMillis(cd: CachedAncillaryDatum) =
                 cd.recordedTimestamp.map(_.toEpochMilli).getOrElse(-1L).toDouble
 
-            val mergedData = FastCollator(
-                imagedMoments,
-                imagedMomentToMillis,
-                usefulData,
-                datumToMillis,
-                tolerance.toMillis.toDouble
-            )
+            if (imagedMoments.isEmpty || usefulData.isEmpty) {
+                Seq.empty
+            }
+            else {
+                val mergedData = FastCollator(
+                    imagedMoments,
+                    imagedMomentToMillis,
+                    usefulData,
+                    datumToMillis,
+                    tolerance.toMillis.toDouble
+                )
 
-            for {
-                (im, opt) <- mergedData
-                cad       <- opt
-            } yield {
-                val d = dao.newPersistentObject(cad.toEntity)
-                transform(createOrUpdate(d, im))
+                for {
+                    (im, opt) <- mergedData
+                    cad       <- opt
+                } yield {
+                    val d = dao.newPersistentObject(cad.toEntity)
+                    transform(createOrUpdate(d, im))
+                }
             }
         }
 

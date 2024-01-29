@@ -17,7 +17,16 @@
 package org.mbari.annosaurus.endpoints
 
 import org.mbari.annosaurus.controllers.{AssociationController, TestUtils}
-import org.mbari.annosaurus.domain.{Association, AssociationSC, ConceptAssociation, ConceptAssociationRequest, ConceptAssociationResponseSC, ConceptCount, RenameConcept, RenameCountSC}
+import org.mbari.annosaurus.domain.{
+    Association,
+    AssociationSC,
+    ConceptAssociation,
+    ConceptAssociationRequest,
+    ConceptAssociationResponseSC,
+    ConceptCount,
+    RenameConcept,
+    RenameCountSC
+}
 import org.mbari.annosaurus.etc.jwt.JwtService
 import org.mbari.annosaurus.repository.jpa.JPADAOFactory
 import sttp.model.StatusCode
@@ -369,9 +378,8 @@ trait AssociationEndpointsSuite extends EndpointsSuite {
             uuid <- a.uuid
         yield controller.update(uuid, toConcept = Some(toConcept)).join).flatten
         val newToConcept = "Pandalus"
-        val dto = RenameConcept(newToConcept, toConcept)
-        val body = dto.stringify
-        println("-----" + body)
+        val dto          = RenameConcept(newToConcept, toConcept)
+        val body         = dto.stringify
 
         val jwt         = jwtService.authorize("foo").orNull
         assert(jwt != null)
@@ -402,26 +410,26 @@ trait AssociationEndpointsSuite extends EndpointsSuite {
     }
 
     test("renameToConcept (form)") {
-        val xs = TestUtils.create(2, 2, 2)
+        val xs   = TestUtils.create(2, 2, 2)
         val dtos = for
             x <- xs
             o <- x.getObservations.asScala
             a <- o.getAssociations.asScala
         yield Association.from(a, true)
 
-        val toConcept = "Pandalus platyceros"
-        val expected = (for
-            a <- dtos
+        val toConcept    = "Pandalus platyceros"
+        val expected     = (for
+            a    <- dtos
             uuid <- a.uuid
         yield controller.update(uuid, toConcept = Some(toConcept)).join).flatten
         val newToConcept = "Pandalus"
-        val dto = RenameConcept(newToConcept, toConcept)
-        val body = Reflect.toFormBody(dto)
+        val dto          = RenameConcept(newToConcept, toConcept)
+        val body         = Reflect.toFormBody(dto)
 
-        val jwt = jwtService.authorize("foo").orNull
+        val jwt         = jwtService.authorize("foo").orNull
         assert(jwt != null)
         val backendStub = newBackendStub(endpoints.renameToConceptImpl)
-        val response = basicRequest
+        val response    = basicRequest
             .put(
                 uri"http://test.com/v1/associations/toconcept/rename"
             )
@@ -432,13 +440,13 @@ trait AssociationEndpointsSuite extends EndpointsSuite {
             .send(backendStub)
             .join
         assertEquals(response.code, StatusCode.Ok)
-        val obtained = checkResponse[RenameCountSC](response.body)
+        val obtained    = checkResponse[RenameCountSC](response.body)
         assertEquals(obtained.count, expected.size.toLong)
         assertEquals(obtained.old_concept, toConcept)
         assertEquals(obtained.new_concept, newToConcept)
 
         for
-            a <- dtos
+            a    <- dtos
             uuid <- a.uuid
         do
             val b = controller.findByUUID(uuid).join
@@ -447,11 +455,11 @@ trait AssociationEndpointsSuite extends EndpointsSuite {
     }
 
     test("findAssociationsByConceptAssociationRequest") {
-        val xs   = TestUtils.create(1, 2, 2) ++ TestUtils.create(1, 2, 2)
+        val xs = TestUtils.create(1, 2, 2) ++ TestUtils.create(1, 2, 2)
 
         // rename all associations linktNames
         val linkName = "Cthulhu"
-        val dtos = (for
+        val dtos     = (for
             x <- xs
             o <- x.getObservations.asScala
             a <- o.getAssociations.asScala
@@ -459,7 +467,7 @@ trait AssociationEndpointsSuite extends EndpointsSuite {
 
         // Verify that they were renamed
         for
-            a <- dtos
+            a    <- dtos
             uuid <- a.uuid
         do
             val b = controller.findByUUID(uuid).join
@@ -467,7 +475,7 @@ trait AssociationEndpointsSuite extends EndpointsSuite {
 
         // build request
         val videoReferenceUuids = xs.map(_.getVideoReferenceUuid).distinct
-        val car = ConceptAssociationRequest(videoReferenceUuids, linkName)
+        val car                 = ConceptAssociationRequest(videoReferenceUuids, linkName)
 
         // run request
         runPost(

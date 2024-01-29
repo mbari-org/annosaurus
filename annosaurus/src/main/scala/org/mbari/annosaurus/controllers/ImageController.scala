@@ -22,8 +22,7 @@ import java.util.UUID
 import org.mbari.annosaurus.repository.ImagedMomentDAO
 import org.mbari.annosaurus.domain.{Image, ImageCreateSC}
 import org.mbari.vcr4j.time.Timecode
-import org.mbari.annosaurus.etc.jdk.Logging.{given, *}
-
+import org.mbari.annosaurus.etc.jdk.Logging.{*, given}
 
 import scala.concurrent.{ExecutionContext, Future}
 import org.mbari.annosaurus.repository.jpa.JPADAOFactory
@@ -81,42 +80,51 @@ class ImageController(daoFactory: JPADAOFactory) {
         f
     }
 
-    /**
-     *
-     * @param imageCreates The image data to create
-     * @param ec
-     * @return Only the newly created images. If an image already exists, it is not returned.
-     */
-    def bulkCreate(imageCreates: Seq[ImageCreateSC])(using ec: ExecutionContext): Future[Seq[Image]] =
-        val imDao = daoFactory.newImagedMomentDAO()
-        val irDao = daoFactory.newImageReferenceDAO(imDao)
+    /** @param imageCreates
+      *   The image data to create
+      * @param ec
+      * @return
+      *   Only the newly created images. If an image already exists, it is not returned.
+      */
+    def bulkCreate(imageCreates: Seq[ImageCreateSC])(using
+        ec: ExecutionContext
+    ): Future[Seq[Image]] =
+        val imDao      = daoFactory.newImagedMomentDAO()
+        val irDao      = daoFactory.newImageReferenceDAO(imDao)
         val candidates = imageCreates.distinctBy(_.url)
         // prefilter
-        val f = for
-            newOnes <- irDao.runTransaction(d => candidates.filter(c => d.findByURL(c.url).isEmpty))
+        val f          = for
+            newOnes      <- irDao.runTransaction(d => candidates.filter(c => d.findByURL(c.url).isEmpty))
             newlyCreated <- irDao.runTransaction(d => {
-                for
-                    ic <- newOnes
-                yield
-                    val imagedMoment = ImagedMomentController
-                        .findOrCreateImagedMoment(
-                            imDao,
-                            ic.video_reference_uuid,
-                            ic.timecode.map(new Timecode(_)),
-                            ic.recorded_timestamp,
-                            ic.elapsed_time_millis.map(Duration.ofMillis)
-                        )
-                    val imageReference = irDao.newPersistentObject(ic.url, ic.description, ic.height_pixels, ic.width_pixels, ic.format)
-                    imagedMoment.addImageReference(imageReference)
-                    irDao.flush()
-                    imageReference
-            })
-            persisted <- irDao.runTransaction(d => newlyCreated.flatMap(i => d.findByUUID(i.getUuid).map(Image.from(_, true))))
+                                for ic <- newOnes
+                                yield
+                                    val imagedMoment   = ImagedMomentController
+                                        .findOrCreateImagedMoment(
+                                            imDao,
+                                            ic.video_reference_uuid,
+                                            ic.timecode.map(new Timecode(_)),
+                                            ic.recorded_timestamp,
+                                            ic.elapsed_time_millis.map(Duration.ofMillis)
+                                        )
+                                    val imageReference = irDao.newPersistentObject(
+                                        ic.url,
+                                        ic.description,
+                                        ic.height_pixels,
+                                        ic.width_pixels,
+                                        ic.format
+                                    )
+                                    imagedMoment.addImageReference(imageReference)
+                                    irDao.flush()
+                                    imageReference
+                            })
+            persisted    <-
+                irDao.runTransaction(d =>
+                    newlyCreated.flatMap(i => d.findByUUID(i.getUuid).map(Image.from(_, true)))
+                )
         yield persisted
 
         f.onComplete(t => irDao.close())
         f
-
 
     def create(
         videoReferenceUUID: UUID,
@@ -169,16 +177,16 @@ class ImageController(daoFactory: JPADAOFactory) {
       * @return
       */
     def update(
-                  imageReferenceUuid: UUID,
-                  videoReferenceUUID: Option[UUID] = None,
-                  url: Option[URL] = None,
-                  timecode: Option[Timecode] = None,
-                  elapsedTime: Option[Duration] = None,
-                  recordedDate: Option[Instant] = None,
-                  format: Option[String] = None,
-                  width: Option[Int] = None,
-                  height: Option[Int] = None,
-                  description: Option[String] = None
+        imageReferenceUuid: UUID,
+        videoReferenceUUID: Option[UUID] = None,
+        url: Option[URL] = None,
+        timecode: Option[Timecode] = None,
+        elapsedTime: Option[Duration] = None,
+        recordedDate: Option[Instant] = None,
+        format: Option[String] = None,
+        width: Option[Int] = None,
+        height: Option[Int] = None,
+        description: Option[String] = None
     )(implicit ec: ExecutionContext): Future[Option[Image]] = {
 
         val imDao = daoFactory.newImagedMomentDAO()
@@ -220,12 +228,14 @@ class ImageController(daoFactory: JPADAOFactory) {
                     move(imDao, newIm, ir)
                 }
 
-
             })
         })
 
-        val g = f.flatMap(opt => opt.map(i => irDao.runTransaction(d => d.findByUUID(imageReferenceUuid).map(Image.from(_, true))))
-            .getOrElse(Future(None)))
+        val g = f.flatMap(opt =>
+            opt.map(i =>
+                irDao.runTransaction(d => d.findByUUID(imageReferenceUuid).map(Image.from(_, true)))
+            ).getOrElse(Future(None))
+        )
 
         g.onComplete(_ => irDao.close())
         g

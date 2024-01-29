@@ -19,6 +19,7 @@ package org.mbari.annosaurus.repository.jpa
 import java.util.UUID
 import jakarta.persistence.EntityManager
 
+import org.mbari.annosaurus.etc.jdk.Numbers.*
 import org.mbari.annosaurus.repository.CachedAncillaryDatumDAO
 import org.mbari.annosaurus.repository.jpa.entity.CachedAncillaryDatumEntity
 
@@ -53,6 +54,7 @@ class CachedAncillaryDatumDAOImpl(entityManager: EntityManager)
     ): CachedAncillaryDatumEntity = {
 
         val cad = new CachedAncillaryDatumEntity()
+
         cad.setLatitude(latitude)
         cad.setLongitude(longitude)
         cad.setDepthMeters(depthMeters)
@@ -70,6 +72,7 @@ class CachedAncillaryDatumDAOImpl(entityManager: EntityManager)
         phi.foreach(cad.setPhi(_))
         theta.foreach(cad.setTheta(_))
         psi.foreach(cad.setPsi(_))
+
         cad
 
     }

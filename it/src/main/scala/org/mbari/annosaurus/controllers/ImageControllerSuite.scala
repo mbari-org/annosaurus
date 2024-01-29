@@ -19,7 +19,7 @@ package org.mbari.annosaurus.controllers
 import org.mbari.annosaurus.AssertUtils
 import org.mbari.annosaurus.domain.{Image, ImageCreateSC}
 import org.mbari.annosaurus.repository.jpa.{BaseDAOSuite, JPADAOFactory}
-import org.mbari.annosaurus.etc.circe.CirceCodecs.{given, *}
+import org.mbari.annosaurus.etc.circe.CirceCodecs.{*, given}
 
 import scala.jdk.CollectionConverters.*
 
@@ -32,7 +32,6 @@ trait ImageControllerSuite extends BaseDAOSuite {
     override def afterAll(): Unit = daoFactory.afterAll()
 
     lazy val controller = new ImageController(daoFactory)
-
 
     test("findByUUID") {
         val im       = TestUtils.create(nImageReferences = 1).head
@@ -73,10 +72,10 @@ trait ImageControllerSuite extends BaseDAOSuite {
     }
 
     test("bulkCreate") {
-        val xs = TestUtils.build(2, 2, 0, 2)
-        val seed = xs.flatMap(ImageCreateSC.from(_))
+        val xs           = TestUtils.build(2, 2, 0, 2)
+        val seed         = xs.flatMap(ImageCreateSC.from(_))
         val imageCreates = seed ++ seed // we want to try to insert duplicates
-        val images = exec(controller.bulkCreate(imageCreates))
+        val images       = exec(controller.bulkCreate(imageCreates))
         assertEquals(images.size, seed.size)
 
         for (i <- imageCreates) {

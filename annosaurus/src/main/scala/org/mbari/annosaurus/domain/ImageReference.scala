@@ -33,6 +33,10 @@ case class ImageReference(
     imagedMomentUuid: Option[UUID] = None
 ) extends ToSnakeCase[ImageReferenceSC]
     with ToEntity[ImageReferenceEntity] {
+
+    def removeForeignKeys(): ImageReference =
+        copy(imagedMomentUuid = None, lastUpdated = None)
+
     override def toSnakeCase: ImageReferenceSC =
         ImageReferenceSC(
             url,

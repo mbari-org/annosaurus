@@ -35,8 +35,8 @@ class CachedAncillaryDatumEndpoints(controller: CachedAncillaryDatumController)(
 ) extends Endpoints {
 
     private val base = "ancillarydata"
-    private val tag = "Ancillary Data"
-    
+    private val tag  = "Ancillary Data"
+
     // GET /:uuid
     val findDataByUuid: Endpoint[Unit, UUID, ErrorMsg, CachedAncillaryDatumSC, Any] = openEndpoint
         .get

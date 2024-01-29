@@ -19,7 +19,7 @@ package org.mbari.annosaurus.controllers
 import org.mbari.annosaurus.domain.CachedAncillaryDatum
 import org.mbari.annosaurus.repository.jpa.{BaseDAOSuite, JPADAOFactory}
 import org.mbari.annosaurus.etc.circe.CirceCodecs.{*, given}
-
+import org.mbari.annosaurus.etc.jdk.Numbers.*
 import java.sql.Timestamp
 import java.time.{Duration, Instant}
 import scala.util.Random
@@ -31,29 +31,30 @@ trait CachedAncillaryDatumControllerSuite extends BaseDAOSuite {
     val controller = new CachedAncillaryDatumController(daoFactory)
 
     test("create using params") {
-        val im  = TestUtils.create(1, 1).head
-        val ad  = TestUtils.randomData()
-        ad.setAltitude(null)
+        val im = TestUtils.create(1, 1).head
+        val ad = TestUtils.randomData()
+        ad.setAltitude(null) // FIXME: null values are being returnd as zero
+        ad.setZ(null)
         val opt = exec(
             controller.create(
                 im.getUuid,
                 ad.getLatitude,
                 ad.getLongitude,
-                ad.getDepthMeters,
-                Option(ad.getAltitude),
-                Option(ad.getCrs),
-                Option(ad.getSalinity),
-                Option(ad.getTemperatureCelsius),
-                Option(ad.getOxygenMlL),
-                Option(ad.getPressureDbar),
-                Option(ad.getLightTransmission),
-                Option(ad.getX),
-                Option(ad.getY),
-                Option(ad.getZ),
+                ad.getDepthMeters,      // IMPORTANT!!
+                ad.getAltitude.asFloat, // Don't do Option(ad.getAltitude) because it will be Some(0.0) for nulls
+                Option(ad.getCrs),      // The extension methods asFloat, asDouble handle null corretly
+                ad.getSalinity.asFloat,
+                ad.getTemperatureCelsius.asFloat,
+                ad.getOxygenMlL.asFloat,
+                ad.getPressureDbar.asFloat,
+                ad.getLightTransmission.asFloat,
+                ad.getX.asDouble,
+                ad.getY.asDouble,
+                ad.getZ.asDouble,
                 Option(ad.getPosePositionUnits),
-                Option(ad.getPhi),
-                Option(ad.getTheta),
-                Option(ad.getPsi)
+                ad.getPhi.asDouble,
+                ad.getTheta.asDouble,
+                ad.getPsi.asDouble
             )
         )
 
