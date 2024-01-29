@@ -17,19 +17,7 @@
 package org.mbari.annosaurus.endpoints
 
 import org.mbari.annosaurus.controllers.TestUtils
-import org.mbari.annosaurus.domain.{
-    Annotation,
-    AnnotationSC,
-    CachedAncillaryDatum,
-    Count,
-    DeleteCount,
-    DeleteCountSC,
-    GeographicRange,
-    GeographicRangeSC,
-    ImageSC,
-    QueryConstraints,
-    QueryConstraintsResponseSC
-}
+import org.mbari.annosaurus.domain.{Annotation, AnnotationSC, CachedAncillaryDatum, ConcurrentRequest, Count, DeleteCount, DeleteCountSC, GeographicRange, GeographicRangeSC, ImageSC, MultiRequest, QueryConstraints, QueryConstraintsResponseSC}
 import org.mbari.annosaurus.etc.jwt.JwtService
 import org.mbari.annosaurus.repository.jdbc.JdbcRepository
 import org.mbari.annosaurus.repository.jpa.JPADAOFactory
@@ -337,11 +325,46 @@ trait FastAnnotationEndpointsSuite extends EndpointsSuite {
     }
 
     test("findAnnotationsByConcurrentRequest") {
-        fail("TODO")
+        val xs = TestUtils.create(2, 2) ++ TestUtils.create(2, 2)
+        val videoReferenceUuids = xs.map(_.getVideoReferenceUuid).distinct
+        val ts = xs.map(_.getRecordedTimestamp).distinct
+        val t0 = ts.min
+        val t1 = ts.max
+        val cr = ConcurrentRequest(t0, t1, videoReferenceUuids)
+        val body = cr.toSnakeCase.stringify
+        runPost(
+            endpoints.findAnnotationsByConcurrentRequestImpl,
+            "http://test.com/v1/fast/concurrent",
+            body,
+            response => {
+                assertEquals(response.code, StatusCode.Ok)
+                val annotations = checkResponse[Seq[AnnotationSC]](response.body)
+                val expected = xs.flatMap(_.getObservations.asScala).size
+                val obtained = annotations.size
+                assertEquals(obtained, expected)
+            }
+        )
     }
 
     test("findAnnotationsByMultiRequest") {
-        fail("TODO")
+        val xs = TestUtils.create(2, 2) ++ TestUtils.create(2, 2)
+
+        val videoReferenceUuids = xs.map(_.getVideoReferenceUuid).distinct
+        val mr = MultiRequest(videoReferenceUuids)
+        val body = mr.toSnakeCase.stringify
+        runPost(
+            endpoints.findAnnotationsByMultiRequestImpl,
+            "http://test.com/v1/fast/multi",
+            body,
+            response => {
+                assertEquals(response.code, StatusCode.Ok)
+                val annotations = checkResponse[Seq[AnnotationSC]](response.body)
+                val expected = xs.flatMap(_.getObservations.asScala).size
+                val obtained = annotations.size
+                assertEquals(obtained, expected)
+            }
+        )
+
     }
 
 }

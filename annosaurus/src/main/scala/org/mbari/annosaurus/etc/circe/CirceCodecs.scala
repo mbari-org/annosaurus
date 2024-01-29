@@ -298,6 +298,9 @@ object CirceCodecs {
     given videoInfoUpdateScEncoder: Encoder[CachedVideoReferenceInfoUpdateSC] = deriveEncoder
     given videoInfoUpdateScDecoder: Decoder[CachedVideoReferenceInfoUpdateSC] = deriveDecoder
 
+    given indexUpdateScEncoder: Encoder[IndexUpdateSC] = deriveEncoder
+    given indexUpdateScDecoder: Decoder[IndexUpdateSC] = deriveDecoder
+
     val CustomPrinter: Printer = Printer(
         dropNullValues = true,
         indent = ""

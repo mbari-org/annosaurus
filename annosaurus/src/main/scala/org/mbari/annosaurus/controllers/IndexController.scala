@@ -17,14 +17,14 @@
 package org.mbari.annosaurus.controllers
 
 import org.mbari.annosaurus.repository.IndexDAO
+
 import java.time.Instant
 import java.util.UUID
-
 import scala.concurrent.{ExecutionContext, Future}
 import org.mbari.annosaurus.repository.jpa.entity.ImagedMomentEntity
 import org.mbari.annosaurus.repository.jpa.JPADAOFactory
 import org.mbari.annosaurus.repository.jpa.entity.IndexEntity
-import org.mbari.annosaurus.domain.Index
+import org.mbari.annosaurus.domain.{Index, IndexUpdate}
 
 /** @author
   *   Brian Schlining
@@ -71,14 +71,13 @@ class IndexController(val daoFactory: JPADAOFactory)
     }
 
     def bulkUpdateRecordedTimestamps(
-        imagedMoments: Iterable[Index]
+        imagedMoments: Iterable[IndexUpdate]
     )(implicit ec: ExecutionContext): Future[Iterable[Index]] = {
         def fn(dao: IDDAO): Iterable[Index] = {
             for {
                 im   <- imagedMoments
-                uuid <- im.uuid
                 rt   <- im.recordedTimestamp
-                i    <- dao.findByUUID(uuid)
+                i    <- dao.findByUUID(im.uuid)
             } yield {
                 i.setRecordedTimestamp(rt)
                 transform(i)

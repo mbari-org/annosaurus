@@ -25,7 +25,7 @@ import sttp.tapir.server.ServerEndpoint
 import CustomTapirJsonCirce.*
 
 import java.util.UUID
-import org.mbari.annosaurus.domain.{ErrorMsg, ImagedMoment, Index, IndexSC}
+import org.mbari.annosaurus.domain.{ErrorMsg, ImagedMoment, Index, IndexSC, IndexUpdateSC}
 import org.mbari.annosaurus.etc.circe.CirceCodecs.{*, given}
 import org.mbari.annosaurus.etc.jwt.JwtService
 import org.mbari.annosaurus.repository.jpa.entity.IndexEntity
@@ -57,19 +57,20 @@ class IndexEndpoints(controller: IndexController)(using
         }
 
     val bulkUpdateRecordedTimestamps
-        : Endpoint[Option[String], List[Index], ErrorMsg, List[IndexSC], Any] = secureEndpoint
+        : Endpoint[Option[String], List[IndexUpdateSC], ErrorMsg, List[IndexSC], Any] = secureEndpoint
         .put
         .in(base / "tapetime")
-        .in(jsonBody[List[Index]].description("The IndexEntity objects"))
-        .out(jsonBody[List[IndexSC]].description("The IndexEntity objects"))
+        .in(jsonBody[List[IndexUpdateSC]].description("Index update objects"))
+        .out(jsonBody[List[IndexSC]].description("The Modified index objects"))
         .tag(tag)
 
     val bulkUpdateRecordedTimestampsImpl: ServerEndpoint[Any, Future] = bulkUpdateRecordedTimestamps
         .serverSecurityLogic(jwtOpt => verify(jwtOpt))
         .serverLogic(_ =>
             indices =>
+                val xs = indices.map(_.toCamelCase)
                 val f = controller
-                    .bulkUpdateRecordedTimestamps(indices)
+                    .bulkUpdateRecordedTimestamps(xs)
                     .map(xs => xs.map(_.toSnakeCase).toList)
                 handleErrors(f)
         )

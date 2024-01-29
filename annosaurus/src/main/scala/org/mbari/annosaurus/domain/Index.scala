@@ -17,7 +17,7 @@
 package org.mbari.annosaurus.domain
 
 import java.util.UUID
-import org.mbari.annosaurus.repository.jpa.entity.IndexEntity
+import org.mbari.annosaurus.repository.jpa.entity.{ImagedMomentEntity, IndexEntity}
 import org.mbari.annosaurus.repository.jpa.entity.extensions.*
 
 final case class Index(
@@ -54,6 +54,17 @@ final case class Index(
 
 object Index extends FromEntity[IndexEntity, Index] {
     def from(entity: IndexEntity, extend: Boolean = false): Index = {
+        Index(
+            entity.getVideoReferenceUuid,
+            Option(entity.getTimecode).map(_.toString()),
+            Option(entity.getElapsedTime).map(_.toMillis),
+            Option(entity.getRecordedTimestamp),
+            entity.primaryKey,
+            entity.lastUpdated
+        )
+    }
+
+    def fromImagedMomentEntity(entity: ImagedMomentEntity): Index = {
         Index(
             entity.getVideoReferenceUuid,
             Option(entity.getTimecode).map(_.toString()),

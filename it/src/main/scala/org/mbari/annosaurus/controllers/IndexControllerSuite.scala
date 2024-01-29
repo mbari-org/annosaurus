@@ -16,7 +16,7 @@
 
 package org.mbari.annosaurus.controllers
 
-import org.mbari.annosaurus.domain.Index
+import org.mbari.annosaurus.domain.{Index, IndexUpdate}
 import org.mbari.annosaurus.repository.jpa.{BaseDAOSuite, JPADAOFactory}
 
 import java.time.{Duration, Instant}
@@ -53,8 +53,8 @@ trait IndexControllerSuite extends BaseDAOSuite {
         val xs       = TestUtils.create(5)
         val newStart = Instant.parse("1968-09-22T02:00:00Z")
         val ys       = xs.map(x =>
-            Index(
-                x.getVideoReferenceUuid,
+            IndexUpdate(
+                x.getUuid,
                 Option(x.getTimecode).map(_.toString),
                 Option(x.getElapsedTime).map(_.toMillis),
                 Option(newStart.plus(x.getElapsedTime))
