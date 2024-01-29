@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package org.mbari.annosaurus.endpoints
-import org.mbari.annosaurus.repository.jpa.{PostgresTestDAOFactory, TestDAOFactory}
+package org.mbari.annosaurus.repository.jdbc
+import org.mbari.annosaurus.repository.jpa.{SqlServerTestDAOFactory, TestDAOFactory}
 
-class PostgresAnnotationEndpointsSuite extends AnnotationEndpointsSuite {
+class SqlServerAnalysisRepositorySuite extends AnalysisRepositorySuite {
 
-    override def daoFactory: TestDAOFactory = PostgresTestDAOFactory
+    override given daoFactory: TestDAOFactory = SqlServerTestDAOFactory
 
 }

@@ -15,10 +15,10 @@
  */
 
 package org.mbari.annosaurus.endpoints
-import org.mbari.annosaurus.repository.jpa.{PostgresTestDAOFactory, TestDAOFactory}
+import org.mbari.annosaurus.repository.jpa.{SqlServerTestDAOFactory, TestDAOFactory}
 
-class PostgrestAnnotationEndpointsSuite extends AnnotationEndpointsSuite {
+class SqlServerAnalysisEndpointsSuite extends AnalysisEndpointsSuite {
 
-    override def daoFactory: TestDAOFactory = PostgresTestDAOFactory
+    override given daoFactory: TestDAOFactory = SqlServerTestDAOFactory
 
 }
