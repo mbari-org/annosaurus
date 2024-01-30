@@ -17,6 +17,10 @@ alter table dbo.imaged_moments
     alter column recorded_timestamp DATETIMEOFFSET(6) null
 go
 
+update dbo.imaged_moments
+    set recorded_timestamp = convert(datetime2, recorded_timestamp) AT TIME ZONE 'UTC'
+go
+
 create index idx_imaged_moments__recorded_timestamp on imaged_moments (recorded_timestamp)
 go
 
@@ -26,4 +30,8 @@ go
 
 alter table dbo.observations
     alter column observation_timestamp DATETIMEOFFSET(6) null
+go
+
+update dbo.observations
+    set observation_timestamp = convert(datetime2, observation_timestamp) AT TIME ZONE 'UTC'
 go

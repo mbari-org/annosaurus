@@ -42,7 +42,7 @@ object Main:
               |   __ _ _ __  _ __   ___  ___  __ _ _   _ _ __ _   _ ___
               |  / _` | '_ \| '_ \ / _ \/ __|/ _` | | | | '__| | | / __|
               | | (_| | | | | | | | (_) \__ \ (_| | |_| | |  | |_| \__ \
-              |  \__,_|_| |_|_| |_|\___/|___/\__,_|\__,_|_|   \__,_|___/""".stripMargin
+              |  \__,_|_| |_|_| |_|\___/|___/\__,_|\__,_|_|   \__,_|___/""".stripMargin + s"  v${AppConfig.Version}"
 
         println(s)
 
@@ -78,18 +78,20 @@ object Main:
 
         router
             .getRoutes()
-            .forEach(r => log.atInfo.log(f"Adding route: ${r.methods()}%8s ${r.getPath}%s"))
+            .forEach(r => log.atDebug.log(f"Adding route: ${r.methods()}%8s ${r.getPath}%s"))
 
-        val program = for
-            binding <- server.requestHandler(router).listen(port).asScala
-            _       <- Future:
-                           println(
-                               s"Go to http://localhost:${binding.actualPort()}/docs to open SwaggerUI. Press ENTER key to exit."
-                           )
-                           StdIn.readLine()
-            stop    <- binding.close().asScala
-        yield stop
+        // val program = for
+        //     binding <- server.requestHandler(router).listen(port).asScala
+        //     _       <- Future:
+        //                    println(
+        //                        s"Go to http://localhost:${binding.actualPort()}/docs to open SwaggerUI. Press ENTER key to exit."
+        //                    )
+        //                    StdIn.readLine()
+        //     stop    <- binding.close().asScala
+        // yield stop
 
-        program.onComplete(_ => vertx.close())
+        // program.onComplete(_ => vertx.close())
+
+         val program = server.requestHandler(router).listen(port).asScala
 
         Await.result(program, Duration.Inf)
