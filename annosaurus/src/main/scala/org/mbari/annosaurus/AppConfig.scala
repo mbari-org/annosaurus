@@ -40,8 +40,8 @@ object AppConfig {
     private lazy val Config = ConfigFactory.load()
 
     lazy val DefaultJwtService: JwtService = JwtService(
-        issuer = Config.getString("basicjwt.client.secret"),
-        apiKey = Config.getString("basicjwt.issuer"),
+        issuer = Config.getString("basicjwt.issuer"), 
+        apiKey = Config.getString("basicjwt.client.secret"),
         signingSecret = Config.getString("basicjwt.signing.secret")
     )
 
