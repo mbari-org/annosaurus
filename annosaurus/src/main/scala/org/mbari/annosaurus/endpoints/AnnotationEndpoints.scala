@@ -17,17 +17,7 @@
 package org.mbari.annosaurus.endpoints
 
 import org.mbari.annosaurus.controllers.AnnotationController
-import org.mbari.annosaurus.domain.{
-    Annotation,
-    AnnotationCreate,
-    AnnotationCreateSC,
-    AnnotationSC,
-    AnnotationUpdateSC,
-    ConcurrentRequest,
-    ConcurrentRequestSC,
-    ErrorMsg,
-    MultiRequest
-}
+import org.mbari.annosaurus.domain.{Annotation, AnnotationCreate, AnnotationCreateSC, AnnotationSC, AnnotationUpdateSC, BulkAnnotationSC, ConcurrentRequest, ConcurrentRequestSC, ErrorMsg, MultiRequest}
 import org.mbari.annosaurus.etc.jwt.JwtService
 import org.mbari.annosaurus.etc.circe.CirceCodecs.{*, given}
 import org.mbari.annosaurus.etc.tapir.TapirCodecs.given
@@ -130,11 +120,11 @@ class AnnotationEndpoints(controller: AnnotationController)(using
 
 //        POST / bulk
     val bulkCreateAnnotations
-        : Endpoint[Option[String], Seq[AnnotationSC], ErrorMsg, Seq[AnnotationSC], Any] =
+        : Endpoint[Option[String], Seq[BulkAnnotationSC], ErrorMsg, Seq[AnnotationSC], Any] =
         secureEndpoint
             .post
             .in(base / "bulk")
-            .in(jsonBody[Seq[AnnotationSC]])
+            .in(jsonBody[Seq[BulkAnnotationSC]])
             .out(jsonBody[Seq[AnnotationSC]])
             .name("bulkCreateAnnotations")
             .description("Create a new annotation")

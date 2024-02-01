@@ -301,6 +301,9 @@ object CirceCodecs {
     given indexUpdateScEncoder: Encoder[IndexUpdateSC] = deriveEncoder
     given indexUpdateScDecoder: Decoder[IndexUpdateSC] = deriveDecoder
 
+    given bulkAnnotationScEncoder: Encoder[BulkAnnotationSC] = deriveEncoder
+    given bulkAnnotationScDecoder: Decoder[BulkAnnotationSC] = deriveDecoder
+
     val CustomPrinter: Printer = Printer(
         dropNullValues = true,
         indent = ""

@@ -216,3 +216,42 @@ final case class AnnotationSC(
             video_reference_uuid
         )
 }
+
+final case class BulkAnnotationSC(
+    activity: Option[String] = None,
+    ancillary_data: Option[CachedAncillaryDatumSC] = None,
+    associations: Option[Seq[AssociationSC]] = None,
+    concept: Option[String] = None,
+    duration_millis: Option[Long] = None,
+    elapsed_time_millis: Option[Long] = None,
+    group: Option[String] = None,
+    imaged_moment_uuid: Option[UUID] = None,
+    image_references: Option[Seq[ImageReferenceSC]] = None,
+    observation_timestamp: Option[Instant] = None,
+    observation_uuid: Option[UUID] = None,
+    observer: Option[String] = None,
+    recorded_timestamp: Option[Instant] = None,
+    timecode: Option[String] = None,
+    video_reference_uuid: Option[UUID] = None
+) extends ToCamelCase[Annotation] {
+
+    override def toCamelCase: Annotation =
+        Annotation(
+            activity,
+            ancillary_data.map(_.toCamelCase),
+            associations.getOrElse(Nil).map(_.toCamelCase),
+            concept,
+            duration_millis,
+            elapsed_time_millis,
+            group,
+            imaged_moment_uuid,
+            image_references.getOrElse(Nil).map(_.toCamelCase),
+            observation_timestamp,
+            observation_uuid,
+            observer,
+            recorded_timestamp,
+            timecode,
+            video_reference_uuid
+        )
+}
+

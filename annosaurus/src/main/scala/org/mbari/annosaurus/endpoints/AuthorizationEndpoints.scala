@@ -28,6 +28,7 @@ import sttp.tapir.generic.auto.*
 import sttp.tapir.json.circe.*
 import sttp.tapir.server.ServerEndpoint
 import org.mbari.annosaurus.domain.{BadRequest, ErrorMsg, NotFound, ServerError, Unauthorized}
+import org.mbari.annosaurus.domain.AuthorizationSC
 
 class AuthorizationEndpoints()(using ec: ExecutionContext, jwtService: JwtService)
     extends Endpoints:
@@ -37,12 +38,12 @@ class AuthorizationEndpoints()(using ec: ExecutionContext, jwtService: JwtServic
 
 //    private val log = System.getLogger(getClass.getName)
 
-    val authEndpoint: Endpoint[String, Unit, ErrorMsg, Authorization, Any] =
+    val authEndpoint: Endpoint[String, Unit, ErrorMsg, AuthorizationSC, Any] =
         baseEndpoint
             .post
             .in(base)
             .securityIn(header[String]("Authorization").description("Header format is `Authorization: APIKEY <key>`"))
-            .out(jsonBody[Authorization])
+            .out(jsonBody[AuthorizationSC])
             .errorOut(
                 oneOf[ErrorMsg](
                     oneOfVariant(statusCode(StatusCode.BadRequest).and(jsonBody[BadRequest])),
@@ -69,7 +70,7 @@ class AuthorizationEndpoints()(using ec: ExecutionContext, jwtService: JwtServic
                         case None      => Future(Left(Unauthorized("Invalid API key")))
                         case Some(jwt) => Future(Right(Authorization.bearer(jwt)))
             )
-            .serverLogic(bearerAuth => Unit => Future(Right(bearerAuth)))
+            .serverLogic(bearerAuth => Unit => Future(Right(bearerAuth.toSnakeCase)))
 
     override val all: List[Endpoint[?, ?, ?, ?, ?]]         = List(authEndpoint)
     override val allImpl: List[ServerEndpoint[Any, Future]] =
