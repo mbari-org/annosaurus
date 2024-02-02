@@ -79,6 +79,8 @@ trait Endpoints:
         Schema.derived[ConcurrentRequest]
     implicit lazy val sConcurrentRequestSc: Schema[ConcurrentRequestSC]                 =
         Schema.derived[ConcurrentRequestSC]
+    implicit lazy val sConcurrentRequestCountSc: Schema[ConcurrentRequestCountSC]       =
+        Schema.derived[ConcurrentRequestCountSC]
     implicit lazy val sCount: Schema[Count]                                             = Schema.derived[Count]
     implicit lazy val sDeleteCountSc: Schema[DeleteCountSC]                             = Schema.derived[DeleteCountSC]
     implicit lazy val sDepthHistogram: Schema[DepthHistogram]                           = Schema.derived[DepthHistogram]
@@ -92,6 +94,8 @@ trait Endpoints:
     implicit lazy val sImagedMomentSc: Schema[ImagedMomentSC]                           = Schema.derived[ImagedMomentSC]
     implicit lazy val sMultiRequest: Schema[MultiRequest]                               = Schema.derived[MultiRequest]
     implicit lazy val sMultiRequestSc: Schema[MultiRequestSC]                           = Schema.derived[MultiRequestSC]
+    implicit lazy val sMultiRequestCountSc: Schema[MultiRequestCountSC]                 =
+        Schema.derived[MultiRequestCountSC]
     implicit lazy val sObservation: Schema[Observation]                                 = Schema.derived[Observation]
     implicit lazy val sObservationSc: Schema[ObservationSC]                             = Schema.derived[ObservationSC]
     implicit lazy val sObservationUpdateSc: Schema[ObservationUpdateSC]                 =

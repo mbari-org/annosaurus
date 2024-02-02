@@ -238,12 +238,18 @@ object CirceCodecs {
     given concurrentRequestDecoder: Decoder[ConcurrentRequest]         =
         concurrentRequestCcDecoder or concurrentRequestScDecoder.map(_.toCamelCase)
 
+    given concurrentRequestCountScDecoder: Decoder[ConcurrentRequestCountSC]     = deriveDecoder
+    given concurrentRequestCountScEncoder: Encoder[ConcurrentRequestCountSC]     = deriveEncoder
+
     given multiRequestScDecoder: Decoder[MultiRequestSC]     = deriveDecoder
     given multiRequestScEncoder: Encoder[MultiRequestSC]     = deriveEncoder
     private val multiRequestCcDecoder: Decoder[MultiRequest] = deriveDecoder
     given multiRequestEncoder: Encoder[MultiRequest]         = deriveEncoder
     given multiRequestDecoder: Decoder[MultiRequest]         =
         multiRequestCcDecoder or multiRequestScDecoder.map(_.toCamelCase)
+
+    given multiRequestCountScDecoder: Decoder[MultiRequestCountSC]     = deriveDecoder
+    given multiRequestCountScEncoder: Encoder[MultiRequestCountSC]     = deriveEncoder
 
     given windowRequestScDecoder: Decoder[WindowRequestSC]     = deriveDecoder
     given windowRequestScEncoder: Encoder[WindowRequestSC]     = deriveEncoder

@@ -357,6 +357,22 @@ class ObservationEndpoints(controller: ObservationController)(using
             }
 
     // POST /delete with json body
+    val deleteManyObservations: Endpoint[Option[String], Seq[UUID], ErrorMsg, Unit, Any] =
+        secureEndpoint
+            .post
+            .in(base / "delete")
+            .in(jsonBody[Seq[UUID]])
+            .out(statusCode(StatusCode.NoContent).and(emptyOutput))
+            .name("deleteManyObservations")
+            .description("Delete many observations. The UUIDs of the observations to delete are provided in the request body as a JSON array")
+            .tag(tag)
+
+    val deleteManyObservationsImpl: ServerEndpoint[Any, Future] =
+        deleteManyObservations
+            .serverSecurityLogic(jwtOpt => verify(jwtOpt))
+            .serverLogic { _ => uuids =>
+                handleErrors(controller.bulkDelete(uuids).map(b => if b then Right(()) else Left(())))
+            }
 
     override def all: List[Endpoint[_, _, _, _, _]] = List(
         findActivities,
@@ -368,6 +384,7 @@ class ObservationEndpoints(controller: ObservationController)(using
         findAllConcepts,
         countAllGroupByVideoReferenceUuid,
         deleteDuration,
+        deleteManyObservations,
         findGroups,
         countByVideoReferenceUuid,
         findObservationsByVideoReferenceUuid,
@@ -386,6 +403,7 @@ class ObservationEndpoints(controller: ObservationController)(using
         findAllConceptsImpl,
         countAllGroupByVideoReferenceUuidImpl,
         deleteDurationImpl,
+        deleteManyObservationsImpl,
         findGroupsImpl,
         countByVideoReferenceUuidImpl,
         findObservationsByVideoReferenceUuidImpl,

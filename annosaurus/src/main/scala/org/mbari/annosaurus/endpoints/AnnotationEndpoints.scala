@@ -17,7 +17,7 @@
 package org.mbari.annosaurus.endpoints
 
 import org.mbari.annosaurus.controllers.AnnotationController
-import org.mbari.annosaurus.domain.{Annotation, AnnotationCreate, AnnotationCreateSC, AnnotationSC, AnnotationUpdateSC, BulkAnnotationSC, ConcurrentRequest, ConcurrentRequestSC, ErrorMsg, MultiRequest}
+import org.mbari.annosaurus.domain.{Annotation, AnnotationCreate, AnnotationCreateSC, AnnotationSC, AnnotationUpdateSC, BulkAnnotationSC, ConcurrentRequest, ConcurrentRequestCountSC, ConcurrentRequestSC, ErrorMsg, MultiRequest, MultiRequestCountSC}
 import org.mbari.annosaurus.etc.jwt.JwtService
 import org.mbari.annosaurus.etc.circe.CirceCodecs.{*, given}
 import org.mbari.annosaurus.etc.tapir.TapirCodecs.given
@@ -162,7 +162,7 @@ class AnnotationEndpoints(controller: AnnotationController)(using
             .post
             .in(base / "concurrent" / "count")
             .in(jsonBody[ConcurrentRequest])
-            .out(jsonBody[Long])
+            .out(jsonBody[ConcurrentRequestCountSC])
             .name("countConcurrentAnnotations")
             .description("Count concurrent annotations. JSON body can be snake_case or camelCase")
             .tag(tag)
@@ -170,7 +170,8 @@ class AnnotationEndpoints(controller: AnnotationController)(using
     val countByConcurrentRequestImpl: ServerEndpoint[Any, Future] =
         countByConcurrentRequest
             .serverLogic { concurrentRequest =>
-                handleErrors(controller.countByConcurrentRequest(concurrentRequest))
+                handleErrors(controller.countByConcurrentRequest(concurrentRequest)
+                    .map(x => ConcurrentRequestCountSC(concurrentRequest.toSnakeCase, x)))
             }
 
 //    POST / multi
@@ -192,12 +193,12 @@ class AnnotationEndpoints(controller: AnnotationController)(using
 //            }
 
 //    POST / multi / count
-    val countByMultiRequest: Endpoint[Unit, MultiRequest, ErrorMsg, Long, Any] =
+    val countByMultiRequest: Endpoint[Unit, MultiRequest, ErrorMsg, MultiRequestCountSC, Any] =
         openEndpoint
             .post
             .in(base / "multi" / "count")
             .in(jsonBody[MultiRequest])
-            .out(jsonBody[Long])
+            .out(jsonBody[MultiRequestCountSC])
             .name("countMultiAnnotations")
             .description("Count multiple annotations. JSON body can be snake_case or camelCase")
             .tag(tag)
@@ -205,7 +206,7 @@ class AnnotationEndpoints(controller: AnnotationController)(using
     val countByMultiRequestImpl: ServerEndpoint[Any, Future] =
         countByMultiRequest
             .serverLogic { multiRequest =>
-                handleErrors(controller.countByMultiRequest(multiRequest))
+                handleErrors(controller.countByMultiRequest(multiRequest).map(x => MultiRequestCountSC(multiRequest.toSnakeCase, x)))
             }
 
 //    PUT /: uuid

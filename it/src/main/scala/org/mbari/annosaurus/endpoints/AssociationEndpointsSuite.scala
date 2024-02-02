@@ -298,7 +298,7 @@ trait AssociationEndpointsSuite extends EndpointsSuite {
         assert(jwt != null)
         val backendStub = newBackendStub(endpoints.deleteAssociationsImpl)
         val response    = basicRequest
-            .put(uri"http://test.com/v1/associations/bulk/delete")
+            .post(uri"http://test.com/v1/associations/delete")
             .body(uuids.stringify)
             .auth
             .bearer(jwt)

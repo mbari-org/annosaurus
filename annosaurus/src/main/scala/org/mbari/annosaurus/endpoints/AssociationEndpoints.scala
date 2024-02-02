@@ -163,8 +163,8 @@ class AssociationEndpoints(controller: AssociationController)(using
     // DELETE json body of uuids
     val deleteAssociations: Endpoint[Option[String], Seq[UUID], ErrorMsg, Unit, Any] =
         secureEndpoint
-            .put
-            .in(base / "bulk" / "delete")
+            .post
+            .in(base / "delete")
             .in(jsonBody[Seq[UUID]])
             .out(statusCode(StatusCode.NoContent).and(emptyOutput))
             .name("deleteAssociations")

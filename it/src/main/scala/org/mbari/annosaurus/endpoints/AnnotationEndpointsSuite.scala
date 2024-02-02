@@ -17,13 +17,7 @@
 package org.mbari.annosaurus.endpoints
 
 import org.mbari.annosaurus.controllers.{AnnotationController, TestUtils}
-import org.mbari.annosaurus.domain.{
-    Annotation,
-    AnnotationCreate,
-    AnnotationSC,
-    ConcurrentRequest,
-    MultiRequest
-}
+import org.mbari.annosaurus.domain.{Annotation, AnnotationCreate, AnnotationSC, ConcurrentRequest, ConcurrentRequestCountSC, MultiRequest, MultiRequestCountSC}
 import org.mbari.annosaurus.repository.jpa.JPADAOFactory
 import org.mbari.annosaurus.etc.jdk.Logging.{*, given}
 import org.mbari.annosaurus.etc.jwt.JwtService
@@ -285,7 +279,8 @@ trait AnnotationEndpointsSuite extends EndpointsSuite {
             cr.stringify,
             response => {
                 assertEquals(response.code, StatusCode.Ok)
-                val obtained = checkResponse[Long](response.body)
+                val crc = checkResponse[ConcurrentRequestCountSC](response.body)
+                val obtained = crc.count
                 assertEquals(obtained, expected)
             }
         )
@@ -305,7 +300,8 @@ trait AnnotationEndpointsSuite extends EndpointsSuite {
             cr.stringify,
             response => {
                 assertEquals(response.code, StatusCode.Ok)
-                val obtained = checkResponse[Long](response.body)
+                val crc = checkResponse[ConcurrentRequestCountSC](response.body)
+                val obtained = crc.count
                 assertEquals(obtained, expected)
             }
         )
@@ -322,7 +318,8 @@ trait AnnotationEndpointsSuite extends EndpointsSuite {
             mr.stringify,
             response => {
                 assertEquals(response.code, StatusCode.Ok)
-                val obtained = checkResponse[Long](response.body)
+                val mrc = checkResponse[MultiRequestCountSC](response.body)
+                val obtained = mrc.count
                 assertEquals(obtained, expected)
             }
         )
@@ -339,7 +336,8 @@ trait AnnotationEndpointsSuite extends EndpointsSuite {
             mr.stringify,
             response => {
                 assertEquals(response.code, StatusCode.Ok)
-                val obtained = checkResponse[Long](response.body)
+                val mrc = checkResponse[MultiRequestCountSC](response.body)
+                val obtained = mrc.count
                 assertEquals(obtained, expected)
             }
         )

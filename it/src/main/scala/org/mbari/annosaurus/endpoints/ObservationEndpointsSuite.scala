@@ -487,4 +487,27 @@ trait ObservationEndpointsSuite extends EndpointsSuite {
         assertEquals(obtained, None)
     }
 
+    test("deleteManyObservations") {
+        val im = TestUtils.create(4, 2)
+        val observationUuids = im.flatMap(_.getObservations.asScala.map(_.getUuid)).toSeq
+        val jwt = jwtService.authorize("foo").orNull
+        assert(jwt != null)
+        val backend = newBackendStub(endpoints.deleteManyObservationsImpl)
+        val response = basicRequest
+            .post(uri"http://test.com/v1/observations/delete")
+            .auth.bearer(jwt)
+            .contentType("application/json")
+            .body(observationUuids.stringify)
+            .send(backend)
+            .join
+        assertEquals(response.code, StatusCode.NoContent)
+
+        for
+            i <- im
+            o <- i.getObservations.asScala
+        do
+            val obtained = controller.findByUUID(o.getUuid).join
+            assertEquals(obtained, None)
+    }
+
 }
