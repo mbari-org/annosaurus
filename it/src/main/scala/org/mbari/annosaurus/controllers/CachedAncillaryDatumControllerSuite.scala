@@ -288,7 +288,8 @@ trait CachedAncillaryDatumControllerSuite extends BaseDAOSuite {
                     .from(TestUtils.randomData())
                     .copy(recordedTimestamp = Some(ts), depthMeters = Some(1000))
             })
-        exec(controller.merge(s0, xs.head.getVideoReferenceUuid, Duration.ofSeconds(15)))
+        val ys = exec(controller.merge(s0, xs.head.getVideoReferenceUuid, Duration.ofSeconds(15)))
+        assertEquals(ys.size, xs.size)
         for x <- xs
         do
             val opt = exec(controller.findByImagedMomentUUID(x.getUuid))

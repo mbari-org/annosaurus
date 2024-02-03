@@ -523,9 +523,9 @@ trait ImagedMomentEndpointsSuite extends EndpointsSuite {
             x  <- xs
             im <- obtained.find(_.uuid.get == x.getUuid)
         do
-            assert(im.recorded_date.isDefined)
+            assert(im.recorded_timestamp.isDefined)
             val expected = newRecordedTimestamp.plus(x.getElapsedTime)
-            val obtained = im.recorded_date.get
+            val obtained = im.recorded_timestamp.get
             assertEquals(obtained, expected)
     }
 

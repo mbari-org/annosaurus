@@ -486,7 +486,7 @@ trait AssociationEndpointsSuite extends EndpointsSuite {
                 assertEquals(response.code, StatusCode.Ok)
                 val obtained = checkResponse[ConceptAssociationResponseSC](response.body)
 //                println(obtained.stringify)
-                assertEquals(obtained.associations.size, dtos.size)
+                assertEquals(obtained.concept_associations.size, dtos.size)
                 // TODO check that the associations are the same
             }
         )

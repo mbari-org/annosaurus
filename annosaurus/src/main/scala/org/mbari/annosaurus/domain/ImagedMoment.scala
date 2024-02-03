@@ -104,22 +104,22 @@ object ImagedMoment extends FromEntity[ImagedMomentEntity, ImagedMoment] {
 }
 
 final case class ImagedMomentSC(
-    video_reference_uuid: UUID,
-    timecode: Option[String] = None,
-    elapsed_time_millis: Option[Long] = None,
-    recorded_date: Option[Instant] = None, // XXX: This should have been recorded_timestamp
-    observations: Seq[ObservationSC] = Nil,
-    image_references: Seq[ImageReferenceSC] = Nil,
-    ancillary_data: Option[CachedAncillaryDatumSC] = None,
-    uuid: Option[UUID] = None,
-    last_updated_time: Option[java.time.Instant] = None
+                                   video_reference_uuid: UUID,
+                                   timecode: Option[String] = None,
+                                   elapsed_time_millis: Option[Long] = None,
+                                   recorded_timestamp: Option[Instant] = None, // XXX: This should have been recorded_timestamp
+                                   observations: Seq[ObservationSC] = Nil,
+                                   image_references: Seq[ImageReferenceSC] = Nil,
+                                   ancillary_data: Option[CachedAncillaryDatumSC] = None,
+                                   uuid: Option[UUID] = None,
+                                   last_updated_time: Option[java.time.Instant] = None
 ) extends ToCamelCase[ImagedMoment] {
     override def toCamelCase: ImagedMoment =
         ImagedMoment(
             video_reference_uuid,
             timecode,
             elapsed_time_millis,
-            recorded_date,
+            recorded_timestamp,
             observations.map(_.toCamelCase),
             image_references.map(_.toCamelCase),
             ancillary_data.map(_.toCamelCase),

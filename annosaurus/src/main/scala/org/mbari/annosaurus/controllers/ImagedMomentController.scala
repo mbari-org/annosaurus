@@ -355,6 +355,10 @@ class ImagedMomentController(val daoFactory: JPADAOFactory)
                         )
                     observation.setUuid(null)
                 }
+                // We ALWAYS set the observation timestamp to now if it's null
+                if (observation.getObservationTimestamp == null) {
+                    observation.setObservationTimestamp(Instant.now())
+                }
                 targetImagedMoment.addObservation(observation)
                 val associations = observation.getAssociations.asScala
                 observation.setAssociations(new util.HashSet[AssociationEntity]())

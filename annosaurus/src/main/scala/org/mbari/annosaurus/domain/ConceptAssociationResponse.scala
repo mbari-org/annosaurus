@@ -17,21 +17,21 @@
 package org.mbari.annosaurus.domain
 
 final case class ConceptAssociationResponse(
-    conceptAssociationRequest: ConceptAssociationRequest,
-    associations: Seq[ConceptAssociation]
+                                               conceptAssociationRequest: ConceptAssociationRequest,
+                                               conceptAssociations: Seq[ConceptAssociation]
 ) extends ToSnakeCase[ConceptAssociationResponseSC] {
     def toSnakeCase: ConceptAssociationResponseSC = ConceptAssociationResponseSC(
         conceptAssociationRequest.toSnakeCase,
-        associations.map(_.toSnakeCase)
+        conceptAssociations.map(_.toSnakeCase)
     )
 }
 
 final case class ConceptAssociationResponseSC(
-    concept_association_request: ConceptAssociationRequestSC,
-    associations: Seq[ConceptAssociationSC]
+                                                 concept_association_request: ConceptAssociationRequestSC,
+                                                 concept_associations: Seq[ConceptAssociationSC]
 ) extends ToCamelCase[ConceptAssociationResponse] {
     def toCamelCase: ConceptAssociationResponse = ConceptAssociationResponse(
         concept_association_request.toCamelCase,
-        associations.map(_.toCamelCase)
+        concept_associations.map(_.toCamelCase)
     )
 }

@@ -30,6 +30,7 @@ import org.mbari.annosaurus.etc.circe.CirceCodecs.{*, given}
 import org.mbari.annosaurus.etc.sdk.Futures.*
 
 import java.time.{Duration, Instant}
+import scala.util.Random
 
 trait IndexEndpointsSuite extends EndpointsSuite {
 
@@ -55,7 +56,7 @@ trait IndexEndpointsSuite extends EndpointsSuite {
 
     }
 
-    test("bulkUpdateRecordedTimestamps (camelCase)") {
+    test("bulkUpdateRecordedTimestamps (recorded_timestamp)") {
         val xs = TestUtils.create(10)
         val ts = Instant.parse("1968-09-22T02:00:00Z")
         val updated = for
@@ -88,8 +89,7 @@ trait IndexEndpointsSuite extends EndpointsSuite {
                 case None => ts
             val obtained = i.recorded_timestamp.get
             assertEquals(obtained, expected)
-
-
     }
+
 
 }

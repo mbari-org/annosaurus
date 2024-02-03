@@ -62,6 +62,8 @@ class IndexEndpoints(controller: IndexController)(using
         .in(base / "tapetime")
         .in(jsonBody[List[IndexUpdateSC]].description("Index update objects"))
         .out(jsonBody[List[IndexSC]].description("The Modified index objects"))
+        .description("Bulk update the recordedTimestamp of multiple indices")
+        .name("bulkUpdateRecordedTimestamps")
         .tag(tag)
 
     val bulkUpdateRecordedTimestampsImpl: ServerEndpoint[Any, Future] = bulkUpdateRecordedTimestamps

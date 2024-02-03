@@ -238,7 +238,7 @@ class AssociationEndpoints(controller: AssociationController)(using
             .in(jsonBody[ConceptAssociationRequest])
             .out(jsonBody[ConceptAssociationResponseSC])
             .name("findAssociationsByConceptAssociationRequest")
-            .description("Find associations by concept association request")
+            .description("Find associations by concept association request. Request can be camelCase or snake_case. Response will be snake_case.")
             .tag(tag)
 
     val findAssociationsByConceptAssociationRequestImpl: ServerEndpoint[Any, Future] =

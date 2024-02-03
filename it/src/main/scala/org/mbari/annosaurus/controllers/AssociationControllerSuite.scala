@@ -213,8 +213,8 @@ trait AssociationControllerSuite extends BaseDAOSuite {
         val linkName = ass.getLinkName()
         val cr       = ConceptAssociationRequest(vrus, linkName)
         val response = exec(controller.findByConceptAssociationRequest(cr))
-        assertEquals(response.associations.size, 1)
-        val a        = response.associations.head
+        assertEquals(response.conceptAssociations.size, 1)
+        val a        = response.conceptAssociations.head
         AssertUtils.assertSameAssociation(a.toEntity, ass)
 
     }
