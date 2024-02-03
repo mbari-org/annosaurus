@@ -1,6 +1,6 @@
 [
   {
-    "recorded_date": "2014-11-04T17:46:09Z",
+    "recorded_timestamp": "2014-11-04T17:46:09Z",
     "timecode": "01:30:47:26",
     "video_reference_uuid": "c101ecb4-d22d-4f5c-aa9f-1d1048643086",
     "observations": [
@@ -46,7 +46,7 @@
   },
   {
     "elapsed_time": 289447,
-    "recorded_date": "2015-09-09T20:10:25.708Z",
+    "recorded_timestamp": "2015-09-09T20:10:25.708Z",
     "video_reference_uuid": "1c19d73e-c8cc-46a6-a705-9edb2245ccca",
     "observations": [
       {
@@ -82,7 +82,7 @@
   },
   {
     "elapsed_time": 80640,
-    "recorded_date": "2019-10-21T17:45:32.640Z",
+    "recorded_timestamp": "2019-10-21T17:45:32.640Z",
     "video_reference_uuid": "7a081057-1967-4b23-8d69-8815df3cd82c",
     "observations": [
       {
@@ -115,7 +115,7 @@
     "uuid": "2627d770-f154-4184-fa6d-0000044ce21e"
   },
   {
-    "recorded_date": "2007-05-30T17:09:09Z",
+    "recorded_timestamp": "2007-05-30T17:09:09Z",
     "timecode": "01:06:43:10",
     "video_reference_uuid": "1f1b7ba6-8aa6-4248-b6b4-3dfcd1651ca7",
     "observations": [
@@ -160,7 +160,7 @@
     "uuid": "112f7aaf-79dc-4150-9a36-000004c943c1"
   },
   {
-    "recorded_date": "2007-05-25T16:02:38Z",
+    "recorded_timestamp": "2007-05-25T16:02:38Z",
     "timecode": "00:34:03:16",
     "video_reference_uuid": "e3005de7-2c0a-4a3f-80ad-79e5e79ee4b8",
     "observations": [
@@ -215,7 +215,7 @@
     "uuid": "7591f5a7-5d4a-4f18-9377-0000051d205f"
   },
   {
-    "recorded_date": "2014-10-14T15:38:20Z",
+    "recorded_timestamp": "2014-10-14T15:38:20Z",
     "timecode": "02:06:41:03",
     "video_reference_uuid": "7e441540-87b2-4fef-86fc-5f4371a9df3e",
     "observations": [
@@ -252,7 +252,7 @@
   },
   {
     "elapsed_time": 894379,
-    "recorded_date": "2020-01-31T15:25:17.379Z",
+    "recorded_timestamp": "2020-01-31T15:25:17.379Z",
     "video_reference_uuid": "aef7a43c-6cf7-4f64-bbf3-f0981737f08d",
     "observations": [
       {
@@ -287,7 +287,7 @@
     "uuid": "af72511c-bb9c-4d5f-4762-000007f6b51e"
   },
   {
-    "recorded_date": "2014-10-02T18:35:33Z",
+    "recorded_timestamp": "2014-10-02T18:35:33Z",
     "timecode": "02:38:21:05",
     "video_reference_uuid": "e097859d-ce0d-4399-be8a-c9d357702b8d",
     "observations": [
@@ -323,7 +323,7 @@
     "uuid": "0ee0aa33-296c-4087-9fbc-000009913c45"
   },
   {
-    "recorded_date": "2014-01-13T21:15:38Z",
+    "recorded_timestamp": "2014-01-13T21:15:38Z",
     "timecode": "04:11:35:20",
     "video_reference_uuid": "0557b59b-60d5-44d0-acb3-71bf4acddf0a",
     "observations": [
@@ -359,7 +359,7 @@
     "uuid": "d2674699-01a1-4c43-a05c-00000a9eba4f"
   },
   {
-    "recorded_date": "2007-06-24T20:49:29Z",
+    "recorded_timestamp": "2007-06-24T20:49:29Z",
     "timecode": "02:56:35:19",
     "video_reference_uuid": "9be0daeb-d303-46a9-b3fa-699d7d40591e",
     "observations": [

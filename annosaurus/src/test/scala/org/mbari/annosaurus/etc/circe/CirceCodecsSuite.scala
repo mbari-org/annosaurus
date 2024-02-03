@@ -43,7 +43,8 @@ class CirceCodecsSuite extends munit.FunSuite {
                 case Right(imagedMoments) =>
                     assertEquals(imagedMoments.size, 10)
 
-                    val im = imagedMoments.sortBy(_.recordedTimestamp.get).head
+                    val im = imagedMoments.filter(i => i.recordedTimestamp.isDefined)
+                        .minBy(_.recordedTimestamp)
                     assertEquals(im.timecode.get, "00:34:03:16")
                     assertEquals(im.recordedTimestamp.get.toString, "2007-05-25T16:02:38Z")
                     assertEquals(
