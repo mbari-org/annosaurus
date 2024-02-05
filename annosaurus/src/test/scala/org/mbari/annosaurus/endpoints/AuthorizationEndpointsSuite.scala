@@ -77,11 +77,18 @@ class AuthorizationEndpointsSuite extends munit.FunSuite:
                 assertEquals(r.code, StatusCode.Ok)
                 assert(r.body.isRight)
 
-                val body       = r.body.right.get
+                val body = r.body.getOrElse(throw new Exception("No body"))
                 // println(body)
-                val d          = decode[Authorization](body)
+                val d = decode[Authorization](body)
                 assert(d.isRight)
-                val bearerAuth = d.right.get
+                val bearerAuth = d.getOrElse(throw new Exception("No bearer auth"))
                 assert(jwtService.verify(bearerAuth.accessToken))
+
+//                val body       = r.body.right.get
+//                // println(body)
+//                val d          = decode[Authorization](body)
+//                assert(d.isRight)
+//                val bearerAuth = d.right.get
+//                assert(jwtService.verify(bearerAuth.accessToken))
             )
             .join
