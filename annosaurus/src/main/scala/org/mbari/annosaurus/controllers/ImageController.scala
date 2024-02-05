@@ -93,6 +93,9 @@ class ImageController(daoFactory: JPADAOFactory) {
         val irDao      = daoFactory.newImageReferenceDAO(imDao)
         val candidates = imageCreates.distinctBy(_.url)
         // prefilter
+        if (candidates.isEmpty) {
+            return Future.successful(Seq.empty)
+        }
         val f          = for
             newOnes      <- irDao.runTransaction(d => candidates.filter(c => d.findByURL(c.url).isEmpty))
             newlyCreated <- irDao.runTransaction(d => {

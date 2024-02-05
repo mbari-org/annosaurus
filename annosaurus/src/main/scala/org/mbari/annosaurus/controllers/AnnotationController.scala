@@ -276,15 +276,11 @@ class AnnotationController(
                 obsDao
                     .runTransaction(d => {
                         for im <- imagedMoments
-                        yield imagedMomentController.create(d, im)
+                        yield
+                            val newIm = imagedMomentController.create(d, im)
+                            Annotation.fromImagedMoment(newIm, true)
                     })
-                    .map(entities =>
-                        // We map to annotations outside of a transaction. They should already be fully loaded
-                        // so no lazy loading issues. The primary keys aren't set until the transaction is
-                        // completed and we need those!!
-                        entities.flatMap(im => Annotation.fromImagedMoment(im, true))
-                    )
-        yield persistedAnnotations
+        yield persistedAnnotations.flatten
 
         future.onComplete(_ => obsDao.close())
         future.foreach(annotationPublisher.publish) // publish new annotations

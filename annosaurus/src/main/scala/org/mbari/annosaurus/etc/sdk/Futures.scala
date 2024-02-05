@@ -19,6 +19,7 @@ package org.mbari.annosaurus.etc.sdk
 import scala.concurrent.{Await, Future}
 import scala.concurrent.duration.Duration
 import java.util.concurrent.TimeUnit
+import java.time.{Duration as JDuration}
 
 object Futures:
 
@@ -32,3 +33,4 @@ object Futures:
     extension [T](t: Future[T])
         def join: T                     = Await.result(t, Timeout)
         def join(duration: Duration): T = Await.result(t, duration)
+        def join(duration: JDuration): T = Await.result(t, Duration.fromNanos(duration.toNanos))
