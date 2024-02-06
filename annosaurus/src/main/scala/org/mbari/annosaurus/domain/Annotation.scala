@@ -40,7 +40,8 @@ final case class Annotation(
     observer: Option[String] = None,
     recordedTimestamp: Option[Instant] = None,
     timecode: Option[String] = None,
-    videoReferenceUuid: Option[UUID] = None
+    videoReferenceUuid: Option[UUID] = None,
+    lastUpdated: Option[java.time.Instant] = None
 ) extends ToSnakeCase[AnnotationSC]
     with ToEntity[ImagedMomentEntity] {
 
@@ -71,7 +72,8 @@ final case class Annotation(
             observer,
             recordedTimestamp,
             timecode,
-            videoReferenceUuid
+            videoReferenceUuid,
+            lastUpdated
         )
 
     override def toEntity: ImagedMomentEntity =
@@ -141,7 +143,8 @@ object Annotation extends FromEntity[ObservationEntity, Annotation] {
             Option(entity.getObserver),
             imOpt.flatMap(im => Option(im.getRecordedTimestamp)),
             imOpt.flatMap(im => Option(im.getTimecode).map(_.toString)),
-            imOpt.flatMap(im => Option(im.getVideoReferenceUuid))
+            imOpt.flatMap(im => Option(im.getVideoReferenceUuid)),
+            Option(entity.getLastUpdatedTime).map(_.toInstant)
         )
 
     def fromImagedMoment(entity: ImagedMomentEntity, extend: Boolean = false): Seq[Annotation] = {
@@ -194,7 +197,8 @@ final case class AnnotationSC(
     observer: Option[String] = None,
     recorded_timestamp: Option[Instant] = None,
     timecode: Option[String] = None,
-    video_reference_uuid: Option[UUID] = None
+    video_reference_uuid: Option[UUID] = None,
+    last_udpated: Option[java.time.Instant] = None
 ) extends ToCamelCase[Annotation] {
 
     override def toCamelCase: Annotation =
@@ -213,7 +217,8 @@ final case class AnnotationSC(
             observer,
             recorded_timestamp,
             timecode,
-            video_reference_uuid
+            video_reference_uuid,
+            last_udpated
         )
 }
 

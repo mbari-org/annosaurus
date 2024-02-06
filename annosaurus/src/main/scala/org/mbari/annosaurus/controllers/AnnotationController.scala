@@ -269,6 +269,8 @@ class AnnotationController(
         // TODO need to stress test this to find the maximum number oa annotations that can be inserted at once
         val imagedMoments = Annotation.toEntities(noImageAnnotations.toSeq, true)
 
+        val newObservationUuids = mutable.ListBuffer[UUID]();
+
         // We commit the images first, then the annotations
         val future = for
             images               <- imageController.bulkCreate(imageCreates)
