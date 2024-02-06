@@ -169,7 +169,7 @@ trait AnnotationControllerSuite extends BaseDAOSuite {
         // Our source anno doesn't have UUIDS set, we remove those to compare the rest of the values
         assert(obtained.observationUuid.isDefined)
         assert(obtained.imagedMomentUuid.isDefined)
-        val corrected = obtained.copy(observationUuid = None, imagedMomentUuid = None)
+        val corrected = obtained.copy(observationUuid = None, imagedMomentUuid = None, lastUpdated = None)
         assertEquals(corrected, anno)
     }
 
@@ -197,9 +197,30 @@ trait AnnotationControllerSuite extends BaseDAOSuite {
         val obtained  = n.head
         assert(obtained.imagedMomentUuid.isDefined)
         assert(obtained.observationUuid.isDefined)
-        val corrected = obtained.copy(imagedMomentUuid = None, observationUuid = None)
+        val corrected = obtained.copy(imagedMomentUuid = None, observationUuid = None, lastUpdated = None)
 //        log.atWarn.log(n.head.stringify)
         assertEquals(corrected, annos0.head)
+    }
+
+    // https://github.com/mbari-org/annosaurus/issues/42
+    test("bulkCreate annotations at same index") {
+        val a = TestUtils.create(1, 1).head
+        for
+            i <- 0 until 5
+        do
+            val b = TestUtils.build(1, 1).head
+            b.setTimecode(a.getTimecode)
+            b.setRecordedTimestamp(a.getRecordedTimestamp)
+            b.setElapsedTime(a.getElapsedTime)
+            val annos = Annotation.fromImagedMoment(b, true)
+            val n      = exec(controller.bulkCreate(annos))
+            assertEquals(n.size, 1)
+            val obtained = n.head
+            assert(obtained.imagedMomentUuid.isDefined)
+            assert(obtained.observationUuid.isDefined)
+            val corrected = obtained.copy(imagedMomentUuid = None, observationUuid = None, lastUpdated = None)
+            assertEquals(corrected, annos.head)
+
     }
 
     test("bulkCreate a 200 annotations") {

@@ -71,6 +71,7 @@ object AssertUtils {
             fail("One of the ImagedMoments is null")
         }
     }
+    
 
     def assertSameObservation(
         a: ObservationEntity,

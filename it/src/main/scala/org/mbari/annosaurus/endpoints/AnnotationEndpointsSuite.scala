@@ -17,7 +17,15 @@
 package org.mbari.annosaurus.endpoints
 
 import org.mbari.annosaurus.controllers.{AnnotationController, TestUtils}
-import org.mbari.annosaurus.domain.{Annotation, AnnotationCreate, AnnotationSC, ConcurrentRequest, ConcurrentRequestCountSC, MultiRequest, MultiRequestCountSC}
+import org.mbari.annosaurus.domain.{
+    Annotation,
+    AnnotationCreate,
+    AnnotationSC,
+    ConcurrentRequest,
+    ConcurrentRequestCountSC,
+    MultiRequest,
+    MultiRequestCountSC
+}
 import org.mbari.annosaurus.repository.jpa.JPADAOFactory
 import org.mbari.annosaurus.etc.jdk.Logging.{*, given}
 import org.mbari.annosaurus.etc.jwt.JwtService
@@ -47,7 +55,7 @@ trait AnnotationEndpointsSuite extends EndpointsSuite {
             response => {
                 assertEquals(response.code, StatusCode.Ok)
                 val obtained = checkResponse[AnnotationSC](response.body).toCamelCase
-                val expected = Annotation.from(obs)
+                val expected = Annotation.from(obs).copy(lastUpdated = obtained.lastUpdated)
                 assertEquals(obtained, expected)
             }
         )
@@ -65,7 +73,7 @@ trait AnnotationEndpointsSuite extends EndpointsSuite {
                 val ys       = checkResponse[Seq[AnnotationSC]](response.body).map(_.toCamelCase)
                 assertEquals(ys.length, 1)
                 val obtained = ys.head
-                val expected = Annotation.from(obs)
+                val expected = Annotation.from(obs).copy(lastUpdated = obtained.lastUpdated)
                 assertEquals(obtained, expected)
             }
         )
@@ -82,7 +90,7 @@ trait AnnotationEndpointsSuite extends EndpointsSuite {
                 val ys       = checkResponse[Seq[AnnotationSC]](response.body).map(_.toCamelCase)
                 assertEquals(ys.length, 1)
                 val obtained = ys.head
-                val expected = Annotation.from(obs)
+                val expected = Annotation.from(obs).copy(lastUpdated = obtained.lastUpdated)
                 assertEquals(obtained, expected)
             }
         )
@@ -107,7 +115,8 @@ trait AnnotationEndpointsSuite extends EndpointsSuite {
         val obtained    = checkResponse[AnnotationSC](response.body).toCamelCase
         val expected    = anno.copy(
             imagedMomentUuid = obtained.imagedMomentUuid,
-            observationUuid = obtained.observationUuid
+            observationUuid = obtained.observationUuid,
+            lastUpdated = obtained.lastUpdated
         )
         assertEquals(obtained, expected)
     }
@@ -134,7 +143,8 @@ trait AnnotationEndpointsSuite extends EndpointsSuite {
         val obtained    = checkResponse[AnnotationSC](response.body).toCamelCase
         val expected    = anno.copy(
             imagedMomentUuid = obtained.imagedMomentUuid,
-            observationUuid = obtained.observationUuid
+            observationUuid = obtained.observationUuid,
+            lastUpdated = obtained.lastUpdated
         )
         assertEquals(obtained, expected)
     }
@@ -164,7 +174,9 @@ trait AnnotationEndpointsSuite extends EndpointsSuite {
             assert(o.imagedMomentUuid.isDefined)
 
         val normalized =
-            obtained.map(_.copy(observationUuid = None, imagedMomentUuid = None)).sortBy(_.concept)
+            obtained
+                .map(_.copy(observationUuid = None, imagedMomentUuid = None, lastUpdated = None))
+                .sortBy(_.concept)
 
         for (o, e) <- normalized.zip(annos)
         do assertEquals(o, e.toCamelCase)
@@ -200,7 +212,12 @@ trait AnnotationEndpointsSuite extends EndpointsSuite {
         do
             // normalize the response and remove assoations
             val e0 = e.copy(associations = Nil)
-            val o0 = o.copy(observation_uuid = None, imaged_moment_uuid = None, associations = Nil)
+            val o0 = o.copy(
+                observation_uuid = None,
+                imaged_moment_uuid = None,
+                associations = Nil,
+                last_udpated = None
+            )
             assertEquals(o0, e0)
 
             // compare associations
@@ -249,7 +266,8 @@ trait AnnotationEndpointsSuite extends EndpointsSuite {
                     observation_uuid = None,
                     imaged_moment_uuid = None,
                     associations = Nil,
-                    image_references = Nil
+                    image_references = Nil,
+                    last_udpated = None
                 )
                 .toCamelCase
 //            println("EXPECTED: " + e0.stringify)
@@ -279,7 +297,7 @@ trait AnnotationEndpointsSuite extends EndpointsSuite {
             cr.stringify,
             response => {
                 assertEquals(response.code, StatusCode.Ok)
-                val crc = checkResponse[ConcurrentRequestCountSC](response.body)
+                val crc      = checkResponse[ConcurrentRequestCountSC](response.body)
                 val obtained = crc.count
                 assertEquals(obtained, expected)
             }
@@ -300,7 +318,7 @@ trait AnnotationEndpointsSuite extends EndpointsSuite {
             cr.stringify,
             response => {
                 assertEquals(response.code, StatusCode.Ok)
-                val crc = checkResponse[ConcurrentRequestCountSC](response.body)
+                val crc      = checkResponse[ConcurrentRequestCountSC](response.body)
                 val obtained = crc.count
                 assertEquals(obtained, expected)
             }
@@ -318,7 +336,7 @@ trait AnnotationEndpointsSuite extends EndpointsSuite {
             mr.stringify,
             response => {
                 assertEquals(response.code, StatusCode.Ok)
-                val mrc = checkResponse[MultiRequestCountSC](response.body)
+                val mrc      = checkResponse[MultiRequestCountSC](response.body)
                 val obtained = mrc.count
                 assertEquals(obtained, expected)
             }
@@ -336,7 +354,7 @@ trait AnnotationEndpointsSuite extends EndpointsSuite {
             mr.stringify,
             response => {
                 assertEquals(response.code, StatusCode.Ok)
-                val mrc = checkResponse[MultiRequestCountSC](response.body)
+                val mrc      = checkResponse[MultiRequestCountSC](response.body)
                 val obtained = mrc.count
                 assertEquals(obtained, expected)
             }
@@ -367,7 +385,7 @@ trait AnnotationEndpointsSuite extends EndpointsSuite {
         val im          = TestUtils.create(1, 1).head
         val expected    = Annotation
             .from(im.getObservations.iterator.next())
-            .copy(activity = Some("foo"), concept = Some("bar"))
+            .copy(activity = Some("foo"), concept = Some("bar"), lastUpdated = None)
         val au          = AnnotationCreate.fromAnnotation(expected).toSnakeCase
         val jwt         = jwtService.authorize("foo").orNull
         assert(jwt != null)
@@ -381,7 +399,8 @@ trait AnnotationEndpointsSuite extends EndpointsSuite {
             .send(backendStub)
             .join
         assertEquals(response.code, StatusCode.Ok)
-        val obtained    = checkResponse[AnnotationSC](response.body).toCamelCase
+        val obtained    =
+            checkResponse[AnnotationSC](response.body).toCamelCase.copy(lastUpdated = None)
         assertEquals(obtained, expected)
     }
 
@@ -410,7 +429,7 @@ trait AnnotationEndpointsSuite extends EndpointsSuite {
         val im          = TestUtils.create(1, 1).head
         val expected    = Annotation
             .from(im.getObservations.iterator.next())
-            .copy(activity = Some("foo"), concept = Some("bar"))
+            .copy(activity = Some("foo"), concept = Some("bar"), lastUpdated = None)
         val au          = AnnotationCreate.fromAnnotation(expected).toSnakeCase
         val jwt         = jwtService.authorize("foo").orNull
         assert(jwt != null)
@@ -425,7 +444,8 @@ trait AnnotationEndpointsSuite extends EndpointsSuite {
             .send(backendStub)
             .join
         assertEquals(response.code, StatusCode.Ok)
-        val obtained    = checkResponse[AnnotationSC](response.body).toCamelCase
+        val obtained    =
+            checkResponse[AnnotationSC](response.body).toCamelCase.copy(lastUpdated = None)
         assertEquals(obtained, expected)
     }
 
@@ -434,7 +454,7 @@ trait AnnotationEndpointsSuite extends EndpointsSuite {
         val expected    = xs
             .flatMap(Annotation.fromImagedMoment(_))
             .map(_.toSnakeCase)
-            .map(_.copy(activity = Some("foofoo"), concept = Some("barbar")))
+            .map(_.copy(activity = Some("foofoo"), concept = Some("barbar"), last_udpated = None))
             .sortBy(_.concept)
         val jwt         = jwtService.authorize("foo").orNull
         assert(jwt != null)
@@ -449,6 +469,7 @@ trait AnnotationEndpointsSuite extends EndpointsSuite {
             .join
         assertEquals(response.code, StatusCode.Ok)
         val obtained    = checkResponse[Seq[AnnotationSC]](response.body)
-        assertEquals(obtained, expected)
+        val corrected = obtained.map(_.copy(last_udpated = None)).sortBy(_.concept)
+        assertEquals(corrected, expected)
     }
 }

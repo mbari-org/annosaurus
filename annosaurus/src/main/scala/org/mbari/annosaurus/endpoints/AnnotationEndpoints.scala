@@ -114,7 +114,8 @@ class AnnotationEndpoints(controller: AnnotationController)(using
                 handleOption(
                     controller
                         .bulkCreate(Seq(annotation))
-                        .map(xs => xs.headOption.map(_.toSnakeCase))
+                        .map(xs => xs.maxByOption(_.lastUpdated).map(_.toSnakeCase))
+//                        .map(xs => xs.headOption.map(_.toSnakeCase))
                 )
             }
 
