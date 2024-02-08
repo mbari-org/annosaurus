@@ -24,6 +24,7 @@ import java.time.Instant
 import org.mbari.annosaurus.repository.jpa.entity.ObservationEntity
 import scala.collection.mutable
 import scala.jdk.CollectionConverters.*
+import org.mbari.annosaurus.repository.jpa.entity.ImageReferenceEntity
 
 final case class Annotation(
     activity: Option[String] = None,
@@ -105,12 +106,12 @@ object Annotation extends FromEntity[ObservationEntity, Annotation] {
 
     override def from(entity: ObservationEntity, extend: Boolean = false): Annotation =
 
-        val imOpt = Option(entity.getImagedMoment)
+        val imagedMomentOpt = Option(entity.getImagedMoment)
 
         // Do not extend data here. As that would include redundant information
         val data =
             if extend then
-                imOpt
+                imagedMomentOpt
                     .flatMap(x => Option(x.getAncillaryDatum))
                     .map(x => CachedAncillaryDatum.from(x, false))
             else None
@@ -118,7 +119,7 @@ object Annotation extends FromEntity[ObservationEntity, Annotation] {
         // NOTE: An annotaiton ALWAYS includes imageReferences and associations
         // Do not extend image references here. As that would include redundant information
         val imageReferences =
-            imOpt
+            imagedMomentOpt
                 .map(_.getImageReferences.asScala)
                 .getOrElse(Nil)
                 .map(x => ImageReference.from(x, false))
@@ -134,16 +135,16 @@ object Annotation extends FromEntity[ObservationEntity, Annotation] {
             associations,
             Option(entity.getConcept),
             Option(entity.getDuration).map(_.toMillis),
-            imOpt.flatMap(x => Option(x.getElapsedTime)).map(_.toMillis),
+            imagedMomentOpt.flatMap(x => Option(x.getElapsedTime)).map(_.toMillis),
             Option(entity.getGroup),
-            imOpt.flatMap(im => Option(im.getUuid)),
+            imagedMomentOpt.flatMap(im => Option(im.getUuid)),
             imageReferences,
             Option(entity.getObservationTimestamp),
             Option(entity.getUuid),
             Option(entity.getObserver),
-            imOpt.flatMap(im => Option(im.getRecordedTimestamp)),
-            imOpt.flatMap(im => Option(im.getTimecode).map(_.toString)),
-            imOpt.flatMap(im => Option(im.getVideoReferenceUuid)),
+            imagedMomentOpt.flatMap(im => Option(im.getRecordedTimestamp)),
+            imagedMomentOpt.flatMap(im => Option(im.getTimecode).map(_.toString)),
+            imagedMomentOpt.flatMap(im => Option(im.getVideoReferenceUuid)),
             Option(entity.getLastUpdatedTime).map(_.toInstant)
         )
 
@@ -160,19 +161,28 @@ object Annotation extends FromEntity[ObservationEntity, Annotation] {
 
         // Consolidate imaged moments
         val imagedMomentMap = mutable.Map[ImagedMomentEntity, Seq[ImagedMomentEntity]]()
+        val imageReferenceMap = mutable.Map[ImagedMomentEntity, Seq[ImageReferenceEntity]]()
         for (im <- imagedMoments)
         do
             val imOpt = imagedMomentMap.get(im)
             imOpt match
-                case None    => imagedMomentMap.put(im, Nil)
-                case Some(x) => imagedMomentMap.put(im, x :+ im)
+                case None    => 
+                    imagedMomentMap.put(im, Nil)
+                    imageReferenceMap.put(im, im.getImageReferences.asScala.toSeq)
+                case Some(x) => 
+                    imagedMomentMap.put(im, x.appended(im))
+                    imageReferenceMap.put(im, imageReferenceMap(im).appendedAll(im.getImageReferences.asScala.toSeq))
 
+        
         for
             (baseIm, xs) <- imagedMomentMap.iterator
             x            <- xs
         do
+            val irs = imageReferenceMap(baseIm).distinctBy(_.getUrl())
+            irs.foreach(i => baseIm.addImageReference(i))
+            
             x.getObservations.forEach(o => baseIm.addObservation(o))
-            x.getImageReferences().forEach(i => baseIm.addImageReference(i))
+            
             if baseIm.getAncillaryDatum() != null && x.getAncillaryDatum() != null then
                 baseIm.setAncillaryDatum(x.getAncillaryDatum())
 

@@ -27,6 +27,7 @@ import org.mbari.annosaurus.domain.QueryConstraints
 import org.mbari.annosaurus.domain.MultiRequest
 import org.mbari.annosaurus.domain.ConcurrentRequest
 import org.mbari.annosaurus.etc.circe.CirceCodecs.{*, given}
+import org.checkerframework.checker.units.qual.A
 
 trait JdbcRepositorySuite extends BaseDAOSuite {
 
@@ -81,13 +82,13 @@ trait JdbcRepositorySuite extends BaseDAOSuite {
         val obs      = x.getObservations().asScala.head
         val xs2      = repository.findByConcept(obs.getConcept(), includeAncillaryData = true)
         assertEquals(xs2.size, 1)
-        val expected = Annotation
+        val expected = TestUtils.stripLastUpdated(Annotation
             .from(obs, true)
-            .removeForeignKeys()
+            .removeForeignKeys())
         val obtained = xs2.head.removeForeignKeys()
 //        println("OBTAINED: " + obtained.stringify)
 //        println("EXPECTED: " + expected.stringify)
-        assertEquals(expected, obtained)
+        assertEquals(obtained, expected)
     }
 
     test("findByConceptWithImages") {
@@ -222,18 +223,29 @@ trait JdbcRepositorySuite extends BaseDAOSuite {
     }
 
     test("findByVideoReferenceUuid") {
-        val xs  = TestUtils.create(8, 1, 1, 1, true)
-        val x   = xs.head
-        val xs2 = repository.findByVideoReferenceUuid(
-            x.getVideoReferenceUuid(),
-            includeAncillaryData = true
-        )
-        assertEquals(xs2.size, xs.size)
-        for (x <- xs2) {
-            assert(x.ancillaryData.isDefined)
-            assertEquals(x.imageReferences.size, 1)
-            assertEquals(x.associations.size, 1)
-        }
+        val xs  = TestUtils.create(8, 3, 3, 3, true)
+                .sortBy(_.getElapsedTime())
+        val videoReferenceUuid = xs.head.getVideoReferenceUuid()
+
+        // w're currently not fetching the lastUpdated timestamps using JDBC. So strip them from everything
+        // before we compare the results
+        val obtained = repository.findByVideoReferenceUuid(videoReferenceUuid,includeAncillaryData = true)
+            .map(i => i.copy(imageReferences = i.imageReferences.sortBy(_.uuid), associations = i.associations.sortBy(_.uuid)))
+            .sortBy(_.observationUuid)
+            .map(TestUtils.stripLastUpdated(_))
+
+        val expected = xs.flatMap(entity => Annotation.fromImagedMoment(entity, true))
+            .map(i => i.copy(imageReferences = i.imageReferences.sortBy(_.uuid), associations = i.associations.sortBy(_.uuid)))
+            .sortBy(_.observationUuid)
+            .map(TestUtils.stripLastUpdated(_))
+            
+        for 
+            i <- obtained.indices
+        do
+            val o = obtained(i)
+            val e = expected(i)
+            assertEquals(o, e)
+
     }
 
     test("findByVideoReferenceUuidAndTimestamps") {

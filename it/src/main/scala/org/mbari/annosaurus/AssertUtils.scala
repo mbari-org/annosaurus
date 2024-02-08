@@ -55,13 +55,15 @@ object AssertUtils {
             assertEquals(a.getUuid(), b.getUuid())
             if (cascade) {
                 assertEquals(a.getObservations.size, b.getObservations.size)
-                val ax = a.getObservations.asScala.toSeq.sortBy(_.getUuid())
-                val bx = b.getObservations.asScala.toSeq.sortBy(_.getUuid())
+                val ax = Option(a.getObservations)
+                    .map(_.asScala.toSeq.sortBy(_.getUuid()))
+                    .getOrElse(Seq.empty)
+                val bx = Option(b.getObservations).map(_.asScala.toSeq.sortBy(_.getUuid())).getOrElse(Seq.empty)
                 ax.zip(bx).foreach(p => assertSameObservation(p._1, p._2, cascade))
 
                 assertEquals(a.getImageReferences.size, b.getImageReferences.size)
-                val ay = a.getImageReferences.asScala.toSeq.sortBy(_.getUuid())
-                val by = b.getImageReferences.asScala.toSeq.sortBy(_.getUuid())
+                val ay = Option(a.getImageReferences).map(_.asScala.toSeq.sortBy(_.getUuid())).getOrElse(Seq.empty)
+                val by = Option(b.getImageReferences).map(_.asScala.toSeq.sortBy(_.getUuid())).getOrElse(Seq.empty)
                 ay.zip(by).foreach(p => assertSameImageReference(p._1, p._2))
 
                 assertSameAncillaryDatum(a.getAncillaryDatum(), b.getAncillaryDatum())

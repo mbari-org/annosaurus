@@ -41,6 +41,7 @@ import scala.util.Random
 import scala.concurrent.ExecutionContext
 import java.sql.Timestamp
 import scala.concurrent.Await
+import org.mbari.annosaurus.domain.Annotation
 
 object TestUtils {
 
@@ -225,6 +226,35 @@ object TestUtils {
             "missionId" + Strings.random(10),
             "missionContact" + Strings.random(10)
         )
+    }
+
+    def stripLastUpdated(a: Annotation): Annotation = {
+        a.copy(
+            lastUpdated = None, 
+            associations = a.associations.map(_.copy(lastUpdated = None)),
+            imageReferences = a.imageReferences.map(_.copy(lastUpdated = None)),
+            ancillaryData = a.ancillaryData.map(_.copy(lastUpdated = None))
+        )
+    }
+
+    def addRandomUuids(imagedMomentEntity: ImagedMomentEntity): ImagedMomentEntity = {
+        imagedMomentEntity.setUuid(UUID.randomUUID())
+        if (imagedMomentEntity.getImageReferences() != null) {
+            imagedMomentEntity.getImageReferences().forEach(img => img.setUuid(UUID.randomUUID()))
+        }
+        if (imagedMomentEntity.getAncillaryDatum() != null) {
+            imagedMomentEntity.getAncillaryDatum().setUuid(UUID.randomUUID())
+        }
+        if (imagedMomentEntity.getObservations() != null) {
+            imagedMomentEntity.getObservations().forEach(obs => {
+                obs.setUuid(UUID.randomUUID())
+                if (obs.getAssociations() != null) {
+                    obs.getAssociations().forEach(assoc => assoc.setUuid(UUID.randomUUID()))
+                }
+            })
+        }
+        imagedMomentEntity
+
     }
 
 }

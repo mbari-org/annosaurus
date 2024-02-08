@@ -64,14 +64,15 @@ object AssociationSQL {
     def join(
         annotations: Seq[Annotation],
         associations: Seq[Association]
-    ): Seq[Annotation] = {
+    ): Seq[Annotation] = 
         for a <- annotations
-        yield associations.find(anno => anno.observationUuid == a.observationUuid) match {
-            case None      => a
-            case Some(ass) => a.copy(associations = a.associations :+ ass)
+        yield {
+            val matches = associations.filter(anno => anno.observationUuid == a.observationUuid)
+            if (matches.isEmpty) a
+            else a.copy(associations = a.associations.appendedAll(matches))
         }
 
-    }
+    
 
     val SELECT: String =
         """ SELECT DISTINCT

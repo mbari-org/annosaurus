@@ -90,13 +90,11 @@ object ImageReferenceSQL {
         annotations: Seq[Annotation],
         images: Seq[ImageReference]
     ): Seq[Annotation] = {
-
         for a <- annotations
-        yield images.find(_.imagedMomentUuid == a.imagedMomentUuid) match {
-            case Some(image) => a.copy(imageReferences = a.imageReferences :+ image)
-            case None        => a
-        }
-
+        yield 
+            val matches = images.filter(_.imagedMomentUuid == a.imagedMomentUuid)
+            if (matches.isEmpty) a
+            else a.copy(imageReferences = a.imageReferences.appendedAll(matches))
     }
 
 }
