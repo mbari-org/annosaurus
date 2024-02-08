@@ -8,7 +8,7 @@ object Dependencies {
     lazy val circeGeneric = "io.circe" %% "circe-generic" % circeVersion
     lazy val circeParser  = "io.circe" %% "circe-parser"  % circeVersion
 
-    lazy val commonsCodec = "commons-codec" % "commons-codec" % "1.16.0"
+    lazy val commonsCodec = "commons-codec" % "commons-codec" % "1.16.1"
 
     val derbyVersion     = "10.17.1.0"
     lazy val derby       = "org.apache.derby" % "derby"       % derbyVersion //          % "test"
@@ -25,7 +25,7 @@ object Dependencies {
     lazy val gson             = "com.google.code.gson" % "gson"              % "2.10.1"
     lazy val h2               = "com.h2database"       % "h2"                % "2.2.224"
 
-    val hibernateVersion     = "6.4.3.Final"
+    val hibernateVersion     = "6.4.4.Final"
     lazy val hibernateCore   = "org.hibernate.orm" % "hibernate-core"     % hibernateVersion
     lazy val hibernateEnvers = "org.hibernate.orm" % "hibernate-envers"   % hibernateVersion
     lazy val hibernateHikari = "org.hibernate.orm" % "hibernate-hikaricp" % hibernateVersion
@@ -58,7 +58,7 @@ object Dependencies {
     lazy val oracle      = "com.oracle.ojdbc"        % "ojdbc8"     % "19.3.0.0"
     lazy val postgresql  = "org.postgresql"          % "postgresql" % "42.7.1"
     lazy val rxJava3     = "io.reactivex.rxjava3"    % "rxjava"     % "3.1.8"
-    lazy val scalatest   = "org.scalatest"          %% "scalatest"  % "3.2.17"
+    lazy val scalatest   = "org.scalatest"          %% "scalatest"  % "3.2.18"
 
     val scalatraVersion        = "3.0.0"
     lazy val scalatra          = "org.scalatra" %% "scalatra-jakarta"           % scalatraVersion
@@ -67,7 +67,7 @@ object Dependencies {
 
     lazy val scilube = "org.mbari.scilube" %% "scilube" % "3.0.1"
 
-    val slf4jVersion    = "2.0.11"
+    val slf4jVersion    = "2.0.12"
     lazy val slf4j      = "org.slf4j" % "slf4j-api"        % slf4jVersion
     lazy val slf4jJul   = "org.slf4j" % "jul-to-slf4j"     % slf4jVersion
     lazy val slf4jLog4j = "org.slf4j" % "log4j-over-slf4j" % slf4jVersion
@@ -81,7 +81,7 @@ object Dependencies {
     lazy val tapirSwagger    = "com.softwaremill.sttp.tapir"   %% "tapir-swagger-ui-bundle"  % tapirVersion
     lazy val tapirVertex     = "com.softwaremill.sttp.tapir"   %% "tapir-vertx-server"       % tapirVersion
 
-    lazy val tapirSttpCirce  = "com.softwaremill.sttp.client3" %% "circe"                    % "3.9.2"
+    lazy val tapirSttpCirce  = "com.softwaremill.sttp.client3" %% "circe"                    % "3.9.3"
 
     // val testcontainersScalaVersion = "0.41.0"
     // lazy val testcontainersPostgresql =
@@ -102,6 +102,6 @@ object Dependencies {
     lazy val typesafeConfig = "com.typesafe"    % "config"     % "1.4.3"
     lazy val uuidgen        = "org.mbari.uuid"  % "uuid-gen"   % "0.1.4"
     lazy val vcr4jCore      = "org.mbari.vcr4j" % "vcr4j-core" % "5.2.0"
-    lazy val zeromq         = "org.zeromq"      % "jeromq"     % "0.5.4"
+    lazy val zeromq         = "org.zeromq"      % "jeromq"     % "0.6.0"
 
 }
