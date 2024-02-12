@@ -62,6 +62,8 @@ trait Endpoints:
         Schema.derived[AnnotationUpdateSC]
     implicit lazy val sAssociation: Schema[Association]                                 = Schema.derived[Association]
     implicit lazy val sAssociationSc: Schema[AssociationSC]                             = Schema.derived[AssociationSC]
+    implicit lazy val sAssociationUpdateSc: Schema[AssociationUpdateSC]                 =
+        Schema.derived[AssociationUpdateSC]
     implicit lazy val sCachedAncillaryDatum: Schema[CachedAncillaryDatum]               =
         Schema.derived[CachedAncillaryDatum]
     implicit lazy val sCachedAncillaryDatumSC: Schema[CachedAncillaryDatumSC]           =

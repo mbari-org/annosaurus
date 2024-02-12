@@ -17,16 +17,7 @@
 package org.mbari.annosaurus.endpoints
 
 import org.mbari.annosaurus.controllers.AssociationController
-import org.mbari.annosaurus.domain.{
-    AssociationSC,
-    BadRequest,
-    ConceptAssociationRequest,
-    ConceptAssociationResponseSC,
-    ConceptCount,
-    ErrorMsg,
-    RenameConcept,
-    RenameCountSC
-}
+import org.mbari.annosaurus.domain.{AssociationSC, AssociationUpdateSC, BadRequest, ConceptAssociationRequest, ConceptAssociationResponseSC, ConceptCount, ErrorMsg, RenameConcept, RenameCountSC}
 import org.mbari.annosaurus.etc.jwt.JwtService
 import sttp.tapir.*
 import sttp.tapir.generic.auto.*
@@ -113,11 +104,11 @@ class AssociationEndpoints(controller: AssociationController)(using
 
     // PUT /:uuid form or json body
     val updateAssociation
-        : Endpoint[Option[String], (UUID, AssociationSC), ErrorMsg, AssociationSC, Any] =
+        : Endpoint[Option[String], (UUID, AssociationUpdateSC), ErrorMsg, AssociationSC, Any] =
         secureEndpoint
             .put
             .in(base / path[UUID]("associationUuid"))
-            .in(oneOfBody(jsonBody[AssociationSC], formBody[AssociationSC]))
+            .in(oneOfBody(jsonBody[AssociationUpdateSC], formBody[AssociationUpdateSC]))
             .out(jsonBody[AssociationSC])
             .name("updateAssociation")
             .description("Update an association")
@@ -125,17 +116,16 @@ class AssociationEndpoints(controller: AssociationController)(using
 
     val updateAssociationImpl: ServerEndpoint[Any, Future] = updateAssociation
         .serverSecurityLogic(jwtOpt => verify(jwtOpt))
-        .serverLogic { _ => (uuid, assoc) =>
-            val a = assoc.toCamelCase
+        .serverLogic { _ => (uuid, a) =>
             handleOption(
                 controller
                     .update(
                         uuid,
-                        a.observationUuid,
-                        Option(a.linkName),
-                        Option(a.toConcept),
-                        Option(a.linkValue),
-                        a.mimeType
+                        a.observation_uuid,
+                        a.link_name,
+                        a.to_concept,
+                        a.link_value,
+                        a.mime_type
                     )
                     .map(_.map(_.toSnakeCase))
             )

@@ -20,6 +20,7 @@ import org.mbari.annosaurus.controllers.TestUtils
 import org.mbari.annosaurus.domain.QueryConstraints
 import org.mbari.annosaurus.repository.jpa.{BaseDAOSuite, JPADAOFactory}
 import scala.jdk.CollectionConverters.*
+import org.checkerframework.checker.units.qual.h
 
 trait AnalysisRepositorySuite extends BaseDAOSuite {
 
@@ -41,6 +42,7 @@ trait AnalysisRepositorySuite extends BaseDAOSuite {
         val expected  = xs.flatMap(_.getObservations.asScala).size
         val qcr       = QueryConstraints(videoReferenceUuids = Seq(xs.head.getVideoReferenceUuid))
         val histogram = repository.timeHistogram(qcr)
+        println(histogram)
         assertEquals(histogram.count, expected)
     }
 
