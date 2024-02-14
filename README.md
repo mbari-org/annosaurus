@@ -2,16 +2,12 @@
 
 # annosaurus
 
-![Build](https://github.com/github/docs/actions/workflows/scala.yml/badge.svg)
+![Build](https://github.com/mbari-org/annosaurus/actions/workflows/scala.yml/badge.svg)
  [![DOI](https://zenodo.org/badge/90171432.svg)](https://zenodo.org/badge/latestdoi/90171432)
 
 ## tl;dr
 
-A web-service for creating image and video annotations. 
-
-Swagger docs are available in your instance at `http://yourhostname.domain:<port>/docs`
-
-Here's an example of how to launch it using Docker:
+A web-service for creating image and video annotations. Swagger docs are available in your instance at `http://yourhostname.domain:<port>/docs`. __Here's an example of how to launch it using Docker:__
 
 ```bash
 docker run -d \
