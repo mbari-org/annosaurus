@@ -1,6 +1,6 @@
 # Fetching annotations
 
-There are a number of endpoints for fetching annotations. The recommended way to fetch annotations is to use the `GET /anno/v1/fast` endpoints.
+There are a number of endpoints for fetching annotations. The recommended way to fetch annotations is to use the `GET /v1/fast` endpoints.
 
 By default, he endpoints below do no include the ancillary data for each annotation. To include the ancillary data, add the `?data=true` query parameter to the URL.
 
