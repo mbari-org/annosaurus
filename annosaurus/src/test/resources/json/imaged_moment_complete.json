@@ -1,0 +1,80 @@
+{
+    "recorded_timestamp": "2014-05-23T14:44:02Z",
+    "timecode": "01:17:59:10",
+    "video_reference_uuid": "26d65e75-1f95-4eec-9330-7f79541d9760",
+    "observations": [
+        {
+            "concept": "Poralia rufescens",
+            "observation_timestamp": "2014-05-23T14:44:04.790Z",
+            "observer": "lynne",
+            "group": "ROV",
+            "activity": "descend",
+            "associations": [
+                {
+                    "link_name": "perspective",
+                    "link_value": "close-up",
+                    "to_concept": "self",
+                    "mime_type": "text/plain",
+                    "last_updated_time": "2018-12-31T12:04:44Z",
+                    "uuid": "7ac95944-0518-49e1-b313-11a9aa5b3024"
+                },
+                {
+                    "link_name": "identity-reference",
+                    "link_value": "4",
+                    "to_concept": "self",
+                    "mime_type": "text/plain",
+                    "last_updated_time": "2018-12-31T12:04:44Z",
+                    "uuid": "ed2af9d2-a25d-4d40-8bfe-aaa8236466ba"
+                },
+                {
+                    "link_name": "bounding box",
+                    "link_value": "{\"x\": 534, \"y\": 2, \"width\": 1290, \"height\": 1079, \"observer\": \"expert-observer\", \"strength\": \"Padawan\", \"generator\": \"vars-localize\", \"project\": \"FathomNet\", \"image_reference_uuid\": \"230440a2-0a28-4849-97d6-7a2543b78e18\"}",
+                    "to_concept": "self",
+                    "mime_type": "application/json",
+                    "last_updated_time": "2021-05-04T12:11:58Z",
+                    "uuid": "dcecfa8f-8286-4a92-f966-ce76d4c4aa1e"
+                }
+            ],
+            "last_updated_time": "2018-12-31T12:04:44Z",
+            "uuid": "b3e1f6b5-8e17-49b5-b6d0-97c6ca0c2767"
+        }
+    ],
+    "image_references": [
+        {
+            "description": "compressed image with overlay",
+            "url": "http://search.mbari.org/ARCHIVE/frameGrabs/Doc%20Ricketts/images/0616/01_17_59_10.jpg",
+            "height_pixels": 1080,
+            "width_pixels": 1920,
+            "format": "image/jpg",
+            "last_updated_time": "2018-12-31T12:04:45Z",
+            "uuid": "2bb028ae-8698-4332-9c20-41f9bf985d26"
+        },
+        {
+            "description": "source image",
+            "url": "http://search.mbari.org/ARCHIVE/frameGrabs/Doc%20Ricketts/images/0616/01_17_59_10.png",
+            "height_pixels": 1080,
+            "width_pixels": 1920,
+            "format": "image/png",
+            "last_updated_time": "2018-12-31T12:04:44Z",
+            "uuid": "230440a2-0a28-4849-97d6-7a2543b78e18"
+        }
+    ],
+    "ancillary_data": {
+        "oxygen_ml_l": 0.9309999942779541,
+        "depth_meters": 1527.8167724609375,
+        "latitude": 36.695694,
+        "temperature_celsius": 2.8570001125335693,
+        "theta": 0.20000000298023224,
+        "longitude": -122.091169,
+        "phi": -1.2000000476837158,
+        "psi": 243.10000610351562,
+        "pressure_dbar": 1563.300048828125,
+        "salinity": 34.53200149536133,
+        "altitude": 0,
+        "light_transmission": 87.08000183105469,
+        "last_updated_time": "2023-03-08T21:42:06Z",
+        "uuid": "b4b05c66-7e16-484b-b047-fa8fb2d4240b"
+    },
+    "last_updated_time": "2019-02-11T11:35:19Z",
+    "uuid": "19d398d2-4ef5-4321-841d-0007d8ae76ce"
+}

@@ -33,7 +33,7 @@ DROP TABLE image_references
 GO
 
 
--- Association
+-- MutableAssociation
 DROP INDEX associations.idx_link_name
 GO
 

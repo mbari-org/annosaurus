@@ -18,7 +18,7 @@
   <logger name="java.util.Date" level="WARN" />
   <logger name="org.eclipse.jetty" level="WARN" />
   <logger name="org.fusesource.scalate" level="WARN" />
-<!--  <logger name="org.mbari.vars.annotation.dao.jpa" level="INFO" />-->
+<!--  <logger name="org.mbari.vars.annotation.repository.jpa" level="INFO" />-->
 
   <root level="${LOGBACK_LEVEL}">
     <appender-ref ref="CONSOLE" />

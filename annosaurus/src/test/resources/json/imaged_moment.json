@@ -1,0 +1,55 @@
+{
+    "recorded_timestamp": "2007-05-25T16:02:38Z",
+    "timecode": "00:34:03:16",
+    "video_reference_uuid": "e3005de7-2c0a-4a3f-80ad-79e5e79ee4b8",
+    "observations": [
+        {
+            "concept": "Euphausiacea",
+            "observation_timestamp": "2009-03-16T22:49:36.530Z",
+            "observer": "svonthun",
+            "group": "ROV",
+            "activity": "stationary",
+            "associations": [
+                {
+                    "link_name": "population-quantity",
+                    "link_value": "999",
+                    "to_concept": "self",
+                    "mime_type": "text/plain",
+                    "last_updated_time": "2019-01-09T08:30:34Z",
+                    "uuid": "d1184b24-020b-4d50-a77a-e7c4358ed2b6"
+                }
+            ],
+            "last_updated_time": "2019-01-09T08:30:34Z",
+            "uuid": "8649142a-6f69-472b-984c-310be35d7e83"
+        }
+    ],
+    "image_references": [
+        {
+            "description": "compressed image with overlay",
+            "url": "http://search.mbari.org/ARCHIVE/frameGrabs/Doc%20Ricketts/images/0616/01_17_59_10.jpg",
+            "height_pixels": 1080,
+            "width_pixels": 1920,
+            "format": "image/jpg",
+            "last_updated_time": "2018-12-31T12:04:45Z",
+            "uuid": "2bb028ae-8698-4332-9c20-41f9bf985d26"
+        }
+    ],
+    "ancillary_data": {
+        "oxygen_ml_l": 1.5099999904632568,
+        "depth_meters": 91.48985290527344,
+        "latitude": 36.75586,
+        "temperature_celsius": 8.442999839782715,
+        "theta": -3.5,
+        "longitude": -121.913426,
+        "phi": 0.10000000149011612,
+        "psi": 175,
+        "pressure_dbar": 91.19999694824219,
+        "salinity": 34.14099884033203,
+        "altitude": 4.519999980926514,
+        "light_transmission": 85.86000061035156,
+        "last_updated_time": "2023-08-20T16:22:59Z",
+        "uuid": "286cf79a-b831-48cd-b94b-212bc10d16f4"
+    },
+    "last_updated_time": "2019-02-11T13:00:50Z",
+    "uuid": "7591f5a7-5d4a-4f18-9377-0000051d205f"
+}
