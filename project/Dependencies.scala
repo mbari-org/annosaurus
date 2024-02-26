@@ -49,14 +49,14 @@ object Dependencies {
     lazy val json4sJackson = "org.json4s"         %% "json4s-jackson"  % "4.0.7"
     lazy val junit         = "junit"               % "junit"           % "4.13.2"
 
-    val logbackVersion      = "1.4.14"
+    val logbackVersion      = "1.5.0"
     lazy val logbackClassic = "ch.qos.logback" % "logback-classic" % logbackVersion
     lazy val logbackCore    = "ch.qos.logback" % "logback-core"    % logbackVersion
 
-    lazy val mssqlserver = "com.microsoft.sqlserver" % "mssql-jdbc" % "12.6.0.jre11"
+    lazy val mssqlserver = "com.microsoft.sqlserver" % "mssql-jdbc" % "12.6.1.jre11"
     lazy val munit       = "org.scalameta"          %% "munit"      % "1.0.0-M11"
     lazy val oracle      = "com.oracle.ojdbc"        % "ojdbc8"     % "19.3.0.0"
-    lazy val postgresql  = "org.postgresql"          % "postgresql" % "42.7.1"
+    lazy val postgresql  = "org.postgresql"          % "postgresql" % "42.7.2"
     lazy val rxJava3     = "io.reactivex.rxjava3"    % "rxjava"     % "3.1.8"
     lazy val scalatest   = "org.scalatest"          %% "scalatest"  % "3.2.18"
 
@@ -73,7 +73,7 @@ object Dependencies {
     lazy val slf4jLog4j = "org.slf4j" % "log4j-over-slf4j" % slf4jVersion
     lazy val slf4jSystem = "org.slf4j" % "slf4j-jdk-platform-logging" % slf4jVersion
 
-    private val tapirVersion = "1.9.9"
+    private val tapirVersion = "1.9.10"
     lazy val tapirCirce      = "com.softwaremill.sttp.tapir"   %% "tapir-json-circe"         % tapirVersion
     lazy val tapirHelidon    = "com.softwaremill.sttp.tapir"   %% "tapir-nima-server"        % tapirVersion
     lazy val tapirPrometheus = "com.softwaremill.sttp.tapir"   %% "tapir-prometheus-metrics" % tapirVersion
@@ -93,7 +93,7 @@ object Dependencies {
     // lazy val testcontainersSqlserver =
     //   "com.dimafeng" %% "testcontainers-scala-mssqlserver" % testcontainersScalaVersion
 
-    val testcontainersVersion        = "1.19.5"
+    val testcontainersVersion        = "1.19.6"
     lazy val testcontainersCore      = "org.testcontainers" % "testcontainers" % testcontainersVersion
     lazy val testcontainersSqlserver = "org.testcontainers" % "mssqlserver"    % testcontainersVersion
     lazy val testcontainersOracle    = "org.testcontainers" % "oracle-xe"      % testcontainersVersion

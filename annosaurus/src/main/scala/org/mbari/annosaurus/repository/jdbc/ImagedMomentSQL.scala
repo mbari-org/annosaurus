@@ -82,8 +82,8 @@ object ImagedMomentSQL {
                 timecode = xs(4).asString,
                 description = xs(5).asString,
                 format = xs(6).asString,
-                height = xs(7).asInt,
-                width = xs(8).asInt,
+                heightPixels = xs(7).asInt,
+                widthPixels = xs(8).asInt,
                 url = xs(9).asUrl,
                 imageReferenceUuid = xs(10).asUUID.orNull
             )

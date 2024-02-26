@@ -87,8 +87,8 @@ trait ImageControllerSuite extends BaseDAOSuite {
                     assertEquals(im.elapsedTime.map(_.toMillis), i.elapsed_time_millis)
                     assertEquals(im.recordedTimestamp, i.recorded_timestamp)
                     assertEquals(im.format, i.format)
-                    assertEquals(im.width, i.width_pixels)
-                    assertEquals(im.height, i.height_pixels)
+                    assertEquals(im.widthPixels, i.width_pixels)
+                    assertEquals(im.heightPixels, i.height_pixels)
                     assertEquals(im.description, i.description)
                 case None     => fail(s"Could not find ImageReference with url=${i.url}")
             }
@@ -123,8 +123,8 @@ trait ImageControllerSuite extends BaseDAOSuite {
         assertEquals(j.elapsedTime.orNull, im.getElapsedTime)
         assertEquals(j.recordedTimestamp.orNull, im.getRecordedTimestamp)
         assertEquals(j.format.orNull, i.getFormat)
-        assertEquals(j.width.orNull, i.getWidth.intValue())
-        assertEquals(j.height.orNull, i.getHeight.intValue())
+        assertEquals(j.widthPixels.orNull, i.getWidth.intValue())
+        assertEquals(j.heightPixels.orNull, i.getHeight.intValue())
         assertEquals(j.description.orNull, i.getDescription)
 
     }
@@ -155,8 +155,8 @@ trait ImageControllerSuite extends BaseDAOSuite {
         assertEquals(k.elapsedTime.orNull, im.getElapsedTime)
         assertEquals(k.recordedTimestamp.orNull, im.getRecordedTimestamp)
         assertEquals(k.format.orNull, j.getFormat)
-        assertEquals(k.width.orNull, j.getWidth.intValue())
-        assertEquals(k.height.orNull, j.getHeight.intValue())
+        assertEquals(k.widthPixels.orNull, j.getWidth.intValue())
+        assertEquals(k.heightPixels.orNull, j.getHeight.intValue())
         assertEquals(k.description.orNull, j.getDescription)
     }
 

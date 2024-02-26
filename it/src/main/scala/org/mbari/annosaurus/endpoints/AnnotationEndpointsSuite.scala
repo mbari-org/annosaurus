@@ -61,6 +61,16 @@ trait AnnotationEndpointsSuite extends EndpointsSuite {
         )
     }
 
+    test("findAnnotationByUuid (404)") {
+        runGet(
+            endpoints.findAnnotationByUuidImpl,
+            s"http://test.com/v1/annotations/00000000-0000-0000-0000-000000000000",
+            response => {
+                assertEquals(response.code, StatusCode.NotFound)
+            }
+        )
+    }
+
     test("findAnnotationsByImageReferenceUuid") {
         val im  = TestUtils.create(1, 1, 0, 1).head
         val obs = im.getObservations.iterator.next()
@@ -79,6 +89,16 @@ trait AnnotationEndpointsSuite extends EndpointsSuite {
         )
     }
 
+//    test("findAnnotationsByImageReferenceUuid (404)") {
+//        runGet(
+//            endpoints.findAnnotationByImageReferenceUuidImpl,
+//            s"http://test.com/v1/annotations/imagereference/00000000-0000-0000-0000-000000000000",
+//            response => {
+//                assertEquals(response.code, StatusCode.NotFound)
+//            }
+//        )
+//    }
+
     test("findAnnotationsByVideoReferenceUuid") {
         val im  = TestUtils.create(1, 1, 0, 1).head
         val obs = im.getObservations.iterator.next()
@@ -95,6 +115,16 @@ trait AnnotationEndpointsSuite extends EndpointsSuite {
             }
         )
     }
+
+//    test("findAnnotationsByVideoReferenceUuid (404)") {
+//        runGet(
+//            endpoints.findAnnotationsByVideoReferenceUuidImpl,
+//            s"http://test.com/v1/annotations/videoreference/00000000-0000-0000-0000-000000000000",
+//            response => {
+//                assertEquals(response.code, StatusCode.NotFound)
+//            }
+//        )
+//    }
 
     test("createAnnotation (json)") {
         val im          = TestUtils.build(1, 1).head
