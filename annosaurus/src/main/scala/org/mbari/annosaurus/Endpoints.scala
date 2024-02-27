@@ -69,19 +69,41 @@ object Endpoints {
     val observationEndpoints              = new ObservationEndpoints(observationController)
 
     // --------------------------------
-    val apiEndpoints = analysisEndpoints.allImpl ++
-        annotationEndpoints.allImpl ++
-        associationEndpoints.allImpl ++
-        authorizationEndpoints.allImpl ++
-        cachedAncillaryDatumEndpoints.allImpl ++
-        cachedVideoReferenceInfoEndpoints.allImpl ++
-        fastAnnotationEndpoints.allImpl ++
-        healthEndpoints.allImpl ++
-        imagedMomentEndpoints.allImpl ++
-        imageEndpoints.allImpl ++
-        imageReferenceEndpoints.allImpl ++
-        indexEndpoints.allImpl ++
+    // For VertX, we need to separate the non-blocking endpoints from the blocking ones
+    val nonBlockingEndpoints = List(
+        authorizationEndpoints.allImpl,
+        healthEndpoints.allImpl
+    ).flatten
+
+    val blockingEndpoints = List(
+        analysisEndpoints.allImpl,
+        annotationEndpoints.allImpl,
+        associationEndpoints.allImpl,
+        cachedAncillaryDatumEndpoints.allImpl,
+        cachedVideoReferenceInfoEndpoints.allImpl,
+        fastAnnotationEndpoints.allImpl,
+        imagedMomentEndpoints.allImpl,
+        imageEndpoints.allImpl,
+        imageReferenceEndpoints.allImpl,
+        indexEndpoints.allImpl,
         observationEndpoints.allImpl
+    ).flatten
+
+    val apiEndpoints = nonBlockingEndpoints ++ blockingEndpoints
+
+//    val apiEndpoints = analysisEndpoints.allImpl ++
+//        annotationEndpoints.allImpl ++
+//        associationEndpoints.allImpl ++
+//        authorizationEndpoints.allImpl ++
+//        cachedAncillaryDatumEndpoints.allImpl ++
+//        cachedVideoReferenceInfoEndpoints.allImpl ++
+//        fastAnnotationEndpoints.allImpl ++
+//        healthEndpoints.allImpl ++
+//        imagedMomentEndpoints.allImpl ++
+//        imageEndpoints.allImpl ++
+//        imageReferenceEndpoints.allImpl ++
+//        indexEndpoints.allImpl ++
+//        observationEndpoints.allImpl
 
     val docEndpoints: List[ServerEndpoint[Any, Future]] =
         SwaggerInterpreter().fromServerEndpoints(apiEndpoints, AppConfig.Name, AppConfig.Version)

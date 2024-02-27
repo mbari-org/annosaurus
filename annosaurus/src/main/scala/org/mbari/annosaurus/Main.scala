@@ -68,13 +68,29 @@ object Main:
 
         val interpreter = VertxFutureServerInterpreter(serverOptions)
 
-        Endpoints
-            .all
+        // For VertX, we need to separate the non-blocking endpoints from the blocking ones
+        Endpoints.nonBlockingEndpoints
             .foreach(endpoint =>
                 interpreter
                     .route(endpoint)
                     .apply(router) // attaches to vertx router
             )
+
+        Endpoints.blockingEndpoints
+            .foreach(endpoint =>
+                interpreter
+                    .blockingRoute(endpoint)
+                    .apply(router) // attaches to vertx router
+            )
+
+//        Endpoints
+//            .all
+//            .foreach(endpoint =>
+//
+//                interpreter
+//                    .route(endpoint)
+//                    .apply(router) // attaches to vertx router
+//            )
 
         router
             .getRoutes()
