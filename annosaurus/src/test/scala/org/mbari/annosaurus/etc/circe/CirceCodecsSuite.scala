@@ -18,13 +18,12 @@ package org.mbari.annosaurus.etc.circe
 
 import scala.io.Source
 import scala.util.Using
-import org.mbari.annosaurus.domain.ImagedMoment
-
+import org.mbari.annosaurus.domain.{ImagedMoment, ImagedMomentSC, QueryConstraints}
 import CirceCodecs.{*, given}
+
 import scala.util.Failure
 import scala.util.Success
 import java.time.Instant
-import org.mbari.annosaurus.domain.ImagedMomentSC
 
 class CirceCodecsSuite extends munit.FunSuite {
 
@@ -201,6 +200,57 @@ class CirceCodecsSuite extends munit.FunSuite {
         val c = None
         val d = c.stringify.reify[Option[Double]].toOption.flatten
         assertEquals(c, d)
+    }
+
+    test("decode QueryConstraints") {
+        val json = """{
+                     |    "videoReferenceUuids": [],
+                     |    "concepts": [
+                     |        "Grimpoteuthis",
+                     |        "Grimpoteuthis bathynectes",
+                     |        "Grimpoteuthis sp. 1",
+                     |        "Grimpoteuthis sp. 4",
+                     |        "Grimpoteuthis sp. 5",
+                     |        "Grimpoteuthis tuftsi"
+                     |    ],
+                     |    "observers": [],
+                     |    "groups": [],
+                     |    "activities": [],
+                     |    "missionContacts": [],
+                     |    "limit": 5000,
+                     |    "data": true
+                     |}""".stripMargin
+        val qc = json.reify[QueryConstraints].toOption
+        assert(qc.isDefined)
+        assertEquals(qc.get.videoReferenceUuids, List.empty)
+        assertEquals(qc.get.concepts, List("Grimpoteuthis", "Grimpoteuthis bathynectes", "Grimpoteuthis sp. 1", "Grimpoteuthis sp. 4", "Grimpoteuthis sp. 5", "Grimpoteuthis tuftsi"))
+    }
+
+    test("decode QueryConstraints from snake_case") {
+        val json =
+            """{
+              |    "video_reference_uuids": [],
+              |    "concepts": [
+              |        "Grimpoteuthis",
+              |        "Grimpoteuthis bathynectes",
+              |        "Grimpoteuthis sp. 1",
+              |        "Grimpoteuthis sp. 4",
+              |        "Grimpoteuthis sp. 5",
+              |        "Grimpoteuthis tuftsi"
+              |    ],
+              |    "observers": [],
+              |    "groups": [],
+              |    "activities": [],
+              |    "mission_contacts": [],
+              |    "limit": 5000,
+              |    "data": true
+              |}""".stripMargin
+        val opt = json.reify[QueryConstraints].toOption
+        assert(opt.isDefined)
+        val qc = opt.get
+        assertEquals(qc.videoReferenceUuids, List.empty)
+        assert(qc.missionContacts.isEmpty)
+        assertEquals(opt.get.concepts, List("Grimpoteuthis", "Grimpoteuthis bathynectes", "Grimpoteuthis sp. 1", "Grimpoteuthis sp. 4", "Grimpoteuthis sp. 5", "Grimpoteuthis tuftsi"))
     }
 
 }

@@ -58,7 +58,7 @@ trait FastAnnotationEndpointsSuite extends EndpointsSuite {
         )
     }
 
-    test("findAnnotationsByQueryConstraints") {
+    test("findAnnotationsByQueryConstraints (snake_case)") {
         val xs                  = TestUtils.create(2, 2, 1, 1, true) ++ TestUtils.create(2, 2, 1, 1, true)
         val obs                 = xs.flatMap(_.getObservations.asScala)
         val videoReferenceUuids = xs.map(_.getVideoReferenceUuid).distinct
@@ -88,7 +88,37 @@ trait FastAnnotationEndpointsSuite extends EndpointsSuite {
             assert(a.ancillary_data.isDefined)
     }
 
-    test("findGeoRangeByQueryConstraints") {
+    test("findAnnotationsByQueryConstraints (camelCase)") {
+        val xs = TestUtils.create(2, 2, 1, 1, true) ++ TestUtils.create(2, 2, 1, 1, true)
+        val obs = xs.flatMap(_.getObservations.asScala)
+        val videoReferenceUuids = xs.map(_.getVideoReferenceUuid).distinct
+        val qc = QueryConstraints(
+            limit = Some(10),
+            offset = Some(0),
+            videoReferenceUuids = videoReferenceUuids,
+            data = Some(true)
+        )
+        val jwt = jwtService.authorize("foo").orNull
+        assert(jwt != null)
+        val backendStub = newBackendStub(endpoints.findAnnotationsByQueryConstraintsImpl)
+        val response = basicRequest
+            .post(uri"http://test.com/v1/fast")
+            .header("Authorization", s"Bearer $jwt")
+            .header("Content-Type", "application/json")
+            .body(qc.stringify)
+            .send(backendStub)
+            .join
+        assertEquals(response.code, StatusCode.Ok)
+        val qcr = checkResponse[QueryConstraintsResponseSC[Seq[AnnotationSC]]](response.body)
+        assertEquals(qcr.content.size, obs.size)
+        for a <- qcr.content
+            do
+                assertEquals(a.image_references.size, 1)
+                assertEquals(a.associations.size, 1)
+                assert(a.ancillary_data.isDefined)
+    }
+
+    test("findGeoRangeByQueryConstraints (snake_case)") {
         val xs                  = TestUtils.create(10, 1, includeData = true)
         val videoReferenceUuids = xs.map(_.getVideoReferenceUuid).distinct
         val qc                  = QueryConstraints(
@@ -128,7 +158,47 @@ trait FastAnnotationEndpointsSuite extends EndpointsSuite {
 
     }
 
-    test("countAnnotationsByQueryConstraints") {
+    test("findGeoRangeByQueryConstraints (camelCase)") {
+        val xs = TestUtils.create(10, 1, includeData = true)
+        val videoReferenceUuids = xs.map(_.getVideoReferenceUuid).distinct
+        val qc = QueryConstraints(
+            limit = Some(10),
+            offset = Some(0),
+            videoReferenceUuids = videoReferenceUuids,
+            data = Some(true)
+        )
+        val jwt = jwtService.authorize("foo").orNull
+        assert(jwt != null)
+        val backendStub = newBackendStub(endpoints.findGeoRangeByQueryConstraintsImpl)
+        val response = basicRequest
+            .post(uri"http://test.com/v1/fast/georange")
+            .header("Authorization", s"Bearer $jwt")
+            .header("Content-Type", "application/json")
+            .body(qc.stringify)
+            .send(backendStub)
+            .join
+        assertEquals(response.code, StatusCode.Ok)
+        val qcr = checkResponse[QueryConstraintsResponseSC[GeographicRangeSC]](response.body)
+        val gr = qcr.content.toCamelCase
+
+        val data = xs.map(_.getAncillaryDatum).map(CachedAncillaryDatum.from(_, true))
+        val minLat = data.map(_.latitude).min.getOrElse(-1)
+        val maxLat = data.map(_.latitude).max.getOrElse(-1)
+        val minLon = data.map(_.longitude).min.getOrElse(-1)
+        val maxLon = data.map(_.longitude).max.getOrElse(-1)
+        val minDepth = data.map(_.depthMeters).min.getOrElse(-1f)
+        val maxDepth = data.map(_.depthMeters).max.getOrElse(-1f)
+
+        assertEquals(gr.minLatitude, minLat)
+        assertEquals(gr.maxLatitude, maxLat)
+        assertEquals(gr.minLongitude, minLon)
+        assertEquals(gr.maxLongitude, maxLon)
+        assertEqualsFloat(gr.minDepthMeters.floatValue(), minDepth, 0.00001)
+        assertEqualsFloat(gr.maxDepthMeters.floatValue(), maxDepth, 0.0001)
+
+    }
+
+    test("countAnnotationsByQueryConstraints (snake_case)") {
         val xs                  = TestUtils.create(2, 2, 1, 1, true) ++ TestUtils.create(2, 2, 1, 1, true)
         val expected            = xs.flatMap(_.getObservations.asScala).size
         val videoReferenceUuids = xs.map(_.getVideoReferenceUuid).distinct
@@ -153,6 +223,34 @@ trait FastAnnotationEndpointsSuite extends EndpointsSuite {
         val n                   = qcr.content.count
         assertEquals(n, expected.longValue)
     }
+
+    test("countAnnotationsByQueryConstraints (camelCase)") {
+        val xs = TestUtils.create(2, 2, 1, 1, true) ++ TestUtils.create(2, 2, 1, 1, true)
+        val expected = xs.flatMap(_.getObservations.asScala).size
+        val videoReferenceUuids = xs.map(_.getVideoReferenceUuid).distinct
+        val qc = QueryConstraints(
+            limit = Some(10),
+            offset = Some(0),
+            videoReferenceUuids = videoReferenceUuids,
+            data = Some(true)
+        )
+        val jwt = jwtService.authorize("foo").orNull
+        assert(jwt != null)
+        val backendStub = newBackendStub(endpoints.countAnnotationsByQueryConstraintsImpl)
+        val response = basicRequest
+            .post(uri"http://test.com/v1/fast/count")
+            .header("Authorization", s"Bearer $jwt")
+            .header("Content-Type", "application/json")
+            .body(qc.stringify)
+            .send(backendStub)
+            .join
+        assertEquals(response.code, StatusCode.Ok)
+        val qcr = checkResponse[QueryConstraintsResponseSC[Count]](response.body)
+        val n = qcr.content.count
+        assertEquals(n, expected.longValue)
+    }
+
+
 
     test("countAllAnnotations") {
         val xs = TestUtils.create(2, 1)

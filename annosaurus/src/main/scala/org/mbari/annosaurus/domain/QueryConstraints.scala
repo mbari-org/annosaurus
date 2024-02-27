@@ -45,17 +45,23 @@ final case class QueryConstraints(
     missionId: Option[String] = None
 ) extends ToSnakeCase[QueryConstraintsSC] {
 
+    // Used by Circe reify. If serializing fails, the circe codec will fall back to snake_case
+    require(
+        videoReferenceUuids.nonEmpty || concepts.nonEmpty || observers.nonEmpty || groups.nonEmpty || activities.nonEmpty || minDepth.isDefined || maxDepth.isDefined || minLat.isDefined || maxLat.isDefined || minLon.isDefined || maxLon.isDefined || minTimestamp.isDefined || maxTimestamp.isDefined || linkName.isDefined || linkValue.isDefined || missionContacts.nonEmpty || platformName.isDefined || missionId.isDefined,
+        "At least one constraint must be defined"
+    )
+
     val definedLimit: Int    = limit.getOrElse(5000)
     val definedOffset: Int   = offset.getOrElse(0)
     val includeData: Boolean = data.getOrElse(false)
 
     def toSnakeCase: QueryConstraintsSC = {
         QueryConstraintsSC(
-            videoReferenceUuids,
-            concepts,
-            observers,
-            groups,
-            activities,
+            Option(videoReferenceUuids),
+            Option(concepts),
+            Option(observers),
+            Option(groups),
+            Option(activities),
             minDepth,
             maxDepth,
             minLat,
@@ -69,7 +75,7 @@ final case class QueryConstraints(
             limit,
             offset,
             data,
-            missionContacts,
+            Option(missionContacts),
             platformName,
             missionId
         )
@@ -77,11 +83,11 @@ final case class QueryConstraints(
 }
 
 final case class QueryConstraintsSC(
-    video_reference_uuids: Seq[UUID] = Nil,
-    concepts: Seq[String] = Nil,
-    observers: Seq[String] = Nil,
-    groups: Seq[String] = Nil,
-    activities: Seq[String] = Nil,
+    video_reference_uuids: Option[Seq[UUID]] = None,
+    concepts: Option[Seq[String]] = None,
+    observers: Option[Seq[String]] = None,
+    groups: Option[Seq[String]] = None,
+    activities: Option[Seq[String]] = None,
     min_depth: Option[Double] = None,
     max_depth: Option[Double] = None,
     min_lat: Option[Double] = None,
@@ -95,17 +101,17 @@ final case class QueryConstraintsSC(
     limit: Option[Int] = Some(5000),
     offset: Option[Int] = Some(0),
     data: Option[Boolean] = Some(false),
-    mission_contacts: Seq[String] = Nil,
+    mission_contacts: Option[Seq[String]] = None,
     platform_name: Option[String] = None,
     mission_id: Option[String] = None
 ) extends ToCamelCase[QueryConstraints] {
     def toCamelCase: QueryConstraints = {
         QueryConstraints(
-            video_reference_uuids,
-            concepts,
-            observers,
-            groups,
-            activities,
+            video_reference_uuids.getOrElse(Nil),
+            concepts.getOrElse(Nil),
+            observers.getOrElse(Nil),
+            groups.getOrElse(Nil),
+            activities.getOrElse(Nil),
             min_depth,
             max_depth,
             min_lat,
@@ -119,7 +125,7 @@ final case class QueryConstraintsSC(
             limit,
             offset,
             data,
-            mission_contacts,
+            mission_contacts.getOrElse(Nil),
             platform_name,
             mission_id
         )
