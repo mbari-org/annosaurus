@@ -83,6 +83,17 @@ object Main:
                     .apply(router) // attaches to vertx router
             )
 
+        // Add our metrics endpoints
+        interpreter.route(Endpoints.metricsEndpoint).apply(router)
+
+        // Add our documentation endpoints
+        Endpoints.docEndpoints
+            .foreach(endpoint =>
+                interpreter
+                    .route(endpoint)
+                    .apply(router)
+            )
+
 //        Endpoints
 //            .all
 //            .foreach(endpoint =>
