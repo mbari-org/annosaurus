@@ -23,4 +23,5 @@ case class AssociationUpdateSC(
     to_concept: Option[String] = None,
     link_value: Option[String] = None,
     mime_type: Option[String] = None,
-    observation_uuid: Option[UUID] = None)
+    observation_uuid: Option[UUID] = None
+)

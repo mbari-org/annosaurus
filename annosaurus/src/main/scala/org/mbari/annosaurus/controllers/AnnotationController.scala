@@ -53,7 +53,7 @@ class AnnotationController(
 
     private val imagedMomentController = new ImagedMomentController(daoFactory)
     private val annotationPublisher    = new AnnotationPublisher(bus)
-    private val log                          = System.getLogger(getClass.getName())
+    private val log                    = System.getLogger(getClass.getName())
 
     protected def exec[T](
         fn: ObservationDAO[ObservationEntity] => T

@@ -58,12 +58,18 @@ object AssertUtils {
                 val ax = Option(a.getObservations)
                     .map(_.asScala.toSeq.sortBy(_.getUuid()))
                     .getOrElse(Seq.empty)
-                val bx = Option(b.getObservations).map(_.asScala.toSeq.sortBy(_.getUuid())).getOrElse(Seq.empty)
+                val bx = Option(b.getObservations)
+                    .map(_.asScala.toSeq.sortBy(_.getUuid()))
+                    .getOrElse(Seq.empty)
                 ax.zip(bx).foreach(p => assertSameObservation(p._1, p._2, cascade))
 
                 assertEquals(a.getImageReferences.size, b.getImageReferences.size)
-                val ay = Option(a.getImageReferences).map(_.asScala.toSeq.sortBy(_.getUuid())).getOrElse(Seq.empty)
-                val by = Option(b.getImageReferences).map(_.asScala.toSeq.sortBy(_.getUuid())).getOrElse(Seq.empty)
+                val ay = Option(a.getImageReferences)
+                    .map(_.asScala.toSeq.sortBy(_.getUuid()))
+                    .getOrElse(Seq.empty)
+                val by = Option(b.getImageReferences)
+                    .map(_.asScala.toSeq.sortBy(_.getUuid()))
+                    .getOrElse(Seq.empty)
                 ay.zip(by).foreach(p => assertSameImageReference(p._1, p._2))
 
                 assertSameAncillaryDatum(a.getAncillaryDatum(), b.getAncillaryDatum())
@@ -73,7 +79,6 @@ object AssertUtils {
             fail("One of the ImagedMoments is null")
         }
     }
-    
 
     def assertSameObservation(
         a: ObservationEntity,

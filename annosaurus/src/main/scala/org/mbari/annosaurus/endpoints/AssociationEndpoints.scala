@@ -17,7 +17,17 @@
 package org.mbari.annosaurus.endpoints
 
 import org.mbari.annosaurus.controllers.AssociationController
-import org.mbari.annosaurus.domain.{AssociationSC, AssociationUpdateSC, BadRequest, ConceptAssociationRequest, ConceptAssociationResponseSC, ConceptCount, ErrorMsg, RenameConcept, RenameCountSC}
+import org.mbari.annosaurus.domain.{
+    AssociationSC,
+    AssociationUpdateSC,
+    BadRequest,
+    ConceptAssociationRequest,
+    ConceptAssociationResponseSC,
+    ConceptCount,
+    ErrorMsg,
+    RenameConcept,
+    RenameCountSC
+}
 import org.mbari.annosaurus.etc.jwt.JwtService
 import sttp.tapir.*
 import sttp.tapir.generic.auto.*
@@ -228,7 +238,9 @@ class AssociationEndpoints(controller: AssociationController)(using
             .in(jsonBody[ConceptAssociationRequest])
             .out(jsonBody[ConceptAssociationResponseSC])
             .name("findAssociationsByConceptAssociationRequest")
-            .description("Find associations by concept association request. Request can be camelCase or snake_case. Response will be snake_case.")
+            .description(
+                "Find associations by concept association request. Request can be camelCase or snake_case. Response will be snake_case."
+            )
             .tag(tag)
 
     val findAssociationsByConceptAssociationRequestImpl: ServerEndpoint[Any, Future] =

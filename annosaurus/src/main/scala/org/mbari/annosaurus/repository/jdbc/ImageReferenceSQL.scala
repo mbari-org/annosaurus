@@ -91,7 +91,7 @@ object ImageReferenceSQL {
         images: Seq[ImageReference]
     ): Seq[Annotation] = {
         for a <- annotations
-        yield 
+        yield
             val matches = images.filter(_.imagedMomentUuid == a.imagedMomentUuid)
             if (matches.isEmpty) a
             else a.copy(imageReferences = a.imageReferences.appendedAll(matches))

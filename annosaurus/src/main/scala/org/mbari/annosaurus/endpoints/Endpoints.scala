@@ -117,7 +117,7 @@ trait Endpoints:
     implicit lazy val sURI: Schema[URI]                                                 = Schema.string
     implicit lazy val sURL: Schema[URL]                                                 = Schema.string
     implicit lazy val sInstant: Schema[Instant]                                         = Schema.string
-    implicit lazy val sBulkAnnotationSc: Schema[BulkAnnotationSC]                      = Schema.derived[BulkAnnotationSC]
+    implicit lazy val sBulkAnnotationSc: Schema[BulkAnnotationSC]                       = Schema.derived[BulkAnnotationSC]
 //    given Schema[Option[URL]]                              = Schema.string
 //    implicit lazy val sOptCAD: Schema[Option[CachedAncillaryDatumSC]]                     = Schema.derived[Option[CachedAncillaryDatumSC]]
 //    implicit lazy val sOptDouble: Schema[Option[Double]]                                 = Schema.derived[Option[Double]]

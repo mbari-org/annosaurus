@@ -82,9 +82,11 @@ trait JdbcRepositorySuite extends BaseDAOSuite {
         val obs      = x.getObservations().asScala.head
         val xs2      = repository.findByConcept(obs.getConcept(), includeAncillaryData = true)
         assertEquals(xs2.size, 1)
-        val expected = TestUtils.stripLastUpdated(Annotation
-            .from(obs, true)
-            .removeForeignKeys())
+        val expected = TestUtils.stripLastUpdated(
+            Annotation
+                .from(obs, true)
+                .removeForeignKeys()
+        )
         val obtained = xs2.head.removeForeignKeys()
 //        println("OBTAINED: " + obtained.stringify)
 //        println("EXPECTED: " + expected.stringify)
@@ -223,24 +225,36 @@ trait JdbcRepositorySuite extends BaseDAOSuite {
     }
 
     test("findByVideoReferenceUuid") {
-        val xs  = TestUtils.create(8, 3, 3, 3, true)
-                .sortBy(_.getElapsedTime())
+        val xs                 = TestUtils
+            .create(8, 3, 3, 3, true)
+            .sortBy(_.getElapsedTime())
         val videoReferenceUuid = xs.head.getVideoReferenceUuid()
 
         // w're currently not fetching the lastUpdated timestamps using JDBC. So strip them from everything
         // before we compare the results
-        val obtained = repository.findByVideoReferenceUuid(videoReferenceUuid,includeAncillaryData = true)
-            .map(i => i.copy(imageReferences = i.imageReferences.sortBy(_.uuid), associations = i.associations.sortBy(_.uuid)))
+        val obtained = repository
+            .findByVideoReferenceUuid(videoReferenceUuid, includeAncillaryData = true)
+            .map(i =>
+                i.copy(
+                    imageReferences = i.imageReferences.sortBy(_.uuid),
+                    associations = i.associations.sortBy(_.uuid)
+                )
+            )
             .sortBy(_.observationUuid)
             .map(TestUtils.stripLastUpdated(_))
 
-        val expected = xs.flatMap(entity => Annotation.fromImagedMoment(entity, true))
-            .map(i => i.copy(imageReferences = i.imageReferences.sortBy(_.uuid), associations = i.associations.sortBy(_.uuid)))
+        val expected = xs
+            .flatMap(entity => Annotation.fromImagedMoment(entity, true))
+            .map(i =>
+                i.copy(
+                    imageReferences = i.imageReferences.sortBy(_.uuid),
+                    associations = i.associations.sortBy(_.uuid)
+                )
+            )
             .sortBy(_.observationUuid)
             .map(TestUtils.stripLastUpdated(_))
-            
-        for 
-            i <- obtained.indices
+
+        for i <- obtained.indices
         do
             val o = obtained(i)
             val e = expected(i)

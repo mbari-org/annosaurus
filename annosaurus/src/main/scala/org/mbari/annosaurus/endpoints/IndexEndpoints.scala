@@ -57,21 +57,22 @@ class IndexEndpoints(controller: IndexController)(using
         }
 
     val bulkUpdateRecordedTimestamps
-        : Endpoint[Option[String], List[IndexUpdateSC], ErrorMsg, List[IndexSC], Any] = secureEndpoint
-        .put
-        .in(base / "tapetime")
-        .in(jsonBody[List[IndexUpdateSC]].description("Index update objects"))
-        .out(jsonBody[List[IndexSC]].description("The Modified index objects"))
-        .description("Bulk update the recordedTimestamp of multiple indices")
-        .name("bulkUpdateRecordedTimestamps")
-        .tag(tag)
+        : Endpoint[Option[String], List[IndexUpdateSC], ErrorMsg, List[IndexSC], Any] =
+        secureEndpoint
+            .put
+            .in(base / "tapetime")
+            .in(jsonBody[List[IndexUpdateSC]].description("Index update objects"))
+            .out(jsonBody[List[IndexSC]].description("The Modified index objects"))
+            .description("Bulk update the recordedTimestamp of multiple indices")
+            .name("bulkUpdateRecordedTimestamps")
+            .tag(tag)
 
     val bulkUpdateRecordedTimestampsImpl: ServerEndpoint[Any, Future] = bulkUpdateRecordedTimestamps
         .serverSecurityLogic(jwtOpt => verify(jwtOpt))
         .serverLogic(_ =>
             indices =>
                 val xs = indices.map(_.toCamelCase)
-                val f = controller
+                val f  = controller
                     .bulkUpdateRecordedTimestamps(xs)
                     .map(xs => xs.map(_.toSnakeCase).toList)
                 handleErrors(f)

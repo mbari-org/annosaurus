@@ -23,17 +23,17 @@ import org.mbari.annosaurus.repository.jpa.entity.ImageReferenceEntity
 import extensions.*
 
 final case class Image(
-                          imageReferenceUuid: UUID,
-                          videoReferenceUuid: UUID,
-                          imagedMomentUuid: UUID,
-                          format: Option[String] = None,
-                          widthPixels: Option[Int] = None,
-                          heightPixels: Option[Int] = None,
-                          url: Option[URL] = None,
-                          description: Option[String] = None,
-                          timecode: Option[String] = None,
-                          elapsedTimeMillis: Option[Long] = None,
-                          recordedTimestamp: Option[Instant] = None
+    imageReferenceUuid: UUID,
+    videoReferenceUuid: UUID,
+    imagedMomentUuid: UUID,
+    format: Option[String] = None,
+    widthPixels: Option[Int] = None,
+    heightPixels: Option[Int] = None,
+    url: Option[URL] = None,
+    description: Option[String] = None,
+    timecode: Option[String] = None,
+    elapsedTimeMillis: Option[Long] = None,
+    recordedTimestamp: Option[Instant] = None
 ) extends ToSnakeCase[ImageSC] {
     override def toSnakeCase: ImageSC = ImageSC(
         imageReferenceUuid,
@@ -80,17 +80,17 @@ object Image extends FromEntity[ImageReferenceEntity, Image] {
 }
 
 final case class ImageSC(
-                            image_reference_uuid: UUID,
-                            video_reference_uuid: UUID,
-                            imaged_moment_uuid: UUID,
-                            format: Option[String] = None,
-                            width_pixels: Option[Int] = None,
-                            height_pixels: Option[Int] = None,
-                            url: Option[URL] = None,
-                            description: Option[String] = None,
-                            timecode: Option[String] = None,
-                            elapsed_time_millis: Option[Long] = None,
-                            recorded_timestamp: Option[Instant] = None
+    image_reference_uuid: UUID,
+    video_reference_uuid: UUID,
+    imaged_moment_uuid: UUID,
+    format: Option[String] = None,
+    width_pixels: Option[Int] = None,
+    height_pixels: Option[Int] = None,
+    url: Option[URL] = None,
+    description: Option[String] = None,
+    timecode: Option[String] = None,
+    elapsed_time_millis: Option[Long] = None,
+    recorded_timestamp: Option[Instant] = None
 ) extends ToCamelCase[Image] {
     override def toCamelCase: Image = Image(
         image_reference_uuid,

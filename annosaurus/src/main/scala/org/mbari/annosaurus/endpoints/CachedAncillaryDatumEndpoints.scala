@@ -154,7 +154,11 @@ class CachedAncillaryDatumEndpoints(controller: CachedAncillaryDatumController)(
         .put
         .in(base / "merge" / path[UUID]("videoReferenceUuid"))
         .in(jsonBody[Seq[CachedAncillaryDatumSC]])
-        .in(query[Option[Int]]("window").description("Window in seconds to merge data. Default is +/-7.5."))
+        .in(
+            query[Option[Int]]("window").description(
+                "Window in seconds to merge data. Default is +/-7.5."
+            )
+        )
         .out(jsonBody[Seq[CachedAncillaryDatumSC]])
         .name("mergeManyData")
         .description("Merge one ancillary data")

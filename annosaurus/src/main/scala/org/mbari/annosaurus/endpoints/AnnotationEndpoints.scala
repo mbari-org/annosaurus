@@ -17,7 +17,20 @@
 package org.mbari.annosaurus.endpoints
 
 import org.mbari.annosaurus.controllers.AnnotationController
-import org.mbari.annosaurus.domain.{Annotation, AnnotationCreate, AnnotationCreateSC, AnnotationSC, AnnotationUpdateSC, BulkAnnotationSC, ConcurrentRequest, ConcurrentRequestCountSC, ConcurrentRequestSC, ErrorMsg, MultiRequest, MultiRequestCountSC}
+import org.mbari.annosaurus.domain.{
+    Annotation,
+    AnnotationCreate,
+    AnnotationCreateSC,
+    AnnotationSC,
+    AnnotationUpdateSC,
+    BulkAnnotationSC,
+    ConcurrentRequest,
+    ConcurrentRequestCountSC,
+    ConcurrentRequestSC,
+    ErrorMsg,
+    MultiRequest,
+    MultiRequestCountSC
+}
 import org.mbari.annosaurus.etc.jwt.JwtService
 import org.mbari.annosaurus.etc.circe.CirceCodecs.{*, given}
 import org.mbari.annosaurus.etc.tapir.TapirCodecs.given
@@ -171,8 +184,11 @@ class AnnotationEndpoints(controller: AnnotationController)(using
     val countByConcurrentRequestImpl: ServerEndpoint[Any, Future] =
         countByConcurrentRequest
             .serverLogic { concurrentRequest =>
-                handleErrors(controller.countByConcurrentRequest(concurrentRequest)
-                    .map(x => ConcurrentRequestCountSC(concurrentRequest.toSnakeCase, x)))
+                handleErrors(
+                    controller
+                        .countByConcurrentRequest(concurrentRequest)
+                        .map(x => ConcurrentRequestCountSC(concurrentRequest.toSnakeCase, x))
+                )
             }
 
 //    POST / multi
@@ -207,7 +223,11 @@ class AnnotationEndpoints(controller: AnnotationController)(using
     val countByMultiRequestImpl: ServerEndpoint[Any, Future] =
         countByMultiRequest
             .serverLogic { multiRequest =>
-                handleErrors(controller.countByMultiRequest(multiRequest).map(x => MultiRequestCountSC(multiRequest.toSnakeCase, x)))
+                handleErrors(
+                    controller
+                        .countByMultiRequest(multiRequest)
+                        .map(x => MultiRequestCountSC(multiRequest.toSnakeCase, x))
+                )
             }
 
 //    PUT /: uuid

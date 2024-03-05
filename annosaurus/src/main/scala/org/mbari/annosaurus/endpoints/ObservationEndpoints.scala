@@ -364,14 +364,18 @@ class ObservationEndpoints(controller: ObservationController)(using
             .in(jsonBody[Seq[UUID]])
             .out(statusCode(StatusCode.NoContent).and(emptyOutput))
             .name("deleteManyObservations")
-            .description("Delete many observations. The UUIDs of the observations to delete are provided in the request body as a JSON array")
+            .description(
+                "Delete many observations. The UUIDs of the observations to delete are provided in the request body as a JSON array"
+            )
             .tag(tag)
 
     val deleteManyObservationsImpl: ServerEndpoint[Any, Future] =
         deleteManyObservations
             .serverSecurityLogic(jwtOpt => verify(jwtOpt))
             .serverLogic { _ => uuids =>
-                handleErrors(controller.bulkDelete(uuids).map(b => if b then Right(()) else Left(())))
+                handleErrors(
+                    controller.bulkDelete(uuids).map(b => if b then Right(()) else Left(()))
+                )
             }
 
     override def all: List[Endpoint[?, ?, ?, ?, ?]] = List(

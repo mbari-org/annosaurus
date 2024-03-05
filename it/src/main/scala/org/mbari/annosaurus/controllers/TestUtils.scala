@@ -230,7 +230,7 @@ object TestUtils {
 
     def stripLastUpdated(a: Annotation): Annotation = {
         a.copy(
-            lastUpdated = None, 
+            lastUpdated = None,
             associations = a.associations.map(_.copy(lastUpdated = None)),
             imageReferences = a.imageReferences.map(_.copy(lastUpdated = None)),
             ancillaryData = a.ancillaryData.map(_.copy(lastUpdated = None))
@@ -246,12 +246,14 @@ object TestUtils {
             imagedMomentEntity.getAncillaryDatum().setUuid(UUID.randomUUID())
         }
         if (imagedMomentEntity.getObservations() != null) {
-            imagedMomentEntity.getObservations().forEach(obs => {
-                obs.setUuid(UUID.randomUUID())
-                if (obs.getAssociations() != null) {
-                    obs.getAssociations().forEach(assoc => assoc.setUuid(UUID.randomUUID()))
-                }
-            })
+            imagedMomentEntity
+                .getObservations()
+                .forEach(obs => {
+                    obs.setUuid(UUID.randomUUID())
+                    if (obs.getAssociations() != null) {
+                        obs.getAssociations().forEach(assoc => assoc.setUuid(UUID.randomUUID()))
+                    }
+                })
         }
         imagedMomentEntity
 

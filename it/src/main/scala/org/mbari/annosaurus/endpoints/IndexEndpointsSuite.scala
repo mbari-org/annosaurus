@@ -36,10 +36,10 @@ trait IndexEndpointsSuite extends EndpointsSuite {
 
     private val log = System.getLogger(getClass.getName)
 
-    given JPADAOFactory         = daoFactory
-    given jwtService: JwtService            = new JwtService("mbari", "foo", "bar")
-    private lazy val controller = new IndexController(daoFactory)
-    private lazy val endpoints  = new IndexEndpoints(controller)
+    given JPADAOFactory          = daoFactory
+    given jwtService: JwtService = new JwtService("mbari", "foo", "bar")
+    private lazy val controller  = new IndexController(daoFactory)
+    private lazy val endpoints   = new IndexEndpoints(controller)
 
     test("findByVideoReferenceUUID") {
         val im = TestUtils.create(1, 1).head
@@ -48,7 +48,7 @@ trait IndexEndpointsSuite extends EndpointsSuite {
             s"http://test.com/v1/index/videoreference/${im.getVideoReferenceUuid}",
             response =>
                 assertEquals(response.code, StatusCode.Ok)
-                val index = checkResponse[Seq[Index]](response.body)
+                val index    = checkResponse[Seq[Index]](response.body)
                 val expected = Index.fromImagedMomentEntity(im)
                 val obtained = index.head
                 assertEquals(obtained, expected)
@@ -57,39 +57,38 @@ trait IndexEndpointsSuite extends EndpointsSuite {
     }
 
     test("bulkUpdateRecordedTimestamps (recorded_timestamp)") {
-        val xs = TestUtils.create(10)
-        val ts = Instant.parse("1968-09-22T02:00:00Z")
-        val updated = for
-                x <- xs
+        val xs      = TestUtils.create(10)
+        val ts      = Instant.parse("1968-09-22T02:00:00Z")
+        val updated =
+            for x <- xs
             yield
                 val t = Option(x.getElapsedTime) match
                     case Some(et) => ts.plus(et)
-                    case None => ts
+                    case None     => ts
                 IndexUpdate(x.getUuid, recordedTimestamp = Some(t))
-        val body = updated.map(_.toSnakeCase).stringify
+        val body    = updated.map(_.toSnakeCase).stringify
 
-        val jwt = jwtService.authorize("foo").orNull
+        val jwt         = jwtService.authorize("foo").orNull
         assert(jwt != null)
         val backendStub = newBackendStub(endpoints.bulkUpdateRecordedTimestampsImpl)
-        val response = basicRequest
+        val response    = basicRequest
             .put(uri"http://test.com/v1/index/tapetime")
-            .auth.bearer(jwt)
+            .auth
+            .bearer(jwt)
             .body(body)
             .send(backendStub)
             .join
         assertEquals(response.code, StatusCode.Ok)
-        val index = checkResponse[Seq[IndexSC]](response.body)
+        val index       = checkResponse[Seq[IndexSC]](response.body)
         assertEquals(index.size, updated.size)
 //        println(index.stringify)
-        for
-            i <- index
+        for i <- index
         do
             val expected = i.elapsed_time_millis match
                 case Some(et) => ts.plus(Duration.ofMillis(et))
-                case None => ts
+                case None     => ts
             val obtained = i.recorded_timestamp.get
             assertEquals(obtained, expected)
     }
-
 
 }

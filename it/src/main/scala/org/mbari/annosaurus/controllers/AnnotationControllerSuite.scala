@@ -46,7 +46,8 @@ trait AnnotationControllerSuite extends BaseDAOSuite {
     override def beforeAll(): Unit = daoFactory.beforeAll()
     override def afterAll(): Unit  = daoFactory.afterAll()
 
-    override val munitTimeout: scala.concurrent.duration.FiniteDuration = scala.concurrent.duration.Duration(30, "s")
+    override val munitTimeout: scala.concurrent.duration.FiniteDuration =
+        scala.concurrent.duration.Duration(30, "s")
 
     test("findByUUID") {
         val im1 = TestUtils.create(1, 2, 3, 2, true).head
@@ -169,7 +170,8 @@ trait AnnotationControllerSuite extends BaseDAOSuite {
         // Our source anno doesn't have UUIDS set, we remove those to compare the rest of the values
         assert(obtained.observationUuid.isDefined)
         assert(obtained.imagedMomentUuid.isDefined)
-        val corrected = obtained.copy(observationUuid = None, imagedMomentUuid = None, lastUpdated = None)
+        val corrected =
+            obtained.copy(observationUuid = None, imagedMomentUuid = None, lastUpdated = None)
         assertEquals(corrected, anno)
     }
 
@@ -197,7 +199,8 @@ trait AnnotationControllerSuite extends BaseDAOSuite {
         val obtained  = n.head
         assert(obtained.imagedMomentUuid.isDefined)
         assert(obtained.observationUuid.isDefined)
-        val corrected = obtained.copy(imagedMomentUuid = None, observationUuid = None, lastUpdated = None)
+        val corrected =
+            obtained.copy(imagedMomentUuid = None, observationUuid = None, lastUpdated = None)
 //        log.atWarn.log(n.head.stringify)
         assertEquals(corrected, annos0.head)
     }
@@ -205,27 +208,27 @@ trait AnnotationControllerSuite extends BaseDAOSuite {
     // https://github.com/mbari-org/annosaurus/issues/42
     test("bulkCreate annotations at same index") {
         val a = TestUtils.create(1, 1).head
-        for
-            i <- 0 until 5
+        for i <- 0 until 5
         do
-            val b = TestUtils.build(1, 1).head
+            val b         = TestUtils.build(1, 1).head
             b.setTimecode(a.getTimecode)
             b.setRecordedTimestamp(a.getRecordedTimestamp)
             b.setElapsedTime(a.getElapsedTime)
-            val annos = Annotation.fromImagedMoment(b, true)
-            val n      = exec(controller.bulkCreate(annos))
+            val annos     = Annotation.fromImagedMoment(b, true)
+            val n         = exec(controller.bulkCreate(annos))
             assertEquals(n.size, 1)
-            val obtained = n.head
+            val obtained  = n.head
             assert(obtained.imagedMomentUuid.isDefined)
             assert(obtained.observationUuid.isDefined)
-            val corrected = obtained.copy(imagedMomentUuid = None, observationUuid = None, lastUpdated = None)
+            val corrected =
+                obtained.copy(imagedMomentUuid = None, observationUuid = None, lastUpdated = None)
             assertEquals(corrected, annos.head)
 
     }
 
     test("bulkCreate a 200 annotations") {
         import org.mbari.annosaurus.etc.circe.CirceCodecs.{*, given}
-        val url = this.getClass.getResource("/json/annotation_full_dive.json").toURI
+        val url         = this.getClass.getResource("/json/annotation_full_dive.json").toURI
         val readAttempt = Using(Source.fromFile(url)) { source =>
             val json = source.getLines().mkString("\n")
             json
@@ -233,19 +236,18 @@ trait AnnotationControllerSuite extends BaseDAOSuite {
                 .getOrElse(throw new RuntimeException("Failed to parse json"))
                 .take(200)
         }
-        val annos = readAttempt.getOrElse(throw new RuntimeException("Failed to read json"))
+        val annos       = readAttempt.getOrElse(throw new RuntimeException("Failed to read json"))
         assert(annos.nonEmpty)
 
-        val n     = controller.bulkCreate(annos).join(Duration.ofSeconds(10))
+        val n = controller.bulkCreate(annos).join(Duration.ofSeconds(10))
         assertEquals(n.size, annos.size)
         daoFactory.cleanup() // IMPORTANT or collides with other tests
-
 
     }
 
     test("bulkCreate a 200 annotations with imageReferences") {
         import org.mbari.annosaurus.etc.circe.CirceCodecs.{*, given}
-        val url = this.getClass.getResource("/json/annotation_full_dive.json").toURI
+        val url         = this.getClass.getResource("/json/annotation_full_dive.json").toURI
         val readAttempt = Using(Source.fromFile(url)) { source =>
             val json = source.getLines().mkString("\n")
             json
@@ -253,9 +255,9 @@ trait AnnotationControllerSuite extends BaseDAOSuite {
                 .getOrElse(throw new RuntimeException("Failed to parse json"))
                 .take(200)
         }
-        val annos = readAttempt.getOrElse(throw new RuntimeException("Failed to read json"))
+        val annos       = readAttempt.getOrElse(throw new RuntimeException("Failed to read json"))
         assert(annos.nonEmpty)
-        val n = controller.bulkCreate(annos).join(Duration.ofSeconds(10))
+        val n           = controller.bulkCreate(annos).join(Duration.ofSeconds(10))
         assertEquals(n.size, annos.size)
         daoFactory.cleanup() // IMPORTANT or collides with other tests
 

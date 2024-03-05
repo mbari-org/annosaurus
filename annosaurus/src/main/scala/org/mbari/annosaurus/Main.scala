@@ -69,14 +69,16 @@ object Main:
         val interpreter = VertxFutureServerInterpreter(serverOptions)
 
         // For VertX, we need to separate the non-blocking endpoints from the blocking ones
-        Endpoints.nonBlockingEndpoints
+        Endpoints
+            .nonBlockingEndpoints
             .foreach(endpoint =>
                 interpreter
                     .route(endpoint)
                     .apply(router) // attaches to vertx router
             )
 
-        Endpoints.blockingEndpoints
+        Endpoints
+            .blockingEndpoints
             .foreach(endpoint =>
                 interpreter
                     .blockingRoute(endpoint)
@@ -87,7 +89,8 @@ object Main:
         interpreter.route(Endpoints.metricsEndpoint).apply(router)
 
         // Add our documentation endpoints
-        Endpoints.docEndpoints
+        Endpoints
+            .docEndpoints
             .foreach(endpoint =>
                 interpreter
                     .route(endpoint)
@@ -119,6 +122,6 @@ object Main:
 
         // program.onComplete(_ => vertx.close())
 
-         val program = server.requestHandler(router).listen(port).asScala
+        val program = server.requestHandler(router).listen(port).asScala
 
         Await.result(program, Duration.Inf)

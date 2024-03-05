@@ -42,7 +42,11 @@ class AuthorizationEndpoints()(using ec: ExecutionContext, jwtService: JwtServic
         baseEndpoint
             .post
             .in(base)
-            .securityIn(header[String]("Authorization").description("Header format is `Authorization: APIKEY <key>`"))
+            .securityIn(
+                header[String]("Authorization").description(
+                    "Header format is `Authorization: APIKEY <key>`"
+                )
+            )
             .out(jsonBody[AuthorizationSC])
             .errorOut(
                 oneOf[ErrorMsg](
@@ -55,7 +59,9 @@ class AuthorizationEndpoints()(using ec: ExecutionContext, jwtService: JwtServic
                 )
             )
             .name("authenticate")
-            .description("Exchange an API key for a JWT. Header format is `Authorization: APIKEY <key>`")
+            .description(
+                "Exchange an API key for a JWT. Header format is `Authorization: APIKEY <key>`"
+            )
             .tag(tag)
 
     val authEndpointImpl: ServerEndpoint[Any, Future] =

@@ -16,7 +16,14 @@
 
 package org.mbari.annosaurus.endpoints
 
-import org.mbari.annosaurus.domain.{DepthHistogramSC, ErrorMsg, QueryConstraints, QueryConstraintsResponseSC, QueryConstraintsSC, TimeHistogramSC}
+import org.mbari.annosaurus.domain.{
+    DepthHistogramSC,
+    ErrorMsg,
+    QueryConstraints,
+    QueryConstraintsResponseSC,
+    QueryConstraintsSC,
+    TimeHistogramSC
+}
 import org.mbari.annosaurus.etc.circe.CirceCodecs.given
 import org.mbari.annosaurus.repository.jdbc.AnalysisRepository
 import sttp.tapir.*

@@ -42,7 +42,7 @@ class ZeroMQPublisher(val topic: String, val port: Int, val subject: Subject[?])
         .observeOn(Schedulers.io())
         .distinct()
         .subscribe(m => queue.offer(m))
-    private val log                          = Logging(getClass)
+    private val log                    = Logging(getClass)
 
     @volatile
     var ok     = true

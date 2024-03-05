@@ -75,9 +75,9 @@ class IndexController(val daoFactory: JPADAOFactory)
     )(implicit ec: ExecutionContext): Future[Iterable[Index]] = {
         def fn(dao: IDDAO): Iterable[Index] = {
             for {
-                im   <- imagedMoments
-                rt   <- im.recordedTimestamp
-                i    <- dao.findByUUID(im.uuid)
+                im <- imagedMoments
+                rt <- im.recordedTimestamp
+                i  <- dao.findByUUID(im.uuid)
             } yield {
                 i.setRecordedTimestamp(rt)
                 transform(i)

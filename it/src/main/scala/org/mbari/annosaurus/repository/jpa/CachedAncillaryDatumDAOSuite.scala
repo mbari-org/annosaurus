@@ -106,7 +106,7 @@ trait CachedAncillaryDatumDAOSuite extends BaseDAOSuite {
         val o                                  = im.getObservations().iterator().next()
         val d                                  = im.getAncillaryDatum()
         given dao: CachedAncillaryDatumDAOImpl = daoFactory.newCachedAncillaryDatumDAO()
-        val opt                                 = run(() => dao.findByObservationUUID(o.getUuid()))
+        val opt                                = run(() => dao.findByObservationUUID(o.getUuid()))
         dao.close()
         assert(opt.isDefined)
         AssertUtils.assertSameAncillaryDatum(opt.get, d)
@@ -114,12 +114,12 @@ trait CachedAncillaryDatumDAOSuite extends BaseDAOSuite {
 
     test("findDTOByObservationUuid") {
         val im = TestUtils.create(1, 1, 1, 1, true).head
-        val o = im.getObservations().iterator().next()
-        val d = im.getAncillaryDatum()
+        val o  = im.getObservations().iterator().next()
+        val d  = im.getAncillaryDatum()
 
         given dao: CachedAncillaryDatumDAOImpl = daoFactory.newCachedAncillaryDatumDAO()
 
-        val opt = run(() => dao.findDTOByObservationUuid(o.getUuid()))
+        val opt      = run(() => dao.findDTOByObservationUuid(o.getUuid()))
         dao.close()
         assert(opt.isDefined)
         val obtained = CachedAncillaryDatum.from(opt.get)

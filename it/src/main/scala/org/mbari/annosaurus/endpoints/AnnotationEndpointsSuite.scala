@@ -499,7 +499,7 @@ trait AnnotationEndpointsSuite extends EndpointsSuite {
             .join
         assertEquals(response.code, StatusCode.Ok)
         val obtained    = checkResponse[Seq[AnnotationSC]](response.body)
-        val corrected = obtained.map(_.copy(last_udpated = None)).sortBy(_.concept)
+        val corrected   = obtained.map(_.copy(last_udpated = None)).sortBy(_.concept)
         assertEquals(corrected, expected)
     }
 }

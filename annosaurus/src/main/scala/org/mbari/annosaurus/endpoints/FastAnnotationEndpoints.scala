@@ -16,7 +16,20 @@
 
 package org.mbari.annosaurus.endpoints
 
-import org.mbari.annosaurus.domain.{AnnotationSC, ConcurrentRequestSC, Count, DeleteCount, DeleteCountSC, ErrorMsg, GeographicRangeSC, ImageSC, MultiRequestSC, QueryConstraints, QueryConstraintsResponseSC, QueryConstraintsSC}
+import org.mbari.annosaurus.domain.{
+    AnnotationSC,
+    ConcurrentRequestSC,
+    Count,
+    DeleteCount,
+    DeleteCountSC,
+    ErrorMsg,
+    GeographicRangeSC,
+    ImageSC,
+    MultiRequestSC,
+    QueryConstraints,
+    QueryConstraintsResponseSC,
+    QueryConstraintsSC
+}
 import org.mbari.annosaurus.etc.jwt.JwtService
 import org.mbari.annosaurus.repository.jdbc.JdbcRepository
 import sttp.tapir.*
@@ -67,7 +80,9 @@ class FastAnnotationEndpoints(jdbcRepository: JdbcRepository)(using
             .in(jsonBody[QueryConstraints])
             .out(jsonBody[QueryConstraintsResponseSC[Seq[AnnotationSC]]])
             .name("findAnnotationsByQueryConstraints")
-            .description("Find annotations by query constraints. Constraints can be snake_case or camelCase. The response will be in snake_case.")
+            .description(
+                "Find annotations by query constraints. Constraints can be snake_case or camelCase. The response will be in snake_case."
+            )
             .tag(tag)
 
     val findAnnotationsByQueryConstraintsImpl: ServerEndpoint[Any, Future] =
@@ -93,7 +108,9 @@ class FastAnnotationEndpoints(jdbcRepository: JdbcRepository)(using
             .in(base / "georange")
             .in(jsonBody[QueryConstraints])
             .out(jsonBody[QueryConstraintsResponseSC[GeographicRangeSC]])
-            .description("Find annotations by query constraints. Constraints can be snake_case or camelCase. The response will be in snake_case.")
+            .description(
+                "Find annotations by query constraints. Constraints can be snake_case or camelCase. The response will be in snake_case."
+            )
             .tag(tag)
 
     val findGeoRangeByQueryConstraintsImpl: ServerEndpoint[Any, Future] =
@@ -118,7 +135,9 @@ class FastAnnotationEndpoints(jdbcRepository: JdbcRepository)(using
             .in(jsonBody[QueryConstraints])
             .out(jsonBody[QueryConstraintsResponseSC[Count]])
             .name("countAnnotationsByQueryConstraints")
-            .description("Count annotations by query constraints. Constraints can be snake_case or camelCase. The response will be in snake_case.")
+            .description(
+                "Count annotations by query constraints. Constraints can be snake_case or camelCase. The response will be in snake_case."
+            )
             .tag(tag)
 
     val countAnnotationsByQueryConstraintsImpl: ServerEndpoint[Any, Future] =

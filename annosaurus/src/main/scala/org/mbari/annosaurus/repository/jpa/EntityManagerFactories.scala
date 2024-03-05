@@ -86,12 +86,12 @@ object EntityManagerFactories {
     }
 
     def apply(configNode: String): EntityManagerFactory = {
-        val driver      = config.getString(configNode + ".driver")
-        val password    = config.getString(configNode + ".password")
+        val driver   = config.getString(configNode + ".driver")
+        val password = config.getString(configNode + ".password")
 //        val productName = config.getString(configNode + ".name")
-        val url         = config.getString(configNode + ".url")
-        val user        = config.getString(configNode + ".user")
-        val props       = Map(
+        val url      = config.getString(configNode + ".url")
+        val user     = config.getString(configNode + ".user")
+        val props    = Map(
 //            "hibernate.dialect"                 -> productName,
             // "jakarta.persistence.database-product-name" -> productName,
             "jakarta.persistence.jdbc.driver"   -> driver,

@@ -160,29 +160,31 @@ object Annotation extends FromEntity[ObservationEntity, Annotation] {
         val imagedMoments = annotations.map(_.toEntity)
 
         // Consolidate imaged moments
-        val imagedMomentMap = mutable.Map[ImagedMomentEntity, Seq[ImagedMomentEntity]]()
+        val imagedMomentMap   = mutable.Map[ImagedMomentEntity, Seq[ImagedMomentEntity]]()
         val imageReferenceMap = mutable.Map[ImagedMomentEntity, Seq[ImageReferenceEntity]]()
         for (im <- imagedMoments)
         do
             val imOpt = imagedMomentMap.get(im)
             imOpt match
-                case None    => 
+                case None    =>
                     imagedMomentMap.put(im, Nil)
                     imageReferenceMap.put(im, im.getImageReferences.asScala.toSeq)
-                case Some(x) => 
+                case Some(x) =>
                     imagedMomentMap.put(im, x.appended(im))
-                    imageReferenceMap.put(im, imageReferenceMap(im).appendedAll(im.getImageReferences.asScala.toSeq))
+                    imageReferenceMap.put(
+                        im,
+                        imageReferenceMap(im).appendedAll(im.getImageReferences.asScala.toSeq)
+                    )
 
-        
         for
             (baseIm, xs) <- imagedMomentMap.iterator
             x            <- xs
         do
             val irs = imageReferenceMap(baseIm).distinctBy(_.getUrl())
             irs.foreach(i => baseIm.addImageReference(i))
-            
+
             x.getObservations.forEach(o => baseIm.addObservation(o))
-            
+
             if baseIm.getAncillaryDatum() != null && x.getAncillaryDatum() != null then
                 baseIm.setAncillaryDatum(x.getAncillaryDatum())
 
@@ -269,4 +271,3 @@ final case class BulkAnnotationSC(
             video_reference_uuid
         )
 }
-

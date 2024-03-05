@@ -103,4 +103,3 @@ case class AssociationSC(
             imaged_moment_uuid
         )
 }
-

@@ -17,7 +17,17 @@
 package org.mbari.annosaurus.endpoints
 
 import org.mbari.annosaurus.controllers.{AssociationController, TestUtils}
-import org.mbari.annosaurus.domain.{Association, AssociationSC, AssociationUpdateSC, ConceptAssociation, ConceptAssociationRequest, ConceptAssociationResponseSC, ConceptCount, RenameConcept, RenameCountSC}
+import org.mbari.annosaurus.domain.{
+    Association,
+    AssociationSC,
+    AssociationUpdateSC,
+    ConceptAssociation,
+    ConceptAssociationRequest,
+    ConceptAssociationResponseSC,
+    ConceptCount,
+    RenameConcept,
+    RenameCountSC
+}
 import org.mbari.annosaurus.etc.jwt.JwtService
 import org.mbari.annosaurus.repository.jpa.JPADAOFactory
 import sttp.model.StatusCode
@@ -201,18 +211,16 @@ trait AssociationEndpointsSuite extends EndpointsSuite {
     }
 
     test("updateAssociation (json) partial updates") {
-        val im = TestUtils.create(1, 1, 1).head
+        val im  = TestUtils.create(1, 1, 1).head
         val obs = im.getObservations.iterator().next()
-        val a = obs.getAssociations.iterator().next()
+        val a   = obs.getAssociations.iterator().next()
 
-
-
-        val jwt = jwtService.authorize("foo").orNull
+        val jwt         = jwtService.authorize("foo").orNull
         assert(jwt != null)
         val backendStub = newBackendStub(endpoints.updateAssociationImpl)
 
         // linkName
-        val update1 = AssociationUpdateSC(link_name = Some("foodefafa"))
+        val update1   = AssociationUpdateSC(link_name = Some("foodefafa"))
         val response1 = basicRequest
             .put(uri"http://test.com/v1/associations/${a.getUuid}")
             .body(update1.stringify)
@@ -226,7 +234,7 @@ trait AssociationEndpointsSuite extends EndpointsSuite {
         assertEquals(obtained1.link_name, update1.link_name.orNull)
 
         // linkValue
-        val update2 = AssociationUpdateSC(link_value = Some("bardebarbar"))
+        val update2   = AssociationUpdateSC(link_value = Some("bardebarbar"))
         val response2 = basicRequest
             .put(uri"http://test.com/v1/associations/${a.getUuid}")
             .body(update2.stringify)
@@ -240,7 +248,7 @@ trait AssociationEndpointsSuite extends EndpointsSuite {
         assertEquals(obtained2.link_value, update2.link_value.orNull)
 
         // toConcept
-        val update3 = AssociationUpdateSC(to_concept = Some("Grimp"))
+        val update3   = AssociationUpdateSC(to_concept = Some("Grimp"))
         val response3 = basicRequest
             .put(uri"http://test.com/v1/associations/${a.getUuid}")
             .body(update3.stringify)
