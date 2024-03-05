@@ -50,8 +50,13 @@ object Main:
 
         ZeroMQPublisher.log(zmq)
 
+        // Disable server log: https://github.com/softwaremill/tapir/issues/3272
+        // https://softwaremill.com/benchmarking-tapir-part-1/
+        // https://softwaremill.com/benchmarking-tapir-part-2/
+
         val serverOptions = VertxFutureServerOptions
             .customiseInterceptors
+            .serverLog(None)
             .metricsInterceptor(Endpoints.prometheusMetrics.metricsInterceptor())
             .options
 
