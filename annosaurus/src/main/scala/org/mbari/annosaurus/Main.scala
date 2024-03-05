@@ -16,7 +16,7 @@
 
 package org.mbari.annosaurus
 
-import io.vertx.core.Vertx
+import io.vertx.core.{Vertx, VertxOptions}
 import io.vertx.ext.web.Router
 import org.mbari.annosaurus.etc.jdk.Logging
 import org.mbari.annosaurus.etc.jdk.Logging.{*, given}
@@ -63,7 +63,7 @@ object Main:
         val port = sys.env.get("HTTP_PORT").flatMap(_.toIntOption).getOrElse(8080)
         log.atInfo.log(s"Starting ${AppConfig.Name} v${AppConfig.Version} on port $port")
 
-        val vertx  = Vertx.vertx()
+        val vertx  = Vertx.vertx(new VertxOptions().setWorkerPoolSize(40))
         val server = vertx.createHttpServer()
         val router = Router.router(vertx)
 
@@ -102,30 +102,9 @@ object Main:
                     .apply(router)
             )
 
-//        Endpoints
-//            .all
-//            .foreach(endpoint =>
-//
-//                interpreter
-//                    .route(endpoint)
-//                    .apply(router) // attaches to vertx router
-//            )
-
         router
             .getRoutes()
             .forEach(r => log.atDebug.log(f"Adding route: ${r.methods()}%8s ${r.getPath}%s"))
-
-        // val program = for
-        //     binding <- server.requestHandler(router).listen(port).asScala
-        //     _       <- Future:
-        //                    println(
-        //                        s"Go to http://localhost:${binding.actualPort()}/docs to open SwaggerUI. Press ENTER key to exit."
-        //                    )
-        //                    StdIn.readLine()
-        //     stop    <- binding.close().asScala
-        // yield stop
-
-        // program.onComplete(_ => vertx.close())
 
         val program = server.requestHandler(router).listen(port).asScala
 
