@@ -69,6 +69,11 @@ import org.mbari.annosaurus.repository.jpa.TransactionLogger;
                                 "SELECT a FROM AncillaryDatum a INNER JOIN FETCH a.imagedMoment im INNER JOIN FETCH im.observations o WHERE o.uuid = :uuid ORDER BY a.uuid"
                 ),
                 @NamedQuery(
+                        name = "AncillaryDatum.findDTOByObservationUUID",
+                        query =
+                                "SELECT new org.mbari.annosaurus.repository.jpa.entity.AncillaryDatumDTO(a.latitude, a.longitude, a.depthMeters, a.altitude, a.crs, a.salinity, a.temperatureCelsius, a.oxygenMlL, a.pressureDbar, a.lightTransmission, a.x, a.y, a.z, a.posePositionUnits, a.phi, a.theta, a.psi, a.uuid, a.lastUpdatedTime, im.uuid, im.recordedTimestamp) FROM AncillaryDatum a JOIN a.imagedMoment im JOIN im.observations obs WHERE obs.uuid = :uuid ORDER BY a.uuid"
+                ),
+                @NamedQuery(
                         name = "AncillaryDatum.findDTOByVideoReferenceUUID",
                         query =
                                 "SELECT new org.mbari.annosaurus.repository.jpa.entity.AncillaryDatumDTO(a.latitude, a.longitude, a.depthMeters, a.altitude, a.crs, a.salinity, a.temperatureCelsius, a.oxygenMlL, a.pressureDbar, a.lightTransmission, a.x, a.y, a.z, a.posePositionUnits, a.phi, a.theta, a.psi, a.uuid, a.lastUpdatedTime, im.uuid, im.recordedTimestamp) FROM AncillaryDatum a LEFT JOIN a.imagedMoment im WHERE im.videoReferenceUuid = :uuid ORDER BY a.uuid"

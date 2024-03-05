@@ -18,10 +18,9 @@ package org.mbari.annosaurus.repository.jpa
 
 import java.util.UUID
 import jakarta.persistence.EntityManager
-
 import org.mbari.annosaurus.etc.jdk.Numbers.*
 import org.mbari.annosaurus.repository.CachedAncillaryDatumDAO
-import org.mbari.annosaurus.repository.jpa.entity.CachedAncillaryDatumEntity
+import org.mbari.annosaurus.repository.jpa.entity.{AncillaryDatumDTO, CachedAncillaryDatumEntity}
 
 /** @author
   *   Brian Schlining
@@ -91,6 +90,12 @@ class CachedAncillaryDatumDAOImpl(entityManager: EntityManager)
     override def findByObservationUUID(observationUuid: UUID): Option[CachedAncillaryDatumEntity] =
         findByNamedQuery(
             "AncillaryDatum.findByObservationUUID",
+            Map("uuid" -> observationUuid)
+        ).headOption
+
+    override def findDTOByObservationUuid(observationUuid: UUID): Option[AncillaryDatumDTO] =
+        findByTypedNamedQuery(
+            "AncillaryDatum.findDTOByObservationUUID",
             Map("uuid" -> observationUuid)
         ).headOption
 

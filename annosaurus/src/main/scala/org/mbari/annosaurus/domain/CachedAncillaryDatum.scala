@@ -17,9 +17,9 @@
 package org.mbari.annosaurus.domain
 
 import java.util.UUID
-
-import org.mbari.annosaurus.repository.jpa.entity.CachedAncillaryDatumEntity
+import org.mbari.annosaurus.repository.jpa.entity.{AncillaryDatumDTO, CachedAncillaryDatumEntity}
 import org.mbari.annosaurus.repository.jpa.entity.extensions.*
+
 import scala.jdk.OptionConverters.*
 import extensions.*
 
@@ -99,6 +99,7 @@ final case class CachedAncillaryDatum(
 
         // NOTE: We can't set he lastUpdated field because it's set by the database driver
         entity
+
 }
 
 object CachedAncillaryDatum extends FromEntity[CachedAncillaryDatumEntity, CachedAncillaryDatum] {
@@ -133,6 +134,32 @@ object CachedAncillaryDatum extends FromEntity[CachedAncillaryDatumEntity, Cache
             opt,
             rt
         )
+
+    def from(dto: AncillaryDatumDTO): CachedAncillaryDatum =
+        CachedAncillaryDatum(
+            dto.latitude.toOption,
+            dto.longitude.toOption,
+            dto.depthMeters.toOption.map(_.toFloat),
+            dto.altitude.toOption.map(_.toFloat),
+            Option(dto.crs),
+            dto.salinity.toOption.map(_.toFloat),
+            dto.temperatureCelsius.toOption.map(_.toFloat),
+            dto.oxygenMlL.toOption.map(_.toFloat),
+            dto.pressureDbar.toOption.map(_.toFloat),
+            dto.lightTransmission.toOption.map(_.toFloat),
+            dto.x.toOption,
+            dto.y.toOption,
+            dto.z.toOption,
+            Option(dto.posePositionUnits),
+            dto.phi.toOption,
+            dto.theta.toOption,
+            dto.psi.toOption,
+            Option(dto.uuid),
+            Option(dto.lastUpdatedTime).map(_.toInstant),
+            Option(dto.imagedMomentUuid),
+            Option(dto.recordedTimestamp)
+        )
+
 }
 
 final case class CachedAncillaryDatumSC(

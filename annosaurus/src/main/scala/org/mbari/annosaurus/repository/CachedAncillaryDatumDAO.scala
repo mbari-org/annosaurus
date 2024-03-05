@@ -17,7 +17,7 @@
 package org.mbari.annosaurus.repository
 
 import java.util.UUID
-import org.mbari.annosaurus.repository.jpa.entity.IPersistentObject
+import org.mbari.annosaurus.repository.jpa.entity.{AncillaryDatumDTO, IPersistentObject}
 
 /** @author
   *   Brian Schlining
@@ -46,6 +46,8 @@ trait CachedAncillaryDatumDAO[T <: IPersistentObject] extends DAO[T] {
     ): T
 
     def findByObservationUUID(observationUuid: UUID): Option[T]
+
+    def findDTOByObservationUuid(observationUuid: UUID): Option[AncillaryDatumDTO]
 
     def findByImagedMomentUUID(imagedMomentUuid: UUID): Option[T]
 

@@ -49,7 +49,7 @@ object Dependencies {
     lazy val json4sJackson = "org.json4s"         %% "json4s-jackson"  % "4.0.7"
     lazy val junit         = "junit"               % "junit"           % "4.13.2"
 
-    val logbackVersion      = "1.5.0"
+    val logbackVersion      = "1.5.3"
     lazy val logbackClassic = "ch.qos.logback" % "logback-classic" % logbackVersion
     lazy val logbackCore    = "ch.qos.logback" % "logback-core"    % logbackVersion
 

@@ -259,7 +259,8 @@ class CachedAncillaryDatumController(val daoFactory: JPADAOFactory)
         uuid: UUID
     )(implicit ec: ExecutionContext): Future[Option[CachedAncillaryDatum]] = {
         def fn(dao: ADDAO): Option[CachedAncillaryDatum] =
-            dao.findByObservationUUID(uuid).map(transform)
+            dao.findDTOByObservationUuid(uuid)
+                .map(CachedAncillaryDatum.from)
 
         exec(fn)
     }

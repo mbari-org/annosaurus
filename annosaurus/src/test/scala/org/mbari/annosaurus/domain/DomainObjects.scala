@@ -16,6 +16,9 @@
 
 package org.mbari.annosaurus.domain
 
+import org.mbari.annosaurus.repository.jpa.entity.AncillaryDatumDTO
+
+import java.sql.Timestamp
 import java.time.Instant
 import java.util.UUID
 
@@ -56,6 +59,31 @@ object DomainObjects {
         Some(UUID.randomUUID()),
         None // Don't compare lastUpdated as it is set by the database
     )
+
+    val ancillaryDatumDTO = AncillaryDatumDTO(
+        -121.2,
+        36.2,
+        -100.2f,
+        10.0f,
+        "some/crs",
+        34.567f,
+        -5.678f,
+        1.2455f,
+        -99.999f,
+        0.887f,
+        -1.887,
+        2.887,
+        -3.887,
+        "meters",
+        2.33,
+        0.888,
+        1.23,
+        UUID.randomUUID(),
+        Timestamp.from(Instant.now()), // Don't compare lastUpdated as it is set by the database
+        UUID.randomUUID(),
+        Instant.now()
+    )
+
 
     val imageReference = ImageReference(
         java.net.URI.create("http://www.mbari.org").toURL(),
