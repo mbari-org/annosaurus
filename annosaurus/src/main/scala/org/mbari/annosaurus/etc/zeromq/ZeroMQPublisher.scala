@@ -32,13 +32,13 @@ import scala.util.control.NonFatal
   *   Brian Schlining
   * @since 2020-01-30T15:47:00
   */
-class ZeroMQPublisher(val topic: String, val port: Int, val subject: Subject[_]) {
+class ZeroMQPublisher(val topic: String, val port: Int, val subject: Subject[?]) {
 
-    private[this] val context                = new ZContext()
-    private[this] val queue                  = new LinkedBlockingQueue[GenericMessage[_]]()
-    private[this] val disposable: Disposable = MessageBus
+    private val context                = new ZContext()
+    private val queue                  = new LinkedBlockingQueue[GenericMessage[?]]()
+    private val disposable: Disposable = MessageBus
         .RxSubject
-        .ofType(classOf[GenericMessage[_]])
+        .ofType(classOf[GenericMessage[?]])
         .observeOn(Schedulers.io())
         .distinct()
         .subscribe(m => queue.offer(m))

@@ -374,7 +374,7 @@ class ObservationEndpoints(controller: ObservationController)(using
                 handleErrors(controller.bulkDelete(uuids).map(b => if b then Right(()) else Left(())))
             }
 
-    override def all: List[Endpoint[_, _, _, _, _]] = List(
+    override def all: List[Endpoint[?, ?, ?, ?, ?]] = List(
         findActivities,
         findObservationByAssociationUuid,
         countObservationsByConcept,

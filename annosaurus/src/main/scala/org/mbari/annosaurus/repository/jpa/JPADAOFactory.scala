@@ -38,53 +38,53 @@ trait JPADAOFactory {
 
     def entityManagerFactory: EntityManagerFactory
 
-    private def extractEntityManager(dao: DAO[_]): EntityManager =
-        dao.asInstanceOf[BaseDAO[_]].entityManager
+    private def extractEntityManager(dao: DAO[?]): EntityManager =
+        dao.asInstanceOf[BaseDAO[?]].entityManager
 
     def newAssociationDAO(): AssociationDAOImpl =
         new AssociationDAOImpl(entityManagerFactory.createEntityManager())
 
-    def newAssociationDAO(dao: DAO[_]): AssociationDAOImpl =
+    def newAssociationDAO(dao: DAO[?]): AssociationDAOImpl =
         new AssociationDAOImpl(extractEntityManager(dao))
 
     def newCachedAncillaryDatumDAO(): CachedAncillaryDatumDAOImpl =
         new CachedAncillaryDatumDAOImpl(entityManagerFactory.createEntityManager())
 
     def newCachedAncillaryDatumDAO(
-        dao: DAO[_]
+        dao: DAO[?]
     ): CachedAncillaryDatumDAOImpl =
         new CachedAncillaryDatumDAOImpl(extractEntityManager(dao))
 
     def newObservationDAO(): ObservationDAOImpl =
         new ObservationDAOImpl(entityManagerFactory.createEntityManager())
 
-    def newObservationDAO(dao: DAO[_]): ObservationDAOImpl =
+    def newObservationDAO(dao: DAO[?]): ObservationDAOImpl =
         new ObservationDAOImpl(extractEntityManager(dao))
 
     def newCachedVideoReferenceInfoDAO(): CachedVideoReferenceInfoDAOImpl =
         new CachedVideoReferenceInfoDAOImpl(entityManagerFactory.createEntityManager())
 
     def newCachedVideoReferenceInfoDAO(
-        dao: DAO[_]
+        dao: DAO[?]
     ): CachedVideoReferenceInfoDAOImpl =
         new CachedVideoReferenceInfoDAOImpl(extractEntityManager(dao))
 
     def newIndexDAO(): IndexDAOImpl =
         new IndexDAOImpl(entityManagerFactory.createEntityManager())
 
-    def newIndexDAO(dao: DAO[_]): IndexDAOImpl =
+    def newIndexDAO(dao: DAO[?]): IndexDAOImpl =
         new IndexDAOImpl(extractEntityManager(dao))
 
     def newImageReferenceDAO(): ImageReferenceDAOImpl =
         new ImageReferenceDAOImpl(entityManagerFactory.createEntityManager())
 
-    def newImageReferenceDAO(dao: DAO[_]): ImageReferenceDAOImpl =
+    def newImageReferenceDAO(dao: DAO[?]): ImageReferenceDAOImpl =
         new ImageReferenceDAOImpl(extractEntityManager(dao))
 
     def newImagedMomentDAO(): ImagedMomentDAOImpl =
         new ImagedMomentDAOImpl(entityManagerFactory.createEntityManager())
 
-    def newImagedMomentDAO(dao: DAO[_]): ImagedMomentDAOImpl =
+    def newImagedMomentDAO(dao: DAO[?]): ImagedMomentDAOImpl =
         new ImagedMomentDAOImpl(extractEntityManager(dao))
 
 }

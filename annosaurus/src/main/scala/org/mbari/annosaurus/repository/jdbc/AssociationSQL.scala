@@ -23,7 +23,7 @@ import org.mbari.annosaurus.domain.Annotation
 // @deprecated("Use Association's NamedQueries instead", "2023-12-18")
 object AssociationSQL {
 
-    def resultListToAssociations(rows: List[_]): Seq[Association] = {
+    def resultListToAssociations(rows: List[?]): Seq[Association] = {
         for {
             row <- rows
         } yield {

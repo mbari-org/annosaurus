@@ -243,7 +243,7 @@ class AssociationEndpoints(controller: AssociationController)(using
                 )
             }
 
-    override def all: List[Endpoint[_, _, _, _, _]] = List(
+    override def all: List[Endpoint[?, ?, ?, ?, ?]] = List(
         deleteAssociations,
         updateAssociations,
         findAssociationsByConceptAssociationRequest,

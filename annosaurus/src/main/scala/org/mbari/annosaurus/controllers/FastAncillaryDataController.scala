@@ -34,7 +34,7 @@ import org.mbari.annosaurus.etc.jdk.Logging.{*, given}
   */
 class FastAncillaryDataController(val entityManager: EntityManager) {
 
-    private[this] val tableName = "ancillary_data"
+    private val tableName = "ancillary_data"
 
     private val log = System.getLogger(getClass.getName)
 

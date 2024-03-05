@@ -37,7 +37,7 @@ import org.mbari.annosaurus.etc.jdk.Logging.given
   */
 class JdbcRepository(entityManagerFactory: EntityManagerFactory) {
 
-    private[this] val log = System.getLogger(getClass.getName)
+    private val log = System.getLogger(getClass.getName)
 
     def deleteByVideoReferenceUuid(videoReferenceUuid: UUID): DeleteCount = {
         implicit val entityManager: EntityManager = entityManagerFactory.createEntityManager()
@@ -114,7 +114,7 @@ class JdbcRepository(entityManagerFactory: EntityManagerFactory) {
         // Queries return java.util.List[Array[Object]]
         val count                          = query.getResultList.asScala.toList
         if (count.nonEmpty) {
-            val head = count.head.asInstanceOf[Array[_]]
+            val head = count.head.asInstanceOf[Array[?]]
             Some(
                 GeographicRange(
                     head(0).toString.toDouble,

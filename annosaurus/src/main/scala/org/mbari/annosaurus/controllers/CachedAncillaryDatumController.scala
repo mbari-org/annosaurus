@@ -279,7 +279,7 @@ class CachedAncillaryDatumController(val daoFactory: JPADAOFactory)
     )(implicit ec: ExecutionContext): Future[Seq[CachedAncillaryDatum]] = {
         def fn(dao: ADDAO): Seq[CachedAncillaryDatum] = {
             val fastDao = new FastAncillaryDataController(
-                dao.asInstanceOf[BaseDAO[_]].entityManager
+                dao.asInstanceOf[BaseDAO[?]].entityManager
             )
             fastDao.createOrUpdate(data)
             data

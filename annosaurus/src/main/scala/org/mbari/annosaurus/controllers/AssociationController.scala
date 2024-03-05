@@ -45,7 +45,7 @@ class AssociationController(
 
     type ADAO = AssociationDAO[AssociationEntity]
 
-    private[this] val associationPublisher = new AssociationPublisher(bus)
+    private val associationPublisher = new AssociationPublisher(bus)
 
     override def newDAO(): AssociationDAO[AssociationEntity] = daoFactory.newAssociationDAO()
 

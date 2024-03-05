@@ -266,7 +266,7 @@ class CachedVideoReferenceInfoEndpoints(controller: CachedVideoReferenceInfoCont
                 )
             }
 
-    override def all: List[Endpoint[_, _, _, _, _]] = List(
+    override def all: List[Endpoint[?, ?, ?, ?, ?]] = List(
         findByMissionContact,
         findAllMissionContacts,
         findByMissionId,

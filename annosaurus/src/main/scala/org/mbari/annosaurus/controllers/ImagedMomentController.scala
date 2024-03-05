@@ -302,7 +302,7 @@ class ImagedMomentController(val daoFactory: JPADAOFactory)
       * @param sourceImagedMoment
       * @return
       */
-    def create(dao: DAO[_], sourceImagedMoment: ImagedMomentEntity): ImagedMomentEntity = {
+    def create(dao: DAO[?], sourceImagedMoment: ImagedMomentEntity): ImagedMomentEntity = {
 
         val imDao  = daoFactory.newImagedMomentDAO(dao)
         val irDao  = daoFactory.newImageReferenceDAO(dao)

@@ -23,7 +23,7 @@ import org.mbari.annosaurus.domain.CachedAncillaryDatumSC
 
 object AncillaryDatumSQL {
 
-    def resultListToAnncillaryData(rows: List[_]): Seq[CachedAncillaryDatum] = {
+    def resultListToAnncillaryData(rows: List[?]): Seq[CachedAncillaryDatum] = {
         for {
             row <- rows
         } yield {

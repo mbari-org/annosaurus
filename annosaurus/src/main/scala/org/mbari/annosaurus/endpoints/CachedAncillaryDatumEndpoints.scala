@@ -217,7 +217,7 @@ class CachedAncillaryDatumEndpoints(controller: CachedAncillaryDatumController)(
                 )
             }
 
-    override def all: List[Endpoint[_, _, _, _, _]] = List(
+    override def all: List[Endpoint[?, ?, ?, ?, ?]] = List(
         createOrUpdateManyData,
         findDataByImagedMomentUuid,
         mergeManyData,

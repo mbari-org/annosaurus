@@ -51,8 +51,8 @@ class AnnotationController(
     bus: Subject[Any] = MessageBus.RxSubject
 ) {
 
-    private[this] val imagedMomentController = new ImagedMomentController(daoFactory)
-    private[this] val annotationPublisher    = new AnnotationPublisher(bus)
+    private val imagedMomentController = new ImagedMomentController(daoFactory)
+    private val annotationPublisher    = new AnnotationPublisher(bus)
     private val log                          = System.getLogger(getClass.getName())
 
     protected def exec[T](
@@ -434,7 +434,7 @@ class AnnotationController(
       *   Observations that belong to the imagedmoment that was modified
       */
     private def _updateRecordedTimestamp(
-        dao: DAO[_],
+        dao: DAO[?],
         uuid: UUID,
         recordedTimestampOpt: Option[Instant]
     ): Seq[ObservationEntity] = {
@@ -482,7 +482,7 @@ class AnnotationController(
       * @return
       */
     private def _update(
-        dao: DAO[_],
+        dao: DAO[?],
         uuid: UUID,
         videoReferenceUUID: Option[UUID] = None,
         concept: Option[String] = None,

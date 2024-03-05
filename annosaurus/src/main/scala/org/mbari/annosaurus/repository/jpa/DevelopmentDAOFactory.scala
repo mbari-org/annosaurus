@@ -29,11 +29,11 @@ import scala.util.Try
   */
 object DevelopmentDAOFactory extends JPADAOFactory {
 
-    private[this] val config           = ConfigFactory.load()
-    private[this] val productName      =
+    private val config           = ConfigFactory.load()
+    private val productName      =
         Try(config.getString("org.mbari.vars.annotation.database.development.name"))
             .getOrElse("Auto")
-    private[this] val developmentProps = Map(
+    private val developmentProps = Map(
         "eclipselink.connection-pool.default.initial"           -> "2",
         "eclipselink.connection-pool.default.max"               -> "16",
         "eclipselink.connection-pool.default.min"               -> "2",

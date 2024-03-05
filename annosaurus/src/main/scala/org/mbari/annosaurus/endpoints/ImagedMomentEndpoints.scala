@@ -597,7 +597,7 @@ class ImagedMomentEndpoints(controller: ImagedMomentController)(using
                 )
             }
 
-    override def all: List[Endpoint[_, _, _, _, _]] = List(
+    override def all: List[Endpoint[?, ?, ?, ?, ?]] = List(
         countImagedMomentsByConceptName,
         countImagedMomentsByConceptNameWithImages,
         findImagedMomentsByConceptNameWithImages,

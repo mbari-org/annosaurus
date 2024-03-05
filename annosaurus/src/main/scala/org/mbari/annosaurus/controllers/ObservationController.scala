@@ -38,7 +38,7 @@ class ObservationController(
 
     type ODAO = ObservationDAO[ObservationEntity]
 
-    private[this] val annotationPublisher = new AnnotationPublisher(bus)
+    private val annotationPublisher = new AnnotationPublisher(bus)
 
     override def newDAO(): ODAO = daoFactory.newObservationDAO()
 

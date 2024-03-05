@@ -27,7 +27,7 @@ import org.mbari.annosaurus.domain.QueryConstraints
 
 class AnalysisRepository(entityManagerFactory: EntityManagerFactory) {
 
-    private[this] val log = LoggerFactory.getLogger(getClass)
+    private val log = LoggerFactory.getLogger(getClass)
 
     def depthHistogram(constraints: QueryConstraints, binSizeMeters: Int = 50): DepthHistogram = {
         val select                       = DepthHistogramSQL.selectFromBinSize(binSizeMeters)

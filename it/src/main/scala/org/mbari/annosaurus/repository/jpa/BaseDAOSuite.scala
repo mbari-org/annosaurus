@@ -34,7 +34,7 @@ trait BaseDAOSuite extends munit.FunSuite {
     def exec[T](future: Future[T], timeout: Duration = Timeout): T =
         Await.result(future, timeout.toScala)
 
-    def run[T](thunk: () => T)(implicit dao: DAO[_]): T =
+    def run[T](thunk: () => T)(implicit dao: DAO[?]): T =
         exec(dao.runTransaction(_ => thunk.apply()))
 
     override def afterEach(context: AfterEach): Unit =

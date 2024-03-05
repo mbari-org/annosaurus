@@ -68,7 +68,7 @@ object ImageReferenceSQL {
       | )
       |""".stripMargin
 
-    def resultListToImageReferences(rows: List[_]): Seq[ImageReference] = {
+    def resultListToImageReferences(rows: List[?]): Seq[ImageReference] = {
         for {
             row <- rows
         } yield {

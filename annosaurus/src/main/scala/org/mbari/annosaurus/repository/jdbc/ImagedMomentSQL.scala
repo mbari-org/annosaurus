@@ -69,7 +69,7 @@ object ImagedMomentSQL {
     val deleteByVideoReferenceUuid: String =
         "DELETE FROM imaged_moments WHERE video_reference_uuid = ?"
 
-    def resultListToImages(rows: List[_]): Seq[Image] = {
+    def resultListToImages(rows: List[?]): Seq[Image] = {
         for {
             row <- rows
         } yield {
