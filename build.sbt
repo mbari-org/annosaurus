@@ -101,6 +101,7 @@ lazy val annosaurus = (project in file("annosaurus"))
             slf4jLog4j,
             slf4jSystem,
             tapirCirce,
+            tapirNetty,
             tapirPrometheus,
             tapirServerStub   % Test,
             tapirSttpCirce,

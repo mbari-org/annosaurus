@@ -16,11 +16,10 @@
 
 package org.mbari.annosaurus
 
-import io.vertx.core.Vertx
-import io.vertx.ext.web.Router
 import org.mbari.annosaurus.etc.jdk.Logging
 import org.mbari.annosaurus.etc.jdk.Logging.{*, given}
 import org.mbari.annosaurus.etc.zeromq.ZeroMQPublisher
+import sttp.tapir.server.netty.{NettyFutureServer, NettyFutureServerOptions}
 import sttp.tapir.server.vertx.{VertxFutureServerInterpreter, VertxFutureServerOptions}
 import sttp.tapir.server.vertx.VertxFutureServerInterpreter.VertxFutureToScalaFuture
 
@@ -54,7 +53,7 @@ object Main:
         // https://softwaremill.com/benchmarking-tapir-part-1/
         // https://softwaremill.com/benchmarking-tapir-part-2/
 
-        val serverOptions = VertxFutureServerOptions
+        val serverOptions = NettyFutureServerOptions
             .customiseInterceptors
             .serverLog(None)
             .metricsInterceptor(Endpoints.prometheusMetrics.metricsInterceptor())
@@ -63,70 +62,10 @@ object Main:
         val port = sys.env.get("HTTP_PORT").flatMap(_.toIntOption).getOrElse(8080)
         log.atInfo.log(s"Starting ${AppConfig.Name} v${AppConfig.Version} on port $port")
 
-        val vertx  = Vertx.vertx()
-        val server = vertx.createHttpServer()
-        val router = Router.router(vertx)
+        val server = NettyFutureServer()
+            .port(port)
+            .options(serverOptions)
+            .addEndpoints(Endpoints.all)
 
-        // NOTE: Don't add a handler. It will intercept all requests (Originally: Log all requests)
-//        router.route()
-//            .handler(ctx => log.atInfo.log(s"${ctx.request().method()} ${ctx.request().path()}"))
+        Await.result(server.start(), Duration.Inf)
 
-        val interpreter = VertxFutureServerInterpreter(serverOptions)
-
-        // For VertX, we need to separate the non-blocking endpoints from the blocking ones
-        Endpoints
-            .nonBlockingEndpoints
-            .foreach(endpoint =>
-                interpreter
-                    .route(endpoint)
-                    .apply(router) // attaches to vertx router
-            )
-
-        Endpoints
-            .blockingEndpoints
-            .foreach(endpoint =>
-                interpreter
-                    .blockingRoute(endpoint)
-                    .apply(router) // attaches to vertx router
-            )
-
-        // Add our metrics endpoints
-        interpreter.route(Endpoints.metricsEndpoint).apply(router)
-
-        // Add our documentation endpoints
-        Endpoints
-            .docEndpoints
-            .foreach(endpoint =>
-                interpreter
-                    .route(endpoint)
-                    .apply(router)
-            )
-
-//        Endpoints
-//            .all
-//            .foreach(endpoint =>
-//
-//                interpreter
-//                    .route(endpoint)
-//                    .apply(router) // attaches to vertx router
-//            )
-
-        router
-            .getRoutes()
-            .forEach(r => log.atDebug.log(f"Adding route: ${r.methods()}%8s ${r.getPath}%s"))
-
-        // val program = for
-        //     binding <- server.requestHandler(router).listen(port).asScala
-        //     _       <- Future:
-        //                    println(
-        //                        s"Go to http://localhost:${binding.actualPort()}/docs to open SwaggerUI. Press ENTER key to exit."
-        //                    )
-        //                    StdIn.readLine()
-        //     stop    <- binding.close().asScala
-        // yield stop
-
-        // program.onComplete(_ => vertx.close())
-
-        val program = server.requestHandler(router).listen(port).asScala
-
-        Await.result(program, Duration.Inf)
