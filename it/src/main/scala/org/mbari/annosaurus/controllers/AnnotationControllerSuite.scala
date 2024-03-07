@@ -189,6 +189,18 @@ trait AnnotationControllerSuite extends BaseDAOSuite {
         assertEquals(a.observer, Some(observer))
     }
 
+    test("create(Annotation)") {
+        val im = TestUtils.build(1, 1).head
+        val expected = Annotation.from(im.getObservations.asScala.head, true)
+        val obtained  = exec(controller.create(expected)).head
+        assert(obtained.observationUuid.isDefined)
+        assert(obtained.imagedMomentUuid.isDefined)
+        assert(obtained.lastUpdated.isDefined)
+        val corrected =
+            obtained.copy(observationUuid = None, imagedMomentUuid = None, lastUpdated = None)
+        assertEquals(corrected, expected)
+    }
+
     test("bulkCreate a single annotation") {
         // test minimal
         val xs0       = TestUtils.build(1, 1)

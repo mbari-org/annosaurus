@@ -247,6 +247,19 @@ class AnnotationController(
             )
     }
 
+    def create(annotation: Annotation)(using ec: ExecutionContext): Future[Seq[Annotation]] =
+        val entity = annotation.toEntity
+        val dao = daoFactory.newImagedMomentDAO()
+        val future = dao.runTransaction(d => {
+//            d.create(entity)
+//            Annotation.fromImagedMoment(entity, true)
+            val newIm = imagedMomentController.create(d, entity)
+            Annotation.fromImagedMoment(newIm, true)
+        })
+        future.onComplete(_ => dao.close())
+        future
+
+
     /** Bulk create annotations
       * @param annotations
       *   THe annotations to create
@@ -257,6 +270,10 @@ class AnnotationController(
     def bulkCreate(
         annotations: Iterable[Annotation]
     )(using ec: ExecutionContext): Future[Seq[Annotation]] = {
+
+        // short circuit if there ore 0 or 1 annotations
+        if (annotations.isEmpty) return Future.successful(Nil)
+        else if (annotations.size == 1) return create(annotations.head)
 
         val obsDao          = daoFactory.newObservationDAO()
         val imDao           = daoFactory.newImagedMomentDAO(obsDao)

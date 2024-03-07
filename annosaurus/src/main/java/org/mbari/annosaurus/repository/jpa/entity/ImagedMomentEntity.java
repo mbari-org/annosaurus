@@ -448,19 +448,30 @@ public class ImagedMomentEntity implements IPersistentObject {
         if (this == o) return true;
         if (!(o instanceof ImagedMomentEntity)) return false;
         ImagedMomentEntity that = (ImagedMomentEntity) o;
+
+        // If both UUIDs are not null, then we can compare them directly
+        if (that.uuid != null && this.uuid != null) {
+            return Objects.equals(uuid, that.uuid);
+        }
+
+        // If one of the UUIDs is null, then we need to compare the other fields
+        // Note: timecodes are only directly comparable if they have framerate set.
+        // Since this is no longer commonly used, we will compare the string representation of the timecode
         String thisTc = timecode == null ? "" : timecode.toString();
         String thatTc = that.timecode == null ? "" : that.timecode.toString();
-
-        return Objects.equals(uuid, that.uuid) &&
-                Objects.equals(videoReferenceUuid, that.videoReferenceUuid) &&
+        return Objects.equals(videoReferenceUuid, that.videoReferenceUuid) &&
                 Objects.equals(recordedTimestamp, that.recordedTimestamp) &&
                 Objects.equals(thisTc, thatTc) &&
                 Objects.equals(elapsedTime, that.elapsedTime);
+
     }
 
     @Override
     public int hashCode() {
+        if (uuid != null) {
+            return Objects.hash(uuid);
+        }
         var tc = timecode == null ? "" : timecode.toString();
-        return Objects.hash(uuid, elapsedTime, recordedTimestamp, tc, videoReferenceUuid);
+        return Objects.hash(elapsedTime, recordedTimestamp, tc, videoReferenceUuid);
     }
 }

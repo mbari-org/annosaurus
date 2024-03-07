@@ -157,38 +157,41 @@ object Annotation extends FromEntity[ObservationEntity, Annotation] {
         extend: Boolean = false
     ): Seq[ImagedMomentEntity] = {
 
-        val imagedMoments = annotations.map(_.toEntity)
+        if (annotations.isEmpty) Nil
+        else if (annotations.size == 1) Seq(annotations.head.toEntity)
+        else
+            val imagedMoments = annotations.map(_.toEntity)
 
-        // Consolidate imaged moments
-        val imagedMomentMap   = mutable.Map[ImagedMomentEntity, Seq[ImagedMomentEntity]]()
-        val imageReferenceMap = mutable.Map[ImagedMomentEntity, Seq[ImageReferenceEntity]]()
-        for (im <- imagedMoments)
-        do
-            val imOpt = imagedMomentMap.get(im)
-            imOpt match
-                case None    =>
-                    imagedMomentMap.put(im, Nil)
-                    imageReferenceMap.put(im, im.getImageReferences.asScala.toSeq)
-                case Some(x) =>
-                    imagedMomentMap.put(im, x.appended(im))
-                    imageReferenceMap.put(
-                        im,
-                        imageReferenceMap(im).appendedAll(im.getImageReferences.asScala.toSeq)
-                    )
+            // Consolidate imaged moments
+            val imagedMomentMap   = mutable.Map[ImagedMomentEntity, Seq[ImagedMomentEntity]]()
+            val imageReferenceMap = mutable.Map[ImagedMomentEntity, Seq[ImageReferenceEntity]]()
+            for (im <- imagedMoments)
+            do
+                val imOpt = imagedMomentMap.get(im)
+                imOpt match
+                    case None    =>
+                        imagedMomentMap.put(im, Nil)
+                        imageReferenceMap.put(im, im.getImageReferences.asScala.toSeq)
+                    case Some(x) =>
+                        imagedMomentMap.put(im, x.appended(im))
+                        imageReferenceMap.put(
+                            im,
+                            imageReferenceMap(im).appendedAll(im.getImageReferences.asScala.toSeq)
+                        )
 
-        for
-            (baseIm, xs) <- imagedMomentMap.iterator
-            x            <- xs
-        do
-            val irs = imageReferenceMap(baseIm).distinctBy(_.getUrl())
-            irs.foreach(i => baseIm.addImageReference(i))
+            for
+                (baseIm, xs) <- imagedMomentMap.iterator
+                x            <- xs
+            do
+                val irs = imageReferenceMap(baseIm).distinctBy(_.getUrl())
+                irs.foreach(i => baseIm.addImageReference(i))
 
-            x.getObservations.forEach(o => baseIm.addObservation(o))
+                x.getObservations.forEach(o => baseIm.addObservation(o))
 
-            if baseIm.getAncillaryDatum() != null && x.getAncillaryDatum() != null then
-                baseIm.setAncillaryDatum(x.getAncillaryDatum())
+                if baseIm.getAncillaryDatum != null && x.getAncillaryDatum != null then
+                    baseIm.setAncillaryDatum(x.getAncillaryDatum)
 
-        imagedMomentMap.keys.toSeq
+            imagedMomentMap.keys.toSeq
 
     }
 
