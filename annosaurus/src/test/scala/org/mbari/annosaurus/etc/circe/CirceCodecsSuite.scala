@@ -18,12 +18,13 @@ package org.mbari.annosaurus.etc.circe
 
 import scala.io.Source
 import scala.util.Using
-import org.mbari.annosaurus.domain.{ImagedMoment, ImagedMomentSC, QueryConstraints}
+import org.mbari.annosaurus.domain.{ImagedMoment, ImagedMomentSC, ObservationsUpdate, QueryConstraints}
 import CirceCodecs.{*, given}
 
 import scala.util.Failure
 import scala.util.Success
 import java.time.Instant
+import java.util.UUID
 
 class CirceCodecsSuite extends munit.FunSuite {
 
@@ -251,6 +252,54 @@ class CirceCodecsSuite extends munit.FunSuite {
         assertEquals(qc.videoReferenceUuids, List.empty)
         assert(qc.missionContacts.isEmpty)
         assertEquals(opt.get.concepts, List("Grimpoteuthis", "Grimpoteuthis bathynectes", "Grimpoteuthis sp. 1", "Grimpoteuthis sp. 4", "Grimpoteuthis sp. 5", "Grimpoteuthis tuftsi"))
+    }
+
+    test("decode ObservationsUpdate (camelCase") {
+        val uuid = UUID.randomUUID()
+        val json =
+            s""" {
+                |    "observationUuids": ["${uuid}"],
+                |    "concept": "Grimpoteuthis",
+                |    "observer": "svonthun",
+                |    "group": "ROV",
+                |    "activity": "stationary"
+                |}""".stripMargin
+
+//        println(json)
+        val e = json.reify[ObservationsUpdate]
+//        println(e)
+        val opt = e.toOption
+
+        assert(opt.isDefined)
+        val ou = opt.get
+        assertEquals(ou.observationUuids, List(uuid))
+        assertEquals(ou.concept, Some("Grimpoteuthis"))
+        assertEquals(ou.observer, Some("svonthun"))
+        assertEquals(ou.group, Some("ROV"))
+    }
+
+    test("decode ObservationsUpdate (snake_case)") {
+        val uuid = UUID.randomUUID()
+        val json =
+            s""" {
+               |    "observation_uuids": ["${uuid}"],
+               |    "concept": "Grimpoteuthis",
+               |    "observer": "svonthun",
+               |    "group": "ROV",
+               |    "activity": "stationary"
+               |}""".stripMargin
+
+        //        println(json)
+        val e = json.reify[ObservationsUpdate]
+        //        println(e)
+        val opt = e.toOption
+
+        assert(opt.isDefined)
+        val ou = opt.get
+        assertEquals(ou.observationUuids, List(uuid))
+        assertEquals(ou.concept, Some("Grimpoteuthis"))
+        assertEquals(ou.observer, Some("svonthun"))
+        assertEquals(ou.group, Some("ROV"))
     }
 
 }

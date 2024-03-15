@@ -17,15 +17,7 @@
 package org.mbari.annosaurus.endpoints
 
 import org.mbari.annosaurus.controllers.ObservationController
-import org.mbari.annosaurus.domain.{
-    ConceptCount,
-    CountForVideoReferenceSC,
-    ErrorMsg,
-    ObservationSC,
-    ObservationUpdateSC,
-    RenameConcept,
-    RenameCountSC
-}
+import org.mbari.annosaurus.domain.{ConceptCount, Count, CountForVideoReferenceSC, ErrorMsg, ObservationSC, ObservationUpdateSC, ObservationsUpdate, RenameConcept, RenameCountSC}
 import org.mbari.annosaurus.etc.jwt.JwtService
 import org.mbari.annosaurus.etc.tapir.TapirCodecs.given
 import sttp.tapir.*
@@ -34,12 +26,13 @@ import sttp.tapir.server.ServerEndpoint
 import org.mbari.annosaurus.etc.circe.CirceCodecs.{*, given}
 import sttp.model.StatusCode
 import CustomTapirJsonCirce.*
+import org.mbari.annosaurus.repository.jdbc.JdbcRepository
 
 import java.time.Instant
 import java.util.UUID
 import scala.concurrent.{ExecutionContext, Future}
 
-class ObservationEndpoints(controller: ObservationController)(using
+class ObservationEndpoints(controller: ObservationController, jdbcRepository: JdbcRepository)(using
     ec: ExecutionContext,
     jwtService: JwtService
 ) extends Endpoints {
@@ -323,6 +316,27 @@ class ObservationEndpoints(controller: ObservationController)(using
                 )
             }
 
+    val updateManyObservations: Endpoint[Option[String], ObservationsUpdate, ErrorMsg, Count, Any] =
+        secureEndpoint
+            .put
+            .in(base / "bulk")
+            .in(jsonBody[ObservationsUpdate].description("Describes the parameters and uuids of the observations to update. Can be camelCase or snake_case."))
+            .out(jsonBody[Count].description("The number of observations updated"))
+            .name("updateManyObservations")
+            .description(
+                "Update many observations. The observations to update are provided in the request body as a JSON array"
+            )
+            .tag(tag)
+
+    val updateManyObservationsImpl: ServerEndpoint[Any, Future] =
+        updateManyObservations
+            .serverSecurityLogic(jwtOpt => verify(jwtOpt))
+            .serverLogic { _ => dto =>
+                handleErrors(
+                    Future(jdbcRepository.updateObservations(dto)).map(Count(_))
+                )
+            }
+
     // PUT /delete/duration/:uuid
     val deleteDuration: Endpoint[Option[String], UUID, ErrorMsg, ObservationSC, Any] =
         secureEndpoint
@@ -380,6 +394,7 @@ class ObservationEndpoints(controller: ObservationController)(using
 
     override def all: List[Endpoint[?, ?, ?, ?, ?]] = List(
         findActivities,
+        updateManyObservations,
         findObservationByAssociationUuid,
         countObservationsByConcept,
         countImagesByConcept,
@@ -399,6 +414,7 @@ class ObservationEndpoints(controller: ObservationController)(using
 
     override def allImpl: List[ServerEndpoint[Any, Future]] = List(
         findActivitiesImpl,
+        updateManyObservationsImpl,
         findObservationByAssociationUuidImpl,
         countObservationsByConceptImpl,
         countImagesByConceptImpl,

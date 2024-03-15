@@ -20,14 +20,11 @@ import java.time.Instant
 import java.util.UUID
 import jakarta.persistence.{EntityManager, EntityManagerFactory, Query}
 
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 import scala.util.control.NonFatal
-import org.mbari.annosaurus.domain.{ConcurrentRequest, DeleteCount, MultiRequest}
-import org.mbari.annosaurus.domain.QueryConstraints
-import org.mbari.annosaurus.domain.Annotation
-import org.mbari.annosaurus.domain.GeographicRange
-import org.mbari.annosaurus.domain.Image
+import org.mbari.annosaurus.domain.{Annotation, ConcurrentRequest, DeleteCount, GeographicRange, Image, MultiRequest, ObservationsUpdate, QueryConstraints}
 import org.mbari.annosaurus.etc.jdk.Logging.given
+import org.mbari.annosaurus.repository.jpa.extensions.*
 
 /** Database access (read-only) provider that uses SQL for fast lookups. WHY? JPA makes about 1 +
   * (rows * 4) database requests when looking up annotations. For 1000 rows that 4001 database calls
@@ -38,6 +35,18 @@ import org.mbari.annosaurus.etc.jdk.Logging.given
 class JdbcRepository(entityManagerFactory: EntityManagerFactory) {
 
     private val log = System.getLogger(getClass.getName)
+
+
+    def updateObservations(update: ObservationsUpdate): Int = {
+        implicit val entityManager: EntityManager = entityManagerFactory.createEntityManager()
+        val n = entityManager.runTransactionSync { em =>
+            val queries = ObservationSQL.buildUpdates(update, entityManager)
+            val counts = queries.map(_.executeUpdate())
+            counts.headOption.getOrElse(0)
+        }
+        entityManager.close()
+        n
+    }
 
     def deleteByVideoReferenceUuid(videoReferenceUuid: UUID): DeleteCount = {
         implicit val entityManager: EntityManager = entityManagerFactory.createEntityManager()

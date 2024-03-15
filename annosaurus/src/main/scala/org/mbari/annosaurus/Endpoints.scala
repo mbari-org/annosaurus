@@ -66,7 +66,7 @@ object Endpoints {
     val imageEndpoints                    = new ImageEndpoints(imageController)
     val imageReferenceEndpoints           = new ImageReferenceEndpoints(imageReferenceController)
     val indexEndpoints                    = new IndexEndpoints(indexController)
-    val observationEndpoints              = new ObservationEndpoints(observationController)
+    val observationEndpoints              = new ObservationEndpoints(observationController, jdbcRepository)
 
     // --------------------------------
     // For VertX, we need to separate the non-blocking endpoints from the blocking ones

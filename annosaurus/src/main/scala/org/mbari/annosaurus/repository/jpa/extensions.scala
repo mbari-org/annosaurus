@@ -35,14 +35,17 @@ object extensions:
     extension (entityManager: EntityManager)
         def runTransaction[R](fn: EntityManager => R)(implicit ec: ExecutionContext): Future[R] =
             Future:
-                val transaction = entityManager.getTransaction
-                transaction.begin()
-                try
-                    val n = fn.apply(entityManager)
-                    transaction.commit()
-                    n
-                catch
-                    case NonFatal(e) =>
-                        log.atError.withCause(e).log("Error running transaction")
-                        throw e
-                finally if transaction.isActive then transaction.rollback()
+                runTransactionSync(fn)
+
+        def runTransactionSync[R](fn: EntityManager => R): R =
+            val transaction = entityManager.getTransaction
+            transaction.begin()
+            try
+                val n = fn.apply(entityManager)
+                transaction.commit()
+                n
+            catch
+                case NonFatal(e) =>
+                    log.atError.withCause(e).log("Error running transaction")
+                    throw e
+            finally if transaction.isActive then transaction.rollback()

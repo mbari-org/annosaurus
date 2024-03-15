@@ -20,14 +20,14 @@ import org.mbari.annosaurus.repository.jpa.BaseDAOSuite
 import org.mbari.annosaurus.controllers.TestUtils
 import org.mbari.annosaurus.repository.jpa.JPADAOFactory
 import junit.framework.Test
+
 import scala.jdk.CollectionConverters.*
-import org.mbari.annosaurus.domain.Annotation
+import org.mbari.annosaurus.domain.{Annotation, ConcurrentRequest, MultiRequest, ObservationsUpdate, QueryConstraints}
+
 import java.time.Duration
-import org.mbari.annosaurus.domain.QueryConstraints
-import org.mbari.annosaurus.domain.MultiRequest
-import org.mbari.annosaurus.domain.ConcurrentRequest
 import org.mbari.annosaurus.etc.circe.CirceCodecs.{*, given}
 import org.checkerframework.checker.units.qual.A
+import org.mbari.annosaurus.repository.jpa.entity.ObservationEntity
 
 trait JdbcRepositorySuite extends BaseDAOSuite {
 
@@ -324,6 +324,56 @@ trait JdbcRepositorySuite extends BaseDAOSuite {
         val y   = ys.head
         val ys2 = repository.findImagesByVideoReferenceUuid(y.getVideoReferenceUuid())
         assertEquals(ys2.size, 16)
+    }
+
+    test("updateObservations") {
+        val xs = TestUtils.create(8, 1)
+        val observationUuids = xs.map(im => im.getObservations.asScala.head.getUuid())
+
+        val update0 = ObservationsUpdate(observationUuids)
+        val n      = repository.updateObservations(update0)
+        assertEquals(n, 0)
+
+        def runUpdate(update: ObservationsUpdate): Unit = {
+            val n = repository.updateObservations(update)
+            assertEquals(n, xs.size)
+            val dao = daoFactory.newObservationDAO()
+            for (uuid <- observationUuids) {
+                val opt = dao.findByUUID(uuid)
+                assert(opt.isDefined)
+                val obs = opt.get
+                update.observer.foreach(o => assertEquals(obs.getObserver, o))
+                update.concept.foreach(c => assertEquals(obs.getConcept, c))
+                update.group.foreach(g => assertEquals(obs.getGroup, g))
+                update.activity.foreach(a => assertEquals(obs.getActivity, a))
+            }
+            dao.close()
+        }
+
+        val update1 = ObservationsUpdate(observationUuids, concept = Some("concept-foo"))
+        runUpdate(update1)
+
+        // a DAO catches JPA changes but misses the ones we run via JDBC
+        // TODO - Make sure I reopen a dao for all queries. Otherwise use JPA to make the updates
+        val update2 = ObservationsUpdate(observationUuids, observer = Some("observer-foo"))
+        runUpdate(update2)
+
+
+        val update3 = ObservationsUpdate(observationUuids, group = Some("group-foo"))
+        runUpdate(update3)
+
+        val update4 = ObservationsUpdate(observationUuids, activity = Some("activity-foo"))
+        runUpdate(update4)
+
+        val update5 = ObservationsUpdate(observationUuids,
+            observer = Some("observer-foo2"),
+            concept = Some("concept-foo2"),
+            group = Some("group-foo2"),
+            activity = Some("activity-foo2"))
+        runUpdate(update5)
+
+
+
     }
 
 }

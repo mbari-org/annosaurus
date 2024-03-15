@@ -313,6 +313,12 @@ object CirceCodecs {
     given associationUpdateScEncoder: Encoder[AssociationUpdateSC] = deriveEncoder
     given associationUpdateScDecoder: Decoder[AssociationUpdateSC] = deriveDecoder
 
+    given observationsUpdateScEncoder: Encoder[ObservationsUpdateSC] = deriveEncoder
+    given observationsUpdateScDecoder: Decoder[ObservationsUpdateSC] = deriveDecoder
+    given observationsUpdateEncoder: Encoder[ObservationsUpdate] = deriveEncoder
+    private val observationsUpdateCcDecoder: Decoder[ObservationsUpdate] = deriveDecoder
+    given observationsUpdateDecoder: Decoder[ObservationsUpdate] = observationsUpdateCcDecoder or observationsUpdateScDecoder.map(_.toCamelCase)
+
     val CustomPrinter: Printer = Printer(
         dropNullValues = true,
         indent = ""

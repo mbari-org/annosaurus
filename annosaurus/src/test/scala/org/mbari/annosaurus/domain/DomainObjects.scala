@@ -181,4 +181,12 @@ object DomainObjects {
         activity = Some("transect"),
     )
 
+    val observationsUpdate = ObservationsUpdate(
+        observationUuids = List(UUID.randomUUID(), UUID.randomUUID()),
+        observer = Some("brian"),
+        concept = Some("Grimpoteuthis"),
+        group = Some("ROV:detailed"),
+        activity = Some("transect"),
+    )
+
 }

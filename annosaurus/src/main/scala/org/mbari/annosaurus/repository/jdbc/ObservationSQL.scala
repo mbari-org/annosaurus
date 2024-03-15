@@ -16,6 +16,9 @@
 
 package org.mbari.annosaurus.repository.jdbc
 
+import jakarta.persistence.{EntityManager, Query}
+import org.mbari.annosaurus.domain.ObservationsUpdate
+
 /** @author
   *   Brian Schlining
   * @since 2019-10-28T16:39:00
@@ -35,5 +38,66 @@ object ObservationSQL {
       |     im.uuid = observations.imaged_moment_uuid
       | )
       |""".stripMargin
+
+    val updateGroup: String =
+        """ UPDATE observations
+      | SET
+      |   observation_group = ?
+      | WHERE
+      |   uuid IN (?)
+      |""".stripMargin
+
+    val updateActivity: String =
+        """ UPDATE observations
+      | SET
+      |   activity = ?
+      | WHERE
+      |   uuid IN (?)
+      |""".stripMargin
+
+    val updateConcept: String =
+        """ UPDATE observations
+        | SET
+        |   concept = ?
+        | WHERE
+        |   uuid IN (?)
+        |""".stripMargin
+
+    val updateObserver: String =
+        """ UPDATE observations
+        | SET
+        |   observer = ?
+        | WHERE
+        |   uuid IN (?)
+        |""".stripMargin
+
+    def buildUpdates(update: ObservationsUpdate, entityManager: EntityManager): Seq[Query] =
+        val uuidsString = update.observationUuids.mkString("('", "','", "')")
+
+        // Helper function to build a query. It replaces the first (?) with the uuidsStrings
+        // and then sets the parameter for the value
+        def build(sql: String, value: Option[String]): Option[Query] =
+            value.map { v =>
+                val sql2 = sql.replace("(?)", uuidsString)
+                val query = entityManager.createNativeQuery(sql2)
+                query.setParameter(1, v)
+                query
+            }
+
+        // Map of the sql and the value to set. We'll build a query for each value that
+        // is not an Option
+        val params = (updateObserver -> update.observer)
+            :: (updateGroup -> update.group)
+            :: (updateConcept -> update.concept)
+            :: (updateActivity -> update.activity)
+            :: Nil
+        params.flatMap(p => build(p._1, p._2))
+
+
+
+
+
+
+
 
 }
