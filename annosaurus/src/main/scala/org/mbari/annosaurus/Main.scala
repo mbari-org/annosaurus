@@ -63,7 +63,8 @@ object Main:
         val port = sys.env.get("HTTP_PORT").flatMap(_.toIntOption).getOrElse(8080)
         log.atInfo.log(s"Starting ${AppConfig.Name} v${AppConfig.Version} on port $port")
 
-        val vertx  = Vertx.vertx(new VertxOptions().setWorkerPoolSize(40))
+        // val vertx  = Vertx.vertx(new VertxOptions().setWorkerPoolSize(40))
+        val vertx  = Vertx.vertx()
         val server = vertx.createHttpServer()
         val router = Router.router(vertx)
 
@@ -104,7 +105,7 @@ object Main:
 
         router
             .getRoutes()
-            .forEach(r => log.atDebug.log(f"Adding route: ${r.methods()}%8s ${r.getPath}%s"))
+            .forEach(r => log.atInfo.log(f"Adding route: ${r.methods()}%8s ${r.getPath}%s"))
 
         val program = server.requestHandler(router).listen(port).asScala
 

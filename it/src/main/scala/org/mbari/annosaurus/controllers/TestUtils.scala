@@ -104,10 +104,6 @@ object TestUtils {
         log.atDebug.log(s"Creating ${xs.size} ImagedMoments: $xs")
         val dao = daoFactory.newImagedMomentDAO()
         Await.ready(dao.runTransaction(d => xs.foreach(x => d.create(x))), Timeout)
-        // for (x <- xs)
-        // do
-        //     val f = dao.runTransaction(d => d.create(x))
-        //     Await.result(f, Timeout)
         dao.close()
         xs
     }
@@ -122,7 +118,7 @@ object TestUtils {
     ): ImagedMomentEntity = {
         val et           = random.nextLong(2592000000L) // 30 days
         val elapsedTime  = Duration.ofMillis(et)
-        val recordedDate = Some(startDate.plusMillis(et)).orNull
+        val recordedDate = startDate.plusMillis(et)
         val timecode     =
             if (random.nextBoolean())
                 Some(new Timecode(random.nextInt(10000).toDouble, FrameRates.NTSC))

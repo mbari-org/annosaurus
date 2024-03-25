@@ -7,7 +7,7 @@ ThisBuild / licenses         := Seq("Apache-2.0" -> url("http://www.apache.org/l
 ThisBuild / organization     := "org.mbari"
 ThisBuild / organizationName := "Monterey Bay Aquarium Research Institute"
 ThisBuild / resolvers ++= Seq(Resolver.githubPackages("mbari-org", "maven"))
-ThisBuild / scalaVersion     := "3.4.0"
+ThisBuild / scalaVersion     := "3.3.3"
 // ThisBuild / scalaVersion     := "3.3.1" // Fails. See https://github.com/lampepfl/dotty/issues/17069#issuecomment-1763053572
 ThisBuild / scalacOptions ++= Seq(
     "-deprecation",  // Emit warning and location for usages of deprecated APIs.
@@ -64,26 +64,14 @@ lazy val annosaurus = (project in file("annosaurus"))
             circeGeneric,
             circeParser,
             commonsCodec,
-//            derby,
-//            derbyClient,
-//            derbyNet,
-//            derbyShared,
-//            derbyTools,
             hibernateCore,
             hibernateEnvers,
             hibernateHikari,
-//            fatboyGson,
-//            gson,
             h2                % Test,
             hikariCp,
             jansi             % Runtime,
             javaxServlet,
             javaxTransaction,
-//            jettyServer,
-//            jettyServlets,
-//            jettyWebapp,
-//            jmelody,
-//            json4sJackson,
             junit             % Test,
             logbackClassic,
             mssqlserver,
@@ -91,10 +79,6 @@ lazy val annosaurus = (project in file("annosaurus"))
             oracle,
             postgresql,
             rxJava3,
-//            scalatest         % Test,
-//            scalatra,
-//            scalatraJson,
-//            scalatraScalatest % Test,
             scilube,
             slf4j,
             slf4jJul,
@@ -130,14 +114,8 @@ lazy val integrationTests = (project in file("it"))
     )
     .settings(
         libraryDependencies ++= Seq(
-//            derby,
-//            derbyClient,
-//            derbyNet,
-//            derbyShared,
-//            derbyTools,
             junit,
             munit,
-//            scalatraScalatest,
             slf4j,
             tapirServerStub,
             testcontainersCore
@@ -159,21 +137,7 @@ lazy val integrationTests = (project in file("it"))
 //     )
 //   )
 
-// lazy val itPostgres = (project in file("it-postgres"))
-//   .dependsOn(integrationTests)
-//   .enablePlugins(
-//     AutomateHeaderPlugin
-//   )
-//   .settings(
-//     libraryDependencies ++= Seq(
-//       junit                    % Test,
-//       munit                    % Test,
-//       scalatest                % Test,
-//       testcontainersMunit      % Test,
-//       testcontainersPostgresql % Test,
-//       testcontainersScalatest  % Test
-//     )
-//   )
+
 
 lazy val itPostgres = (project in file("it-postgres"))
   .dependsOn(integrationTests)

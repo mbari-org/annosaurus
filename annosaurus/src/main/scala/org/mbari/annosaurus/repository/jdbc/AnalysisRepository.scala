@@ -33,37 +33,35 @@ class AnalysisRepository(entityManagerFactory: EntityManagerFactory) {
         val select                       = DepthHistogramSQL.selectFromBinSize(binSizeMeters)
         val entityManager: EntityManager = entityManagerFactory.createEntityManager()
         val query                        = QueryConstraintsSqlBuilder.toQuery(constraints, entityManager, select, "")
-        val results                      = query.getResultList.asScala.toList
+        val results                      = query.getResultList.iterator().next()
         entityManager.close()
-        val values                       = results
-            .head
-            .asInstanceOf[Array[Object]]
-            .map(s => s.toString.toInt)
+        val values                       = results.asInstanceOf[Array[Object]]
+            .map(s => s.asInt.getOrElse(0))
             .toList
+
         val binsMin                      = (0 until DepthHistogramSQL.MaxDepth by binSizeMeters).toList
         val binsMax                      = binsMin.map(_ + binSizeMeters)
         DepthHistogram(binsMin, binsMax, values)
     }
 
     def timeHistogram(constraints: QueryConstraints, binSizeDays: Int = 30): TimeHistogram = {
-        val now                          = Instant.now()
-        val select                       = TimeHistogramSQL.selectFromBinSize(now, binSizeDays)
+        val start = constraints.minTimestamp.getOrElse(TimeHistogramSQL.MinTime)
+        val now                          = constraints.maxTimestamp.getOrElse(Instant.now())
+        val select                       = TimeHistogramSQL.selectFromBinSize(start, now, binSizeDays)
         val entityManager: EntityManager = entityManagerFactory.createEntityManager()
         val query                        = QueryConstraintsSqlBuilder.toQuery(constraints, entityManager, select, "")
 
 //        println(query)
-        val results = query.getResultList.asScala.toList
+        val results = query.getResultList.iterator().next()
         entityManager.close()
-        val values  = results
-            .head
-            .asInstanceOf[Array[Object]]
+        val values  = results.asInstanceOf[Array[Object]]
             .map(s => s.asInt.getOrElse(0))
-            .toIndexedSeq
+            .toList
 
         val intervalMillis = binSizeDays * 24 * 60 * 60 * 1000L
         val binsMin        =
-            (TimeHistogramSQL.MinTime.toEpochMilli until now.toEpochMilli by intervalMillis)
-                .map(Instant.ofEpochMilli(_))
+            (start.toEpochMilli until now.toEpochMilli by intervalMillis)
+                .map(Instant.ofEpochMilli)
 
         val binsMax = binsMin
             .map(_.plusMillis(intervalMillis))
