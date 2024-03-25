@@ -37,6 +37,9 @@ object AppConfig {
 
     val Description: String = "Annotation Service"
 
+    /** We should have the same # of max db connections as vertx workers */
+    val NumberOfVertxWorkers: Int = 20
+
     private lazy val Config = ConfigFactory.load()
 
     lazy val DefaultJwtService: JwtService = JwtService(

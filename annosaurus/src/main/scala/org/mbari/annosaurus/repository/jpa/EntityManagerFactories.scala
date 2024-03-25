@@ -18,9 +18,11 @@ package org.mbari.annosaurus.repository.jpa
 
 import com.typesafe.config.ConfigFactory
 import jakarta.persistence.{EntityManagerFactory, Persistence}
-import scala.jdk.CollectionConverters._
+import org.mbari.annosaurus.AppConfig
 
+import scala.jdk.CollectionConverters.*
 import org.mbari.annosaurus.etc.jdk.Logging.given
+
 import java.lang.System.Logger.Level
 
 /** https://stackoverflow.com/questions/4106078/dynamic-jpa-connection
@@ -45,7 +47,7 @@ object EntityManagerFactories {
         "hibernate.hbm2ddl.auto"              -> "validate",
         "hibernate.hikari.idleTimeout"        -> "30000",
         "hibernate.jdbc.batch_size"           -> "100",
-        "hibernate.hikari.maximumPoolSize"    -> "20", // Same as vertx worker pool threads
+        "hibernate.hikari.maximumPoolSize"    -> s"${AppConfig.NumberOfVertxWorkers}", // Same as vertx worker pool threads
         "hibernate.hikari.minimumIdle"        -> "2",
         "hibernate.order_inserts"             -> "true",
         "hibernate.order_updates"             -> "true"
