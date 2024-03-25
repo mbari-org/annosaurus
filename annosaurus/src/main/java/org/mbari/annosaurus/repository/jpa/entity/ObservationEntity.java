@@ -63,7 +63,7 @@ import java.util.Objects;
                 @NamedNativeQuery(
                         name = "Observation.countByVideoReferenceUUID",
                         query =
-                                "SELECT COUNT(obs.uuid) FROM observations obs JOIN imaged_moments im ON obs.imaged_moment_uuid = im.uuid " +
+                                "SELECT COUNT(*) FROM observations obs INNER JOIN imaged_moments im ON obs.imaged_moment_uuid = im.uuid " +
                                         "WHERE im.video_reference_uuid = ?1"
                 ),
                 // @NamedNativeQuery(
