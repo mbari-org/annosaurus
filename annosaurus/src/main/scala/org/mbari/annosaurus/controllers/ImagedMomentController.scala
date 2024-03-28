@@ -305,9 +305,7 @@ class ImagedMomentController(val daoFactory: JPADAOFactory)
     def create(dao: DAO[?], sourceImagedMoment: ImagedMomentEntity): ImagedMomentEntity = {
 
         val imDao  = daoFactory.newImagedMomentDAO(dao)
-        val irDao  = daoFactory.newImageReferenceDAO(dao)
-        val adDao  = daoFactory.newCachedAncillaryDatumDAO(dao)
-        val obsDao = daoFactory.newObservationDAO(dao)
+
 
         // Reuse existing imagedmoments if it already exists
         val targetImagedMoment =

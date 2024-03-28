@@ -126,7 +126,7 @@ class AnnotationEndpoints(controller: AnnotationController)(using
                 val annotation = annotationCreate.toCamelCase.toAnnotation
                 handleOption(
                     controller
-                        .bulkCreate(Seq(annotation))
+                        .create(annotation)
                         .map(xs => xs.maxByOption(_.lastUpdated).map(_.toSnakeCase))
 //                        .map(xs => xs.headOption.map(_.toSnakeCase))
                 )
