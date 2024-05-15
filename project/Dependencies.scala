@@ -25,7 +25,7 @@ object Dependencies {
     lazy val gson             = "com.google.code.gson" % "gson"              % "2.10.1"
     lazy val h2               = "com.h2database"       % "h2"                % "2.2.224"
 
-    val hibernateVersion     = "6.4.8.Final"
+    val hibernateVersion     = "6.4.8.Final" //"6.5.1.Final" - envers is throwing: The column name REV is not valid. 
     lazy val hibernateCore   = "org.hibernate.orm" % "hibernate-core"     % hibernateVersion
     lazy val hibernateEnvers = "org.hibernate.orm" % "hibernate-envers"   % hibernateVersion
     lazy val hibernateHikari = "org.hibernate.orm" % "hibernate-hikaricp" % hibernateVersion
