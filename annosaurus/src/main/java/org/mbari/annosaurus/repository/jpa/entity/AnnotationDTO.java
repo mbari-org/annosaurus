@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.UUID;
 import java.time.Instant;
 import java.time.Duration;
+import org.mbari.vcr4j.time.Timecode;
 
 public record AnnotationDTO(
     UUID observationUuid,
@@ -33,24 +34,48 @@ public record AnnotationDTO(
     Instant recordedTimestamp,
     Duration duration,
     String group,
-    String activity,
+    String activity, 
     List<AssociationDTO> associations,
     List<ImageReferenceDTO> imageReferences
 ) {
 
     public AnnotationDTO(UUID observationUuid,
-    String concept,
-    String observer,
-    Instant observationTimestamp,
-    UUID videoReferenceUuid,
-    UUID imagedMomentUuid,
-    String timecode,
-    Duration elapsedTime,
-    Instant recordedTimestamp,
-    Duration duration,
-    String group,
-    String activity) {
+            String concept,
+            String observer,
+            Instant observationTimestamp,
+            UUID videoReferenceUuid,
+            UUID imagedMomentUuid,
+            String timecode,
+            Duration elapsedTime,
+            Instant recordedTimestamp,
+            Duration duration,
+            String group,
+            String activity) {
         this(observationUuid, concept, observer, observationTimestamp, videoReferenceUuid, imagedMomentUuid, timecode, elapsedTime, recordedTimestamp, duration, group, activity, List.of(), List.of());
+    }
+
+    public AnnotationDTO(UUID observationUuid,
+            String concept,
+            String observer,
+            Instant observationTimestamp,
+            UUID videoReferenceUuid,
+            UUID imagedMomentUuid,
+            Timecode timecode,
+            Duration elapsedTime,
+            Instant recordedTimestamp,
+            Duration duration,
+            String group,
+            String activity) {
+        this(observationUuid, 
+             concept, 
+             observer, 
+             observationTimestamp, 
+             videoReferenceUuid, 
+             imagedMomentUuid, 
+             timecode == null ? null : timecode.toString(), 
+             elapsedTime, 
+             recordedTimestamp, 
+             duration, group, activity, List.of(), List.of());
     }
 
 }

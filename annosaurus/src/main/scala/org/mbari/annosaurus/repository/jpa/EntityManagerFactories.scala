@@ -50,7 +50,8 @@ object EntityManagerFactories {
         "hibernate.hikari.maximumPoolSize"    -> s"${AppConfig.NumberOfVertxWorkers * 2}", // Same as vertx worker pool threads
         "hibernate.hikari.minimumIdle"        -> "2",
         "hibernate.order_inserts"             -> "true",
-        "hibernate.order_updates"             -> "true"
+        "hibernate.order_updates"             -> "true",
+        "hibernate.type.java_time_use_direct_jdbc" -> "true"
     )
 
     def apply(properties: Map[String, String]): EntityManagerFactory = {

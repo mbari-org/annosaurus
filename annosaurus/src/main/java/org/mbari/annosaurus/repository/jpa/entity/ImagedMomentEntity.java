@@ -219,20 +219,20 @@ import org.mbari.vcr4j.time.Timecode;
                 ),
                 @NamedQuery(
                         name = "ImagedMoment.findImageByConceptWithImages",
-                        query = "SELECT new org.mbari.annosaurus.repository.jpa.entity.ImageDTO(i.uuid, i.elapsedTime, i.videoReferenceUuid, i.recordedTimestamp, i.timecode, ir.description, ir.format, ir.height, ir.width, ir.url, ir.uuid) " +
+                        query = "SELECT new org.mbari.annosaurus.repository.jpa.entity.ImageDTO(i.uuid, i.videoReferenceUuid, i.elapsedTime, i.recordedTimestamp, i.timecode, ir.description, ir.format, ir.height, ir.width, ir.url, ir.uuid) " +
                                 "FROM ImagedMoment i LEFT JOIN i.observations o LEFT JOIN i.imageReferences ir " +
                                 "WHERE ir.url IS NOT NULL AND o.concept = :concept ORDER BY i.uuid"
                 ),
                 @NamedQuery(
                         name = "ImagedMoment.findImageByToConceptWithImages",
-                        query = "SELECT new org.mbari.annosaurus.repository.jpa.entity.ImageDTO(i.uuid, i.elapsedTime, i.videoReferenceUuid, i.recordedTimestamp, i.timecode, ir.description, ir.format, ir.height, ir.width, ir.url, ir.uuid) " +
+                        query = "SELECT new org.mbari.annosaurus.repository.jpa.entity.ImageDTO(i.uuid, i.videoReferenceUuid, i.elapsedTime, i.recordedTimestamp, i.timecode, ir.description, ir.format, ir.height, ir.width, ir.url, ir.uuid) " +
                                 "FROM ImagedMoment i LEFT JOIN i.observations o LEFT JOIN i.imageReferences ir LEFT JOIN o.associations a " +
                                 "WHERE ir.url IS NOT NULL AND a.toConcept = :concept ORDER BY i.uuid"
                 ),
                 @NamedQuery(
                         name = "ImagedMoment.findImageByVideoReferenceUUID",
                         query =
-                                "SELECT new org.mbari.annosaurus.repository.jpa.entity.ImageDTO(i.uuid, i.elapsedTime, i.videoReferenceUuid, i.recordedTimestamp, i.timecode, ir.description, ir.format, ir.height, ir.width, ir.url, ir.uuid) " +
+                                "SELECT new org.mbari.annosaurus.repository.jpa.entity.ImageDTO(i.uuid, i.videoReferenceUuid, i.elapsedTime,  i.recordedTimestamp, i.timecode, ir.description, ir.format, ir.height, ir.width, ir.url, ir.uuid) " +
                                         "FROM ImagedMoment i LEFT JOIN i.imageReferences ir " +
                                         "WHERE ir.url IS NOT NULL AND i.videoReferenceUuid = :uuid ORDER BY i.uuid"
                 ),
