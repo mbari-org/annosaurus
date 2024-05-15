@@ -25,7 +25,8 @@ import java.net.URI
 
 object ImagedMomentSQL {
 
-    val SELECT_UUID: String = "SELECT DISTINCT im.uuid "
+    /** recorded_timestamp is used for sorting, but not returned in the result set */
+    val SELECT_UUID: String = "SELECT DISTINCT im.uuid, im.recorded_timestamp "
 
     val SELECT_IMAGES: String =
         """SELECT DISTINCT
@@ -57,11 +58,11 @@ object ImagedMomentSQL {
       |  associations ass ON ass.observation_uuid = obs.uuid""".stripMargin
 
     val byConceptWithImages: String = SELECT_UUID + FROM +
-        " WHERE concept = ? AND ir.url IS NOT NULL ORDER BY im.uuid"
+        " WHERE concept = ? AND ir.url IS NOT NULL ORDER BY im.recorded_timestamp, im.uuid"
 
     val byToConceptWithImages: String = SELECT_UUID +
         FROM_WITH_IMAGES_AND_ASSOCIATIONS +
-        " WHERE ass.to_concept = ? AND ir.url IS NOT NULL ORDER BY im.uuid"
+        " WHERE ass.to_concept = ? AND ir.url IS NOT NULL ORDER BY im.recorded_timestamp, im.uuid"
 
     val byVideoReferenceUuid: String =
         SELECT_IMAGES + FROM + " WHERE im.video_reference_uuid = ? AND ir.url IS NOT NULL ORDER BY im.recorded_timestamp, image_reference_uuid"

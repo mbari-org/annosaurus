@@ -353,7 +353,8 @@ class JdbcRepository(entityManagerFactory: EntityManagerFactory) {
         val uuids                          = query
             .getResultList()
             .asScala
-            .flatMap(_.asUUID)
+            .map(_.asInstanceOf[Array[Object]])
+            .flatMap(row => row(0).asUUID)
             .toSeq
         entityManager.close()
         uuids
@@ -372,7 +373,8 @@ class JdbcRepository(entityManagerFactory: EntityManagerFactory) {
         val uuids                                 = query
             .getResultList()
             .asScala
-            .flatMap(_.asUUID)
+            .map(_.asInstanceOf[Array[Object]])
+            .flatMap(row => row(0).asUUID)
             .toSeq
         entityManager.close()
         uuids

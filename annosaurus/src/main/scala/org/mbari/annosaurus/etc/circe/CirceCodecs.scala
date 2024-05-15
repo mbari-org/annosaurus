@@ -99,12 +99,10 @@ object CirceCodecs {
     given qcrAnnotationsScEncoder: Encoder[QueryConstraintsResponseSC[Seq[AnnotationSC]]] =
         deriveEncoder
 
-    given qcrGeographicRangeScDecoder: Decoder[QueryConstraintsResponseSC[GeographicRangeSC]] =
-        deriveDecoder
+    given qcrGeographicRangeScDecoder: Decoder[QueryConstraintsResponseSC[GeographicRangeSC]] = deriveDecoder
     given qcrGeographicRangeScEncoder: Encoder[QueryConstraintsResponseSC[GeographicRangeSC]] =
         deriveEncoder
-    given qcrGeographicRangeDecoder: Decoder[QueryConstraintsResponse[GeographicRange]]       =
-        deriveDecoder
+    given qcrGeographicRangeDecoder: Decoder[QueryConstraintsResponse[GeographicRange]]       = deriveDecoder
     given qcrGeographicRangeEncoder: Encoder[QueryConstraintsResponse[GeographicRange]]       =
         deriveEncoder
 
@@ -264,7 +262,10 @@ object CirceCodecs {
     given deleteCountEncoder: Encoder[DeleteCount]     = deriveEncoder
 
     given geographicRangeScEncoder: Encoder[GeographicRangeSC] = deriveEncoder
+    given geographicRangeScDecoder: Decoder[GeographicRangeSC] = deriveDecoder
+
     given geographicRangeEncoder: Encoder[GeographicRange]     = deriveEncoder
+    given geographicRangeDecoder: Decoder[GeographicRange]     = deriveDecoder
 
     given healthStatusEncoder: Encoder[HealthStatus] = deriveEncoder
     given healthStatusDecoder: Decoder[HealthStatus] = deriveDecoder
