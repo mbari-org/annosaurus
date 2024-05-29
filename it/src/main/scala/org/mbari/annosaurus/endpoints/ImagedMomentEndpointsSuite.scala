@@ -352,7 +352,7 @@ trait ImagedMomentEndpointsSuite extends EndpointsSuite {
         val xs                 = TestUtils.create(2, 2, 2, 2)
         val videoReferenceUuid = xs.head.getVideoReferenceUuid
         runGet(
-            endpoints.findByVideoReferenceUuidImpl,
+            endpoints.findImagedMomentsByVideoReferenceUuidImpl,
             s"http://test.com/v1/imagedmoments/videoreference/${videoReferenceUuid}?limit=10&offset=0",
             response => {
                 assertEquals(response.code, StatusCode.Ok)

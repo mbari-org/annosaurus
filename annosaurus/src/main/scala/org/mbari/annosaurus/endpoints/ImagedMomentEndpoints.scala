@@ -365,17 +365,17 @@ class ImagedMomentEndpoints(controller: ImagedMomentController)(using
             }
 
     // GET /videoreference/:uuid
-    val findByVideoReferenceUuid: Endpoint[Unit, UUID, ErrorMsg, Seq[ImagedMomentSC], Any] =
+    val findImagdMomentsByVideoReferenceUuid: Endpoint[Unit, UUID, ErrorMsg, Seq[ImagedMomentSC], Any] =
         openEndpoint
             .get
             .in(base / "videoreference" / path[UUID]("videoReferenceUuid"))
             .out(jsonBody[Seq[ImagedMomentSC]])
-            .name("findByVideoReferenceUuid")
+            .name("findImagdMomentsByVideoReferenceUuid")
             .description("Find all imaged moments for a given video reference UUID")
             .tag(tag)
 
-    val findByVideoReferenceUuidImpl: ServerEndpoint[Any, Future] =
-        findByVideoReferenceUuid
+    val findImagedMomentsByVideoReferenceUuidImpl: ServerEndpoint[Any, Future] =
+        findImagdMomentsByVideoReferenceUuid
             .serverLogic { uuid =>
                 handleErrors(
                     controller.findByVideoReferenceUUID(uuid).map(_.map(_.toSnakeCase).toSeq)
@@ -617,7 +617,7 @@ class ImagedMomentEndpoints(controller: ImagedMomentController)(using
         updateRecordedTimestampForObservationUuid,
         countModifiedBeforeDate,
         deleteByVideoReferenceUUID,
-        findByVideoReferenceUuid,
+        findImagdMomentsByVideoReferenceUuid,
         findAllVideoReferenceUUIDs,
         findImagedMomentsByWindowRequest,
         findImagedMomentByUUID,
@@ -647,7 +647,7 @@ class ImagedMomentEndpoints(controller: ImagedMomentController)(using
         updateRecordedTimestampForObservationUuidImpl,
         countModifiedBeforeDateImpl,
         deleteByVideoReferenceUUIDImpl,
-        findByVideoReferenceUuidImpl,
+        findImagedMomentsByVideoReferenceUuidImpl,
         findAllVideoReferenceUUIDsImpl,
         findImagedMomentsByWindowRequestImpl,
         findImagedMomentByUUIDImpl,
