@@ -3,7 +3,7 @@ object Dependencies {
 
     lazy val auth0 = "com.auth0" % "java-jwt" % "4.4.0"
 
-    val circeVersion      = "0.14.7"
+    val circeVersion      = "0.14.8"
     lazy val circeCore    = "io.circe" %% "circe-core"    % circeVersion
     lazy val circeGeneric = "io.circe" %% "circe-generic" % circeVersion
     lazy val circeParser  = "io.circe" %% "circe-parser"  % circeVersion
@@ -60,7 +60,7 @@ object Dependencies {
     lazy val rxJava3     = "io.reactivex.rxjava3"    % "rxjava"     % "3.1.8"
     lazy val scalatest   = "org.scalatest"          %% "scalatest"  % "3.2.18"
 
-    val scalatraVersion        = "3.0.0"
+    val scalatraVersion        = "3.1.0"
     lazy val scalatra          = "org.scalatra" %% "scalatra-jakarta"           % scalatraVersion
     lazy val scalatraJson      = "org.scalatra" %% "scalatra-json-jakarta"      % scalatraVersion
     lazy val scalatraScalatest = "org.scalatra" %% "scalatra-scalatest-jakarta" % scalatraVersion
@@ -73,7 +73,7 @@ object Dependencies {
     lazy val slf4jLog4j = "org.slf4j" % "log4j-over-slf4j" % slf4jVersion
     lazy val slf4jSystem = "org.slf4j" % "slf4j-jdk-platform-logging" % slf4jVersion
 
-    private val tapirVersion = "1.10.8"
+    private val tapirVersion = "1.10.9"
     lazy val tapirCirce      = "com.softwaremill.sttp.tapir"   %% "tapir-json-circe"         % tapirVersion
     lazy val tapirHelidon    = "com.softwaremill.sttp.tapir"   %% "tapir-nima-server"        % tapirVersion
     lazy val tapirPrometheus = "com.softwaremill.sttp.tapir"   %% "tapir-prometheus-metrics" % tapirVersion
