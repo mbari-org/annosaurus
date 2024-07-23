@@ -3,12 +3,12 @@ object Dependencies {
 
     lazy val auth0 = "com.auth0" % "java-jwt" % "4.4.0"
 
-    val circeVersion      = "0.14.8"
+    val circeVersion      = "0.14.9"
     lazy val circeCore    = "io.circe" %% "circe-core"    % circeVersion
     lazy val circeGeneric = "io.circe" %% "circe-generic" % circeVersion
     lazy val circeParser  = "io.circe" %% "circe-parser"  % circeVersion
 
-    lazy val commonsCodec = "commons-codec" % "commons-codec" % "1.17.0"
+    lazy val commonsCodec = "commons-codec" % "commons-codec" % "1.17.1"
 
     val derbyVersion     = "10.17.1.0"
     lazy val derby       = "org.apache.derby" % "derby"       % derbyVersion //          % "test"
@@ -23,7 +23,7 @@ object Dependencies {
 
     lazy val fatboyGson       = "com.fatboyindustrial.gson-javatime-serialisers" % "gson-javatime-serialisers" % "1.1.2"
     lazy val gson             = "com.google.code.gson" % "gson"              % "2.10.1"
-    lazy val h2               = "com.h2database"       % "h2"                % "2.2.224"
+    lazy val h2               = "com.h2database"       % "h2"                % "2.3.230"
 
     val hibernateVersion     = "6.5.2.Final"  //"6.4.8.Final" //"6.5.1.Final" - envers is throwing: The column name REV is not valid. 
     lazy val hibernateCore   = "org.hibernate.orm" % "hibernate-core"     % hibernateVersion
@@ -53,12 +53,12 @@ object Dependencies {
     lazy val logbackClassic = "ch.qos.logback" % "logback-classic" % logbackVersion
     lazy val logbackCore    = "ch.qos.logback" % "logback-core"    % logbackVersion
 
-    lazy val mssqlserver = "com.microsoft.sqlserver" % "mssql-jdbc" % "12.6.2.jre11"
+    lazy val mssqlserver = "com.microsoft.sqlserver" % "mssql-jdbc" % "12.6.3.jre11"
     lazy val munit       = "org.scalameta"          %% "munit"      % "1.0.0"
     lazy val oracle      = "com.oracle.ojdbc"        % "ojdbc8"     % "19.3.0.0"
     lazy val postgresql  = "org.postgresql"          % "postgresql" % "42.7.3"
     lazy val rxJava3     = "io.reactivex.rxjava3"    % "rxjava"     % "3.1.8"
-    lazy val scalatest   = "org.scalatest"          %% "scalatest"  % "3.2.18"
+    lazy val scalatest   = "org.scalatest"          %% "scalatest"  % "3.2.19"
 
     val scalatraVersion        = "3.1.0"
     lazy val scalatra          = "org.scalatra" %% "scalatra-jakarta"           % scalatraVersion
@@ -73,7 +73,7 @@ object Dependencies {
     lazy val slf4jLog4j = "org.slf4j" % "log4j-over-slf4j" % slf4jVersion
     lazy val slf4jSystem = "org.slf4j" % "slf4j-jdk-platform-logging" % slf4jVersion
 
-    private val tapirVersion = "1.10.9"
+    private val tapirVersion = "1.10.14"
     lazy val tapirCirce      = "com.softwaremill.sttp.tapir"   %% "tapir-json-circe"         % tapirVersion
     lazy val tapirHelidon    = "com.softwaremill.sttp.tapir"   %% "tapir-nima-server"        % tapirVersion
     lazy val tapirPrometheus = "com.softwaremill.sttp.tapir"   %% "tapir-prometheus-metrics" % tapirVersion
@@ -93,7 +93,7 @@ object Dependencies {
     // lazy val testcontainersSqlserver =
     //   "com.dimafeng" %% "testcontainers-scala-mssqlserver" % testcontainersScalaVersion
 
-    val testcontainersVersion        = "1.19.8"
+    val testcontainersVersion        = "1.20.0"
     lazy val testcontainersCore      = "org.testcontainers" % "testcontainers" % testcontainersVersion
     lazy val testcontainersSqlserver = "org.testcontainers" % "mssqlserver"    % testcontainersVersion
     lazy val testcontainersOracle    = "org.testcontainers" % "oracle-xe"      % testcontainersVersion

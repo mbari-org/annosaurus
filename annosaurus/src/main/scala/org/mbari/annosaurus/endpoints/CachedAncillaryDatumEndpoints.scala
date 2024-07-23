@@ -161,7 +161,7 @@ class CachedAncillaryDatumEndpoints(controller: CachedAncillaryDatumController)(
         )
         .out(jsonBody[Seq[CachedAncillaryDatumSC]])
         .name("mergeManyData")
-        .description("Merge one ancillary data")
+        .description("Merge ancillary data")
         .tag(tag)
 
     val mergeManyDataImpl: ServerEndpoint[Any, Future] =
