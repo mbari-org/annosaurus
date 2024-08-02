@@ -53,7 +53,7 @@ object Dependencies {
     lazy val logbackClassic = "ch.qos.logback" % "logback-classic" % logbackVersion
     lazy val logbackCore    = "ch.qos.logback" % "logback-core"    % logbackVersion
 
-    lazy val mssqlserver = "com.microsoft.sqlserver" % "mssql-jdbc" % "12.6.3.jre11"
+    lazy val mssqlserver = "com.microsoft.sqlserver" % "mssql-jdbc" % "12.8.0.jre11"
     lazy val munit       = "org.scalameta"          %% "munit"      % "1.0.0"
     lazy val oracle      = "com.oracle.ojdbc"        % "ojdbc8"     % "19.3.0.0"
     lazy val postgresql  = "org.postgresql"          % "postgresql" % "42.7.3"
@@ -73,7 +73,7 @@ object Dependencies {
     lazy val slf4jLog4j = "org.slf4j" % "log4j-over-slf4j" % slf4jVersion
     lazy val slf4jSystem = "org.slf4j" % "slf4j-jdk-platform-logging" % slf4jVersion
 
-    private val tapirVersion = "1.10.14"
+    private val tapirVersion = "1.11.0"
     lazy val tapirCirce      = "com.softwaremill.sttp.tapir"   %% "tapir-json-circe"         % tapirVersion
     lazy val tapirHelidon    = "com.softwaremill.sttp.tapir"   %% "tapir-nima-server"        % tapirVersion
     lazy val tapirPrometheus = "com.softwaremill.sttp.tapir"   %% "tapir-prometheus-metrics" % tapirVersion
@@ -93,7 +93,7 @@ object Dependencies {
     // lazy val testcontainersSqlserver =
     //   "com.dimafeng" %% "testcontainers-scala-mssqlserver" % testcontainersScalaVersion
 
-    val testcontainersVersion        = "1.20.0"
+    val testcontainersVersion        = "1.20.1"
     lazy val testcontainersCore      = "org.testcontainers" % "testcontainers" % testcontainersVersion
     lazy val testcontainersSqlserver = "org.testcontainers" % "mssqlserver"    % testcontainersVersion
     lazy val testcontainersOracle    = "org.testcontainers" % "oracle-xe"      % testcontainersVersion
