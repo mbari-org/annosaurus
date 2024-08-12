@@ -25,7 +25,7 @@ object Dependencies {
     lazy val gson             = "com.google.code.gson" % "gson"              % "2.10.1"
     lazy val h2               = "com.h2database"       % "h2"                % "2.3.230"
 
-    val hibernateVersion     = "6.5.2.Final"  //"6.4.8.Final" //"6.5.1.Final" - envers is throwing: The column name REV is not valid. 
+    val hibernateVersion     = "6.6.0.Final"  //"6.4.8.Final" //"6.5.1.Final" - envers is throwing: The column name REV is not valid. 
     lazy val hibernateCore   = "org.hibernate.orm" % "hibernate-core"     % hibernateVersion
     lazy val hibernateEnvers = "org.hibernate.orm" % "hibernate-envers"   % hibernateVersion
     lazy val hibernateHikari = "org.hibernate.orm" % "hibernate-hikaricp" % hibernateVersion
@@ -67,13 +67,13 @@ object Dependencies {
 
     lazy val scilube = "org.mbari.scilube" %% "scilube" % "3.0.1"
 
-    val slf4jVersion    = "2.0.13"
+    val slf4jVersion    = "2.0.16"
     lazy val slf4j      = "org.slf4j" % "slf4j-api"        % slf4jVersion
     lazy val slf4jJul   = "org.slf4j" % "jul-to-slf4j"     % slf4jVersion
     lazy val slf4jLog4j = "org.slf4j" % "log4j-over-slf4j" % slf4jVersion
     lazy val slf4jSystem = "org.slf4j" % "slf4j-jdk-platform-logging" % slf4jVersion
 
-    private val tapirVersion = "1.11.0"
+    private val tapirVersion = "1.11.1"
     lazy val tapirCirce      = "com.softwaremill.sttp.tapir"   %% "tapir-json-circe"         % tapirVersion
     lazy val tapirHelidon    = "com.softwaremill.sttp.tapir"   %% "tapir-nima-server"        % tapirVersion
     lazy val tapirPrometheus = "com.softwaremill.sttp.tapir"   %% "tapir-prometheus-metrics" % tapirVersion
@@ -81,7 +81,7 @@ object Dependencies {
     lazy val tapirSwagger    = "com.softwaremill.sttp.tapir"   %% "tapir-swagger-ui-bundle"  % tapirVersion
     lazy val tapirVertex     = "com.softwaremill.sttp.tapir"   %% "tapir-vertx-server"       % tapirVersion
 
-    lazy val tapirSttpCirce  = "com.softwaremill.sttp.client3" %% "circe"                    % "3.9.7"
+    lazy val tapirSttpCirce  = "com.softwaremill.sttp.client3" %% "circe"                    % "3.9.8"
 
     // val testcontainersScalaVersion = "0.41.0"
     // lazy val testcontainersPostgresql =
