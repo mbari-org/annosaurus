@@ -25,8 +25,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          sbt 'Docker / stage'
-          cd oni/target/docker/stage
+          sbt stage
           docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_TOKEN }}
           docker buildx create --name dockerbuilder --platform linux/amd64,linux/arm64 --use
-          docker buildx build --platform linux/amd64,linux/arm64 -t mbari/oni:${{ github.ref_name }} -t mbari/oni:latest --push .
+          docker buildx build --platform linux/amd64,linux/arm64 -t mbari/annosaurus:${{ github.ref_name }} -t mbari/annosaurus:latest --push .
