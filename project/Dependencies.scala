@@ -54,10 +54,10 @@ object Dependencies {
     lazy val logbackCore    = "ch.qos.logback" % "logback-core"    % logbackVersion
 
     lazy val mssqlserver = "com.microsoft.sqlserver" % "mssql-jdbc" % "12.8.0.jre11"
-    lazy val munit       = "org.scalameta"          %% "munit"      % "1.0.0"
+    lazy val munit       = "org.scalameta"          %% "munit"      % "1.0.1"
     lazy val oracle      = "com.oracle.ojdbc"        % "ojdbc8"     % "19.3.0.0"
     lazy val postgresql  = "org.postgresql"          % "postgresql" % "42.7.3"
-    lazy val rxJava3     = "io.reactivex.rxjava3"    % "rxjava"     % "3.1.8"
+    lazy val rxJava3     = "io.reactivex.rxjava3"    % "rxjava"     % "3.1.9"
     lazy val scalatest   = "org.scalatest"          %% "scalatest"  % "3.2.19"
 
     val scalatraVersion        = "3.1.0"
