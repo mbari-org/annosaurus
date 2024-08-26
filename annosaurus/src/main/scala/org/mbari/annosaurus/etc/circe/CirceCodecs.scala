@@ -99,10 +99,12 @@ object CirceCodecs {
     given qcrAnnotationsScEncoder: Encoder[QueryConstraintsResponseSC[Seq[AnnotationSC]]] =
         deriveEncoder
 
-    given qcrGeographicRangeScDecoder: Decoder[QueryConstraintsResponseSC[GeographicRangeSC]] = deriveDecoder
+    given qcrGeographicRangeScDecoder: Decoder[QueryConstraintsResponseSC[GeographicRangeSC]] =
+        deriveDecoder
     given qcrGeographicRangeScEncoder: Encoder[QueryConstraintsResponseSC[GeographicRangeSC]] =
         deriveEncoder
-    given qcrGeographicRangeDecoder: Decoder[QueryConstraintsResponse[GeographicRange]]       = deriveDecoder
+    given qcrGeographicRangeDecoder: Decoder[QueryConstraintsResponse[GeographicRange]]       =
+        deriveDecoder
     given qcrGeographicRangeEncoder: Encoder[QueryConstraintsResponse[GeographicRange]]       =
         deriveEncoder
 
@@ -239,6 +241,13 @@ object CirceCodecs {
     given concurrentRequestCountScDecoder: Decoder[ConcurrentRequestCountSC] = deriveDecoder
     given concurrentRequestCountScEncoder: Encoder[ConcurrentRequestCountSC] = deriveEncoder
 
+    given moveImagedMomentsScDecoder: Decoder[MoveImagedMomentsSC]     = deriveDecoder
+    given moveImagedMomentsScEncoder: Encoder[MoveImagedMomentsSC]     = deriveEncoder
+    private val moveImagedMomentsCcDecoder: Decoder[MoveImagedMoments] = deriveDecoder
+    given moveImagedMomentsEncoder: Encoder[MoveImagedMoments]         = deriveEncoder
+    given moveImagedMomentsDecoder: Decoder[MoveImagedMoments]         =
+        moveImagedMomentsCcDecoder or moveImagedMomentsScDecoder.map(_.toCamelCase)
+
     given multiRequestScDecoder: Decoder[MultiRequestSC]     = deriveDecoder
     given multiRequestScEncoder: Encoder[MultiRequestSC]     = deriveEncoder
     private val multiRequestCcDecoder: Decoder[MultiRequest] = deriveDecoder
@@ -264,8 +273,8 @@ object CirceCodecs {
     given geographicRangeScEncoder: Encoder[GeographicRangeSC] = deriveEncoder
     given geographicRangeScDecoder: Decoder[GeographicRangeSC] = deriveDecoder
 
-    given geographicRangeEncoder: Encoder[GeographicRange]     = deriveEncoder
-    given geographicRangeDecoder: Decoder[GeographicRange]     = deriveDecoder
+    given geographicRangeEncoder: Encoder[GeographicRange] = deriveEncoder
+    given geographicRangeDecoder: Decoder[GeographicRange] = deriveDecoder
 
     given healthStatusEncoder: Encoder[HealthStatus] = deriveEncoder
     given healthStatusDecoder: Decoder[HealthStatus] = deriveDecoder
@@ -314,11 +323,12 @@ object CirceCodecs {
     given associationUpdateScEncoder: Encoder[AssociationUpdateSC] = deriveEncoder
     given associationUpdateScDecoder: Decoder[AssociationUpdateSC] = deriveDecoder
 
-    given observationsUpdateScEncoder: Encoder[ObservationsUpdateSC] = deriveEncoder
-    given observationsUpdateScDecoder: Decoder[ObservationsUpdateSC] = deriveDecoder
-    given observationsUpdateEncoder: Encoder[ObservationsUpdate] = deriveEncoder
+    given observationsUpdateScEncoder: Encoder[ObservationsUpdateSC]     = deriveEncoder
+    given observationsUpdateScDecoder: Decoder[ObservationsUpdateSC]     = deriveDecoder
+    given observationsUpdateEncoder: Encoder[ObservationsUpdate]         = deriveEncoder
     private val observationsUpdateCcDecoder: Decoder[ObservationsUpdate] = deriveDecoder
-    given observationsUpdateDecoder: Decoder[ObservationsUpdate] = observationsUpdateCcDecoder or observationsUpdateScDecoder.map(_.toCamelCase)
+    given observationsUpdateDecoder: Decoder[ObservationsUpdate]         =
+        observationsUpdateCcDecoder or observationsUpdateScDecoder.map(_.toCamelCase)
 
     val CustomPrinter: Printer = Printer(
         dropNullValues = true,

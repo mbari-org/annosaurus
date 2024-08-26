@@ -21,229 +21,218 @@ import java.sql.Timestamp;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.*;
-
-import org.hibernate.annotations.Type;
 import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.annotations.Type;
 import org.hibernate.type.SqlTypes;
 import org.mbari.annosaurus.repository.jpa.*;
 import org.mbari.vcr4j.time.Timecode;
 
-
 @Entity(name = "ImagedMoment")
 @Table(
-        name = "imaged_moments",
-        indexes = {
-                @Index(
-                        name = "idx_imaged_moments__video_reference_uuid",
-                        columnList = "video_reference_uuid"
-                ),
-                @Index(
-                        name = "idx_imaged_moments__recorded_timestamp",
-                        columnList = "recorded_timestamp"
-                ),
-                @Index(
-                        name = "idx_imaged_moments__elapsed_time",
-                        columnList = "elapsed_time_millis"
-                ),
-                @Index(name = "idx_imaged_moments__timecode", columnList = "timecode")
-        }
+    name = "imaged_moments",
+    indexes = {
+        @Index(
+            name = "idx_imaged_moments__video_reference_uuid",
+            columnList = "video_reference_uuid"
+        ),
+        @Index(
+            name = "idx_imaged_moments__recorded_timestamp",
+            columnList = "recorded_timestamp"
+        ),
+        @Index(
+            name = "idx_imaged_moments__elapsed_time",
+            columnList = "elapsed_time_millis"
+        ),
+        @Index(name = "idx_imaged_moments__timecode", columnList = "timecode"),
+    }
 )
-@EntityListeners({TransactionLogger.class})
+@EntityListeners({ TransactionLogger.class })
 @NamedNativeQueries(
-        {
-                @NamedNativeQuery(
-                        name = "ImagedMoment.findAllVideoReferenceUUIDs",
-                        query =
-                                "SELECT DISTINCT video_reference_uuid FROM imaged_moments ORDER BY video_reference_uuid ASC"
-                ),
-                @NamedNativeQuery(
-                        name = "ImagedMoment.findVideoReferenceUUIDsModifiedBetweenDates",
-                        query = "SELECT DISTINCT video_reference_uuid FROM imaged_moments im LEFT JOIN " +
-                                "observations obs ON obs.imaged_moment_uuid = im.uuid WHERE " +
-                                "im.last_updated_timestamp BETWEEN ?1 AND ?2 OR " +
-                                "obs.last_updated_timestamp BETWEEN ?1 AND ?2 " +
-                                "ORDER BY video_reference_uuid ASC"
-                ),
-                @NamedNativeQuery(
-                        name = "ImagedMoment.countByConcept",
-                        query = "SELECT COUNT(*) FROM imaged_moments im LEFT JOIN " +
-                                "observations obs ON obs.imaged_moment_uuid = im.uuid WHERE " +
-                                "obs.concept = ?1"
-                ),
-                @NamedNativeQuery(
-                        name = "ImagedMoment.countByConceptWithImages",
-                        query = "SELECT COUNT(DISTINCT im.uuid) FROM imaged_moments im LEFT JOIN " +
-                                "observations obs ON obs.imaged_moment_uuid = im.uuid RIGHT JOIN " +
-                                "image_references ir ON ir.imaged_moment_uuid = im.uuid " +
-                                "WHERE obs.concept = ?1 AND ir.url IS NOT NULL"
-                ),
-                @NamedNativeQuery(
-                        name = "ImagedMoment.countBetweenUpdatedDates",
-                        query = "SELECT COUNT(*) FROM imaged_moments im LEFT JOIN " +
-                                "observations obs ON obs.imaged_moment_uuid = im.uuid WHERE " +
-                                "im.last_updated_timestamp BETWEEN ?1 AND ?2 OR " +
-                                "obs.last_updated_timestamp BETWEEN ?1 AND ?2"
-                ),
-                @NamedNativeQuery(
-                        name = "ImagedMoment.updateRecordedTimestampByObservationUuid",
-                        query = "UPDATE imaged_moments SET recorded_timestamp = ?1 WHERE " +
-                                "uuid IN (SELECT obs.imaged_moment_uuid FROM observations obs WHERE obs.uuid = ?2)"
-                ),
-                @NamedNativeQuery(
-                        name = "ImagedMoment.countAllByVideoReferenceUUIDs",
-                        query =
-                                "SELECT video_reference_uuid, COUNT(uuid) as n FROM imaged_moments GROUP BY video_reference_uuid ORDER BY n"
-                ),
-                @NamedNativeQuery(
-                        name = "ImagedMoment.countModifiedBeforeDate",
-                        query =
-                                "SELECT COUNT(*) FROM imaged_moments WHERE video_reference_uuid = ?1 AND last_updated_timestamp < ?2"
-                ),
-                @NamedNativeQuery(
-                        name = "ImagedMoment.countByVideoReferenceUUID",
-                        query = "SELECT COUNT(*) FROM imaged_moments WHERE video_reference_uuid = ?1"
-                ),
-                @NamedNativeQuery(
-                        name = "ImagedMoment.countByVideoReferenceUUIDWithImages",
-                        query = "SELECT COUNT(DISTINCT i.uuid) FROM imaged_moments i " +
-                                "INNER JOIN image_references ir ON ir.imaged_moment_uuid = i.uuid " +
-                                "WHERE ir.url IS NOT NULL AND video_reference_uuid = ?1"
-                ),
-                @NamedNativeQuery(
-                        name = "ImagedMoment.countAll",
-                        query = "SELECT COUNT(*) FROM imaged_moments"
-                ),
-                @NamedNativeQuery(
-                        name = "ImagedMoment.countWithImages",
-                        query = "SELECT COUNT(DISTINCT i.uuid) FROM imaged_moments i " +
-                                "INNER JOIN image_references ir ON ir.imaged_moment_uuid = i.uuid " +
-                                "WHERE ir.url IS NOT NULL"
-                ),
-                @NamedNativeQuery(
-                        name = "ImagedMoment.countByLinkName",
-                        query = "SELECT COUNT(DISTINCT i.uuid) FROM imaged_moments i " +
-                                "INNER JOIN observations o ON o.imaged_moment_uuid = i.uuid " +
-                                "INNER JOIN associations a ON a.observation_uuid = o.uuid " +
-                                "WHERE a.link_name = ?1"
-                )
-        }
+    {
+        @NamedNativeQuery(
+            name = "ImagedMoment.findAllVideoReferenceUUIDs",
+            query = "SELECT DISTINCT video_reference_uuid FROM imaged_moments ORDER BY video_reference_uuid ASC"
+        ),
+        @NamedNativeQuery(
+            name = "ImagedMoment.findVideoReferenceUUIDsModifiedBetweenDates",
+            query = "SELECT DISTINCT video_reference_uuid FROM imaged_moments im LEFT JOIN " +
+            "observations obs ON obs.imaged_moment_uuid = im.uuid WHERE " +
+            "im.last_updated_timestamp BETWEEN ?1 AND ?2 OR " +
+            "obs.last_updated_timestamp BETWEEN ?1 AND ?2 " +
+            "ORDER BY video_reference_uuid ASC"
+        ),
+        @NamedNativeQuery(
+            name = "ImagedMoment.countByConcept",
+            query = "SELECT COUNT(*) FROM imaged_moments im LEFT JOIN " +
+            "observations obs ON obs.imaged_moment_uuid = im.uuid WHERE " +
+            "obs.concept = ?1"
+        ),
+        @NamedNativeQuery(
+            name = "ImagedMoment.countByConceptWithImages",
+            query = "SELECT COUNT(DISTINCT im.uuid) FROM imaged_moments im LEFT JOIN " +
+            "observations obs ON obs.imaged_moment_uuid = im.uuid RIGHT JOIN " +
+            "image_references ir ON ir.imaged_moment_uuid = im.uuid " +
+            "WHERE obs.concept = ?1 AND ir.url IS NOT NULL"
+        ),
+        @NamedNativeQuery(
+            name = "ImagedMoment.countBetweenUpdatedDates",
+            query = "SELECT COUNT(*) FROM imaged_moments im LEFT JOIN " +
+            "observations obs ON obs.imaged_moment_uuid = im.uuid WHERE " +
+            "im.last_updated_timestamp BETWEEN ?1 AND ?2 OR " +
+            "obs.last_updated_timestamp BETWEEN ?1 AND ?2"
+        ),
+        @NamedNativeQuery(
+            name = "ImagedMoment.updateRecordedTimestampByObservationUuid",
+            query = "UPDATE imaged_moments SET recorded_timestamp = ?1 WHERE " +
+            "uuid IN (SELECT obs.imaged_moment_uuid FROM observations obs WHERE obs.uuid = ?2)"
+        ),
+        @NamedNativeQuery(
+            name = "ImagedMoment.countAllByVideoReferenceUUIDs",
+            query = "SELECT video_reference_uuid, COUNT(uuid) as n FROM imaged_moments GROUP BY video_reference_uuid ORDER BY n"
+        ),
+        @NamedNativeQuery(
+            name = "ImagedMoment.countModifiedBeforeDate",
+            query = "SELECT COUNT(*) FROM imaged_moments WHERE video_reference_uuid = ?1 AND last_updated_timestamp < ?2"
+        ),
+        @NamedNativeQuery(
+            name = "ImagedMoment.countByVideoReferenceUUID",
+            query = "SELECT COUNT(*) FROM imaged_moments WHERE video_reference_uuid = ?1"
+        ),
+        @NamedNativeQuery(
+            name = "ImagedMoment.countByVideoReferenceUUIDWithImages",
+            query = "SELECT COUNT(DISTINCT i.uuid) FROM imaged_moments i " +
+            "INNER JOIN image_references ir ON ir.imaged_moment_uuid = i.uuid " +
+            "WHERE ir.url IS NOT NULL AND video_reference_uuid = ?1"
+        ),
+        @NamedNativeQuery(
+            name = "ImagedMoment.countAll",
+            query = "SELECT COUNT(*) FROM imaged_moments"
+        ),
+        @NamedNativeQuery(
+            name = "ImagedMoment.countWithImages",
+            query = "SELECT COUNT(DISTINCT i.uuid) FROM imaged_moments i " +
+            "INNER JOIN image_references ir ON ir.imaged_moment_uuid = i.uuid " +
+            "WHERE ir.url IS NOT NULL"
+        ),
+        @NamedNativeQuery(
+            name = "ImagedMoment.countByLinkName",
+            query = "SELECT COUNT(DISTINCT i.uuid) FROM imaged_moments i " +
+            "INNER JOIN observations o ON o.imaged_moment_uuid = i.uuid " +
+            "INNER JOIN associations a ON a.observation_uuid = o.uuid " +
+            "WHERE a.link_name = ?1"
+        ),
+        @NamedNativeQuery(
+            name = "ImagedMoment.moveToVideoReference",
+            query = "UPDATE imaged_moments SET video_reference_uuid = ?1 WHERE uuid IN ?2"
+        ),
+    }
 )
 @NamedQueries(
-        {
-                @NamedQuery(
-                        name = "ImagedMoment.findAll",
-                        query = "SELECT i FROM ImagedMoment i ORDER BY i.uuid"
-                ),
-                @NamedQuery(
-                        name = "ImagedMoment.findWithImages",
-                        query = "SELECT i FROM ImagedMoment i " +
-                                "LEFT JOIN i.imageReferences ir " +
-                                "WHERE ir.url IS NOT NULL"
-                ),
-                @NamedQuery(
-                        name = "ImagedMoment.findByLinkName",
-                        query = "SELECT i FROM ImagedMoment i " +
-                                "INNER JOIN i.observations o " +
-                                "INNER JOIN o.associations a " +
-                                "WHERE a.linkName = :linkName"
-                ),
-                @NamedQuery(
-                        name = "ImagedMoment.findByConcept",
-                        query = "SELECT i FROM ImagedMoment i LEFT JOIN i.observations o WHERE " +
-                                "o.concept = :concept ORDER BY i.uuid"
-                ),
-                @NamedQuery(
-                        name = "ImagedMoment.findByConceptWithImages",
-                        query = "SELECT i FROM ImagedMoment i LEFT JOIN i.observations o " +
-                                "LEFT JOIN i.imageReferences ir " +
-                                "WHERE ir.url IS NOT NULL AND o.concept = :concept ORDER BY i.uuid"
-                ),
-                @NamedQuery(
-                        name = "ImagedMoment.findBetweenUpdatedDates",
-                        query = "SELECT i FROM ImagedMoment i LEFT JOIN i.observations o WHERE " +
-                                "i.lastUpdatedTime BETWEEN :start AND :end OR " +
-                                "o.lastUpdatedTime BETWEEN :start AND :end ORDER BY i.uuid"
-                ),
-                @NamedQuery(
-                        name = "ImagedMoment.findByVideoReferenceUUID",
-                        query =
-                                "SELECT i FROM ImagedMoment i WHERE i.videoReferenceUuid = :uuid ORDER BY i.uuid"
-                ),
-                @NamedQuery(
-                        name = "ImagedMoment.findByVideoReferenceUUIDAndTimestamps",
-                        query = "SELECT i FROM ImagedMoment i WHERE i.videoReferenceUuid = :uuid AND " +
-                                "i.recordedTimestamp BETWEEN :start AND :end ORDER BY i.recordedTimestamp"
-                ),
-                @NamedQuery(
-                        name = "ImagedMoment.findWithImageReferences",
-                        query =
-                                "SELECT i FROM ImagedMoment i RIGHT JOIN i.imageReferences r WHERE i.videoReferenceUuid = :uuid ORDER BY i.uuid"
-                ),
-                @NamedQuery(
-                        name = "ImagedMoment.findByObservationUUID",
-                        query =
-                                "SELECT i FROM ImagedMoment i LEFT JOIN i.observations o WHERE o.uuid = :uuid ORDER BY i.uuid"
-                ),
-                @NamedQuery(
-                        name = "ImagedMoment.findByUUID",
-                        query = "SELECT i FROM ImagedMoment i WHERE i.uuid = :uuid ORDER BY i.uuid"
-                ),
-                @NamedQuery(
-                        name = "ImagedMoment.findByVideoReferenceUUIDAndTimecode",
-                        query =
-                                "SELECT i FROM ImagedMoment i WHERE i.timecode = :timecode AND i.videoReferenceUuid = :uuid ORDER BY i.uuid"
-                ),
-                @NamedQuery(
-                        name = "ImagedMoment.findByVideoReferenceUUIDAndElapsedTime",
-                        query =
-                                "SELECT i FROM ImagedMoment i WHERE i.elapsedTime = :elapsedTime AND i.videoReferenceUuid = :uuid ORDER BY i.uuid"
-                ),
-                @NamedQuery(
-                        name = "ImagedMoment.findByVideoReferenceUUIDAndRecordedDate",
-                        query =
-                                "SELECT i FROM ImagedMoment i WHERE i.recordedTimestamp = :recordedDate AND i.videoReferenceUuid = :uuid ORDER BY i.uuid"
-                ),
-                @NamedQuery(
-                        name = "ImagedMoment.deleteByVideoReferenceUUID",
-                        query = "DELETE FROM ImagedMoment i WHERE i.videoReferenceUuid = :uuid"
-                ),
-                @NamedQuery(
-                        name = "ImagedMoment.findByWindowRequest",
-                        query =
-                                "SELECT i from ImagedMoment i WHERE i.videoReferenceUuid IN :uuids AND i.recordedTimestamp BETWEEN :start AND :end"
-                ),
-                @NamedQuery(
-                        name = "ImagedMoment.findByImageReferenceUUID",
-                        query =
-                                "SELECT i FROM ImagedMoment i LEFT JOIN i.imageReferences r WHERE r.uuid = :uuid ORDER BY i.uuid"
-                ),
-                @NamedQuery(
-                        name = "ImagedMoment.findImageByConceptWithImages",
-                        query = "SELECT new org.mbari.annosaurus.repository.jpa.entity.ImageDTO(i.uuid, i.videoReferenceUuid, i.elapsedTime, i.recordedTimestamp, i.timecode, ir.description, ir.format, ir.height, ir.width, ir.url, ir.uuid) " +
-                                "FROM ImagedMoment i LEFT JOIN i.observations o LEFT JOIN i.imageReferences ir " +
-                                "WHERE ir.url IS NOT NULL AND o.concept = :concept ORDER BY i.uuid"
-                ),
-                @NamedQuery(
-                        name = "ImagedMoment.findImageByToConceptWithImages",
-                        query = "SELECT new org.mbari.annosaurus.repository.jpa.entity.ImageDTO(i.uuid, i.videoReferenceUuid, i.elapsedTime, i.recordedTimestamp, i.timecode, ir.description, ir.format, ir.height, ir.width, ir.url, ir.uuid) " +
-                                "FROM ImagedMoment i LEFT JOIN i.observations o LEFT JOIN i.imageReferences ir LEFT JOIN o.associations a " +
-                                "WHERE ir.url IS NOT NULL AND a.toConcept = :concept ORDER BY i.uuid"
-                ),
-                @NamedQuery(
-                        name = "ImagedMoment.findImageByVideoReferenceUUID",
-                        query =
-                                "SELECT new org.mbari.annosaurus.repository.jpa.entity.ImageDTO(i.uuid, i.videoReferenceUuid, i.elapsedTime,  i.recordedTimestamp, i.timecode, ir.description, ir.format, ir.height, ir.width, ir.url, ir.uuid) " +
-                                        "FROM ImagedMoment i LEFT JOIN i.imageReferences ir " +
-                                        "WHERE ir.url IS NOT NULL AND i.videoReferenceUuid = :uuid ORDER BY i.uuid"
-                ),
-                @NamedQuery(
-                        name = "Annotation.findByVideoReferenceUuid",
-                        query = "SELECT new org.mbari.annosaurus.repository.jpa.entity.AnnotationDTO(o.uuid, o.concept, o.observer, o.observationTimestamp, i.videoReferenceUuid, i.uuid, i.timecode, i.elapsedTime, i.recordedTimestamp, o.duration, o.group, o.activity) " +
-                                "FROM ImagedMoment i LEFT JOIN i.observations o " +
-                                "WHERE i.videoReferenceUuid = :uuid ORDER BY i.uuid"
-                )
-                
-        }
+    {
+        @NamedQuery(
+            name = "ImagedMoment.findAll",
+            query = "SELECT i FROM ImagedMoment i ORDER BY i.uuid"
+        ),
+        @NamedQuery(
+            name = "ImagedMoment.findWithImages",
+            query = "SELECT i FROM ImagedMoment i " +
+            "LEFT JOIN i.imageReferences ir " +
+            "WHERE ir.url IS NOT NULL"
+        ),
+        @NamedQuery(
+            name = "ImagedMoment.findByLinkName",
+            query = "SELECT i FROM ImagedMoment i " +
+            "INNER JOIN i.observations o " +
+            "INNER JOIN o.associations a " +
+            "WHERE a.linkName = :linkName"
+        ),
+        @NamedQuery(
+            name = "ImagedMoment.findByConcept",
+            query = "SELECT i FROM ImagedMoment i LEFT JOIN i.observations o WHERE " +
+            "o.concept = :concept ORDER BY i.uuid"
+        ),
+        @NamedQuery(
+            name = "ImagedMoment.findByConceptWithImages",
+            query = "SELECT i FROM ImagedMoment i LEFT JOIN i.observations o " +
+            "LEFT JOIN i.imageReferences ir " +
+            "WHERE ir.url IS NOT NULL AND o.concept = :concept ORDER BY i.uuid"
+        ),
+        @NamedQuery(
+            name = "ImagedMoment.findBetweenUpdatedDates",
+            query = "SELECT i FROM ImagedMoment i LEFT JOIN i.observations o WHERE " +
+            "i.lastUpdatedTime BETWEEN :start AND :end OR " +
+            "o.lastUpdatedTime BETWEEN :start AND :end ORDER BY i.uuid"
+        ),
+        @NamedQuery(
+            name = "ImagedMoment.findByVideoReferenceUUID",
+            query = "SELECT i FROM ImagedMoment i WHERE i.videoReferenceUuid = :uuid ORDER BY i.uuid"
+        ),
+        @NamedQuery(
+            name = "ImagedMoment.findByVideoReferenceUUIDAndTimestamps",
+            query = "SELECT i FROM ImagedMoment i WHERE i.videoReferenceUuid = :uuid AND " +
+            "i.recordedTimestamp BETWEEN :start AND :end ORDER BY i.recordedTimestamp"
+        ),
+        @NamedQuery(
+            name = "ImagedMoment.findWithImageReferences",
+            query = "SELECT i FROM ImagedMoment i RIGHT JOIN i.imageReferences r WHERE i.videoReferenceUuid = :uuid ORDER BY i.uuid"
+        ),
+        @NamedQuery(
+            name = "ImagedMoment.findByObservationUUID",
+            query = "SELECT i FROM ImagedMoment i LEFT JOIN i.observations o WHERE o.uuid = :uuid ORDER BY i.uuid"
+        ),
+        @NamedQuery(
+            name = "ImagedMoment.findByUUID",
+            query = "SELECT i FROM ImagedMoment i WHERE i.uuid = :uuid ORDER BY i.uuid"
+        ),
+        @NamedQuery(
+            name = "ImagedMoment.findByVideoReferenceUUIDAndTimecode",
+            query = "SELECT i FROM ImagedMoment i WHERE i.timecode = :timecode AND i.videoReferenceUuid = :uuid ORDER BY i.uuid"
+        ),
+        @NamedQuery(
+            name = "ImagedMoment.findByVideoReferenceUUIDAndElapsedTime",
+            query = "SELECT i FROM ImagedMoment i WHERE i.elapsedTime = :elapsedTime AND i.videoReferenceUuid = :uuid ORDER BY i.uuid"
+        ),
+        @NamedQuery(
+            name = "ImagedMoment.findByVideoReferenceUUIDAndRecordedDate",
+            query = "SELECT i FROM ImagedMoment i WHERE i.recordedTimestamp = :recordedDate AND i.videoReferenceUuid = :uuid ORDER BY i.uuid"
+        ),
+        @NamedQuery(
+            name = "ImagedMoment.deleteByVideoReferenceUUID",
+            query = "DELETE FROM ImagedMoment i WHERE i.videoReferenceUuid = :uuid"
+        ),
+        @NamedQuery(
+            name = "ImagedMoment.findByWindowRequest",
+            query = "SELECT i from ImagedMoment i WHERE i.videoReferenceUuid IN :uuids AND i.recordedTimestamp BETWEEN :start AND :end"
+        ),
+        @NamedQuery(
+            name = "ImagedMoment.findByImageReferenceUUID",
+            query = "SELECT i FROM ImagedMoment i LEFT JOIN i.imageReferences r WHERE r.uuid = :uuid ORDER BY i.uuid"
+        ),
+        @NamedQuery(
+            name = "ImagedMoment.findImageByConceptWithImages",
+            query = "SELECT new org.mbari.annosaurus.repository.jpa.entity.ImageDTO(i.uuid, i.videoReferenceUuid, i.elapsedTime, i.recordedTimestamp, i.timecode, ir.description, ir.format, ir.height, ir.width, ir.url, ir.uuid) " +
+            "FROM ImagedMoment i LEFT JOIN i.observations o LEFT JOIN i.imageReferences ir " +
+            "WHERE ir.url IS NOT NULL AND o.concept = :concept ORDER BY i.uuid"
+        ),
+        @NamedQuery(
+            name = "ImagedMoment.findImageByToConceptWithImages",
+            query = "SELECT new org.mbari.annosaurus.repository.jpa.entity.ImageDTO(i.uuid, i.videoReferenceUuid, i.elapsedTime, i.recordedTimestamp, i.timecode, ir.description, ir.format, ir.height, ir.width, ir.url, ir.uuid) " +
+            "FROM ImagedMoment i LEFT JOIN i.observations o LEFT JOIN i.imageReferences ir LEFT JOIN o.associations a " +
+            "WHERE ir.url IS NOT NULL AND a.toConcept = :concept ORDER BY i.uuid"
+        ),
+        @NamedQuery(
+            name = "ImagedMoment.findImageByVideoReferenceUUID",
+            query = "SELECT new org.mbari.annosaurus.repository.jpa.entity.ImageDTO(i.uuid, i.videoReferenceUuid, i.elapsedTime,  i.recordedTimestamp, i.timecode, ir.description, ir.format, ir.height, ir.width, ir.url, ir.uuid) " +
+            "FROM ImagedMoment i LEFT JOIN i.imageReferences ir " +
+            "WHERE ir.url IS NOT NULL AND i.videoReferenceUuid = :uuid ORDER BY i.uuid"
+        ),
+        @NamedQuery(
+            name = "Annotation.findByVideoReferenceUuid",
+            query = "SELECT new org.mbari.annosaurus.repository.jpa.entity.AnnotationDTO(o.uuid, o.concept, o.observer, o.observationTimestamp, i.videoReferenceUuid, i.uuid, i.timecode, i.elapsedTime, i.recordedTimestamp, o.duration, o.group, o.activity) " +
+            "FROM ImagedMoment i LEFT JOIN i.observations o " +
+            "WHERE i.videoReferenceUuid = :uuid ORDER BY i.uuid"
+        ),
+    }
 )
 // @org.hibernate.envers.Audited
 public class ImagedMomentEntity implements IPersistentObject {
@@ -264,7 +253,7 @@ public class ImagedMomentEntity implements IPersistentObject {
 
     @Column(name = "recorded_timestamp", nullable = true)
     @Temporal(value = TemporalType.TIMESTAMP)
-//     @Convert(converter = InstantConverter.class)
+    //     @Convert(converter = InstantConverter.class)
     Instant recordedTimestamp;
 
     @Column(name = "timecode", nullable = true, length = 11)
@@ -272,45 +261,46 @@ public class ImagedMomentEntity implements IPersistentObject {
     Timecode timecode;
 
     @Basic(optional = false)
-    @Column(
-            name = "video_reference_uuid"
-    )
+    @Column(name = "video_reference_uuid")
     @JdbcTypeCode(SqlTypes.UUID)
     UUID videoReferenceUuid;
 
     @OneToMany(
-            targetEntity = ObservationEntity.class,
-            cascade = {CascadeType.ALL},
-            fetch = FetchType.LAZY,
-            mappedBy = "imagedMoment",
-            orphanRemoval = true
+        targetEntity = ObservationEntity.class,
+        cascade = { CascadeType.ALL },
+        fetch = FetchType.LAZY,
+        mappedBy = "imagedMoment",
+        orphanRemoval = true
     )
     Set<ObservationEntity> observations = new HashSet<>();
 
     @OneToMany(
-            targetEntity = ImageReferenceEntity.class,
-            cascade = {CascadeType.ALL},
-            fetch = FetchType.LAZY,
-            mappedBy = "imagedMoment",
-            orphanRemoval = true
+        targetEntity = ImageReferenceEntity.class,
+        cascade = { CascadeType.ALL },
+        fetch = FetchType.LAZY,
+        mappedBy = "imagedMoment",
+        orphanRemoval = true
     )
     Set<ImageReferenceEntity> imageReferences = new HashSet<>();
 
     @OneToOne(
-            mappedBy = "imagedMoment",
-            cascade = {CascadeType.ALL},
-            optional = true,
-            fetch = FetchType.LAZY,
-            targetEntity = CachedAncillaryDatumEntity.class,
-            orphanRemoval = true
+        mappedBy = "imagedMoment",
+        cascade = { CascadeType.ALL },
+        optional = true,
+        fetch = FetchType.LAZY,
+        targetEntity = CachedAncillaryDatumEntity.class,
+        orphanRemoval = true
     )
     CachedAncillaryDatumEntity ancillaryDatum;
 
-    public ImagedMomentEntity() {
+    public ImagedMomentEntity() {}
 
-    }
-
-    public ImagedMomentEntity(UUID videoReferenceUuid, Instant recordedTimestamp, Timecode timecode, Duration elapsedTime) {
+    public ImagedMomentEntity(
+        UUID videoReferenceUuid,
+        Instant recordedTimestamp,
+        Timecode timecode,
+        Duration elapsedTime
+    ) {
         this.videoReferenceUuid = videoReferenceUuid;
         this.recordedTimestamp = recordedTimestamp;
         this.timecode = timecode;
@@ -459,11 +449,12 @@ public class ImagedMomentEntity implements IPersistentObject {
         // Since this is no longer commonly used, we will compare the string representation of the timecode
         String thisTc = timecode == null ? "" : timecode.toString();
         String thatTc = that.timecode == null ? "" : that.timecode.toString();
-        return Objects.equals(videoReferenceUuid, that.videoReferenceUuid) &&
-                Objects.equals(recordedTimestamp, that.recordedTimestamp) &&
-                Objects.equals(thisTc, thatTc) &&
-                Objects.equals(elapsedTime, that.elapsedTime);
-
+        return (
+            Objects.equals(videoReferenceUuid, that.videoReferenceUuid) &&
+            Objects.equals(recordedTimestamp, that.recordedTimestamp) &&
+            Objects.equals(thisTc, thatTc) &&
+            Objects.equals(elapsedTime, that.elapsedTime)
+        );
     }
 
     @Override
@@ -472,6 +463,11 @@ public class ImagedMomentEntity implements IPersistentObject {
             return Objects.hash(uuid);
         }
         var tc = timecode == null ? "" : timecode.toString();
-        return Objects.hash(elapsedTime, recordedTimestamp, tc, videoReferenceUuid);
+        return Objects.hash(
+            elapsedTime,
+            recordedTimestamp,
+            tc,
+            videoReferenceUuid
+        );
     }
 }

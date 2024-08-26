@@ -25,6 +25,7 @@ import org.mbari.annosaurus.domain.{
     ErrorMsg,
     ImagedMomentSC,
     ImagedMomentTimestampUpdateSC,
+    MoveImagedMoments,
     VideoTimestampSC,
     WindowRequestSC
 }
@@ -50,6 +51,32 @@ class ImagedMomentEndpoints(controller: ImagedMomentController)(using
 
     private val base = "imagedmoments"
     private val tag  = "Imaged Moments"
+
+    val bulkMove: Endpoint[Option[String], MoveImagedMoments, ErrorMsg, Count, Any] =
+        secureEndpoint
+            .put
+            .in(base / "bulk" / "move")
+            .in(jsonBody[MoveImagedMoments])
+            .out(jsonBody[Count])
+            .name("bulkMove")
+            .description("Bulk move imaged moments to a new video reference")
+            .tag(tag)
+
+    val bulkMoveImpl: ServerEndpoint[Any, Future] =
+        bulkMove
+            .serverSecurityLogic(jwtOpt => verify(jwtOpt))
+            .serverLogic(_ =>
+                moveImagedMoments => {
+                    handleErrors(
+                        controller
+                            .bulkMove(
+                                moveImagedMoments.videoReferenceUuid,
+                                moveImagedMoments.imagedMomentUuids
+                            )
+                            .map(n => Count(n))
+                    )
+                }
+            )
 
     val findAllImagedMoments: Endpoint[Unit, Paging, ErrorMsg, Seq[ImagedMomentSC], Any] =
         openEndpoint
@@ -365,7 +392,8 @@ class ImagedMomentEndpoints(controller: ImagedMomentController)(using
             }
 
     // GET /videoreference/:uuid
-    val findImagdMomentsByVideoReferenceUuid: Endpoint[Unit, UUID, ErrorMsg, Seq[ImagedMomentSC], Any] =
+    val findImagdMomentsByVideoReferenceUuid
+        : Endpoint[Unit, UUID, ErrorMsg, Seq[ImagedMomentSC], Any] =
         openEndpoint
             .get
             .in(base / "videoreference" / path[UUID]("videoReferenceUuid"))
@@ -610,6 +638,7 @@ class ImagedMomentEndpoints(controller: ImagedMomentController)(using
         findImagedMomentsByLinkName,
         findImagedMomentsWithImages,
         findByImageReferenceUUID,
+        bulkMove,
         countImagedMomentsBetweenModifiedDates,
         findImagedMomentsBetweenModifiedDates,
         updateRecordedTimestampsForVideoReference,
@@ -639,6 +668,7 @@ class ImagedMomentEndpoints(controller: ImagedMomentController)(using
         findImagedMomentsByLinkNameImpl,
         findImagedMomentsWithImagesImpl,
         findByImageReferenceUUIDImpl,
+        bulkMoveImpl,
         countsPerVideoReferenceImpl,
         countImagedMomentsBetweenModifiedDatesImpl,
         findImagedMomentsBetweenModifiedDatesImpl,

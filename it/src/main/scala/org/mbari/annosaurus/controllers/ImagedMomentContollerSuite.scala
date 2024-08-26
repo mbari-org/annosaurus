@@ -328,6 +328,13 @@ trait ImagedMomentContollerSuite extends BaseDAOSuite {
         AssertUtils.assertSameImagedMoment(x, y.toEntity)
     }
 
+    test("bulkMove") {
+        val xs                    = TestUtils.create(40, 1)
+        val newVideoReferenceUuid = UUID.randomUUID()
+        val n                     = exec(controller.bulkMove(newVideoReferenceUuid, xs.map(_.getUuid())))
+        assertEquals(n, 40)
+    }
+
     test("update") {
         val im0 = TestUtils.create(1).head
         val im1 = exec(

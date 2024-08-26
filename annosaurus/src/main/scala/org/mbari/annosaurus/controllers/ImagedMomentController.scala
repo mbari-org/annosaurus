@@ -304,8 +304,7 @@ class ImagedMomentController(val daoFactory: JPADAOFactory)
       */
     def create(dao: DAO[?], sourceImagedMoment: ImagedMomentEntity): ImagedMomentEntity = {
 
-        val imDao  = daoFactory.newImagedMomentDAO(dao)
-
+        val imDao = daoFactory.newImagedMomentDAO(dao)
 
         // Reuse existing imagedmoments if it already exists
         val targetImagedMoment =
@@ -384,6 +383,15 @@ class ImagedMomentController(val daoFactory: JPADAOFactory)
             .log(() => "Created " + sourceImagedMoment.getObservations.size() + " observations")
 
         targetImagedMoment
+    }
+
+    def bulkMove(newVideoReferenceUuid: UUID, uuids: Seq[UUID])(implicit
+        ec: ExecutionContext
+    ): Future[Int] = {
+        def fn(dao: IMDAO): Int = {
+            dao.moveToVideoReference(newVideoReferenceUuid, uuids)
+        }
+        exec(fn)
     }
 
     def update(

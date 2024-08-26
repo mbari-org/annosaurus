@@ -206,4 +206,6 @@ trait ImagedMomentDAO[T <: IPersistentObject] extends DAO[T] {
         }
 
     def deleteIfEmptyByUUID(uuid: UUID): Boolean
+
+    def moveToVideoReference(newVideoReferenceUuid: UUID, imagedMomentUuids: Seq[UUID]): Int
 }

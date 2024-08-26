@@ -2,7 +2,8 @@ import Dependencies._
 
 Global / onChangedBuildSource := ReloadOnSourceChanges
 
-ThisBuild / javacOptions ++= Seq("-target", "21", "-source", "21")
+// ThisBuild / javacOptions ++= Seq("-target", "21", "-source", "21")
+ThisBuild / javacOptions ++= Seq("--release", "21")
 ThisBuild / licenses         := Seq("Apache-2.0" -> url("http://www.apache.org/licenses/LICENSE-2.0"))
 ThisBuild / organization     := "org.mbari"
 ThisBuild / organizationName := "Monterey Bay Aquarium Research Institute"

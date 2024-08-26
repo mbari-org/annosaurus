@@ -436,6 +436,18 @@ class ImagedMomentDAOImpl(entityManager: EntityManager)
         xs.foreach(delete)
         xs.size
 
+    override def moveToVideoReference(
+        newVideoReferenceUuid: UUID,
+        imageMomentUuids: Seq[UUID]
+    ): Int = {
+        if (imageMomentUuids.isEmpty) return 0
+
+        val query = entityManager.createNamedQuery("ImagedMoment.moveToVideoReference")
+        query.setParameter(1, newVideoReferenceUuid)
+        query.setParameter(2, imageMomentUuids.asJava)
+        query.executeUpdate()
+    }
+
 //  override def delete(entity: ImagedMomentImpl): Unit = {
 //    Option(entity.ancillaryDatum).foreach(entityManager.remove)
 //    entity.observations.flatMap(_.associations).foreach(entityManager.remove)
