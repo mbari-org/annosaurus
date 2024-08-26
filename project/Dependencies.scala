@@ -23,7 +23,7 @@ object Dependencies {
 
     lazy val fatboyGson       = "com.fatboyindustrial.gson-javatime-serialisers" % "gson-javatime-serialisers" % "1.1.2"
     lazy val gson             = "com.google.code.gson" % "gson"              % "2.10.1"
-    lazy val h2               = "com.h2database"       % "h2"                % "2.3.230"
+    lazy val h2               = "com.h2database"       % "h2"                % "2.3.232"
 
     val hibernateVersion     = "6.6.0.Final"  //"6.4.8.Final" //"6.5.1.Final" - envers is throwing: The column name REV is not valid. 
     lazy val hibernateCore   = "org.hibernate.orm" % "hibernate-core"     % hibernateVersion
@@ -49,14 +49,14 @@ object Dependencies {
     lazy val json4sJackson = "org.json4s"         %% "json4s-jackson"  % "4.0.7"
     lazy val junit         = "junit"               % "junit"           % "4.13.2"
 
-    val logbackVersion      = "1.5.6"
+    val logbackVersion      = "1.5.7"
     lazy val logbackClassic = "ch.qos.logback" % "logback-classic" % logbackVersion
     lazy val logbackCore    = "ch.qos.logback" % "logback-core"    % logbackVersion
 
-    lazy val mssqlserver = "com.microsoft.sqlserver" % "mssql-jdbc" % "12.8.0.jre11"
+    lazy val mssqlserver = "com.microsoft.sqlserver" % "mssql-jdbc" % "12.8.1.jre11"
     lazy val munit       = "org.scalameta"          %% "munit"      % "1.0.1"
     lazy val oracle      = "com.oracle.ojdbc"        % "ojdbc8"     % "19.3.0.0"
-    lazy val postgresql  = "org.postgresql"          % "postgresql" % "42.7.3"
+    lazy val postgresql  = "org.postgresql"          % "postgresql" % "42.7.4"
     lazy val rxJava3     = "io.reactivex.rxjava3"    % "rxjava"     % "3.1.9"
     lazy val scalatest   = "org.scalatest"          %% "scalatest"  % "3.2.19"
 
