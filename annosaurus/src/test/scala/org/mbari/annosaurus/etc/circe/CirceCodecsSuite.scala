@@ -20,6 +20,7 @@ import scala.io.Source
 import scala.util.Using
 import org.mbari.annosaurus.domain.{ImagedMoment, ImagedMomentSC, ObservationsUpdate, QueryConstraints}
 import CirceCodecs.{*, given}
+import org.mbari.annosaurus.repository.query.Constraints
 
 import scala.util.Failure
 import scala.util.Success
@@ -300,6 +301,19 @@ class CirceCodecsSuite extends munit.FunSuite {
         assertEquals(ou.concept, Some("Grimpoteuthis"))
         assertEquals(ou.observer, Some("svonthun"))
         assertEquals(ou.group, Some("ROV"))
+    }
+
+    test("decode constraints") {
+        val url = getClass.getResource("/json/constraints.json")
+        assert(url != null)
+        val t   = Using(Source.fromURL(url)) { source =>
+            val json = source.getLines().mkString
+            assert(json != null)
+            val opt = json.reify[Constraints].toOption
+            assert(opt.isDefined)
+            val constraints = opt.get.constraints
+            assertEquals(constraints.size, 6)
+        }
     }
 
 }

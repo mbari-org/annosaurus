@@ -21,7 +21,7 @@ import io.circe.generic.semiauto.*
 import io.circe.syntax.*
 import org.mbari.annosaurus.util.HexUtil
 import org.mbari.annosaurus.domain.*
-import org.mbari.annosaurus.repository.query.Constraint
+import org.mbari.annosaurus.repository.query.{Constraint, Constraints}
 
 import java.net.{URI, URL}
 import java.time.Instant
@@ -360,6 +360,8 @@ object CirceCodecs {
             }
         } yield constraint
     }
+    
+    given constraintsDecoder: Decoder[Constraints] = deriveDecoder
 
 
     val CustomPrinter: Printer = Printer(
