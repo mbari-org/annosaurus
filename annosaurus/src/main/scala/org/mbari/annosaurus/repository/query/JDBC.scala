@@ -49,10 +49,11 @@ object JDBC {
 
 class JDBC(user: String, password: String, url: String, driver: String) {
 
+    Class.forName(driver)
+
     def this(config: DatabaseConfig) = this(config.user, config.password, config.url, config.driver)
 
     def newConnection(): Connection = {
-        Class.forName(driver)
         java.sql.DriverManager.getConnection(url, user, password)
     }
 
