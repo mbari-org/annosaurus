@@ -67,6 +67,13 @@ object AppConfig {
                 log.atWarn.withCause(e).log("Failed to load ZeroMQ configuration")
                 None
         }
+
+    lazy val DefaultDatabaseConfig: DatabaseConfig = DatabaseConfig(
+        url = Config.getString("database.url"),
+        user = Config.getString("database.user"),
+        password = Config.getString("database.password"),
+        driver = Config.getString("database.driver"),
+    )
 }
 
 case class HttpConfig(
@@ -75,3 +82,13 @@ case class HttpConfig(
     connectorIdleTimeout: Int,
     contextPath: String
 )
+
+case class DatabaseConfig(
+    url: String,
+    user: String,
+    password: String,
+    driver: String
+):
+    def newConnection(): java.sql.Connection =
+        Class.forName(driver)
+        java.sql.DriverManager.getConnection(url, user, password)

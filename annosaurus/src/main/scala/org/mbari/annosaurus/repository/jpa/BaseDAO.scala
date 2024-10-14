@@ -30,6 +30,7 @@ import org.mbari.annosaurus.repository.jpa.extensions.*
 import org.mbari.annosaurus.etc.jdk.Logging.given
 
 import java.lang.System.Logger.Level
+import org.hibernate.jpa.QueryHints
 
 /** @author
   *   Brian Schlining
@@ -57,21 +58,26 @@ abstract class BaseDAO[B <: IPersistentObject: ClassTag](val entityManager: Enti
         name: String,
         namedParameters: Map[String, Any] = Map.empty,
         limit: Option[Int] = None,
-        offset: Option[Int] = None
+        offset: Option[Int] = None,
+        readOnly: Boolean = false
     ): List[B] = {
-        findByTypedNamedQuery[B](name, namedParameters, limit, offset)
+        findByTypedNamedQuery[B](name, namedParameters, limit, offset, readOnly)
     }
 
     def findByTypedNamedQuery[C](
         name: String,
         namedParameters: Map[String, Any] = Map.empty,
         limit: Option[Int] = None,
-        offset: Option[Int] = None
+        offset: Option[Int] = None,
+        readOnly: Boolean = false
     ): List[C] = {
         if (log.isLoggable(Level.DEBUG)) {
             log.atDebug.log(s"JPA Query => $name using $namedParameters")
         }
         val query = entityManager.createNamedQuery(name)
+        if (readOnly) {
+            query.setHint(QueryHints.HINT_READONLY, true)
+        }
         limit.foreach(query.setMaxResults)
         offset.foreach(query.setFirstResult)
         namedParameters.foreach { case (a, b) => query.setParameter(a, b) }
@@ -94,10 +100,14 @@ abstract class BaseDAO[B <: IPersistentObject: ClassTag](val entityManager: Enti
         name: String,
         namedParameters: Map[String, Any] = Map.empty,
         limit: Option[Int] = None,
-        offset: Option[Int] = None
+        offset: Option[Int] = None,
+        readOnly: Boolean = false
     ): java.util.stream.Stream[B] = {
 
         val query = entityManager.createNamedQuery(name)
+        if (readOnly) {
+            query.setHint(QueryHints.HINT_READONLY, true)
+        }
         limit.foreach(query.setMaxResults)
         offset.foreach(query.setFirstResult)
         namedParameters.foreach { case (a, b) => query.setParameter(a, b) }

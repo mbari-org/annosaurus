@@ -28,6 +28,7 @@ import org.mbari.annosaurus.repository.jpa.entity.ImagedMomentEntity
 import org.mbari.vcr4j.time.Timecode
 
 import scala.jdk.CollectionConverters._
+import org.hibernate.jpa.QueryHints
 
 /** @author
   *   Brian Schlining
@@ -144,6 +145,7 @@ class ImagedMomentDAOImpl(entityManager: EntityManager)
         val query          = entityManager.createNamedQuery("ImagedMoment.countBetweenUpdatedDates")
         val startTimestamp = Timestamp.from(start)
         val endTimestamp   = Timestamp.from(end)
+        query.setHint(QueryHints.HINT_READONLY, true)
         query.setParameter(1, startTimestamp)
         query.setParameter(2, endTimestamp)
         query

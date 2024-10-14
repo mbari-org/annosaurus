@@ -24,6 +24,7 @@ import org.slf4j.LoggerFactory
 import scala.jdk.CollectionConverters._
 import java.time.Instant
 import org.mbari.annosaurus.domain.QueryConstraints
+import org.hibernate.jpa.QueryHints
 
 class AnalysisRepository(entityManagerFactory: EntityManagerFactory) {
 
@@ -32,8 +33,12 @@ class AnalysisRepository(entityManagerFactory: EntityManagerFactory) {
     def depthHistogram(constraints: QueryConstraints, binSizeMeters: Int = 50): DepthHistogram = {
         val select                       = DepthHistogramSQL.selectFromBinSize(binSizeMeters)
         val entityManager: EntityManager = entityManagerFactory.createEntityManager()
+        val transaction = entityManager.getTransaction()
+        transaction.begin()
         val query                        = QueryConstraintsSqlBuilder.toQuery(constraints, entityManager, select, "")
+        query.setHint(QueryHints.HINT_READONLY, true)
         val results                      = query.getResultList.iterator().next()
+        transaction.commit()
         entityManager.close()
         val values                       = results.asInstanceOf[Array[Object]]
             .map(s => s.asInt.getOrElse(0))
@@ -50,7 +55,7 @@ class AnalysisRepository(entityManagerFactory: EntityManagerFactory) {
         val select                       = TimeHistogramSQL.selectFromBinSize(start, now, binSizeDays)
         val entityManager: EntityManager = entityManagerFactory.createEntityManager()
         val query                        = QueryConstraintsSqlBuilder.toQuery(constraints, entityManager, select, "")
-
+        query.setHint(QueryHints.HINT_READONLY, true)
 //        println(query)
         val results = query.getResultList.iterator().next()
         entityManager.close()

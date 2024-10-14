@@ -16,14 +16,15 @@
 
 package org.mbari.annosaurus.etc.circe
 
-import io.circe._
-import io.circe.generic.semiauto._
-import io.circe.syntax._
-
+import io.circe.*
+import io.circe.generic.semiauto.*
+import io.circe.syntax.*
 import org.mbari.annosaurus.util.HexUtil
 import org.mbari.annosaurus.domain.*
+import org.mbari.annosaurus.repository.query.Constraint
 
 import java.net.{URI, URL}
+import java.time.Instant
 import scala.util.Try
 
 object CirceCodecs {
@@ -329,6 +330,37 @@ object CirceCodecs {
     private val observationsUpdateCcDecoder: Decoder[ObservationsUpdate] = deriveDecoder
     given observationsUpdateDecoder: Decoder[ObservationsUpdate]         =
         observationsUpdateCcDecoder or observationsUpdateScDecoder.map(_.toCamelCase)
+
+    // Custom Decoder for Constraint
+    given constraintDecoder: Decoder[Constraint] = (c: HCursor) => {
+        for {
+            columnName <- c.downField("columnName").as[String]
+            // Determine which constraint key is present
+            constraint <- {
+                if (c.downField("in").succeeded) {
+                    c.downField("in").as[List[String]].map(Constraint.In(columnName, _))
+                } else if (c.downField("like").succeeded) {
+                    c.downField("like").as[String].map(Constraint.Like(columnName, _))
+                } else if (c.downField("between").succeeded) {
+                    // Attempt to decode between as List[Int] first
+                    c.downField("between").as[List[Double]].map(xs => Constraint.MinMax(columnName, xs.head, xs.last))
+                        .orElse {
+                            // If decoding as Int fails, try decoding as List[Instant]
+                            c.downField("between").as[List[Instant]].map(xs => Constraint.Date(columnName, xs.head, xs.last))
+                        }
+                } else if (c.downField("minmax").succeeded) {
+                    c.downField("minmax").as[List[Double]].map(xs => Constraint.MinMax(columnName, xs.head, xs.last))
+                } else if (c.downField("min").succeeded) {
+                    c.downField("min").as[Double].map(Constraint.Min(columnName, _))
+                } else if (c.downField("max").succeeded) {
+                    c.downField("max").as[Double].map(Constraint.Max(columnName, _))
+                } else {
+                    Left(DecodingFailure("Unknown constraint type", c.history))
+                }
+            }
+        } yield constraint
+    }
+
 
     val CustomPrinter: Printer = Printer(
         dropNullValues = true,

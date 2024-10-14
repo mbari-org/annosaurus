@@ -573,7 +573,7 @@ trait ImagedMomentEndpointsSuite extends EndpointsSuite {
         assert(imagedMoment.isEmpty)
     }
 
-    test("bulkMove") {
+    test("bulkMove (camelCase)") {
         val xs          = TestUtils.create(4)
         val newVideoRef = java.util.UUID.randomUUID()
         val moveRequest = MoveImagedMoments(newVideoRef, xs.map(_.getUuid))
@@ -585,6 +585,27 @@ trait ImagedMomentEndpointsSuite extends EndpointsSuite {
             .header("Authorization", s"Bearer $jwt")
             .header("Content-Type", "application/json")
             .body(moveRequest.stringify)
+            .send(backendStub)
+            .join
+
+        assertEquals(response.code, StatusCode.Ok)
+        val count = checkResponse[Count](response.body)
+        assertEquals(count.count.intValue, xs.size)
+            
+    }
+
+    test("bulkMove (snake_case)") {
+        val xs          = TestUtils.create(4)
+        val newVideoRef = java.util.UUID.randomUUID()
+        val moveRequest = MoveImagedMoments(newVideoRef, xs.map(_.getUuid))
+        val jwt         = jwtService.authorize("foo").orNull
+        assert(jwt != null)
+        val backendStub = newBackendStub(endpoints.bulkMoveImpl)
+        val response    = basicRequest
+            .put(uri"http://test.com/v1/imagedmoments/bulk/move")
+            .header("Authorization", s"Bearer $jwt")
+            .header("Content-Type", "application/json")
+            .body(moveRequest.toSnakeCase.stringify)
             .send(backendStub)
             .join
 

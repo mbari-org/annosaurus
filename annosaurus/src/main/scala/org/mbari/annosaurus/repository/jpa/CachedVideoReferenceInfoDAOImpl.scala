@@ -22,6 +22,7 @@ import org.mbari.annosaurus.repository.CachedVideoReferenceInfoDAO
 import org.mbari.annosaurus.repository.jpa.entity.CachedVideoReferenceInfoEntity
 
 import scala.jdk.CollectionConverters._
+import org.hibernate.jpa.QueryHints
 
 /** @author
   *   Brian Schlining
@@ -76,9 +77,9 @@ class CachedVideoReferenceInfoDAOImpl(entityManager: EntityManager)
         fetchUsing("VideoReferenceInfo.findAllMissionIDs")
 
     private def fetchUsing(namedQuery: String): Iterable[String] =
-        entityManager
-            .createNamedQuery(namedQuery)
-            .getResultList
+        val query = entityManager.createNamedQuery(namedQuery)
+        query.setHint(QueryHints.HINT_READONLY, true)
+        query.getResultList
             .asScala
             .filter(_ != null)
             .map(_.toString)

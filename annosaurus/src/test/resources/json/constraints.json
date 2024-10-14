@@ -1,0 +1,38 @@
+{
+  "constraints": [
+    {
+      "columnName": "id",
+      "in": [
+        "1",
+        "2",
+        "3"
+      ]
+    },
+    {
+      "columnName": "name",
+      "like": ".*"
+    },
+    {
+      "columnName": "age",
+      "minmax": [
+        1,
+        100
+      ]
+    },
+    {
+      "columnName": "foo",
+      "min": 1
+    },
+    {
+      "columnName": "bar",
+      "max": 100
+    },
+    {
+      "columnName": "baz",
+      "between": [
+        "2010-01-01T01:22:33Z",
+        "2011-01-01T01:22:33Z"
+      ]
+    }
+  ]
+}

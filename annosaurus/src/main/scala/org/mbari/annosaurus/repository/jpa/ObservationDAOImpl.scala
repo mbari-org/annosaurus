@@ -27,6 +27,8 @@ import java.util.{stream, UUID}
 import scala.jdk.CollectionConverters._
 import java.{util => ju}
 import org.mbari.annosaurus.repository.jdbc.*
+import jakarta.persistence.QueryHint
+import org.hibernate.jpa.QueryHints
 
 /** @author
   *   Brian Schlining
@@ -152,6 +154,7 @@ class ObservationDAOImpl(entityManager: EntityManager)
 
     override def countByMultiRequest(request: MultiRequest): Long = {
         val query = entityManager.createNamedQuery("Observation.countByMultiRequest")
+        query.setHint(QueryHints.HINT_READONLY, true)
         query.setParameter("uuids", request.videoReferenceUuids.asJava)
         query.getSingleResult.asInstanceOf[Number].longValue()
     }
@@ -160,27 +163,27 @@ class ObservationDAOImpl(entityManager: EntityManager)
       *   Order sequence of all concept names used
       */
     override def findAllConcepts(): Seq[String] =
-        entityManager
-            .createNamedQuery("Observation.findAllNames")
-            .getResultList
+        val query = entityManager.createNamedQuery("Observation.findAllNames")
+        query.setHint(QueryHints.HINT_READONLY, true)
+        query.getResultList
             .asScala
             .filter(_ != null)
             .map(_.toString)
             .toSeq
 
     override def findAllGroups(): Seq[String] =
-        entityManager
-            .createNamedQuery("Observation.findAllGroups")
-            .getResultList
+        val query = entityManager.createNamedQuery("Observation.findAllGroups")
+        query.setHint(QueryHints.HINT_READONLY, true)
+        query.getResultList
             .asScala
             .filter(_ != null)
             .map(_.toString)
             .toSeq
 
     override def findAllActivities(): Seq[String] =
-        entityManager
-            .createNamedQuery("Observation.findAllActivities")
-            .getResultList
+        val query = entityManager.createNamedQuery("Observation.findAllActivities")
+        query.setHint(QueryHints.HINT_READONLY, true)
+        query.getResultList
             .asScala
             .filter(_ != null)
             .map(_.toString)
@@ -204,6 +207,7 @@ class ObservationDAOImpl(entityManager: EntityManager)
 
     override def countByConcept(name: String): Int = {
         val query = entityManager.createNamedQuery("Observation.countByConcept")
+        query.setHint(QueryHints.HINT_READONLY, true)
         query.setParameter(1, name)
         query
             .getResultList
@@ -214,6 +218,7 @@ class ObservationDAOImpl(entityManager: EntityManager)
 
     override def countByConceptWithImages(name: String): Int = {
         val query = entityManager.createNamedQuery("Observation.countByConceptWithImages")
+        query.setHint(QueryHints.HINT_READONLY, true)
         query.setParameter(1, name)
         query
             .getResultList
@@ -224,6 +229,7 @@ class ObservationDAOImpl(entityManager: EntityManager)
 
     override def countByVideoReferenceUUID(uuid: UUID): Int = {
         val query = entityManager.createNamedQuery("Observation.countByVideoReferenceUUID")
+        query.setHint(QueryHints.HINT_READONLY, true)
         query.setParameter(1, uuid)
         query
             .getResultList
@@ -234,6 +240,7 @@ class ObservationDAOImpl(entityManager: EntityManager)
 
     override def countAllByVideoReferenceUuids(): Map[UUID, Int] = {
         val query = entityManager.createNamedQuery("Observation.countAllByVideoReferenceUUIDs")
+        query.setHint(QueryHints.HINT_READONLY, true)
         query
             .getResultList
             .asScala

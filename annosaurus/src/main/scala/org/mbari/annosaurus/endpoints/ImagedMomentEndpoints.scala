@@ -59,7 +59,7 @@ class ImagedMomentEndpoints(controller: ImagedMomentController)(using
             .in(jsonBody[MoveImagedMoments])
             .out(jsonBody[Count])
             .name("bulkMove")
-            .description("Bulk move imaged moments to a new video reference")
+            .description("Bulk move imaged moments to a new video reference. JSON request can be camelCase or snake_case")
             .tag(tag)
 
     val bulkMoveImpl: ServerEndpoint[Any, Future] =
