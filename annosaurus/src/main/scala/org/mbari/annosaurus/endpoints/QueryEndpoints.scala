@@ -31,6 +31,8 @@ import sttp.tapir.server.ServerEndpoint.Full
 import scala.util.Success
 import scala.concurrent.{ExecutionContext, Future}
 
+import org.mbari.annosaurus.etc.tapir.TapirCodecs
+
 class QueryEndpoints(queryController: QueryController)(using executionContext: ExecutionContext)
     extends Endpoints {
 
@@ -54,7 +56,6 @@ class QueryEndpoints(queryController: QueryController)(using executionContext: E
             .in(base / "run")
             .in(jsonBody[QueryRequest])
             .out(stringBody)
-            .out(header("Content-Type", "text/tab-separated-values"))
             .name("runQuery")
             .description("Run a query")
             .tag(tag)

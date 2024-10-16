@@ -18,12 +18,13 @@ package org.mbari.annosaurus.etc.tapir
 
 import org.mbari.annosaurus.etc.jdk.Instants
 import sttp.tapir.CodecFormat.TextPlain
-import sttp.tapir.{Codec, DecodeResult}
+import sttp.tapir.{Codec, CodecFormat, DecodeResult}
 
 import java.net.{URI, URL}
 import java.time.Instant
 import java.util.HexFormat
 import scala.util.{Failure, Success, Try}
+import org.mbari.annosaurus.repository.query.QueryResults
 
 object TapirCodecs:
 

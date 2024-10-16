@@ -17,6 +17,7 @@
 package org.mbari.annosaurus.repository.query
 
 import java.sql.ResultSet
+import java.util.{Calendar, TimeZone}
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 
@@ -24,8 +25,13 @@ type QueryResults = List[(JDBC.Metadata, Seq[Any])]
 
 object QueryResults {
 
+    val Empty = List.empty[(JDBC.Metadata, Seq[Any])]
+
+    private lazy val UtcCalendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
+
     def fromResultSet(rs: ResultSet): QueryResults =
         val metadata = JDBC.Metadata.fromResultSet(rs)
+        val timestampColumnIdx = metadata.zipWithIndex.filter(_._1.columnClassName == "java.sql.Timestamp").map(_._2)
         val results = ListBuffer[ListBuffer[Any]]()
         val numColumns = metadata.size
         var isNew = true
@@ -33,7 +39,10 @@ object QueryResults {
             for i <- 1 to numColumns do
                 if (isNew) results += ListBuffer[Any]()
                 val column = results(i - 1)
-                column += rs.getObject(i)
+                if timestampColumnIdx.contains(i - 1) then
+                    column += rs.getTimestamp(i, UtcCalendar).toInstant
+                else
+                    column += rs.getObject(i)
             isNew = false
         val columnData = results.result().map(_.result()) // Turn into immutable
         metadata.zip(columnData).toList
