@@ -18,7 +18,18 @@ package org.mbari.annosaurus.endpoints
 
 import org.mbari.annosaurus.Endpoints.daoFactory
 import org.mbari.annosaurus.controllers.{ImagedMomentController, ObservationController, TestUtils}
-import org.mbari.annosaurus.domain.{ConceptCount, Count, CountForVideoReferenceSC, ImagedMoment, Observation, ObservationSC, ObservationUpdateSC, ObservationsUpdate, RenameConcept, RenameCountSC}
+import org.mbari.annosaurus.domain.{
+    ConceptCount,
+    Count,
+    CountForVideoReferenceSC,
+    ImagedMoment,
+    Observation,
+    ObservationSC,
+    ObservationUpdateSC,
+    ObservationsUpdate,
+    RenameConcept,
+    RenameCountSC
+}
 import org.mbari.annosaurus.etc.jwt.JwtService
 import org.mbari.annosaurus.repository.jpa.JPADAOFactory
 import org.mbari.annosaurus.etc.tapir.TapirCodecs.given
@@ -44,11 +55,10 @@ trait ObservationEndpointsSuite extends EndpointsSuite {
 
     given JPADAOFactory = daoFactory
 
-    given jwtService: JwtService = new JwtService("mbari", "foo", "bar")
-    private lazy val controller  = ObservationController(daoFactory)
-    private lazy val jdbcRepository     = new JdbcRepository(daoFactory.entityManagerFactory)
-    private lazy val endpoints   = new ObservationEndpoints(controller, jdbcRepository)
-
+    given jwtService: JwtService    = new JwtService("mbari", "foo", "bar")
+    private lazy val controller     = ObservationController(daoFactory)
+    private lazy val jdbcRepository = new JdbcRepository(daoFactory.entityManagerFactory)
+    private lazy val endpoints      = new ObservationEndpoints(controller, jdbcRepository)
 
     test("findObservationByUuid") {
         val im          = TestUtils.create(1, 1).head
@@ -509,12 +519,13 @@ trait ObservationEndpointsSuite extends EndpointsSuite {
     test("updateManyObservations") {
         val im               = TestUtils.create(20, 2)
         val observationUuids = im.flatMap(_.getObservations.asScala.map(_.getUuid)).toSeq
-        val update = ObservationsUpdate(
+        val update           = ObservationsUpdate(
             observationUuids,
             concept = Some("new-concept"),
             observer = Some("new-observer"),
             activity = Some("new-activity"),
-            group = Some("new-group"))
+            group = Some("new-group")
+        )
         val jwt              = jwtService.authorize("foo").orNull
         assert(jwt != null)
         val backend          = newBackendStub(endpoints.updateManyObservationsImpl)
@@ -526,13 +537,12 @@ trait ObservationEndpointsSuite extends EndpointsSuite {
             .body(update.stringify)
             .send(backend)
             .join
-        val obtained = checkResponse[Count](response.body)
+        val obtained         = checkResponse[Count](response.body)
         assertEquals(obtained.count, observationUuids.size.toLong)
 
-        for
-            uuid <- observationUuids
+        for uuid <- observationUuids
         do
-            val opt = controller.findByUUID(uuid).join
+            val opt      = controller.findByUUID(uuid).join
             assert(opt.isDefined)
             val obtained = opt.get
             assertEquals(obtained.concept, update.concept.get)

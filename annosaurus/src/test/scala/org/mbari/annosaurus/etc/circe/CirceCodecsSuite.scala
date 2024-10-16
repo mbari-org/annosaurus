@@ -312,7 +312,8 @@ class CirceCodecsSuite extends munit.FunSuite {
             val opt = json.reify[Constraints].toOption
             assert(opt.isDefined)
             val constraints = opt.get.constraints
-            assertEquals(constraints.size, 6)
+            assertEquals(constraints.size, 9)
+            println(constraints)
         }
     }
 

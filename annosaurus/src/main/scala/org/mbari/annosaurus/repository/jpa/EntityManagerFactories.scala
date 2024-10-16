@@ -43,14 +43,14 @@ object EntityManagerFactories {
 
     // https://juliuskrah.com/tutorial/2017/02/16/getting-started-with-hikaricp-hibernate-and-jpa/
     val PRODUCTION_PROPS = Map(
-        "hibernate.connection.provider_class" -> "org.hibernate.hikaricp.internal.HikariCPConnectionProvider",
-        "hibernate.hbm2ddl.auto"              -> "validate",
-        "hibernate.hikari.idleTimeout"        -> "30000",
-        "hibernate.jdbc.batch_size"           -> "100",
-        "hibernate.hikari.maximumPoolSize"    -> s"${AppConfig.NumberOfVertxWorkers * 2}", // Same as vertx worker pool threads
-        "hibernate.hikari.minimumIdle"        -> "2",
-        "hibernate.order_inserts"             -> "true",
-        "hibernate.order_updates"             -> "true",
+        "hibernate.connection.provider_class"      -> "org.hibernate.hikaricp.internal.HikariCPConnectionProvider",
+        "hibernate.hbm2ddl.auto"                   -> "validate",
+        "hibernate.hikari.idleTimeout"             -> "30000",
+        "hibernate.jdbc.batch_size"                -> "100",
+        "hibernate.hikari.maximumPoolSize"         -> s"${AppConfig.NumberOfVertxWorkers * 2}", // Same as vertx worker pool threads
+        "hibernate.hikari.minimumIdle"             -> "2",
+        "hibernate.order_inserts"                  -> "true",
+        "hibernate.order_updates"                  -> "true",
         "hibernate.type.java_time_use_direct_jdbc" -> "true"
     )
 

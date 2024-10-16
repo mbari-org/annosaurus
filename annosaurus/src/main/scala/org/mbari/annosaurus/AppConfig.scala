@@ -73,6 +73,7 @@ object AppConfig {
         user = Config.getString("database.user"),
         password = Config.getString("database.password"),
         driver = Config.getString("database.driver"),
+        queryView = Config.getString("database.query.view")
     )
 }
 
@@ -87,7 +88,8 @@ case class DatabaseConfig(
     url: String,
     user: String,
     password: String,
-    driver: String
+    driver: String,
+    queryView: String
 ):
     def newConnection(): java.sql.Connection =
         Class.forName(driver)

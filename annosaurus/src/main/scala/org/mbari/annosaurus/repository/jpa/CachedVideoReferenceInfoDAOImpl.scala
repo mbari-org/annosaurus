@@ -79,7 +79,8 @@ class CachedVideoReferenceInfoDAOImpl(entityManager: EntityManager)
     private def fetchUsing(namedQuery: String): Iterable[String] =
         val query = entityManager.createNamedQuery(namedQuery)
         query.setHint(QueryHints.HINT_READONLY, true)
-        query.getResultList
+        query
+            .getResultList
             .asScala
             .filter(_ != null)
             .map(_.toString)

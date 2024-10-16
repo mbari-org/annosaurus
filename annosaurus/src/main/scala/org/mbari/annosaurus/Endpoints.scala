@@ -44,6 +44,10 @@ object Endpoints {
     val imageReferenceController           = new ImageReferenceController(daoFactory)
     val indexController                    = new IndexController(daoFactory)
     val observationController              = new ObservationController(daoFactory)
+    val queryController                    = new QueryController(
+        AppConfig.DefaultDatabaseConfig,
+        AppConfig.DefaultDatabaseConfig.queryView
+    )
 
     // --------------------------------
     val analysisRepository = new AnalysisRepository(daoFactory.entityManagerFactory)
@@ -67,6 +71,7 @@ object Endpoints {
     val imageReferenceEndpoints           = new ImageReferenceEndpoints(imageReferenceController)
     val indexEndpoints                    = new IndexEndpoints(indexController)
     val observationEndpoints              = new ObservationEndpoints(observationController, jdbcRepository)
+    val queryEndpoints                    = new QueryEndpoints(queryController)
 
     // --------------------------------
     // For VertX, we need to separate the non-blocking endpoints from the blocking ones
@@ -86,7 +91,8 @@ object Endpoints {
         imageEndpoints.allImpl,
         imageReferenceEndpoints.allImpl,
         indexEndpoints.allImpl,
-        observationEndpoints.allImpl
+        observationEndpoints.allImpl,
+        queryEndpoints.allImpl
     ).flatten
 
     val apiEndpoints = nonBlockingEndpoints ++ blockingEndpoints

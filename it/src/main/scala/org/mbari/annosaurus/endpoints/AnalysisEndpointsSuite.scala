@@ -17,7 +17,12 @@
 package org.mbari.annosaurus.endpoints
 
 import org.mbari.annosaurus.controllers.TestUtils
-import org.mbari.annosaurus.domain.{DepthHistogramSC, QueryConstraints, QueryConstraintsResponseSC, TimeHistogramSC}
+import org.mbari.annosaurus.domain.{
+    DepthHistogramSC,
+    QueryConstraints,
+    QueryConstraintsResponseSC,
+    TimeHistogramSC
+}
 import sttp.tapir.*
 import sttp.client3.*
 import sttp.model.StatusCode
@@ -78,23 +83,22 @@ trait AnalysisEndpointsSuite extends EndpointsSuite {
 
     // TODO both the depth and time histogram logic needs to be reworked. They can give incorrect results
     test("timeHistogram".flaky) {
-        val xs = TestUtils.build(10, 10, includeData = true)
+        val xs    = TestUtils.build(10, 10, includeData = true)
         val start = Instant.parse("1888-08-01T00:00:00Z")
-        for
-            i <- xs.indices
-        do
-            xs(i).setRecordedTimestamp(start.plusSeconds(i * 60 * 60))
-        val dao = daoFactory.newImagedMomentDAO()
+        for i <- xs.indices
+        do xs(i).setRecordedTimestamp(start.plusSeconds(i * 60 * 60))
+        val dao                 = daoFactory.newImagedMomentDAO()
         dao.runTransaction(d => xs.foreach(d.create))
-        val minTime = xs.map(_.getRecordedTimestamp).min
-        val maxTime = xs.map(_.getRecordedTimestamp).max
+        val minTime             = xs.map(_.getRecordedTimestamp).min
+        val maxTime             = xs.map(_.getRecordedTimestamp).max
         val expected            =
             xs.filter(_.getRecordedTimestamp != null).flatMap(_.getObservations.asScala).size
         val videoReferenceUuids = xs.map(_.getVideoReferenceUuid).distinct
-        val qcr = QueryConstraints(
+        val qcr                 = QueryConstraints(
             videoReferenceUuids = Seq(xs.head.getVideoReferenceUuid),
             minTimestamp = Some(minTime.minusSeconds(24 * 60 * 60)),
-            maxTimestamp = Some(maxTime.plusSeconds(24 * 60 * 60)))
+            maxTimestamp = Some(maxTime.plusSeconds(24 * 60 * 60))
+        )
 //        println(qcr.toSnakeCase.stringify)
         runPost(
             endpoints.timeHistogramImpl,

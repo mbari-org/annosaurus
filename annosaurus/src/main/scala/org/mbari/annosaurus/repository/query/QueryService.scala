@@ -19,16 +19,17 @@ package org.mbari.annosaurus.repository.query
 import org.mbari.annosaurus.DatabaseConfig
 import org.mbari.annosaurus.repository.jdbc.*
 import org.mbari.annosaurus.domain.{Annotation, Association}
+import org.mbari.annosaurus.etc.jdk.Logging.{*, given}
 
 import java.sql.ResultSet
 import scala.collection.mutable.ListBuffer
 import scala.util.Using
 
-
 class QueryService(databaseConfig: DatabaseConfig, viewName: String) {
 
-    private val jdbc = new JDBC(databaseConfig)
+    val jdbc               = new JDBC(databaseConfig)
     val AnnotationViewName = "annotations"
+    private val log        = System.getLogger(getClass.getName)
 
     def findAllConceptNames(): Either[Throwable, Seq[String]] =
         jdbc.findDistinct(viewName, "concept", stringConverter)
@@ -45,45 +46,76 @@ class QueryService(databaseConfig: DatabaseConfig, viewName: String) {
            | WHERE
            |   concept IN (${concepts.map(s => s"'$s'").mkString(",")})
            |""".stripMargin
-        jdbc.runQuery(sql, rs => {
-            val associations = ListBuffer.newBuilder[Association]
-            while (rs.next()) {
-                val linkName = rs.getString("link_name")
-                val toConcept = rs.getString("to_concept")
-                val linkValue = rs.getString("link_value")
-                associations += Association(linkName, toConcept, linkValue)
+        jdbc.runQuery(
+            sql,
+            rs => {
+                val associations = ListBuffer.newBuilder[Association]
+                while (rs.next()) {
+                    val linkName  = rs.getString("link_name")
+                    val toConcept = rs.getString("to_concept")
+                    val linkValue = rs.getString("link_value")
+                    associations += Association(linkName, toConcept, linkValue)
+                }
+                associations.result().toSeq.sortBy(_.linkName)
             }
-            associations.result().toSeq.sortBy(_.linkName)
-        })
+        )
 
     }
 
-    def query(querySelects: Seq[String],
-              constraints: Seq[Constraint],
-              includeConcurrentObservations: Boolean = false,
-              includeRelatedAssociations: Boolean = false): Either[Throwable, QueryResults] =
+    def count(constraints: Constraints): Either[Throwable, Int] =
+        val sql = PreparedStatementGenerator.buildPreparedStatementTemplateForCounts(
+            viewName,
+            constraints.constraints,
+            constraints.concurrentObservations.getOrElse(false),
+            constraints.relatedAssociations.getOrElse(false)
+        )
+        log.atDebug.log(s"Running query: $sql")
+        Using
+            .Manager(use =>
+                val conn = use(jdbc.newConnection())
+                conn.setReadOnly(true)
+                val stmt = use(
+                    conn.prepareStatement(
+                        sql,
+                        ResultSet.TYPE_FORWARD_ONLY,
+                        ResultSet.CONCUR_READ_ONLY
+                    )
+                )
+                PreparedStatementGenerator.bind(stmt, constraints.constraints)
+                val rs   = use(stmt.executeQuery(sql))
+                if rs.next() then rs.getInt(1) else 0
+            )
+            .toEither
+
+    def query(
+        querySelects: Seq[String],
+        constraints: Constraints
+    ): Either[Throwable, QueryResults] =
         val sql = PreparedStatementGenerator.buildPreparedStatementTemplate(
             viewName,
             querySelects,
-            constraints,
-            includeConcurrentObservations,
-            includeRelatedAssociations
+            constraints.constraints,
+            constraints.concurrentObservations.getOrElse(false),
+            constraints.relatedAssociations.getOrElse(false)
         )
-        Using.Manager(use =>
-            val conn = use(jdbc.newConnection())
-            conn.setReadOnly(true)
-            val stmt = use(conn.prepareStatement(sql, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY))
-            PreparedStatementGenerator.bind(stmt, constraints)
-            val rs = use(stmt.executeQuery(sql))
-            QueryResults.fromResultSet(rs)
-        ).toEither
-
-
-
-
-
-
-
-
+        log.atDebug.log(s"Running query: $sql")
+        Using
+            .Manager(use =>
+                val conn = use(jdbc.newConnection())
+                conn.setReadOnly(true)
+                val stmt = use(
+                    conn.prepareStatement(
+                        sql,
+                        ResultSet.TYPE_FORWARD_ONLY,
+                        ResultSet.CONCUR_READ_ONLY
+                    )
+                )
+                constraints.limit.foreach(stmt.setMaxRows)
+                constraints.offset.foreach(stmt.setFetchSize)
+                PreparedStatementGenerator.bind(stmt, constraints.constraints)
+                val rs   = use(stmt.executeQuery(sql))
+                QueryResults.fromResultSet(rs)
+            )
+            .toEither
 
 }

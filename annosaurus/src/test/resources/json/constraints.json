@@ -20,6 +20,13 @@
       ]
     },
     {
+      "columnName": "height",
+      "between": [
+        1,
+        100
+      ]
+    },
+    {
       "columnName": "foo",
       "min": 1
     },
@@ -33,6 +40,16 @@
         "2010-01-01T01:22:33Z",
         "2011-01-01T01:22:33Z"
       ]
+    },
+    {
+      "columnName": "qux",
+      "isnull": true
+    },
+
+    {
+      "columnName": "quxx",
+      "isnull": false
     }
+
   ]
 }

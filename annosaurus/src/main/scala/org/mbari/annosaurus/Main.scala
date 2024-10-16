@@ -63,7 +63,8 @@ object Main:
         val port = sys.env.get("HTTP_PORT").flatMap(_.toIntOption).getOrElse(8080)
         log.atInfo.log(s"Starting ${AppConfig.Name} v${AppConfig.Version} on port $port")
 
-        val vertx  = Vertx.vertx(new VertxOptions().setWorkerPoolSize(AppConfig.NumberOfVertxWorkers))
+        val vertx  =
+            Vertx.vertx(new VertxOptions().setWorkerPoolSize(AppConfig.NumberOfVertxWorkers))
 //        val vertx  = Vertx.vertx()
         val server = vertx.createHttpServer()
         val router = Router.router(vertx)

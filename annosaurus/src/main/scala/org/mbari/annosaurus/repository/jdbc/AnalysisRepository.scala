@@ -33,33 +33,35 @@ class AnalysisRepository(entityManagerFactory: EntityManagerFactory) {
     def depthHistogram(constraints: QueryConstraints, binSizeMeters: Int = 50): DepthHistogram = {
         val select                       = DepthHistogramSQL.selectFromBinSize(binSizeMeters)
         val entityManager: EntityManager = entityManagerFactory.createEntityManager()
-        val transaction = entityManager.getTransaction()
+        val transaction                  = entityManager.getTransaction()
         transaction.begin()
         val query                        = QueryConstraintsSqlBuilder.toQuery(constraints, entityManager, select, "")
         query.setHint(QueryHints.HINT_READONLY, true)
         val results                      = query.getResultList.iterator().next()
         transaction.commit()
         entityManager.close()
-        val values                       = results.asInstanceOf[Array[Object]]
+        val values                       = results
+            .asInstanceOf[Array[Object]]
             .map(s => s.asInt.getOrElse(0))
             .toList
 
-        val binsMin                      = (0 until DepthHistogramSQL.MaxDepth by binSizeMeters).toList
-        val binsMax                      = binsMin.map(_ + binSizeMeters)
+        val binsMin = (0 until DepthHistogramSQL.MaxDepth by binSizeMeters).toList
+        val binsMax = binsMin.map(_ + binSizeMeters)
         DepthHistogram(binsMin, binsMax, values)
     }
 
     def timeHistogram(constraints: QueryConstraints, binSizeDays: Int = 30): TimeHistogram = {
-        val start = constraints.minTimestamp.getOrElse(TimeHistogramSQL.MinTime)
+        val start                        = constraints.minTimestamp.getOrElse(TimeHistogramSQL.MinTime)
         val now                          = constraints.maxTimestamp.getOrElse(Instant.now())
         val select                       = TimeHistogramSQL.selectFromBinSize(start, now, binSizeDays)
         val entityManager: EntityManager = entityManagerFactory.createEntityManager()
         val query                        = QueryConstraintsSqlBuilder.toQuery(constraints, entityManager, select, "")
         query.setHint(QueryHints.HINT_READONLY, true)
 //        println(query)
-        val results = query.getResultList.iterator().next()
+        val results                      = query.getResultList.iterator().next()
         entityManager.close()
-        val values  = results.asInstanceOf[Array[Object]]
+        val values                       = results
+            .asInstanceOf[Array[Object]]
             .map(s => s.asInt.getOrElse(0))
             .toList
 

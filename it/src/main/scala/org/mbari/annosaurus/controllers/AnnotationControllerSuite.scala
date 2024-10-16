@@ -190,8 +190,8 @@ trait AnnotationControllerSuite extends BaseDAOSuite {
     }
 
     test("create(Annotation)") {
-        val im = TestUtils.build(1, 1).head
-        val expected = Annotation.from(im.getObservations.asScala.head, true)
+        val im        = TestUtils.build(1, 1).head
+        val expected  = Annotation.from(im.getObservations.asScala.head, true)
         val obtained  = exec(controller.create(expected)).head
         assert(obtained.observationUuid.isDefined)
         assert(obtained.imagedMomentUuid.isDefined)

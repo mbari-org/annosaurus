@@ -22,8 +22,17 @@ import jakarta.persistence.{EntityManager, EntityManagerFactory, Query}
 
 import scala.jdk.CollectionConverters.*
 import scala.util.control.NonFatal
-import org.mbari.annosaurus.domain.{Annotation, ConcurrentRequest, DeleteCount, GeographicRange, Image, MultiRequest, ObservationsUpdate, QueryConstraints}
-import org.mbari.annosaurus.etc.jdk.Logging.{given, *}
+import org.mbari.annosaurus.domain.{
+    Annotation,
+    ConcurrentRequest,
+    DeleteCount,
+    GeographicRange,
+    Image,
+    MultiRequest,
+    ObservationsUpdate,
+    QueryConstraints
+}
+import org.mbari.annosaurus.etc.jdk.Logging.{*, given}
 import org.mbari.annosaurus.repository.jpa.extensions.*
 // import org.mbari.annosaurus.etc.jpa.EntityManagers.*
 import jakarta.persistence.QueryHint
@@ -39,12 +48,11 @@ class JdbcRepository(entityManagerFactory: EntityManagerFactory) {
 
     private val log = System.getLogger(getClass.getName)
 
-
     def updateObservations(update: ObservationsUpdate): Int = {
         implicit val entityManager: EntityManager = entityManagerFactory.createEntityManager()
-        val n = entityManager.runTransactionSync { em =>
+        val n                                     = entityManager.runTransactionSync { em =>
             val queries = ObservationSQL.buildUpdates(update, entityManager)
-            val counts = queries.map(_.executeUpdate())
+            val counts  = queries.map(_.executeUpdate())
             counts.headOption.getOrElse(0)
         }
         entityManager.close()
@@ -103,22 +111,23 @@ class JdbcRepository(entityManagerFactory: EntityManagerFactory) {
     def findByQueryConstraint(constraints: QueryConstraints): Seq[Annotation] = {
         given entityManager: EntityManager = entityManagerFactory.createEntityManager()
         entityManagerFactory.createEntityManager().runTransactionSync { entityManager =>
-            given EntityManager = entityManager
-            val query1                         = QueryConstraintsSqlBuilder.toQuery(constraints, entityManager)
-            val r1                             = query1.getResultList.asScala.toList
-            val annotations                    = AnnotationSQL.resultListToAnnotations(r1)
-            val resolvedAnnotations            = executeQueryForAnnotations(annotations, constraints.includeData)
+            given EntityManager     = entityManager
+            val query1              = QueryConstraintsSqlBuilder.toQuery(constraints, entityManager)
+            val r1                  = query1.getResultList.asScala.toList
+            val annotations         = AnnotationSQL.resultListToAnnotations(r1)
+            val resolvedAnnotations =
+                executeQueryForAnnotations(annotations, constraints.includeData)
             resolvedAnnotations.map(_.removeForeignKeys())
-        } 
+        }
     }
 
     def countByQueryConstraint(constraints: QueryConstraints): Int = {
         entityManagerFactory.createEntityManager().runTransactionSync { entityManager =>
             given EntityManager = entityManager
-            val query                          = QueryConstraintsSqlBuilder.toCountQuery(constraints, entityManager)
+            val query           = QueryConstraintsSqlBuilder.toCountQuery(constraints, entityManager)
             query.setHint(QueryHints.HINT_READONLY, true)
             // Postgresql returns a Long, Everything else returns an Int
-            val count                          = query.getResultList.get(0).toString().toInt
+            val count           = query.getResultList.get(0).toString().toInt
             entityManager.close()
             count
         }
@@ -129,10 +138,11 @@ class JdbcRepository(entityManagerFactory: EntityManagerFactory) {
     ): Option[GeographicRange] = {
         entityManagerFactory.createEntityManager().runTransactionSync { entityManager =>
             given EntityManager = entityManager
-            val query                          = QueryConstraintsSqlBuilder.toGeographicRangeQuery(constraints, entityManager)
+            val query           =
+                QueryConstraintsSqlBuilder.toGeographicRangeQuery(constraints, entityManager)
             query.setHint(QueryHints.HINT_READONLY, true)
             // Queries return java.util.List[Array[Object]]
-            val count                          = query.getResultList.asScala.toList
+            val count           = query.getResultList.asScala.toList
             if (count.nonEmpty) {
                 val head = count.head.asInstanceOf[Array[?]]
                 Some(
@@ -147,7 +157,7 @@ class JdbcRepository(entityManagerFactory: EntityManagerFactory) {
                 )
             }
             else None
-        } 
+        }
     }
 
     def findAll(
@@ -158,7 +168,7 @@ class JdbcRepository(entityManagerFactory: EntityManagerFactory) {
 
         entityManagerFactory.createEntityManager().runTransactionSync { entityManager =>
             given EntityManager = entityManager
-            val query1                         = entityManager.createNativeQuery(AnnotationSQL.all)
+            val query1          = entityManager.createNativeQuery(AnnotationSQL.all)
             limit.foreach(query1.setMaxResults)
             offset.foreach(query1.setFirstResult)
 
@@ -167,7 +177,7 @@ class JdbcRepository(entityManagerFactory: EntityManagerFactory) {
             val a2 = executeQueryForAnnotations(a1, includeAncillaryData)
             entityManager.close()
             a2
-        } 
+        }
 
     }
 

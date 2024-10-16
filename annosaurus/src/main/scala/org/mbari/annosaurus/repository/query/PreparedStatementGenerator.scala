@@ -22,7 +22,7 @@ import java.sql.PreparedStatement
 import scala.util.Try
 object PreparedStatementGenerator {
 
-    val ObservationUuid = "observation_uuid"
+    val ObservationUuid  = "observation_uuid"
     val ImagedMomentUuid = "imaged_moment_uuid"
 
     private val log = System.getLogger(getClass.getName)
@@ -35,6 +35,24 @@ object PreparedStatementGenerator {
             log.atDebug.log(s"Bound ${idx - 1} constraints to prepared statement")
         }.toEither
 
+    def buildPreparedStatementTemplateForCounts(
+        tableName: String,
+        constraints: Seq[Constraint],
+        includeConcurrentObservations: Boolean = false,
+        includeRelatedAssociations: Boolean = false
+    ): String =
+        val where = buildWhereClause(
+            tableName,
+            constraints,
+            includeConcurrentObservations,
+            includeRelatedAssociations
+        )
+        s"""
+          |SELECT COUNT(*)
+          |FROM $tableName
+          |$where
+          |""".stripMargin
+
     def buildPreparedStatementTemplate(
         tableName: String,
         querySelects: Seq[String],
@@ -44,7 +62,12 @@ object PreparedStatementGenerator {
     ): String =
 
         val select = (ObservationUuid +: querySelects).mkString(", ")
-        val where = buildWhereClause(tableName, constraints, includeConcurrentObservations, includeRelatedAssociations)
+        val where  = buildWhereClause(
+            tableName,
+            constraints,
+            includeConcurrentObservations,
+            includeRelatedAssociations
+        )
 
         s"""
           |SELECT $select
@@ -52,12 +75,13 @@ object PreparedStatementGenerator {
           |WHERE $where
           |""".stripMargin
 
-
-    private def buildWhereClause(tableName: String,
-                         constraints: Seq[Constraint],
-                         includeConcurrentObservations: Boolean = false,
-                         includeRelatedAssociations: Boolean = false): String =
-        val wheres  = constraints.map(_.toPreparedStatementTemplate).mkString(" AND ")
+    private def buildWhereClause(
+        tableName: String,
+        constraints: Seq[Constraint],
+        includeConcurrentObservations: Boolean = false,
+        includeRelatedAssociations: Boolean = false
+    ): String =
+        val wheres = constraints.map(_.toPreparedStatementTemplate).mkString(" AND ")
         if includeConcurrentObservations && includeRelatedAssociations then
             s"""WHERE $ObservationUuid IN (
                |     SELECT $ObservationUuid
@@ -69,20 +93,17 @@ object PreparedStatementGenerator {
                |     )
                |)
                |""".stripMargin
-        else if includeConcurrentObservations then
-            s"""WHERE $ImagedMomentUuid IN (
+        else if includeConcurrentObservations then s"""WHERE $ImagedMomentUuid IN (
                |     SELECT $ImagedMomentUuid
                |     FROM $tableName
                |     WHERE $wheres
                |)
                |""".stripMargin
-        else if includeRelatedAssociations then
-            s"""WHERE $ObservationUuid IN (
+        else if includeRelatedAssociations then s"""WHERE $ObservationUuid IN (
                |     SELECT $ObservationUuid
                |     FROM $tableName
                |     WHERE $wheres
                |)
                |""".stripMargin
-        else
-            s"""WHERE $wheres"""
+        else s"""WHERE $wheres"""
 }

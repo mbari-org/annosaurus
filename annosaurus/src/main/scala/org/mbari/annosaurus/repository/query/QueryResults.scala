@@ -25,14 +25,26 @@ object QueryResults {
 
     def fromResultSet(rs: ResultSet): QueryResults =
         val metadata = JDBC.Metadata.fromResultSet(rs)
-        val map = scala.collection.mutable.Map[JDBC.Metadata, mutable.ListBuffer[Any]]()
+        val map      = scala.collection.mutable.Map[JDBC.Metadata, mutable.ListBuffer[Any]]()
         while rs.next() do
             metadata.foreach { m =>
                 val list = map.getOrElseUpdate(m, mutable.ListBuffer())
                 list += rs.getObject(m.columnName)
             }
-        val data = map.map { case (k, v) => k -> v.result() }.toMap
+        val data     = map.map { case (k, v) => k -> v.result() }.toMap
         data
 
+    def toTsv(queryResults: QueryResults): LazyList[String] =
+        val header = queryResults.keys.map(_.columnName).mkString("\t")
+        val values = queryResults.values
+        val n      = values.headOption.map(_.size).getOrElse(0)
+        LazyList
+            .tabulate(n) { i =>
+                val s =
+                    for v <- values
+                    yield v(i)
+                s.mkString("\t")
+            }
+            .prepended(header)
 
 }

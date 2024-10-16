@@ -249,7 +249,7 @@ class AnnotationController(
 
     def create(annotation: Annotation)(using ec: ExecutionContext): Future[Seq[Annotation]] =
         val entity = annotation.toEntity
-        val dao = daoFactory.newImagedMomentDAO()
+        val dao    = daoFactory.newImagedMomentDAO()
         val future = dao.runTransaction(d => {
 //            d.create(entity)
 //            Annotation.fromImagedMoment(entity, true)
@@ -258,7 +258,6 @@ class AnnotationController(
         })
         future.onComplete(_ => dao.close())
         future
-
 
     /** Bulk create annotations
       * @param annotations

@@ -165,7 +165,8 @@ class ObservationDAOImpl(entityManager: EntityManager)
     override def findAllConcepts(): Seq[String] =
         val query = entityManager.createNamedQuery("Observation.findAllNames")
         query.setHint(QueryHints.HINT_READONLY, true)
-        query.getResultList
+        query
+            .getResultList
             .asScala
             .filter(_ != null)
             .map(_.toString)
@@ -174,7 +175,8 @@ class ObservationDAOImpl(entityManager: EntityManager)
     override def findAllGroups(): Seq[String] =
         val query = entityManager.createNamedQuery("Observation.findAllGroups")
         query.setHint(QueryHints.HINT_READONLY, true)
-        query.getResultList
+        query
+            .getResultList
             .asScala
             .filter(_ != null)
             .map(_.toString)
@@ -183,7 +185,8 @@ class ObservationDAOImpl(entityManager: EntityManager)
     override def findAllActivities(): Seq[String] =
         val query = entityManager.createNamedQuery("Observation.findAllActivities")
         query.setHint(QueryHints.HINT_READONLY, true)
-        query.getResultList
+        query
+            .getResultList
             .asScala
             .filter(_ != null)
             .map(_.toString)

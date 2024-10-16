@@ -21,7 +21,7 @@ import io.circe.generic.semiauto.*
 import io.circe.syntax.*
 import org.mbari.annosaurus.util.HexUtil
 import org.mbari.annosaurus.domain.*
-import org.mbari.annosaurus.repository.query.{Constraint, Constraints}
+import org.mbari.annosaurus.repository.query.{Constraint, Constraints, JDBC}
 
 import java.net.{URI, URL}
 import java.time.Instant
@@ -339,30 +339,70 @@ object CirceCodecs {
             constraint <- {
                 if (c.downField("in").succeeded) {
                     c.downField("in").as[List[String]].map(Constraint.In(columnName, _))
-                } else if (c.downField("like").succeeded) {
+                }
+                else if (c.downField("like").succeeded) {
                     c.downField("like").as[String].map(Constraint.Like(columnName, _))
-                } else if (c.downField("between").succeeded) {
+                }
+                else if (c.downField("between").succeeded) {
                     // Attempt to decode between as List[Int] first
-                    c.downField("between").as[List[Double]].map(xs => Constraint.MinMax(columnName, xs.head, xs.last))
+                    c.downField("between")
+                        .as[List[Double]]
+                        .map(xs => Constraint.MinMax(columnName, xs.head, xs.last))
                         .orElse {
                             // If decoding as Int fails, try decoding as List[Instant]
-                            c.downField("between").as[List[Instant]].map(xs => Constraint.Date(columnName, xs.head, xs.last))
+                            c.downField("between")
+                                .as[List[Instant]]
+                                .map(xs => Constraint.Date(columnName, xs.head, xs.last))
                         }
-                } else if (c.downField("minmax").succeeded) {
-                    c.downField("minmax").as[List[Double]].map(xs => Constraint.MinMax(columnName, xs.head, xs.last))
-                } else if (c.downField("min").succeeded) {
+                }
+                else if (c.downField("minmax").succeeded) {
+                    c.downField("minmax")
+                        .as[List[Double]]
+                        .map(xs => Constraint.MinMax(columnName, xs.head, xs.last))
+                }
+                else if (c.downField("min").succeeded) {
                     c.downField("min").as[Double].map(Constraint.Min(columnName, _))
-                } else if (c.downField("max").succeeded) {
+                }
+                else if (c.downField("max").succeeded) {
                     c.downField("max").as[Double].map(Constraint.Max(columnName, _))
-                } else {
+                }
+                else if (c.downField("isnull").succeeded) {
+                    c.downField("isnull").as[Boolean].map(Constraint.IsNull(columnName, _))
+                }
+                else {
                     Left(DecodingFailure("Unknown constraint type", c.history))
                 }
             }
         } yield constraint
     }
-    
-    given constraintsDecoder: Decoder[Constraints] = deriveDecoder
 
+    given Encoder[Constraint.Date]       = deriveEncoder
+    given Encoder[Constraint.In[String]] = deriveEncoder
+    given Encoder[Constraint.Like]       = deriveEncoder
+    given Encoder[Constraint.Max]        = deriveEncoder
+    given Encoder[Constraint.Min]        = deriveEncoder
+    given Encoder[Constraint.MinMax]     = deriveEncoder
+    given Encoder[Constraint.IsNull]     = deriveEncoder
+    given Encoder[List[Constraint]]      = deriveEncoder
+
+    // THis is needed to handle the trait Constraint used in Constraints
+    given constraintEncoder: Encoder[Constraint] = Encoder.instance[Constraint] {
+        case c: Constraint.In[String] => c.asJson
+        case c: Constraint.Like       => c.asJson
+        case c: Constraint.Min        => c.asJson
+        case c: Constraint.Max        => c.asJson
+        case c: Constraint.MinMax     => c.asJson
+        case c: Constraint.IsNull     => c.asJson
+        case c: Constraint.Date       => c.asJson
+    }
+
+    given constraintsDecoder: Decoder[Constraints] = deriveDecoder
+    given constraintsEncoder: Encoder[Constraints] = deriveEncoder
+
+    given queryRequestDecoder: Decoder[QueryRequest]  = deriveDecoder
+    given queryRequestEncoder: Encoder[QueryRequest]  = deriveEncoder
+    given jdbcMetadataDecoder: Decoder[JDBC.Metadata] = deriveDecoder
+    given jdbcMetadataEncoder: Encoder[JDBC.Metadata] = deriveEncoder
 
     val CustomPrinter: Printer = Printer(
         dropNullValues = true,

@@ -18,14 +18,18 @@ package org.mbari.annosaurus.domain
 
 import java.util.UUID
 
-/**
- * Update multiple observations at once
- * @param observationUuids The UUIDs of the observations to update
- * @param concept The new concept
- * @param observer The new observer
- * @param activity The new activity
- * @param group The new group
- */
+/** Update multiple observations at once
+  * @param observationUuids
+  *   The UUIDs of the observations to update
+  * @param concept
+  *   The new concept
+  * @param observer
+  *   The new observer
+  * @param activity
+  *   The new activity
+  * @param group
+  *   The new group
+  */
 case class ObservationsUpdate(
     observationUuids: Seq[UUID],
     concept: Option[String] = None,

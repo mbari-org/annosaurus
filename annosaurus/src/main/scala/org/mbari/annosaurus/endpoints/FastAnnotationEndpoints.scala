@@ -335,7 +335,9 @@ class FastAnnotationEndpoints(jdbcRepository: JdbcRepository)(using
             .in(paging)
             .out(jsonBody[Seq[UUID]])
             .name("findImageMomentUuidsByConcept")
-            .description("Find the UUIDS of image moments by concept. Only include image moments with images. Sorted by recorded timestamp.")
+            .description(
+                "Find the UUIDS of image moments by concept. Only include image moments with images. Sorted by recorded timestamp."
+            )
             .tag(tag)
 
     val findImagedMomentUuidsByConceptImpl: ServerEndpoint[Any, Future] =
@@ -363,7 +365,9 @@ class FastAnnotationEndpoints(jdbcRepository: JdbcRepository)(using
             .in(paging)
             .out(jsonBody[Seq[UUID]])
             .name("findImagedMomentUuidsByToConcept")
-            .description("Find image moment UUIDs by to concept. Only include image moments with images. Sorted by recorded timestamp.")
+            .description(
+                "Find image moment UUIDs by to concept. Only include image moments with images. Sorted by recorded timestamp."
+            )
             .tag(tag)
 
     val findImagedMomentUuidsByToConceptImpl: ServerEndpoint[Any, Future] =

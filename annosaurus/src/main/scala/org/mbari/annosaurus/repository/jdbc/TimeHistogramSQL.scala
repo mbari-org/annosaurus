@@ -22,7 +22,11 @@ object TimeHistogramSQL {
 
     val MinTime = Instant.parse("1987-01-01T00:00:00Z")
 
-    def selectFromBinSize(minInstant: Instant, maxInstant: Instant, binSizeDays: Int = 30): String = {
+    def selectFromBinSize(
+        minInstant: Instant,
+        maxInstant: Instant,
+        binSizeDays: Int = 30
+    ): String = {
         val intervalMillis = binSizeDays * 24 * 60 * 60 * 1000L
         val start          = minInstant.toEpochMilli
         val end            = maxInstant.toEpochMilli

@@ -17,7 +17,17 @@
 package org.mbari.annosaurus.endpoints
 
 import org.mbari.annosaurus.controllers.ObservationController
-import org.mbari.annosaurus.domain.{ConceptCount, Count, CountForVideoReferenceSC, ErrorMsg, ObservationSC, ObservationUpdateSC, ObservationsUpdate, RenameConcept, RenameCountSC}
+import org.mbari.annosaurus.domain.{
+    ConceptCount,
+    Count,
+    CountForVideoReferenceSC,
+    ErrorMsg,
+    ObservationSC,
+    ObservationUpdateSC,
+    ObservationsUpdate,
+    RenameConcept,
+    RenameCountSC
+}
 import org.mbari.annosaurus.etc.jwt.JwtService
 import org.mbari.annosaurus.etc.tapir.TapirCodecs.given
 import sttp.tapir.*
@@ -320,7 +330,11 @@ class ObservationEndpoints(controller: ObservationController, jdbcRepository: Jd
         secureEndpoint
             .put
             .in(base / "bulk")
-            .in(jsonBody[ObservationsUpdate].description("Describes the parameters and uuids of the observations to update. Can be camelCase or snake_case."))
+            .in(
+                jsonBody[ObservationsUpdate].description(
+                    "Describes the parameters and uuids of the observations to update. Can be camelCase or snake_case."
+                )
+            )
             .out(jsonBody[Count].description("The number of observations updated"))
             .name("updateManyObservations")
             .description(

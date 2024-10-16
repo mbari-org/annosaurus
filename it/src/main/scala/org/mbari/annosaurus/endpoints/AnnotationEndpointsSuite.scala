@@ -17,7 +17,15 @@
 package org.mbari.annosaurus.endpoints
 
 import org.mbari.annosaurus.controllers.{AnnotationController, TestUtils}
-import org.mbari.annosaurus.domain.{Annotation, AnnotationCreate, AnnotationSC, ConcurrentRequest, ConcurrentRequestCountSC, MultiRequest, MultiRequestCountSC}
+import org.mbari.annosaurus.domain.{
+    Annotation,
+    AnnotationCreate,
+    AnnotationSC,
+    ConcurrentRequest,
+    ConcurrentRequestCountSC,
+    MultiRequest,
+    MultiRequestCountSC
+}
 import org.mbari.annosaurus.repository.jpa.JPADAOFactory
 import org.mbari.annosaurus.etc.jdk.Logging.{*, given}
 import org.mbari.annosaurus.etc.jwt.JwtService
@@ -503,17 +511,17 @@ trait AnnotationEndpointsSuite extends EndpointsSuite {
     }
 
     test("create (stress test)") {
-        val count = new AtomicInteger(0)
-        val jwt = jwtService.authorize("foo").orNull
-        val uuid = UUID.randomUUID()
+        val count       = new AtomicInteger(0)
+        val jwt         = jwtService.authorize("foo").orNull
+        val uuid        = UUID.randomUUID()
         assert(jwt != null)
         val backendStub = newBackendStub(endpoints.createAnnotationImpl)
-        val n = 1000
-        var threads = (0 until n)
+        val n           = 1000
+        var threads     = (0 until n)
             .map(i => TestUtils.build(1, 1).head)
             .map(im => {
                 val obs = im.getObservations.iterator.next()
-                val a = Annotation.from(obs)
+                val a   = Annotation.from(obs)
                 a.copy(videoReferenceUuid = Some(uuid), timecode = None)
             })
             .map(anno => {
@@ -542,7 +550,6 @@ trait AnnotationEndpointsSuite extends EndpointsSuite {
         while (count.get() < n) {
             Thread.sleep(100)
         }
-
 
     }
 }

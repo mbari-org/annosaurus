@@ -591,7 +591,7 @@ trait ImagedMomentEndpointsSuite extends EndpointsSuite {
         assertEquals(response.code, StatusCode.Ok)
         val count = checkResponse[Count](response.body)
         assertEquals(count.count.intValue, xs.size)
-            
+
     }
 
     test("bulkMove (snake_case)") {
@@ -612,6 +612,6 @@ trait ImagedMomentEndpointsSuite extends EndpointsSuite {
         assertEquals(response.code, StatusCode.Ok)
         val count = checkResponse[Count](response.body)
         assertEquals(count.count.intValue, xs.size)
-            
+
     }
 }

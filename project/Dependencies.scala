@@ -30,7 +30,7 @@ object Dependencies {
     lazy val hibernateEnvers = "org.hibernate.orm" % "hibernate-envers"   % hibernateVersion
     lazy val hibernateHikari = "org.hibernate.orm" % "hibernate-hikaricp" % hibernateVersion
 
-    lazy val hikariCp         = "com.zaxxer"           % "HikariCP"          % "5.1.0"
+    lazy val hikariCp         = "com.zaxxer"           % "HikariCP"          % "6.0.0"
     lazy val jansi            = "org.fusesource.jansi" % "jansi"             % "2.4.1"
     lazy val javaxServlet     = "javax.servlet"        % "javax.servlet-api" % "4.0.1"
     lazy val javaxTransaction = "javax.transaction"    % "jta"               % "1.1"
@@ -49,7 +49,7 @@ object Dependencies {
     lazy val json4sJackson = "org.json4s"         %% "json4s-jackson"  % "4.0.7"
     lazy val junit         = "junit"               % "junit"           % "4.13.2"
 
-    val logbackVersion      = "1.5.10"
+    val logbackVersion      = "1.5.11"
     lazy val logbackClassic = "ch.qos.logback" % "logback-classic" % logbackVersion
     lazy val logbackCore    = "ch.qos.logback" % "logback-core"    % logbackVersion
 

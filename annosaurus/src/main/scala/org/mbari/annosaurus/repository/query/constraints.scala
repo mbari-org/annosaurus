@@ -21,9 +21,14 @@ import java.time.Instant
 
 import java.time.Instant
 
-
 // Define the Root case class
-case class Constraints(constraints: List[Constraint])
+case class Constraints(
+    constraints: List[Constraint],
+    limit: Option[Int] = None,
+    offset: Option[Int] = None,
+    concurrentObservations: Option[Boolean] = None,
+    relatedAssociations: Option[Boolean] = None
+)
 
 sealed trait Constraint:
     def columnName: String
@@ -33,15 +38,28 @@ sealed trait Constraint:
     def bind(statement: PreparedStatement, idx: Int): Int
 
 object Constraint:
-    object Noop extends Constraint:
-        val columnName: String = ""
-        def toPreparedStatementTemplate: String = ""
+    case object Noop extends Constraint:
+        val columnName: String                                = ""
+        def toPreparedStatementTemplate: String               = ""
         @throws[SQLException]
         def bind(statement: PreparedStatement, idx: Int): Int = idx
 
+    case class Date(columnName: String, startTimestamp: Instant, endTimestamp: Instant)
+        extends Constraint:
+        @throws[SQLException]
+        def bind(statement: PreparedStatement, idx: Int): Int =
+            statement.setObject(idx, startTimestamp)
+            statement.setObject(idx + 1, endTimestamp)
+            idx + 2
+
+        def toPreparedStatementTemplate: String = columnName + " BETWEEN ? AND ?"
+
     case class In[A](columnName: String, in: Seq[A]) extends Constraint:
         require(columnName != null)
-        require(in != null && in.nonEmpty, "Check your value arg! null and empty values are not allowed")
+        require(
+            in != null && in.nonEmpty,
+            "Check your value arg! null and empty values are not allowed"
+        )
 
         @throws[SQLException]
         def bind(statement: PreparedStatement, idx: Int): Int =
@@ -88,16 +106,12 @@ object Constraint:
 
         def toPreparedStatementTemplate: String = columnName + " BETWEEN ? AND ?"
 
-    case class Date(columnName: String, startTimestamp: Instant, endTimestamp: Instant) extends Constraint:
+    case class IsNull(columnName: String, isNull: Boolean) extends Constraint:
         @throws[SQLException]
-        def bind(statement: PreparedStatement, idx: Int): Int =
-            statement.setObject(idx, startTimestamp)
-            statement.setObject(idx + 1, endTimestamp)
-            idx + 2
+        def bind(statement: PreparedStatement, idx: Int): Int = idx
 
-        def toPreparedStatementTemplate: String = columnName + " BETWEEN ? AND ?"
-
-
+        def toPreparedStatementTemplate: String = if isNull then columnName + " IS NULL"
+        else columnName + " IS NOT NULL"
 //
 //case class InConstraint[A](columnName: String, in: Seq[A]) extends Constraint {
 //    require(columnName != null)
@@ -169,4 +183,3 @@ object Constraint:
 //    def toPreparedStatementTemplate: String = columnName + " BETWEEN ? AND ?"
 //
 //
-
