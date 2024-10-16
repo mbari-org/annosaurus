@@ -17,24 +17,20 @@
 package org.mbari.annosaurus.controllers
 
 import org.mbari.annosaurus.DatabaseConfig
-import org.mbari.annosaurus.domain.QueryRequest
-import org.mbari.annosaurus.repository.query.{
-    Constraint,
-    Constraints,
-    JDBC,
-    QueryResults,
-    QueryService
-}
+import org.mbari.annosaurus.domain.{Count, QueryRequest}
+import org.mbari.annosaurus.repository.query.{JDBC, Query, QueryResults, QueryService}
 
 class QueryController(databaseConfig: DatabaseConfig, viewName: String) {
 
     private lazy val queryService = new QueryService(databaseConfig, viewName)
 
-    def count(constraints: Constraints): Either[Throwable, Int] =
-        queryService.count(constraints)
+    def count(queryRequest: QueryRequest): Either[Throwable, Count] =
+        val query = Query.from(queryRequest)
+        queryService.count(query).map(Count(_))
 
     def query(queryRequest: QueryRequest): Either[Throwable, QueryResults] =
-        queryService.query(queryRequest.querySelects, queryRequest.constraints)
+        val query = Query.from(queryRequest)
+        queryService.query(query)
 
     def listColumns(): Either[Throwable, Seq[JDBC.Metadata]] =
         queryService.jdbc.listColumnsMetadata(viewName)

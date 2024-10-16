@@ -16,35 +16,62 @@
 
 package org.mbari.annosaurus.repository.query
 
+import org.mbari.annosaurus.domain.{ConstraintRequest, QueryRequest}
+
 import java.sql.{PreparedStatement, SQLException}
 import java.time.Instant
-
-import java.time.Instant
+import org.mbari.annosaurus.etc.circe.CirceCodecs.{*, given}
 
 // Define the Root case class
-case class Constraints(
-    constraints: List[Constraint],
+case class Query(
+    constraints: Seq[Constraint],
+    columns: Seq[String] = Seq.empty,
     limit: Option[Int] = None,
     offset: Option[Int] = None,
     concurrentObservations: Option[Boolean] = None,
     relatedAssociations: Option[Boolean] = None
 )
 
+object Query:
+    def from(queryRequest: QueryRequest): Query =
+        Query(
+            constraints = queryRequest.where.map(Constraint.from),
+            columns = queryRequest.select.getOrElse(Seq.empty),
+            limit = queryRequest.limit,
+            offset = queryRequest.offset,
+            concurrentObservations = queryRequest.concurrentObservations,
+            relatedAssociations = queryRequest.relatedAssociations
+        )
+
+
+
 sealed trait Constraint:
-    def columnName: String
+    def column: String
     def toPreparedStatementTemplate: String
 
     @throws[SQLException]
     def bind(statement: PreparedStatement, idx: Int): Int
 
 object Constraint:
+
+    def from (constraintRequest: ConstraintRequest): Constraint =
+        constraintRequest match
+            case ConstraintRequest(column, Some(in), _, _, _, _, _, _) => In(column, in)
+            case ConstraintRequest(column, _, Some(like), _, _, _, _, _) => Like(column, like)
+            case ConstraintRequest(column, _, _, Some(min), _, _, _, _) => Min(column, min)
+            case ConstraintRequest(column, _, _, _, Some(max), _, _, _) => Max(column, max)
+            case ConstraintRequest(column, _, _, _, _, Some(minmax), _, _) => MinMax(column, minmax.head, minmax(1))
+            case ConstraintRequest(column, _, _, _, _, _, Some(between), _) => Date(column, between.head, between(1))
+            case ConstraintRequest(column, _, _, _, _, _, _, Some(isnull)) => IsNull(column, isnull)
+            case _ => Noop
+
     case object Noop extends Constraint:
-        val columnName: String                                = ""
+        val column: String                                = ""
         def toPreparedStatementTemplate: String               = ""
         @throws[SQLException]
         def bind(statement: PreparedStatement, idx: Int): Int = idx
 
-    case class Date(columnName: String, startTimestamp: Instant, endTimestamp: Instant)
+    case class Date(column: String, startTimestamp: Instant, endTimestamp: Instant)
         extends Constraint:
         @throws[SQLException]
         def bind(statement: PreparedStatement, idx: Int): Int =
@@ -52,10 +79,10 @@ object Constraint:
             statement.setObject(idx + 1, endTimestamp)
             idx + 2
 
-        def toPreparedStatementTemplate: String = columnName + " BETWEEN ? AND ?"
+        def toPreparedStatementTemplate: String = column + " BETWEEN ? AND ?"
 
-    case class In[A](columnName: String, in: Seq[A]) extends Constraint:
-        require(columnName != null)
+    case class In[A](column: String, in: Seq[A]) extends Constraint:
+        require(column != null)
         require(
             in != null && in.nonEmpty,
             "Check your value arg! null and empty values are not allowed"
@@ -65,53 +92,53 @@ object Constraint:
         def bind(statement: PreparedStatement, idx: Int): Int =
             var i = idx
             for v <- in do
-                statement.setObject(idx, v)
+                statement.setObject(i, v)
                 i = i + 1
             i
 
         def toPreparedStatementTemplate: String =
-            if in.size eq 1 then columnName + " = ?"
-            else columnName + " IN " + in.map(s => "?").mkString("(", ",", ")")
+            if in.size eq 1 then column + " = ?"
+            else column + " IN " + in.map(s => "?").mkString("(", ",", ")")
 
-    case class Like(columnName: String, like: String) extends Constraint:
+    case class Like(column: String, like: String) extends Constraint:
         @throws[SQLException]
         def bind(statement: PreparedStatement, idx: Int): Int =
             statement.setString(idx, s"%$like%")
             idx + 1
 
-        def toPreparedStatementTemplate: String = s"$columnName LIKE ?"
+        def toPreparedStatementTemplate: String = s"$column LIKE ?"
 
-    case class Max(columnName: String, max: Double) extends Constraint:
+    case class Max(column: String, max: Double) extends Constraint:
         @throws[SQLException]
         def bind(statement: PreparedStatement, idx: Int): Int =
             statement.setDouble(idx, max)
             idx + 1
 
-        def toPreparedStatementTemplate: String = columnName + " <= ?"
+        def toPreparedStatementTemplate: String = column + " <= ?"
 
-    case class Min(columnName: String, min: Double) extends Constraint:
+    case class Min(column: String, min: Double) extends Constraint:
         @throws[SQLException]
         def bind(statement: PreparedStatement, idx: Int): Int =
             statement.setDouble(idx, min)
             idx + 1
 
-        def toPreparedStatementTemplate: String = columnName + " >= ?"
+        def toPreparedStatementTemplate: String = column + " >= ?"
 
-    case class MinMax(columnName: String, min: Double, max: Double) extends Constraint:
+    case class MinMax(column: String, min: Double, max: Double) extends Constraint:
         @throws[SQLException]
         def bind(statement: PreparedStatement, idx: Int): Int =
             statement.setDouble(idx, min)
             statement.setDouble(idx + 1, max)
             idx + 2
 
-        def toPreparedStatementTemplate: String = columnName + " BETWEEN ? AND ?"
+        def toPreparedStatementTemplate: String = column + " BETWEEN ? AND ?"
 
-    case class IsNull(columnName: String, isNull: Boolean) extends Constraint:
+    case class IsNull(column: String, isNull: Boolean) extends Constraint:
         @throws[SQLException]
         def bind(statement: PreparedStatement, idx: Int): Int = idx
 
-        def toPreparedStatementTemplate: String = if isNull then columnName + " IS NULL"
-        else columnName + " IS NOT NULL"
+        def toPreparedStatementTemplate: String = if isNull then column + " IS NULL"
+        else column + " IS NOT NULL"
 //
 //case class InConstraint[A](columnName: String, in: Seq[A]) extends Constraint {
 //    require(columnName != null)

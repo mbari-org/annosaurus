@@ -22,6 +22,7 @@ import java.sql.PreparedStatement
 import scala.util.Try
 object PreparedStatementGenerator {
 
+    val IndexTime        = "index_recorded_timestamp"
     val ObservationUuid  = "observation_uuid"
     val ImagedMomentUuid = "imaged_moment_uuid"
 
@@ -55,13 +56,16 @@ object PreparedStatementGenerator {
 
     def buildPreparedStatementTemplate(
         tableName: String,
-        querySelects: Seq[String],
+        columns: Seq[String],
         constraints: Seq[Constraint],
         includeConcurrentObservations: Boolean = false,
         includeRelatedAssociations: Boolean = false
     ): String =
 
-        val select = (ObservationUuid +: querySelects).mkString(", ")
+        // Add InexTime to the columns if it is not already there so that we can always sort by time
+        val resolvedColumns1 = if columns.contains(IndexTime) then columns else IndexTime +: columns
+        val resolvedColumns2 = if resolvedColumns1.contains(ObservationUuid) then resolvedColumns1 else ObservationUuid +: resolvedColumns1
+        val select = resolvedColumns2.mkString(", ")
         val where  = buildWhereClause(
             tableName,
             constraints,
@@ -70,9 +74,10 @@ object PreparedStatementGenerator {
         )
 
         s"""
-          |SELECT $select
+          |SELECT DISTINCT $select
           |FROM $tableName
-          |WHERE $where
+          |$where
+          |ORDER BY $IndexTime, $ObservationUuid ASC
           |""".stripMargin
 
     private def buildWhereClause(

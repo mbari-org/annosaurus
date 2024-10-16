@@ -16,9 +16,26 @@
 
 package org.mbari.annosaurus.domain
 
-import org.mbari.annosaurus.repository.query.Constraints
+import org.mbari.annosaurus.repository.query.Query
+
+import java.time.Instant
 
 case class QueryRequest(
-    querySelects: Seq[String],
-    constraints: Constraints
+                           where: Seq[ConstraintRequest],
+                           select: Option[Seq[String]] = None,
+                           limit: Option[Int] = None,
+                           offset: Option[Int] = None,
+                           concurrentObservations: Option[Boolean] = None,
+                           relatedAssociations: Option[Boolean] = None
+)
+
+case class ConstraintRequest(
+    column: String,
+    in: Option[Seq[String]] = None,
+    like: Option[String] = None,
+    min: Option[Double] = None,
+    max: Option[Double] = None,
+    minmax: Option[Seq[Double]] = None,
+    between: Option[Seq[Instant]] = None,
+    isnull: Option[Boolean] = None
 )

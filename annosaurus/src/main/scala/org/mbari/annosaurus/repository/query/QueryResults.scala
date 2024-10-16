@@ -18,33 +18,39 @@ package org.mbari.annosaurus.repository.query
 
 import java.sql.ResultSet
 import scala.collection.mutable
+import scala.collection.mutable.ListBuffer
 
-type QueryResults = Map[JDBC.Metadata, Seq[Any]]
+type QueryResults = List[(JDBC.Metadata, Seq[Any])]
 
 object QueryResults {
 
     def fromResultSet(rs: ResultSet): QueryResults =
         val metadata = JDBC.Metadata.fromResultSet(rs)
-        val map      = scala.collection.mutable.Map[JDBC.Metadata, mutable.ListBuffer[Any]]()
+        val results = ListBuffer[ListBuffer[Any]]()
+        val numColumns = metadata.size
+        var isNew = true
         while rs.next() do
-            metadata.foreach { m =>
-                val list = map.getOrElseUpdate(m, mutable.ListBuffer())
-                list += rs.getObject(m.columnName)
-            }
-        val data     = map.map { case (k, v) => k -> v.result() }.toMap
-        data
+            for i <- 1 to numColumns do
+                if (isNew) results += ListBuffer[Any]()
+                val column = results(i - 1)
+                column += rs.getObject(i)
+            isNew = false
+        val columnData = results.result().map(_.result()) // Turn into immutable
+        metadata.zip(columnData).toList
 
-    def toTsv(queryResults: QueryResults): LazyList[String] =
-        val header = queryResults.keys.map(_.columnName).mkString("\t")
-        val values = queryResults.values
-        val n      = values.headOption.map(_.size).getOrElse(0)
-        LazyList
-            .tabulate(n) { i =>
-                val s =
-                    for v <- values
-                    yield v(i)
-                s.mkString("\t")
-            }
-            .prepended(header)
+
+    def toTsv(queryResults: QueryResults): String =
+        val header = queryResults.map(_._1.columnName).mkString("\t")
+        val columnData = queryResults.map(_._2)
+        val numRows      = columnData.headOption.map(_.size).getOrElse(0)
+        val numCols     = columnData.size
+        val sb = new StringBuilder(header)
+        sb.append("\n")
+        for i <- 0 until numRows do
+            for j <- 0 until numCols do
+                sb.append(columnData(j)(i))
+                if j < numCols - 1 then sb.append("\t")
+            sb.append("\n")
+        sb.result()
 
 }

@@ -21,7 +21,7 @@ import io.circe.generic.semiauto.*
 import io.circe.syntax.*
 import org.mbari.annosaurus.util.HexUtil
 import org.mbari.annosaurus.domain.*
-import org.mbari.annosaurus.repository.query.{Constraint, Constraints, JDBC}
+import org.mbari.annosaurus.repository.query.{Constraint, Query, JDBC}
 
 import java.net.{URI, URL}
 import java.time.Instant
@@ -396,9 +396,11 @@ object CirceCodecs {
         case c: Constraint.Date       => c.asJson
     }
 
-    given constraintsDecoder: Decoder[Constraints] = deriveDecoder
-    given constraintsEncoder: Encoder[Constraints] = deriveEncoder
+    given constraintsDecoder: Decoder[Query] = deriveDecoder
+    given constraintsEncoder: Encoder[Query] = deriveEncoder
 
+    given constraintRequestDecoder: Decoder[ConstraintRequest] = deriveDecoder
+    given constraintRequestEncoder: Encoder[ConstraintRequest] = deriveEncoder
     given queryRequestDecoder: Decoder[QueryRequest]  = deriveDecoder
     given queryRequestEncoder: Encoder[QueryRequest]  = deriveEncoder
     given jdbcMetadataDecoder: Decoder[JDBC.Metadata] = deriveDecoder

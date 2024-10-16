@@ -62,12 +62,12 @@ class QueryService(databaseConfig: DatabaseConfig, viewName: String) {
 
     }
 
-    def count(constraints: Constraints): Either[Throwable, Int] =
+    def count(query: Query): Either[Throwable, Int] =
         val sql = PreparedStatementGenerator.buildPreparedStatementTemplateForCounts(
             viewName,
-            constraints.constraints,
-            constraints.concurrentObservations.getOrElse(false),
-            constraints.relatedAssociations.getOrElse(false)
+            query.constraints,
+            query.concurrentObservations.getOrElse(false),
+            query.relatedAssociations.getOrElse(false)
         )
         log.atDebug.log(s"Running query: $sql")
         Using
@@ -81,22 +81,22 @@ class QueryService(databaseConfig: DatabaseConfig, viewName: String) {
                         ResultSet.CONCUR_READ_ONLY
                     )
                 )
-                PreparedStatementGenerator.bind(stmt, constraints.constraints)
-                val rs   = use(stmt.executeQuery(sql))
+                PreparedStatementGenerator.bind(stmt, query.constraints)
+                val rs = stmt.executeQuery()
+                //                val rs   = use(stmt.executeQuery(sql))
                 if rs.next() then rs.getInt(1) else 0
             )
             .toEither
 
     def query(
-        querySelects: Seq[String],
-        constraints: Constraints
+        query: Query
     ): Either[Throwable, QueryResults] =
         val sql = PreparedStatementGenerator.buildPreparedStatementTemplate(
             viewName,
-            querySelects,
-            constraints.constraints,
-            constraints.concurrentObservations.getOrElse(false),
-            constraints.relatedAssociations.getOrElse(false)
+            query.columns,
+            query.constraints,
+            query.concurrentObservations.getOrElse(false),
+            query.relatedAssociations.getOrElse(false)
         )
         log.atDebug.log(s"Running query: $sql")
         Using
@@ -110,10 +110,11 @@ class QueryService(databaseConfig: DatabaseConfig, viewName: String) {
                         ResultSet.CONCUR_READ_ONLY
                     )
                 )
-                constraints.limit.foreach(stmt.setMaxRows)
-                constraints.offset.foreach(stmt.setFetchSize)
-                PreparedStatementGenerator.bind(stmt, constraints.constraints)
-                val rs   = use(stmt.executeQuery(sql))
+                query.limit.foreach(stmt.setMaxRows)
+                query.offset.foreach(stmt.setFetchSize)
+                PreparedStatementGenerator.bind(stmt, query.constraints)
+                val rs = stmt.executeQuery()
+//                val rs   = use(stmt.executeQuery(stmt))
                 QueryResults.fromResultSet(rs)
             )
             .toEither

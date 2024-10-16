@@ -18,7 +18,7 @@ package org.mbari.annosaurus.endpoints
 
 import CustomTapirJsonCirce.*
 import org.mbari.annosaurus.controllers.QueryController
-import org.mbari.annosaurus.domain.{ErrorMsg, QueryRequest}
+import org.mbari.annosaurus.domain.{Count, ErrorMsg, QueryRequest}
 import org.mbari.annosaurus.etc.circe.CirceCodecs.{*, given}
 import org.mbari.annosaurus.etc.tapir.TapirCodecs.given
 import org.mbari.annosaurus.repository.query.{JDBC, QueryResults}
@@ -59,20 +59,34 @@ class QueryEndpoints(queryController: QueryController)(using executionContext: E
             .description("Run a query")
             .tag(tag)
 
-    val runQueryImpl =
+    val runQueryImpl: Full[Unit, Unit, QueryRequest, ErrorMsg, String, Any, Future] =
         runQuery.serverLogic(request =>
             handleEitherAsync(
-                queryController.query(request).map(QueryResults.toTsv).map(_.mkString("\n"))
+                queryController.query(request).map(QueryResults.toTsv)
             )
         )
 
+    val count: Endpoint[Unit, QueryRequest, ErrorMsg, Count, Any] = openEndpoint
+        .post
+        .in(base / "count")
+        .in(jsonBody[QueryRequest])
+        .out(jsonBody[Count])
+        .name("countQuery")
+        .description("Count the number of rows in a query")
+        .tag(tag)
+
+    val countImpl: Full[Unit, Unit, QueryRequest, ErrorMsg, Count, Any, Future] =
+        count.serverLogic(request => handleEitherAsync(queryController.count(request)))
+
     override def all: List[Endpoint[_, _, _, _, _]] = List(
         listColumns,
-        runQuery
+        runQuery,
+        count
     )
 
     override def allImpl: List[ServerEndpoint[Any, Future]] = List(
         listColumnsImpl,
-        runQueryImpl
+        runQueryImpl,
+        countImpl
     )
 }

@@ -20,7 +20,7 @@ import scala.io.Source
 import scala.util.Using
 import org.mbari.annosaurus.domain.{ImagedMoment, ImagedMomentSC, ObservationsUpdate, QueryConstraints}
 import CirceCodecs.{*, given}
-import org.mbari.annosaurus.repository.query.Constraints
+import org.mbari.annosaurus.repository.query.Query
 
 import scala.util.Failure
 import scala.util.Success
@@ -309,7 +309,7 @@ class CirceCodecsSuite extends munit.FunSuite {
         val t   = Using(Source.fromURL(url)) { source =>
             val json = source.getLines().mkString
             assert(json != null)
-            val opt = json.reify[Constraints].toOption
+            val opt = json.reify[Query].toOption
             assert(opt.isDefined)
             val constraints = opt.get.constraints
             assertEquals(constraints.size, 9)
