@@ -17,9 +17,9 @@
 package org.mbari.annosaurus.domain
 
 import org.mbari.annosaurus.repository.jpa.entity.AssociationEntity
-import java.util.UUID
 import org.mbari.annosaurus.repository.jpa.entity.extensions.*
-import scala.util.Try
+
+import java.util.UUID
 
 case class Association(
     linkName: String,
@@ -31,7 +31,7 @@ case class Association(
     observationUuid: Option[UUID] = None,
     imagedMomentUuid: Option[UUID] = None
 ) extends ToSnakeCase[AssociationSC]
-    with ToEntity[AssociationEntity] {
+    with ToEntity[AssociationEntity]:
 
     def removeForeignKeys(): Association = copy(
         observationUuid = None,
@@ -51,14 +51,12 @@ case class Association(
             imagedMomentUuid
         )
 
-    override def toEntity: AssociationEntity = {
+    override def toEntity: AssociationEntity =
         val a = AssociationEntity(linkName, toConcept, linkValue, mimeType.orNull)
         uuid.foreach(a.setUuid)
         a
-    }
-}
 
-object Association extends FromEntity[AssociationEntity, Association] {
+object Association extends FromEntity[AssociationEntity, Association]:
     def from(entity: AssociationEntity, extend: Boolean = false): Association =
         val (optObs, optIm) =
             if extend then
@@ -78,7 +76,6 @@ object Association extends FromEntity[AssociationEntity, Association] {
             optObs,
             optIm
         )
-}
 
 case class AssociationSC(
     link_name: String,
@@ -89,7 +86,7 @@ case class AssociationSC(
     last_updated_time: Option[java.time.Instant] = None,
     observation_uuid: Option[UUID] = None,
     imaged_moment_uuid: Option[UUID] = None
-) extends ToCamelCase[Association] {
+) extends ToCamelCase[Association]:
 
     def toCamelCase: Association =
         Association(
@@ -102,4 +99,3 @@ case class AssociationSC(
             observation_uuid,
             imaged_moment_uuid
         )
-}

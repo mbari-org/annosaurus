@@ -17,16 +17,26 @@
 package org.mbari.annosaurus.endpoints
 
 import org.mbari.annosaurus.controllers.ObservationController
-import org.mbari.annosaurus.domain.{ConceptCount, Count, CountForVideoReferenceSC, ErrorMsg, ObservationSC, ObservationUpdateSC, ObservationsUpdate, RenameConcept, RenameCountSC}
+import org.mbari.annosaurus.domain.{
+    ConceptCount,
+    Count,
+    CountForVideoReferenceSC,
+    ErrorMsg,
+    ObservationSC,
+    ObservationUpdateSC,
+    ObservationsUpdate,
+    RenameConcept,
+    RenameCountSC
+}
+import org.mbari.annosaurus.endpoints.CustomTapirJsonCirce.*
+import org.mbari.annosaurus.etc.circe.CirceCodecs.given
 import org.mbari.annosaurus.etc.jwt.JwtService
 import org.mbari.annosaurus.etc.tapir.TapirCodecs.given
+import org.mbari.annosaurus.repository.jdbc.JdbcRepository
+import sttp.model.StatusCode
 import sttp.tapir.*
 import sttp.tapir.generic.auto.*
 import sttp.tapir.server.ServerEndpoint
-import org.mbari.annosaurus.etc.circe.CirceCodecs.{*, given}
-import sttp.model.StatusCode
-import CustomTapirJsonCirce.*
-import org.mbari.annosaurus.repository.jdbc.JdbcRepository
 
 import java.time.Instant
 import java.util.UUID
@@ -35,7 +45,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class ObservationEndpoints(controller: ObservationController, jdbcRepository: JdbcRepository)(using
     ec: ExecutionContext,
     jwtService: JwtService
-) extends Endpoints {
+) extends Endpoints:
 
     private val base = "observations"
     private val tag  = "Observations"
@@ -57,8 +67,7 @@ class ObservationEndpoints(controller: ObservationController, jdbcRepository: Jd
             }
 
     // GET /videoreference/:uuid
-    val findObservationsByVideoReferenceUuid
-        : Endpoint[Unit, (UUID, Paging), ErrorMsg, Seq[ObservationSC], Any] =
+    val findObservationsByVideoReferenceUuid: Endpoint[Unit, (UUID, Paging), ErrorMsg, Seq[ObservationSC], Any] =
         openEndpoint
             .get
             .in(base / "videoreference" / path[UUID]("videoReferenceUuid"))
@@ -227,18 +236,15 @@ class ObservationEndpoints(controller: ObservationController, jdbcRepository: Jd
     val countByVideoReferenceUuidImpl: ServerEndpoint[Any, Future] =
         countByVideoReferenceUuid
             .serverLogic { (uuid, start, end) =>
-                val f = if (start.isDefined && end.isDefined) {
-                    controller.countByVideoReferenceUuidAndTimestamps(uuid, start.get, end.get)
-                }
-                else {
-                    controller.countByVideoReferenceUuid(uuid)
-                }
+                val f =
+                    if start.isDefined && end.isDefined then
+                        controller.countByVideoReferenceUuidAndTimestamps(uuid, start.get, end.get)
+                    else controller.countByVideoReferenceUuid(uuid)
                 handleErrors(f.map(i => CountForVideoReferenceSC(uuid, i)))
             }
 
     // GET/ counts
-    val countAllGroupByVideoReferenceUuid
-        : Endpoint[Unit, Unit, ErrorMsg, Seq[CountForVideoReferenceSC], Any] =
+    val countAllGroupByVideoReferenceUuid: Endpoint[Unit, Unit, ErrorMsg, Seq[CountForVideoReferenceSC], Any] =
         openEndpoint
             .get
             .in(base / "counts")
@@ -282,8 +288,7 @@ class ObservationEndpoints(controller: ObservationController, jdbcRepository: Jd
             }
 
     // PUT /:uuid
-    val updateOneObservation
-        : Endpoint[Option[String], (UUID, ObservationUpdateSC), ErrorMsg, ObservationSC, Any] =
+    val updateOneObservation: Endpoint[Option[String], (UUID, ObservationUpdateSC), ErrorMsg, ObservationSC, Any] =
         secureEndpoint
             .put
             .in(base / path[UUID]("observationUuid"))
@@ -320,7 +325,11 @@ class ObservationEndpoints(controller: ObservationController, jdbcRepository: Jd
         secureEndpoint
             .put
             .in(base / "bulk")
-            .in(jsonBody[ObservationsUpdate].description("Describes the parameters and uuids of the observations to update. Can be camelCase or snake_case."))
+            .in(
+                jsonBody[ObservationsUpdate].description(
+                    "Describes the parameters and uuids of the observations to update. Can be camelCase or snake_case."
+                )
+            )
             .out(jsonBody[Count].description("The number of observations updated"))
             .name("updateManyObservations")
             .description(
@@ -431,4 +440,3 @@ class ObservationEndpoints(controller: ObservationController, jdbcRepository: Jd
         updateOneObservationImpl,
         deleteOneObservationImpl
     )
-}

@@ -17,24 +17,31 @@
 package org.mbari.annosaurus.endpoints
 
 import org.mbari.annosaurus.controllers.{AnnotationController, TestUtils}
-import org.mbari.annosaurus.domain.{Annotation, AnnotationCreate, AnnotationSC, ConcurrentRequest, ConcurrentRequestCountSC, MultiRequest, MultiRequestCountSC}
-import org.mbari.annosaurus.repository.jpa.JPADAOFactory
-import org.mbari.annosaurus.etc.jdk.Logging.{*, given}
-import org.mbari.annosaurus.etc.jwt.JwtService
-import sttp.model.StatusCode
+import org.mbari.annosaurus.domain.{
+    Annotation,
+    AnnotationCreate,
+    AnnotationSC,
+    ConcurrentRequest,
+    ConcurrentRequestCountSC,
+    MultiRequest,
+    MultiRequestCountSC
+}
 import org.mbari.annosaurus.etc.circe.CirceCodecs.{*, given}
-import sttp.client3.*
+import org.mbari.annosaurus.etc.jwt.JwtService
 import org.mbari.annosaurus.etc.sdk.Futures.*
 import org.mbari.annosaurus.etc.sdk.Reflect
+import org.mbari.annosaurus.repository.jpa.JPADAOFactory
+import sttp.client3.*
+import sttp.model.StatusCode
 
 import java.time.Duration
 import java.util.UUID
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicInteger
-import scala.jdk.CollectionConverters.*
 import scala.concurrent.duration.Duration as ScalaDuration
+import scala.jdk.CollectionConverters.*
 
-trait AnnotationEndpointsSuite extends EndpointsSuite {
+trait AnnotationEndpointsSuite extends EndpointsSuite:
 
     // If the stress test fails we wait for 10 seconds and then fail the test
     override val munitTimeout = ScalaDuration(10, TimeUnit.SECONDS)
@@ -51,12 +58,11 @@ trait AnnotationEndpointsSuite extends EndpointsSuite {
         runGet(
             endpoints.findAnnotationByUuidImpl,
             s"http://test.com/v1/annotations/${obs.getUuid}",
-            response => {
+            response =>
                 assertEquals(response.code, StatusCode.Ok)
                 val obtained = checkResponse[AnnotationSC](response.body).toCamelCase
                 val expected = Annotation.from(obs).copy(lastUpdated = obtained.lastUpdated)
                 assertEquals(obtained, expected)
-            }
         )
     }
 
@@ -64,9 +70,7 @@ trait AnnotationEndpointsSuite extends EndpointsSuite {
         runGet(
             endpoints.findAnnotationByUuidImpl,
             s"http://test.com/v1/annotations/00000000-0000-0000-0000-000000000000",
-            response => {
-                assertEquals(response.code, StatusCode.NotFound)
-            }
+            response => assertEquals(response.code, StatusCode.NotFound)
         )
     }
 
@@ -77,14 +81,13 @@ trait AnnotationEndpointsSuite extends EndpointsSuite {
         runGet(
             endpoints.findAnnotationByImageReferenceUuidImpl,
             s"http://test.com/v1/annotations/imagereference/${ir.getUuid}",
-            response => {
+            response =>
                 assertEquals(response.code, StatusCode.Ok)
                 val ys       = checkResponse[Seq[AnnotationSC]](response.body).map(_.toCamelCase)
                 assertEquals(ys.length, 1)
                 val obtained = ys.head
                 val expected = Annotation.from(obs).copy(lastUpdated = obtained.lastUpdated)
                 assertEquals(obtained, expected)
-            }
         )
     }
 
@@ -104,14 +107,13 @@ trait AnnotationEndpointsSuite extends EndpointsSuite {
         runGet(
             endpoints.findAnnotationsByVideoReferenceUuidImpl,
             s"http://test.com/v1/annotations/videoreference/${im.getVideoReferenceUuid}",
-            response => {
+            response =>
                 assertEquals(response.code, StatusCode.Ok)
                 val ys       = checkResponse[Seq[AnnotationSC]](response.body).map(_.toCamelCase)
                 assertEquals(ys.length, 1)
                 val obtained = ys.head
                 val expected = Annotation.from(obs).copy(lastUpdated = obtained.lastUpdated)
                 assertEquals(obtained, expected)
-            }
         )
     }
 
@@ -324,12 +326,11 @@ trait AnnotationEndpointsSuite extends EndpointsSuite {
             endpoints.countByConcurrentRequestImpl,
             "http://test.com/v1/annotations/concurrent/count",
             cr.stringify,
-            response => {
+            response =>
                 assertEquals(response.code, StatusCode.Ok)
                 val crc      = checkResponse[ConcurrentRequestCountSC](response.body)
                 val obtained = crc.count
                 assertEquals(obtained, expected)
-            }
         )
     }
 
@@ -345,12 +346,11 @@ trait AnnotationEndpointsSuite extends EndpointsSuite {
             endpoints.countByConcurrentRequestImpl,
             "http://test.com/v1/annotations/concurrent/count",
             cr.stringify,
-            response => {
+            response =>
                 assertEquals(response.code, StatusCode.Ok)
                 val crc      = checkResponse[ConcurrentRequestCountSC](response.body)
                 val obtained = crc.count
                 assertEquals(obtained, expected)
-            }
         )
     }
 
@@ -363,12 +363,11 @@ trait AnnotationEndpointsSuite extends EndpointsSuite {
             endpoints.countByMultiRequestImpl,
             "http://test.com/v1/annotations/multi/count",
             mr.stringify,
-            response => {
+            response =>
                 assertEquals(response.code, StatusCode.Ok)
                 val mrc      = checkResponse[MultiRequestCountSC](response.body)
                 val obtained = mrc.count
                 assertEquals(obtained, expected)
-            }
         )
     }
 
@@ -381,12 +380,11 @@ trait AnnotationEndpointsSuite extends EndpointsSuite {
             endpoints.countByMultiRequestImpl,
             "http://test.com/v1/annotations/multi/count",
             mr.stringify,
-            response => {
+            response =>
                 assertEquals(response.code, StatusCode.Ok)
                 val mrc      = checkResponse[MultiRequestCountSC](response.body)
                 val obtained = mrc.count
                 assertEquals(obtained, expected)
-            }
         )
     }
 
@@ -503,21 +501,21 @@ trait AnnotationEndpointsSuite extends EndpointsSuite {
     }
 
     test("create (stress test)") {
-        val count = new AtomicInteger(0)
-        val jwt = jwtService.authorize("foo").orNull
-        val uuid = UUID.randomUUID()
+        val count       = new AtomicInteger(0)
+        val jwt         = jwtService.authorize("foo").orNull
+        val uuid        = UUID.randomUUID()
         assert(jwt != null)
         val backendStub = newBackendStub(endpoints.createAnnotationImpl)
-        val n = 1000
-        var threads = (0 until n)
+        val n           = 1000
+        var threads     = (0 until n)
             .map(i => TestUtils.build(1, 1).head)
-            .map(im => {
+            .map(im =>
                 val obs = im.getObservations.iterator.next()
-                val a = Annotation.from(obs)
+                val a   = Annotation.from(obs)
                 a.copy(videoReferenceUuid = Some(uuid), timecode = None)
-            })
-            .map(anno => {
-                val r: Runnable = () => {
+            )
+            .map(anno =>
+                val r: Runnable = () =>
                     val response = basicRequest
                         .post(uri"http://test.com/v1/annotations")
                         .body(anno.toSnakeCase.stringify)
@@ -535,14 +533,9 @@ trait AnnotationEndpointsSuite extends EndpointsSuite {
                     )
                     assertEquals(obtained, expected)
                     count.incrementAndGet()
-                }
                 r
-            })
+            )
             .foreach(runnable => Thread.startVirtualThread(runnable))
-        while (count.get() < n) {
-            Thread.sleep(100)
-        }
-
+        while count.get() < n do Thread.sleep(100)
 
     }
-}

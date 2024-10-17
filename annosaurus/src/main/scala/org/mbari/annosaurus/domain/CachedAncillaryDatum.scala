@@ -16,12 +16,11 @@
 
 package org.mbari.annosaurus.domain
 
-import java.util.UUID
-import org.mbari.annosaurus.repository.jpa.entity.{AncillaryDatumDTO, CachedAncillaryDatumEntity}
+import org.mbari.annosaurus.domain.extensions.*
 import org.mbari.annosaurus.repository.jpa.entity.extensions.*
+import org.mbari.annosaurus.repository.jpa.entity.{AncillaryDatumDTO, CachedAncillaryDatumEntity}
 
-import scala.jdk.OptionConverters.*
-import extensions.*
+import java.util.UUID
 
 final case class CachedAncillaryDatum(
     latitude: Option[Double] = None,
@@ -46,7 +45,7 @@ final case class CachedAncillaryDatum(
     imagedMomentUuid: Option[UUID] = None,              // extend
     recordedTimestamp: Option[java.time.Instant] = None // extend
 ) extends ToSnakeCase[CachedAncillaryDatumSC]
-    with ToEntity[CachedAncillaryDatumEntity] {
+    with ToEntity[CachedAncillaryDatumEntity]:
 
     def removeForeignKeys(): CachedAncillaryDatum =
         copy(imagedMomentUuid = None, recordedTimestamp = None, lastUpdated = None)
@@ -100,16 +99,13 @@ final case class CachedAncillaryDatum(
         // NOTE: We can't set he lastUpdated field because it's set by the database driver
         entity
 
-}
-
-object CachedAncillaryDatum extends FromEntity[CachedAncillaryDatumEntity, CachedAncillaryDatum] {
+object CachedAncillaryDatum extends FromEntity[CachedAncillaryDatumEntity, CachedAncillaryDatum]:
     def from(entity: CachedAncillaryDatumEntity, extend: Boolean = false): CachedAncillaryDatum =
         val opt =
             if extend && entity.getImagedMoment != null then entity.getImagedMoment.primaryKey
             else None
         val rt  =
-            if extend && entity.getImagedMoment != null then
-                Option(entity.getImagedMoment.getRecordedTimestamp)
+            if extend && entity.getImagedMoment != null then Option(entity.getImagedMoment.getRecordedTimestamp)
             else None
         CachedAncillaryDatum(
             entity.getLatitude.toOption,
@@ -160,8 +156,6 @@ object CachedAncillaryDatum extends FromEntity[CachedAncillaryDatumEntity, Cache
             Option(dto.recordedTimestamp)
         )
 
-}
-
 final case class CachedAncillaryDatumSC(
     latitude: Option[Double] = None,
     longitude: Option[Double] = None,
@@ -184,7 +178,7 @@ final case class CachedAncillaryDatumSC(
     last_updated_time: Option[java.time.Instant] = None,
     imaged_moment_uuid: Option[UUID] = None,
     recorded_timestamp: Option[java.time.Instant] = None
-) extends ToCamelCase[CachedAncillaryDatum] {
+) extends ToCamelCase[CachedAncillaryDatum]:
     override def toCamelCase: CachedAncillaryDatum =
         CachedAncillaryDatum(
             latitude,
@@ -209,4 +203,3 @@ final case class CachedAncillaryDatumSC(
             imaged_moment_uuid,
             recorded_timestamp
         )
-}

@@ -16,22 +16,21 @@
 
 package org.mbari.annosaurus.controllers
 
+import org.mbari.annosaurus.domain.{Index, IndexUpdate}
 import org.mbari.annosaurus.repository.IndexDAO
+import org.mbari.annosaurus.repository.jpa.JPADAOFactory
+import org.mbari.annosaurus.repository.jpa.entity.IndexEntity
 
 import java.time.Instant
 import java.util.UUID
 import scala.concurrent.{ExecutionContext, Future}
-import org.mbari.annosaurus.repository.jpa.entity.ImagedMomentEntity
-import org.mbari.annosaurus.repository.jpa.JPADAOFactory
-import org.mbari.annosaurus.repository.jpa.entity.IndexEntity
-import org.mbari.annosaurus.domain.{Index, IndexUpdate}
 
-/** @author
-  *   Brian Schlining
-  * @since 2019-02-08T11:00:00
-  */
-class IndexController(val daoFactory: JPADAOFactory)
-    extends BaseController[IndexEntity, IndexDAO[IndexEntity], Index] {
+/**
+ * @author
+ *   Brian Schlining
+ * @since 2019-02-08T11:00:00
+ */
+class IndexController(val daoFactory: JPADAOFactory) extends BaseController[IndexEntity, IndexDAO[IndexEntity], Index]:
 
     protected type IDDAO = IndexDAO[IndexEntity]
 
@@ -39,51 +38,41 @@ class IndexController(val daoFactory: JPADAOFactory)
 
     override def transform(a: IndexEntity): Index = Index.from(a, true)
 
-    def findByVideoReferenceUUID(uuid: UUID, limit: Option[Int] = None, offset: Option[Int] = None)(
-        implicit ec: ExecutionContext
+    def findByVideoReferenceUUID(uuid: UUID, limit: Option[Int] = None, offset: Option[Int] = None)(implicit
+        ec: ExecutionContext
     ): Future[Iterable[Index]] =
         exec(d => d.findByVideoReferenceUuid(uuid, limit, offset).map(transform))
 
-    /** Updates all recordedTimestamps thave have an elapsed time using the updated video
-      * starttimestamp
-      * @param videoReferenceUuid
-      * @param newStartTimestamp
-      * @param ec
-      * @return
-      */
+    /**
+     * Updates all recordedTimestamps thave have an elapsed time using the updated video starttimestamp
+     * @param videoReferenceUuid
+     * @param newStartTimestamp
+     * @param ec
+     * @return
+     */
     def updateRecordedTimestamps(videoReferenceUuid: UUID, newStartTimestamp: Instant)(implicit
         ec: ExecutionContext
-    ): Future[Iterable[Index]] = {
-        def fn(dao: IDDAO): Iterable[Index] = {
+    ): Future[Iterable[Index]] =
+        def fn(dao: IDDAO): Iterable[Index] =
             dao
                 .findByVideoReferenceUuid(videoReferenceUuid)
-                .map(im => {
-                    if (im.getElapsedTime != null) {
+                .map(im =>
+                    if im.getElapsedTime != null then
                         val newRecordedDate = newStartTimestamp.plus(im.getElapsedTime)
-                        if (newRecordedDate != im.getRecordedTimestamp) {
-                            im.setRecordedTimestamp(newRecordedDate)
-                        }
-                    }
+                        if newRecordedDate != im.getRecordedTimestamp then im.setRecordedTimestamp(newRecordedDate)
                     transform(im)
-                })
-        }
+                )
         exec(fn)
-    }
 
     def bulkUpdateRecordedTimestamps(
         imagedMoments: Iterable[IndexUpdate]
-    )(implicit ec: ExecutionContext): Future[Iterable[Index]] = {
-        def fn(dao: IDDAO): Iterable[Index] = {
-            for {
+    )(implicit ec: ExecutionContext): Future[Iterable[Index]] =
+        def fn(dao: IDDAO): Iterable[Index] =
+            for
                 im <- imagedMoments
                 rt <- im.recordedTimestamp
                 i  <- dao.findByUUID(im.uuid)
-            } yield {
+            yield
                 i.setRecordedTimestamp(rt)
                 transform(i)
-            }
-        }
         exec(fn)
-    }
-
-}

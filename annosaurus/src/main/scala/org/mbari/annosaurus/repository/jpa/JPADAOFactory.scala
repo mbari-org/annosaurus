@@ -16,25 +16,15 @@
 
 package org.mbari.annosaurus.repository.jpa
 
-import com.typesafe.config.ConfigFactory
 import jakarta.persistence.{EntityManager, EntityManagerFactory}
-import org.mbari.annosaurus.repository.{
-    AssociationDAO,
-    CachedAncillaryDatumDAO,
-    CachedVideoReferenceInfoDAO,
-    DAO,
-    ImageReferenceDAO,
-    ImagedMomentDAO,
-    IndexDAO,
-    ObservationDAO
-}
-import org.mbari.annosaurus.repository.jpa.entity.*
+import org.mbari.annosaurus.repository.DAO
 
-/** @author
-  *   Brian Schlining
-  * @since 2016-06-25T17:27:00
-  */
-trait JPADAOFactory {
+/**
+ * @author
+ *   Brian Schlining
+ * @since 2016-06-25T17:27:00
+ */
+trait JPADAOFactory:
 
     def entityManagerFactory: EntityManagerFactory
 
@@ -87,12 +77,8 @@ trait JPADAOFactory {
     def newImagedMomentDAO(dao: DAO[?]): ImagedMomentDAOImpl =
         new ImagedMomentDAOImpl(extractEntityManager(dao))
 
-}
-
-object JPADAOFactory extends JPADAOFactory {
+object JPADAOFactory extends JPADAOFactory:
 
     lazy val entityManagerFactory = EntityManagerFactories("database")
-
-}
 
 class JPADAOFactoryImpl(val entityManagerFactory: EntityManagerFactory) extends JPADAOFactory

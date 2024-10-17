@@ -16,10 +16,10 @@
 
 package org.mbari.annosaurus.domain
 
-import java.util.UUID
 import org.mbari.annosaurus.repository.jpa.entity.CachedVideoReferenceInfoEntity
 import org.mbari.annosaurus.repository.jpa.entity.extensions.*
-import org.mbari.annosaurus.domain.FromEntity
+
+import java.util.UUID
 
 final case class CachedVideoReferenceInfo(
     uuid: UUID,
@@ -29,7 +29,7 @@ final case class CachedVideoReferenceInfo(
     missionContact: Option[String] = None,
     lastUpdated: Option[java.time.Instant] = None
 ) extends ToSnakeCase[CachedVideoReferenceInfoSC]
-    with ToEntity[CachedVideoReferenceInfoEntity] {
+    with ToEntity[CachedVideoReferenceInfoEntity]:
     override def toSnakeCase: CachedVideoReferenceInfoSC = CachedVideoReferenceInfoSC(
         uuid,
         videoReferenceUuid,
@@ -39,7 +39,7 @@ final case class CachedVideoReferenceInfo(
         lastUpdated
     )
 
-    override def toEntity: CachedVideoReferenceInfoEntity = {
+    override def toEntity: CachedVideoReferenceInfoEntity =
         val entity = CachedVideoReferenceInfoEntity(
             videoReferenceUuid,
             missionId.orNull,
@@ -48,15 +48,12 @@ final case class CachedVideoReferenceInfo(
         )
         entity.setUuid(uuid)
         entity
-    }
-}
 
-object CachedVideoReferenceInfo
-    extends FromEntity[CachedVideoReferenceInfoEntity, CachedVideoReferenceInfo] {
+object CachedVideoReferenceInfo extends FromEntity[CachedVideoReferenceInfoEntity, CachedVideoReferenceInfo]:
     override def from(
         entity: CachedVideoReferenceInfoEntity,
         extend: Boolean = false
-    ): CachedVideoReferenceInfo = {
+    ): CachedVideoReferenceInfo =
         CachedVideoReferenceInfo(
             entity.getUuid,
             entity.getVideoReferenceUuid,
@@ -65,8 +62,6 @@ object CachedVideoReferenceInfo
             Option(entity.getMissionContact),
             entity.lastUpdated
         )
-    }
-}
 
 final case class CachedVideoReferenceInfoSC(
     uuid: UUID,
@@ -75,7 +70,7 @@ final case class CachedVideoReferenceInfoSC(
     mission_id: Option[String] = None,
     mission_contact: Option[String] = None,
     last_updated: Option[java.time.Instant] = None
-) extends ToCamelCase[CachedVideoReferenceInfo] {
+) extends ToCamelCase[CachedVideoReferenceInfo]:
     override def toCamelCase: CachedVideoReferenceInfo = CachedVideoReferenceInfo(
         uuid,
         video_reference_uuid,
@@ -84,7 +79,6 @@ final case class CachedVideoReferenceInfoSC(
         mission_contact,
         last_updated
     )
-}
 
 final case class CachedVideoReferenceInfoCreateSC(
     video_reference_uuid: UUID,

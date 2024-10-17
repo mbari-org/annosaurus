@@ -16,17 +16,16 @@
 
 package org.mbari.annosaurus.repository.jdbc
 
+import org.mbari.annosaurus.domain.{Annotation, Association}
+
 import java.util.UUID
-import org.mbari.annosaurus.domain.Association
-import org.mbari.annosaurus.domain.Annotation
 
 // @deprecated("Use Association's NamedQueries instead", "2023-12-18")
-object AssociationSQL {
+object AssociationSQL:
 
-    def resultListToAssociations(rows: List[?]): Seq[Association] = {
-        for {
-            row <- rows
-        } yield {
+    def resultListToAssociations(rows: List[?]): Seq[Association] =
+        for row <- rows
+        yield
             val xs               = row.asInstanceOf[Array[Object]]
             val uuid             = xs(0).asUUID
             val observationUuid  = xs(1).asUUID
@@ -58,19 +57,16 @@ object AssociationSQL {
             // // a.mimeType = xs(5).toString
             // a.imagedMomentUuid = UUID.fromString(xs(6).toString)
             // a
-        }
-    }
 
     def join(
         annotations: Seq[Annotation],
         associations: Seq[Association]
     ): Seq[Annotation] =
         for a <- annotations
-        yield {
+        yield
             val matches = associations.filter(anno => anno.observationUuid == a.observationUuid)
-            if (matches.isEmpty) a
+            if matches.isEmpty then a
             else a.copy(associations = a.associations.appendedAll(matches))
-        }
 
     val SELECT: String =
         """ SELECT DISTINCT
@@ -126,5 +122,3 @@ object AssociationSQL {
       |     obs.uuid = associations.observation_uuid
       | )
       |""".stripMargin
-
-}

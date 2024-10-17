@@ -1,0 +1,57 @@
+{
+  "select": ["foo"],
+  "where": [
+    {
+      "column": "id",
+      "in": [
+        "1",
+        "2",
+        "3"
+      ]
+    },
+    {
+      "column": "name",
+      "like": ".*"
+    },
+    {
+      "column": "age",
+      "minmax": [
+        1,
+        100
+      ]
+    },
+    {
+      "column": "foo",
+      "min": 1
+    },
+    {
+      "column": "bar",
+      "max": 100
+    },
+    {
+      "column": "baz",
+      "between": [
+        "2010-01-01T01:22:33Z",
+        "2011-01-01T01:22:33Z"
+      ]
+    },
+    {
+      "column": "qux",
+      "isnull": true
+    },
+
+    {
+      "column": "quxx",
+      "isnull": false
+    },
+    {
+      "column": "quxxx",
+      "equals": "foo"
+    },
+    {
+      "column": "zzzz",
+      "contains": "foo"
+    }
+
+  ]
+}

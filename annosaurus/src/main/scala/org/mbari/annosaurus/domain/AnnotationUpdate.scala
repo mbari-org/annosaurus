@@ -33,13 +33,13 @@ case class AnnotationUpdate(
     durationMillis: Option[Long] = None,
     group: Option[String] = None,
     activity: Option[String] = None
-) extends ToSnakeCase[AnnotationUpdateSC] {
+) extends ToSnakeCase[AnnotationUpdateSC]:
 
     lazy val elapsedTime: Option[Duration]   = elapsedTimeMillis.map(Duration.ofMillis)
     lazy val duration: Option[Duration]      = durationMillis.map(Duration.ofMillis)
     lazy val validTimecode: Option[Timecode] = timecode.map(Timecode(_))
 
-    override def toSnakeCase: AnnotationUpdateSC = {
+    override def toSnakeCase: AnnotationUpdateSC =
         AnnotationUpdateSC(
             observationUuid,
             videoReferenceUuid,
@@ -53,9 +53,8 @@ case class AnnotationUpdate(
             group,
             activity
         )
-    }
 
-    def toAnnotation: Annotation = {
+    def toAnnotation: Annotation =
         Annotation(
             observationUuid = observationUuid,
             videoReferenceUuid = videoReferenceUuid,
@@ -69,8 +68,6 @@ case class AnnotationUpdate(
             group = group,
             activity = activity
         )
-    }
-}
 
 case class AnnotationUpdateSC(
     observation_uuid: Option[UUID] = None,
@@ -84,9 +81,9 @@ case class AnnotationUpdateSC(
     duration_millis: Option[Long] = None,
     group: Option[String] = None,
     activity: Option[String] = None
-) extends ToCamelCase[AnnotationUpdate] {
+) extends ToCamelCase[AnnotationUpdate]:
 
-    override def toCamelCase: AnnotationUpdate = {
+    override def toCamelCase: AnnotationUpdate =
         AnnotationUpdate(
             observation_uuid,
             video_reference_uuid,
@@ -100,5 +97,3 @@ case class AnnotationUpdateSC(
             group,
             activity
         )
-    }
-}

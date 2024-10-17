@@ -27,6 +27,5 @@ case class ObservationUpdateSC(
     duration_millis: Option[Long] = None,
     observation_timestamp: Option[Instant] = None,
     imaged_moment_uuid: Option[UUID] = None
-) {
+):
     lazy val duration: Option[Duration] = duration_millis.map(Duration.ofMillis)
-}

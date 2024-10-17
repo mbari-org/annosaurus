@@ -16,15 +16,16 @@
 
 package org.mbari.annosaurus.repository
 
-import java.util.UUID
-
 import org.mbari.annosaurus.repository.jpa.entity.IPersistentObject
 
-/** @author
-  *   Brian Schlining
-  * @since 2016-06-17T16:10:00
-  */
-trait CachedVideoReferenceInfoDAO[T <: IPersistentObject] extends DAO[T] {
+import java.util.UUID
+
+/**
+ * @author
+ *   Brian Schlining
+ * @since 2016-06-17T16:10:00
+ */
+trait CachedVideoReferenceInfoDAO[T <: IPersistentObject] extends DAO[T]:
 
     def findByVideoReferenceUUID(uuid: UUID): Option[T]
     def findByPlatformName(platformName: String): Iterable[T]
@@ -34,5 +35,3 @@ trait CachedVideoReferenceInfoDAO[T <: IPersistentObject] extends DAO[T] {
     def findAllMissionContacts(): Iterable[String]
     def findAllPlatformNames(): Iterable[String]
     def findAllMissionIDs(): Iterable[String]
-
-}

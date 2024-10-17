@@ -16,10 +16,11 @@
 
 package org.mbari.annosaurus.repository.jdbc
 
-import java.sql.Connection
-import java.net.URL
 import jakarta.persistence.EntityManager
 import org.mbari.annosaurus.etc.jdk.Logging.given
+
+import java.net.URL
+import java.sql.Connection
 
 object SqlFileParser:
 

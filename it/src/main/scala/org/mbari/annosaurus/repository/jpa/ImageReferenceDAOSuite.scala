@@ -16,12 +16,13 @@
 
 package org.mbari.annosaurus.repository.jpa
 
+import org.mbari.annosaurus.AssertUtils
 import org.mbari.annosaurus.controllers.TestUtils
 import org.mbari.annosaurus.repository.jpa.entity.ImageReferenceEntity
-import org.mbari.annosaurus.AssertUtils
+
 import java.net.URI
 
-trait ImageReferenceDAOSuite extends BaseDAOSuite {
+trait ImageReferenceDAOSuite extends BaseDAOSuite:
 
     given JPADAOFactory = daoFactory
 
@@ -30,11 +31,11 @@ trait ImageReferenceDAOSuite extends BaseDAOSuite {
         val ir                           = TestUtils.randomImageReference()
         given dao: ImageReferenceDAOImpl = daoFactory.newImageReferenceDAO()
         val imDao                        = daoFactory.newImagedMomentDAO(dao)
-        run(() => {
+        run(() =>
             val im1 = imDao.update(im)
             im1.addImageReference(ir)
             // dao.create(ir)
-        })
+        )
         run(() => dao.findByUUID(ir.getUuid())) match
             case Some(ir1) => AssertUtils.assertSameImageReference(ir1, ir)
             case None      => fail("Failed to find image reference")
@@ -57,12 +58,12 @@ trait ImageReferenceDAOSuite extends BaseDAOSuite {
         val im                           = TestUtils.create(1, nImageReferences = 1).head
         val ir                           = im.getImageReferences.iterator().next()
         given dao: ImageReferenceDAOImpl = daoFactory.newImageReferenceDAO()
-        run(() => {
+        run(() =>
             // update brings entity into transactional context
             val ir0 = dao.update(ir)
             ir0.getImagedMoment().removeImageReference(ir0)
             // dao.delete(ir0) // Not needed as removing from imagedmoment in transaction will remove the image reference
-        })
+        )
         run(() => dao.findByUUID(ir.getUuid())) match
             case Some(_) => fail("should not have found the entity")
             case None    => // good
@@ -122,5 +123,3 @@ trait ImageReferenceDAOSuite extends BaseDAOSuite {
         AssertUtils.assertSameImageReference(xs.head, ir)
         dao.close()
     }
-
-}

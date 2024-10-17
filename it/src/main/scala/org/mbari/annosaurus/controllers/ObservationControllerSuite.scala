@@ -16,15 +16,14 @@
 
 package org.mbari.annosaurus.controllers
 
-import org.mbari.annosaurus.repository.jpa.BaseDAOSuite
-import org.mbari.annosaurus.repository.jpa.JPADAOFactory
-import scala.concurrent.ExecutionContext
 import org.mbari.annosaurus.AssertUtils
-import scala.jdk.CollectionConverters.*
-import junit.framework.Assert
-import java.time.Duration
+import org.mbari.annosaurus.repository.jpa.{BaseDAOSuite, JPADAOFactory}
 
-trait ObservationControllerSuite extends BaseDAOSuite {
+import java.time.Duration
+import scala.concurrent.ExecutionContext
+import scala.jdk.CollectionConverters.*
+
+trait ObservationControllerSuite extends BaseDAOSuite:
 
     given JPADAOFactory    = daoFactory
     given ExecutionContext = ExecutionContext.global
@@ -109,7 +108,7 @@ trait ObservationControllerSuite extends BaseDAOSuite {
     test("findAllActivities") {
         val xs           = TestUtils.create(1, 9)
         val expected     = xs
-            .flatMap(im => im.getObservations().asScala.map(_.getActivity()))
+            .flatMap(im => im.getObservations.asScala.map(_.getActivity()))
             .toSet
             .filter(_ != null)
         val obtained     = exec(controller.findAllActivities)
@@ -260,5 +259,3 @@ trait ObservationControllerSuite extends BaseDAOSuite {
         o0.setConcept(newConcept)
         AssertUtils.assertSameObservation(o0, obtained.get.toEntity)
     }
-
-}

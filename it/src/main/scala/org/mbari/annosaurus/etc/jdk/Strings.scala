@@ -18,14 +18,11 @@ package org.mbari.annosaurus.etc.jdk
 
 import scala.util.Random
 
-object Strings {
+object Strings:
 
     private val chars  = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
     private val random = new Random
 
-    def random(length: Int): String = {
+    def random(length: Int): String =
         val xs = for (_ <- 0 until length) yield chars.charAt(random.nextInt(chars.length))
         new String(xs.toArray)
-    }
-
-}

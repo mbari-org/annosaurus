@@ -17,34 +17,19 @@
 package org.mbari.annosaurus.endpoints
 
 import org.mbari.annosaurus.controllers.TestUtils
-import org.mbari.annosaurus.domain.{
-    Annotation,
-    AnnotationSC,
-    CachedAncillaryDatum,
-    ConcurrentRequest,
-    Count,
-    DeleteCount,
-    DeleteCountSC,
-    GeographicRange,
-    GeographicRangeSC,
-    ImageSC,
-    MultiRequest,
-    QueryConstraints,
-    QueryConstraintsResponseSC
-}
+import org.mbari.annosaurus.domain.{Annotation, AnnotationSC, CachedAncillaryDatum, ConcurrentRequest, Count, DeleteCountSC, GeographicRangeSC, ImageSC, MultiRequest, QueryConstraints, QueryConstraintsResponseSC}
+import org.mbari.annosaurus.etc.circe.CirceCodecs.{*, given}
 import org.mbari.annosaurus.etc.jwt.JwtService
+import org.mbari.annosaurus.etc.sdk.Futures.*
 import org.mbari.annosaurus.repository.jdbc.JdbcRepository
 import org.mbari.annosaurus.repository.jpa.JPADAOFactory
-import sttp.model.StatusCode
-import org.mbari.annosaurus.etc.circe.CirceCodecs.{*, given}
 import sttp.client3.*
-import org.mbari.annosaurus.etc.sdk.Futures.*
-import org.junit.Assert.*
+import sttp.model.StatusCode
 
 import java.util.UUID
 import scala.jdk.CollectionConverters.*
 
-trait FastAnnotationEndpointsSuite extends EndpointsSuite {
+trait FastAnnotationEndpointsSuite extends EndpointsSuite:
 
     private val log              = System.getLogger(getClass.getName)
     given JPADAOFactory          = daoFactory
@@ -57,7 +42,7 @@ trait FastAnnotationEndpointsSuite extends EndpointsSuite {
         runGet(
             endpoints.findAllAnnotationsImpl,
             "http://test.com/v1/fast?data=true",
-            response => {
+            response =>
                 assertEquals(response.code, StatusCode.Ok)
                 val annotations = checkResponse[Seq[AnnotationSC]](response.body)
                 assert(annotations.size >= 4)
@@ -68,7 +53,6 @@ trait FastAnnotationEndpointsSuite extends EndpointsSuite {
                     assert(a.ancillary_data.isDefined)
 //                println(response.body)
 // TODO this is not returning the ancillary data
-            }
         )
     }
 
@@ -269,11 +253,10 @@ trait FastAnnotationEndpointsSuite extends EndpointsSuite {
         runGet(
             endpoints.countAllAnnotationsImpl,
             "http://test.com/v1/fast/count",
-            response => {
+            response =>
                 assertEquals(response.code, StatusCode.Ok)
                 val count = checkResponse[Count](response.body)
                 assert(count.count >= xs.size)
-            }
         )
     }
 
@@ -283,7 +266,7 @@ trait FastAnnotationEndpointsSuite extends EndpointsSuite {
         runGet(
             endpoints.findAnnotationsByVideoReferenceUuidImpl,
             s"http://test.com/v1/fast/videoreference/$videoReferenceUuid?data=true",
-            response => {
+            response =>
                 assertEquals(response.code, StatusCode.Ok)
                 val annotations = checkResponse[Seq[AnnotationSC]](response.body)
                 assertEquals(annotations.size, 4)
@@ -292,7 +275,6 @@ trait FastAnnotationEndpointsSuite extends EndpointsSuite {
                     assertEquals(a.image_references.size, 1)
                     assertEquals(a.associations.size, 1)
                     assert(a.ancillary_data.isDefined)
-            }
         )
     }
 
@@ -302,11 +284,10 @@ trait FastAnnotationEndpointsSuite extends EndpointsSuite {
         runGet(
             endpoints.findImagesByVideoReferenceUuidImpl,
             s"http://test.com/v1/fast/images/videoreference/$videoReferenceUuid",
-            response => {
+            response =>
                 assertEquals(response.code, StatusCode.Ok)
                 val images = checkResponse[Seq[ImageSC]](response.body)
                 assertEquals(images.size, xs.size)
-            }
         )
     }
 
@@ -316,11 +297,10 @@ trait FastAnnotationEndpointsSuite extends EndpointsSuite {
         runGet(
             endpoints.countImagesByVideoReferenceUuidImpl,
             s"http://test.com/v1/fast/images/count/videoreference/$videoReferenceUuid",
-            response => {
+            response =>
                 assertEquals(response.code, StatusCode.Ok)
                 val count = checkResponse[Count](response.body)
                 assertEquals(count.count, xs.size.longValue)
-            }
         )
     }
 
@@ -330,7 +310,7 @@ trait FastAnnotationEndpointsSuite extends EndpointsSuite {
         runGet(
             endpoints.findAnnotationsByConceptImpl,
             s"http://test.com/v1/fast/concept/$concept?data=true",
-            response => {
+            response =>
                 assertEquals(response.code, StatusCode.Ok)
                 val annotations = checkResponse[Seq[AnnotationSC]](response.body)
                 assertEquals(annotations.size, 1)
@@ -340,7 +320,6 @@ trait FastAnnotationEndpointsSuite extends EndpointsSuite {
                     assertEquals(a.image_references.size, 1)
                     assertEquals(a.associations.size, 1)
                     assert(a.ancillary_data.isDefined)
-            }
         )
     }
 
@@ -350,7 +329,7 @@ trait FastAnnotationEndpointsSuite extends EndpointsSuite {
         runGet(
             endpoints.findAnnotationsWithImagesByConceptImpl,
             s"http://test.com/v1/fast/concept/images/$concept?data=true",
-            response => {
+            response =>
                 assertEquals(response.code, StatusCode.Ok)
                 val annotations = checkResponse[Seq[AnnotationSC]](response.body)
                 assertEquals(annotations.size, 1)
@@ -359,7 +338,6 @@ trait FastAnnotationEndpointsSuite extends EndpointsSuite {
                     assertEquals(a.image_references.size, 1)
                     assertEquals(a.associations.size, 1)
                     assert(a.ancillary_data.isDefined)
-            }
         )
     }
 
@@ -369,11 +347,10 @@ trait FastAnnotationEndpointsSuite extends EndpointsSuite {
         runGet(
             endpoints.findImagedMomentUuidsByConceptImpl,
             s"http://test.com/v1/fast/imagedmoments/concept/images/$concept",
-            response => {
+            response =>
                 assertEquals(response.code, StatusCode.Ok)
                 val imagedMomentUuids = checkResponse[Seq[String]](response.body)
                 assertEquals(imagedMomentUuids.size, 1)
-            }
         )
     }
 
@@ -385,12 +362,11 @@ trait FastAnnotationEndpointsSuite extends EndpointsSuite {
         runGet(
             endpoints.findImagedMomentUuidsByToConceptImpl,
             s"http://test.com/v1/fast/imagedmoments/toconcept/images/$toConcept",
-            response => {
+            response =>
                 assertEquals(response.code, StatusCode.Ok)
                 val imagedMomentUuids = checkResponse[Seq[UUID]](response.body)
                 assertEquals(imagedMomentUuids.size, 1)
                 assertEquals(imagedMomentUuids.head, im.getUuid)
-            }
         )
     }
 
@@ -403,7 +379,7 @@ trait FastAnnotationEndpointsSuite extends EndpointsSuite {
         runGet(
             endpoints.findAnnotationsByLinkNameAndLinkValueImpl,
             s"http://test.com/v1/fast/details/${ass.getLinkName}/${ass.getLinkValue}",
-            response => {
+            response =>
                 assertEquals(response.code, StatusCode.Ok)
                 val annos    = checkResponse[Seq[AnnotationSC]](response.body)
                 assertEquals(annos.size, 1)
@@ -412,7 +388,6 @@ trait FastAnnotationEndpointsSuite extends EndpointsSuite {
 //                println("EXPECTED: " + expected.stringify)
 //                println("OBTAINED: " + obtained.stringify)
                 assertEquals(obtained, expected)
-            }
         )
 
     }
@@ -446,13 +421,12 @@ trait FastAnnotationEndpointsSuite extends EndpointsSuite {
             endpoints.findAnnotationsByConcurrentRequestImpl,
             "http://test.com/v1/fast/concurrent",
             body,
-            response => {
+            response =>
                 assertEquals(response.code, StatusCode.Ok)
                 val annotations = checkResponse[Seq[AnnotationSC]](response.body)
                 val expected    = xs.flatMap(_.getObservations.asScala).size
                 val obtained    = annotations.size
                 assertEquals(obtained, expected)
-            }
         )
     }
 
@@ -466,15 +440,12 @@ trait FastAnnotationEndpointsSuite extends EndpointsSuite {
             endpoints.findAnnotationsByMultiRequestImpl,
             "http://test.com/v1/fast/multi",
             body,
-            response => {
+            response =>
                 assertEquals(response.code, StatusCode.Ok)
                 val annotations = checkResponse[Seq[AnnotationSC]](response.body)
                 val expected    = xs.flatMap(_.getObservations.asScala).size
                 val obtained    = annotations.size
                 assertEquals(obtained, expected)
-            }
         )
 
     }
-
-}

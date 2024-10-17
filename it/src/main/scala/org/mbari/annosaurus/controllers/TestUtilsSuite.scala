@@ -17,14 +17,13 @@
 package org.mbari.annosaurus.controllers
 
 import org.mbari.annosaurus.AssertUtils
-import org.mbari.annosaurus.repository.jpa.TestDAOFactory
+import org.mbari.annosaurus.repository.jpa.{BaseDAOSuite, TestDAOFactory}
 
 import java.util.concurrent.TimeUnit
-import scala.concurrent.{Await, ExecutionContext}
+import scala.concurrent.Await
 import scala.jdk.CollectionConverters.*
-import org.mbari.annosaurus.repository.jpa.BaseDAOSuite
 
-trait TestUtilsSuite extends BaseDAOSuite {
+trait TestUtilsSuite extends BaseDAOSuite:
 
     val timeout = scala.concurrent.duration.Duration(10, TimeUnit.SECONDS)
 
@@ -87,5 +86,3 @@ trait TestUtilsSuite extends BaseDAOSuite {
         dao.close()
 
     }
-
-}

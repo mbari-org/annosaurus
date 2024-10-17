@@ -21,14 +21,14 @@ import org.mbari.annosaurus.repository.jpa.{BaseDAOSuite, JPADAOFactory}
 
 import scala.concurrent.ExecutionContext
 
-trait CachedVideoReferenceInfoControllerSuite extends BaseDAOSuite {
+trait CachedVideoReferenceInfoControllerSuite extends BaseDAOSuite:
 
     given JPADAOFactory    = daoFactory
     given ExecutionContext = ExecutionContext.global
 
     private lazy val controller = new CachedVideoReferenceInfoController(daoFactory)
 
-    private def createOne(): CachedVideoReferenceInfo = {
+    private def createOne(): CachedVideoReferenceInfo =
         val vi = TestUtils.randomVideoReferenceInfo()
         exec(
             controller.create(
@@ -38,7 +38,6 @@ trait CachedVideoReferenceInfoControllerSuite extends BaseDAOSuite {
                 Option(vi.getMissionContact)
             )
         )
-    }
 
     test("findByVideoReferenceUUID") {
         val existing = createOne()
@@ -67,19 +66,19 @@ trait CachedVideoReferenceInfoControllerSuite extends BaseDAOSuite {
     test("findAllMissionContacts") {
         val xs       = (0 until 5).map(_ => createOne()).map(_.missionContact.get).toSet
         val obtained = exec(controller.findAllMissionContacts()).toSet
-        for (x <- xs) assert(obtained.contains(x))
+        for x <- xs do assert(obtained.contains(x))
     }
 
     test("findAllPlatformNames") {
         val xs       = (0 until 5).map(_ => createOne()).map(_.platformName.get).toSet
         val obtained = exec(controller.findAllPlatformNames()).toSet
-        for (x <- xs) assert(obtained.contains(x))
+        for x <- xs do assert(obtained.contains(x))
     }
 
     test("findAllMissionIds") {
         val xs       = (0 until 5).map(_ => createOne()).map(_.missionId.get).toSet
         val obtained = exec(controller.findAllMissionIds()).toSet
-        for (x <- xs) assert(obtained.contains(x))
+        for x <- xs do assert(obtained.contains(x))
     }
 
     test("create") {
@@ -132,5 +131,3 @@ trait CachedVideoReferenceInfoControllerSuite extends BaseDAOSuite {
         val obtained = exec(controller.findByUUID(existing.uuid))
         assertEquals(obtained, Option(existing))
     }
-
-}

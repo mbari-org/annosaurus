@@ -16,12 +16,12 @@
 
 package org.mbari.annosaurus.domain
 
-import java.util.UUID
-import java.time.Duration
-import org.mbari.vcr4j.time.Timecode
-import java.time.Instant
 import org.mbari.annosaurus.repository.jpa.entity.ImagedMomentEntity
 import org.mbari.annosaurus.repository.jpa.entity.extensions.*
+import org.mbari.vcr4j.time.Timecode
+
+import java.time.{Duration, Instant}
+import java.util.UUID
 import scala.jdk.CollectionConverters.*
 
 final case class ImagedMoment(
@@ -35,7 +35,7 @@ final case class ImagedMoment(
     uuid: Option[UUID] = None,
     lastUpdated: Option[java.time.Instant] = None
 ) extends ToSnakeCase[ImagedMomentSC]
-    with ToEntity[ImagedMomentEntity] {
+    with ToEntity[ImagedMomentEntity]:
 
     def removeForeignKeys(): ImagedMoment = copy(
         lastUpdated = None
@@ -68,10 +68,9 @@ final case class ImagedMoment(
         entity
 
     lazy val elapsedTime: Option[Duration] = elapsedTimeMillis.map(Duration.ofMillis)
-}
 
-object ImagedMoment extends FromEntity[ImagedMomentEntity, ImagedMoment] {
-    def from(entity: ImagedMomentEntity, extend: Boolean = false): ImagedMoment = {
+object ImagedMoment extends FromEntity[ImagedMomentEntity, ImagedMoment]:
+    def from(entity: ImagedMomentEntity, extend: Boolean = false): ImagedMoment =
 
         val observations =
             if extend && !entity.getObservations().isEmpty()
@@ -100,8 +99,6 @@ object ImagedMoment extends FromEntity[ImagedMomentEntity, ImagedMoment] {
             entity.primaryKey,
             entity.lastUpdated
         )
-    }
-}
 
 final case class ImagedMomentSC(
     video_reference_uuid: UUID,
@@ -113,7 +110,7 @@ final case class ImagedMomentSC(
     ancillary_data: Option[CachedAncillaryDatumSC] = None,
     uuid: Option[UUID] = None,
     last_updated_time: Option[java.time.Instant] = None
-) extends ToCamelCase[ImagedMoment] {
+) extends ToCamelCase[ImagedMoment]:
     override def toCamelCase: ImagedMoment =
         ImagedMoment(
             video_reference_uuid,
@@ -126,4 +123,3 @@ final case class ImagedMomentSC(
             uuid,
             last_updated_time
         )
-}

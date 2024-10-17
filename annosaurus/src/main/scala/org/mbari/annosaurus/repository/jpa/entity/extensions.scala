@@ -19,10 +19,8 @@ package org.mbari.annosaurus.repository.jpa.entity
 import java.time.Instant
 import java.util.UUID
 
-object extensions {
+object extensions:
 
     extension (po: IPersistentObject)
         def primaryKey: Option[UUID]     = Option(po.getUuid)
         def lastUpdated: Option[Instant] = Option(po.getLastUpdatedTime).map(_.toInstant)
-
-}

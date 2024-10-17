@@ -28,13 +28,13 @@ import org.mbari.annosaurus.domain.{
     RenameConcept,
     RenameCountSC
 }
+import org.mbari.annosaurus.endpoints.CustomTapirJsonCirce.*
+import org.mbari.annosaurus.etc.circe.CirceCodecs.given
 import org.mbari.annosaurus.etc.jwt.JwtService
+import sttp.model.StatusCode
 import sttp.tapir.*
 import sttp.tapir.generic.auto.*
 import sttp.tapir.server.ServerEndpoint
-import org.mbari.annosaurus.etc.circe.CirceCodecs.{*, given}
-import sttp.model.StatusCode
-import CustomTapirJsonCirce.*
 
 import java.util.UUID
 import scala.concurrent.{ExecutionContext, Future}
@@ -42,7 +42,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class AssociationEndpoints(controller: AssociationController)(using
     ec: ExecutionContext,
     jwtService: JwtService
-) extends Endpoints {
+) extends Endpoints:
 
     private val base = "associations"
     private val tag  = "Associations"
@@ -113,8 +113,7 @@ class AssociationEndpoints(controller: AssociationController)(using
         )
 
     // PUT /:uuid form or json body
-    val updateAssociation
-        : Endpoint[Option[String], (UUID, AssociationUpdateSC), ErrorMsg, AssociationSC, Any] =
+    val updateAssociation: Endpoint[Option[String], (UUID, AssociationUpdateSC), ErrorMsg, AssociationSC, Any] =
         secureEndpoint
             .put
             .in(base / path[UUID]("associationUuid"))
@@ -142,8 +141,7 @@ class AssociationEndpoints(controller: AssociationController)(using
         }
 
     // PUT /bulk json body
-    val updateAssociations
-        : Endpoint[Option[String], Seq[AssociationSC], ErrorMsg, Seq[AssociationSC], Any] =
+    val updateAssociations: Endpoint[Option[String], Seq[AssociationSC], ErrorMsg, Seq[AssociationSC], Any] =
         secureEndpoint
             .put
             .in(base / "bulk")
@@ -174,7 +172,7 @@ class AssociationEndpoints(controller: AssociationController)(using
     val deleteAssociationsImpl: ServerEndpoint[Any, Future] = deleteAssociations
         .serverSecurityLogic(jwtOpt => verify(jwtOpt))
         .serverLogic { _ => uuids =>
-            if (uuids.isEmpty) Future(Left(BadRequest("No UUIDs provided")))
+            if uuids.isEmpty then Future(Left(BadRequest("No UUIDs provided")))
             else handleErrors(controller.bulkDelete(uuids))
         }
 
@@ -249,9 +247,7 @@ class AssociationEndpoints(controller: AssociationController)(using
                 handleErrors(
                     controller
                         .findByConceptAssociationRequest(conceptAssociationRequest)
-                        .map(a => {
-                            a.toSnakeCase
-                        })
+                        .map(a => a.toSnakeCase)
                 )
             }
 
@@ -280,4 +276,3 @@ class AssociationEndpoints(controller: AssociationController)(using
         updateAssociationImpl,
         deleteAssociationImpl
     )
-}

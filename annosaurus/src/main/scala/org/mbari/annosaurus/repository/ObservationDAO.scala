@@ -16,18 +16,18 @@
 
 package org.mbari.annosaurus.repository
 
-import org.mbari.annosaurus.repository.jpa.entity.IPersistentObject
-import org.mbari.annosaurus.repository.jpa.entity.ObservationEntity
 import org.mbari.annosaurus.domain.{ConcurrentRequest, MultiRequest}
+import org.mbari.annosaurus.repository.jpa.entity.{IPersistentObject, ObservationEntity}
 
 import java.time.{Duration, Instant}
 import java.util.UUID
 
-/** @author
-  *   Brian Schlining
-  * @since 2016-06-17T16:10:00
-  */
-trait ObservationDAO[T <: IPersistentObject] extends DAO[T] {
+/**
+ * @author
+ *   Brian Schlining
+ * @since 2016-06-17T16:10:00
+ */
+trait ObservationDAO[T <: IPersistentObject] extends DAO[T]:
 
     def newPersistentObject(
         concept: String,
@@ -79,19 +79,22 @@ trait ObservationDAO[T <: IPersistentObject] extends DAO[T] {
 
     def countByMultiRequest(request: MultiRequest): Long
 
-    /** @return
-      *   Order sequence of all concept names used
-      */
+    /**
+     * @return
+     *   Order sequence of all concept names used
+     */
     def findAllConcepts(): Seq[String]
 
-    /** @return
-      *   Ordered sequence of all activities used.
-      */
+    /**
+     * @return
+     *   Ordered sequence of all activities used.
+     */
     def findAllActivities(): Seq[String]
 
-    /** @return
-      *   Ordered sequence of all groups used.
-      */
+    /**
+     * @return
+     *   Ordered sequence of all groups used.
+     */
     def findAllGroups(): Seq[String]
 
     def findAllConceptsByVideoReferenceUUID(uuid: UUID): Seq[String]
@@ -106,14 +109,13 @@ trait ObservationDAO[T <: IPersistentObject] extends DAO[T] {
 
     def updateConcept(oldName: String, newName: String): Int
 
-    /** Move an observation to a different imaged moment efficeintly
-      * @param imagedMomentUuid
-      *   The image moment we want to move to
-      * @param observationUuid
-      *   The observation to move
-      * @return
-      *   The number of records affected. Should be 1
-      */
+    /**
+     * Move an observation to a different imaged moment efficeintly
+     * @param imagedMomentUuid
+     *   The image moment we want to move to
+     * @param observationUuid
+     *   The observation to move
+     * @return
+     *   The number of records affected. Should be 1
+     */
     def changeImageMoment(imagedMomentUuid: UUID, observationUuid: UUID): Int
-
-}

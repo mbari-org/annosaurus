@@ -20,17 +20,18 @@ import org.mbari.scilube3.Matlib
 
 import scala.math.Ordering.Double.IeeeOrdering
 
-/** @author
-  *   Brian Schlining
-  * @since 2015-03-02T16:20:00
-  */
-object FastCollator {
+/**
+ * @author
+ *   Brian Schlining
+ * @since 2015-03-02T16:20:00
+ */
+object FastCollator:
 
     def apply[A: Numeric, B: Numeric](
         a: Iterable[A],
         b: Iterable[B],
         tolerance: Double
-    ): Seq[(A, Option[B])] = {
+    ): Seq[(A, Option[B])] =
         val numericA = implicitly[Numeric[A]]
         val numericB = implicitly[Numeric[B]]
 
@@ -39,15 +40,13 @@ object FastCollator {
 
         apply(a, fa, b, fb, tolerance)
 
-    }
-
     def apply[A, B](
         a: Iterable[A],
         fnA: A => Double,
         b: Iterable[B],
         fnB: B => Double,
         tolerance: Double
-    ): Seq[(A, Option[B])] = {
+    ): Seq[(A, Option[B])] =
 
         val listA = a.toSeq.sortBy(fnA) // sorted d0
         val listB = b.toSeq.sortBy(fnB) // sorted d1
@@ -55,19 +54,14 @@ object FastCollator {
         val valuesA = listA.map(fnA).toArray // transformed d0 in same order as list0
         val valuesB = listB.map(fnB).toArray // transformed d1 in same order as list1
 
-        val tmp = for {
-            (vA, iA) <- valuesA.zipWithIndex
-        } yield {
-            val iB      = Matlib.near(valuesB, vA, false)
-            val nearest = if (iB >= 0) {
-                val vB = valuesB(iB)
-                if (math.abs(vA - vB) <= tolerance) Option(listB(iB))
+        val tmp =
+            for (vA, iA) <- valuesA.zipWithIndex
+            yield
+                val iB      = Matlib.near(valuesB, vA, false)
+                val nearest = if iB >= 0 then
+                    val vB = valuesB(iB)
+                    if math.abs(vA - vB) <= tolerance then Option(listB(iB))
+                    else None
                 else None
-            }
-            else None
-            listA(iA) -> nearest
-        }
+                listA(iA) -> nearest
         tmp.toSeq
-    }
-
-}

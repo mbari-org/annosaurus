@@ -16,23 +16,23 @@
 
 package org.mbari.annosaurus.repository.jpa
 
-import java.util.UUID
 import jakarta.persistence.EntityManager
-
+import org.mbari.annosaurus.domain.{ConceptAssociation, ConceptAssociationRequest}
 import org.mbari.annosaurus.repository.AssociationDAO
+import org.mbari.annosaurus.repository.jdbc.*
 import org.mbari.annosaurus.repository.jpa.entity.{AssociationEntity, ConceptAssociationDTO}
 
-import scala.jdk.CollectionConverters._
-import org.mbari.annosaurus.domain.{ConceptAssociation, ConceptAssociationRequest}
-import org.mbari.annosaurus.repository.jdbc.*
+import java.util.UUID
+import scala.jdk.CollectionConverters.*
 
-/** @author
-  *   Brian Schlining
-  * @since 2016-06-17T17:11:00
-  */
+/**
+ * @author
+ *   Brian Schlining
+ * @since 2016-06-17T17:11:00
+ */
 class AssociationDAOImpl(entityManager: EntityManager)
     extends BaseDAO[AssociationEntity](entityManager)
-    with AssociationDAO[AssociationEntity] {
+    with AssociationDAO[AssociationEntity]:
 
     override def newPersistentObject(): AssociationEntity = new AssociationEntity
 
@@ -41,14 +41,13 @@ class AssociationDAOImpl(entityManager: EntityManager)
         toConcept: Option[String],
         linkValue: Option[String],
         mimeType: Option[String]
-    ): AssociationEntity = {
+    ): AssociationEntity =
         val a = new AssociationEntity
         a.setLinkName(linkName)
         toConcept.foreach(a.setToConcept)
         linkValue.foreach(a.setLinkValue)
         mimeType.foreach(a.setMimeType)
         a
-    }
 
     override def newPersistentObject(association: AssociationEntity): AssociationEntity =
         AssociationEntity(association)
@@ -64,15 +63,14 @@ class AssociationDAOImpl(entityManager: EntityManager)
     override def findByLinkNameAndVideoReferenceUUID(
         linkName: String,
         videoReferenceUUID: UUID
-    ): Iterable[AssociationEntity] = {
+    ): Iterable[AssociationEntity] =
         findByLinkNameAndVideoReferenceUUIDAndConcept(linkName, videoReferenceUUID, None)
-    }
 
     def findByLinkNameAndVideoReferenceUUIDAndConcept(
         linkName: String,
         videoReferenceUUID: UUID,
         concept: Option[String] = None
-    ): Iterable[AssociationEntity] = {
+    ): Iterable[AssociationEntity] =
         // HACK We are experiencing performance issues with the JPQL query. This
         // version is native SQL. Faster, but type casting is not pretty
         val query  = entityManager.createNamedQuery("Association.findByLinkNameAndVideoReference")
@@ -104,15 +102,13 @@ class AssociationDAOImpl(entityManager: EntityManager)
             )
 
         // Filter for a particular concept name
-        concept match {
+        concept match
             case None    => tuples.map(_._2)
             case Some(c) => tuples.filter(_._1 == c).map(_._2)
-        }
-    }
 
     def findByConceptAssociationRequest(
         request: ConceptAssociationRequest
-    ): Iterable[ConceptAssociation] = {
+    ): Iterable[ConceptAssociation] =
 
         val xs = findByTypedNamedQuery[ConceptAssociationDTO](
             "Association.findByConceptAssociationRequest",
@@ -124,15 +120,13 @@ class AssociationDAOImpl(entityManager: EntityManager)
 
         xs.map(ConceptAssociation.fromDto)
 
-    }
-
     override def findAll(
         limit: Option[Int] = None,
         offset: Option[Int] = None
     ): Iterable[AssociationEntity] =
         findByNamedQuery("Association.findAll", limit = limit, offset = offset)
 
-    override def countByToConcept(toConcept: String): Long = {
+    override def countByToConcept(toConcept: String): Long =
         // val query = entityManager.createNativeQuery("MutableAssociation.countByToConcept")
         val query = entityManager.createNamedQuery("Association.countByToConcept")
         query.setParameter(1, toConcept)
@@ -142,12 +136,8 @@ class AssociationDAOImpl(entityManager: EntityManager)
             .map(_.asLong.getOrElse(0L))
             .head
 
-    }
-
-    override def updateToConcept(oldToConcept: String, newToConcept: String): Int = {
+    override def updateToConcept(oldToConcept: String, newToConcept: String): Int =
         val query = entityManager.createNamedQuery("Association.updateToConcept")
         query.setParameter(1, newToConcept)
         query.setParameter(2, oldToConcept)
         query.executeUpdate()
-    }
-}

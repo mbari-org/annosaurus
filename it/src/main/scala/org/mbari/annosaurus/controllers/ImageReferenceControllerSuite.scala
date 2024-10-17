@@ -21,7 +21,7 @@ import org.mbari.annosaurus.repository.jpa.{BaseDAOSuite, JPADAOFactory}
 
 import scala.jdk.CollectionConverters.*
 
-trait ImageReferenceControllerSuite extends BaseDAOSuite {
+trait ImageReferenceControllerSuite extends BaseDAOSuite:
 
     given JPADAOFactory = daoFactory
 
@@ -116,5 +116,3 @@ trait ImageReferenceControllerSuite extends BaseDAOSuite {
         assertEquals(ir0.getWidth.intValue(), ir1.get.widthPixels.orNull)
         assertEquals(ir0.getFormat, ir1.get.format.orNull)
     }
-
-}

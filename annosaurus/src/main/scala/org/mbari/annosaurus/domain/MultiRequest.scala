@@ -18,11 +18,8 @@ package org.mbari.annosaurus.domain
 
 import java.util.UUID
 
-final case class MultiRequest(videoReferenceUuids: Seq[UUID]) extends ToSnakeCase[MultiRequestSC] {
+final case class MultiRequest(videoReferenceUuids: Seq[UUID]) extends ToSnakeCase[MultiRequestSC]:
     def toSnakeCase: MultiRequestSC = MultiRequestSC(videoReferenceUuids)
-}
 
-final case class MultiRequestSC(video_reference_uuids: Seq[UUID])
-    extends ToCamelCase[MultiRequest] {
+final case class MultiRequestSC(video_reference_uuids: Seq[UUID]) extends ToCamelCase[MultiRequest]:
     def toCamelCase: MultiRequest = MultiRequest(video_reference_uuids)
-}

@@ -16,15 +16,13 @@
 
 package org.mbari.annosaurus.domain
 
-import java.util.UUID
-import org.mbari.annosaurus.repository.jpa.entity.ImagedMomentEntity
+import org.mbari.annosaurus.repository.jpa.entity.{ImageReferenceEntity, ImagedMomentEntity, ObservationEntity}
 import org.mbari.vcr4j.time.Timecode
-import java.time.Duration
-import java.time.Instant
-import org.mbari.annosaurus.repository.jpa.entity.ObservationEntity
+
+import java.time.{Duration, Instant}
+import java.util.UUID
 import scala.collection.mutable
 import scala.jdk.CollectionConverters.*
-import org.mbari.annosaurus.repository.jpa.entity.ImageReferenceEntity
 
 final case class Annotation(
     activity: Option[String] = None,
@@ -44,7 +42,7 @@ final case class Annotation(
     videoReferenceUuid: Option[UUID] = None,
     lastUpdated: Option[java.time.Instant] = None
 ) extends ToSnakeCase[AnnotationSC]
-    with ToEntity[ImagedMomentEntity] {
+    with ToEntity[ImagedMomentEntity]:
 
     lazy val elapsedTime: Option[Duration]   = elapsedTimeMillis.map(Duration.ofMillis(_))
     lazy val duration: Option[Duration]      = durationMillis.map(Duration.ofMillis(_))
@@ -100,9 +98,7 @@ final case class Annotation(
         ancillaryData.foreach(x => im.setAncillaryDatum(x.toEntity))
         im
 
-}
-
-object Annotation extends FromEntity[ObservationEntity, Annotation] {
+object Annotation extends FromEntity[ObservationEntity, Annotation]:
 
     override def from(entity: ObservationEntity, extend: Boolean = false): Annotation =
 
@@ -148,24 +144,22 @@ object Annotation extends FromEntity[ObservationEntity, Annotation] {
             Option(entity.getLastUpdatedTime).map(_.toInstant)
         )
 
-    def fromImagedMoment(entity: ImagedMomentEntity, extend: Boolean = false): Seq[Annotation] = {
+    def fromImagedMoment(entity: ImagedMomentEntity, extend: Boolean = false): Seq[Annotation] =
         entity.getObservations.asScala.map(x => from(x, extend)).toSeq
-    }
 
     def toEntities(
         annotations: Seq[Annotation],
         extend: Boolean = false
-    ): Seq[ImagedMomentEntity] = {
-
-        if (annotations.isEmpty) Nil
-        else if (annotations.size == 1) Seq(annotations.head.toEntity)
+    ): Seq[ImagedMomentEntity] =
+        if annotations.isEmpty then Nil
+        else if annotations.size == 1 then Seq(annotations.head.toEntity)
         else
             val imagedMoments = annotations.map(_.toEntity)
 
             // Consolidate imaged moments
             val imagedMomentMap   = mutable.Map[ImagedMomentEntity, Seq[ImagedMomentEntity]]()
             val imageReferenceMap = mutable.Map[ImagedMomentEntity, Seq[ImageReferenceEntity]]()
-            for (im <- imagedMoments)
+            for im <- imagedMoments
             do
                 val imOpt = imagedMomentMap.get(im)
                 imOpt match
@@ -193,10 +187,6 @@ object Annotation extends FromEntity[ObservationEntity, Annotation] {
 
             imagedMomentMap.keys.toSeq
 
-    }
-
-}
-
 final case class AnnotationSC(
     activity: Option[String] = None,
     ancillary_data: Option[CachedAncillaryDatumSC] = None,
@@ -214,7 +204,7 @@ final case class AnnotationSC(
     timecode: Option[String] = None,
     video_reference_uuid: Option[UUID] = None,
     last_udpated: Option[java.time.Instant] = None
-) extends ToCamelCase[Annotation] {
+) extends ToCamelCase[Annotation]:
 
     override def toCamelCase: Annotation =
         Annotation(
@@ -235,7 +225,6 @@ final case class AnnotationSC(
             video_reference_uuid,
             last_udpated
         )
-}
 
 final case class BulkAnnotationSC(
     activity: Option[String] = None,
@@ -253,7 +242,7 @@ final case class BulkAnnotationSC(
     recorded_timestamp: Option[Instant] = None,
     timecode: Option[String] = None,
     video_reference_uuid: Option[UUID] = None
-) extends ToCamelCase[Annotation] {
+) extends ToCamelCase[Annotation]:
 
     override def toCamelCase: Annotation =
         Annotation(
@@ -273,4 +262,3 @@ final case class BulkAnnotationSC(
             timecode,
             video_reference_uuid
         )
-}

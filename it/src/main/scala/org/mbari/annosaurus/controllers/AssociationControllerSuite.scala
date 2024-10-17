@@ -17,17 +17,12 @@
 package org.mbari.annosaurus.controllers
 
 import org.mbari.annosaurus.AssertUtils
-import org.mbari.annosaurus.repository.jpa.BaseDAOSuite
-import org.mbari.annosaurus.repository.jpa.JPADAOFactory
+import org.mbari.annosaurus.domain.{Association, ConceptAssociationRequest}
+import org.mbari.annosaurus.repository.jpa.{AssociationDAOImpl, BaseDAOSuite, JPADAOFactory}
 
-import scala.concurrent.ExecutionContext
 import scala.jdk.CollectionConverters.*
-import org.mbari.annosaurus.domain.Association
-import junit.framework.Test
-import org.mbari.annosaurus.repository.jpa.AssociationDAOImpl
-import org.mbari.annosaurus.domain.ConceptAssociationRequest
 
-trait AssociationControllerSuite extends BaseDAOSuite {
+trait AssociationControllerSuite extends BaseDAOSuite:
 
     implicit val df: JPADAOFactory = daoFactory
 //    override implicit val ec: ExecutionContext = ExecutionContext.global
@@ -237,4 +232,3 @@ trait AssociationControllerSuite extends BaseDAOSuite {
         val ass0      = opt.get
         assertEquals(ass0.toConcept, toConcept)
     }
-}

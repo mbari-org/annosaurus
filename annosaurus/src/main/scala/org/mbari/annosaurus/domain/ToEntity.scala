@@ -18,6 +18,5 @@ package org.mbari.annosaurus.domain
 
 import org.mbari.annosaurus.repository.jpa.entity.IPersistentObject
 
-trait ToEntity[A <: IPersistentObject] {
+trait ToEntity[A <: IPersistentObject]:
     def toEntity: A
-}

@@ -18,6 +18,5 @@ package org.mbari.annosaurus.domain
 
 import org.mbari.annosaurus.repository.jpa.entity.IPersistentObject
 
-trait FromEntity[A <: IPersistentObject, B] {
+trait FromEntity[A <: IPersistentObject, B]:
     def from(entity: A, extend: Boolean): B
-}
