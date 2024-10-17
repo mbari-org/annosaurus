@@ -65,9 +65,7 @@ class QueryService(databaseConfig: DatabaseConfig, viewName: String) {
     def count(query: Query): Either[Throwable, Int] =
         val sql = PreparedStatementGenerator.buildPreparedStatementTemplateForCounts(
             viewName,
-            query.constraints,
-            query.concurrentObservations.getOrElse(false),
-            query.relatedAssociations.getOrElse(false)
+            query
         )
         log.atDebug.log(s"Running query: $sql")
         Using
@@ -81,7 +79,7 @@ class QueryService(databaseConfig: DatabaseConfig, viewName: String) {
                         ResultSet.CONCUR_READ_ONLY
                     )
                 )
-                PreparedStatementGenerator.bind(stmt, query.constraints)
+                PreparedStatementGenerator.bind(stmt, query.where)
                 val rs = stmt.executeQuery()
                 //                val rs   = use(stmt.executeQuery(sql))
                 if rs.next() then rs.getInt(1) else 0
@@ -91,13 +89,7 @@ class QueryService(databaseConfig: DatabaseConfig, viewName: String) {
     def query(
         query: Query
     ): Either[Throwable, QueryResults] =
-        val sql = PreparedStatementGenerator.buildPreparedStatementTemplate(
-            viewName,
-            query.columns,
-            query.constraints,
-            query.concurrentObservations.getOrElse(false),
-            query.relatedAssociations.getOrElse(false)
-        )
+        val sql = PreparedStatementGenerator.buildPreparedStatementTemplate(viewName, query)
         log.atDebug.log(s"Running query: $sql")
         Using
             .Manager(use =>
@@ -112,9 +104,8 @@ class QueryService(databaseConfig: DatabaseConfig, viewName: String) {
                 )
                 query.limit.foreach(stmt.setMaxRows)
                 query.offset.foreach(stmt.setFetchSize)
-                PreparedStatementGenerator.bind(stmt, query.constraints)
+                PreparedStatementGenerator.bind(stmt, query.where)
                 val rs = stmt.executeQuery()
-//                val rs   = use(stmt.executeQuery(stmt))
                 QueryResults.fromResultSet(rs)
             )
             .toEither

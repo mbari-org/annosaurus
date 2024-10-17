@@ -334,16 +334,10 @@ object CirceCodecs {
     // Custom Decoder for Constraint
     given constraintDecoder: Decoder[Constraint] = (c: HCursor) => {
         for {
-            columnName <- c.downField("columnName").as[String]
+            columnName <- c.downField("column").as[String]
             // Determine which constraint key is present
             constraint <- {
-                if (c.downField("in").succeeded) {
-                    c.downField("in").as[List[String]].map(Constraint.In(columnName, _))
-                }
-                else if (c.downField("like").succeeded) {
-                    c.downField("like").as[String].map(Constraint.Like(columnName, _))
-                }
-                else if (c.downField("between").succeeded) {
+                if (c.downField("between").succeeded) {
                     // Attempt to decode between as List[Int] first
                     c.downField("between")
                         .as[List[Double]]
@@ -355,19 +349,32 @@ object CirceCodecs {
                                 .map(xs => Constraint.Date(columnName, xs.head, xs.last))
                         }
                 }
-                else if (c.downField("minmax").succeeded) {
-                    c.downField("minmax")
-                        .as[List[Double]]
-                        .map(xs => Constraint.MinMax(columnName, xs.head, xs.last))
+                else if (c.downField("contains").succeeded) {
+                    c.downField("contains").as[String].map(Constraint.Contains(columnName, _))
                 }
-                else if (c.downField("min").succeeded) {
-                    c.downField("min").as[Double].map(Constraint.Min(columnName, _))
+                else if (c.downField("equals").succeeded) {
+                    c.downField("equals").as[String].map(Constraint.Equals(columnName, _))
+                }
+                else if (c.downField("in").succeeded) {
+                    c.downField("in").as[List[String]].map(Constraint.In(columnName, _))
+                }
+                else if (c.downField("isnull").succeeded) {
+                    c.downField("isnull").as[Boolean].map(Constraint.IsNull(columnName, _))
+                }
+                else if (c.downField("like").succeeded) {
+                    c.downField("like").as[String].map(Constraint.Like(columnName, _))
                 }
                 else if (c.downField("max").succeeded) {
                     c.downField("max").as[Double].map(Constraint.Max(columnName, _))
                 }
-                else if (c.downField("isnull").succeeded) {
-                    c.downField("isnull").as[Boolean].map(Constraint.IsNull(columnName, _))
+                else if (c.downField("min").succeeded) {
+                    c.downField("min").as[Double].map(Constraint.Min(columnName, _))
+                }
+
+                else if (c.downField("minmax").succeeded) {
+                    c.downField("minmax")
+                        .as[List[Double]]
+                        .map(xs => Constraint.MinMax(columnName, xs.head, xs.last))
                 }
                 else {
                     Left(DecodingFailure("Unknown constraint type", c.history))
@@ -377,23 +384,25 @@ object CirceCodecs {
     }
 
     given Encoder[Constraint.Date]       = deriveEncoder
+    given Encoder[Constraint.Contains]   = deriveEncoder
+    given Encoder[Constraint.Equals[String]]     = deriveEncoder
     given Encoder[Constraint.In[String]] = deriveEncoder
+    given Encoder[Constraint.IsNull]     = deriveEncoder
     given Encoder[Constraint.Like]       = deriveEncoder
     given Encoder[Constraint.Max]        = deriveEncoder
-    given Encoder[Constraint.Min]        = deriveEncoder
     given Encoder[Constraint.MinMax]     = deriveEncoder
-    given Encoder[Constraint.IsNull]     = deriveEncoder
+    given Encoder[Constraint.Min]        = deriveEncoder
     given Encoder[List[Constraint]]      = deriveEncoder
 
     // THis is needed to handle the trait Constraint used in Constraints
     given constraintEncoder: Encoder[Constraint] = Encoder.instance[Constraint] {
-        case c: Constraint.In[String] => c.asJson
-        case c: Constraint.Like       => c.asJson
-        case c: Constraint.Min        => c.asJson
-        case c: Constraint.Max        => c.asJson
-        case c: Constraint.MinMax     => c.asJson
-        case c: Constraint.IsNull     => c.asJson
         case c: Constraint.Date       => c.asJson
+        case c: Constraint.In[String] => c.asJson
+        case c: Constraint.IsNull     => c.asJson
+        case c: Constraint.Like       => c.asJson
+        case c: Constraint.Max        => c.asJson
+        case c: Constraint.Min        => c.asJson
+        case c: Constraint.MinMax     => c.asJson
     }
 
     given constraintsDecoder: Decoder[Query] = deriveDecoder

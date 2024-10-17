@@ -21,21 +21,26 @@ import org.mbari.annosaurus.repository.query.Query
 import java.time.Instant
 
 case class QueryRequest(
-                           where: Seq[ConstraintRequest],
-                           select: Option[Seq[String]] = None,
-                           limit: Option[Int] = None,
-                           offset: Option[Int] = None,
-                           concurrentObservations: Option[Boolean] = None,
-                           relatedAssociations: Option[Boolean] = None
+    where: Seq[ConstraintRequest],
+    select: Option[Seq[String]] = None,
+    limit: Option[Int] = None,
+    offset: Option[Int] = None,
+    concurrentObservations: Option[Boolean] = None,
+    relatedAssociations: Option[Boolean] = None,
+    distinct: Option[Boolean] = Some(true),
+    strict: Option[Boolean] = Some(false),
+    orderby: Option[Seq[String]] = None
 )
 
 case class ConstraintRequest(
     column: String,
-    in: Option[Seq[String]] = None,
-    like: Option[String] = None,
-    min: Option[Double] = None,
-    max: Option[Double] = None,
-    minmax: Option[Seq[Double]] = None,
     between: Option[Seq[Instant]] = None,
-    isnull: Option[Boolean] = None
+    contains: Option[String] = None,
+    equals: Option[String] = None,
+    in: Option[Seq[String]] = None,
+    isnull: Option[Boolean] = None,
+    like: Option[String] = None,
+    max: Option[Double] = None,
+    min: Option[Double] = None,
+    minmax: Option[Seq[Double]] = None
 )

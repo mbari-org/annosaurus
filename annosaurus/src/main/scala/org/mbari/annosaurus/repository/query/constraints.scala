@@ -24,23 +24,39 @@ import org.mbari.annosaurus.etc.circe.CirceCodecs.{*, given}
 
 // Define the Root case class
 case class Query(
-    constraints: Seq[Constraint],
-    columns: Seq[String] = Seq.empty,
+    where: Seq[Constraint],
+    select: Seq[String] = Seq.empty,
     limit: Option[Int] = None,
     offset: Option[Int] = None,
-    concurrentObservations: Option[Boolean] = None,
-    relatedAssociations: Option[Boolean] = None
+    concurrentObservations: Boolean = false,
+    relatedAssociations: Boolean = false,
+    distinct: Boolean = true,
+    strict: Boolean = false,
+    orderby: Option[Seq[String]] = None
 )
 
 object Query:
+
+    def validate(queryRequest: QueryRequest, checkWhere: Boolean = true): Either[Throwable, Query] =
+        val query = from(queryRequest)
+        if (checkWhere && query.where.isEmpty) then Left(new IllegalArgumentException("where clause is required"))
+        else if (query.select.isEmpty) then Left(new IllegalArgumentException("select clause is required"))
+        else if (query.strict && (query.concurrentObservations || query.relatedAssociations)) then
+            Left(new IllegalArgumentException("strict mode cannot be used with concurrentObservations or relatedAssociations"))
+        else
+            Right(from(queryRequest))
+
     def from(queryRequest: QueryRequest): Query =
         Query(
-            constraints = queryRequest.where.map(Constraint.from),
-            columns = queryRequest.select.getOrElse(Seq.empty),
+            where = queryRequest.where.map(Constraint.from),
+            select = queryRequest.select.getOrElse(Seq.empty),
             limit = queryRequest.limit,
             offset = queryRequest.offset,
-            concurrentObservations = queryRequest.concurrentObservations,
-            relatedAssociations = queryRequest.relatedAssociations
+            concurrentObservations = queryRequest.concurrentObservations.getOrElse(false),
+            relatedAssociations = queryRequest.relatedAssociations.getOrElse(false),
+            distinct = queryRequest.distinct.getOrElse(true),
+            strict = queryRequest.strict.getOrElse(false),
+            orderby = queryRequest.orderby
         )
 
 
@@ -56,13 +72,15 @@ object Constraint:
 
     def from (constraintRequest: ConstraintRequest): Constraint =
         constraintRequest match
-            case ConstraintRequest(column, Some(in), _, _, _, _, _, _) => In(column, in)
-            case ConstraintRequest(column, _, Some(like), _, _, _, _, _) => Like(column, like)
-            case ConstraintRequest(column, _, _, Some(min), _, _, _, _) => Min(column, min)
-            case ConstraintRequest(column, _, _, _, Some(max), _, _, _) => Max(column, max)
-            case ConstraintRequest(column, _, _, _, _, Some(minmax), _, _) => MinMax(column, minmax.head, minmax(1))
-            case ConstraintRequest(column, _, _, _, _, _, Some(between), _) => Date(column, between.head, between(1))
-            case ConstraintRequest(column, _, _, _, _, _, _, Some(isnull)) => IsNull(column, isnull)
+            case ConstraintRequest(column, Some(between: Seq[Instant]), _, _, _, _, _, _, _, _) => Date(column, between.head, between(1))
+            case ConstraintRequest(column, _, Some(contains), _, _, _, _, _, _, _) => Contains(column, contains)
+            case ConstraintRequest(column, _, _, Some(equals), _, _, _, _, _, _) => Equals(column, equals)
+            case ConstraintRequest(column, _, _, _,Some(in), _, _, _, _, _) => In(column, in)
+            case ConstraintRequest(column, _, _, _, _, Some(isnull), _, _, _, _) => IsNull(column, isnull)
+            case ConstraintRequest(column, _, _, _, _, _, Some(like), _, _, _) => Like(column, like)
+            case ConstraintRequest(column, _, _, _, _, _, _, Some(max), _, _) => Max(column, max)
+            case ConstraintRequest(column, _, _, _, _, _, _, _, Some(min), _) => Min(column, min)
+            case ConstraintRequest(column, _, _, _, _, _, _, _, _, Some(minmax)) => MinMax(column, minmax.head, minmax(1))
             case _ => Noop
 
     case object Noop extends Constraint:
@@ -70,6 +88,14 @@ object Constraint:
         def toPreparedStatementTemplate: String               = ""
         @throws[SQLException]
         def bind(statement: PreparedStatement, idx: Int): Int = idx
+
+    case class Contains(column: String, contains: String) extends Constraint:
+        @throws[SQLException]
+        def bind(statement: PreparedStatement, idx: Int): Int =
+            statement.setString(idx, s"%$contains%")
+            idx + 1
+
+        def toPreparedStatementTemplate: String = s"$column LIKE ?"
 
     case class Date(column: String, startTimestamp: Instant, endTimestamp: Instant)
         extends Constraint:
@@ -80,6 +106,16 @@ object Constraint:
             idx + 2
 
         def toPreparedStatementTemplate: String = column + " BETWEEN ? AND ?"
+
+    case class Equals[A](column: String, equals: A) extends Constraint:
+        require(column != null)
+
+        @throws[SQLException]
+        def bind(statement: PreparedStatement, idx: Int): Int =
+            statement.setObject(idx, equals)
+            idx + 1
+
+        def toPreparedStatementTemplate: String = column + " = ?"
 
     case class In[A](column: String, in: Seq[A]) extends Constraint:
         require(column != null)
@@ -103,7 +139,7 @@ object Constraint:
     case class Like(column: String, like: String) extends Constraint:
         @throws[SQLException]
         def bind(statement: PreparedStatement, idx: Int): Int =
-            statement.setString(idx, s"%$like%")
+            statement.setString(idx, like)
             idx + 1
 
         def toPreparedStatementTemplate: String = s"$column LIKE ?"
@@ -139,74 +175,3 @@ object Constraint:
 
         def toPreparedStatementTemplate: String = if isNull then column + " IS NULL"
         else column + " IS NOT NULL"
-//
-//case class InConstraint[A](columnName: String, in: Seq[A]) extends Constraint {
-//    require(columnName != null)
-//    require(in != null && in.nonEmpty, "Check your value arg! null and empty values are not allowed")
-//
-//    @throws[SQLException]
-//    def bind(statement: PreparedStatement, idx: Int): Int = {
-//        var i = idx
-//        for (v <- in) {
-//            statement.setObject(idx, v)
-//            i = i + 1
-//        }
-//        i
-//    }
-//
-//    def toPreparedStatementTemplate: String = if (in.size eq 1) columnName + " = ?"
-//    else columnName + " IN " + in.map(s => "?").mkString("(", ",", ")")
-//}
-//
-//case class LikeConstraint(columnName: String, like: String) extends Constraint {
-//    @throws[SQLException]
-//    def bind(statement: PreparedStatement, idx: Int): Int = {
-//        statement.setString(idx, s"%$like%")
-//        idx + 1
-//    }
-//
-//    def toPreparedStatementTemplate: String = s"$columnName LIKE ?"
-//}
-//
-//case class MaxConstraint(columnName: String, max: Double) extends Constraint {
-//    @throws[SQLException]
-//    def bind(statement: PreparedStatement, idx: Int): Int = {
-//        statement.setDouble(idx, max)
-//        idx + 1
-//    }
-//
-//    def toPreparedStatementTemplate: String = columnName + " <= ?"
-//}
-//
-//case class MinConstraint(columnName: String, min: Double) extends Constraint {
-//    @throws[SQLException]
-//    def bind(statement: PreparedStatement, idx: Int): Int = {
-//        statement.setDouble(idx, min)
-//        idx + 1
-//    }
-//
-//    def toPreparedStatementTemplate: String = columnName + " >= ?"
-//}
-//
-//case class MinMaxConstraint(columnName: String, min: Double, max: Double) extends Constraint {
-//    @throws[SQLException]
-//    def bind(statement: PreparedStatement, idx: Int): Int = {
-//        statement.setDouble(idx, min)
-//        statement.setDouble(idx + 1, max)
-//        idx + 2
-//    }
-//
-//    def toPreparedStatementTemplate: String = columnName + " BETWEEN ? AND ?"
-//}
-//
-//case class DateConstraint(columnName: String, startTimestamp: Instant, endTimestamp: Instant) extends Constraint:
-//    @throws[SQLException]
-//    def bind(statement: PreparedStatement, idx: Int): Int = {
-//        statement.setObject(idx, min)
-//        statement.setObject(idx + 1, max)
-//        idx + 2
-//    }
-//
-//    def toPreparedStatementTemplate: String = columnName + " BETWEEN ? AND ?"
-//
-//

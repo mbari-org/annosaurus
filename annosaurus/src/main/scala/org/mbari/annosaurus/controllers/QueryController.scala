@@ -25,12 +25,16 @@ class QueryController(databaseConfig: DatabaseConfig, viewName: String) {
     private lazy val queryService = new QueryService(databaseConfig, viewName)
 
     def count(queryRequest: QueryRequest): Either[Throwable, Count] =
-        val query = Query.from(queryRequest)
-        queryService.count(query).map(Count(_))
+        for
+            query <- Query.validate(queryRequest)
+            count <- queryService.count(query)
+        yield Count(count)
 
     def query(queryRequest: QueryRequest): Either[Throwable, QueryResults] =
-        val query = Query.from(queryRequest)
-        queryService.query(query)
+        for
+            query <- Query.validate(queryRequest)
+            results <- queryService.query(query)
+        yield results
 
     def listColumns(): Either[Throwable, Seq[JDBC.Metadata]] =
         queryService.jdbc.listColumnsMetadata(viewName)

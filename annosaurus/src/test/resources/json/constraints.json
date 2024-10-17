@@ -1,7 +1,8 @@
 {
-  "constraints": [
+  "select": ["foo"],
+  "where": [
     {
-      "columnName": "id",
+      "column": "id",
       "in": [
         "1",
         "2",
@@ -9,46 +10,47 @@
       ]
     },
     {
-      "columnName": "name",
+      "column": "name",
       "like": ".*"
     },
     {
-      "columnName": "age",
+      "column": "age",
       "minmax": [
         1,
         100
       ]
     },
     {
-      "columnName": "height",
-      "between": [
-        1,
-        100
-      ]
-    },
-    {
-      "columnName": "foo",
+      "column": "foo",
       "min": 1
     },
     {
-      "columnName": "bar",
+      "column": "bar",
       "max": 100
     },
     {
-      "columnName": "baz",
+      "column": "baz",
       "between": [
         "2010-01-01T01:22:33Z",
         "2011-01-01T01:22:33Z"
       ]
     },
     {
-      "columnName": "qux",
+      "column": "qux",
       "isnull": true
     },
 
     {
-      "columnName": "quxx",
+      "column": "quxx",
       "isnull": false
+    },
+    {
+      "column": "quxxx",
+      "equals": "foo"
+    },
+    {
+      "column": "zzzz",
+      "contains": "foo"
     }
 
   ]

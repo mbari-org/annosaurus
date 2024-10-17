@@ -38,16 +38,9 @@ object PreparedStatementGenerator {
 
     def buildPreparedStatementTemplateForCounts(
         tableName: String,
-        constraints: Seq[Constraint],
-        includeConcurrentObservations: Boolean = false,
-        includeRelatedAssociations: Boolean = false
+        query: Query
     ): String =
-        val where = buildWhereClause(
-            tableName,
-            constraints,
-            includeConcurrentObservations,
-            includeRelatedAssociations
-        )
+        val where = buildWhereClause(tableName, query)
         s"""
           |SELECT COUNT(*)
           |FROM $tableName
@@ -56,38 +49,42 @@ object PreparedStatementGenerator {
 
     def buildPreparedStatementTemplate(
         tableName: String,
-        columns: Seq[String],
-        constraints: Seq[Constraint],
-        includeConcurrentObservations: Boolean = false,
-        includeRelatedAssociations: Boolean = false
+        query: Query
     ): String =
 
-        // Add InexTime to the columns if it is not already there so that we can always sort by time
-        val resolvedColumns1 = if columns.contains(IndexTime) then columns else IndexTime +: columns
-        val resolvedColumns2 = if resolvedColumns1.contains(ObservationUuid) then resolvedColumns1 else ObservationUuid +: resolvedColumns1
-        val select = resolvedColumns2.mkString(", ")
-        val where  = buildWhereClause(
-            tableName,
-            constraints,
-            includeConcurrentObservations,
-            includeRelatedAssociations
-        )
+        val select   = buildSelectClause(query)
+        val where    = buildWhereClause(tableName, query)
+        val distinct = if query.distinct then "DISTINCT" else ""
+        val orderBy  = query.orderby match
+            case Some(columns) => columns.mkString(", ")
+            case None          =>
+                if query.strict then query.select.head
+                else s"$IndexTime, $ObservationUuid"
 
         s"""
-          |SELECT DISTINCT $select
+          |SELECT $distinct $select
           |FROM $tableName
           |$where
-          |ORDER BY $IndexTime, $ObservationUuid ASC
+          |ORDER BY $orderBy ASC
           |""".stripMargin
+
+    private def buildSelectClause(query: Query): String =
+        if query.strict then query.where.map(_.column).mkString(", ")
+        else
+            // Add InexTime to the columns if it is not already there so that we can always sort by time
+            val resolvedColumns1 =
+                if query.select.contains(IndexTime) then query.select else IndexTime +: query.select
+            val resolvedColumns2 =
+                if resolvedColumns1.contains(ObservationUuid) then resolvedColumns1
+                else ObservationUuid +: resolvedColumns1
+            resolvedColumns2.mkString(", ")
 
     private def buildWhereClause(
         tableName: String,
-        constraints: Seq[Constraint],
-        includeConcurrentObservations: Boolean = false,
-        includeRelatedAssociations: Boolean = false
+        query: Query
     ): String =
-        val wheres = constraints.map(_.toPreparedStatementTemplate).mkString(" AND ")
-        if includeConcurrentObservations && includeRelatedAssociations then
+        val wheres = query.where.map(_.toPreparedStatementTemplate).mkString(" AND ")
+        if query.concurrentObservations && query.relatedAssociations then
             s"""WHERE $ObservationUuid IN (
                |     SELECT $ObservationUuid
                |     FROM $tableName
@@ -98,13 +95,13 @@ object PreparedStatementGenerator {
                |     )
                |)
                |""".stripMargin
-        else if includeConcurrentObservations then s"""WHERE $ImagedMomentUuid IN (
+        else if query.concurrentObservations then s"""WHERE $ImagedMomentUuid IN (
                |     SELECT $ImagedMomentUuid
                |     FROM $tableName
                |     WHERE $wheres
                |)
                |""".stripMargin
-        else if includeRelatedAssociations then s"""WHERE $ObservationUuid IN (
+        else if query.relatedAssociations then s"""WHERE $ObservationUuid IN (
                |     SELECT $ObservationUuid
                |     FROM $tableName
                |     WHERE $wheres
