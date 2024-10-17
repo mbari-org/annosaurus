@@ -16,9 +16,9 @@
 
 package org.mbari.annosaurus.repository
 
-import java.util.UUID
-
 import org.mbari.annosaurus.repository.jpa.entity.IPersistentObject
+
+import java.util.UUID
 
 /**
  * Special DAO for fetching just the index information from the ImagedMomemnts

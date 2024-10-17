@@ -16,17 +16,15 @@
 
 package org.mbari.annosaurus.controllers
 
+import jakarta.persistence.EntityManager
+import org.mbari.annosaurus.domain.CachedAncillaryDatum
+import org.mbari.annosaurus.etc.jdk.Logging.{*, given}
+
 import java.sql.Timestamp
 import java.time.Instant
 import java.util.UUID
-
-import jakarta.persistence.EntityManager
-
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
 import scala.jdk.CollectionConverters.*
-import org.mbari.annosaurus.domain.CachedAncillaryDatum
-import org.mbari.annosaurus.repository.jpa.extensions.*
-import org.mbari.annosaurus.etc.jdk.Logging.{*, given}
 
 /**
  * @author

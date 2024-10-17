@@ -16,13 +16,12 @@
 
 package org.mbari.annosaurus.controllers
 
-import org.mbari.annosaurus.repository.jpa.BaseDAOSuite
-import org.mbari.annosaurus.repository.jpa.JPADAOFactory
-import scala.concurrent.ExecutionContext
 import org.mbari.annosaurus.AssertUtils
-import scala.jdk.CollectionConverters.*
-import junit.framework.Assert
+import org.mbari.annosaurus.repository.jpa.{BaseDAOSuite, JPADAOFactory}
+
 import java.time.Duration
+import scala.concurrent.ExecutionContext
+import scala.jdk.CollectionConverters.*
 
 trait ObservationControllerSuite extends BaseDAOSuite:
 

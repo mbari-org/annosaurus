@@ -16,17 +16,14 @@
 
 package org.mbari.annosaurus.repository.jpa
 
-import jakarta.persistence.EntityManager
-import java.util.UUID
-import org.mbari.vcr4j.time.Timecode
-import java.time.Duration
-import java.time.Instant
-import junit.framework.Test
-import org.mbari.annosaurus.controllers.TestUtils
-import junit.framework.Assert
 import org.mbari.annosaurus.AssertUtils
-import scala.jdk.CollectionConverters.*
+import org.mbari.annosaurus.controllers.TestUtils
 import org.mbari.annosaurus.domain.WindowRequest
+import org.mbari.vcr4j.time.Timecode
+
+import java.time.{Duration, Instant}
+import java.util.UUID
+import scala.jdk.CollectionConverters.*
 
 trait ImagedMomentDAOSuite extends BaseDAOSuite:
 

@@ -16,12 +16,10 @@
 
 package org.mbari.annosaurus.repository.jdbc
 
-import java.time.Duration
-import java.util.UUID
-import java.sql.Timestamp
-import org.mbari.vcr4j.time.Timecode
 import org.mbari.annosaurus.domain.Annotation
+
 import java.time.Instant
+import java.util.UUID
 
 /**
  * Object that contains the SQL and methods to build annotations

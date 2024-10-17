@@ -17,29 +17,14 @@
 package org.mbari.annosaurus.endpoints
 
 import org.mbari.annosaurus.controllers.TestUtils
-import org.mbari.annosaurus.domain.{
-    Annotation,
-    AnnotationSC,
-    CachedAncillaryDatum,
-    ConcurrentRequest,
-    Count,
-    DeleteCount,
-    DeleteCountSC,
-    GeographicRange,
-    GeographicRangeSC,
-    ImageSC,
-    MultiRequest,
-    QueryConstraints,
-    QueryConstraintsResponseSC
-}
+import org.mbari.annosaurus.domain.{Annotation, AnnotationSC, CachedAncillaryDatum, ConcurrentRequest, Count, DeleteCountSC, GeographicRangeSC, ImageSC, MultiRequest, QueryConstraints, QueryConstraintsResponseSC}
+import org.mbari.annosaurus.etc.circe.CirceCodecs.{*, given}
 import org.mbari.annosaurus.etc.jwt.JwtService
+import org.mbari.annosaurus.etc.sdk.Futures.*
 import org.mbari.annosaurus.repository.jdbc.JdbcRepository
 import org.mbari.annosaurus.repository.jpa.JPADAOFactory
-import sttp.model.StatusCode
-import org.mbari.annosaurus.etc.circe.CirceCodecs.{*, given}
 import sttp.client3.*
-import org.mbari.annosaurus.etc.sdk.Futures.*
-import org.junit.Assert.*
+import sttp.model.StatusCode
 
 import java.util.UUID
 import scala.jdk.CollectionConverters.*

@@ -18,12 +18,12 @@ package org.mbari.annosaurus.endpoints
 
 import org.mbari.annosaurus.controllers.CachedAncillaryDatumController
 import org.mbari.annosaurus.domain.{CachedAncillaryDatumSC, CountForVideoReferenceSC, ErrorMsg}
+import org.mbari.annosaurus.endpoints.CustomTapirJsonCirce.*
+import org.mbari.annosaurus.etc.circe.CirceCodecs.given
 import org.mbari.annosaurus.etc.jwt.JwtService
 import sttp.tapir.*
 import sttp.tapir.generic.auto.*
 import sttp.tapir.server.ServerEndpoint
-import org.mbari.annosaurus.etc.circe.CirceCodecs.{*, given}
-import CustomTapirJsonCirce.*
 
 import java.time.Duration
 import java.util.UUID

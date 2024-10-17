@@ -17,9 +17,9 @@
 package org.mbari.annosaurus.domain
 
 import org.mbari.annosaurus.repository.jpa.entity.AssociationEntity
-import java.util.UUID
 import org.mbari.annosaurus.repository.jpa.entity.extensions.*
-import scala.util.Try
+
+import java.util.UUID
 
 case class Association(
     linkName: String,

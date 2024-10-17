@@ -16,9 +16,10 @@
 
 package org.mbari.annosaurus.domain
 
-import java.util.UUID
-import org.mbari.annosaurus.repository.jpa.entity.{ImagedMomentEntity, IndexEntity}
 import org.mbari.annosaurus.repository.jpa.entity.extensions.*
+import org.mbari.annosaurus.repository.jpa.entity.{ImagedMomentEntity, IndexEntity}
+
+import java.util.UUID
 
 final case class Index(
     videoReferenceUuid: UUID,

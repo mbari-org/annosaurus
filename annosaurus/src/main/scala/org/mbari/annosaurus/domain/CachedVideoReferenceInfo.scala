@@ -16,10 +16,10 @@
 
 package org.mbari.annosaurus.domain
 
-import java.util.UUID
 import org.mbari.annosaurus.repository.jpa.entity.CachedVideoReferenceInfoEntity
 import org.mbari.annosaurus.repository.jpa.entity.extensions.*
-import org.mbari.annosaurus.domain.FromEntity
+
+import java.util.UUID
 
 final case class CachedVideoReferenceInfo(
     uuid: UUID,

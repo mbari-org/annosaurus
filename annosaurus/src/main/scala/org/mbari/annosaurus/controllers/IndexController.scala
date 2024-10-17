@@ -16,15 +16,14 @@
 
 package org.mbari.annosaurus.controllers
 
+import org.mbari.annosaurus.domain.{Index, IndexUpdate}
 import org.mbari.annosaurus.repository.IndexDAO
+import org.mbari.annosaurus.repository.jpa.JPADAOFactory
+import org.mbari.annosaurus.repository.jpa.entity.IndexEntity
 
 import java.time.Instant
 import java.util.UUID
 import scala.concurrent.{ExecutionContext, Future}
-import org.mbari.annosaurus.repository.jpa.entity.ImagedMomentEntity
-import org.mbari.annosaurus.repository.jpa.JPADAOFactory
-import org.mbari.annosaurus.repository.jpa.entity.IndexEntity
-import org.mbari.annosaurus.domain.{Index, IndexUpdate}
 
 /**
  * @author

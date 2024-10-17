@@ -17,10 +17,10 @@
 package org.mbari.annosaurus.repository.query
 
 import org.mbari.annosaurus.domain.{ConstraintRequest, QueryRequest}
+import org.mbari.annosaurus.etc.circe.CirceCodecs.*
 
 import java.sql.{PreparedStatement, SQLException}
 import java.time.Instant
-import org.mbari.annosaurus.etc.circe.CirceCodecs.{*, given}
 
 // Define the Root case class
 case class Query(

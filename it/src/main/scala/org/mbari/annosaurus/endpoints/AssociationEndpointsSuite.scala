@@ -17,24 +17,14 @@
 package org.mbari.annosaurus.endpoints
 
 import org.mbari.annosaurus.controllers.{AssociationController, TestUtils}
-import org.mbari.annosaurus.domain.{
-    Association,
-    AssociationSC,
-    AssociationUpdateSC,
-    ConceptAssociation,
-    ConceptAssociationRequest,
-    ConceptAssociationResponseSC,
-    ConceptCount,
-    RenameConcept,
-    RenameCountSC
-}
-import org.mbari.annosaurus.etc.jwt.JwtService
-import org.mbari.annosaurus.repository.jpa.JPADAOFactory
-import sttp.model.StatusCode
+import org.mbari.annosaurus.domain.{Association, AssociationSC, AssociationUpdateSC, ConceptAssociationRequest, ConceptAssociationResponseSC, ConceptCount, RenameConcept, RenameCountSC}
 import org.mbari.annosaurus.etc.circe.CirceCodecs.{*, given}
-import sttp.client3.*
+import org.mbari.annosaurus.etc.jwt.JwtService
 import org.mbari.annosaurus.etc.sdk.Futures.*
 import org.mbari.annosaurus.etc.sdk.Reflect
+import org.mbari.annosaurus.repository.jpa.JPADAOFactory
+import sttp.client3.*
+import sttp.model.StatusCode
 
 import scala.jdk.CollectionConverters.*
 import scala.util.Random

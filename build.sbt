@@ -19,8 +19,12 @@ ThisBuild / scalacOptions ++= Seq(
     "-language:existentials",
     "-language:higherKinds",
     "-language:implicitConversions",
-    "-unchecked"
+    "-unchecked",
+    "-Wunused:imports"
 )
+ThisBuild / semanticdbEnabled := true
+ThisBuild / semanticdbVersion := scalafixSemanticdb.revision
+
 ThisBuild / startYear        := Some(2017)
 //ThisBuild / updateOptions    := updateOptions.value.withCachedResolution(true)
 ThisBuild / versionScheme    := Some("semver-spec")

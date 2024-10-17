@@ -16,31 +16,14 @@
 
 package org.mbari.annosaurus.endpoints
 
-import org.mbari.annosaurus.Endpoints.daoFactory
 import org.mbari.annosaurus.controllers.{ImagedMomentController, ObservationController, TestUtils}
-import org.mbari.annosaurus.domain.{
-    ConceptCount,
-    Count,
-    CountForVideoReferenceSC,
-    ImagedMoment,
-    Observation,
-    ObservationSC,
-    ObservationUpdateSC,
-    ObservationsUpdate,
-    RenameConcept,
-    RenameCountSC
-}
-import org.mbari.annosaurus.etc.jwt.JwtService
-import org.mbari.annosaurus.repository.jpa.JPADAOFactory
-import org.mbari.annosaurus.etc.tapir.TapirCodecs.given
-import org.mbari.annosaurus.etc.sdk.Futures.join
-import sttp.tapir.*
-import sttp.tapir.json.circe.*
-import sttp.tapir.generic.auto.*
-import sttp.tapir.server.ServerEndpoint
+import org.mbari.annosaurus.domain.{ConceptCount, Count, CountForVideoReferenceSC, Observation, ObservationSC, ObservationUpdateSC, ObservationsUpdate, RenameConcept, RenameCountSC}
 import org.mbari.annosaurus.etc.circe.CirceCodecs.{*, given}
+import org.mbari.annosaurus.etc.jwt.JwtService
+import org.mbari.annosaurus.etc.sdk.Futures.join
 import org.mbari.annosaurus.etc.sdk.Reflect
 import org.mbari.annosaurus.repository.jdbc.JdbcRepository
+import org.mbari.annosaurus.repository.jpa.JPADAOFactory
 import sttp.client3.*
 import sttp.model.StatusCode
 

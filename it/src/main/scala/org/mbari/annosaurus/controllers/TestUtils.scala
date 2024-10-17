@@ -16,19 +16,13 @@
 
 package org.mbari.annosaurus.controllers
 
+import org.mbari.annosaurus.domain.Annotation
+import org.mbari.annosaurus.etc.jdk.Logging.given
 import org.mbari.annosaurus.etc.jdk.Strings
-import org.mbari.annosaurus.repository.jpa.entity.{
-    AssociationEntity,
-    CachedAncillaryDatumEntity,
-    ImageReferenceEntity,
-    ImagedMomentEntity,
-    ObservationEntity
-}
-import org.mbari.scilube3.ocean.Ocean
 import org.mbari.annosaurus.repository.jpa.JPADAOFactory
 import org.mbari.annosaurus.repository.jpa.entity.*
+import org.mbari.scilube3.ocean.Ocean
 import org.mbari.vcr4j.time.{FrameRates, Timecode}
-import org.mbari.annosaurus.etc.jdk.Logging.given
 
 import java.net.URI
 import java.security.MessageDigest
@@ -36,12 +30,8 @@ import java.sql.Connection
 import java.time.{Duration, Instant}
 import java.util.UUID
 import java.util.concurrent.TimeUnit
-import scala.concurrent.duration
+import scala.concurrent.{Await, ExecutionContext, duration}
 import scala.util.Random
-import scala.concurrent.ExecutionContext
-import java.sql.Timestamp
-import scala.concurrent.Await
-import org.mbari.annosaurus.domain.Annotation
 
 object TestUtils:
 

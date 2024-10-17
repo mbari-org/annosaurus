@@ -16,11 +16,9 @@
 
 package org.mbari.annosaurus.repository
 
-import org.mbari.annosaurus.PersistentObject
 import org.mbari.annosaurus.domain.WindowRequest
-import org.mbari.annosaurus.repository.jpa.entity.ImagedMomentEntity
-import org.mbari.annosaurus.repository.jpa.entity.IPersistentObject
 import org.mbari.annosaurus.repository.jpa.entity.extensions.*
+import org.mbari.annosaurus.repository.jpa.entity.{IPersistentObject, ImagedMomentEntity}
 import org.mbari.vcr4j.time.Timecode
 
 import java.time.{Duration, Instant}

@@ -29,16 +29,16 @@ import org.mbari.annosaurus.domain.{
     VideoTimestampSC,
     WindowRequestSC
 }
+import org.mbari.annosaurus.endpoints.CustomTapirJsonCirce.*
+import org.mbari.annosaurus.etc.circe.CirceCodecs.given
 import org.mbari.annosaurus.etc.jwt.JwtService
+import org.mbari.annosaurus.etc.sdk.Futures.*
 import org.mbari.annosaurus.etc.tapir.TapirCodecs.given
+import org.mbari.vcr4j.time.Timecode
+import sttp.model.StatusCode
 import sttp.tapir.*
 import sttp.tapir.generic.auto.*
 import sttp.tapir.server.ServerEndpoint
-import org.mbari.annosaurus.etc.circe.CirceCodecs.{*, given}
-import org.mbari.vcr4j.time.Timecode
-import org.mbari.annosaurus.etc.sdk.Futures.*
-import sttp.model.StatusCode
-import CustomTapirJsonCirce.*
 
 import java.time.{Duration, Instant}
 import java.util.UUID

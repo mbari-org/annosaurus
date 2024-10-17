@@ -24,7 +24,6 @@ import java.net.{URI, URL}
 import java.time.Instant
 import java.util.HexFormat
 import scala.util.{Failure, Success, Try}
-import org.mbari.annosaurus.repository.query.QueryResults
 
 object TapirCodecs:
 

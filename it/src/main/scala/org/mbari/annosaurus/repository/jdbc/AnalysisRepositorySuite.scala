@@ -17,13 +17,11 @@
 package org.mbari.annosaurus.repository.jdbc
 
 import org.mbari.annosaurus.controllers.TestUtils
-import org.mbari.annosaurus.domain.{ImagedMoment, QueryConstraints}
+import org.mbari.annosaurus.domain.QueryConstraints
 import org.mbari.annosaurus.repository.jpa.{BaseDAOSuite, JPADAOFactory}
 
-import scala.jdk.CollectionConverters.*
-import org.mbari.annosaurus.etc.circe.CirceCodecs.{*, given}
-
 import java.time.Instant
+import scala.jdk.CollectionConverters.*
 
 trait AnalysisRepositorySuite extends BaseDAOSuite:
 

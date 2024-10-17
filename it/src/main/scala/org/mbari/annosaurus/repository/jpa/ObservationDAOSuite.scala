@@ -16,12 +16,11 @@
 
 package org.mbari.annosaurus.repository.jpa
 
-import org.mbari.annosaurus.controllers.TestUtils
 import org.mbari.annosaurus.AssertUtils
+import org.mbari.annosaurus.controllers.TestUtils
+import org.mbari.annosaurus.domain.{ConcurrentRequest, MultiRequest}
+
 import java.time.Duration
-import org.checkerframework.checker.units.qual.C
-import org.mbari.annosaurus.domain.ConcurrentRequest
-import org.mbari.annosaurus.domain.MultiRequest
 import scala.jdk.CollectionConverters.*
 
 trait ObservationDAOSuite extends BaseDAOSuite:

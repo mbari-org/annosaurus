@@ -16,12 +16,11 @@
 
 package org.mbari.annosaurus.repository.jpa
 
-import org.mbari.annosaurus.controllers.TestUtils
-import java.sql.DriverManager
-import scala.jdk.CollectionConverters.*
-import java.util.UUID
 import org.hibernate.Session
 import org.hibernate.jdbc.Work
+import org.mbari.annosaurus.controllers.TestUtils
+
+import java.util.UUID
 
 trait TestDAOFactorySuite extends BaseDAOSuite:
 

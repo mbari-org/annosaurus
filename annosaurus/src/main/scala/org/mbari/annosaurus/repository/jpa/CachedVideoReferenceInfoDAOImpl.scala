@@ -16,13 +16,13 @@
 
 package org.mbari.annosaurus.repository.jpa
 
-import java.util.UUID
 import jakarta.persistence.EntityManager
+import org.hibernate.jpa.QueryHints
 import org.mbari.annosaurus.repository.CachedVideoReferenceInfoDAO
 import org.mbari.annosaurus.repository.jpa.entity.CachedVideoReferenceInfoEntity
 
+import java.util.UUID
 import scala.jdk.CollectionConverters.*
-import org.hibernate.jpa.QueryHints
 
 /**
  * @author

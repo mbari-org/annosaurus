@@ -16,18 +16,12 @@
 
 package org.mbari.annosaurus.repository.jdbc
 
-import org.mbari.annosaurus.repository.jpa.BaseDAOSuite
 import org.mbari.annosaurus.controllers.TestUtils
-import org.mbari.annosaurus.repository.jpa.JPADAOFactory
-import junit.framework.Test
-
-import scala.jdk.CollectionConverters.*
 import org.mbari.annosaurus.domain.{Annotation, ConcurrentRequest, MultiRequest, ObservationsUpdate, QueryConstraints}
+import org.mbari.annosaurus.repository.jpa.{BaseDAOSuite, JPADAOFactory}
 
 import java.time.Duration
-import org.mbari.annosaurus.etc.circe.CirceCodecs.{*, given}
-import org.checkerframework.checker.units.qual.A
-import org.mbari.annosaurus.repository.jpa.entity.ObservationEntity
+import scala.jdk.CollectionConverters.*
 
 trait JdbcRepositorySuite extends BaseDAOSuite:
 

@@ -16,19 +16,8 @@
 
 package org.mbari.annosaurus.repository.jpa
 
-import com.typesafe.config.ConfigFactory
 import jakarta.persistence.{EntityManager, EntityManagerFactory}
-import org.mbari.annosaurus.repository.{
-    AssociationDAO,
-    CachedAncillaryDatumDAO,
-    CachedVideoReferenceInfoDAO,
-    DAO,
-    ImageReferenceDAO,
-    ImagedMomentDAO,
-    IndexDAO,
-    ObservationDAO
-}
-import org.mbari.annosaurus.repository.jpa.entity.*
+import org.mbari.annosaurus.repository.DAO
 
 /**
  * @author

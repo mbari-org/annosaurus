@@ -17,10 +17,9 @@
 package org.mbari.annosaurus.controllers
 
 import org.mbari.annosaurus.domain.CachedAncillaryDatum
-import org.mbari.annosaurus.repository.jpa.{BaseDAOSuite, JPADAOFactory}
-import org.mbari.annosaurus.etc.circe.CirceCodecs.{*, given}
 import org.mbari.annosaurus.etc.jdk.Numbers.*
-import java.sql.Timestamp
+import org.mbari.annosaurus.repository.jpa.{BaseDAOSuite, JPADAOFactory}
+
 import java.time.{Duration, Instant}
 import scala.util.Random
 

@@ -16,10 +16,9 @@
 
 package org.mbari.annosaurus.repository.jdbc
 
+import org.mbari.annosaurus.domain.{Annotation, CachedAncillaryDatum}
+
 import java.util.UUID
-import org.mbari.annosaurus.domain.CachedAncillaryDatum
-import org.mbari.annosaurus.domain.Annotation
-import org.mbari.annosaurus.domain.CachedAncillaryDatumSC
 
 object AncillaryDatumSQL:
 

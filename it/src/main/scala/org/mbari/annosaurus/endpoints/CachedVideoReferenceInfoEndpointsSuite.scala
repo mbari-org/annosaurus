@@ -24,18 +24,15 @@ import org.mbari.annosaurus.domain.{
     CachedVideoReferenceInfoUpdateSC
 }
 import org.mbari.annosaurus.etc.circe.CirceCodecs.{*, given}
-import org.mbari.annosaurus.etc.jdk.Instants
-import org.mbari.annosaurus.etc.jdk.Logging.{*, given}
 import org.mbari.annosaurus.etc.jwt.JwtService
 import org.mbari.annosaurus.etc.sdk.Futures.*
 import org.mbari.annosaurus.etc.sdk.Reflect
 import org.mbari.annosaurus.repository.jpa.JPADAOFactory
-
-import scala.jdk.CollectionConverters.*
 import sttp.client3.*
 import sttp.model.StatusCode
 
 import java.util.UUID
+import scala.jdk.CollectionConverters.*
 
 trait CachedVideoReferenceInfoEndpointsSuite extends EndpointsSuite:
 

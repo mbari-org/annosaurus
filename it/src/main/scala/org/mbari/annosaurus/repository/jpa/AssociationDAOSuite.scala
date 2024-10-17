@@ -16,10 +16,11 @@
 
 package org.mbari.annosaurus.repository.jpa
 
-import org.mbari.annosaurus.controllers.TestUtils
-import scala.jdk.CollectionConverters.*
 import org.mbari.annosaurus.AssertUtils
+import org.mbari.annosaurus.controllers.TestUtils
 import org.mbari.annosaurus.domain.ConceptAssociationRequest
+
+import scala.jdk.CollectionConverters.*
 
 trait AssociationDAOSuite extends BaseDAOSuite:
 

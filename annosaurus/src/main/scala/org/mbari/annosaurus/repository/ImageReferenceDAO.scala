@@ -16,8 +16,7 @@
 
 package org.mbari.annosaurus.repository
 
-import org.mbari.annosaurus.repository.jpa.entity.ImageReferenceEntity
-import org.mbari.annosaurus.repository.jpa.entity.IPersistentObject
+import org.mbari.annosaurus.repository.jpa.entity.{IPersistentObject, ImageReferenceEntity}
 
 import java.net.URL
 

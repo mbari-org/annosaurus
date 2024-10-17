@@ -19,11 +19,10 @@ package org.mbari.annosaurus.repository.jpa
 import com.typesafe.config.ConfigFactory
 import jakarta.persistence.{EntityManagerFactory, Persistence}
 import org.mbari.annosaurus.AppConfig
-
-import scala.jdk.CollectionConverters.*
 import org.mbari.annosaurus.etc.jdk.Logging.given
 
 import java.lang.System.Logger.Level
+import scala.jdk.CollectionConverters.*
 
 /**
  * https://stackoverflow.com/questions/4106078/dynamic-jpa-connection

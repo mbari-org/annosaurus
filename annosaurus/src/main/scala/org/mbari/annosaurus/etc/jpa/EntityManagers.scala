@@ -17,11 +17,9 @@
 package org.mbari.annosaurus.etc.jpa
 
 import jakarta.persistence.EntityManager
-import org.checkerframework.checker.units.qual.N
+import org.mbari.annosaurus.etc.jdk.Logging.given
 
 import scala.util.control.NonFatal
-import org.mbari.annosaurus.etc.jdk.Logging.given
-import org.hibernate.Session
 
 object EntityManagers:
 

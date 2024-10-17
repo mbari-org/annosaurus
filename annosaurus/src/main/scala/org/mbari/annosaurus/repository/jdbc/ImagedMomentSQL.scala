@@ -17,11 +17,8 @@
 package org.mbari.annosaurus.repository.jdbc
 
 import org.mbari.annosaurus.domain.Image
+
 import java.util.UUID
-import java.time.Duration
-import java.sql.Timestamp
-import org.mbari.vcr4j.time.Timecode
-import java.net.URI
 
 object ImagedMomentSQL:
 

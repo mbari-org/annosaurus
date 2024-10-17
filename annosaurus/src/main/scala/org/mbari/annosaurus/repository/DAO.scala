@@ -16,7 +16,6 @@
 
 package org.mbari.annosaurus.repository
 
-import jakarta.persistence.Entity
 import org.mbari.annosaurus.repository.jpa.entity.IPersistentObject
 
 import java.util.UUID

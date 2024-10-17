@@ -16,30 +16,21 @@
 
 package org.mbari.annosaurus.controllers
 
+import io.reactivex.rxjava3.subjects.Subject
+import org.mbari.annosaurus.domain.{Annotation, ConcurrentRequest, ImageCreateSC, MultiRequest}
+import org.mbari.annosaurus.etc.jdk.Logging.given
+import org.mbari.annosaurus.messaging.{AnnotationPublisher, MessageBus}
+import org.mbari.annosaurus.repository.jpa.JPADAOFactory
+import org.mbari.annosaurus.repository.jpa.entity.{ImagedMomentEntity, ObservationEntity}
+import org.mbari.annosaurus.repository.{DAO, ObservationDAO}
+import org.mbari.vcr4j.time.Timecode
+
 import java.io.Closeable
 import java.time.{Duration, Instant}
 import java.util.UUID
-import java.util.concurrent.Executors
-import io.reactivex.rxjava3.subjects.Subject
-import org.mbari.annosaurus.messaging.{AnnotationPublisher, MessageBus}
-import org.mbari.annosaurus.domain.{Annotation, ConcurrentRequest, ImageCreateSC, MultiRequest}
-import org.mbari.annosaurus.repository.DAO
-import org.mbari.annosaurus.repository.jpa.entity.{ImagedMomentEntity, ObservationEntity}
-import org.mbari.vcr4j.time.Timecode
-import org.mbari.annosaurus.repository.jpa.Implicits.*
-
-import scala.concurrent.{ExecutionContext, Future}
-import org.mbari.annosaurus.repository.jpa.JPADAOFactory
-import org.mbari.annosaurus.repository.jpa.entity.ObservationEntity
-import org.mbari.annosaurus.repository.ObservationDAO
-import org.mbari.annosaurus.etc.jdk.Logging.given
-
-import scala.jdk.CollectionConverters.*
-import org.mbari.annosaurus.etc.circe.CirceCodecs.{*, given}
-
 import scala.collection.mutable
-import org.mbari.annosaurus.etc.sdk.Futures.*
-
+import scala.concurrent.{ExecutionContext, Future}
+import scala.jdk.CollectionConverters.*
 import scala.util.chaining.*
 
 /**

@@ -17,29 +17,22 @@
 package org.mbari.annosaurus.endpoints
 
 import io.circe.Printer
-
-import java.net.URI
 import org.mbari.annosaurus.domain.*
 import org.mbari.annosaurus.etc.circe.CirceCodecs
 import org.mbari.annosaurus.etc.circe.CirceCodecs.{*, given}
-import org.mbari.annosaurus.etc.jwt.JwtService
 import org.mbari.annosaurus.etc.jdk.Logging.given
-import org.mbari.annosaurus.repository.query.{Constraint, Query}
-
-import scala.concurrent.ExecutionContext
-import scala.concurrent.Future
-import scala.util.Failure
-import scala.util.Success
+import org.mbari.annosaurus.etc.jwt.JwtService
 import sttp.model.StatusCode
 import sttp.model.headers.WWWAuthenticateChallenge
-import sttp.tapir.*
-import sttp.tapir.Endpoint
 import sttp.tapir.generic.auto.*
 import sttp.tapir.json.circe.*
 import sttp.tapir.server.ServerEndpoint
+import sttp.tapir.{Endpoint, *}
 
+import java.net.{URI, URL}
 import java.time.Instant
-import java.net.URL
+import scala.concurrent.{ExecutionContext, Future}
+import scala.util.{Failure, Success}
 
 case class Paging(offset: Option[Int] = Some(0), limit: Option[Int] = Some(100))
 

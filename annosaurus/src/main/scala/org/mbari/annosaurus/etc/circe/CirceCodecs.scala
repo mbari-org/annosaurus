@@ -19,9 +19,9 @@ package org.mbari.annosaurus.etc.circe
 import io.circe.*
 import io.circe.generic.semiauto.*
 import io.circe.syntax.*
-import org.mbari.annosaurus.util.HexUtil
 import org.mbari.annosaurus.domain.*
 import org.mbari.annosaurus.repository.query.{Constraint, JDBC, Query}
+import org.mbari.annosaurus.util.HexUtil
 
 import java.net.{URI, URL}
 import java.time.Instant

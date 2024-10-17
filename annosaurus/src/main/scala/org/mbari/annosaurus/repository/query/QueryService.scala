@@ -17,9 +17,9 @@
 package org.mbari.annosaurus.repository.query
 
 import org.mbari.annosaurus.DatabaseConfig
-import org.mbari.annosaurus.repository.jdbc.*
-import org.mbari.annosaurus.domain.{Annotation, Association}
+import org.mbari.annosaurus.domain.Association
 import org.mbari.annosaurus.etc.jdk.Logging.{*, given}
+import org.mbari.annosaurus.repository.jdbc.*
 
 import java.sql.ResultSet
 import scala.collection.mutable.ListBuffer

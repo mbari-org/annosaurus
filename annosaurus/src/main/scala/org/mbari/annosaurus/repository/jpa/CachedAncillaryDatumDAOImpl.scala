@@ -16,11 +16,11 @@
 
 package org.mbari.annosaurus.repository.jpa
 
-import java.util.UUID
 import jakarta.persistence.EntityManager
-import org.mbari.annosaurus.etc.jdk.Numbers.*
 import org.mbari.annosaurus.repository.CachedAncillaryDatumDAO
 import org.mbari.annosaurus.repository.jpa.entity.{AncillaryDatumDTO, CachedAncillaryDatumEntity}
+
+import java.util.UUID
 
 /**
  * @author

@@ -16,10 +16,11 @@
 
 package org.mbari.annosaurus.domain
 
-import java.time.{Duration, Instant}
-import java.util.UUID
 import org.mbari.annosaurus.repository.jpa.entity.ObservationEntity
 import org.mbari.annosaurus.repository.jpa.entity.extensions.*
+
+import java.time.{Duration, Instant}
+import java.util.UUID
 import scala.jdk.CollectionConverters.*
 
 final case class Observation(

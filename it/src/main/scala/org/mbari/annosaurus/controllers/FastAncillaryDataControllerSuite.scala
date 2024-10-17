@@ -17,10 +17,8 @@
 package org.mbari.annosaurus.controllers
 
 import org.mbari.annosaurus.domain.CachedAncillaryDatum
-import org.mbari.annosaurus.repository.jpa.{BaseDAOSuite, CachedAncillaryDatumDAOImpl, JPADAOFactory}
-import org.mbari.annosaurus.etc.jdk.Logging.given
-import org.mbari.annosaurus.repository.jpa.extensions.runTransaction
-import org.mbari.annosaurus.etc.circe.CirceCodecs.{*, given}
+import org.mbari.annosaurus.etc.circe.CirceCodecs.*
+import org.mbari.annosaurus.repository.jpa.{BaseDAOSuite, JPADAOFactory}
 
 import scala.concurrent.ExecutionContext
 

@@ -17,27 +17,13 @@
 package org.mbari.annosaurus.endpoints
 
 import org.mbari.annosaurus.controllers.AnnotationController
-import org.mbari.annosaurus.domain.{
-    Annotation,
-    AnnotationCreate,
-    AnnotationCreateSC,
-    AnnotationSC,
-    AnnotationUpdateSC,
-    BulkAnnotationSC,
-    ConcurrentRequest,
-    ConcurrentRequestCountSC,
-    ConcurrentRequestSC,
-    ErrorMsg,
-    MultiRequest,
-    MultiRequestCountSC
-}
+import org.mbari.annosaurus.domain.{AnnotationCreateSC, AnnotationSC, AnnotationUpdateSC, BulkAnnotationSC, ConcurrentRequest, ConcurrentRequestCountSC, ErrorMsg, MultiRequest, MultiRequestCountSC}
+import org.mbari.annosaurus.endpoints.CustomTapirJsonCirce.*
+import org.mbari.annosaurus.etc.circe.CirceCodecs.given
 import org.mbari.annosaurus.etc.jwt.JwtService
-import org.mbari.annosaurus.etc.circe.CirceCodecs.{*, given}
 import org.mbari.annosaurus.etc.tapir.TapirCodecs.given
 import sttp.tapir.*
-//import sttp.tapir.json.circe.*
 import sttp.tapir.server.ServerEndpoint
-import CustomTapirJsonCirce.*
 
 import java.util.UUID
 import scala.concurrent.{ExecutionContext, Future}

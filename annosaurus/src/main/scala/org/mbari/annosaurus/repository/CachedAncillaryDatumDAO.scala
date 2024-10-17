@@ -16,8 +16,9 @@
 
 package org.mbari.annosaurus.repository
 
-import java.util.UUID
 import org.mbari.annosaurus.repository.jpa.entity.{AncillaryDatumDTO, IPersistentObject}
+
+import java.util.UUID
 
 /**
  * @author

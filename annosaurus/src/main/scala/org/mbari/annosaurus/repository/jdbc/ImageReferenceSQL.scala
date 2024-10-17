@@ -16,10 +16,9 @@
 
 package org.mbari.annosaurus.repository.jdbc
 
+import org.mbari.annosaurus.domain.{Annotation, ImageReference}
+
 import java.util.UUID
-import java.net.URI
-import org.mbari.annosaurus.domain.ImageReference
-import org.mbari.annosaurus.domain.Annotation
 
 object ImageReferenceSQL:
     val SELECT: String =

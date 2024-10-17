@@ -16,13 +16,12 @@
 
 package org.mbari.annosaurus.controllers
 
-import org.mbari.annosaurus.PersistentObject
 import org.mbari.annosaurus.repository.DAO
-import java.util.UUID
-
-import scala.concurrent.{ExecutionContext, Future}
 import org.mbari.annosaurus.repository.jpa.JPADAOFactory
 import org.mbari.annosaurus.repository.jpa.entity.IPersistentObject
+
+import java.util.UUID
+import scala.concurrent.{ExecutionContext, Future}
 
 /**
  * @author

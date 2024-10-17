@@ -17,10 +17,9 @@
 package org.mbari.annosaurus.repository
 
 import org.mbari.annosaurus.domain.{ConceptAssociation, ConceptAssociationRequest}
+import org.mbari.annosaurus.repository.jpa.entity.{AssociationEntity, IPersistentObject}
 
 import java.util.UUID
-import org.mbari.annosaurus.repository.jpa.entity.AssociationEntity
-import org.mbari.annosaurus.repository.jpa.entity.IPersistentObject
 
 /**
  * @author

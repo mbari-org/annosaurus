@@ -17,18 +17,17 @@
 package org.mbari.annosaurus.endpoints
 
 import org.mbari.annosaurus.controllers.IndexController
-
-import scala.concurrent.{ExecutionContext, Future}
-import sttp.tapir.*
-import sttp.tapir.generic.auto.*
-import sttp.tapir.server.ServerEndpoint
-import CustomTapirJsonCirce.*
-
-import java.util.UUID
-import org.mbari.annosaurus.domain.{ErrorMsg, ImagedMoment, Index, IndexSC, IndexUpdateSC}
+import org.mbari.annosaurus.domain.{ErrorMsg, Index, IndexSC, IndexUpdateSC}
+import org.mbari.annosaurus.endpoints.CustomTapirJsonCirce.*
 import org.mbari.annosaurus.etc.circe.CirceCodecs.{*, given}
 import org.mbari.annosaurus.etc.jwt.JwtService
 import org.mbari.annosaurus.repository.jpa.entity.IndexEntity
+import sttp.tapir.*
+import sttp.tapir.generic.auto.*
+import sttp.tapir.server.ServerEndpoint
+
+import java.util.UUID
+import scala.concurrent.{ExecutionContext, Future}
 
 class IndexEndpoints(controller: IndexController)(using
     val executor: ExecutionContext,

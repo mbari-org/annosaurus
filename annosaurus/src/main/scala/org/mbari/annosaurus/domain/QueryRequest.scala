@@ -16,8 +16,6 @@
 
 package org.mbari.annosaurus.domain
 
-import org.mbari.annosaurus.repository.query.Query
-
 import java.time.Instant
 
 case class QueryRequest(

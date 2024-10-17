@@ -16,10 +16,10 @@
 
 package org.mbari.annosaurus.etc.sdk
 
-import scala.concurrent.{Await, Future}
-import scala.concurrent.duration.Duration
-import java.util.concurrent.TimeUnit
 import java.time.Duration as JDuration
+import java.util.concurrent.TimeUnit
+import scala.concurrent.duration.Duration
+import scala.concurrent.{Await, Future}
 
 object Futures:
 

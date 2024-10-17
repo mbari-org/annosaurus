@@ -16,19 +16,18 @@
 
 package org.mbari.annosaurus.repository.jpa
 
-import java.sql.Timestamp
-import java.time.{Duration, Instant}
-import java.util.function.Function
-import java.util.{stream, UUID}
 import jakarta.persistence.EntityManager
-
+import org.hibernate.jpa.QueryHints
 import org.mbari.annosaurus.domain.{ImagedMoment, WindowRequest}
 import org.mbari.annosaurus.repository.ImagedMomentDAO
 import org.mbari.annosaurus.repository.jpa.entity.ImagedMomentEntity
 import org.mbari.vcr4j.time.Timecode
 
+import java.sql.Timestamp
+import java.time.{Duration, Instant}
+import java.util.function.Function
+import java.util.{UUID, stream}
 import scala.jdk.CollectionConverters.*
-import org.hibernate.jpa.QueryHints
 
 /**
  * @author

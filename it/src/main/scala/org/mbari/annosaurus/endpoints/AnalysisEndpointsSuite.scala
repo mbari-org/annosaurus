@@ -18,14 +18,10 @@ package org.mbari.annosaurus.endpoints
 
 import org.mbari.annosaurus.controllers.TestUtils
 import org.mbari.annosaurus.domain.{DepthHistogramSC, QueryConstraints, QueryConstraintsResponseSC, TimeHistogramSC}
-import sttp.tapir.*
-import sttp.client3.*
-import sttp.model.StatusCode
 import org.mbari.annosaurus.etc.circe.CirceCodecs.{*, given}
-import org.mbari.annosaurus.etc.sdk.Futures.join
 import org.mbari.annosaurus.repository.jdbc.AnalysisRepository
 import org.mbari.annosaurus.repository.jpa.JPADAOFactory
-import org.mbari.annosaurus.etc.circe.CirceCodecs.{*, given}
+import sttp.model.StatusCode
 
 import java.time.Instant
 import scala.jdk.CollectionConverters.*

@@ -16,12 +16,8 @@
 
 package org.mbari.annosaurus.controllers
 
-import org.mbari.annosaurus.AssertUtils
 import org.mbari.annosaurus.domain.{Image, ImageCreateSC}
 import org.mbari.annosaurus.repository.jpa.{BaseDAOSuite, JPADAOFactory}
-import org.mbari.annosaurus.etc.circe.CirceCodecs.{*, given}
-
-import scala.jdk.CollectionConverters.*
 
 trait ImageControllerSuite extends BaseDAOSuite:
 

@@ -16,7 +16,7 @@
 
 package org.mbari.annosaurus.domain
 
-import org.checkerframework.checker.units.qual.A
+
 
 final case class QueryConstraintsResponse[A](queryConstraints: QueryConstraints, content: A):
     def toSnakeCase: QueryConstraintsResponseSC[A] =

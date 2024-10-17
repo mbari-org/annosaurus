@@ -16,23 +16,20 @@
 
 package org.mbari.annosaurus.controllers
 
-import java.util.UUID
-
 import io.reactivex.rxjava3.subjects.Subject
-import org.mbari.annosaurus.messaging.{AssociationPublisher, MessageBus}
-
-import org.mbari.annosaurus.repository.{AssociationDAO, NotFoundInDatastoreException}
-
-import scala.concurrent.{ExecutionContext, Future}
-import org.mbari.annosaurus.repository.jpa.JPADAOFactory
-import org.mbari.annosaurus.repository.jpa.entity.AssociationEntity
 import org.mbari.annosaurus.domain.{
     Association,
     ConceptAssociation,
     ConceptAssociationRequest,
     ConceptAssociationResponse
 }
-import org.checkerframework.checker.units.qual.t
+import org.mbari.annosaurus.messaging.{AssociationPublisher, MessageBus}
+import org.mbari.annosaurus.repository.jpa.JPADAOFactory
+import org.mbari.annosaurus.repository.jpa.entity.AssociationEntity
+import org.mbari.annosaurus.repository.{AssociationDAO, NotFoundInDatastoreException}
+
+import java.util.UUID
+import scala.concurrent.{ExecutionContext, Future}
 
 /**
  * @author

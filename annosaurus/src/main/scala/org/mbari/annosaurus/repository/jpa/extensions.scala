@@ -17,9 +17,9 @@
 package org.mbari.annosaurus.repository.jpa
 
 import jakarta.persistence.EntityManager
+import org.mbari.annosaurus.etc.jdk.Logging.given
 
 import scala.concurrent.{ExecutionContext, Future}
-import org.mbari.annosaurus.etc.jdk.Logging.given
 import scala.util.control.NonFatal
 
 /**

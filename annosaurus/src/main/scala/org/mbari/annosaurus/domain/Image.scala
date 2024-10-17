@@ -16,11 +16,12 @@
 
 package org.mbari.annosaurus.domain
 
-import java.util.UUID
+import org.mbari.annosaurus.domain.extensions.*
+import org.mbari.annosaurus.repository.jpa.entity.ImageReferenceEntity
+
 import java.net.URL
 import java.time.{Duration, Instant}
-import org.mbari.annosaurus.repository.jpa.entity.ImageReferenceEntity
-import extensions.*
+import java.util.UUID
 
 final case class Image(
     imageReferenceUuid: UUID,

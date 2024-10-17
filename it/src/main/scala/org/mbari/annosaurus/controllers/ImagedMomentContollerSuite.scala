@@ -16,24 +16,17 @@
 
 package org.mbari.annosaurus.controllers
 
-import org.mbari.annosaurus.repository.jpa.BaseDAOSuite
-import org.mbari.annosaurus.repository.jpa.JPADAOFactory
-
-import scala.concurrent.ExecutionContext
-import scala.jdk.CollectionConverters.*
-import org.mbari.annosaurus.etc.jdk.Logging.given
 import org.mbari.annosaurus.AssertUtils
-
-import java.time.Duration
 import org.mbari.annosaurus.domain.WindowRequest
-
-import java.time.Instant
-import java.util.UUID
-import org.mbari.annosaurus.repository.jpa.ImagedMomentDAOImpl
 import org.mbari.annosaurus.etc.circe.CirceCodecs.{*, given}
+import org.mbari.annosaurus.etc.jdk.Logging.given
 import org.mbari.annosaurus.repository.jpa.entity.ImagedMomentEntity
+import org.mbari.annosaurus.repository.jpa.{BaseDAOSuite, ImagedMomentDAOImpl, JPADAOFactory}
 
 import java.net.URI
+import java.time.{Duration, Instant}
+import java.util.UUID
+import scala.concurrent.ExecutionContext
 import scala.util.Random
 
 trait ImagedMomentContollerSuite extends BaseDAOSuite:

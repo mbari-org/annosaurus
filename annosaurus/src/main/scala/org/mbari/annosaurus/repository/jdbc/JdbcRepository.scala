@@ -16,12 +16,8 @@
 
 package org.mbari.annosaurus.repository.jdbc
 
-import java.time.Instant
-import java.util.UUID
 import jakarta.persistence.{EntityManager, EntityManagerFactory, Query}
-
-import scala.jdk.CollectionConverters.*
-import scala.util.control.NonFatal
+import org.hibernate.jpa.QueryHints
 import org.mbari.annosaurus.domain.{
     Annotation,
     ConcurrentRequest,
@@ -32,11 +28,13 @@ import org.mbari.annosaurus.domain.{
     ObservationsUpdate,
     QueryConstraints
 }
-import org.mbari.annosaurus.etc.jdk.Logging.{*, given}
+import org.mbari.annosaurus.etc.jdk.Logging.given
 import org.mbari.annosaurus.repository.jpa.extensions.*
-// import org.mbari.annosaurus.etc.jpa.EntityManagers.*
-import jakarta.persistence.QueryHint
-import org.hibernate.jpa.QueryHints
+
+import java.time.Instant
+import java.util.UUID
+import scala.jdk.CollectionConverters.*
+import scala.util.control.NonFatal
 
 /**
  * Database access (read-only) provider that uses SQL for fast lookups. WHY? JPA makes about 1 + (rows * 4) database

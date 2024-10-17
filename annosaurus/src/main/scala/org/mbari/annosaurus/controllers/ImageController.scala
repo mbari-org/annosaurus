@@ -16,19 +16,16 @@
 
 package org.mbari.annosaurus.controllers
 
+import org.mbari.annosaurus.domain.{Image, ImageCreateSC}
+import org.mbari.annosaurus.repository.ImagedMomentDAO
+import org.mbari.annosaurus.repository.jpa.JPADAOFactory
+import org.mbari.annosaurus.repository.jpa.entity.{ImageReferenceEntity, ImagedMomentEntity}
+import org.mbari.vcr4j.time.Timecode
+
 import java.net.URL
 import java.time.{Duration, Instant}
 import java.util.UUID
-import org.mbari.annosaurus.repository.ImagedMomentDAO
-import org.mbari.annosaurus.domain.{Image, ImageCreateSC}
-import org.mbari.vcr4j.time.Timecode
-import org.mbari.annosaurus.etc.jdk.Logging.{*, given}
-
 import scala.concurrent.{ExecutionContext, Future}
-import org.mbari.annosaurus.repository.jpa.JPADAOFactory
-import org.mbari.annosaurus.repository.jpa.entity.ImagedMomentEntity
-import org.mbari.annosaurus.repository.jpa.entity.ImageReferenceEntity
-
 import scala.jdk.CollectionConverters.*
 
 /**

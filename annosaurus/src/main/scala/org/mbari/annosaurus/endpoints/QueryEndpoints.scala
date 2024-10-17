@@ -16,22 +16,17 @@
 
 package org.mbari.annosaurus.endpoints
 
-import CustomTapirJsonCirce.*
 import org.mbari.annosaurus.controllers.QueryController
 import org.mbari.annosaurus.domain.{Count, ErrorMsg, QueryRequest}
+import org.mbari.annosaurus.endpoints.CustomTapirJsonCirce.*
 import org.mbari.annosaurus.etc.circe.CirceCodecs.{*, given}
-import org.mbari.annosaurus.etc.tapir.TapirCodecs.given
 import org.mbari.annosaurus.repository.query.{JDBC, QueryResults}
-import sttp.model.StatusCode
 import sttp.tapir.*
 import sttp.tapir.generic.auto.*
 import sttp.tapir.server.ServerEndpoint
 import sttp.tapir.server.ServerEndpoint.Full
 
-import scala.util.Success
 import scala.concurrent.{ExecutionContext, Future}
-
-import org.mbari.annosaurus.etc.tapir.TapirCodecs
 
 class QueryEndpoints(queryController: QueryController)(using executionContext: ExecutionContext) extends Endpoints:
 

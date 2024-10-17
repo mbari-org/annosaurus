@@ -16,22 +16,19 @@
 
 package org.mbari.annosaurus.controllers
 
-import java.io.Closeable
-import java.time.{Duration, Instant}
-import java.util.UUID
-import org.mbari.annosaurus.domain.{Annotation, ImageCreateSC, ImagedMoment, WindowRequest}
-import org.mbari.annosaurus.repository.{DAO, ImagedMomentDAO, NotFoundInDatastoreException}
-import org.mbari.vcr4j.time.Timecode
-import org.slf4j.LoggerFactory
-
-import scala.concurrent.{ExecutionContext, Future}
+import org.mbari.annosaurus.domain.{ImagedMoment, WindowRequest}
+import org.mbari.annosaurus.etc.jdk.Logging.given
 import org.mbari.annosaurus.repository.jpa.JPADAOFactory
 import org.mbari.annosaurus.repository.jpa.entity.{AssociationEntity, ImagedMomentEntity}
+import org.mbari.annosaurus.repository.{DAO, ImagedMomentDAO, NotFoundInDatastoreException}
+import org.mbari.vcr4j.time.Timecode
 
-import scala.jdk.CollectionConverters.*
-import org.mbari.annosaurus.etc.jdk.Logging.given
-
+import java.io.Closeable
+import java.time.{Duration, Instant}
 import java.util
+import java.util.UUID
+import scala.concurrent.{ExecutionContext, Future}
+import scala.jdk.CollectionConverters.*
 
 /**
  * @author

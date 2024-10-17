@@ -19,14 +19,13 @@ package org.mbari.annosaurus
 import io.vertx.core.{Vertx, VertxOptions}
 import io.vertx.ext.web.Router
 import org.mbari.annosaurus.etc.jdk.Logging
-import org.mbari.annosaurus.etc.jdk.Logging.{*, given}
+import org.mbari.annosaurus.etc.jdk.Logging.given
 import org.mbari.annosaurus.etc.zeromq.ZeroMQPublisher
-import sttp.tapir.server.vertx.{VertxFutureServerInterpreter, VertxFutureServerOptions}
 import sttp.tapir.server.vertx.VertxFutureServerInterpreter.VertxFutureToScalaFuture
+import sttp.tapir.server.vertx.{VertxFutureServerInterpreter, VertxFutureServerOptions}
 
-import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.concurrent.duration.Duration
-import scala.io.StdIn
+import scala.concurrent.{Await, ExecutionContext}
 
 object Main:
 

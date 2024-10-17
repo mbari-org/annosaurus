@@ -16,11 +16,12 @@
 
 package org.mbari.annosaurus.domain
 
-import java.util.UUID
-import java.net.URL
+import org.mbari.annosaurus.domain.extensions.*
 import org.mbari.annosaurus.repository.jpa.entity.ImageReferenceEntity
 import org.mbari.annosaurus.repository.jpa.entity.extensions.*
-import extensions.*
+
+import java.net.URL
+import java.util.UUID
 
 case class ImageReference(
     url: URL, // TODO should this be optional to allow for partial updates?

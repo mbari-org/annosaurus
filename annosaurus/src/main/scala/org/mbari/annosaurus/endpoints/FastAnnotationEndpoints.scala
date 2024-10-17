@@ -16,20 +16,9 @@
 
 package org.mbari.annosaurus.endpoints
 
-import org.mbari.annosaurus.domain.{
-    AnnotationSC,
-    ConcurrentRequestSC,
-    Count,
-    DeleteCount,
-    DeleteCountSC,
-    ErrorMsg,
-    GeographicRangeSC,
-    ImageSC,
-    MultiRequestSC,
-    QueryConstraints,
-    QueryConstraintsResponseSC,
-    QueryConstraintsSC
-}
+import org.mbari.annosaurus.domain.{AnnotationSC, ConcurrentRequestSC, Count, DeleteCountSC, ErrorMsg, GeographicRangeSC, ImageSC, MultiRequestSC, QueryConstraints, QueryConstraintsResponseSC}
+import org.mbari.annosaurus.endpoints.CustomTapirJsonCirce.*
+import org.mbari.annosaurus.etc.circe.CirceCodecs.given
 import org.mbari.annosaurus.etc.jwt.JwtService
 import org.mbari.annosaurus.repository.jdbc.JdbcRepository
 import sttp.tapir.*
@@ -37,8 +26,6 @@ import sttp.tapir.server.ServerEndpoint
 
 import java.util.UUID
 import scala.concurrent.{ExecutionContext, Future}
-import CustomTapirJsonCirce.*
-import org.mbari.annosaurus.etc.circe.CirceCodecs.given
 
 class FastAnnotationEndpoints(jdbcRepository: JdbcRepository)(using
     ec: ExecutionContext,

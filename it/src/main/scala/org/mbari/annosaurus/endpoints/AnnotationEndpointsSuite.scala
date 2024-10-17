@@ -26,21 +26,20 @@ import org.mbari.annosaurus.domain.{
     MultiRequest,
     MultiRequestCountSC
 }
-import org.mbari.annosaurus.repository.jpa.JPADAOFactory
-import org.mbari.annosaurus.etc.jdk.Logging.{*, given}
-import org.mbari.annosaurus.etc.jwt.JwtService
-import sttp.model.StatusCode
 import org.mbari.annosaurus.etc.circe.CirceCodecs.{*, given}
-import sttp.client3.*
+import org.mbari.annosaurus.etc.jwt.JwtService
 import org.mbari.annosaurus.etc.sdk.Futures.*
 import org.mbari.annosaurus.etc.sdk.Reflect
+import org.mbari.annosaurus.repository.jpa.JPADAOFactory
+import sttp.client3.*
+import sttp.model.StatusCode
 
 import java.time.Duration
 import java.util.UUID
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicInteger
-import scala.jdk.CollectionConverters.*
 import scala.concurrent.duration.Duration as ScalaDuration
+import scala.jdk.CollectionConverters.*
 
 trait AnnotationEndpointsSuite extends EndpointsSuite:
 

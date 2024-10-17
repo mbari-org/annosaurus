@@ -17,18 +17,16 @@
 package org.mbari.annosaurus.repository.jpa
 
 import jakarta.persistence.EntityManager
+import org.hibernate.jpa.QueryHints
 import org.mbari.annosaurus.domain.{ConcurrentRequest, MultiRequest}
 import org.mbari.annosaurus.repository.ObservationDAO
+import org.mbari.annosaurus.repository.jdbc.*
 import org.mbari.annosaurus.repository.jpa.entity.ObservationEntity
 
-import java.sql.Timestamp
 import java.time.{Duration, Instant}
-import java.util.{stream, UUID}
+import java.util as ju
+import java.util.{UUID, stream}
 import scala.jdk.CollectionConverters.*
-import java.{util as ju}
-import org.mbari.annosaurus.repository.jdbc.*
-import jakarta.persistence.QueryHint
-import org.hibernate.jpa.QueryHints
 
 /**
  * @author

@@ -16,12 +16,12 @@
 
 package org.mbari.annosaurus.domain
 
-import java.util.UUID
-import java.time.Duration
-import org.mbari.vcr4j.time.Timecode
-import java.time.Instant
 import org.mbari.annosaurus.repository.jpa.entity.ImagedMomentEntity
 import org.mbari.annosaurus.repository.jpa.entity.extensions.*
+import org.mbari.vcr4j.time.Timecode
+
+import java.time.{Duration, Instant}
+import java.util.UUID
 import scala.jdk.CollectionConverters.*
 
 final case class ImagedMoment(

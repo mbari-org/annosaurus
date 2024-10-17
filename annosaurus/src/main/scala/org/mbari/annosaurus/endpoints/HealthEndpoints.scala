@@ -16,16 +16,14 @@
 
 package org.mbari.annosaurus.endpoints
 
-import scala.concurrent.ExecutionContext
-import sttp.tapir.Endpoint
-import sttp.tapir.server.ServerEndpoint
-import scala.concurrent.Future
+import org.mbari.annosaurus.domain.{ErrorMsg, HealthStatus}
+import org.mbari.annosaurus.etc.circe.CirceCodecs.given
 import sttp.tapir.*
 import sttp.tapir.generic.auto.*
 import sttp.tapir.json.circe.*
-import org.mbari.annosaurus.domain.HealthStatus
-import org.mbari.annosaurus.etc.circe.CirceCodecs.given
-import org.mbari.annosaurus.domain.ErrorMsg
+import sttp.tapir.server.ServerEndpoint
+
+import scala.concurrent.{ExecutionContext, Future}
 
 class HealthEndpoints(using ec: ExecutionContext) extends Endpoints:
 

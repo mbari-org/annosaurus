@@ -16,7 +16,6 @@
 
 package org.mbari.annosaurus.endpoints
 
-import java.time.{Duration, Instant}
 import org.mbari.annosaurus.controllers.{ImagedMomentController, TestUtils}
 import org.mbari.annosaurus.domain.{
     Annotation,
@@ -31,13 +30,14 @@ import org.mbari.annosaurus.domain.{
 }
 import org.mbari.annosaurus.etc.circe.CirceCodecs.{*, given}
 import org.mbari.annosaurus.etc.jdk.Instants
-import org.mbari.annosaurus.etc.jdk.Logging.{*, given}
 import org.mbari.annosaurus.etc.jwt.JwtService
 import org.mbari.annosaurus.etc.sdk.Futures.*
 import org.mbari.annosaurus.repository.jpa.JPADAOFactory
-import scala.jdk.CollectionConverters.*
 import sttp.client3.*
 import sttp.model.StatusCode
+
+import java.time.{Duration, Instant}
+import scala.jdk.CollectionConverters.*
 
 trait ImagedMomentEndpointsSuite extends EndpointsSuite:
 

@@ -28,15 +28,15 @@ import org.mbari.annosaurus.domain.{
     RenameConcept,
     RenameCountSC
 }
+import org.mbari.annosaurus.endpoints.CustomTapirJsonCirce.*
+import org.mbari.annosaurus.etc.circe.CirceCodecs.given
 import org.mbari.annosaurus.etc.jwt.JwtService
 import org.mbari.annosaurus.etc.tapir.TapirCodecs.given
+import org.mbari.annosaurus.repository.jdbc.JdbcRepository
+import sttp.model.StatusCode
 import sttp.tapir.*
 import sttp.tapir.generic.auto.*
 import sttp.tapir.server.ServerEndpoint
-import org.mbari.annosaurus.etc.circe.CirceCodecs.{*, given}
-import sttp.model.StatusCode
-import CustomTapirJsonCirce.*
-import org.mbari.annosaurus.repository.jdbc.JdbcRepository
 
 import java.time.Instant
 import java.util.UUID

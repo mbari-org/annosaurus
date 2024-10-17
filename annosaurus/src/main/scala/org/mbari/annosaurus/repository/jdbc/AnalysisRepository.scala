@@ -17,14 +17,12 @@
 package org.mbari.annosaurus.repository.jdbc
 
 import jakarta.persistence.{EntityManager, EntityManagerFactory}
-
-import org.mbari.annosaurus.domain.{DepthHistogram, TimeHistogram}
+import org.hibernate.jpa.QueryHints
+import org.mbari.annosaurus.domain.{DepthHistogram, QueryConstraints, TimeHistogram}
 import org.slf4j.LoggerFactory
 
-import scala.jdk.CollectionConverters.*
 import java.time.Instant
-import org.mbari.annosaurus.domain.QueryConstraints
-import org.hibernate.jpa.QueryHints
+import scala.jdk.CollectionConverters.*
 
 class AnalysisRepository(entityManagerFactory: EntityManagerFactory):
 

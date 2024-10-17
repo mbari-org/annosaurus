@@ -16,9 +16,8 @@
 
 package org.mbari.annosaurus.repository
 
-import org.mbari.annosaurus.repository.jpa.entity.IPersistentObject
-import org.mbari.annosaurus.repository.jpa.entity.ObservationEntity
 import org.mbari.annosaurus.domain.{ConcurrentRequest, MultiRequest}
+import org.mbari.annosaurus.repository.jpa.entity.{IPersistentObject, ObservationEntity}
 
 import java.time.{Duration, Instant}
 import java.util.UUID

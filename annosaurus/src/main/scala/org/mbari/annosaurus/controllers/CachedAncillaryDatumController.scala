@@ -16,20 +16,16 @@
 
 package org.mbari.annosaurus.controllers
 
+import org.mbari.annosaurus.domain.CachedAncillaryDatum
+import org.mbari.annosaurus.etc.jdk.Logging.given
+import org.mbari.annosaurus.repository.jpa.entity.{CachedAncillaryDatumEntity, ImagedMomentEntity}
+import org.mbari.annosaurus.repository.jpa.{BaseDAO, JPADAOFactory}
+import org.mbari.annosaurus.repository.{CachedAncillaryDatumDAO, NotFoundInDatastoreException}
 import org.mbari.annosaurus.util.FastCollator
+
 import java.time.Duration
 import java.util.UUID
-
-import org.mbari.annosaurus.repository.jpa.BaseDAO
-import org.mbari.annosaurus.repository.{CachedAncillaryDatumDAO, NotFoundInDatastoreException}
-import org.slf4j.LoggerFactory
-
 import scala.concurrent.{ExecutionContext, Future}
-import org.mbari.annosaurus.repository.jpa.JPADAOFactory
-import org.mbari.annosaurus.repository.jpa.entity.CachedAncillaryDatumEntity
-import org.mbari.annosaurus.domain.CachedAncillaryDatum
-import org.mbari.annosaurus.repository.jpa.entity.ImagedMomentEntity
-import org.mbari.annosaurus.etc.jdk.Logging.given
 
 /**
  * @author

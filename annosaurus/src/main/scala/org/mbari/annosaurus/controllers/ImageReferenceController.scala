@@ -16,15 +16,14 @@
 
 package org.mbari.annosaurus.controllers
 
+import org.mbari.annosaurus.domain.ImageReference
+import org.mbari.annosaurus.repository.jpa.JPADAOFactory
+import org.mbari.annosaurus.repository.jpa.entity.ImageReferenceEntity
 import org.mbari.annosaurus.repository.{ImageReferenceDAO, NotFoundInDatastoreException}
 
 import java.net.URL
 import java.util.UUID
-
 import scala.concurrent.{ExecutionContext, Future}
-import org.mbari.annosaurus.repository.jpa.entity.ImageReferenceEntity
-import org.mbari.annosaurus.repository.jpa.JPADAOFactory
-import org.mbari.annosaurus.domain.ImageReference
 
 /**
  * @author

@@ -16,9 +16,9 @@
 
 package org.mbari.annosaurus.domain
 
+import org.mbari.annosaurus.repository.jpa.entity.{AssociationEntity, ConceptAssociationDTO}
+
 import java.util.UUID
-import org.mbari.annosaurus.repository.jpa.entity.AssociationEntity
-import org.mbari.annosaurus.repository.jpa.entity.ConceptAssociationDTO
 
 final case class ConceptAssociation(
     uuid: UUID,

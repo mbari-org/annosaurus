@@ -16,8 +16,8 @@
 
 package org.mbari.annosaurus.domain
 
-import java.util.UUID
 import java.time.Duration
+import java.util.UUID
 
 final case class WindowRequest(
     videoReferenceUuids: Seq[UUID],

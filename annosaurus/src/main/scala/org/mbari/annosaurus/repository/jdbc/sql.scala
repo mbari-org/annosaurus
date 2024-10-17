@@ -16,11 +16,10 @@
 
 package org.mbari.annosaurus.repository.jdbc
 
+import java.net.{URI, URL}
 import java.time.Instant
 import java.util.UUID
 import scala.util.Try
-import java.net.URL
-import java.net.URI
 
 /**
  * This is a collection of explicit conversions to convert from java.sql.ResultSet to various types. This is used in the

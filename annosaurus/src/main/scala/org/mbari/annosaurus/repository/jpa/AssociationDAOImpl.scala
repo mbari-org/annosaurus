@@ -16,15 +16,14 @@
 
 package org.mbari.annosaurus.repository.jpa
 
-import java.util.UUID
 import jakarta.persistence.EntityManager
-
+import org.mbari.annosaurus.domain.{ConceptAssociation, ConceptAssociationRequest}
 import org.mbari.annosaurus.repository.AssociationDAO
+import org.mbari.annosaurus.repository.jdbc.*
 import org.mbari.annosaurus.repository.jpa.entity.{AssociationEntity, ConceptAssociationDTO}
 
+import java.util.UUID
 import scala.jdk.CollectionConverters.*
-import org.mbari.annosaurus.domain.{ConceptAssociation, ConceptAssociationRequest}
-import org.mbari.annosaurus.repository.jdbc.*
 
 /**
  * @author

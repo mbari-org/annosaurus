@@ -16,8 +16,8 @@
 
 package org.mbari.annosaurus.etc.sdk
 
-import scala.reflect.ClassTag
 import scala.jdk.CollectionConverters.*
+import scala.reflect.ClassTag
 
 object Reflect:
 

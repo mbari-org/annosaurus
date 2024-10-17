@@ -16,15 +16,13 @@
 
 package org.mbari.annosaurus.domain
 
-import java.util.UUID
-import org.mbari.annosaurus.repository.jpa.entity.ImagedMomentEntity
+import org.mbari.annosaurus.repository.jpa.entity.{ImageReferenceEntity, ImagedMomentEntity, ObservationEntity}
 import org.mbari.vcr4j.time.Timecode
-import java.time.Duration
-import java.time.Instant
-import org.mbari.annosaurus.repository.jpa.entity.ObservationEntity
+
+import java.time.{Duration, Instant}
+import java.util.UUID
 import scala.collection.mutable
 import scala.jdk.CollectionConverters.*
-import org.mbari.annosaurus.repository.jpa.entity.ImageReferenceEntity
 
 final case class Annotation(
     activity: Option[String] = None,

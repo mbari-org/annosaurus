@@ -16,12 +16,11 @@
 
 package org.mbari.annosaurus.repository.jpa
 
-import java.util.UUID
 import jakarta.persistence.EntityManager
-
 import org.mbari.annosaurus.repository.IndexDAO
 import org.mbari.annosaurus.repository.jpa.entity.IndexEntity
-import org.mbari.annosaurus.repository.jpa.entity.ImagedMomentEntity
+
+import java.util.UUID
 
 /**
  * @author

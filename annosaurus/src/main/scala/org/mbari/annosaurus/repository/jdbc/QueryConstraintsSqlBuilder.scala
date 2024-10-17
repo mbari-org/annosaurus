@@ -16,13 +16,11 @@
 
 package org.mbari.annosaurus.repository.jdbc
 
-import java.util.UUID
-import java.time.Instant
+import jakarta.persistence.{EntityManager, Query}
 import org.mbari.annosaurus.domain.QueryConstraints
-import jakarta.persistence.EntityManager
-import jakarta.persistence.Query
-import java.sql.Timestamp
 import org.mbari.annosaurus.etc.jdk.Logging.given
+
+import java.time.Instant
 
 object QueryConstraintsSqlBuilder:
 

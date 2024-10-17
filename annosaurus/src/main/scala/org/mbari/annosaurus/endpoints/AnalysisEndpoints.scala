@@ -24,15 +24,14 @@ import org.mbari.annosaurus.domain.{
     QueryConstraintsSC,
     TimeHistogramSC
 }
+import org.mbari.annosaurus.endpoints.CustomTapirJsonCirce.*
 import org.mbari.annosaurus.etc.circe.CirceCodecs.given
 import org.mbari.annosaurus.repository.jdbc.AnalysisRepository
 import sttp.tapir.*
 import sttp.tapir.generic.auto.*
 import sttp.tapir.server.ServerEndpoint
-import CustomTapirJsonCirce.*
 
-import scala.concurrent.ExecutionContext
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 // Endpoint[SECURITY_INPUT, INPUT, ERROR_OUTPUT, OUTPUT, -R]
 class AnalysisEndpoints(repository: AnalysisRepository)(implicit val executor: ExecutionContext) extends Endpoints:

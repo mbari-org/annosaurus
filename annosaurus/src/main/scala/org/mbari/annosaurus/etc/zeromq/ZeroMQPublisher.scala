@@ -19,10 +19,10 @@ package org.mbari.annosaurus.etc.zeromq
 import io.reactivex.rxjava3.disposables.Disposable
 import io.reactivex.rxjava3.schedulers.Schedulers
 import io.reactivex.rxjava3.subjects.Subject
-import org.mbari.annosaurus.messaging.{GenericMessage, MessageBus}
 import org.mbari.annosaurus.ZeroMQConfig
 import org.mbari.annosaurus.etc.jdk.Logging
 import org.mbari.annosaurus.etc.jdk.Logging.{*, given}
+import org.mbari.annosaurus.messaging.{GenericMessage, MessageBus}
 import org.zeromq.{SocketType, ZContext}
 
 import java.util.concurrent.{LinkedBlockingQueue, TimeUnit}

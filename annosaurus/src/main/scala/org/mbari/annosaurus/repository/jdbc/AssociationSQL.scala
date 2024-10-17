@@ -16,9 +16,9 @@
 
 package org.mbari.annosaurus.repository.jdbc
 
+import org.mbari.annosaurus.domain.{Annotation, Association}
+
 import java.util.UUID
-import org.mbari.annosaurus.domain.Association
-import org.mbari.annosaurus.domain.Annotation
 
 // @deprecated("Use Association's NamedQueries instead", "2023-12-18")
 object AssociationSQL:

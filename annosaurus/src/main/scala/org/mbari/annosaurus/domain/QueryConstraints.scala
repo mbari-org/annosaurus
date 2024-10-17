@@ -16,9 +16,8 @@
 
 package org.mbari.annosaurus.domain
 
-import java.util.UUID
 import java.time.Instant
-import org.mbari.annosaurus.repository.jdbc.QueryConstraintsSqlBuilder
+import java.util.UUID
 import scala.jdk.CollectionConverters.*
 
 final case class QueryConstraints(

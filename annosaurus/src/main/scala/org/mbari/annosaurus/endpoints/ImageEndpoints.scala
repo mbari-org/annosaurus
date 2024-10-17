@@ -18,17 +18,16 @@ package org.mbari.annosaurus.endpoints
 
 import org.mbari.annosaurus.controllers.ImageController
 import org.mbari.annosaurus.domain.{ErrorMsg, ImageCreateSC, ImageSC, ImageUpdateSC}
+import org.mbari.annosaurus.endpoints.CustomTapirJsonCirce.*
+import org.mbari.annosaurus.etc.circe.CirceCodecs.given
 import org.mbari.annosaurus.etc.jwt.JwtService
 import org.mbari.annosaurus.etc.tapir.TapirCodecs.given
+import org.mbari.vcr4j.time.Timecode
 import sttp.tapir.*
 import sttp.tapir.generic.auto.*
 import sttp.tapir.server.ServerEndpoint
-import org.mbari.annosaurus.etc.circe.CirceCodecs.{*, given}
-import org.mbari.vcr4j.time.Timecode
-import CustomTapirJsonCirce.*
 
-import java.net.{URI, URL, URLDecoder, URLEncoder}
-import java.nio.charset.StandardCharsets
+import java.net.URL
 import java.time.Duration
 import java.util.UUID
 import scala.concurrent.{ExecutionContext, Future}

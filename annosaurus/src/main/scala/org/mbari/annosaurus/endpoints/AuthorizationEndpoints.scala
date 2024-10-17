@@ -16,19 +16,16 @@
 
 package org.mbari.annosaurus.endpoints
 
-import org.mbari.annosaurus.domain.Authorization
+import org.mbari.annosaurus.domain.{Authorization, AuthorizationSC, BadRequest, ErrorMsg, NotFound, ServerError, Unauthorized}
 import org.mbari.annosaurus.etc.circe.CirceCodecs.given
 import org.mbari.annosaurus.etc.jwt.JwtService
-import scala.concurrent.ExecutionContext
-import scala.concurrent.Future
 import sttp.model.StatusCode
-import sttp.tapir.*
-import sttp.tapir.Endpoint
 import sttp.tapir.generic.auto.*
 import sttp.tapir.json.circe.*
 import sttp.tapir.server.ServerEndpoint
-import org.mbari.annosaurus.domain.{BadRequest, ErrorMsg, NotFound, ServerError, Unauthorized}
-import org.mbari.annosaurus.domain.AuthorizationSC
+import sttp.tapir.{Endpoint, *}
+
+import scala.concurrent.{ExecutionContext, Future}
 
 class AuthorizationEndpoints()(using ec: ExecutionContext, jwtService: JwtService) extends Endpoints:
 

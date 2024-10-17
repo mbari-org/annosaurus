@@ -16,8 +16,7 @@
 
 package org.mbari.annosaurus.messaging
 
-import org.mbari.annosaurus.domain.Annotation
-import org.mbari.annosaurus.domain.Association
+import org.mbari.annosaurus.domain.{Annotation, Association}
 import org.mbari.annosaurus.etc.circe.CirceCodecs.{*, given}
 
 /**

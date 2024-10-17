@@ -17,11 +17,9 @@
 package org.mbari.annosaurus.messaging
 
 import io.reactivex.rxjava3.subjects.Subject
+import org.mbari.annosaurus.domain.{Annotation, Association, Observation}
 
 import scala.util.Try
-import org.mbari.annosaurus.domain.Annotation
-import org.mbari.annosaurus.domain.Observation
-import org.mbari.annosaurus.domain.Association
 
 /**
  * @author

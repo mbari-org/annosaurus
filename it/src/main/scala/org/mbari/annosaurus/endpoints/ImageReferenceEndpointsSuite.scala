@@ -18,14 +18,13 @@ package org.mbari.annosaurus.endpoints
 
 import org.mbari.annosaurus.controllers.{ImageReferenceController, TestUtils}
 import org.mbari.annosaurus.domain.{ImageReference, ImageReferenceSC}
-import org.mbari.annosaurus.etc.jwt.JwtService
-import org.mbari.annosaurus.repository.jpa.JPADAOFactory
-import org.mbari.annosaurus.etc.jdk.Logging.{*, given}
-import sttp.client3.*
-import org.mbari.annosaurus.etc.sdk.Futures.*
-import sttp.model.StatusCode
 import org.mbari.annosaurus.etc.circe.CirceCodecs.{*, given}
+import org.mbari.annosaurus.etc.jwt.JwtService
+import org.mbari.annosaurus.etc.sdk.Futures.*
 import org.mbari.annosaurus.etc.sdk.Reflect
+import org.mbari.annosaurus.repository.jpa.JPADAOFactory
+import sttp.client3.*
+import sttp.model.StatusCode
 
 import scala.jdk.CollectionConverters.*
 
