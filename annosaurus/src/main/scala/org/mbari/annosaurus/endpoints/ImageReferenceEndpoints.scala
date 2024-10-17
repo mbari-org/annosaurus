@@ -33,7 +33,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class ImageReferenceEndpoints(controller: ImageReferenceController)(using
     val executor: ExecutionContext,
     jwtService: JwtService
-) extends Endpoints {
+) extends Endpoints:
 
     private val base = "imagereferences"
     private val tag  = "Image References"
@@ -107,4 +107,3 @@ class ImageReferenceEndpoints(controller: ImageReferenceController)(using
 
     override def allImpl: List[ServerEndpoint[Any, Future]] =
         List(deleteImageByUuidImpl, findImageByUuidImpl, updateImageReferenceByUuidImpl)
-}

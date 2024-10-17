@@ -23,7 +23,7 @@ import java.util.UUID
 import org.hibernate.Session
 import org.hibernate.jdbc.Work
 
-trait TestDAOFactorySuite extends BaseDAOSuite {
+trait TestDAOFactorySuite extends BaseDAOSuite:
 
     test("DAOFactory connects to database") {
         val dao = daoFactory.newImagedMomentDAO();
@@ -53,7 +53,7 @@ trait TestDAOFactorySuite extends BaseDAOSuite {
         tx.begin();
 
         val session = em.unwrap(classOf[Session]);
-        session.doWork(connection => {
+        session.doWork(connection =>
             val statement = connection.createStatement()
             val rs        = statement.executeQuery(
                 s"select uuid from imaged_moments where uuid = '${im.getUuid()}'"
@@ -62,11 +62,9 @@ trait TestDAOFactorySuite extends BaseDAOSuite {
             val uuid      = UUID.fromString(rs.getString("uuid"))
 //            println(s"uuid: $uuid  ---- ${im.getUuid()}")
             assert(uuid == im.getUuid())
-        })
+        )
 
         tx.commit()
         dao.close()
 
     }
-
-}

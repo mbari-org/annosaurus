@@ -16,7 +16,7 @@
 
 package org.mbari.annosaurus.repository.jdbc
 
-object QueryContraintsJpqlBuilder {
+object QueryContraintsJpqlBuilder:
 
     def buildJpql(select: JpqlSelect, from: JpqlFrom, where: JpqlWhere, order: JpqlOrder): String =
         s"$select $from $where $order"
@@ -24,7 +24,7 @@ object QueryContraintsJpqlBuilder {
     def buildJpql(select: JpqlSelect, from: JpqlFrom, order: JpqlOrder): String =
         s"$select $from $order"
 
-    object Annotation {
+    object Annotation:
 
         val Order: JpqlOrder = JpqlOrder("ORDER BY obs.observationTimestamp")
 
@@ -105,7 +105,3 @@ object QueryContraintsJpqlBuilder {
             JpqlWhere("WHERE a.toConcept = :toConcept AND ir.url IS NOT NULL"),
             Order
         )
-
-    }
-
-}

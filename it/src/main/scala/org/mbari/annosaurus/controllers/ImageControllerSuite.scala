@@ -23,7 +23,7 @@ import org.mbari.annosaurus.etc.circe.CirceCodecs.{*, given}
 
 import scala.jdk.CollectionConverters.*
 
-trait ImageControllerSuite extends BaseDAOSuite {
+trait ImageControllerSuite extends BaseDAOSuite:
 
     given JPADAOFactory = daoFactory
 
@@ -78,8 +78,8 @@ trait ImageControllerSuite extends BaseDAOSuite {
         val images       = exec(controller.bulkCreate(imageCreates))
         assertEquals(images.size, seed.size)
 
-        for (i <- imageCreates) {
-            exec(controller.findByURL(i.url)) match {
+        for i <- imageCreates do
+            exec(controller.findByURL(i.url)) match
                 case Some(im) =>
                     assertEquals(im.videoReferenceUuid, i.video_reference_uuid)
                     assertEquals(im.url.orNull, i.url)
@@ -91,8 +91,6 @@ trait ImageControllerSuite extends BaseDAOSuite {
                     assertEquals(im.heightPixels, i.height_pixels)
                     assertEquals(im.description, i.description)
                 case None     => fail(s"Could not find ImageReference with url=${i.url}")
-            }
-        }
 
         // Try to insert duplicates. None should be created
         val images2 = exec(controller.bulkCreate(imageCreates))
@@ -186,5 +184,3 @@ trait ImageControllerSuite extends BaseDAOSuite {
         val opt = exec(controller.findByUUID(i.getUuid))
         assert(opt.isEmpty)
     }
-
-}

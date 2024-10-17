@@ -23,34 +23,31 @@ import org.mbari.annosaurus.domain.Annotation
 import org.mbari.annosaurus.domain.Observation
 import org.mbari.annosaurus.domain.Association
 
-/** @author
-  *   Brian Schlining
-  * @since 2020-03-04T13:32:00
-  */
-trait GenericPublisher[A] {
+/**
+ * @author
+ *   Brian Schlining
+ * @since 2020-03-04T13:32:00
+ */
+trait GenericPublisher[A]:
     def publish(x: A): Unit
     def publish(xs: Iterable[A]): Unit =
-        for {
-            x <- xs
-        } publish(x)
-    def publish(opt: Option[A]): Unit  = opt match {
+        for x <- xs
+        do publish(x)
+    def publish(opt: Option[A]): Unit  = opt match
         case None    => // do nothing
         case Some(a) => Try(publish(a))
-    }
-}
 
-/** Decorator for an reactive Subject that publishes AnnotationMessages for common use cases.
-  * @param subject
-  */
-class AnnotationPublisher(subject: Subject[Any]) extends GenericPublisher[Annotation] {
+/**
+ * Decorator for an reactive Subject that publishes AnnotationMessages for common use cases.
+ * @param subject
+ */
+class AnnotationPublisher(subject: Subject[Any]) extends GenericPublisher[Annotation]:
     def publish(annotation: Annotation): Unit   = Try(
         subject.onNext(AnnotationMessage(annotation))
     )
     def publish(observation: Observation): Unit = publish(Annotation.from(observation.toEntity))
-}
 
-class AssociationPublisher(subject: Subject[Any]) extends GenericPublisher[Association] {
+class AssociationPublisher(subject: Subject[Any]) extends GenericPublisher[Association]:
     def publish(association: Association): Unit = Try(
         subject.onNext(AssociationMessage(association))
     )
-}

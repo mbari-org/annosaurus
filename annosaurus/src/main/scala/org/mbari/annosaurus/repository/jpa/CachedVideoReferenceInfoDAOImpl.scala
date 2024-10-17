@@ -21,16 +21,17 @@ import jakarta.persistence.EntityManager
 import org.mbari.annosaurus.repository.CachedVideoReferenceInfoDAO
 import org.mbari.annosaurus.repository.jpa.entity.CachedVideoReferenceInfoEntity
 
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 import org.hibernate.jpa.QueryHints
 
-/** @author
-  *   Brian Schlining
-  * @since 2016-06-17T17:15:00
-  */
+/**
+ * @author
+ *   Brian Schlining
+ * @since 2016-06-17T17:15:00
+ */
 class CachedVideoReferenceInfoDAOImpl(entityManager: EntityManager)
     extends BaseDAO[CachedVideoReferenceInfoEntity](entityManager)
-    with CachedVideoReferenceInfoDAO[CachedVideoReferenceInfoEntity] {
+    with CachedVideoReferenceInfoDAO[CachedVideoReferenceInfoEntity]:
 
     override def newPersistentObject(): CachedVideoReferenceInfoEntity =
         new CachedVideoReferenceInfoEntity
@@ -84,5 +85,3 @@ class CachedVideoReferenceInfoDAOImpl(entityManager: EntityManager)
             .asScala
             .filter(_ != null)
             .map(_.toString)
-
-}

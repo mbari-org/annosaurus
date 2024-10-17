@@ -32,7 +32,7 @@ import org.mbari.annosaurus.etc.sdk.Futures.*
 import java.time.{Duration, Instant}
 import scala.util.Random
 
-trait IndexEndpointsSuite extends EndpointsSuite {
+trait IndexEndpointsSuite extends EndpointsSuite:
 
     private val log = System.getLogger(getClass.getName)
 
@@ -90,5 +90,3 @@ trait IndexEndpointsSuite extends EndpointsSuite {
             val obtained = i.recorded_timestamp.get
             assertEquals(obtained, expected)
     }
-
-}

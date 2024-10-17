@@ -23,37 +23,34 @@ import scala.collection.mutable.ListBuffer
 
 type QueryResults = List[(JDBC.Metadata, Seq[Any])]
 
-object QueryResults {
+object QueryResults:
 
     val Empty = List.empty[(JDBC.Metadata, Seq[Any])]
 
     private lazy val UtcCalendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
 
     def fromResultSet(rs: ResultSet): QueryResults =
-        val metadata = JDBC.Metadata.fromResultSet(rs)
+        val metadata           = JDBC.Metadata.fromResultSet(rs)
         val timestampColumnIdx = metadata.zipWithIndex.filter(_._1.columnClassName == "java.sql.Timestamp").map(_._2)
-        val results = ListBuffer[ListBuffer[Any]]()
-        val numColumns = metadata.size
-        var isNew = true
+        val results            = ListBuffer[ListBuffer[Any]]()
+        val numColumns         = metadata.size
+        var isNew              = true
         while rs.next() do
             for i <- 1 to numColumns do
-                if (isNew) results += ListBuffer[Any]()
+                if isNew then results += ListBuffer[Any]()
                 val column = results(i - 1)
-                if timestampColumnIdx.contains(i - 1) then
-                    column += rs.getTimestamp(i, UtcCalendar).toInstant
-                else
-                    column += rs.getObject(i)
+                if timestampColumnIdx.contains(i - 1) then column += rs.getTimestamp(i, UtcCalendar).toInstant
+                else column += rs.getObject(i)
             isNew = false
-        val columnData = results.result().map(_.result()) // Turn into immutable
+        val columnData         = results.result().map(_.result()) // Turn into immutable
         metadata.zip(columnData).toList
 
-
     def toTsv(queryResults: QueryResults): String =
-        val header = queryResults.map(_._1.columnName).mkString("\t")
+        val header     = queryResults.map(_._1.columnName).mkString("\t")
         val columnData = queryResults.map(_._2)
-        val numRows      = columnData.headOption.map(_.size).getOrElse(0)
-        val numCols     = columnData.size
-        val sb = new StringBuilder(header)
+        val numRows    = columnData.headOption.map(_.size).getOrElse(0)
+        val numCols    = columnData.size
+        val sb         = new StringBuilder(header)
         sb.append("\n")
         for i <- 0 until numRows do
             for j <- 0 until numCols do
@@ -61,5 +58,3 @@ object QueryResults {
                 if j < numCols - 1 then sb.append("\t")
             sb.append("\n")
         sb.result()
-
-}

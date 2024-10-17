@@ -38,7 +38,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class CachedVideoReferenceInfoEndpoints(controller: CachedVideoReferenceInfoController)(using
     ec: ExecutionContext,
     jwtService: JwtService
-) extends Endpoints {
+) extends Endpoints:
 
     private val tag  = "Video Information"
     private val base = "videoreferences"
@@ -158,8 +158,7 @@ class CachedVideoReferenceInfoEndpoints(controller: CachedVideoReferenceInfoCont
             }
 
     // GET /missioncontact/:missioncontact
-    val findByMissionContact
-        : Endpoint[Unit, String, ErrorMsg, Seq[CachedVideoReferenceInfoSC], Any] =
+    val findByMissionContact: Endpoint[Unit, String, ErrorMsg, Seq[CachedVideoReferenceInfoSC], Any] =
         openEndpoint
             .get
             .in(base / "missioncontact" / path[String]("missioncontact"))
@@ -262,7 +261,7 @@ class CachedVideoReferenceInfoEndpoints(controller: CachedVideoReferenceInfoCont
                 handleErrors(
                     controller
                         .delete(uuid)
-                        .map(b => if (b) StatusCode.NoContent else StatusCode.NotFound)
+                        .map(b => if b then StatusCode.NoContent else StatusCode.NotFound)
                 )
             }
 
@@ -293,4 +292,3 @@ class CachedVideoReferenceInfoEndpoints(controller: CachedVideoReferenceInfoCont
         createOneVideoReferenceInfoImpl,
         findAllImpl
     )
-}

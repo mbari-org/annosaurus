@@ -36,7 +36,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class ImageEndpoints(controller: ImageController)(using
     ec: ExecutionContext,
     jwtService: JwtService
-) extends Endpoints {
+) extends Endpoints:
 
     private val base = "images"
     private val tag  = "Images"
@@ -187,4 +187,3 @@ class ImageEndpoints(controller: ImageController)(using
         updateOneImageImpl,
         createOneImageImpl
     )
-}

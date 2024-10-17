@@ -24,7 +24,7 @@ import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.concurrent.duration.Duration as SDuration
 import scala.jdk.DurationConverters.*
 
-trait BaseDAOSuite extends munit.FunSuite {
+trait BaseDAOSuite extends munit.FunSuite:
 
     given ec: ExecutionContext = ExecutionContext.global
 
@@ -40,4 +40,3 @@ trait BaseDAOSuite extends munit.FunSuite {
     override def afterEach(context: AfterEach): Unit =
         super.afterEach(context)
     daoFactory.cleanup()
-}

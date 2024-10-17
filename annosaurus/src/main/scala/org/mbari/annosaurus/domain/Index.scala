@@ -28,7 +28,7 @@ final case class Index(
     uuid: Option[UUID] = None,
     lastUpdated: Option[java.time.Instant] = None
 ) extends ToSnakeCase[IndexSC]
-    with ToEntity[IndexEntity] {
+    with ToEntity[IndexEntity]:
 
     lazy val elapsedTime              = elapsedTimeMillis.map(java.time.Duration.ofMillis)
     override def toSnakeCase: IndexSC =
@@ -41,7 +41,7 @@ final case class Index(
             lastUpdated
         )
 
-    override def toEntity: IndexEntity = {
+    override def toEntity: IndexEntity =
         val entity = new IndexEntity
         entity.setVideoReferenceUuid(videoReferenceUuid)
         timecode.foreach(tc => entity.setTimecode(org.mbari.vcr4j.time.Timecode(tc)))
@@ -49,11 +49,9 @@ final case class Index(
         recordedTimestamp.foreach(entity.setRecordedTimestamp)
         uuid.foreach(entity.setUuid)
         entity
-    }
-}
 
-object Index extends FromEntity[IndexEntity, Index] {
-    def from(entity: IndexEntity, extend: Boolean = false): Index = {
+object Index extends FromEntity[IndexEntity, Index]:
+    def from(entity: IndexEntity, extend: Boolean = false): Index =
         Index(
             entity.getVideoReferenceUuid,
             Option(entity.getTimecode).map(_.toString()),
@@ -62,9 +60,8 @@ object Index extends FromEntity[IndexEntity, Index] {
             entity.primaryKey,
             entity.lastUpdated
         )
-    }
 
-    def fromImagedMomentEntity(entity: ImagedMomentEntity): Index = {
+    def fromImagedMomentEntity(entity: ImagedMomentEntity): Index =
         Index(
             entity.getVideoReferenceUuid,
             Option(entity.getTimecode).map(_.toString()),
@@ -73,8 +70,6 @@ object Index extends FromEntity[IndexEntity, Index] {
             entity.primaryKey,
             entity.lastUpdated
         )
-    }
-}
 
 final case class IndexSC(
     video_reference_uuid: UUID,
@@ -83,7 +78,7 @@ final case class IndexSC(
     recorded_timestamp: Option[java.time.Instant] = None,
     uuid: Option[UUID] = None,
     last_updated: Option[java.time.Instant] = None
-) extends ToCamelCase[Index] {
+) extends ToCamelCase[Index]:
     override def toCamelCase: Index =
         Index(
             video_reference_uuid,
@@ -93,4 +88,3 @@ final case class IndexSC(
             uuid,
             last_updated
         )
-}

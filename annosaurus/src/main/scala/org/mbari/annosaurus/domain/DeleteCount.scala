@@ -26,7 +26,7 @@ final case class DeleteCount(
     observationCount: Int = 0,
     imagedMomentCount: Int = 0,
     errorMessage: Option[String] = None
-) extends ToSnakeCase[DeleteCountSC] {
+) extends ToSnakeCase[DeleteCountSC]:
     override def toSnakeCase: DeleteCountSC = DeleteCountSC(
         videoReferenceUuid,
         ancillaryDataCount,
@@ -36,7 +36,6 @@ final case class DeleteCount(
         imagedMomentCount,
         errorMessage
     )
-}
 
 final case class DeleteCountSC(
     video_reference_uuid: UUID,
@@ -46,7 +45,7 @@ final case class DeleteCountSC(
     observation_count: Int = 0,
     imaged_moment_count: Int = 0,
     error_message: Option[String] = None
-) extends ToCamelCase[DeleteCount] {
+) extends ToCamelCase[DeleteCount]:
     override def toCamelCase: DeleteCount = DeleteCount(
         video_reference_uuid,
         ancillary_data_count,
@@ -56,4 +55,3 @@ final case class DeleteCountSC(
         imaged_moment_count,
         error_message
     )
-}

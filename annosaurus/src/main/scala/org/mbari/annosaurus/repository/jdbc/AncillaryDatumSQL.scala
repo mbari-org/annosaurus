@@ -21,12 +21,11 @@ import org.mbari.annosaurus.domain.CachedAncillaryDatum
 import org.mbari.annosaurus.domain.Annotation
 import org.mbari.annosaurus.domain.CachedAncillaryDatumSC
 
-object AncillaryDatumSQL {
+object AncillaryDatumSQL:
 
-    def resultListToAnncillaryData(rows: List[?]): Seq[CachedAncillaryDatum] = {
-        for {
-            row <- rows
-        } yield {
+    def resultListToAnncillaryData(rows: List[?]): Seq[CachedAncillaryDatum] =
+        for row <- rows
+        yield
             val xs = row.asInstanceOf[Array[Object]]
 
             CachedAncillaryDatum(
@@ -50,11 +49,9 @@ object AncillaryDatumSQL {
                 lightTransmission = xs(17).asFloat,
                 imagedMomentUuid = xs(18).asUUID
             )
-        }
-    }
 
     private def toDouble(obj: Number): Option[Double] =
-        if (obj != null) Some(obj.doubleValue())
+        if obj != null then Some(obj.doubleValue())
         else None
 
     val SELECT: String =
@@ -115,12 +112,8 @@ object AncillaryDatumSQL {
     def join(
         annotations: Seq[Annotation],
         data: Seq[CachedAncillaryDatum]
-    ): Seq[Annotation] = {
+    ): Seq[Annotation] =
         for a <- annotations
-        yield data.find(_.imagedMomentUuid == a.imagedMomentUuid) match {
+        yield data.find(_.imagedMomentUuid == a.imagedMomentUuid) match
             case Some(d) => a.copy(ancillaryData = Some(d))
             case None    => a
-        }
-    }
-
-}

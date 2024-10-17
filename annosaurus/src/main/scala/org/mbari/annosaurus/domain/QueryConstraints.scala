@@ -43,7 +43,7 @@ final case class QueryConstraints(
     missionContacts: Seq[String] = Nil,
     platformName: Option[String] = None,
     missionId: Option[String] = None
-) extends ToSnakeCase[QueryConstraintsSC] {
+) extends ToSnakeCase[QueryConstraintsSC]:
 
     // Used by Circe reify. If serializing fails, the circe codec will fall back to snake_case
     require(
@@ -55,7 +55,7 @@ final case class QueryConstraints(
     val definedOffset: Int   = offset.getOrElse(0)
     val includeData: Boolean = data.getOrElse(false)
 
-    def toSnakeCase: QueryConstraintsSC = {
+    def toSnakeCase: QueryConstraintsSC =
         QueryConstraintsSC(
             Option(videoReferenceUuids),
             Option(concepts),
@@ -79,8 +79,6 @@ final case class QueryConstraints(
             platformName,
             missionId
         )
-    }
-}
 
 final case class QueryConstraintsSC(
     video_reference_uuids: Option[Seq[UUID]] = None,
@@ -104,8 +102,8 @@ final case class QueryConstraintsSC(
     mission_contacts: Option[Seq[String]] = None,
     platform_name: Option[String] = None,
     mission_id: Option[String] = None
-) extends ToCamelCase[QueryConstraints] {
-    def toCamelCase: QueryConstraints = {
+) extends ToCamelCase[QueryConstraints]:
+    def toCamelCase: QueryConstraints =
         QueryConstraints(
             video_reference_uuids.getOrElse(Nil),
             concepts.getOrElse(Nil),
@@ -129,5 +127,3 @@ final case class QueryConstraintsSC(
             platform_name,
             mission_id
         )
-    }
-}

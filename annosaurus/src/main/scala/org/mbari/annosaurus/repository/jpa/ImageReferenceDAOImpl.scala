@@ -21,13 +21,14 @@ import jakarta.persistence.EntityManager
 import org.mbari.annosaurus.repository.ImageReferenceDAO
 import org.mbari.annosaurus.repository.jpa.entity.ImageReferenceEntity
 
-/** @author
-  *   Brian Schlining
-  * @since 2016-06-17T17:17:00
-  */
+/**
+ * @author
+ *   Brian Schlining
+ * @since 2016-06-17T17:17:00
+ */
 class ImageReferenceDAOImpl(entityManager: EntityManager)
     extends BaseDAO[ImageReferenceEntity](entityManager)
-    with ImageReferenceDAO[ImageReferenceEntity] {
+    with ImageReferenceDAO[ImageReferenceEntity]:
 
     override def newPersistentObject(): ImageReferenceEntity = new ImageReferenceEntity
 
@@ -37,7 +38,7 @@ class ImageReferenceDAOImpl(entityManager: EntityManager)
         heightPixels: Option[Int] = None,
         widthPixels: Option[Int] = None,
         format: Option[String] = None
-    ): ImageReferenceEntity = {
+    ): ImageReferenceEntity =
         val imageReference = newPersistentObject()
         imageReference.setUrl(url)
         description.foreach(imageReference.setDescription)
@@ -46,7 +47,6 @@ class ImageReferenceDAOImpl(entityManager: EntityManager)
         format.foreach(imageReference.setFormat)
 
         imageReference
-    }
 
     override def findAll(
         limit: Option[Int] = None,
@@ -59,5 +59,3 @@ class ImageReferenceDAOImpl(entityManager: EntityManager)
 
     override def findByImageName(name: String): Seq[ImageReferenceEntity] =
         findByNamedQuery("ImageReference.findByImageName", Map("name" -> s"%$name%"))
-
-}

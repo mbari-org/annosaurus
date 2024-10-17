@@ -24,19 +24,20 @@ import org.mbari.annosaurus.repository.jpa.entity.ObservationEntity
 import java.sql.Timestamp
 import java.time.{Duration, Instant}
 import java.util.{stream, UUID}
-import scala.jdk.CollectionConverters._
-import java.{util => ju}
+import scala.jdk.CollectionConverters.*
+import java.{util as ju}
 import org.mbari.annosaurus.repository.jdbc.*
 import jakarta.persistence.QueryHint
 import org.hibernate.jpa.QueryHints
 
-/** @author
-  *   Brian Schlining
-  * @since 2016-06-17T17:10:00
-  */
+/**
+ * @author
+ *   Brian Schlining
+ * @since 2016-06-17T17:10:00
+ */
 class ObservationDAOImpl(entityManager: EntityManager)
     extends BaseDAO[ObservationEntity](entityManager)
-    with ObservationDAO[ObservationEntity] {
+    with ObservationDAO[ObservationEntity]:
 
     override def newPersistentObject(): ObservationEntity = new ObservationEntity
 
@@ -46,7 +47,7 @@ class ObservationDAOImpl(entityManager: EntityManager)
         observationDate: Instant = Instant.now(),
         group: Option[String] = None,
         duration: Option[Duration] = None
-    ): ObservationEntity = {
+    ): ObservationEntity =
 
         val observation = new ObservationEntity
         observation.setConcept(concept)
@@ -55,7 +56,6 @@ class ObservationDAOImpl(entityManager: EntityManager)
         group.foreach(observation.setGroup)
         duration.foreach(observation.setDuration)
         observation
-    }
 
     override def findByVideoReferenceUuid(
         uuid: UUID,
@@ -82,21 +82,19 @@ class ObservationDAOImpl(entityManager: EntityManager)
         endTimestamp: Instant,
         limit: Option[Int],
         offset: Option[Int]
-    ): stream.Stream[ObservationEntity] = {
-
+    ): stream.Stream[ObservationEntity] =
         streamByNamedQuery(
             "Observation.findByVideoReferenceUUIDAndTimestamps",
             Map("uuid" -> uuid, "start" -> startTimestamp, "end" -> endTimestamp),
             limit,
             offset
         )
-    }
 
     override def countByVideoReferenceUUIDAndTimestamps(
         uuid: UUID,
         startTimestamp: Instant,
         endTimestamp: Instant
-    ): Int = {
+    ): Int =
         // val query =
         //     entityManager.createNamedQuery("Observation.countByVideoReferenceUUIDAndTimestamps")
         // // setUuidParameter(query, 1, uuid)
@@ -112,13 +110,12 @@ class ObservationDAOImpl(entityManager: EntityManager)
         query.setParameter("start", startTimestamp)
         query.setParameter("end", endTimestamp)
         query.getSingleResult.asInstanceOf[Number].intValue()
-    }
 
     override def streamByConcurrentRequest(
         request: ConcurrentRequest,
         limit: Option[Int],
         offset: Option[Int]
-    ): stream.Stream[ObservationEntity] = {
+    ): stream.Stream[ObservationEntity] =
         streamByNamedQuery(
             "Observation.findByConcurrentRequest",
             Map(
@@ -129,39 +126,36 @@ class ObservationDAOImpl(entityManager: EntityManager)
             limit,
             offset
         )
-    }
 
-    override def countByConcurrentRequest(request: ConcurrentRequest): Long = {
+    override def countByConcurrentRequest(request: ConcurrentRequest): Long =
         val query = entityManager.createNamedQuery("Observation.countByConcurrentRequest")
         query.setParameter("uuids", request.videoReferenceUuids.asJava)
         query.setParameter("start", request.startTimestamp)
         query.setParameter("end", request.endTimestamp)
         query.getSingleResult.asInstanceOf[Number].longValue()
-    }
 
     override def streamByMultiRequest(
         request: MultiRequest,
         limit: Option[Int],
         offset: Option[Int]
-    ): stream.Stream[ObservationEntity] = {
+    ): stream.Stream[ObservationEntity] =
         streamByNamedQuery(
             "Observation.findByMultiRequest",
             Map("uuids" -> request.videoReferenceUuids),
             limit,
             offset
         )
-    }
 
-    override def countByMultiRequest(request: MultiRequest): Long = {
+    override def countByMultiRequest(request: MultiRequest): Long =
         val query = entityManager.createNamedQuery("Observation.countByMultiRequest")
         query.setHint(QueryHints.HINT_READONLY, true)
         query.setParameter("uuids", request.videoReferenceUuids.asJava)
         query.getSingleResult.asInstanceOf[Number].longValue()
-    }
 
-    /** @return
-      *   Order sequence of all concept names used
-      */
+    /**
+     * @return
+     *   Order sequence of all concept names used
+     */
     override def findAllConcepts(): Seq[String] =
         val query = entityManager.createNamedQuery("Observation.findAllNames")
         query.setHint(QueryHints.HINT_READONLY, true)
@@ -198,7 +192,7 @@ class ObservationDAOImpl(entityManager: EntityManager)
     ): Iterable[ObservationEntity] =
         findByNamedQuery("Observation.findAll", limit = limit, offset = offset)
 
-    override def findAllConceptsByVideoReferenceUUID(uuid: UUID): Seq[String] = {
+    override def findAllConceptsByVideoReferenceUUID(uuid: UUID): Seq[String] =
         val query = entityManager.createNamedQuery("Observation.findAllNamesByVideoReferenceUUID")
         query.setParameter(1, uuid)
         query
@@ -206,9 +200,8 @@ class ObservationDAOImpl(entityManager: EntityManager)
             .asScala
             .map(_.toString)
             .toSeq
-    }
 
-    override def countByConcept(name: String): Int = {
+    override def countByConcept(name: String): Int =
         val query = entityManager.createNamedQuery("Observation.countByConcept")
         query.setHint(QueryHints.HINT_READONLY, true)
         query.setParameter(1, name)
@@ -217,9 +210,8 @@ class ObservationDAOImpl(entityManager: EntityManager)
             .asScala
             .map(_.asInstanceOf[Number].intValue())
             .head
-    }
 
-    override def countByConceptWithImages(name: String): Int = {
+    override def countByConceptWithImages(name: String): Int =
         val query = entityManager.createNamedQuery("Observation.countByConceptWithImages")
         query.setHint(QueryHints.HINT_READONLY, true)
         query.setParameter(1, name)
@@ -228,9 +220,8 @@ class ObservationDAOImpl(entityManager: EntityManager)
             .asScala
             .map(_.asInstanceOf[Number].intValue())
             .head
-    }
 
-    override def countByVideoReferenceUUID(uuid: UUID): Int = {
+    override def countByVideoReferenceUUID(uuid: UUID): Int =
         val query = entityManager.createNamedQuery("Observation.countByVideoReferenceUUID")
         query.setHint(QueryHints.HINT_READONLY, true)
         query.setParameter(1, uuid)
@@ -239,36 +230,30 @@ class ObservationDAOImpl(entityManager: EntityManager)
             .asScala
             .map(_.asInstanceOf[Number].intValue())
             .head
-    }
 
-    override def countAllByVideoReferenceUuids(): Map[UUID, Int] = {
+    override def countAllByVideoReferenceUuids(): Map[UUID, Int] =
         val query = entityManager.createNamedQuery("Observation.countAllByVideoReferenceUUIDs")
         query.setHint(QueryHints.HINT_READONLY, true)
         query
             .getResultList
             .asScala
             .map(_.asInstanceOf[Array[Object]])
-            .map(xs => {
+            .map(xs =>
                 val uuid  = xs(0).asUUID.getOrElse(throw new RuntimeException("UUID is null"))
                 val count = xs(1).asInt.getOrElse(0)
                 uuid -> count
-            })
+            )
             .toMap
-    }
 
-    override def updateConcept(oldConcept: String, newConcept: String): Int = {
+    override def updateConcept(oldConcept: String, newConcept: String): Int =
         val query = entityManager.createNamedQuery("Observation.updateConcept")
         query.setParameter(1, newConcept)
         query.setParameter(2, oldConcept)
         query.executeUpdate()
-    }
 
-    override def changeImageMoment(imagedMomentUuid: UUID, observationUuid: UUID): Int = {
+    override def changeImageMoment(imagedMomentUuid: UUID, observationUuid: UUID): Int =
         val query = entityManager.createNamedQuery("Observation.updateImagedMomentUUID")
         query
             .setParameter(1, imagedMomentUuid)
             .setParameter(2, observationUuid)
         query.executeUpdate()
-    }
-
-}

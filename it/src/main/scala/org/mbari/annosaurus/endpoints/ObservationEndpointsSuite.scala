@@ -49,7 +49,7 @@ import java.util.UUID
 import scala.jdk.CollectionConverters.*
 import scala.util.Random
 
-trait ObservationEndpointsSuite extends EndpointsSuite {
+trait ObservationEndpointsSuite extends EndpointsSuite:
 
     private val log = System.getLogger(getClass.getName)
 
@@ -67,12 +67,11 @@ trait ObservationEndpointsSuite extends EndpointsSuite {
         runGet(
             endpoints.findObservationByUuidImpl,
             s"http://test.com/v1/observations/$uuid",
-            response => {
+            response =>
                 assertEquals(response.code, StatusCode.Ok)
                 val expected = Observation.from(observation, true)
                 val obtained = checkResponse[ObservationSC](response.body).toCamelCase
                 assertEquals(obtained, expected)
-            }
         )
     }
 
@@ -82,7 +81,7 @@ trait ObservationEndpointsSuite extends EndpointsSuite {
         runGet(
             endpoints.findObservationsByVideoReferenceUuidImpl,
             s"http://test.com/v1/observations/videoreference/$videoReferenceUuid",
-            response => {
+            response =>
                 assertEquals(response.code, StatusCode.Ok)
                 val expected = xs
                     .flatMap(_.getObservations.asScala)
@@ -94,7 +93,6 @@ trait ObservationEndpointsSuite extends EndpointsSuite {
                     .sortBy(_.uuid)
                     .toSet
                 assertEquals(obtained, expected)
-            }
         )
     }
 
@@ -109,12 +107,11 @@ trait ObservationEndpointsSuite extends EndpointsSuite {
         runGet(
             endpoints.findActivitiesImpl,
             s"http://test.com/v1/observations/activities",
-            response => {
+            response =>
                 assertEquals(response.code, StatusCode.Ok)
                 val obtained = checkResponse[Seq[String]](response.body).sorted
                 for a <- expected
                 do assert(obtained.contains(a))
-            }
         )
     }
 
@@ -125,12 +122,11 @@ trait ObservationEndpointsSuite extends EndpointsSuite {
         runGet(
             endpoints.findObservationByAssociationUuidImpl,
             s"http://test.com/v1/observations/association/$associationUuid",
-            response => {
+            response =>
                 assertEquals(response.code, StatusCode.Ok)
                 val expected = Observation.from(im.getObservations.iterator().next(), true)
                 val obtained = checkResponse[ObservationSC](response.body).toCamelCase
                 assertEquals(obtained, expected)
-            }
         )
     }
 
@@ -146,12 +142,11 @@ trait ObservationEndpointsSuite extends EndpointsSuite {
         runGet(
             endpoints.findAllConceptsImpl,
             s"http://test.com/v1/observations/concepts",
-            response => {
+            response =>
                 assertEquals(response.code, StatusCode.Ok)
                 val obtained = checkResponse[Seq[String]](response.body).sorted
                 for c <- expected
                 do assert(obtained.contains(c))
-            }
         )
     }
 
@@ -168,13 +163,12 @@ trait ObservationEndpointsSuite extends EndpointsSuite {
         runGet(
             endpoints.findConceptsByVideoReferenceUuidImpl,
             s"http://test.com/v1/observations/concepts/$videoReferenceUuid",
-            response => {
+            response =>
                 assertEquals(response.code, StatusCode.Ok)
                 val obtained = checkResponse[Seq[String]](response.body).sorted
                 assertEquals(obtained.size, expected.size)
                 for c <- expected
                 do assert(obtained.contains(c))
-            }
         )
     }
 
@@ -192,12 +186,11 @@ trait ObservationEndpointsSuite extends EndpointsSuite {
         runGet(
             endpoints.countObservationsByConceptImpl,
             s"http://test.com/v1/observations/concept/count/$concept",
-            response => {
+            response =>
                 assertEquals(response.code, StatusCode.Ok)
                 val obtained = checkResponse[ConceptCount](response.body)
                 assertEquals(obtained.concept, concept)
                 assertEquals(obtained.count, expected.longValue)
-            }
         )
     }
 
@@ -211,12 +204,11 @@ trait ObservationEndpointsSuite extends EndpointsSuite {
         runGet(
             endpoints.countImagesByConceptImpl,
             s"http://test.com/v1/observations/concept/images/count/$concept",
-            response => {
+            response =>
                 assertEquals(response.code, StatusCode.Ok)
                 val obtained = checkResponse[ConceptCount](response.body)
                 assertEquals(obtained.concept, concept)
                 assertEquals(obtained.count, expected.longValue)
-            }
         )
     }
 
@@ -232,12 +224,11 @@ trait ObservationEndpointsSuite extends EndpointsSuite {
         runGet(
             endpoints.findGroupsImpl,
             "http://test.com/v1/observations/groups",
-            response => {
+            response =>
                 assertEquals(response.code, StatusCode.Ok)
                 val obtained = checkResponse[Seq[String]](response.body).sorted
                 for a <- expected
                 do assert(obtained.contains(a))
-            }
         )
     }
 
@@ -250,11 +241,10 @@ trait ObservationEndpointsSuite extends EndpointsSuite {
         runGet(
             endpoints.countByVideoReferenceUuidImpl,
             s"http://test.com/v1/observations/videoreference/count/$videoReferenceUuid",
-            response => {
+            response =>
                 assertEquals(response.code, StatusCode.Ok)
                 val obtained = checkResponse[CountForVideoReferenceSC](response.body)
                 assertEquals(obtained.count, expected)
-            }
         )
 
         // Test with start/end
@@ -263,11 +253,10 @@ trait ObservationEndpointsSuite extends EndpointsSuite {
         runGet(
             endpoints.countByVideoReferenceUuidImpl,
             s"http://test.com/v1/observations/videoreference/count/$videoReferenceUuid?start=$t0&end=$t1",
-            response => {
+            response =>
                 assertEquals(response.code, StatusCode.Ok)
                 val obtained = checkResponse[CountForVideoReferenceSC](response.body)
                 assertEquals(obtained.count, expected)
-            }
         )
 
         // Test with start/end that should return no results
@@ -275,22 +264,20 @@ trait ObservationEndpointsSuite extends EndpointsSuite {
         runGet(
             endpoints.countByVideoReferenceUuidImpl,
             s"http://test.com/v1/observations/videoreference/count/$videoReferenceUuid?start=$t1&end=$t2",
-            response => {
+            response =>
                 assertEquals(response.code, StatusCode.Ok)
                 val obtained = checkResponse[CountForVideoReferenceSC](response.body)
                 assertEquals(obtained.count, 0)
-            }
         )
 
         // Test with bogus videoreference uuid but valid start/end that should return no results
         runGet(
             endpoints.countByVideoReferenceUuidImpl,
             s"http://test.com/v1/observations/videoreference/count/${UUID.randomUUID()}?start=$t0&end=$t1",
-            response => {
+            response =>
                 assertEquals(response.code, StatusCode.Ok)
                 val obtained = checkResponse[CountForVideoReferenceSC](response.body)
                 assertEquals(obtained.count, 0)
-            }
         )
     }
 
@@ -300,18 +287,15 @@ trait ObservationEndpointsSuite extends EndpointsSuite {
         runGet(
             endpoints.countAllGroupByVideoReferenceUuidImpl,
             s"http://test.com/v1/observations/counts",
-            response => {
+            response =>
                 assertEquals(response.code, StatusCode.Ok)
                 val results = checkResponse[Seq[CountForVideoReferenceSC]](response.body)
-                results.find(_.video_reference_uuid == videoReferenceUuid) match {
+                results.find(_.video_reference_uuid == videoReferenceUuid) match
                     case Some(result) => assertEquals(result.count, im.getObservations.size)
                     case None         =>
                         fail(
                             s"Expected to find a result with videoreference uuid $videoReferenceUuid"
                         )
-                }
-
-            }
         )
     }
 
@@ -551,5 +535,3 @@ trait ObservationEndpointsSuite extends EndpointsSuite {
             assertEquals(obtained.group, update.group)
 
     }
-
-}

@@ -25,7 +25,7 @@ import java.sql.ResultSet
 import scala.collection.mutable.ListBuffer
 import scala.util.Using
 
-class QueryService(databaseConfig: DatabaseConfig, viewName: String) {
+class QueryService(databaseConfig: DatabaseConfig, viewName: String):
 
     val jdbc               = new JDBC(databaseConfig)
     val AnnotationViewName = "annotations"
@@ -34,7 +34,7 @@ class QueryService(databaseConfig: DatabaseConfig, viewName: String) {
     def findAllConceptNames(): Either[Throwable, Seq[String]] =
         jdbc.findDistinct(viewName, "concept", stringConverter)
 
-    def findAssociationsForConcepts(concepts: Seq[String]): Either[Throwable, Seq[Association]] = {
+    def findAssociationsForConcepts(concepts: Seq[String]): Either[Throwable, Seq[Association]] =
         val sql = s"""
            | SELECT DISTINCT
            |   link_name,
@@ -48,19 +48,15 @@ class QueryService(databaseConfig: DatabaseConfig, viewName: String) {
            |""".stripMargin
         jdbc.runQuery(
             sql,
-            rs => {
+            rs =>
                 val associations = ListBuffer.newBuilder[Association]
-                while (rs.next()) {
+                while rs.next() do
                     val linkName  = rs.getString("link_name")
                     val toConcept = rs.getString("to_concept")
                     val linkValue = rs.getString("link_value")
                     associations += Association(linkName, toConcept, linkValue)
-                }
                 associations.result().toSeq.sortBy(_.linkName)
-            }
         )
-
-    }
 
     def count(query: Query): Either[Throwable, Int] =
         val sql = PreparedStatementGenerator.buildPreparedStatementTemplateForCounts(
@@ -80,7 +76,7 @@ class QueryService(databaseConfig: DatabaseConfig, viewName: String) {
                     )
                 )
                 PreparedStatementGenerator.bind(stmt, query.where)
-                val rs = stmt.executeQuery()
+                val rs   = stmt.executeQuery()
                 //                val rs   = use(stmt.executeQuery(sql))
                 if rs.next() then rs.getInt(1) else 0
             )
@@ -105,9 +101,7 @@ class QueryService(databaseConfig: DatabaseConfig, viewName: String) {
                 query.limit.foreach(stmt.setMaxRows)
                 query.offset.foreach(stmt.setFetchSize)
                 PreparedStatementGenerator.bind(stmt, query.where)
-                val rs = stmt.executeQuery()
+                val rs   = stmt.executeQuery()
                 QueryResults.fromResultSet(rs)
             )
             .toEither
-
-}

@@ -24,7 +24,7 @@ import java.sql.Timestamp
 import java.time.{Duration, Instant}
 import scala.util.Random
 
-trait CachedAncillaryDatumControllerSuite extends BaseDAOSuite {
+trait CachedAncillaryDatumControllerSuite extends BaseDAOSuite:
 
     given JPADAOFactory = daoFactory
 
@@ -196,12 +196,12 @@ trait CachedAncillaryDatumControllerSuite extends BaseDAOSuite {
         // test create
         val s0 = TestUtils
             .create(4, 1, 1, 1, false)
-            .map(x => {
+            .map(x =>
                 val ad = TestUtils.randomData()
                 ad.setDepthMeters(1000)
                 x.setAncillaryDatum(ad)
                 CachedAncillaryDatum.from(ad, true)
-            })
+            )
         val a0 = exec(controller.bulkCreateOrUpdate(s0))
         for s <- s0
         do
@@ -223,11 +223,11 @@ trait CachedAncillaryDatumControllerSuite extends BaseDAOSuite {
         // test update
         val s0 = TestUtils
             .create(4, 1, 1, 1, true)
-            .map(x => {
+            .map(x =>
                 val ad = x.getAncillaryDatum
                 ad.setDepthMeters(1000)
                 CachedAncillaryDatum.from(ad, true)
-            })
+            )
         val a0 = exec(controller.bulkCreateOrUpdate(s0))
         for s <- s0
         do
@@ -247,18 +247,18 @@ trait CachedAncillaryDatumControllerSuite extends BaseDAOSuite {
     test("bulkCreateOrUpdate (mixed create/update") {
         val s0 = TestUtils
             .create(4, 1, 1, 1, true)
-            .map(x => {
+            .map(x =>
                 val ad = x.getAncillaryDatum
                 ad.setDepthMeters(1000)
                 CachedAncillaryDatum.from(ad, true)
-            }) ++ TestUtils
+            ) ++ TestUtils
             .create(4, 1, 1, 1, false)
-            .map(x => {
+            .map(x =>
                 val ad = TestUtils.randomData()
                 ad.setDepthMeters(1000)
                 x.setAncillaryDatum(ad)
                 CachedAncillaryDatum.from(ad, true)
-            })
+            )
 
         val a0 = exec(controller.bulkCreateOrUpdate(s0))
         for s <- s0
@@ -281,13 +281,13 @@ trait CachedAncillaryDatumControllerSuite extends BaseDAOSuite {
         val minEpochMillis = xs.map(_.getRecordedTimestamp.toEpochMilli).min
         val s0             = xs
             .zipWithIndex
-            .map((im, idx) => {
+            .map((im, idx) =>
                 val ts = Instant
                     .ofEpochMilli(im.getRecordedTimestamp.toEpochMilli + Random.nextInt(14000))
                 CachedAncillaryDatum
                     .from(TestUtils.randomData())
                     .copy(recordedTimestamp = Some(ts), depthMeters = Some(1000))
-            })
+            )
         val ys             = exec(controller.merge(s0, xs.head.getVideoReferenceUuid, Duration.ofSeconds(15)))
         assertEquals(ys.size, xs.size)
         for x <- xs
@@ -334,5 +334,3 @@ trait CachedAncillaryDatumControllerSuite extends BaseDAOSuite {
                 assert(obtained.salinity.isEmpty)
                 assert(obtained.temperatureCelsius.isEmpty)
     }
-
-}

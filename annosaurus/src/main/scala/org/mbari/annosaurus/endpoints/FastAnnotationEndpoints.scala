@@ -43,14 +43,13 @@ import org.mbari.annosaurus.etc.circe.CirceCodecs.given
 class FastAnnotationEndpoints(jdbcRepository: JdbcRepository)(using
     ec: ExecutionContext,
     jwtService: JwtService
-) extends Endpoints {
+) extends Endpoints:
 
     private val base = "fast"
     private val tag  = "Fast Annotation Queries"
 
     // GET / limit offset
-    val findAllAnnotations
-        : Endpoint[Unit, (Paging, Option[Boolean]), ErrorMsg, Seq[AnnotationSC], Any] =
+    val findAllAnnotations: Endpoint[Unit, (Paging, Option[Boolean]), ErrorMsg, Seq[AnnotationSC], Any] =
         openEndpoint
             .get
             .in(base)
@@ -99,10 +98,9 @@ class FastAnnotationEndpoints(jdbcRepository: JdbcRepository)(using
             }
 
     // POST /georange queryconstraints json
-    val findGeoRangeByQueryConstraints
-        : Endpoint[Unit, QueryConstraints, ErrorMsg, QueryConstraintsResponseSC[
-            GeographicRangeSC
-        ], Any] =
+    val findGeoRangeByQueryConstraints: Endpoint[Unit, QueryConstraints, ErrorMsg, QueryConstraintsResponseSC[
+        GeographicRangeSC
+    ], Any] =
         openEndpoint
             .post
             .in(base / "georange")
@@ -201,8 +199,7 @@ class FastAnnotationEndpoints(jdbcRepository: JdbcRepository)(using
             }
 
     // GET /images/videoreference/:uuid
-    val findImagesByVideoReferenceUuid
-        : Endpoint[Unit, (UUID, Paging), ErrorMsg, Seq[ImageSC], Any] = openEndpoint
+    val findImagesByVideoReferenceUuid: Endpoint[Unit, (UUID, Paging), ErrorMsg, Seq[ImageSC], Any] = openEndpoint
         .get
         .in(base / "images" / "videoreference" / path[UUID]("videoReferenceUuid"))
         .in(paging)
@@ -244,8 +241,7 @@ class FastAnnotationEndpoints(jdbcRepository: JdbcRepository)(using
             }
 
     // GET /concept/:concept
-    val findAnnotationsByConcept
-        : Endpoint[Unit, (String, Paging, Option[Boolean]), ErrorMsg, Seq[AnnotationSC], Any] =
+    val findAnnotationsByConcept: Endpoint[Unit, (String, Paging, Option[Boolean]), ErrorMsg, Seq[AnnotationSC], Any] =
         openEndpoint
             .get
             .in(base / "concept" / path[String]("concept"))
@@ -355,8 +351,7 @@ class FastAnnotationEndpoints(jdbcRepository: JdbcRepository)(using
             }
 
     // GET /imagedmoments/toconcept/images/:toconcept
-    val findImagedMomentUuidsByToConcept
-        : Endpoint[Unit, (String, Paging), ErrorMsg, Seq[UUID], Any] =
+    val findImagedMomentUuidsByToConcept: Endpoint[Unit, (String, Paging), ErrorMsg, Seq[UUID], Any] =
         openEndpoint
             .get
             .in(
@@ -460,10 +455,9 @@ class FastAnnotationEndpoints(jdbcRepository: JdbcRepository)(using
             }
 
     // POST /multi limit offset multirequest json
-    val findAnnotationsByMultiRequest
-        : Endpoint[Unit, (Paging, Option[Boolean], MultiRequestSC), ErrorMsg, Seq[
-            AnnotationSC
-        ], Any] =
+    val findAnnotationsByMultiRequest: Endpoint[Unit, (Paging, Option[Boolean], MultiRequestSC), ErrorMsg, Seq[
+        AnnotationSC
+    ], Any] =
         openEndpoint
             .post
             .in(base / "multi")
@@ -531,4 +525,3 @@ class FastAnnotationEndpoints(jdbcRepository: JdbcRepository)(using
         findAllAnnotationsImpl,
         findAnnotationsByQueryConstraintsImpl
     )
-}

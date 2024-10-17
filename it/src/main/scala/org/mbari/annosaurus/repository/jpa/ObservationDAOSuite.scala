@@ -24,7 +24,7 @@ import org.mbari.annosaurus.domain.ConcurrentRequest
 import org.mbari.annosaurus.domain.MultiRequest
 import scala.jdk.CollectionConverters.*
 
-trait ObservationDAOSuite extends BaseDAOSuite {
+trait ObservationDAOSuite extends BaseDAOSuite:
     given JPADAOFactory = daoFactory
 
     test("create") {
@@ -32,10 +32,10 @@ trait ObservationDAOSuite extends BaseDAOSuite {
         val obs                       = TestUtils.randomObservation()
         given dao: ObservationDAOImpl = daoFactory.newObservationDAO()
         val imDao                     = daoFactory.newImagedMomentDAO(dao)
-        run(() => {
+        run(() =>
             val im0 = imDao.update(im)
             im0.addObservation(obs)
-        })
+        )
         run(() => dao.findByUUID(obs.getUuid())) match
             case None        => fail("should have found the entity")
             case Some(value) => AssertUtils.assertSameObservation(value, obs)
@@ -58,11 +58,11 @@ trait ObservationDAOSuite extends BaseDAOSuite {
         val im                        = TestUtils.create(1, 1).head
         val obs                       = im.getObservations().iterator().next()
         given dao: ObservationDAOImpl = daoFactory.newObservationDAO()
-        run(() => {
+        run(() =>
             val obs0 = dao.update(obs)
             obs0.getImagedMoment().removeObservation(obs0)
             // dao.delete(obs0) // DOn't call delete, just remove from parent
-        })
+        )
         run(() => dao.findByUUID(obs.getUuid())) match
             case None        => // OK
             case Some(value) => fail("should not have found the entity")
@@ -73,9 +73,7 @@ trait ObservationDAOSuite extends BaseDAOSuite {
         val im                        = TestUtils.create(1, 1).head
         val obs                       = im.getObservations().iterator().next()
         given dao: ObservationDAOImpl = daoFactory.newObservationDAO()
-        run(() => {
-            dao.deleteByUUID(obs.getUuid())
-        })
+        run(() => dao.deleteByUUID(obs.getUuid()))
         run(() => dao.findByUUID(obs.getUuid())) match
             case None        => // OK
             case Some(value) => fail("should not have found the entity")
@@ -148,7 +146,7 @@ trait ObservationDAOSuite extends BaseDAOSuite {
         given dao: ObservationDAOImpl = daoFactory.newObservationDAO()
         val concepts                  = run(() => dao.findAllConcepts())
         assert(concepts.size >= xs.size)
-        for (c <- existingConcepts) assert(concepts.contains(c))
+        for c <- existingConcepts do assert(concepts.contains(c))
         dao.close()
     }
 
@@ -159,7 +157,7 @@ trait ObservationDAOSuite extends BaseDAOSuite {
         given dao: ObservationDAOImpl = daoFactory.newObservationDAO()
         val groups                    = run(() => dao.findAllGroups())
         assert(groups.size >= xs.size)
-        for (g <- existingGroups) assert(groups.contains(g))
+        for g <- existingGroups do assert(groups.contains(g))
         dao.close()
     }
 
@@ -170,7 +168,7 @@ trait ObservationDAOSuite extends BaseDAOSuite {
         given dao: ObservationDAOImpl = daoFactory.newObservationDAO()
         val activities                = run(() => dao.findAllActivities())
         assert(activities.size >= xs.size)
-        for (a <- existingActivities) assert(activities.contains(a))
+        for a <- existingActivities do assert(activities.contains(a))
         dao.close()
     }
 
@@ -190,10 +188,9 @@ trait ObservationDAOSuite extends BaseDAOSuite {
         val xs                        = TestUtils.create(5, 1)
         val existingConcepts          = xs.flatMap(_.getObservations().asScala.map(_.getConcept()))
         given dao: ObservationDAOImpl = daoFactory.newObservationDAO()
-        for (c <- existingConcepts) {
+        for c <- existingConcepts do
             val count = run(() => dao.countByConcept(c))
             assert(count == 1)
-        }
         dao.close()
     }
 
@@ -201,17 +198,15 @@ trait ObservationDAOSuite extends BaseDAOSuite {
         val xs                        = TestUtils.create(3, 1)
         val existingConcepts          = xs.flatMap(_.getObservations().asScala.map(_.getConcept()))
         given dao: ObservationDAOImpl = daoFactory.newObservationDAO()
-        for (c <- existingConcepts) {
+        for c <- existingConcepts do
             val count = run(() => dao.countByConceptWithImages(c))
             assert(count == 0)
-        }
 
         val ys                = TestUtils.create(3, 1, 0, 1)
         val existingConcepts2 = ys.flatMap(_.getObservations().asScala.map(_.getConcept()))
-        for (c <- existingConcepts2) {
+        for c <- existingConcepts2 do
             val count = run(() => dao.countByConceptWithImages(c))
             assert(count == 1)
-        }
         dao.close()
     }
 
@@ -267,5 +262,3 @@ trait ObservationDAOSuite extends BaseDAOSuite {
         dao.close()
 
     }
-
-}

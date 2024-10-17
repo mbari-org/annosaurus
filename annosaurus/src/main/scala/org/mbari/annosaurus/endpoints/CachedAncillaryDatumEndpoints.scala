@@ -32,7 +32,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class CachedAncillaryDatumEndpoints(controller: CachedAncillaryDatumController)(using
     ec: ExecutionContext,
     jwtService: JwtService
-) extends Endpoints {
+) extends Endpoints:
 
     private val base = "ancillarydata"
     private val tag  = "Ancillary Data"
@@ -53,8 +53,7 @@ class CachedAncillaryDatumEndpoints(controller: CachedAncillaryDatumController)(
             }
 
     // GET /videoreference/:uuid
-    val findDataByVideoReferenceUuid
-        : Endpoint[Unit, UUID, ErrorMsg, Seq[CachedAncillaryDatumSC], Any] = openEndpoint
+    val findDataByVideoReferenceUuid: Endpoint[Unit, UUID, ErrorMsg, Seq[CachedAncillaryDatumSC], Any] = openEndpoint
         .get
         .in(base / "videoreference" / path[UUID]("videoReferenceUuid"))
         .out(jsonBody[Seq[CachedAncillaryDatumSC]])
@@ -101,8 +100,7 @@ class CachedAncillaryDatumEndpoints(controller: CachedAncillaryDatumController)(
             }
 
     // POST / form or json body
-    val createOneDatum
-        : Endpoint[Option[String], CachedAncillaryDatumSC, ErrorMsg, CachedAncillaryDatumSC, Any] =
+    val createOneDatum: Endpoint[Option[String], CachedAncillaryDatumSC, ErrorMsg, CachedAncillaryDatumSC, Any] =
         secureEndpoint
             .post
             .in(base)
@@ -147,10 +145,9 @@ class CachedAncillaryDatumEndpoints(controller: CachedAncillaryDatumController)(
             }
 
     // PUT /merge/:uuid json body
-    val mergeManyData
-        : Endpoint[Option[String], (UUID, Seq[CachedAncillaryDatumSC], Option[Int]), ErrorMsg, Seq[
-            CachedAncillaryDatumSC
-        ], Any] = secureEndpoint
+    val mergeManyData: Endpoint[Option[String], (UUID, Seq[CachedAncillaryDatumSC], Option[Int]), ErrorMsg, Seq[
+        CachedAncillaryDatumSC
+    ], Any] = secureEndpoint
         .put
         .in(base / "merge" / path[UUID]("videoReferenceUuid"))
         .in(jsonBody[Seq[CachedAncillaryDatumSC]])
@@ -201,14 +198,14 @@ class CachedAncillaryDatumEndpoints(controller: CachedAncillaryDatumController)(
             }
 
     // DELETE /videoreference/:uuid
-    val deleteDataByVideoReferenceUuid
-        : Endpoint[Option[String], UUID, ErrorMsg, CountForVideoReferenceSC, Any] = secureEndpoint
-        .delete
-        .in(base / "videoreference" / path[UUID]("videoReferenceUuid"))
-        .out(jsonBody[CountForVideoReferenceSC])
-        .name("deleteDataByVideoReferenceUuid")
-        .description("Delete ancillary data by video reference UUID")
-        .tag(tag)
+    val deleteDataByVideoReferenceUuid: Endpoint[Option[String], UUID, ErrorMsg, CountForVideoReferenceSC, Any] =
+        secureEndpoint
+            .delete
+            .in(base / "videoreference" / path[UUID]("videoReferenceUuid"))
+            .out(jsonBody[CountForVideoReferenceSC])
+            .name("deleteDataByVideoReferenceUuid")
+            .description("Delete ancillary data by video reference UUID")
+            .tag(tag)
 
     val deleteDataByVideoReferenceUuidImpl: ServerEndpoint[Any, Future] =
         deleteDataByVideoReferenceUuid
@@ -244,4 +241,3 @@ class CachedAncillaryDatumEndpoints(controller: CachedAncillaryDatumController)(
         updateOneDatumImpl,
         createOneDatumImpl
     )
-}

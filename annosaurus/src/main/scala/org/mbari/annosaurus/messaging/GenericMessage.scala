@@ -20,36 +20,35 @@ import org.mbari.annosaurus.domain.Annotation
 import org.mbari.annosaurus.domain.Association
 import org.mbari.annosaurus.etc.circe.CirceCodecs.{*, given}
 
-/** @author
-  *   Brian Schlining
-  * @since 2020-03-04T13:31:00
-  */
-sealed trait GenericMessage[+A] {
+/**
+ * @author
+ *   Brian Schlining
+ * @since 2020-03-04T13:31:00
+ */
+sealed trait GenericMessage[+A]:
     def content: A
     def toJson: String
-}
 
-/** Send when a new annotation is created or an existing one is updated
-  * @param content
-  */
-case class AnnotationMessage(content: Annotation) extends GenericMessage[Annotation] {
+/**
+ * Send when a new annotation is created or an existing one is updated
+ * @param content
+ */
+case class AnnotationMessage(content: Annotation) extends GenericMessage[Annotation]:
 
     override def hashCode(): Int =
         this.content.observationUuid.hashCode() +
             this.content.observationTimestamp.hashCode() * 3
 
     override def equals(obj: Any): Boolean =
-        obj match {
+        obj match
             case that: AnnotationMessage =>
                 this.content.observationUuid == that.content.observationUuid &&
                 this.content.observationTimestamp == that.content.observationTimestamp
             case _                       => false
-        }
 
     override def toJson: String = content.stringify
-}
 
-case class AssociationMessage(content: Association) extends GenericMessage[Association] {
+case class AssociationMessage(content: Association) extends GenericMessage[Association]:
 //  override def hashCode(): Int = this.content.uuid.hashCode()
 //
 //  override def equals(obj: Any): Boolean = obj match {
@@ -57,7 +56,5 @@ case class AssociationMessage(content: Association) extends GenericMessage[Assoc
 //    case _ => false
 //  }
 
-    override def toJson: String = {
+    override def toJson: String =
         content.stringify
-    }
-}

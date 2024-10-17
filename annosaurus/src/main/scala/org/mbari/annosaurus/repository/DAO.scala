@@ -22,15 +22,16 @@ import org.mbari.annosaurus.repository.jpa.entity.IPersistentObject
 import java.util.UUID
 import scala.concurrent.{ExecutionContext, Future}
 
-/** All DAOs should implement this trait as it defines the minimum CRUD methods needed.
-  *
-  * @author
-  *   Brian Schlining
-  * @since 2016-05-05T12:44:00
-  * @tparam A
-  *   The type of the entity
-  */
-trait DAO[A <: IPersistentObject] extends AutoCloseable {
+/**
+ * All DAOs should implement this trait as it defines the minimum CRUD methods needed.
+ *
+ * @author
+ *   Brian Schlining
+ * @since 2016-05-05T12:44:00
+ * @tparam A
+ *   The type of the entity
+ */
+trait DAO[A <: IPersistentObject] extends AutoCloseable:
 
     def newPersistentObject(): A
     def create(entity: A): Unit
@@ -44,5 +45,3 @@ trait DAO[A <: IPersistentObject] extends AutoCloseable {
     def flush(): Unit
     def commit(): Unit
     def isDetached(entity: A): Boolean
-
-}

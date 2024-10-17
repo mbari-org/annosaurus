@@ -19,15 +19,13 @@ package org.mbari.annosaurus.domain
 import java.time.Instant
 
 final case class TimeHistogram(binsMin: Seq[Instant], binsMax: Seq[Instant], values: Seq[Int])
-    extends ToSnakeCase[TimeHistogramSC] {
+    extends ToSnakeCase[TimeHistogramSC]:
     override def toSnakeCase: TimeHistogramSC = TimeHistogramSC(binsMin, binsMax, values)
 
     def count: Int = values.sum
-}
 
 final case class TimeHistogramSC(bins_min: Seq[Instant], bins_max: Seq[Instant], values: Seq[Int])
-    extends ToCamelCase[TimeHistogram] {
+    extends ToCamelCase[TimeHistogram]:
     override def toCamelCase: TimeHistogram = TimeHistogram(bins_min, bins_max, values)
 
     def count: Int = values.sum
-}

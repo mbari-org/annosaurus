@@ -25,7 +25,7 @@ import org.mbari.annosaurus.etc.circe.CirceCodecs.{*, given}
 
 import java.time.Instant
 
-trait AnalysisRepositorySuite extends BaseDAOSuite {
+trait AnalysisRepositorySuite extends BaseDAOSuite:
 
     given JPADAOFactory = daoFactory
 
@@ -60,5 +60,3 @@ trait AnalysisRepositorySuite extends BaseDAOSuite {
 //        println(histogram)
         assertEquals(histogram.count, expected)
     }
-
-}

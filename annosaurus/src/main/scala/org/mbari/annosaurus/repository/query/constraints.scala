@@ -39,12 +39,15 @@ object Query:
 
     def validate(queryRequest: QueryRequest, checkWhere: Boolean = true): Either[Throwable, Query] =
         val query = from(queryRequest)
-        if (checkWhere && query.where.isEmpty) then Left(new IllegalArgumentException("where clause is required"))
-        else if (query.select.isEmpty) then Left(new IllegalArgumentException("select clause is required"))
-        else if (query.strict && (query.concurrentObservations || query.relatedAssociations)) then
-            Left(new IllegalArgumentException("strict mode cannot be used with concurrentObservations or relatedAssociations"))
-        else
-            Right(from(queryRequest))
+        if checkWhere && query.where.isEmpty then Left(new IllegalArgumentException("where clause is required"))
+        else if query.select.isEmpty then Left(new IllegalArgumentException("select clause is required"))
+        else if query.strict && (query.concurrentObservations || query.relatedAssociations) then
+            Left(
+                new IllegalArgumentException(
+                    "strict mode cannot be used with concurrentObservations or relatedAssociations"
+                )
+            )
+        else Right(from(queryRequest))
 
     def from(queryRequest: QueryRequest): Query =
         Query(
@@ -59,8 +62,6 @@ object Query:
             orderby = queryRequest.orderby
         )
 
-
-
 sealed trait Constraint:
     def column: String
     def toPreparedStatementTemplate: String
@@ -70,21 +71,23 @@ sealed trait Constraint:
 
 object Constraint:
 
-    def from (constraintRequest: ConstraintRequest): Constraint =
+    def from(constraintRequest: ConstraintRequest): Constraint =
         constraintRequest match
-            case ConstraintRequest(column, Some(between: Seq[Instant]), _, _, _, _, _, _, _, _) => Date(column, between.head, between(1))
-            case ConstraintRequest(column, _, Some(contains), _, _, _, _, _, _, _) => Contains(column, contains)
-            case ConstraintRequest(column, _, _, Some(equals), _, _, _, _, _, _) => Equals(column, equals)
-            case ConstraintRequest(column, _, _, _,Some(in), _, _, _, _, _) => In(column, in)
-            case ConstraintRequest(column, _, _, _, _, Some(isnull), _, _, _, _) => IsNull(column, isnull)
-            case ConstraintRequest(column, _, _, _, _, _, Some(like), _, _, _) => Like(column, like)
-            case ConstraintRequest(column, _, _, _, _, _, _, Some(max), _, _) => Max(column, max)
-            case ConstraintRequest(column, _, _, _, _, _, _, _, Some(min), _) => Min(column, min)
-            case ConstraintRequest(column, _, _, _, _, _, _, _, _, Some(minmax)) => MinMax(column, minmax.head, minmax(1))
-            case _ => Noop
+            case ConstraintRequest(column, Some(between: Seq[Instant]), _, _, _, _, _, _, _, _) =>
+                Date(column, between.head, between(1))
+            case ConstraintRequest(column, _, Some(contains), _, _, _, _, _, _, _)              => Contains(column, contains)
+            case ConstraintRequest(column, _, _, Some(equals), _, _, _, _, _, _)                => Equals(column, equals)
+            case ConstraintRequest(column, _, _, _, Some(in), _, _, _, _, _)                    => In(column, in)
+            case ConstraintRequest(column, _, _, _, _, Some(isnull), _, _, _, _)                => IsNull(column, isnull)
+            case ConstraintRequest(column, _, _, _, _, _, Some(like), _, _, _)                  => Like(column, like)
+            case ConstraintRequest(column, _, _, _, _, _, _, Some(max), _, _)                   => Max(column, max)
+            case ConstraintRequest(column, _, _, _, _, _, _, _, Some(min), _)                   => Min(column, min)
+            case ConstraintRequest(column, _, _, _, _, _, _, _, _, Some(minmax))                =>
+                MinMax(column, minmax.head, minmax(1))
+            case _                                                                              => Noop
 
     case object Noop extends Constraint:
-        val column: String                                = ""
+        val column: String                                    = ""
         def toPreparedStatementTemplate: String               = ""
         @throws[SQLException]
         def bind(statement: PreparedStatement, idx: Int): Int = idx
@@ -97,8 +100,7 @@ object Constraint:
 
         def toPreparedStatementTemplate: String = s"$column LIKE ?"
 
-    case class Date(column: String, startTimestamp: Instant, endTimestamp: Instant)
-        extends Constraint:
+    case class Date(column: String, startTimestamp: Instant, endTimestamp: Instant) extends Constraint:
         @throws[SQLException]
         def bind(statement: PreparedStatement, idx: Int): Int =
             statement.setObject(idx, startTimestamp)

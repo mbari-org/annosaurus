@@ -45,7 +45,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class ObservationEndpoints(controller: ObservationController, jdbcRepository: JdbcRepository)(using
     ec: ExecutionContext,
     jwtService: JwtService
-) extends Endpoints {
+) extends Endpoints:
 
     private val base = "observations"
     private val tag  = "Observations"
@@ -67,8 +67,7 @@ class ObservationEndpoints(controller: ObservationController, jdbcRepository: Jd
             }
 
     // GET /videoreference/:uuid
-    val findObservationsByVideoReferenceUuid
-        : Endpoint[Unit, (UUID, Paging), ErrorMsg, Seq[ObservationSC], Any] =
+    val findObservationsByVideoReferenceUuid: Endpoint[Unit, (UUID, Paging), ErrorMsg, Seq[ObservationSC], Any] =
         openEndpoint
             .get
             .in(base / "videoreference" / path[UUID]("videoReferenceUuid"))
@@ -237,18 +236,15 @@ class ObservationEndpoints(controller: ObservationController, jdbcRepository: Jd
     val countByVideoReferenceUuidImpl: ServerEndpoint[Any, Future] =
         countByVideoReferenceUuid
             .serverLogic { (uuid, start, end) =>
-                val f = if (start.isDefined && end.isDefined) {
-                    controller.countByVideoReferenceUuidAndTimestamps(uuid, start.get, end.get)
-                }
-                else {
-                    controller.countByVideoReferenceUuid(uuid)
-                }
+                val f =
+                    if start.isDefined && end.isDefined then
+                        controller.countByVideoReferenceUuidAndTimestamps(uuid, start.get, end.get)
+                    else controller.countByVideoReferenceUuid(uuid)
                 handleErrors(f.map(i => CountForVideoReferenceSC(uuid, i)))
             }
 
     // GET/ counts
-    val countAllGroupByVideoReferenceUuid
-        : Endpoint[Unit, Unit, ErrorMsg, Seq[CountForVideoReferenceSC], Any] =
+    val countAllGroupByVideoReferenceUuid: Endpoint[Unit, Unit, ErrorMsg, Seq[CountForVideoReferenceSC], Any] =
         openEndpoint
             .get
             .in(base / "counts")
@@ -292,8 +288,7 @@ class ObservationEndpoints(controller: ObservationController, jdbcRepository: Jd
             }
 
     // PUT /:uuid
-    val updateOneObservation
-        : Endpoint[Option[String], (UUID, ObservationUpdateSC), ErrorMsg, ObservationSC, Any] =
+    val updateOneObservation: Endpoint[Option[String], (UUID, ObservationUpdateSC), ErrorMsg, ObservationSC, Any] =
         secureEndpoint
             .put
             .in(base / path[UUID]("observationUuid"))
@@ -445,4 +440,3 @@ class ObservationEndpoints(controller: ObservationController, jdbcRepository: Jd
         updateOneObservationImpl,
         deleteOneObservationImpl
     )
-}

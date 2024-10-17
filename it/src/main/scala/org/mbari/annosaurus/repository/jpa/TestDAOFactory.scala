@@ -24,14 +24,14 @@ import scala.concurrent.Await
 import scala.concurrent.duration.Duration
 import org.mbari.annosaurus.repository.jpa.EntityManagerFactories
 
-trait TestDAOFactory extends JPADAOFactory {
+trait TestDAOFactory extends JPADAOFactory:
 
     lazy val config: Config = ConfigFactory.load()
 
     def beforeAll(): Unit = ()
     def afterAll(): Unit  = ()
 
-    def cleanup(): Unit = {
+    def cleanup(): Unit =
 
         import scala.concurrent.ExecutionContext.Implicits.global
         val dao = newImagedMomentDAO()
@@ -42,14 +42,11 @@ trait TestDAOFactory extends JPADAOFactory {
         }
         f.onComplete(t => dao.close())
         Await.result(f, Duration(60, TimeUnit.SECONDS))
-    }
 
     def testProps(): Map[String, String]
-}
 
-object TestDAOFactory {
+object TestDAOFactory:
     val TestProperties = EntityManagerFactories.PRODUCTION_PROPS ++ Map(
         "jakarta.persistence.schema-generation.scripts.create-target" -> "target/test-database-create.ddl",
         "jakarta.persistence.schema-generation.scripts.drop-target"   -> "target/test-database-drop.ddl"
     )
-}

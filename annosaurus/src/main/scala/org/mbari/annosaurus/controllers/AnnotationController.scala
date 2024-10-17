@@ -42,14 +42,15 @@ import org.mbari.annosaurus.etc.sdk.Futures.*
 
 import scala.util.chaining.*
 
-/** @author
-  *   Brian Schlining
-  * @since 2016-06-25T20:28:00
-  */
+/**
+ * @author
+ *   Brian Schlining
+ * @since 2016-06-25T20:28:00
+ */
 class AnnotationController(
     val daoFactory: JPADAOFactory,
     bus: Subject[Any] = MessageBus.RxSubject
-) {
+):
 
     private val imagedMomentController = new ImagedMomentController(daoFactory)
     private val annotationPublisher    = new AnnotationPublisher(bus)
@@ -57,28 +58,24 @@ class AnnotationController(
 
     protected def exec[T](
         fn: ObservationDAO[ObservationEntity] => T
-    )(implicit ec: ExecutionContext): Future[T] = {
+    )(implicit ec: ExecutionContext): Future[T] =
         val dao = daoFactory.newObservationDAO()
         val f   = dao.runTransaction(fn)
         f.onComplete(_ => dao.close())
         f
-    }
 
-    def findByUUID(uuid: UUID)(implicit ec: ExecutionContext): Future[Option[Annotation]] = {
+    def findByUUID(uuid: UUID)(implicit ec: ExecutionContext): Future[Option[Annotation]] =
         // val obsDao = daoFactory.newObservationDAO()
         // val f      = obsDao.runTransaction(d => obsDao.findByUUID(uuid))
         // f.onComplete(_ => obsDao.close())
         // f.map(_.map(obs => Annotation.from(obs, true)))
         exec(d => d.findByUUID(uuid).map(Annotation.from(_, true)))
 
-    }
-
-    def countByVideoReferenceUuid(uuid: UUID)(implicit ec: ExecutionContext): Future[Int] = {
+    def countByVideoReferenceUuid(uuid: UUID)(implicit ec: ExecutionContext): Future[Int] =
         val dao = daoFactory.newObservationDAO()
         val f   = dao.runTransaction(d => d.countByVideoReferenceUUID(uuid))
         f.onComplete(_ => dao.close())
         f
-    }
 
     /*
       This searches for the ImagedMoments but returns an MutableAnnotation view. Keep in mind
@@ -92,7 +89,7 @@ class AnnotationController(
         limit: Option[Int] = None,
         offset: Option[Int] = None,
         includedAncillaryData: Boolean = false
-    )(implicit ec: ExecutionContext): Future[Seq[Annotation]] = {
+    )(implicit ec: ExecutionContext): Future[Seq[Annotation]] =
 
         val dao = daoFactory.newObservationDAO()
         val f   =
@@ -104,20 +101,19 @@ class AnnotationController(
         f.onComplete(_ => dao.close())
         f
         // f.map(_.map(obs => Annotation.from(obs, true)).toSeq)
-    }
 
-    /** @param videoReferenceUuid
-      * @param limit
-      * @param offset
-      * @return
-      *   A butple of a closeable, and a stream. When the stream is done being processed invoke the
-      *   closeable
-      */
+    /**
+     * @param videoReferenceUuid
+     * @param limit
+     * @param offset
+     * @return
+     *   A butple of a closeable, and a stream. When the stream is done being processed invoke the closeable
+     */
     def streamByVideoReferenceUUID(
         videoReferenceUuid: UUID,
         limit: Option[Int] = None,
         offset: Option[Int] = None
-    ): (Closeable, java.util.stream.Stream[Annotation]) = {
+    ): (Closeable, java.util.stream.Stream[Annotation]) =
         val dao = daoFactory.newObservationDAO()
         (
             () => dao.close(),
@@ -125,7 +121,6 @@ class AnnotationController(
                 .streamByVideoReferenceUUID(videoReferenceUuid, limit, offset)
                 .map(obs => Annotation.from(obs, true))
         )
-    }
 
     def streamByVideoReferenceUUIDAndTimestamps(
         videoReferenceUuid: UUID,
@@ -133,7 +128,7 @@ class AnnotationController(
         endTimestamp: Instant,
         limit: Option[Int] = None,
         offset: Option[Int] = None
-    ): (Closeable, java.util.stream.Stream[Annotation]) = {
+    ): (Closeable, java.util.stream.Stream[Annotation]) =
 //    val dao = daoFactory.newImagedMomentDAO()
 //    (() => dao.close(),
 //      dao.streamByVideoReferenceUUIDAndTimestamps(videoReferenceUuid, startTimestamp, endTimestamp, limit, offset)
@@ -151,52 +146,47 @@ class AnnotationController(
                 )
                 .map(obs => Annotation.from(obs, true))
         )
-    }
 
     def streamByConcurrentRequest(
         request: ConcurrentRequest,
         limit: Option[Int],
         offset: Option[Int]
-    ): (Closeable, java.util.stream.Stream[Annotation]) = {
+    ): (Closeable, java.util.stream.Stream[Annotation]) =
         val dao = daoFactory.newObservationDAO()
         (
             () => dao.close(),
             dao.streamByConcurrentRequest(request, limit, offset)
                 .map(obs => Annotation.from(obs, true))
         )
-    }
 
     def countByConcurrentRequest(
         request: ConcurrentRequest
-    )(implicit ec: ExecutionContext): Future[Long] = {
+    )(implicit ec: ExecutionContext): Future[Long] =
         def dao = daoFactory.newObservationDAO()
         val f   = dao.runTransaction(d => d.countByConcurrentRequest(request))
         f.onComplete(t => dao.close())
         f
-    }
 
     def streamByMultiRequest(
         request: MultiRequest,
         limit: Option[Int],
         offset: Option[Int]
-    ): (Closeable, java.util.stream.Stream[Annotation]) = {
+    ): (Closeable, java.util.stream.Stream[Annotation]) =
         val dao = daoFactory.newObservationDAO()
         (
             () => dao.close(),
             dao.streamByMultiRequest(request, limit, offset).map(obs => Annotation.from(obs))
         )
-    }
 
-    def countByMultiRequest(request: MultiRequest)(implicit ec: ExecutionContext): Future[Long] = {
+    def countByMultiRequest(request: MultiRequest)(implicit ec: ExecutionContext): Future[Long] =
         def dao = daoFactory.newObservationDAO()
         val f   = dao.runTransaction(d => d.countByMultiRequest(request))
         f.onComplete(t => dao.close())
         f
-    }
 
     def findByImageReferenceUUID(
         imageReferenceUUID: UUID
-    )(implicit ec: ExecutionContext): Future[Iterable[Annotation]] = {
+    )(implicit ec: ExecutionContext): Future[Iterable[Annotation]] =
 
         val imDao = daoFactory.newImagedMomentDAO()
         val f     = imDao.runTransaction(d =>
@@ -206,7 +196,6 @@ class AnnotationController(
         )
         f.onComplete(t => imDao.close())
         f
-    }
 
     def create(
         videoReferenceUUID: UUID,
@@ -219,7 +208,7 @@ class AnnotationController(
         duration: Option[Duration] = None,
         group: Option[String] = None,
         activity: Option[String] = None
-    )(implicit ec: ExecutionContext): Future[Annotation] = {
+    )(implicit ec: ExecutionContext): Future[Annotation] =
         // We need to assign a UUID first so that we can find the correct
         // observation. This is only needed if more than one observation
         // exists at the same timestamp
@@ -245,34 +234,33 @@ class AnnotationController(
                         && a.observationTimestamp.orNull == observationDate
                 ).orNull
             )
-    }
 
     def create(annotation: Annotation)(using ec: ExecutionContext): Future[Seq[Annotation]] =
         val entity = annotation.toEntity
         val dao    = daoFactory.newImagedMomentDAO()
-        val future = dao.runTransaction(d => {
+        val future = dao.runTransaction(d =>
 //            d.create(entity)
 //            Annotation.fromImagedMoment(entity, true)
             val newIm = imagedMomentController.create(d, entity)
             Annotation.fromImagedMoment(newIm, true)
-        })
+        )
         future.onComplete(_ => dao.close())
         future
 
-    /** Bulk create annotations
-      * @param annotations
-      *   THe annotations to create
-      * @return
-      *   The newly created annotations along with any existing ones that share the same
-      *   imagedMoment
-      */
+    /**
+     * Bulk create annotations
+     * @param annotations
+     *   THe annotations to create
+     * @return
+     *   The newly created annotations along with any existing ones that share the same imagedMoment
+     */
     def bulkCreate(
         annotations: Iterable[Annotation]
-    )(using ec: ExecutionContext): Future[Seq[Annotation]] = {
+    )(using ec: ExecutionContext): Future[Seq[Annotation]] =
 
         // short circuit if there ore 0 or 1 annotations
-        if (annotations.isEmpty) return Future.successful(Nil)
-        else if (annotations.size == 1) return create(annotations.head)
+        if annotations.isEmpty then return Future.successful(Nil)
+        else if annotations.size == 1 then return create(annotations.head)
 
         val obsDao          = daoFactory.newObservationDAO()
         val imDao           = daoFactory.newImagedMomentDAO(obsDao)
@@ -292,22 +280,21 @@ class AnnotationController(
             images               <- imageController.bulkCreate(imageCreates)
             persistedAnnotations <-
                 obsDao
-                    .runTransaction(d => {
+                    .runTransaction(d =>
                         for im <- imagedMoments
                         yield
                             val newIm = imagedMomentController.create(d, im)
                             Annotation.fromImagedMoment(newIm, true)
-                    })
+                    )
         yield persistedAnnotations.flatten
 
         future.onComplete(_ => obsDao.close())
         future.foreach(annotationPublisher.publish) // publish new annotations
         future
-    }
 
     def update(observationUuid: UUID, annotation: Annotation)(implicit
         ec: ExecutionContext
-    ): Future[Option[Annotation]] = {
+    ): Future[Option[Annotation]] =
         update(
             observationUuid,
             annotation.videoReferenceUuid,
@@ -321,7 +308,6 @@ class AnnotationController(
             annotation.group,
             annotation.activity
         )
-    }
 
     def update(
         uuid: UUID,
@@ -335,7 +321,7 @@ class AnnotationController(
         duration: Option[Duration] = None,
         group: Option[String] = None,
         activity: Option[String] = None
-    )(implicit ec: ExecutionContext): Future[Option[Annotation]] = {
+    )(implicit ec: ExecutionContext): Future[Option[Annotation]] =
 
         // We have to do this in 2 transactions. The first makes all the changes. The second to
         // retrieve them. We have to do this because we may make a SQL call to move an observaton
@@ -360,21 +346,20 @@ class AnnotationController(
         )
         f.onComplete(_ => dao.close())
 
-        val g = f.flatMap(opt => {
+        val g = f.flatMap(opt =>
             val dao1 = daoFactory.newObservationDAO()
             val ff   = dao1.runTransaction(d => d.findByUUID(uuid).map(Annotation.from(_, true)))
             ff.onComplete(_ => dao1.close())
             ff
-        })
+        )
 
         g.foreach(annotationPublisher.publish)
 
         g
-    }
 
     def bulkUpdate(
         annotations: Iterable[Annotation]
-    )(implicit ec: ExecutionContext): Future[Iterable[Annotation]] = {
+    )(implicit ec: ExecutionContext): Future[Iterable[Annotation]] =
 
         val goodAnnos = annotations.filter(x => x.observationUuid.isDefined)
 
@@ -383,8 +368,8 @@ class AnnotationController(
         // to a new imagedmoment. The enitymanage doesn't see this change and so returns the cached
         // value which may have the wrong time index or videoreference.
         val dao = daoFactory.newObservationDAO()
-        val f   = dao.runTransaction(d => {
-            goodAnnos.flatMap(a => {
+        val f   = dao.runTransaction(d =>
+            goodAnnos.flatMap(a =>
                 _update(
                     d,
                     a.observationUuid.get,
@@ -399,104 +384,92 @@ class AnnotationController(
                     a.group,
                     a.activity
                 )
-            })
-        })
+            )
+        )
 
         // --- After update find all the changes
-        val h = f.flatMap(obs => {
+        val h = f.flatMap(obs =>
             val dao1 = daoFactory.newObservationDAO()
-            val ff   = dao.runTransaction(d =>
-                obs.flatMap(o => d.findByUUID(o.getUuid).map(Annotation.from(_, true)))
-            )
+            val ff   = dao.runTransaction(d => obs.flatMap(o => d.findByUUID(o.getUuid).map(Annotation.from(_, true))))
             ff.onComplete(_ => dao1.close())
             ff
-        })
+        )
         h
-    }
 
     def bulkUpdateRecordedTimestampOnly(
         annotations: Iterable[Annotation]
-    )(implicit ec: ExecutionContext): Future[Iterable[Annotation]] = {
-        if (annotations.isEmpty) Future.successful(Nil)
+    )(implicit ec: ExecutionContext): Future[Iterable[Annotation]] =
+        if annotations.isEmpty then Future.successful(Nil)
         else
             val goodAnnos = annotations.filter(x => x.observationUuid.isDefined)
             val dao       = daoFactory.newObservationDAO()
-            val f         = dao.runTransaction(d => {
-                goodAnnos.flatMap(a => {
-                    _updateRecordedTimestamp(d, a.observationUuid.get, a.recordedTimestamp)
-                })
-            })
+            val f         = dao.runTransaction(d =>
+                goodAnnos.flatMap(a => _updateRecordedTimestamp(d, a.observationUuid.get, a.recordedTimestamp))
+            )
             f.onComplete(_ => dao.close())
             // --- After update find all the changes
-            val g         = f.flatMap(obs => {
+            val g         = f.flatMap(obs =>
                 val dao1 = daoFactory.newObservationDAO()
                 val ff   =
-                    dao1.runTransaction(d =>
-                        obs.flatMap(o => d.findByUUID(o.getUuid).map(Annotation.from(_, true)))
-                    )
+                    dao1.runTransaction(d => obs.flatMap(o => d.findByUUID(o.getUuid).map(Annotation.from(_, true))))
                 ff.onComplete(_ => dao1.close())
                 ff
-            })
+            )
             g
-    }
 
-    /** This is a special method to handle the case where an ImagedMoment's recordedTimestamp needs
-      * to be explicity changed and NOT moved. It is meant for tape annotations where the timecode
-      * is the correct index and the recordedTimestamp may need to be adjusted in-place
-      * @param dao
-      * @param uuid
-      * @param recordedTimestampOpt
-      * @return
-      *   Observations that belong to the imagedmoment that was modified
-      */
+    /**
+     * This is a special method to handle the case where an ImagedMoment's recordedTimestamp needs to be explicity
+     * changed and NOT moved. It is meant for tape annotations where the timecode is the correct index and the
+     * recordedTimestamp may need to be adjusted in-place
+     * @param dao
+     * @param uuid
+     * @param recordedTimestampOpt
+     * @return
+     *   Observations that belong to the imagedmoment that was modified
+     */
     private def _updateRecordedTimestamp(
         dao: DAO[?],
         uuid: UUID,
         recordedTimestampOpt: Option[Instant]
-    ): Seq[ObservationEntity] = {
+    ): Seq[ObservationEntity] =
 
         val obsDao = daoFactory.newObservationDAO(dao)
         obsDao
             .findByUUID(uuid)
-            .map(observation => {
+            .map(observation =>
                 val imagedMoment        = observation.getImagedMoment
                 val timecodeOpt         = Option(imagedMoment.getTimecode)
                 val currentTimestampOpt = Option(imagedMoment.getRecordedTimestamp)
                 // MUST have a timecode!! This method is for tape annotations
-                if (timecodeOpt.isEmpty) Nil
-                else if (recordedTimestampOpt.isEmpty && currentTimestampOpt.isDefined) {
+                if timecodeOpt.isEmpty then Nil
+                else if recordedTimestampOpt.isEmpty && currentTimestampOpt.isDefined then
                     imagedMoment.setRecordedTimestamp(null)
                     imagedMoment.getObservations.asScala.toSeq
-                }
-                else if (
-                    recordedTimestampOpt.isDefined
+                else if recordedTimestampOpt.isDefined
                     && (currentTimestampOpt.isEmpty || currentTimestampOpt.get != recordedTimestampOpt.get)
-                ) {
+                then
                     recordedTimestampOpt.foreach(imagedMoment.setRecordedTimestamp)
                     imagedMoment.getObservations.asScala.toSeq
-                }
                 else Nil
-            })
+            )
             .getOrElse(Nil)
 
-    }
-
-    /** This private method is meant to be wrapped in a transaction, either for a single update or
-      * for bulk updates
-      * @param dao
-      * @param uuid
-      * @param videoReferenceUUID
-      * @param concept
-      * @param observer
-      * @param observationDate
-      * @param timecode
-      * @param elapsedTime
-      * @param recordedDate
-      * @param duration
-      * @param group
-      * @param activity
-      * @return
-      */
+    /**
+     * This private method is meant to be wrapped in a transaction, either for a single update or for bulk updates
+     * @param dao
+     * @param uuid
+     * @param videoReferenceUUID
+     * @param concept
+     * @param observer
+     * @param observationDate
+     * @param timecode
+     * @param elapsedTime
+     * @param recordedDate
+     * @param duration
+     * @param group
+     * @param activity
+     * @return
+     */
     private def _update(
         dao: DAO[?],
         uuid: UUID,
@@ -510,11 +483,11 @@ class AnnotationController(
         duration: Option[Duration] = None,
         group: Option[String] = None,
         activity: Option[String] = None
-    ): Option[ObservationEntity] = {
+    ): Option[ObservationEntity] =
         val obsDao      = daoFactory.newObservationDAO(dao)
         val imDao       = daoFactory.newImagedMomentDAO(dao)
         val observation = obsDao.findByUUID(uuid)
-        observation.map(obs => {
+        observation.map(obs =>
 
             val imagedMoment = obs.getImagedMoment
 
@@ -525,7 +498,7 @@ class AnnotationController(
             val etSame = elapsedTime.contains(imagedMoment.getElapsedTime)
             val rtSame = recordedDate.contains(imagedMoment.getRecordedTimestamp)
 
-            if (!vrSame || !tcSame || !etSame || !rtSame) {
+            if !vrSame || !tcSame || !etSame || !rtSame then
                 val vrUUID = videoReferenceUUID.getOrElse(imagedMoment.getVideoReferenceUuid)
                 val tc     = Option(timecode.getOrElse(imagedMoment.getTimecode))
                 val rd     = Option(recordedDate.getOrElse(imagedMoment.getRecordedTimestamp))
@@ -533,13 +506,10 @@ class AnnotationController(
                 val newIm  =
                     ImagedMomentController.findOrCreateImagedMoment(imDao, vrUUID, tc, rd, et)
                 log.atDebug
-                    .log(() =>
-                        s"Moving observation ${obs.getUuid} to imagedMoment ${newIm.getUuid}"
-                    )
+                    .log(() => s"Moving observation ${obs.getUuid} to imagedMoment ${newIm.getUuid}")
                 imDao.update(imagedMoment)
 //                imagedMoment.removeObservation(obs) // This causes a delete which messes up the transaction as the observation becomes detached
                 newIm.addObservation(obs)
-            }
 
             concept.foreach(obs.setConcept)
             observer.foreach(obs.setObserver)
@@ -550,33 +520,24 @@ class AnnotationController(
 //            obsDao.update(obs)
             dao.flush()
             obs
-        })
-    }
+        )
 
-    def delete(uuid: UUID)(implicit ec: ExecutionContext): Future[Boolean] = {
+    def delete(uuid: UUID)(implicit ec: ExecutionContext): Future[Boolean] =
         val imDao  = daoFactory.newImagedMomentDAO()
         val obsDao = daoFactory.newObservationDAO(imDao)
-        val f      = obsDao.runTransaction(d => {
-            d.findByUUID(uuid) match {
+        val f      = obsDao.runTransaction(d =>
+            d.findByUUID(uuid) match
                 case None    => false
                 case Some(v) =>
                     val imagedMoment = v.getImagedMoment
-                    if (
-                        imagedMoment.getObservations.size == 1 && imagedMoment
+                    if imagedMoment.getObservations.size == 1 && imagedMoment
                             .getImageReferences
                             .isEmpty
-                    ) {
-                        imDao.delete(imagedMoment)
-                    }
-                    else {
+                    then imDao.delete(imagedMoment)
+                    else
                         imagedMoment.removeObservation(v)
 //                        d.delete(v)
-                    }
                     true
-            }
-        })
+        )
         f.onComplete(_ => obsDao.close())
         f
-    }
-
-}

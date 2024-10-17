@@ -29,7 +29,7 @@ import org.mbari.annosaurus.etc.sdk.Reflect
 
 import scala.jdk.CollectionConverters.*
 
-trait ImageReferenceEndpointsSuite extends EndpointsSuite {
+trait ImageReferenceEndpointsSuite extends EndpointsSuite:
 
     given JPADAOFactory          = daoFactory
     private val log              = System.getLogger(getClass.getName)
@@ -61,12 +61,11 @@ trait ImageReferenceEndpointsSuite extends EndpointsSuite {
         runGet(
             endpoints.findImageByUuidImpl,
             s"http://test.com/v1/imagereferences/${imageReference.getUuid}",
-            response => {
+            response =>
                 assertEquals(response.code, StatusCode.Ok)
                 val obtained = checkResponse[ImageReferenceSC](response.body).toCamelCase
                 val expected = ImageReference.from(imageReference, true)
                 assertEquals(obtained, expected)
-            }
         )
     }
 
@@ -124,5 +123,3 @@ trait ImageReferenceEndpointsSuite extends EndpointsSuite {
         )
         assertEquals(obtained, expected)
     }
-
-}

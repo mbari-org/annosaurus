@@ -17,12 +17,7 @@
 package org.mbari.annosaurus.endpoints
 
 import org.mbari.annosaurus.controllers.TestUtils
-import org.mbari.annosaurus.domain.{
-    DepthHistogramSC,
-    QueryConstraints,
-    QueryConstraintsResponseSC,
-    TimeHistogramSC
-}
+import org.mbari.annosaurus.domain.{DepthHistogramSC, QueryConstraints, QueryConstraintsResponseSC, TimeHistogramSC}
 import sttp.tapir.*
 import sttp.client3.*
 import sttp.model.StatusCode
@@ -35,7 +30,7 @@ import org.mbari.annosaurus.etc.circe.CirceCodecs.{*, given}
 import java.time.Instant
 import scala.jdk.CollectionConverters.*
 
-trait AnalysisEndpointsSuite extends EndpointsSuite {
+trait AnalysisEndpointsSuite extends EndpointsSuite:
 
     given JPADAOFactory         = daoFactory
     private lazy val repository = new AnalysisRepository(daoFactory.entityManagerFactory)
@@ -51,13 +46,12 @@ trait AnalysisEndpointsSuite extends EndpointsSuite {
             endpoints.depthHistogramImpl,
             s"http://test.com/v1/histogram/depth",
             qcr.toSnakeCase.stringify,
-            response => {
+            response =>
                 assertEquals(response.code, StatusCode.Ok)
                 val qcResponse =
                     checkResponse[QueryConstraintsResponseSC[DepthHistogramSC]](response.body)
                 val obtained   = qcResponse.content.count
                 assertEquals(obtained, expected)
-            }
         )
     }
 
@@ -71,13 +65,12 @@ trait AnalysisEndpointsSuite extends EndpointsSuite {
             endpoints.depthHistogramImpl,
             s"http://test.com/v1/histogram/depth?size=100",
             qcr.toSnakeCase.stringify,
-            response => {
+            response =>
                 assertEquals(response.code, StatusCode.Ok)
                 val qcResponse =
                     checkResponse[QueryConstraintsResponseSC[DepthHistogramSC]](response.body)
                 val obtained   = qcResponse.content.count
                 assertEquals(obtained, expected)
-            }
         )
     }
 
@@ -104,13 +97,12 @@ trait AnalysisEndpointsSuite extends EndpointsSuite {
             endpoints.timeHistogramImpl,
             s"http://test.com/v1/histogram/time",
             qcr.toSnakeCase.stringify,
-            response => {
+            response =>
                 assertEquals(response.code, StatusCode.Ok)
                 val qcResponse =
                     checkResponse[QueryConstraintsResponseSC[TimeHistogramSC]](response.body)
                 val obtained   = qcResponse.content.count
                 assertEquals(obtained, expected)
-            }
         )
     }
 
@@ -124,14 +116,11 @@ trait AnalysisEndpointsSuite extends EndpointsSuite {
             endpoints.timeHistogramImpl,
             s"http://test.com/v1/histogram/time?size=100",
             qcr.toSnakeCase.stringify,
-            response => {
+            response =>
                 assertEquals(response.code, StatusCode.Ok)
                 val qcResponse =
                     checkResponse[QueryConstraintsResponseSC[TimeHistogramSC]](response.body)
                 val obtained   = qcResponse.content.count
                 assertEquals(obtained, expected)
-            }
         )
     }
-
-}

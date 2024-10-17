@@ -22,20 +22,14 @@ import org.mbari.annosaurus.repository.jpa.JPADAOFactory
 import junit.framework.Test
 
 import scala.jdk.CollectionConverters.*
-import org.mbari.annosaurus.domain.{
-    Annotation,
-    ConcurrentRequest,
-    MultiRequest,
-    ObservationsUpdate,
-    QueryConstraints
-}
+import org.mbari.annosaurus.domain.{Annotation, ConcurrentRequest, MultiRequest, ObservationsUpdate, QueryConstraints}
 
 import java.time.Duration
 import org.mbari.annosaurus.etc.circe.CirceCodecs.{*, given}
 import org.checkerframework.checker.units.qual.A
 import org.mbari.annosaurus.repository.jpa.entity.ObservationEntity
 
-trait JdbcRepositorySuite extends BaseDAOSuite {
+trait JdbcRepositorySuite extends BaseDAOSuite:
 
     given JPADAOFactory = daoFactory
 
@@ -130,26 +124,25 @@ trait JdbcRepositorySuite extends BaseDAOSuite {
         val mr = MultiRequest(Seq(xs.head.getVideoReferenceUuid()))
         val ys = repository.findByMultiRequest(mr, includeAncillaryData = true)
         assertEquals(ys.size, 8)
-        for (y <- ys) {
+        for y <- ys do
             assert(y.ancillaryData.isDefined)
             assertEquals(y.imageReferences.size, 1)
             assertEquals(y.associations.size, 1)
-        }
     }
 
     test("findByQueryConstraint") {
 
         val seed = TestUtils
             .build(50, 1, 1, 1, true)
-            .map(im => {
+            .map(im =>
                 val os = im.getObservations().asScala
-                os.foreach(o => {
+                os.foreach(o =>
                     o.setGroup("group-foo")
                     o.setObserver("observer-foo")
                     o.setActivity("activity-foo")
-                })
+                )
                 im
-            })
+            )
         val xs   = TestUtils.create(seed)
         val ys   = TestUtils.create(50, 1, 1, 1, true)
         val x    = xs.head
@@ -275,11 +268,11 @@ trait JdbcRepositorySuite extends BaseDAOSuite {
         val ts0 = ts.head.minus(Duration.ofSeconds(1))
         val ts1 = ts(2).plus(Duration.ofSeconds(1))
 
-        val expected = xs.filter(im => {
+        val expected = xs.filter(im =>
             val t = im.getRecordedTimestamp()
             im.getVideoReferenceUuid() == x.getVideoReferenceUuid() &&
             t.isAfter(ts0) && t.isBefore(ts1)
-        })
+        )
 
         val obtained =
             repository.findByVideoReferenceUuidAndTimestamps(x.getVideoReferenceUuid(), ts0, ts1)
@@ -340,11 +333,11 @@ trait JdbcRepositorySuite extends BaseDAOSuite {
         val n       = repository.updateObservations(update0)
         assertEquals(n, 0)
 
-        def runUpdate(update: ObservationsUpdate): Unit = {
+        def runUpdate(update: ObservationsUpdate): Unit =
             val n   = repository.updateObservations(update)
             assertEquals(n, xs.size)
             val dao = daoFactory.newObservationDAO()
-            for (uuid <- observationUuids) {
+            for uuid <- observationUuids do
                 val opt = dao.findByUUID(uuid)
                 assert(opt.isDefined)
                 val obs = opt.get
@@ -352,9 +345,7 @@ trait JdbcRepositorySuite extends BaseDAOSuite {
                 update.concept.foreach(c => assertEquals(obs.getConcept, c))
                 update.group.foreach(g => assertEquals(obs.getGroup, g))
                 update.activity.foreach(a => assertEquals(obs.getActivity, a))
-            }
             dao.close()
-        }
 
         val update1 = ObservationsUpdate(observationUuids, concept = Some("concept-foo"))
         runUpdate(update1)
@@ -380,5 +371,3 @@ trait JdbcRepositorySuite extends BaseDAOSuite {
         runUpdate(update5)
 
     }
-
-}

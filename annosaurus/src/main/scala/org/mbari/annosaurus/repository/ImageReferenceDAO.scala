@@ -21,11 +21,12 @@ import org.mbari.annosaurus.repository.jpa.entity.IPersistentObject
 
 import java.net.URL
 
-/** @author
-  *   Brian Schlining
-  * @since 2016-06-17T16:10:00
-  */
-trait ImageReferenceDAO[T <: IPersistentObject] extends DAO[T] {
+/**
+ * @author
+ *   Brian Schlining
+ * @since 2016-06-17T16:10:00
+ */
+trait ImageReferenceDAO[T <: IPersistentObject] extends DAO[T]:
 
     def newPersistentObject(
         url: URL,
@@ -38,5 +39,3 @@ trait ImageReferenceDAO[T <: IPersistentObject] extends DAO[T] {
     def findByURL(url: URL): Option[T]
 
     def findByImageName(name: String): Seq[ImageReferenceEntity]
-
-}

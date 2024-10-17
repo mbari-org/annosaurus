@@ -29,7 +29,7 @@ final case class ConceptAssociation(
     linkValue: String,
     mimeType: String
 ) extends ToSnakeCase[ConceptAssociationSC]
-    with ToEntity[AssociationEntity] {
+    with ToEntity[AssociationEntity]:
     def toSnakeCase: ConceptAssociationSC = ConceptAssociationSC(
         uuid,
         videoReferenceUuid,
@@ -40,15 +40,13 @@ final case class ConceptAssociation(
         mimeType
     )
 
-    override def toEntity: AssociationEntity = {
+    override def toEntity: AssociationEntity =
         val a = AssociationEntity(linkName, toConcept, linkValue, mimeType)
         a.setUuid(uuid)
         a
-    }
-}
 
-object ConceptAssociation extends FromEntity[AssociationEntity, ConceptAssociation] {
-    def from(entity: AssociationEntity, extend: Boolean = false): ConceptAssociation = {
+object ConceptAssociation extends FromEntity[AssociationEntity, ConceptAssociation]:
+    def from(entity: AssociationEntity, extend: Boolean = false): ConceptAssociation =
         ConceptAssociation(
             entity.getUuid,
             entity.getObservation.getImagedMoment.getVideoReferenceUuid,
@@ -58,7 +56,6 @@ object ConceptAssociation extends FromEntity[AssociationEntity, ConceptAssociati
             entity.getLinkValue,
             entity.getMimeType
         )
-    }
 
     def fromDto(dto: ConceptAssociationDTO): ConceptAssociation =
         ConceptAssociation(
@@ -70,7 +67,6 @@ object ConceptAssociation extends FromEntity[AssociationEntity, ConceptAssociati
             dto.linkValue,
             dto.mimeType
         )
-}
 
 final case class ConceptAssociationSC(
     uuid: UUID,
@@ -80,7 +76,7 @@ final case class ConceptAssociationSC(
     to_concept: String,
     link_value: String,
     mime_type: String
-) extends ToCamelCase[ConceptAssociation] {
+) extends ToCamelCase[ConceptAssociation]:
     def toCamelCase: ConceptAssociation = ConceptAssociation(
         uuid,
         video_reference_uuid,
@@ -90,4 +86,3 @@ final case class ConceptAssociationSC(
         link_value,
         mime_type
     )
-}

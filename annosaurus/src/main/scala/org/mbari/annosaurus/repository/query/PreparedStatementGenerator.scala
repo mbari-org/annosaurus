@@ -20,7 +20,7 @@ import org.mbari.annosaurus.etc.jdk.Logging.{*, given}
 
 import java.sql.PreparedStatement
 import scala.util.Try
-object PreparedStatementGenerator {
+object PreparedStatementGenerator:
 
     val IndexTime        = "index_recorded_timestamp"
     val ObservationUuid  = "observation_uuid"
@@ -84,8 +84,7 @@ object PreparedStatementGenerator {
         query: Query
     ): String =
         val wheres = query.where.map(_.toPreparedStatementTemplate).mkString(" AND ")
-        if query.concurrentObservations && query.relatedAssociations then
-            s"""WHERE $ObservationUuid IN (
+        if query.concurrentObservations && query.relatedAssociations then s"""WHERE $ObservationUuid IN (
                |     SELECT $ObservationUuid
                |     FROM $tableName
                |     WHERE $ImagedMomentUuid IN (
@@ -108,4 +107,3 @@ object PreparedStatementGenerator {
                |)
                |""".stripMargin
         else s"""WHERE $wheres"""
-}

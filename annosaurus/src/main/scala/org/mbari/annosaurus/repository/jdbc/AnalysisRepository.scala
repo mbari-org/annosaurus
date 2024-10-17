@@ -21,16 +21,16 @@ import jakarta.persistence.{EntityManager, EntityManagerFactory}
 import org.mbari.annosaurus.domain.{DepthHistogram, TimeHistogram}
 import org.slf4j.LoggerFactory
 
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 import java.time.Instant
 import org.mbari.annosaurus.domain.QueryConstraints
 import org.hibernate.jpa.QueryHints
 
-class AnalysisRepository(entityManagerFactory: EntityManagerFactory) {
+class AnalysisRepository(entityManagerFactory: EntityManagerFactory):
 
     private val log = LoggerFactory.getLogger(getClass)
 
-    def depthHistogram(constraints: QueryConstraints, binSizeMeters: Int = 50): DepthHistogram = {
+    def depthHistogram(constraints: QueryConstraints, binSizeMeters: Int = 50): DepthHistogram =
         val select                       = DepthHistogramSQL.selectFromBinSize(binSizeMeters)
         val entityManager: EntityManager = entityManagerFactory.createEntityManager()
         val transaction                  = entityManager.getTransaction()
@@ -48,9 +48,8 @@ class AnalysisRepository(entityManagerFactory: EntityManagerFactory) {
         val binsMin = (0 until DepthHistogramSQL.MaxDepth by binSizeMeters).toList
         val binsMax = binsMin.map(_ + binSizeMeters)
         DepthHistogram(binsMin, binsMax, values)
-    }
 
-    def timeHistogram(constraints: QueryConstraints, binSizeDays: Int = 30): TimeHistogram = {
+    def timeHistogram(constraints: QueryConstraints, binSizeDays: Int = 30): TimeHistogram =
         val start                        = constraints.minTimestamp.getOrElse(TimeHistogramSQL.MinTime)
         val now                          = constraints.maxTimestamp.getOrElse(Instant.now())
         val select                       = TimeHistogramSQL.selectFromBinSize(start, now, binSizeDays)
@@ -74,7 +73,3 @@ class AnalysisRepository(entityManagerFactory: EntityManagerFactory) {
             .map(_.plusMillis(intervalMillis))
 
         TimeHistogram(binsMin, binsMax, values)
-
-    }
-
-}

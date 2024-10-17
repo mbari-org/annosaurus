@@ -20,7 +20,7 @@ import org.mbari.annosaurus.DatabaseConfig
 import org.mbari.annosaurus.domain.{Count, QueryRequest}
 import org.mbari.annosaurus.repository.query.{JDBC, Query, QueryResults, QueryService}
 
-class QueryController(databaseConfig: DatabaseConfig, viewName: String) {
+class QueryController(databaseConfig: DatabaseConfig, viewName: String):
 
     private lazy val queryService = new QueryService(databaseConfig, viewName)
 
@@ -32,11 +32,9 @@ class QueryController(databaseConfig: DatabaseConfig, viewName: String) {
 
     def query(queryRequest: QueryRequest): Either[Throwable, QueryResults] =
         for
-            query <- Query.validate(queryRequest)
+            query   <- Query.validate(queryRequest)
             results <- queryService.query(query)
         yield results
 
     def listColumns(): Either[Throwable, Seq[JDBC.Metadata]] =
         queryService.jdbc.listColumnsMetadata(viewName)
-
-}

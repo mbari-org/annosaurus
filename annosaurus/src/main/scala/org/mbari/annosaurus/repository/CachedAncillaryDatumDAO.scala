@@ -19,11 +19,12 @@ package org.mbari.annosaurus.repository
 import java.util.UUID
 import org.mbari.annosaurus.repository.jpa.entity.{AncillaryDatumDTO, IPersistentObject}
 
-/** @author
-  *   Brian Schlining
-  * @since 2016-06-17T16:08:00
-  */
-trait CachedAncillaryDatumDAO[T <: IPersistentObject] extends DAO[T] {
+/**
+ * @author
+ *   Brian Schlining
+ * @since 2016-06-17T16:08:00
+ */
+trait CachedAncillaryDatumDAO[T <: IPersistentObject] extends DAO[T]:
 
     def newPersistentObject(
         latitude: Double,
@@ -53,12 +54,11 @@ trait CachedAncillaryDatumDAO[T <: IPersistentObject] extends DAO[T] {
 
     def newPersistentObject(bean: T): T
 
-    /** Delete all ancillary data associated with annotations for a given video reference
-      * @param videoReferenceUuid
-      *   the VideoReference UUID
-      * @return
-      *   The number of rows deleted
-      */
+    /**
+     * Delete all ancillary data associated with annotations for a given video reference
+     * @param videoReferenceUuid
+     *   the VideoReference UUID
+     * @return
+     *   The number of rows deleted
+     */
     def deleteByVideoReferenceUuid(videoReferenceUuid: UUID): Int
-
-}

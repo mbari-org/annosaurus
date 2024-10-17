@@ -34,9 +34,9 @@ case class ImageUpdateSC(
     description: Option[String] = None
 )
 
-object ImageUpdateSC extends FromEntity[ImageReferenceEntity, ImageUpdateSC] {
+object ImageUpdateSC extends FromEntity[ImageReferenceEntity, ImageUpdateSC]:
 
-    override def from(entity: ImageReferenceEntity, extend: Boolean = false): ImageUpdateSC = {
+    override def from(entity: ImageReferenceEntity, extend: Boolean = false): ImageUpdateSC =
         val im = entity.getImagedMoment
         ImageUpdateSC(
             video_reference_uuid = Option(im.getVideoReferenceUuid),
@@ -49,5 +49,3 @@ object ImageUpdateSC extends FromEntity[ImageReferenceEntity, ImageUpdateSC] {
             height_pixels = Option(entity.getHeight),
             description = Option(entity.getDescription)
         )
-    }
-}

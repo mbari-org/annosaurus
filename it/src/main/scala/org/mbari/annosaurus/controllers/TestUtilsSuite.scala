@@ -24,7 +24,7 @@ import scala.concurrent.{Await, ExecutionContext}
 import scala.jdk.CollectionConverters.*
 import org.mbari.annosaurus.repository.jpa.BaseDAOSuite
 
-trait TestUtilsSuite extends BaseDAOSuite {
+trait TestUtilsSuite extends BaseDAOSuite:
 
     val timeout = scala.concurrent.duration.Duration(10, TimeUnit.SECONDS)
 
@@ -87,5 +87,3 @@ trait TestUtilsSuite extends BaseDAOSuite {
         dao.close()
 
     }
-
-}

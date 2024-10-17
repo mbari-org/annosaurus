@@ -28,7 +28,7 @@ import org.mbari.annosaurus.AssertUtils
 import scala.jdk.CollectionConverters.*
 import org.mbari.annosaurus.domain.WindowRequest
 
-trait ImagedMomentDAOSuite extends BaseDAOSuite {
+trait ImagedMomentDAOSuite extends BaseDAOSuite:
 
     given JPADAOFactory = daoFactory
 
@@ -89,12 +89,11 @@ trait ImagedMomentDAOSuite extends BaseDAOSuite {
         given dao: ImagedMomentDAOImpl = daoFactory.newImagedMomentDAO()
         val opt0                       = run(() => dao.findByUUID(im0.getUuid()))
         assert(opt0.isDefined)
-        run(() => {
-            dao.findByUUID(im0.getUuid()) match {
+        run(() =>
+            dao.findByUUID(im0.getUuid()) match
                 case Some(x) => dao.delete(x)
                 case None    => fail("Could not find imaged moment")
-            }
-        })
+        )
         val opt1                       = run(() => dao.findByUUID(im0.getUuid()))
         assert(opt1.isEmpty)
     }
@@ -302,9 +301,7 @@ trait ImagedMomentDAOSuite extends BaseDAOSuite {
         val xs                         = TestUtils.create(1)
         given dao: ImagedMomentDAOImpl = daoFactory.newImagedMomentDAO()
         val t                          = xs.head.getRecordedTimestamp()
-        val opt                        = run(() =>
-            dao.findByVideoReferenceUUIDAndRecordedDate(xs.head.getVideoReferenceUuid(), t)
-        )
+        val opt                        = run(() => dao.findByVideoReferenceUUIDAndRecordedDate(xs.head.getVideoReferenceUuid(), t))
         assert(opt.isDefined)
         AssertUtils.assertSameImagedMoment(opt.get, xs.head)
     }
@@ -313,9 +310,7 @@ trait ImagedMomentDAOSuite extends BaseDAOSuite {
         val xs                         = TestUtils.create(1)
         given dao: ImagedMomentDAOImpl = daoFactory.newImagedMomentDAO()
         val t                          = xs.head.getElapsedTime()
-        val opt                        = run(() =>
-            dao.findByVideoReferenceUUIDAndElapsedTime(xs.head.getVideoReferenceUuid(), t)
-        )
+        val opt                        = run(() => dao.findByVideoReferenceUUIDAndElapsedTime(xs.head.getVideoReferenceUuid(), t))
         assert(opt.isDefined)
         AssertUtils.assertSameImagedMoment(opt.get, xs.head)
     }
@@ -339,9 +334,7 @@ trait ImagedMomentDAOSuite extends BaseDAOSuite {
         run(() => dao.update(im0))
 
         val timecode = im0.getTimecode()
-        val im1      = run(() =>
-            dao.findByVideoReferenceUUIDAndIndex(im0.getVideoReferenceUuid(), Some(timecode))
-        )
+        val im1      = run(() => dao.findByVideoReferenceUUIDAndIndex(im0.getVideoReferenceUuid(), Some(timecode)))
         assert(im1.isDefined)
         AssertUtils.assertSameImagedMoment(im1.get, im0)
 
@@ -440,5 +433,3 @@ trait ImagedMomentDAOSuite extends BaseDAOSuite {
         val im4 = run(() => dao.findByUUID(im3.getUuid()))
         assert(im4.isEmpty)
     }
-
-}

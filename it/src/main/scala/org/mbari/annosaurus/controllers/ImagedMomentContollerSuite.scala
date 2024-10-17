@@ -36,7 +36,7 @@ import org.mbari.annosaurus.repository.jpa.entity.ImagedMomentEntity
 import java.net.URI
 import scala.util.Random
 
-trait ImagedMomentContollerSuite extends BaseDAOSuite {
+trait ImagedMomentContollerSuite extends BaseDAOSuite:
 
     given JPADAOFactory    = daoFactory
     given ExecutionContext = ExecutionContext.global
@@ -303,7 +303,7 @@ trait ImagedMomentContollerSuite extends BaseDAOSuite {
         val videoReferenceUuid = UUID.randomUUID()
         val url                = URI.create("http://www.mbari.org/foo/image.png").toURL
         intercept[Exception] {
-            for (i <- 0 until 2) {
+            for i <- 0 until 2 do
                 val source         = new ImagedMomentEntity(
                     videoReferenceUuid,
                     Instant.now().plus(Duration.ofSeconds(Random.nextInt())),
@@ -314,7 +314,6 @@ trait ImagedMomentContollerSuite extends BaseDAOSuite {
                 imageReference.setUrl(url)
                 source.addImageReference(imageReference)
                 exec(controller.create(Seq(source)))
-            }
         }
     }
 
@@ -416,5 +415,3 @@ trait ImagedMomentContollerSuite extends BaseDAOSuite {
         val im2 = run(() => ImagedMomentController.findOrCreateImagedMoment(dao, im0))
         AssertUtils.assertSameImagedMoment(im2, im1)
     }
-
-}

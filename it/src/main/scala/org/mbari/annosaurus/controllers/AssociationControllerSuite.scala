@@ -27,7 +27,7 @@ import junit.framework.Test
 import org.mbari.annosaurus.repository.jpa.AssociationDAOImpl
 import org.mbari.annosaurus.domain.ConceptAssociationRequest
 
-trait AssociationControllerSuite extends BaseDAOSuite {
+trait AssociationControllerSuite extends BaseDAOSuite:
 
     implicit val df: JPADAOFactory = daoFactory
 //    override implicit val ec: ExecutionContext = ExecutionContext.global
@@ -237,4 +237,3 @@ trait AssociationControllerSuite extends BaseDAOSuite {
         val ass0      = opt.get
         assertEquals(ass0.toConcept, toConcept)
     }
-}

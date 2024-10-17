@@ -32,7 +32,7 @@ case class ImageReference(
     lastUpdated: Option[java.time.Instant] = None,
     imagedMomentUuid: Option[UUID] = None
 ) extends ToSnakeCase[ImageReferenceSC]
-    with ToEntity[ImageReferenceEntity] {
+    with ToEntity[ImageReferenceEntity]:
 
     def removeForeignKeys(): ImageReference =
         copy(imagedMomentUuid = None, lastUpdated = None)
@@ -58,9 +58,8 @@ case class ImageReference(
         description.foreach(entity.setDescription)
         uuid.foreach(entity.setUuid)
         entity
-}
 
-object ImageReference extends FromEntity[ImageReferenceEntity, ImageReference] {
+object ImageReference extends FromEntity[ImageReferenceEntity, ImageReference]:
     override def from(entity: ImageReferenceEntity, extend: Boolean = false): ImageReference =
         val opt = if extend then entity.getImagedMoment.primaryKey else None
         ImageReference(
@@ -73,7 +72,6 @@ object ImageReference extends FromEntity[ImageReferenceEntity, ImageReference] {
             entity.lastUpdated,
             opt
         )
-}
 
 case class ImageReferenceSC(
     url: URL,
@@ -84,7 +82,7 @@ case class ImageReferenceSC(
     uuid: Option[UUID] = None,
     last_updated_time: Option[java.time.Instant] = None,
     imaged_moment_uuid: Option[UUID] = None
-) extends ToCamelCase[ImageReference] {
+) extends ToCamelCase[ImageReference]:
     override def toCamelCase: ImageReference =
         ImageReference(
             url,
@@ -96,4 +94,3 @@ case class ImageReferenceSC(
             last_updated_time,
             imaged_moment_uuid
         )
-}

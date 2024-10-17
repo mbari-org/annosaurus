@@ -21,7 +21,7 @@ import org.mbari.annosaurus.repository.jpa.{BaseDAOSuite, JPADAOFactory}
 
 import java.time.{Duration, Instant}
 
-trait IndexControllerSuite extends BaseDAOSuite {
+trait IndexControllerSuite extends BaseDAOSuite:
 
     given JPADAOFactory         = daoFactory
     private lazy val controller = new IndexController(daoFactory)
@@ -87,5 +87,3 @@ trait IndexControllerSuite extends BaseDAOSuite {
         assertEquals(obtained.recordedTimestamp.orNull, im.getRecordedTimestamp)
 
     }
-
-}

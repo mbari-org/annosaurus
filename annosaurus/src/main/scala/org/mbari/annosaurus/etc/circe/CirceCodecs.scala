@@ -21,13 +21,13 @@ import io.circe.generic.semiauto.*
 import io.circe.syntax.*
 import org.mbari.annosaurus.util.HexUtil
 import org.mbari.annosaurus.domain.*
-import org.mbari.annosaurus.repository.query.{Constraint, Query, JDBC}
+import org.mbari.annosaurus.repository.query.{Constraint, JDBC, Query}
 
 import java.net.{URI, URL}
 import java.time.Instant
 import scala.util.Try
 
-object CirceCodecs {
+object CirceCodecs:
     given Encoder[Array[Byte]] = (xs: Array[Byte]) => Json.fromString(HexUtil.toHex(xs))
     given Decoder[Array[Byte]] = Decoder
         .decodeString
@@ -332,12 +332,12 @@ object CirceCodecs {
         observationsUpdateCcDecoder or observationsUpdateScDecoder.map(_.toCamelCase)
 
     // Custom Decoder for Constraint
-    given constraintDecoder: Decoder[Constraint] = (c: HCursor) => {
-        for {
+    given constraintDecoder: Decoder[Constraint] = (c: HCursor) =>
+        for
             columnName <- c.downField("column").as[String]
             // Determine which constraint key is present
-            constraint <- {
-                if (c.downField("between").succeeded) {
+            constraint <-
+                if c.downField("between").succeeded then
                     // Attempt to decode between as List[Int] first
                     c.downField("between")
                         .as[List[Double]]
@@ -348,51 +348,37 @@ object CirceCodecs {
                                 .as[List[Instant]]
                                 .map(xs => Constraint.Date(columnName, xs.head, xs.last))
                         }
-                }
-                else if (c.downField("contains").succeeded) {
+                else if c.downField("contains").succeeded then
                     c.downField("contains").as[String].map(Constraint.Contains(columnName, _))
-                }
-                else if (c.downField("equals").succeeded) {
+                else if c.downField("equals").succeeded then
                     c.downField("equals").as[String].map(Constraint.Equals(columnName, _))
-                }
-                else if (c.downField("in").succeeded) {
+                else if c.downField("in").succeeded then
                     c.downField("in").as[List[String]].map(Constraint.In(columnName, _))
-                }
-                else if (c.downField("isnull").succeeded) {
+                else if c.downField("isnull").succeeded then
                     c.downField("isnull").as[Boolean].map(Constraint.IsNull(columnName, _))
-                }
-                else if (c.downField("like").succeeded) {
+                else if c.downField("like").succeeded then
                     c.downField("like").as[String].map(Constraint.Like(columnName, _))
-                }
-                else if (c.downField("max").succeeded) {
+                else if c.downField("max").succeeded then
                     c.downField("max").as[Double].map(Constraint.Max(columnName, _))
-                }
-                else if (c.downField("min").succeeded) {
+                else if c.downField("min").succeeded then
                     c.downField("min").as[Double].map(Constraint.Min(columnName, _))
-                }
-
-                else if (c.downField("minmax").succeeded) {
+                else if c.downField("minmax").succeeded then
                     c.downField("minmax")
                         .as[List[Double]]
                         .map(xs => Constraint.MinMax(columnName, xs.head, xs.last))
-                }
-                else {
-                    Left(DecodingFailure("Unknown constraint type", c.history))
-                }
-            }
-        } yield constraint
-    }
+                else Left(DecodingFailure("Unknown constraint type", c.history))
+        yield constraint
 
-    given Encoder[Constraint.Date]       = deriveEncoder
-    given Encoder[Constraint.Contains]   = deriveEncoder
-    given Encoder[Constraint.Equals[String]]     = deriveEncoder
-    given Encoder[Constraint.In[String]] = deriveEncoder
-    given Encoder[Constraint.IsNull]     = deriveEncoder
-    given Encoder[Constraint.Like]       = deriveEncoder
-    given Encoder[Constraint.Max]        = deriveEncoder
-    given Encoder[Constraint.MinMax]     = deriveEncoder
-    given Encoder[Constraint.Min]        = deriveEncoder
-    given Encoder[List[Constraint]]      = deriveEncoder
+    given Encoder[Constraint.Date]           = deriveEncoder
+    given Encoder[Constraint.Contains]       = deriveEncoder
+    given Encoder[Constraint.Equals[String]] = deriveEncoder
+    given Encoder[Constraint.In[String]]     = deriveEncoder
+    given Encoder[Constraint.IsNull]         = deriveEncoder
+    given Encoder[Constraint.Like]           = deriveEncoder
+    given Encoder[Constraint.Max]            = deriveEncoder
+    given Encoder[Constraint.MinMax]         = deriveEncoder
+    given Encoder[Constraint.Min]            = deriveEncoder
+    given Encoder[List[Constraint]]          = deriveEncoder
 
     // THis is needed to handle the trait Constraint used in Constraints
     given constraintEncoder: Encoder[Constraint] = Encoder.instance[Constraint] {
@@ -410,10 +396,10 @@ object CirceCodecs {
 
     given constraintRequestDecoder: Decoder[ConstraintRequest] = deriveDecoder
     given constraintRequestEncoder: Encoder[ConstraintRequest] = deriveEncoder
-    given queryRequestDecoder: Decoder[QueryRequest]  = deriveDecoder
-    given queryRequestEncoder: Encoder[QueryRequest]  = deriveEncoder
-    given jdbcMetadataDecoder: Decoder[JDBC.Metadata] = deriveDecoder
-    given jdbcMetadataEncoder: Encoder[JDBC.Metadata] = deriveEncoder
+    given queryRequestDecoder: Decoder[QueryRequest]           = deriveDecoder
+    given queryRequestEncoder: Encoder[QueryRequest]           = deriveEncoder
+    given jdbcMetadataDecoder: Decoder[JDBC.Metadata]          = deriveDecoder
+    given jdbcMetadataEncoder: Encoder[JDBC.Metadata]          = deriveEncoder
 
     val CustomPrinter: Printer = Printer(
         dropNullValues = true,
@@ -423,26 +409,27 @@ object CirceCodecs {
 //    @deprecated("Use stringify[T: Encoder] instead", "2021-11-23T11:00:00")
 //    def print[T: Encoder](t: T): String = CustomPrinter.print(t.asJson)
 
-    /** Convert a circe Json object to a JSON string
-      *
-      * @param value
-      *   Any value with an implicit circe coder in scope
-      */
+    /**
+     * Convert a circe Json object to a JSON string
+     *
+     * @param value
+     *   Any value with an implicit circe coder in scope
+     */
     extension (json: Json) def stringify: String = CustomPrinter.print(json)
 
-    /** Convert an object to a JSON string
-      *
-      * @param value
-      *   Any value with an implicit circe coder in scope
-      */
+    /**
+     * Convert an object to a JSON string
+     *
+     * @param value
+     *   Any value with an implicit circe coder in scope
+     */
     extension [T: Encoder](value: T)
         def stringify: String = Encoder[T]
             .apply(value)
             .deepDropNullValues
             .stringify
 
-    extension [T: Decoder](jsonString: String)
-        def toJson: Either[ParsingFailure, Json] = parser.parse(jsonString);
+    extension [T: Decoder](jsonString: String) def toJson: Either[ParsingFailure, Json] = parser.parse(jsonString);
 
     extension (jsonString: String)
         def reify[T: Decoder]: Either[Error, T] =
@@ -450,5 +437,3 @@ object CirceCodecs {
                 json   <- jsonString.toJson
                 result <- Decoder[T].apply(json.hcursor)
             yield result
-
-}

@@ -16,8 +16,6 @@
 
 package org.mbari.annosaurus.domain
 
-trait ToSnakeCase[A] {
+trait ToSnakeCase[A]:
 
     def toSnakeCase: A
-
-}

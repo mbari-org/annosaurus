@@ -23,13 +23,12 @@ import org.mbari.annosaurus.repository.IndexDAO
 import org.mbari.annosaurus.repository.jpa.entity.IndexEntity
 import org.mbari.annosaurus.repository.jpa.entity.ImagedMomentEntity
 
-/** @author
-  *   Brian Schlining
-  * @since 2019-02-08T08:55:00
-  */
-class IndexDAOImpl(entityManager: EntityManager)
-    extends BaseDAO[IndexEntity](entityManager)
-    with IndexDAO[IndexEntity] {
+/**
+ * @author
+ *   Brian Schlining
+ * @since 2019-02-08T08:55:00
+ */
+class IndexDAOImpl(entityManager: EntityManager) extends BaseDAO[IndexEntity](entityManager) with IndexDAO[IndexEntity]:
 
     def newPersistentObject(): IndexEntity = new IndexEntity
 
@@ -58,4 +57,3 @@ class IndexDAOImpl(entityManager: EntityManager)
     override def create(entity: IndexEntity): Unit = ???
 
     override def delete(entity: IndexEntity): Unit = ???
-}

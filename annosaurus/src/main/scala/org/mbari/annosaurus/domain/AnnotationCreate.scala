@@ -32,9 +32,9 @@ case class AnnotationCreate(
     observer: Option[String] = None,
     recordedTimestamp: Option[Instant] = None,
     timecode: Option[String] = None
-) extends ToSnakeCase[AnnotationCreateSC] {
+) extends ToSnakeCase[AnnotationCreateSC]:
 
-    def toAnnotation: Annotation = {
+    def toAnnotation: Annotation =
         Annotation(
             activity = activity,
             concept = Some(concept),
@@ -49,9 +49,8 @@ case class AnnotationCreate(
             timecode = timecode,
             videoReferenceUuid = Some(videoReferenceUuid)
         )
-    }
 
-    def toSnakeCase: AnnotationCreateSC = {
+    def toSnakeCase: AnnotationCreateSC =
         AnnotationCreateSC(
             activity = activity,
             concept = concept,
@@ -66,12 +65,9 @@ case class AnnotationCreate(
             timecode = timecode,
             video_reference_uuid = videoReferenceUuid
         )
-    }
 
-}
-
-object AnnotationCreate {
-    def fromAnnotation(a: Annotation): AnnotationCreate = {
+object AnnotationCreate:
+    def fromAnnotation(a: Annotation): AnnotationCreate =
         // TODO - hack. Forcing get on concept and videoReferenceUuid
         AnnotationCreate(
             activity = a.activity,
@@ -87,8 +83,6 @@ object AnnotationCreate {
             timecode = a.timecode,
             videoReferenceUuid = a.videoReferenceUuid.get
         )
-    }
-}
 
 case class AnnotationCreateSC(
     video_reference_uuid: UUID,
@@ -103,9 +97,9 @@ case class AnnotationCreateSC(
     observer: Option[String] = None,
     recorded_timestamp: Option[Instant] = None,
     timecode: Option[String] = None
-) extends ToCamelCase[AnnotationCreate] {
+) extends ToCamelCase[AnnotationCreate]:
 
-    def toCamelCase: AnnotationCreate = {
+    def toCamelCase: AnnotationCreate =
         AnnotationCreate(
             activity = activity,
             concept = concept,
@@ -120,5 +114,3 @@ case class AnnotationCreateSC(
             timecode = timecode,
             videoReferenceUuid = video_reference_uuid
         )
-    }
-}

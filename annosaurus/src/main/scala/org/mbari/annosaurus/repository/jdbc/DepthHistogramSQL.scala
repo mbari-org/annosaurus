@@ -16,19 +16,15 @@
 
 package org.mbari.annosaurus.repository.jdbc
 
-object DepthHistogramSQL {
+object DepthHistogramSQL:
 
     val MaxDepth: Int = 4000
 
-    def selectFromBinSize(binSizeMeters: Int = 50): String = {
-        val xs = for (i <- 0 until MaxDepth by binSizeMeters) yield {
+    def selectFromBinSize(binSizeMeters: Int = 50): String =
+        val xs = for (i <- 0 until MaxDepth by binSizeMeters) yield
             val j = i + binSizeMeters
             s"COUNT(CASE WHEN ad.depth_meters >= $i AND ad.depth_meters < $j THEN 1 END) AS \"$i-$j\""
-        }
 
         s"""SELECT
        |  ${xs.mkString(",\n  ")}
        |""".stripMargin
-    }
-
-}

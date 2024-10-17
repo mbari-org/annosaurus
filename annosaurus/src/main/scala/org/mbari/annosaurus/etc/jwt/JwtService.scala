@@ -22,7 +22,7 @@ import java.time.Instant
 import java.time.temporal.ChronoUnit
 import java.util.Date
 
-case class JwtService(issuer: String, apiKey: String, signingSecret: String) {
+case class JwtService(issuer: String, apiKey: String, signingSecret: String):
 
     private val algorithm = Algorithm.HMAC512(signingSecret)
 
@@ -32,16 +32,13 @@ case class JwtService(issuer: String, apiKey: String, signingSecret: String) {
         .build()
 
     def verify(jwt: String): Boolean =
-        try {
+        try
             verifier.verify(jwt)
             true
-        }
-        catch {
-            case e: Exception => false
-        }
+        catch case e: Exception => false
 
     def authorize(providedApiKey: String): Option[String] =
-        if (providedApiKey == apiKey) {
+        if providedApiKey == apiKey then
             val now      = Instant.now()
             val tomorrow = now.plus(1, ChronoUnit.DAYS)
             val iat      = Date.from(now)
@@ -54,6 +51,4 @@ case class JwtService(issuer: String, apiKey: String, signingSecret: String) {
                 .withExpiresAt(exp)
                 .sign(algorithm)
             Some(jwt)
-        }
         else None
-}

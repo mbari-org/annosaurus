@@ -23,7 +23,7 @@ import java.sql.Timestamp
 import org.mbari.vcr4j.time.Timecode
 import java.net.URI
 
-object ImagedMomentSQL {
+object ImagedMomentSQL:
 
     /** recorded_timestamp is used for sorting, but not returned in the result set */
     val SELECT_UUID: String = "SELECT DISTINCT im.uuid, im.recorded_timestamp "
@@ -70,10 +70,9 @@ object ImagedMomentSQL {
     val deleteByVideoReferenceUuid: String =
         "DELETE FROM imaged_moments WHERE video_reference_uuid = ?"
 
-    def resultListToImages(rows: List[?]): Seq[Image] = {
-        for {
-            row <- rows
-        } yield {
+    def resultListToImages(rows: List[?]): Seq[Image] =
+        for row <- rows
+        yield
             val xs = row.asInstanceOf[Array[Object]]
             Image(
                 imagedMomentUuid = xs(0).asUUID.orNull,
@@ -88,8 +87,3 @@ object ImagedMomentSQL {
                 url = xs(9).asUrl,
                 imageReferenceUuid = xs(10).asUUID.orNull
             )
-
-        }
-    }
-
-}

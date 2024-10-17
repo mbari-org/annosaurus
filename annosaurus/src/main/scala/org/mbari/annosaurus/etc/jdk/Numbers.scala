@@ -18,7 +18,7 @@ package org.mbari.annosaurus.etc.jdk
 
 import scala.util.Try
 
-object Numbers {
+object Numbers:
 
     extension (obj: Object | Number)
         def asDouble: Option[Double] = Numbers.doubleConverter(obj)
@@ -57,5 +57,3 @@ object Numbers {
             case n: Number => Some(n.intValue())
             case s: String => Try(s.toInt).toOption
             case _         => None
-
-}

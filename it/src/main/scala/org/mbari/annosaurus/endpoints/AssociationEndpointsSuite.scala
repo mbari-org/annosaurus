@@ -39,7 +39,7 @@ import org.mbari.annosaurus.etc.sdk.Reflect
 import scala.jdk.CollectionConverters.*
 import scala.util.Random
 
-trait AssociationEndpointsSuite extends EndpointsSuite {
+trait AssociationEndpointsSuite extends EndpointsSuite:
 
     private val log              = System.getLogger(getClass.getName)
     given JPADAOFactory          = daoFactory
@@ -53,12 +53,11 @@ trait AssociationEndpointsSuite extends EndpointsSuite {
         runGet(
             endpoints.findAssociationByUuidImpl,
             s"/v1/associations/${a.getUuid}",
-            response => {
+            response =>
                 assertEquals(response.code, StatusCode.Ok)
                 val obtained = checkResponse[AssociationSC](response.body)
                 val expected = Association.from(a, true).toSnakeCase
                 assertEquals(obtained, expected)
-            }
         )
     }
 
@@ -69,7 +68,7 @@ trait AssociationEndpointsSuite extends EndpointsSuite {
         runGet(
             endpoints.findAssociationsByVideoReferenceUuidAndLinkNameImpl,
             s"/v1/associations/${im.getVideoReferenceUuid}/${a.getLinkName}",
-            response => {
+            response =>
                 assertEquals(response.code, StatusCode.Ok)
                 val xs       = checkResponse[Seq[AssociationSC]](response.body)
                 assertEquals(xs.size, 1)
@@ -83,7 +82,6 @@ trait AssociationEndpointsSuite extends EndpointsSuite {
                     )
                     .toSnakeCase
                 assertEquals(obtained, expected)
-            }
         )
     }
 
@@ -97,7 +95,7 @@ trait AssociationEndpointsSuite extends EndpointsSuite {
         runGet(
             endpoints.findAssociationsByVideoReferenceUuidAndLinkNameImpl,
             s"/v1/associations/${im.getVideoReferenceUuid}/${a.getLinkName}?concept=${obs.getConcept}",
-            response => {
+            response =>
                 assertEquals(response.code, StatusCode.Ok)
                 val xs       = checkResponse[Seq[AssociationSC]](response.body)
                 assertEquals(xs.size, 1)
@@ -111,18 +109,16 @@ trait AssociationEndpointsSuite extends EndpointsSuite {
                     )
                     .toSnakeCase
                 assertEquals(obtained, expected)
-            }
         )
 
         // should return 0
         runGet(
             endpoints.findAssociationsByVideoReferenceUuidAndLinkNameImpl,
             s"/v1/associations/${im.getVideoReferenceUuid}/${a.getLinkName}?concept=robocop",
-            response => {
+            response =>
                 assertEquals(response.code, StatusCode.Ok)
                 val xs = checkResponse[Seq[AssociationSC]](response.body)
                 assertEquals(xs.size, 0)
-            }
         )
     }
 
@@ -535,14 +531,11 @@ trait AssociationEndpointsSuite extends EndpointsSuite {
             endpoints.findAssociationsByConceptAssociationRequestImpl,
             s"/v1/associations/conceptassociations",
             car.stringify,
-            response => {
+            response =>
                 assertEquals(response.code, StatusCode.Ok)
                 val obtained = checkResponse[ConceptAssociationResponseSC](response.body)
 //                println(obtained.stringify)
                 assertEquals(obtained.concept_associations.size, dtos.size)
                 // TODO check that the associations are the same
-            }
         )
     }
-
-}

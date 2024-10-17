@@ -19,11 +19,12 @@ package org.mbari.annosaurus.repository.jdbc
 import jakarta.persistence.{EntityManager, Query}
 import org.mbari.annosaurus.domain.ObservationsUpdate
 
-/** @author
-  *   Brian Schlining
-  * @since 2019-10-28T16:39:00
-  */
-object ObservationSQL {
+/**
+ * @author
+ *   Brian Schlining
+ * @since 2019-10-28T16:39:00
+ */
+object ObservationSQL:
 
     val countAll: String = "SELECT COUNT(*) FROM observations"
 
@@ -92,5 +93,3 @@ object ObservationSQL {
             :: (updateActivity -> update.activity)
             :: Nil
         params.flatMap(p => build(p._1, p._2))
-
-}

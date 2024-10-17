@@ -17,18 +17,14 @@
 package org.mbari.annosaurus.controllers
 
 import org.mbari.annosaurus.domain.CachedAncillaryDatum
-import org.mbari.annosaurus.repository.jpa.{
-    BaseDAOSuite,
-    CachedAncillaryDatumDAOImpl,
-    JPADAOFactory
-}
+import org.mbari.annosaurus.repository.jpa.{BaseDAOSuite, CachedAncillaryDatumDAOImpl, JPADAOFactory}
 import org.mbari.annosaurus.etc.jdk.Logging.given
 import org.mbari.annosaurus.repository.jpa.extensions.runTransaction
 import org.mbari.annosaurus.etc.circe.CirceCodecs.{*, given}
 
 import scala.concurrent.ExecutionContext
 
-trait FastAncillaryDataControllerSuite extends BaseDAOSuite {
+trait FastAncillaryDataControllerSuite extends BaseDAOSuite:
 
     given JPADAOFactory    = daoFactory
     given ExecutionContext = ExecutionContext.global
@@ -38,7 +34,7 @@ trait FastAncillaryDataControllerSuite extends BaseDAOSuite {
 
     override def afterAll(): Unit = daoFactory.afterAll()
 
-    private def runTransaction[A](fn: FastAncillaryDataController => A): A = {
+    private def runTransaction[A](fn: FastAncillaryDataController => A): A =
         val dao        = daoFactory.newCachedAncillaryDatumDAO()
         val em         = dao.entityManager
         val controller = FastAncillaryDataController(em)
@@ -47,15 +43,14 @@ trait FastAncillaryDataControllerSuite extends BaseDAOSuite {
         em.getTransaction.commit()
         dao.close()
         result
-    }
 
     test("createOrUpdate") {
         val xs    = TestUtils.create(2, includeData = true) ++ TestUtils.create(2)
         val pairs = xs
-            .map(im => {
+            .map(im =>
                 val ad = TestUtils.randomData()
                 im -> CachedAncillaryDatum.from(ad).copy(imagedMomentUuid = Option(im.getUuid))
-            })
+            )
             .toMap
 
         // Make sure we set the im uuid correctly
@@ -129,5 +124,3 @@ trait FastAncillaryDataControllerSuite extends BaseDAOSuite {
                 assertEquals(obtained.salinity, dto.salinity)
 
     }
-
-}

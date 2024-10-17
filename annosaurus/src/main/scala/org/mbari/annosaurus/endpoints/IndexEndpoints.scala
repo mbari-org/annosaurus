@@ -33,7 +33,7 @@ import org.mbari.annosaurus.repository.jpa.entity.IndexEntity
 class IndexEndpoints(controller: IndexController)(using
     val executor: ExecutionContext,
     jwtService: JwtService
-) extends Endpoints {
+) extends Endpoints:
 
     private val base = "index"
     private val tag  = "Time Indices"
@@ -56,8 +56,7 @@ class IndexEndpoints(controller: IndexController)(using
             handleErrors(f)
         }
 
-    val bulkUpdateRecordedTimestamps
-        : Endpoint[Option[String], List[IndexUpdateSC], ErrorMsg, List[IndexSC], Any] =
+    val bulkUpdateRecordedTimestamps: Endpoint[Option[String], List[IndexUpdateSC], ErrorMsg, List[IndexSC], Any] =
         secureEndpoint
             .put
             .in(base / "tapetime")
@@ -83,5 +82,3 @@ class IndexEndpoints(controller: IndexController)(using
 
     override def allImpl: List[ServerEndpoint[Any, Future]] =
         List(findByVideoReferenceUUIDImpl, bulkUpdateRecordedTimestampsImpl)
-
-}

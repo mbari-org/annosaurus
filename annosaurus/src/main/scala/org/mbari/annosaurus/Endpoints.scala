@@ -27,7 +27,7 @@ import sttp.tapir.swagger.bundle.SwaggerInterpreter
 
 import scala.concurrent.{ExecutionContext, Future}
 
-object Endpoints {
+object Endpoints:
 
     // --------------------------------
     given ExecutionContext = ExecutionContext.global
@@ -119,5 +119,3 @@ object Endpoints {
 
     val all: List[ServerEndpoint[Any, Future]] =
         apiEndpoints ++ docEndpoints ++ List(metricsEndpoint)
-
-}

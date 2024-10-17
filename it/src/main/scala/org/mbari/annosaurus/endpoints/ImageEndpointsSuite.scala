@@ -29,7 +29,7 @@ import sttp.client3.*
 import java.net.{URI, URLEncoder}
 import java.nio.charset.StandardCharsets
 
-trait ImageEndpointsSuite extends EndpointsSuite {
+trait ImageEndpointsSuite extends EndpointsSuite:
 
     private val log              = System.getLogger(getClass.getName)
     given JPADAOFactory          = daoFactory
@@ -43,12 +43,11 @@ trait ImageEndpointsSuite extends EndpointsSuite {
         runGet(
             endpoints.findOneImageImpl,
             s"/v1/images/${ir.getUuid}",
-            response => {
+            response =>
                 assertEquals(response.code, StatusCode.Ok)
                 val obtained = checkResponse[ImageSC](response.body)
                 val expected = Image.from(ir, true).toSnakeCase
                 assertEquals(obtained, expected)
-            }
         )
     }
 
@@ -58,13 +57,12 @@ trait ImageEndpointsSuite extends EndpointsSuite {
         runGet(
             endpoints.findByVideoReferenceUUIDImpl,
             s"/v1/images/videoreference/${im.getVideoReferenceUuid}",
-            response => {
+            response =>
                 assertEquals(response.code, StatusCode.Ok)
                 val obtained = checkResponse[Seq[ImageSC]](response.body)
                 assertEquals(obtained.size, 1)
                 val expected = Image.from(ir, true).toSnakeCase
                 assertEquals(obtained.head, expected)
-            }
         )
     }
 
@@ -74,11 +72,10 @@ trait ImageEndpointsSuite extends EndpointsSuite {
         runGet(
             endpoints.findByVideoReferenceUUIDImpl,
             s"/v1/images/videoreference/${im.getVideoReferenceUuid}",
-            response => {
+            response =>
                 assertEquals(response.code, StatusCode.Ok)
                 val obtained = checkResponse[Seq[ImageSC]](response.body)
                 assertEquals(obtained.size, 10)
-            }
         )
     }
 
@@ -89,13 +86,12 @@ trait ImageEndpointsSuite extends EndpointsSuite {
         runGet(
             endpoints.findByImageNameImpl,
             s"/v1/images/name/${imageName}",
-            response => {
+            response =>
                 assertEquals(response.code, StatusCode.Ok)
                 val obtained = checkResponse[Seq[ImageSC]](response.body)
                 assertEquals(obtained.size, 1)
                 val expected = Image.from(ir, true).toSnakeCase
                 assertEquals(obtained.head, expected)
-            }
         )
     }
 
@@ -107,12 +103,11 @@ trait ImageEndpointsSuite extends EndpointsSuite {
         runGet(
             endpoints.findByImageUrlImpl,
             s"/v1/images/url/${url}",
-            response => {
+            response =>
                 assertEquals(response.code, StatusCode.Ok)
                 val obtained = checkResponse[ImageSC](response.body)
                 val expected = Image.from(ir, true).toSnakeCase
                 assertEquals(obtained, expected)
-            }
         )
     }
 
@@ -225,5 +220,3 @@ trait ImageEndpointsSuite extends EndpointsSuite {
         assertEquals(obtained, expected)
 
     }
-
-}

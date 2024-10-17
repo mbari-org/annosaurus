@@ -33,8 +33,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import org.mbari.annosaurus.etc.tapir.TapirCodecs
 
-class QueryEndpoints(queryController: QueryController)(using executionContext: ExecutionContext)
-    extends Endpoints {
+class QueryEndpoints(queryController: QueryController)(using executionContext: ExecutionContext) extends Endpoints:
 
     private val base = "query"
     private val tag  = "Query"
@@ -90,4 +89,3 @@ class QueryEndpoints(queryController: QueryController)(using executionContext: E
         runQueryImpl,
         countImpl
     )
-}

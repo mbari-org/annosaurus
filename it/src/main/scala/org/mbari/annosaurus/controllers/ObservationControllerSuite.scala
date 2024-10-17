@@ -24,7 +24,7 @@ import scala.jdk.CollectionConverters.*
 import junit.framework.Assert
 import java.time.Duration
 
-trait ObservationControllerSuite extends BaseDAOSuite {
+trait ObservationControllerSuite extends BaseDAOSuite:
 
     given JPADAOFactory    = daoFactory
     given ExecutionContext = ExecutionContext.global
@@ -109,7 +109,7 @@ trait ObservationControllerSuite extends BaseDAOSuite {
     test("findAllActivities") {
         val xs           = TestUtils.create(1, 9)
         val expected     = xs
-            .flatMap(im => im.getObservations().asScala.map(_.getActivity()))
+            .flatMap(im => im.getObservations.asScala.map(_.getActivity()))
             .toSet
             .filter(_ != null)
         val obtained     = exec(controller.findAllActivities)
@@ -260,5 +260,3 @@ trait ObservationControllerSuite extends BaseDAOSuite {
         o0.setConcept(newConcept)
         AssertUtils.assertSameObservation(o0, obtained.get.toEntity)
     }
-
-}

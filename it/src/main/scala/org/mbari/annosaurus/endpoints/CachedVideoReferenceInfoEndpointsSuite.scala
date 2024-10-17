@@ -37,7 +37,7 @@ import sttp.model.StatusCode
 
 import java.util.UUID
 
-trait CachedVideoReferenceInfoEndpointsSuite extends EndpointsSuite {
+trait CachedVideoReferenceInfoEndpointsSuite extends EndpointsSuite:
 
     private val log              = System.getLogger(getClass.getName)
     given JPADAOFactory          = daoFactory
@@ -45,7 +45,7 @@ trait CachedVideoReferenceInfoEndpointsSuite extends EndpointsSuite {
     lazy val controller          = new CachedVideoReferenceInfoController(daoFactory)
     lazy val endpoints           = new CachedVideoReferenceInfoEndpoints(controller)
 
-    def createVideoReferenceInfo(): CachedVideoReferenceInfo = {
+    def createVideoReferenceInfo(): CachedVideoReferenceInfo =
         val x = TestUtils.randomVideoReferenceInfo()
         controller
             .create(
@@ -55,14 +55,13 @@ trait CachedVideoReferenceInfoEndpointsSuite extends EndpointsSuite {
                 Option(x.getMissionContact)
             )
             .join
-    }
 
     test("findAll") {
         val xs = (0 until 3).map(_ => createVideoReferenceInfo())
         runGet(
             endpoints.findAllImpl,
             "http://test.com/v1/videoreferences",
-            response => {
+            response =>
                 assert(response.code == StatusCode.Ok)
                 val ys =
                     checkResponse[Seq[CachedVideoReferenceInfoSC]](response.body).map(_.toCamelCase)
@@ -73,7 +72,6 @@ trait CachedVideoReferenceInfoEndpointsSuite extends EndpointsSuite {
                             assertEquals(y, x)
                         case None    =>
                             fail(s"Could not find ${x.videoReferenceUuid}")
-            }
         )
     }
 
@@ -82,12 +80,11 @@ trait CachedVideoReferenceInfoEndpointsSuite extends EndpointsSuite {
         runGet(
             endpoints.findAllVideoReferenceUuidsImpl,
             "http://test.com/v1/videoreferences/videoreferences",
-            response => {
+            response =>
                 assert(response.code == StatusCode.Ok)
                 val ys = checkResponse[Seq[UUID]](response.body)
                 for x <- xs
                 do assert(ys.contains(x.videoReferenceUuid))
-            }
         )
     }
 
@@ -96,11 +93,10 @@ trait CachedVideoReferenceInfoEndpointsSuite extends EndpointsSuite {
         runGet(
             endpoints.findByUuidImpl,
             s"http://test.com/v1/videoreferences/${x.uuid}",
-            response => {
+            response =>
                 assertEquals(response.code, StatusCode.Ok)
                 val y = checkResponse[CachedVideoReferenceInfoSC](response.body).toCamelCase
                 assertEquals(y, x)
-            }
         )
     }
 
@@ -109,11 +105,10 @@ trait CachedVideoReferenceInfoEndpointsSuite extends EndpointsSuite {
         runGet(
             endpoints.findByVideoReferenceUuidImpl,
             s"http://test.com/v1/videoreferences/videoreference/${x.videoReferenceUuid}",
-            response => {
+            response =>
                 assertEquals(response.code, StatusCode.Ok)
                 val y = checkResponse[CachedVideoReferenceInfoSC](response.body).toCamelCase
                 assertEquals(y, x)
-            }
         )
     }
 
@@ -122,12 +117,11 @@ trait CachedVideoReferenceInfoEndpointsSuite extends EndpointsSuite {
         runGet(
             endpoints.findAllMissionIdsImpl,
             "http://test.com/v1/videoreferences/missionids",
-            response => {
+            response =>
                 assert(response.code == StatusCode.Ok)
                 val ys = checkResponse[Seq[String]](response.body)
                 for x <- xs
                 do assert(ys.contains(x.missionId.get))
-            }
         )
     }
 
@@ -136,13 +130,12 @@ trait CachedVideoReferenceInfoEndpointsSuite extends EndpointsSuite {
         runGet(
             endpoints.findByMissionIdImpl,
             s"http://test.com/v1/videoreferences/missionid/${x.missionId.get}",
-            response => {
+            response =>
                 assertEquals(response.code, StatusCode.Ok)
                 val y =
                     checkResponse[Seq[CachedVideoReferenceInfoSC]](response.body).map(_.toCamelCase)
                 assertEquals(y.size, 1)
                 assertEquals(y.head, x)
-            }
         )
     }
 
@@ -151,12 +144,11 @@ trait CachedVideoReferenceInfoEndpointsSuite extends EndpointsSuite {
         runGet(
             endpoints.findAllMissionContactsImpl,
             "http://test.com/v1/videoreferences/missioncontacts",
-            response => {
+            response =>
                 assert(response.code == StatusCode.Ok)
                 val ys = checkResponse[Seq[String]](response.body)
                 for x <- xs
                 do assert(ys.contains(x.missionContact.get))
-            }
         )
     }
 
@@ -165,13 +157,12 @@ trait CachedVideoReferenceInfoEndpointsSuite extends EndpointsSuite {
         runGet(
             endpoints.findByMissionContactImpl,
             s"http://test.com/v1/videoreferences/missioncontact/${x.missionContact.get}",
-            response => {
+            response =>
                 assertEquals(response.code, StatusCode.Ok)
                 val y =
                     checkResponse[Seq[CachedVideoReferenceInfoSC]](response.body).map(_.toCamelCase)
                 assertEquals(y.size, 1)
                 assertEquals(y.head, x)
-            }
         )
     }
 
@@ -326,5 +317,3 @@ trait CachedVideoReferenceInfoEndpointsSuite extends EndpointsSuite {
             case None    =>
             // pass
     }
-
-}

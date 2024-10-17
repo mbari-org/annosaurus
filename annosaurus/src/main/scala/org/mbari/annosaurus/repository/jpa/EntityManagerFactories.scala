@@ -25,17 +25,17 @@ import org.mbari.annosaurus.etc.jdk.Logging.given
 
 import java.lang.System.Logger.Level
 
-/** https://stackoverflow.com/questions/4106078/dynamic-jpa-connection
-  *
-  * THis factory allows us to instantiate an javax.persistence.EntityManager from the basic
-  * parameters (url, driver, password, username). You can pass in a map of additional properties to
-  * customize the EntityManager.
-  *
-  * @author
-  *   Brian Schlining
-  * @since 2016-05-05T17:29:00
-  */
-object EntityManagerFactories {
+/**
+ * https://stackoverflow.com/questions/4106078/dynamic-jpa-connection
+ *
+ * THis factory allows us to instantiate an javax.persistence.EntityManager from the basic parameters (url, driver,
+ * password, username). You can pass in a map of additional properties to customize the EntityManager.
+ *
+ * @author
+ *   Brian Schlining
+ * @since 2016-05-05T17:29:00
+ */
+object EntityManagerFactories:
 
     private val log = System.getLogger(getClass.getName)
 
@@ -54,10 +54,10 @@ object EntityManagerFactories {
         "hibernate.type.java_time_use_direct_jdbc" -> "true"
     )
 
-    def apply(properties: Map[String, String]): EntityManagerFactory = {
+    def apply(properties: Map[String, String]): EntityManagerFactory =
         val props = PRODUCTION_PROPS ++ properties
         val emf   = Persistence.createEntityManagerFactory("annosaurus", props.asJava)
-        if (log.isLoggable(Level.INFO)) {
+        if log.isLoggable(Level.INFO) then
             val props = emf
                 .getProperties
                 .asScala
@@ -67,9 +67,7 @@ object EntityManagerFactories {
                 .sorted
                 .mkString("\n")
             log.atInfo.log(s"EntityManager Properties:\n${props}")
-        }
         emf
-    }
 
     def apply(
         url: String,
@@ -77,7 +75,7 @@ object EntityManagerFactories {
         password: String,
         driverName: String,
         properties: Map[String, String] = Map.empty
-    ): EntityManagerFactory = {
+    ): EntityManagerFactory =
 
         val map = Map(
             "jakarta.persistence.jdbc.url"      -> url,
@@ -86,9 +84,8 @@ object EntityManagerFactories {
             "jakarta.persistence.jdbc.driver"   -> driverName
         )
         apply(map ++ properties)
-    }
 
-    def apply(configNode: String): EntityManagerFactory = {
+    def apply(configNode: String): EntityManagerFactory =
         val driver   = config.getString(configNode + ".driver")
         val password = config.getString(configNode + ".password")
 //        val productName = config.getString(configNode + ".name")
@@ -103,6 +100,3 @@ object EntityManagerFactories {
             "jakarta.persistence.jdbc.user"     -> user
         )
         apply(props)
-    }
-
-}

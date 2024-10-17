@@ -47,7 +47,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class ImagedMomentEndpoints(controller: ImagedMomentController)(using
     ec: ExecutionContext,
     jwtService: JwtService
-) extends Endpoints {
+) extends Endpoints:
 
     private val base = "imagedmoments"
     private val tag  = "Imaged Moments"
@@ -68,7 +68,7 @@ class ImagedMomentEndpoints(controller: ImagedMomentController)(using
         bulkMove
             .serverSecurityLogic(jwtOpt => verify(jwtOpt))
             .serverLogic(_ =>
-                moveImagedMoments => {
+                moveImagedMoments =>
                     handleErrors(
                         controller
                             .bulkMove(
@@ -77,7 +77,6 @@ class ImagedMomentEndpoints(controller: ImagedMomentController)(using
                             )
                             .map(n => Count(n))
                     )
-                }
             )
 
     val findAllImagedMoments: Endpoint[Unit, Paging, ErrorMsg, Seq[ImagedMomentSC], Any] =
@@ -169,8 +168,7 @@ class ImagedMomentEndpoints(controller: ImagedMomentController)(using
             }
 
     // GET /find/linkname/:linkName
-    val findImagedMomentsByLinkName
-        : Endpoint[Unit, (String, Paging), ErrorMsg, Seq[ImagedMomentSC], Any] =
+    val findImagedMomentsByLinkName: Endpoint[Unit, (String, Paging), ErrorMsg, Seq[ImagedMomentSC], Any] =
         openEndpoint
             .get
             .in(base / "find" / "linkname" / path[String]("linkName"))
@@ -225,8 +223,7 @@ class ImagedMomentEndpoints(controller: ImagedMomentController)(using
             }
 
     // get /concept/:name
-    val findImagedMomentsByConceptName
-        : Endpoint[Unit, (String, Paging), ErrorMsg, Seq[ImagedMomentSC], Any] =
+    val findImagedMomentsByConceptName: Endpoint[Unit, (String, Paging), ErrorMsg, Seq[ImagedMomentSC], Any] =
         openEndpoint
             .get
             .in(base / "concept" / path[String]("conceptName"))
@@ -247,8 +244,7 @@ class ImagedMomentEndpoints(controller: ImagedMomentController)(using
             }
 
     // GET /concept/images/:name
-    val findImagedMomentsByConceptNameWithImages
-        : Endpoint[Unit, (String, Paging), ErrorMsg, Seq[ImagedMomentSC], Any] =
+    val findImagedMomentsByConceptNameWithImages: Endpoint[Unit, (String, Paging), ErrorMsg, Seq[ImagedMomentSC], Any] =
         openEndpoint
             .get
             .in(base / "concept" / "images" / path[String]("conceptName"))
@@ -290,8 +286,7 @@ class ImagedMomentEndpoints(controller: ImagedMomentController)(using
             }
 
     // GET /concept/images/count/:name
-    val countImagedMomentsByConceptNameWithImages
-        : Endpoint[Unit, String, ErrorMsg, ConceptCount, Any] =
+    val countImagedMomentsByConceptNameWithImages: Endpoint[Unit, String, ErrorMsg, ConceptCount, Any] =
         openEndpoint
             .get
             .in(
@@ -335,8 +330,7 @@ class ImagedMomentEndpoints(controller: ImagedMomentController)(using
             }
 
     // GET /modified/count/:start/:end
-    val countImagedMomentsBetweenModifiedDates
-        : Endpoint[Unit, (Instant, Instant), ErrorMsg, Count, Any] =
+    val countImagedMomentsBetweenModifiedDates: Endpoint[Unit, (Instant, Instant), ErrorMsg, Count, Any] =
         openEndpoint
             .get
             .in(
@@ -357,8 +351,7 @@ class ImagedMomentEndpoints(controller: ImagedMomentController)(using
             }
 
     // GET /counts
-    val countsPerVideoReference
-        : Endpoint[Unit, Unit, ErrorMsg, Seq[CountForVideoReferenceSC], Any] =
+    val countsPerVideoReference: Endpoint[Unit, Unit, ErrorMsg, Seq[CountForVideoReferenceSC], Any] =
         openEndpoint
             .get
             .in(base / "counts")
@@ -394,8 +387,7 @@ class ImagedMomentEndpoints(controller: ImagedMomentController)(using
             }
 
     // GET /videoreference/:uuid
-    val findImagdMomentsByVideoReferenceUuid
-        : Endpoint[Unit, UUID, ErrorMsg, Seq[ImagedMomentSC], Any] =
+    val findImagdMomentsByVideoReferenceUuid: Endpoint[Unit, UUID, ErrorMsg, Seq[ImagedMomentSC], Any] =
         openEndpoint
             .get
             .in(base / "videoreference" / path[UUID]("videoReferenceUuid"))
@@ -413,8 +405,7 @@ class ImagedMomentEndpoints(controller: ImagedMomentController)(using
             }
 
     // GET /videoreference/modified/:uuid/:date
-    val countModifiedBeforeDate
-        : Endpoint[Unit, (UUID, Instant), ErrorMsg, CountForVideoReferenceSC, Any] =
+    val countModifiedBeforeDate: Endpoint[Unit, (UUID, Instant), ErrorMsg, CountForVideoReferenceSC, Any] =
         openEndpoint
             .get
             .in(
@@ -515,8 +506,7 @@ class ImagedMomentEndpoints(controller: ImagedMomentController)(using
             }
 
     // PUT /:uuid
-    val updateImagedMoment
-        : Endpoint[Option[String], (UUID, VideoTimestampSC), ErrorMsg, ImagedMomentSC, Any] =
+    val updateImagedMoment: Endpoint[Option[String], (UUID, VideoTimestampSC), ErrorMsg, ImagedMomentSC, Any] =
         secureEndpoint
             .put
             .in(base / path[UUID]("imagedMomentUuid"))
@@ -623,7 +613,7 @@ class ImagedMomentEndpoints(controller: ImagedMomentController)(using
                 handleErrors(
                     controller
                         .delete(uuid)
-                        .map(b => if (b) StatusCode.NoContent else StatusCode.NotFound)
+                        .map(b => if b then StatusCode.NoContent else StatusCode.NotFound)
                 )
             }
 
@@ -687,4 +677,3 @@ class ImagedMomentEndpoints(controller: ImagedMomentController)(using
         deleteImagedMomentImpl,
         findAllImagedMomentsImpl
     )
-}

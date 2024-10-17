@@ -23,7 +23,7 @@ final case class WindowRequest(
     videoReferenceUuids: Seq[UUID],
     imagedMomentUuid: UUID,
     windowMillis: Long
-) extends ToSnakeCase[WindowRequestSC] {
+) extends ToSnakeCase[WindowRequestSC]:
     def toSnakeCase: WindowRequestSC = WindowRequestSC(
         videoReferenceUuids,
         imagedMomentUuid,
@@ -31,16 +31,14 @@ final case class WindowRequest(
     )
 
     val window: Duration = Duration.ofMillis(windowMillis)
-}
 
 final case class WindowRequestSC(
     video_reference_uuids: Seq[UUID],
     imaged_moment_uuid: UUID,
     window_millis: Long
-) extends ToCamelCase[WindowRequest] {
+) extends ToCamelCase[WindowRequest]:
     def toCamelCase: WindowRequest = WindowRequest(
         video_reference_uuids,
         imaged_moment_uuid,
         window_millis
     )
-}
