@@ -73,7 +73,7 @@ class QueryEndpoints(queryController: QueryController)(using executionContext: E
     val countImpl: Full[Unit, Unit, QueryRequest, ErrorMsg, Count, Any, Future] =
         count.serverLogic(request => handleEitherAsync(queryController.count(request)))
 
-    override def all: List[Endpoint[_, _, _, _, _]] = List(
+    override def all: List[Endpoint[?, ?, ?, ?, ?]] = List(
         listColumns,
         runQuery,
         count
