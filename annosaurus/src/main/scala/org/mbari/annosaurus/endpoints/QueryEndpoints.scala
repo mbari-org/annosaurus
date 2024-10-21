@@ -16,17 +16,21 @@
 
 package org.mbari.annosaurus.endpoints
 
+import sttp.capabilities.Streams
 import org.mbari.annosaurus.controllers.QueryController
 import org.mbari.annosaurus.domain.{Count, ErrorMsg, QueryRequest}
 import org.mbari.annosaurus.endpoints.CustomTapirJsonCirce.*
 import org.mbari.annosaurus.etc.circe.CirceCodecs.{*, given}
 import org.mbari.annosaurus.repository.query.{JDBC, QueryResults}
+// import sttp.capabilities.fs2.Fs2Streams
 import sttp.tapir.*
 import sttp.tapir.generic.auto.*
 import sttp.tapir.server.ServerEndpoint
 import sttp.tapir.server.ServerEndpoint.Full
+// import fs2.{Chunk, Stream}
 
 import scala.concurrent.{ExecutionContext, Future}
+import java.nio.charset.StandardCharsets
 
 class QueryEndpoints(queryController: QueryController)(using executionContext: ExecutionContext) extends Endpoints:
 
@@ -60,6 +64,23 @@ class QueryEndpoints(queryController: QueryController)(using executionContext: E
                 queryController.query(request).map(QueryResults.toTsv)
             )
         )
+
+    // val runQueryStreaming = 
+    //     openEndpoint
+    //         .post 
+    //         .in(base / "run")
+    //         .in(jsonBody[QueryRequest])
+    //         .out(streamTextBody(Fs2Streams[Future]), (CodecFormat.TextPlain(), Some(StandardCharsets.UTF_8)))
+    //         .name("runQueryStreaming")
+    //         .description("Run a query and stream the results")
+    //         .tag(tag)
+
+    // val runQueryStreamingImpl: Full[Unit, Unit, QueryRequest, ErrorMsg, Future[Seq[String]], Any, Future] =
+    //     runQueryStreaming.serverLogic(request =>
+    //         handleEitherAsync(
+    //             queryController.query(request).map(QueryResults.toTsvStream)
+    //         )
+    //     )
 
     val count: Endpoint[Unit, QueryRequest, ErrorMsg, Count, Any] = openEndpoint
         .post

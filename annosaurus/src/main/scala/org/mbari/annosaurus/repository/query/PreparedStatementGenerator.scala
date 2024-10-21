@@ -69,7 +69,7 @@ object PreparedStatementGenerator:
           |""".stripMargin
 
     private def buildSelectClause(query: Query): String =
-        if query.strict then query.where.map(_.column).mkString(", ")
+        if query.strict then query.select.mkString(", ")
         else
             // Add InexTime to the columns if it is not already there so that we can always sort by time
             val resolvedColumns1 =
