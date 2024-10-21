@@ -87,6 +87,16 @@ case class DatabaseConfig(
     driver: String,
     queryView: String
 ):
+    lazy val dataSource = {
+        val ds = new com.zaxxer.hikari.HikariDataSource()
+        ds.setJdbcUrl(url)
+        ds.setUsername(user)
+        ds.setPassword(password)
+        ds.setDriverClassName(driver)
+        ds.setMaximumPoolSize(AppConfig.NumberOfVertxWorkers)
+        ds
+    }
     def newConnection(): java.sql.Connection =
-        Class.forName(driver)
-        java.sql.DriverManager.getConnection(url, user, password)
+        dataSource.getConnection()
+        // Class.forName(driver)
+        // java.sql.DriverManager.getConnection(url, user, password)
