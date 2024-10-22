@@ -28,35 +28,35 @@ import scala.util.Using
 class QueryService(databaseConfig: DatabaseConfig, viewName: String):
 
     val jdbc               = new JDBC(databaseConfig)
-    val AnnotationViewName = "annotations"
+//    val AnnotationViewName = "annotations"
     private val log        = System.getLogger(getClass.getName)
 
-    def findAllConceptNames(): Either[Throwable, Seq[String]] =
-        jdbc.findDistinct(viewName, "concept", stringConverter)
-
-    def findAssociationsForConcepts(concepts: Seq[String]): Either[Throwable, Seq[Association]] =
-        val sql = s"""
-           | SELECT DISTINCT
-           |   link_name,
-           |   to_concept,
-           |   link_value
-           | FROM
-           |   associations AS a JOIN
-           |   observations AS o ON o.uuid = a.observation_uuid
-           | WHERE
-           |   concept IN (${concepts.map(s => s"'$s'").mkString(",")})
-           |""".stripMargin
-        jdbc.runQuery(
-            sql,
-            rs =>
-                val associations = ListBuffer.newBuilder[Association]
-                while rs.next() do
-                    val linkName  = rs.getString("link_name")
-                    val toConcept = rs.getString("to_concept")
-                    val linkValue = rs.getString("link_value")
-                    associations += Association(linkName, toConcept, linkValue)
-                associations.result().toSeq.sortBy(_.linkName)
-        )
+//    def findAllConceptNames(): Either[Throwable, Seq[String]] =
+//        jdbc.findDistinct(viewName, "concept", stringConverter)
+//
+//    def findAssociationsForConcepts(concepts: Seq[String]): Either[Throwable, Seq[Association]] =
+//        val sql = s"""
+//           | SELECT DISTINCT
+//           |   link_name,
+//           |   to_concept,
+//           |   link_value
+//           | FROM
+//           |   associations AS a JOIN
+//           |   observations AS o ON o.uuid = a.observation_uuid
+//           | WHERE
+//           |   concept IN (${concepts.map(s => s"'$s'").mkString(",")})
+//           |""".stripMargin
+//        jdbc.runQuery(
+//            sql,
+//            rs =>
+//                val associations = ListBuffer.newBuilder[Association]
+//                while rs.next() do
+//                    val linkName  = rs.getString("link_name")
+//                    val toConcept = rs.getString("to_concept")
+//                    val linkValue = rs.getString("link_value")
+//                    associations += Association(linkName, toConcept, linkValue)
+//                associations.result().toSeq.sortBy(_.linkName)
+//        )
 
     def count(query: Query): Either[Throwable, Int] =
         val sql = PreparedStatementGenerator.buildPreparedStatementTemplateForCounts(

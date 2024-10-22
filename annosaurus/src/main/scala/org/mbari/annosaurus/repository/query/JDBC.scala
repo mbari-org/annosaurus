@@ -43,14 +43,9 @@ object JDBC:
                 columnClassName = metadata.getColumnClassName(i)
             yield JDBC.Metadata(columnName, columnType, columnSize, columnLabel, columnClassName)
 
-class JDBC(user: String, password: String, url: String, driver: String):
+class JDBC(config: DatabaseConfig):
 
-    Class.forName(driver)
-
-    def this(config: DatabaseConfig) = this(config.user, config.password, config.url, config.driver)
-
-    def newConnection(): Connection =
-        java.sql.DriverManager.getConnection(url, user, password)
+    def newConnection(): Connection = config.newConnection()
 
     def runQuery[T](
         sql: String,

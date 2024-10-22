@@ -24,15 +24,15 @@ import java.time.Instant
 
 // Define the Root case class
 case class Query(
-    where: Seq[Constraint],
     select: Seq[String] = Seq.empty,
+    distinct: Boolean = false,
+    where: Seq[Constraint] = Seq.empty,
+    orderby: Option[Seq[String]] = None,
     limit: Option[Int] = None,
     offset: Option[Int] = None,
     concurrentObservations: Boolean = false,
     relatedAssociations: Boolean = false,
-    distinct: Boolean = true,
-    strict: Boolean = false,
-    orderby: Option[Seq[String]] = None
+    strict: Boolean = true
 )
 
 object Query:
@@ -50,15 +50,19 @@ object Query:
         else Right(from(queryRequest))
 
     def from(queryRequest: QueryRequest): Query =
+        val strict = if (queryRequest.concurrentObservations.getOrElse(false) || queryRequest.relatedAssociations.getOrElse(false))
+            false
+        else queryRequest.strict.getOrElse(true)
+
         Query(
-            where = queryRequest.where.map(Constraint.from),
+            where = queryRequest.where.getOrElse(Seq.empty).map(Constraint.from),
             select = queryRequest.select.getOrElse(Seq.empty),
             limit = queryRequest.limit,
             offset = queryRequest.offset,
             concurrentObservations = queryRequest.concurrentObservations.getOrElse(false),
             relatedAssociations = queryRequest.relatedAssociations.getOrElse(false),
-            distinct = queryRequest.distinct.getOrElse(true),
-            strict = queryRequest.strict.getOrElse(false),
+            distinct = queryRequest.distinct.getOrElse(false),
+            strict = strict,
             orderby = queryRequest.orderby
         )
 

@@ -83,27 +83,29 @@ object PreparedStatementGenerator:
         tableName: String,
         query: Query
     ): String =
-        val wheres = query.where.map(_.toPreparedStatementTemplate).mkString(" AND ")
-        if query.concurrentObservations && query.relatedAssociations then s"""WHERE $ObservationUuid IN (
-               |     SELECT $ObservationUuid
-               |     FROM $tableName
-               |     WHERE $ImagedMomentUuid IN (
-               |          SELECT $ImagedMomentUuid
-               |          FROM $tableName
-               |          WHERE $wheres
-               |     )
-               |)
-               |""".stripMargin
-        else if query.concurrentObservations then s"""WHERE $ImagedMomentUuid IN (
-               |     SELECT $ImagedMomentUuid
-               |     FROM $tableName
-               |     WHERE $wheres
-               |)
-               |""".stripMargin
-        else if query.relatedAssociations then s"""WHERE $ObservationUuid IN (
-               |     SELECT $ObservationUuid
-               |     FROM $tableName
-               |     WHERE $wheres
-               |)
-               |""".stripMargin
-        else s"""WHERE $wheres"""
+        if (query.where.isEmpty) ""
+        else
+            val wheres = query.where.map(_.toPreparedStatementTemplate).mkString(" AND ")
+            if query.concurrentObservations && query.relatedAssociations then s"""WHERE $ObservationUuid IN (
+                   |     SELECT $ObservationUuid
+                   |     FROM $tableName
+                   |     WHERE $ImagedMomentUuid IN (
+                   |          SELECT $ImagedMomentUuid
+                   |          FROM $tableName
+                   |          WHERE $wheres
+                   |     )
+                   |)
+                   |""".stripMargin
+            else if query.concurrentObservations then s"""WHERE $ImagedMomentUuid IN (
+                   |     SELECT $ImagedMomentUuid
+                   |     FROM $tableName
+                   |     WHERE $wheres
+                   |)
+                   |""".stripMargin
+            else if query.relatedAssociations then s"""WHERE $ObservationUuid IN (
+                   |     SELECT $ObservationUuid
+                   |     FROM $tableName
+                   |     WHERE $wheres
+                   |)
+                   |""".stripMargin
+            else s"""WHERE $wheres"""

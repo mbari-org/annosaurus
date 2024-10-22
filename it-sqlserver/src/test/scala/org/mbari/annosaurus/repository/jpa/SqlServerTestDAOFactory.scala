@@ -17,6 +17,7 @@
 package org.mbari.annosaurus.repository.jpa
 
 import jakarta.persistence.EntityManagerFactory
+import org.mbari.annosaurus.DatabaseConfig
 import org.mbari.annosaurus.etc.tc.AzureSqlEdgeContainerProvider
 
 object SqlServerTestDAOFactory extends TestDAOFactory:
@@ -56,3 +57,11 @@ object SqlServerTestDAOFactory extends TestDAOFactory:
             container.getDriverClassName(),
             testProps()
         )
+
+    lazy val databaseConfig: DatabaseConfig = DatabaseConfig(
+        container.getJdbcUrl(),
+        container.getUsername(),
+        container.getPassword(),
+        container.getDriverClassName(),
+        annotationView
+    )

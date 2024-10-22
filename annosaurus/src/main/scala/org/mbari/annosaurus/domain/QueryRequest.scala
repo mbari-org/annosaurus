@@ -18,16 +18,30 @@ package org.mbari.annosaurus.domain
 
 import java.time.Instant
 
+/**
+ * QueryRequest is a case class that represents a query (i.e. SQL) request.
+ * @param where A list of constraints to apply to the query
+ * @param select A list of columns to return
+ * @param limit The maximum number of rows to return
+ * @param offset The number of rows to skip before returning results
+ * @param concurrentObservations Whether to include concurrent observations in the query (i.e. observations that are part of the same moment in time on a video)
+ * @param relatedAssociations Whether to include related associations in the query (i.e. associations that are related to the observations in the query)
+ * @param distinct Whether to return distinct rows (default is false)
+ * @param strict Whether to use strict mode or to 'enhance' the query by adding additional columns useful for grouping annotations
+ *               if either concurrentObservations or relatedAssociations are true, strict is set to false regardless of the value passed in.
+ *               default is true
+ * @param orderby A list of columns to order the results by
+ */
 case class QueryRequest(
-    where: Seq[ConstraintRequest],
     select: Option[Seq[String]] = None,
+    distinct: Option[Boolean] = None,
+    where: Option[Seq[ConstraintRequest]] = None,
+    orderby: Option[Seq[String]] = None,
     limit: Option[Int] = None,
     offset: Option[Int] = None,
     concurrentObservations: Option[Boolean] = None,
     relatedAssociations: Option[Boolean] = None,
-    distinct: Option[Boolean] = Some(true),
-    strict: Option[Boolean] = Some(false),
-    orderby: Option[Seq[String]] = None
+    strict: Option[Boolean] = None
 )
 
 case class ConstraintRequest(

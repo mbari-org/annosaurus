@@ -32,7 +32,7 @@ class QueryController(databaseConfig: DatabaseConfig, viewName: String):
 
     def query(queryRequest: QueryRequest): Either[Throwable, QueryResults] =
         for
-            query   <- Query.validate(queryRequest)
+            query   <- Query.validate(queryRequest, checkWhere = queryRequest.strict.getOrElse(false))
             results <- queryService.query(query)
         yield results
 
