@@ -37,4 +37,4 @@ trait BaseDAOSuite extends munit.FunSuite:
 
     override def afterEach(context: AfterEach): Unit =
         super.afterEach(context)
-    daoFactory.cleanup()
+        daoFactory.cleanup()

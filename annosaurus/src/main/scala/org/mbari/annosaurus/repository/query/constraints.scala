@@ -27,7 +27,7 @@ case class Query(
     select: Seq[String] = Seq.empty,
     distinct: Boolean = false,
     where: Seq[Constraint] = Seq.empty,
-    orderby: Option[Seq[String]] = None,
+    orderBy: Option[Seq[String]] = None,
     limit: Option[Int] = None,
     offset: Option[Int] = None,
     concurrentObservations: Boolean = false,
@@ -37,10 +37,10 @@ case class Query(
 
 object Query:
 
-    def validate(queryRequest: QueryRequest, checkWhere: Boolean = true): Either[Throwable, Query] =
+    def validate(queryRequest: QueryRequest, checkWhere: Boolean = true, checkSelect: Boolean = true): Either[Throwable, Query] =
         val query = from(queryRequest)
         if checkWhere && query.where.isEmpty then Left(new IllegalArgumentException("where clause is required"))
-        else if query.select.isEmpty then Left(new IllegalArgumentException("select clause is required"))
+        else if checkSelect && query.select.isEmpty then Left(new IllegalArgumentException("select clause is required"))
         else if query.strict && (query.concurrentObservations || query.relatedAssociations) then
             Left(
                 new IllegalArgumentException(
@@ -50,9 +50,10 @@ object Query:
         else Right(from(queryRequest))
 
     def from(queryRequest: QueryRequest): Query =
-        val strict = if (queryRequest.concurrentObservations.getOrElse(false) || queryRequest.relatedAssociations.getOrElse(false))
-            false
-        else queryRequest.strict.getOrElse(true)
+        val strict =
+            if queryRequest.concurrentObservations.getOrElse(false) || queryRequest.relatedAssociations.getOrElse(false)
+            then false
+            else queryRequest.strict.getOrElse(true)
 
         Query(
             where = queryRequest.where.getOrElse(Seq.empty).map(Constraint.from),
@@ -63,7 +64,7 @@ object Query:
             relatedAssociations = queryRequest.relatedAssociations.getOrElse(false),
             distinct = queryRequest.distinct.getOrElse(false),
             strict = strict,
-            orderby = queryRequest.orderby
+            orderBy = queryRequest.orderBy
         )
 
 sealed trait Constraint:

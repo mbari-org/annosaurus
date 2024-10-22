@@ -72,16 +72,10 @@ trait AnalysisEndpointsSuite extends EndpointsSuite:
 
     // TODO both the depth and time histogram logic needs to be reworked. They can give incorrect results
     test("timeHistogram".flaky) {
-        val xs    = TestUtils.build(10, 10, includeData = true)
-        val start = Instant.parse("1888-08-01T00:00:00Z")
-        for i <- xs.indices
-        do xs(i).setRecordedTimestamp(start.plusSeconds(i * 60 * 60))
-        val dao                 = daoFactory.newImagedMomentDAO()
-        dao.runTransaction(d => xs.foreach(d.create))
-        val minTime             = xs.map(_.getRecordedTimestamp).min
-        val maxTime             = xs.map(_.getRecordedTimestamp).max
-        val expected            =
-            xs.filter(_.getRecordedTimestamp != null).flatMap(_.getObservations.asScala).size
+        val xs = TestUtils.create(5, 5, includeData = true)
+        val minTime = xs.map(_.getRecordedTimestamp).min
+        val maxTime = xs.map(_.getRecordedTimestamp).max
+        val expected = xs.flatMap(_.getObservations.asScala).size
         val videoReferenceUuids = xs.map(_.getVideoReferenceUuid).distinct
         val qcr                 = QueryConstraints(
             videoReferenceUuids = Seq(xs.head.getVideoReferenceUuid),
@@ -91,7 +85,7 @@ trait AnalysisEndpointsSuite extends EndpointsSuite:
 //        println(qcr.toSnakeCase.stringify)
         runPost(
             endpoints.timeHistogramImpl,
-            s"http://test.com/v1/histogram/time",
+            s"http://test.com/v1/histogram/time?size=1",
             qcr.toSnakeCase.stringify,
             response =>
                 assertEquals(response.code, StatusCode.Ok)

@@ -238,7 +238,7 @@ trait ObservationControllerSuite extends BaseDAOSuite:
         val xs     = TestUtils.create(2, 2)
         val n      = xs.flatMap(im => im.getObservations().asScala).size
         val counts = exec(controller.countAllGroupByVideoReferenceUuid())
-        assert(counts.size >= 2)
+        assertEquals(counts.size, 1)
         val uuids  = xs.map(_.getVideoReferenceUuid())
         for uuid <- uuids
         do

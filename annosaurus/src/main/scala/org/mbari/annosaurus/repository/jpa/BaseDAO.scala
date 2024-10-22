@@ -18,7 +18,7 @@ package org.mbari.annosaurus.repository.jpa
 
 import jakarta.persistence.{EntityManager, Query}
 import org.hibernate.jpa.QueryHints
-import org.mbari.annosaurus.etc.jdk.Logging.given
+import org.mbari.annosaurus.etc.jdk.Loggers.given
 import org.mbari.annosaurus.repository.DAO
 import org.mbari.annosaurus.repository.jpa.entity.IPersistentObject
 import org.mbari.annosaurus.repository.jpa.entity.extensions.*

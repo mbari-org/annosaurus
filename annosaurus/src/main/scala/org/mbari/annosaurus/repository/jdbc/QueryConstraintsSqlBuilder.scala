@@ -18,7 +18,7 @@ package org.mbari.annosaurus.repository.jdbc
 
 import jakarta.persistence.{EntityManager, Query}
 import org.mbari.annosaurus.domain.QueryConstraints
-import org.mbari.annosaurus.etc.jdk.Logging.given
+import org.mbari.annosaurus.etc.jdk.Loggers.given
 
 import java.time.Instant
 

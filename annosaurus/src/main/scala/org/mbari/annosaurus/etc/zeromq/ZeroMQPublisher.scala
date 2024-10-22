@@ -20,8 +20,8 @@ import io.reactivex.rxjava3.disposables.Disposable
 import io.reactivex.rxjava3.schedulers.Schedulers
 import io.reactivex.rxjava3.subjects.Subject
 import org.mbari.annosaurus.ZeroMQConfig
-import org.mbari.annosaurus.etc.jdk.Logging
-import org.mbari.annosaurus.etc.jdk.Logging.{*, given}
+import org.mbari.annosaurus.etc.jdk.Loggers
+import org.mbari.annosaurus.etc.jdk.Loggers.{*, given}
 import org.mbari.annosaurus.messaging.{GenericMessage, MessageBus}
 import org.zeromq.{SocketType, ZContext}
 
@@ -43,7 +43,7 @@ class ZeroMQPublisher(val topic: String, val port: Int, val subject: Subject[?])
         .observeOn(Schedulers.io())
         .distinct()
         .subscribe(m => queue.offer(m))
-    private val log                    = Logging(getClass)
+    private val log                    = Loggers(getClass)
 
     @volatile
     var ok     = true
@@ -77,7 +77,7 @@ class ZeroMQPublisher(val topic: String, val port: Int, val subject: Subject[?])
 
 object ZeroMQPublisher:
 
-    private val log = Logging(getClass)
+    private val log = Loggers(getClass)
 
     /**
      * @param opt

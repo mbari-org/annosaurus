@@ -17,7 +17,7 @@
 package org.mbari.annosaurus.controllers
 
 import org.mbari.annosaurus.domain.Annotation
-import org.mbari.annosaurus.etc.jdk.Logging.given
+import org.mbari.annosaurus.etc.jdk.Loggers.given
 import org.mbari.annosaurus.etc.jdk.Strings
 import org.mbari.annosaurus.repository.jpa.JPADAOFactory
 import org.mbari.annosaurus.repository.jpa.entity.*

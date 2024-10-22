@@ -16,7 +16,7 @@
 
 package org.mbari.annosaurus.repository.query
 
-import org.mbari.annosaurus.etc.jdk.Logging.{*, given}
+import org.mbari.annosaurus.etc.jdk.Loggers.{*, given}
 
 import java.sql.PreparedStatement
 import scala.util.Try
@@ -55,7 +55,7 @@ object PreparedStatementGenerator:
         val select   = buildSelectClause(query)
         val where    = buildWhereClause(tableName, query)
         val distinct = if query.distinct then "DISTINCT" else ""
-        val orderBy  = query.orderby match
+        val orderBy  = query.orderBy match
             case Some(columns) => columns.mkString(", ")
             case None          =>
                 if query.strict then query.select.head

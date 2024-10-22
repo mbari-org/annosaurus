@@ -33,7 +33,7 @@ import java.util.function.Supplier
  * }}}
  * * @author Brian Schlining
  */
-object Logging:
+object Loggers:
 
     trait Builder:
         def logger: Logger

@@ -317,7 +317,7 @@ class CirceCodecsSuite extends munit.FunSuite {
         yield
             val constraints = query.where
             assertEquals(constraints.size, 10)
-            println(query.where)
+//            println(query.where)
 
         attempt match
             case Left(e) =>

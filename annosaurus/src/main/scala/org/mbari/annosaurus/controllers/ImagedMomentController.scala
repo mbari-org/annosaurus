@@ -17,7 +17,7 @@
 package org.mbari.annosaurus.controllers
 
 import org.mbari.annosaurus.domain.{ImagedMoment, WindowRequest}
-import org.mbari.annosaurus.etc.jdk.Logging.given
+import org.mbari.annosaurus.etc.jdk.Loggers.given
 import org.mbari.annosaurus.repository.jpa.JPADAOFactory
 import org.mbari.annosaurus.repository.jpa.entity.{AssociationEntity, ImagedMomentEntity}
 import org.mbari.annosaurus.repository.{DAO, ImagedMomentDAO, NotFoundInDatastoreException}

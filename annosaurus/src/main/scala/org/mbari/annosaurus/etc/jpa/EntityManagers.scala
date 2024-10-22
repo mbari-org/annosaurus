@@ -17,7 +17,7 @@
 package org.mbari.annosaurus.etc.jpa
 
 import jakarta.persistence.EntityManager
-import org.mbari.annosaurus.etc.jdk.Logging.given
+import org.mbari.annosaurus.etc.jdk.Loggers.given
 
 import scala.util.control.NonFatal
 

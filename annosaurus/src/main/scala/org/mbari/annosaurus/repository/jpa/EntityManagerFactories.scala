@@ -19,7 +19,7 @@ package org.mbari.annosaurus.repository.jpa
 import com.typesafe.config.ConfigFactory
 import jakarta.persistence.{EntityManagerFactory, Persistence}
 import org.mbari.annosaurus.AppConfig
-import org.mbari.annosaurus.etc.jdk.Logging.given
+import org.mbari.annosaurus.etc.jdk.Loggers.given
 
 import java.lang.System.Logger.Level
 import scala.jdk.CollectionConverters.*

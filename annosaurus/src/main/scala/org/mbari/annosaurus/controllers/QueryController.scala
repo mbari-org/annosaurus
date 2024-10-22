@@ -26,7 +26,7 @@ class QueryController(databaseConfig: DatabaseConfig, viewName: String):
 
     def count(queryRequest: QueryRequest): Either[Throwable, Count] =
         for
-            query <- Query.validate(queryRequest)
+            query <- Query.validate(queryRequest, checkSelect = false)
             count <- queryService.count(query)
         yield Count(count)
 

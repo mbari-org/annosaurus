@@ -18,7 +18,7 @@ package org.mbari.annosaurus.controllers
 
 import jakarta.persistence.EntityManager
 import org.mbari.annosaurus.domain.CachedAncillaryDatum
-import org.mbari.annosaurus.etc.jdk.Logging.{*, given}
+import org.mbari.annosaurus.etc.jdk.Loggers.{*, given}
 
 import java.sql.Timestamp
 import java.time.Instant

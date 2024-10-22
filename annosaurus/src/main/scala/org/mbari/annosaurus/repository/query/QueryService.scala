@@ -18,7 +18,7 @@ package org.mbari.annosaurus.repository.query
 
 import org.mbari.annosaurus.DatabaseConfig
 import org.mbari.annosaurus.domain.Association
-import org.mbari.annosaurus.etc.jdk.Logging.{*, given}
+import org.mbari.annosaurus.etc.jdk.Loggers.{*, given}
 import org.mbari.annosaurus.repository.jdbc.*
 
 import java.sql.ResultSet

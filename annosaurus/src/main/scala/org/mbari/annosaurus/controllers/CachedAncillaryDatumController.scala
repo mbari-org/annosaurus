@@ -17,7 +17,7 @@
 package org.mbari.annosaurus.controllers
 
 import org.mbari.annosaurus.domain.CachedAncillaryDatum
-import org.mbari.annosaurus.etc.jdk.Logging.given
+import org.mbari.annosaurus.etc.jdk.Loggers.given
 import org.mbari.annosaurus.repository.jpa.entity.{CachedAncillaryDatumEntity, ImagedMomentEntity}
 import org.mbari.annosaurus.repository.jpa.{BaseDAO, JPADAOFactory}
 import org.mbari.annosaurus.repository.{CachedAncillaryDatumDAO, NotFoundInDatastoreException}

@@ -17,8 +17,8 @@
 package org.mbari.annosaurus
 
 import com.typesafe.config.ConfigFactory
-import org.mbari.annosaurus.etc.jdk.Logging
-import org.mbari.annosaurus.etc.jdk.Logging.{*, given}
+import org.mbari.annosaurus.etc.jdk.Loggers
+import org.mbari.annosaurus.etc.jdk.Loggers.{*, given}
 import org.mbari.annosaurus.etc.jwt.JwtService
 
 import scala.util.Try
@@ -26,7 +26,7 @@ import scala.util.control.NonFatal
 
 object AppConfig:
 
-    private val log = Logging(getClass)
+    private val log = Loggers(getClass)
 
     val Name: String = "annosaurus"
 

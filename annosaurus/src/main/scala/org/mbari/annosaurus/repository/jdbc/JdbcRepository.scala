@@ -28,7 +28,7 @@ import org.mbari.annosaurus.domain.{
     ObservationsUpdate,
     QueryConstraints
 }
-import org.mbari.annosaurus.etc.jdk.Logging.given
+import org.mbari.annosaurus.etc.jdk.Loggers.given
 import org.mbari.annosaurus.repository.jpa.extensions.*
 
 import java.time.Instant

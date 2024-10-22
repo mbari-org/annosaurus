@@ -17,7 +17,7 @@
 package org.mbari.annosaurus.repository.jdbc
 
 import jakarta.persistence.EntityManager
-import org.mbari.annosaurus.etc.jdk.Logging.given
+import org.mbari.annosaurus.etc.jdk.Loggers.given
 
 import java.net.URL
 import java.sql.Connection

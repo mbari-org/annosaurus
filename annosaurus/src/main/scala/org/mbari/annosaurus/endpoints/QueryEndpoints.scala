@@ -16,18 +16,15 @@
 
 package org.mbari.annosaurus.endpoints
 
-import sttp.capabilities.Streams
 import org.mbari.annosaurus.controllers.QueryController
 import org.mbari.annosaurus.domain.{Count, ErrorMsg, QueryRequest}
 import org.mbari.annosaurus.endpoints.CustomTapirJsonCirce.*
 import org.mbari.annosaurus.etc.circe.CirceCodecs.{*, given}
 import org.mbari.annosaurus.repository.query.{JDBC, QueryResults}
-// import sttp.capabilities.fs2.Fs2Streams
 import sttp.tapir.*
 import sttp.tapir.generic.auto.*
 import sttp.tapir.server.ServerEndpoint
 import sttp.tapir.server.ServerEndpoint.Full
-// import fs2.{Chunk, Stream}
 
 import scala.concurrent.{ExecutionContext, Future}
 import java.nio.charset.StandardCharsets
