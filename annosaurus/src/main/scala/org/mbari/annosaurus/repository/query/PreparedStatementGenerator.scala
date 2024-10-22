@@ -83,7 +83,7 @@ object PreparedStatementGenerator:
         tableName: String,
         query: Query
     ): String =
-        if (query.where.isEmpty) ""
+        if query.where.isEmpty then ""
         else
             val wheres = query.where.map(_.toPreparedStatementTemplate).mkString(" AND ")
             if query.concurrentObservations && query.relatedAssociations then s"""WHERE $ObservationUuid IN (

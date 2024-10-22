@@ -17,19 +17,16 @@
 package org.mbari.annosaurus.repository.query
 
 import org.mbari.annosaurus.DatabaseConfig
-import org.mbari.annosaurus.domain.Association
 import org.mbari.annosaurus.etc.jdk.Loggers.{*, given}
-import org.mbari.annosaurus.repository.jdbc.*
 
 import java.sql.ResultSet
-import scala.collection.mutable.ListBuffer
 import scala.util.Using
 
 class QueryService(databaseConfig: DatabaseConfig, viewName: String):
 
-    val jdbc               = new JDBC(databaseConfig)
+    val jdbc        = new JDBC(databaseConfig)
 //    val AnnotationViewName = "annotations"
-    private val log        = System.getLogger(getClass.getName)
+    private val log = System.getLogger(getClass.getName)
 
 //    def findAllConceptNames(): Either[Throwable, Seq[String]] =
 //        jdbc.findDistinct(viewName, "concept", stringConverter)

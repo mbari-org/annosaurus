@@ -26,7 +26,7 @@ import org.mbari.vcr4j.time.Timecode
 import java.sql.Timestamp
 import java.time.{Duration, Instant}
 import java.util.function.Function
-import java.util.{UUID, stream}
+import java.util.{stream, UUID}
 import scala.jdk.CollectionConverters.*
 
 /**

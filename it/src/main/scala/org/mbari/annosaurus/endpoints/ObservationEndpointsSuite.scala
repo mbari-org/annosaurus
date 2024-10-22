@@ -17,7 +17,17 @@
 package org.mbari.annosaurus.endpoints
 
 import org.mbari.annosaurus.controllers.{ImagedMomentController, ObservationController, TestUtils}
-import org.mbari.annosaurus.domain.{ConceptCount, Count, CountForVideoReferenceSC, Observation, ObservationSC, ObservationUpdateSC, ObservationsUpdate, RenameConcept, RenameCountSC}
+import org.mbari.annosaurus.domain.{
+    ConceptCount,
+    Count,
+    CountForVideoReferenceSC,
+    Observation,
+    ObservationSC,
+    ObservationUpdateSC,
+    ObservationsUpdate,
+    RenameConcept,
+    RenameCountSC
+}
 import org.mbari.annosaurus.etc.circe.CirceCodecs.{*, given}
 import org.mbari.annosaurus.etc.jwt.JwtService
 import org.mbari.annosaurus.etc.sdk.Futures.join

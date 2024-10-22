@@ -81,7 +81,7 @@ class CachedAncillaryDatumController(val daoFactory: JPADAOFactory)
                             )
                         // TODO should this return the existing data?
                         None
-                    else {
+                    else
                         val cad = dao.newPersistentObject(
                             latitude,
                             longitude,
@@ -104,7 +104,6 @@ class CachedAncillaryDatumController(val daoFactory: JPADAOFactory)
 //                        println("---- " + cad)
                         imagedMoment.setAncillaryDatum(cad)
                         Some(cad)
-                    }
 
         for
             entity <- exec(fn)
@@ -126,11 +125,10 @@ class CachedAncillaryDatumController(val daoFactory: JPADAOFactory)
                         throw new RuntimeException(
                             s"ImagedMoment with UUID of $imagedMomentUuid already has ancillary data"
                         )
-                    else {
+                    else
                         val entity = datum.toEntity
                         imagedMoment.setAncillaryDatum(entity)
                         entity
-                    }
 
         for
             entity <- exec(fn)
@@ -289,10 +287,9 @@ class CachedAncillaryDatumController(val daoFactory: JPADAOFactory)
         if im.getAncillaryDatum != null then
             updateValues(im.getAncillaryDatum, d)
             im.getAncillaryDatum
-        else {
+        else
             im.setAncillaryDatum(d)
             im.getAncillaryDatum
-        }
 
     def merge(
         data: Iterable[CachedAncillaryDatum],
@@ -315,7 +312,7 @@ class CachedAncillaryDatumController(val daoFactory: JPADAOFactory)
                 cd.recordedTimestamp.map(_.toEpochMilli).getOrElse(-1L).toDouble
 
             if imagedMoments.isEmpty || usefulData.isEmpty then Seq.empty
-            else {
+            else
                 val mergedData = FastCollator(
                     imagedMoments,
                     imagedMomentToMillis,
@@ -330,7 +327,6 @@ class CachedAncillaryDatumController(val daoFactory: JPADAOFactory)
                 yield
                     val d = dao.newPersistentObject(cad.toEntity)
                     transform(createOrUpdate(d, im))
-            }
 
         exec(fn)
 

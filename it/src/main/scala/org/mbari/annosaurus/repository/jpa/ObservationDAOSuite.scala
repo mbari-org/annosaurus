@@ -151,24 +151,26 @@ trait ObservationDAOSuite extends BaseDAOSuite:
 
     test("findAllGroups") {
         val xs                        = TestUtils.create(5, 1)
-        val expected            =  xs.flatMap(_.getObservations().asScala.map(_.getGroup()))
+        val expected                  = xs
+            .flatMap(_.getObservations().asScala.map(_.getGroup()))
             .filter(_ != null)
             .distinct
             .sorted
         given dao: ObservationDAOImpl = daoFactory.newObservationDAO()
-        val obtained                    = run(() => dao.findAllGroups()).sorted
+        val obtained                  = run(() => dao.findAllGroups()).sorted
         assertEquals(obtained, expected)
         dao.close()
     }
 
     test("findAllActivities") {
         val xs                        = TestUtils.create(5, 1)
-        val expected        = xs.flatMap(_.getObservations.asScala.map(_.getActivity()))
-                .filter(_ != null)
-                .distinct
-                .sorted
+        val expected                  = xs
+            .flatMap(_.getObservations.asScala.map(_.getActivity()))
+            .filter(_ != null)
+            .distinct
+            .sorted
         given dao: ObservationDAOImpl = daoFactory.newObservationDAO()
-        val obtained                = run(() => dao.findAllActivities()).sorted
+        val obtained                  = run(() => dao.findAllActivities()).sorted
         assertEquals(obtained, expected)
         dao.close()
     }

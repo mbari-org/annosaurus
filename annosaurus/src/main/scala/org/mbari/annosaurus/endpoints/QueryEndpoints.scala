@@ -27,7 +27,6 @@ import sttp.tapir.server.ServerEndpoint
 import sttp.tapir.server.ServerEndpoint.Full
 
 import scala.concurrent.{ExecutionContext, Future}
-import java.nio.charset.StandardCharsets
 
 class QueryEndpoints(queryController: QueryController)(using executionContext: ExecutionContext) extends Endpoints:
 
@@ -62,9 +61,9 @@ class QueryEndpoints(queryController: QueryController)(using executionContext: E
             )
         )
 
-    // val runQueryStreaming = 
+    // val runQueryStreaming =
     //     openEndpoint
-    //         .post 
+    //         .post
     //         .in(base / "run")
     //         .in(jsonBody[QueryRequest])
     //         .out(streamTextBody(Fs2Streams[Future]), (CodecFormat.TextPlain(), Some(StandardCharsets.UTF_8)))

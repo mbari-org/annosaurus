@@ -165,7 +165,7 @@ trait ImagedMomentDAO[T <: IPersistentObject] extends DAO[T]:
                 val im0 = elapsedTime.flatMap(findByVideoReferenceUUIDAndElapsedTime(uuid, _))
                 if im0.isEmpty then recordedDate.flatMap(findByVideoReferenceUUIDAndRecordedDate(uuid, _))
                 else im0
-        // This code has bug when resolving timecodes. See M3-15
+            // This code has bug when resolving timecodes. See M3-15
 //    val im0 = timecode.flatMap(findByVideoReferenceUUIDAndTimecode(uuid, _))
 //    val im1 = if (im0.isEmpty) elapsedTime.flatMap(findByVideoReferenceUUIDAndElapsedTime(uuid, _)) else im0
 //    if (im1.isEmpty) recordedDate.flatMap(findByVideoReferenceUUIDAndRecordedDate(uuid, _)) else im1

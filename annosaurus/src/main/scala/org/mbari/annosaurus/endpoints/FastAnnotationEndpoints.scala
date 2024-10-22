@@ -16,7 +16,18 @@
 
 package org.mbari.annosaurus.endpoints
 
-import org.mbari.annosaurus.domain.{AnnotationSC, ConcurrentRequestSC, Count, DeleteCountSC, ErrorMsg, GeographicRangeSC, ImageSC, MultiRequestSC, QueryConstraints, QueryConstraintsResponseSC}
+import org.mbari.annosaurus.domain.{
+    AnnotationSC,
+    ConcurrentRequestSC,
+    Count,
+    DeleteCountSC,
+    ErrorMsg,
+    GeographicRangeSC,
+    ImageSC,
+    MultiRequestSC,
+    QueryConstraints,
+    QueryConstraintsResponseSC
+}
 import org.mbari.annosaurus.endpoints.CustomTapirJsonCirce.*
 import org.mbari.annosaurus.etc.circe.CirceCodecs.given
 import org.mbari.annosaurus.etc.jwt.JwtService

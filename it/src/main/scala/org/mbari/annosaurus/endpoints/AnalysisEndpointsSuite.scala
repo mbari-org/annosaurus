@@ -72,10 +72,10 @@ trait AnalysisEndpointsSuite extends EndpointsSuite:
 
     // TODO both the depth and time histogram logic needs to be reworked. They can give incorrect results
     test("timeHistogram".flaky) {
-        val xs = TestUtils.create(5, 5, includeData = true)
-        val minTime = xs.map(_.getRecordedTimestamp).min
-        val maxTime = xs.map(_.getRecordedTimestamp).max
-        val expected = xs.flatMap(_.getObservations.asScala).size
+        val xs                  = TestUtils.create(5, 5, includeData = true)
+        val minTime             = xs.map(_.getRecordedTimestamp).min
+        val maxTime             = xs.map(_.getRecordedTimestamp).max
+        val expected            = xs.flatMap(_.getObservations.asScala).size
         val videoReferenceUuids = xs.map(_.getVideoReferenceUuid).distinct
         val qcr                 = QueryConstraints(
             videoReferenceUuids = Seq(xs.head.getVideoReferenceUuid),

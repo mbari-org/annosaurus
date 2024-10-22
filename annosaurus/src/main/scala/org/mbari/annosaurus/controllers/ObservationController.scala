@@ -216,8 +216,7 @@ class ObservationController(
                 then
                     val imDao = daoFactory.newImagedMomentDAO(dao)
                     imDao.delete(imagedMoment)
-                else {
+                else
                     imagedMoment.removeObservation(observation)
                     dao.delete(observation)
-                }
                 true

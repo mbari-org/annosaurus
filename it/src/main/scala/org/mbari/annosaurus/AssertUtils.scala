@@ -17,7 +17,15 @@
 package org.mbari.annosaurus
 
 import org.junit.Assert.*
-import org.mbari.annosaurus.repository.jpa.entity.{AssociationEntity, CachedAncillaryDatumEntity, CachedVideoReferenceInfoEntity, ImageReferenceEntity, ImagedMomentEntity, IndexEntity, ObservationEntity}
+import org.mbari.annosaurus.repository.jpa.entity.{
+    AssociationEntity,
+    CachedAncillaryDatumEntity,
+    CachedVideoReferenceInfoEntity,
+    ImageReferenceEntity,
+    ImagedMomentEntity,
+    IndexEntity,
+    ObservationEntity
+}
 
 import scala.jdk.CollectionConverters.*
 

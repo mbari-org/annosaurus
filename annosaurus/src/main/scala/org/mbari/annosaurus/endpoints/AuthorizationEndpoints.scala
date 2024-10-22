@@ -16,7 +16,15 @@
 
 package org.mbari.annosaurus.endpoints
 
-import org.mbari.annosaurus.domain.{Authorization, AuthorizationSC, BadRequest, ErrorMsg, NotFound, ServerError, Unauthorized}
+import org.mbari.annosaurus.domain.{
+    Authorization,
+    AuthorizationSC,
+    BadRequest,
+    ErrorMsg,
+    NotFound,
+    ServerError,
+    Unauthorized
+}
 import org.mbari.annosaurus.etc.circe.CirceCodecs.given
 import org.mbari.annosaurus.etc.jwt.JwtService
 import sttp.model.StatusCode

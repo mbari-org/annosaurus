@@ -43,9 +43,9 @@ trait TestDAOFactory extends JPADAOFactory:
         Await.result(f, Duration(60, TimeUnit.SECONDS))
 
     def testProps(): Map[String, String]
-    
+
     def databaseConfig: DatabaseConfig
-    
+
     val annotationView: String = "annotations"
 
 object TestDAOFactory:

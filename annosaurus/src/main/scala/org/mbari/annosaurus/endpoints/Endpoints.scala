@@ -24,10 +24,10 @@ import org.mbari.annosaurus.etc.jdk.Loggers.given
 import org.mbari.annosaurus.etc.jwt.JwtService
 import sttp.model.StatusCode
 import sttp.model.headers.WWWAuthenticateChallenge
+import sttp.tapir.*
 import sttp.tapir.generic.auto.*
 import sttp.tapir.json.circe.*
 import sttp.tapir.server.ServerEndpoint
-import sttp.tapir.*
 
 import java.net.{URI, URL}
 import java.time.Instant

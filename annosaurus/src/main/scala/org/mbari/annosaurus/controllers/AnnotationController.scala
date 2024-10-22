@@ -525,8 +525,7 @@ class AnnotationController(
                             .getImageReferences
                             .isEmpty
                     then imDao.delete(imagedMoment)
-                    else
-                        imagedMoment.removeObservation(v)
+                    else imagedMoment.removeObservation(v)
 //                        d.delete(v)
                     true
         )

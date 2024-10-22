@@ -20,7 +20,7 @@ import org.mbari.annosaurus.controllers.TestUtils
 import org.mbari.annosaurus.repository.jpa.{BaseDAOSuite, JPADAOFactory}
 import org.mbari.annosaurus.repository.query.Constraint.In
 
-trait QueryServiceSuite extends BaseDAOSuite {
+trait QueryServiceSuite extends BaseDAOSuite:
 
     given JPADAOFactory = daoFactory
 
@@ -33,10 +33,10 @@ trait QueryServiceSuite extends BaseDAOSuite {
     }
 
     test("query distinct concept") {
-        val im = TestUtils.create(5, 2, 1)
+        val im    = TestUtils.create(5, 2, 1)
         val query = Query(select = Seq("concept"), distinct = true)
         queryService.query(query) match
-            case Left(e) => fail(e.getMessage)
+            case Left(e)        => fail(e.getMessage)
             case Right(results) =>
                 assertEquals(results.size, 1)
                 assertEquals(results.head._2.size, 10)
@@ -44,23 +44,25 @@ trait QueryServiceSuite extends BaseDAOSuite {
     }
 
     test("query distinct concept with limit") {
-        val im = TestUtils.create(5, 2, 1)
+        val im    = TestUtils.create(5, 2, 1)
         val query = Query(select = Seq("concept"), distinct = true, limit = Some(2))
         queryService.query(query) match
-            case Left(e) => fail(e.getMessage)
+            case Left(e)        => fail(e.getMessage)
             case Right(results) =>
                 assertEquals(results.size, 1)
                 assertEquals(results.head._2.size, 2)
     }
 
     test("query by concept") {
-        val im = TestUtils.create(5, 2, 1)
-        val query = Query(select = Seq("concept"), distinct = true, where = Seq(In("concept", Seq(im.head.getObservations.iterator().next().getConcept))))
+        val im    = TestUtils.create(5, 2, 1)
+        val query = Query(
+            select = Seq("concept"),
+            distinct = true,
+            where = Seq(In("concept", Seq(im.head.getObservations.iterator().next().getConcept)))
+        )
         queryService.query(query) match
-            case Left(e) => fail(e.getMessage)
+            case Left(e)        => fail(e.getMessage)
             case Right(results) =>
                 assertEquals(results.size, 1)
                 assertEquals(results.head._2.size, 1)
     }
-
-}

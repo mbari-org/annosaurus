@@ -18,25 +18,25 @@ package org.mbari.annosaurus.endpoints
 
 import org.mbari.annosaurus.controllers.{QueryController, TestUtils}
 import org.mbari.annosaurus.domain.{ConstraintRequest, Count, QueryRequest}
+import org.mbari.annosaurus.etc.circe.CirceCodecs.{*, given}
 import org.mbari.annosaurus.repository.jpa.JPADAOFactory
 import org.mbari.annosaurus.repository.query.JDBC
-import org.mbari.annosaurus.etc.jdk.Loggers.{*, given}
 import sttp.model.StatusCode
-import org.mbari.annosaurus.etc.circe.CirceCodecs.{*, given}
 
 import scala.jdk.CollectionConverters.*
 
-trait QueryEndpointsSuite extends EndpointsSuite {
+trait QueryEndpointsSuite extends EndpointsSuite:
 
     private val log = System.getLogger(getClass.getName)
 
     given JPADAOFactory = daoFactory
 
     private lazy val controller = new QueryController(daoFactory.databaseConfig, daoFactory.annotationView)
-    private lazy val endpoints = new QueryEndpoints(controller)
+    private lazy val endpoints  = new QueryEndpoints(controller)
 
     test("listColumns") {
-        runGet(endpoints.listColumnsImpl,
+        runGet(
+            endpoints.listColumnsImpl,
             s"http://test.com/v1/query/columns",
             response =>
                 assertEquals(response.code, StatusCode.Ok)
@@ -47,16 +47,18 @@ trait QueryEndpointsSuite extends EndpointsSuite {
     }
 
     test("runQuery") {
-        val xs = TestUtils.create(2, 2)
-        val expected = ("concept" +: xs.flatMap(_.getObservations.asScala.map(_.getConcept))).distinct.sorted.mkString("\n")
+        val xs           = TestUtils.create(2, 2)
+        val expected     =
+            ("concept" +: xs.flatMap(_.getObservations.asScala.map(_.getConcept))).distinct.sorted.mkString("\n")
         val queryRequest = QueryRequest(select = Some(Seq("concept")), distinct = Some(true))
-        runPost(endpoints.runQueryImpl,
+        runPost(
+            endpoints.runQueryImpl,
             s"http://test.com/v1/query/run",
             queryRequest.stringify,
             response =>
                 assertEquals(response.code, StatusCode.Ok)
                 response.body match
-                    case Left(e) => fail(e)
+                    case Left(e)     => fail(e)
                     case Right(body) =>
                         val obtained = body.split("\n").sorted.mkString("\n")
 //                        log.atDebug.log(s"Query results: $obtained")
@@ -65,10 +67,12 @@ trait QueryEndpointsSuite extends EndpointsSuite {
     }
 
     test("count") {
-        val xs = TestUtils.create(2, 2)
-        val expected = 4L
-        val queryRequest = QueryRequest(distinct = Some(true), where = Some(Seq(ConstraintRequest("concept", isnull = Some(false)))))
-        runPost(endpoints.countImpl,
+        val xs           = TestUtils.create(2, 2)
+        val expected     = 4L
+        val queryRequest =
+            QueryRequest(distinct = Some(true), where = Some(Seq(ConstraintRequest("concept", isnull = Some(false)))))
+        runPost(
+            endpoints.countImpl,
             s"http://test.com/v1/query/count",
             queryRequest.stringify,
             response =>
@@ -78,5 +82,3 @@ trait QueryEndpointsSuite extends EndpointsSuite {
                 assertEquals(obtained.count, expected)
         )
     }
-
-}

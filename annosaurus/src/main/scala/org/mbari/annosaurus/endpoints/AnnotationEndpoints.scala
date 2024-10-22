@@ -17,7 +17,17 @@
 package org.mbari.annosaurus.endpoints
 
 import org.mbari.annosaurus.controllers.AnnotationController
-import org.mbari.annosaurus.domain.{AnnotationCreateSC, AnnotationSC, AnnotationUpdateSC, BulkAnnotationSC, ConcurrentRequest, ConcurrentRequestCountSC, ErrorMsg, MultiRequest, MultiRequestCountSC}
+import org.mbari.annosaurus.domain.{
+    AnnotationCreateSC,
+    AnnotationSC,
+    AnnotationUpdateSC,
+    BulkAnnotationSC,
+    ConcurrentRequest,
+    ConcurrentRequestCountSC,
+    ErrorMsg,
+    MultiRequest,
+    MultiRequestCountSC
+}
 import org.mbari.annosaurus.endpoints.CustomTapirJsonCirce.*
 import org.mbari.annosaurus.etc.circe.CirceCodecs.given
 import org.mbari.annosaurus.etc.jwt.JwtService

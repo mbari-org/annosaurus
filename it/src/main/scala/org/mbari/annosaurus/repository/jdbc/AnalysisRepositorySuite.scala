@@ -39,11 +39,11 @@ trait AnalysisRepositorySuite extends BaseDAOSuite:
     }
 
     test("timeHistogram") {
-        val xs = TestUtils.create(5, 5, includeData = true)
-        val minTime = xs.map(_.getRecordedTimestamp).min
-        val maxTime = xs.map(_.getRecordedTimestamp).max
-        val expected = xs.flatMap(_.getObservations.asScala).size
-        val qcr = QueryConstraints(
+        val xs        = TestUtils.create(5, 5, includeData = true)
+        val minTime   = xs.map(_.getRecordedTimestamp).min
+        val maxTime   = xs.map(_.getRecordedTimestamp).max
+        val expected  = xs.flatMap(_.getObservations.asScala).size
+        val qcr       = QueryConstraints(
             videoReferenceUuids = Seq(xs.head.getVideoReferenceUuid),
             minTimestamp = Some(minTime.minusSeconds(24 * 60 * 60)),
             maxTimestamp = Some(maxTime.plusSeconds(24 * 60 * 60))

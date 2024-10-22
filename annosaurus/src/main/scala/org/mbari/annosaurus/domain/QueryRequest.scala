@@ -58,17 +58,27 @@ case class QueryRequest(
 /**
  * ConstraintRequest is a case class that represents a constraint to apply to a query. It can have exactly 2 fields:
  * column and one of the following fields: between, contains, equals, in, isnull, like, max, min, minmax.
- * @param column The column to apply the constraint to
- * @param between A list of two numeric, or dat2 (as iso8601) values to apply a between constraint
- * @param contains Maps to a SQL 'LIKE' clause with the value wrapped in '%' characters
- * @param equals A value to apply an equals constraint
- * @param in A list of values to apply an 'IN' constraint
- * @param isnull A boolean value to apply an 'IS NULL' constraint. If true, the constraint is 'IS NULL', if false, the
- *               constraint is 'IS NOT NULL'
- * @param like A value to apply a 'LIKE' constraint. You must apply the '%' characters to the value before passing it
- * @param max The maximum value to apply a '<=' constraint
- * @param min The minimum value to apply a '>=' constraint
- * @param minmax A list of 2 numeric values to apply a 'BETWEEN' constraint
+ * @param column
+ *   The column to apply the constraint to
+ * @param between
+ *   A list of two numeric, or dat2 (as iso8601) values to apply a between constraint
+ * @param contains
+ *   Maps to a SQL 'LIKE' clause with the value wrapped in '%' characters
+ * @param equals
+ *   A value to apply an equals constraint
+ * @param in
+ *   A list of values to apply an 'IN' constraint
+ * @param isnull
+ *   A boolean value to apply an 'IS NULL' constraint. If true, the constraint is 'IS NULL', if false, the constraint is
+ *   'IS NOT NULL'
+ * @param like
+ *   A value to apply a 'LIKE' constraint. You must apply the '%' characters to the value before passing it
+ * @param max
+ *   The maximum value to apply a '<=' constraint
+ * @param min
+ *   The minimum value to apply a '>=' constraint
+ * @param minmax
+ *   A list of 2 numeric values to apply a 'BETWEEN' constraint
  */
 case class ConstraintRequest(
     column: String,

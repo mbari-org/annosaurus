@@ -17,7 +17,19 @@
 package org.mbari.annosaurus.endpoints
 
 import org.mbari.annosaurus.controllers.TestUtils
-import org.mbari.annosaurus.domain.{Annotation, AnnotationSC, CachedAncillaryDatum, ConcurrentRequest, Count, DeleteCountSC, GeographicRangeSC, ImageSC, MultiRequest, QueryConstraints, QueryConstraintsResponseSC}
+import org.mbari.annosaurus.domain.{
+    Annotation,
+    AnnotationSC,
+    CachedAncillaryDatum,
+    ConcurrentRequest,
+    Count,
+    DeleteCountSC,
+    GeographicRangeSC,
+    ImageSC,
+    MultiRequest,
+    QueryConstraints,
+    QueryConstraintsResponseSC
+}
 import org.mbari.annosaurus.etc.circe.CirceCodecs.{*, given}
 import org.mbari.annosaurus.etc.jwt.JwtService
 import org.mbari.annosaurus.etc.sdk.Futures.*

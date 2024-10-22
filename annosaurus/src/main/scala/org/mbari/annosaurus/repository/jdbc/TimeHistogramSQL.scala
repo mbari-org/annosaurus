@@ -16,8 +16,6 @@
 
 package org.mbari.annosaurus.repository.jdbc
 
-import io.prometheus.metrics.shaded.com_google_protobuf_3_25_3.Timestamp
-
 import java.time.Instant
 
 object TimeHistogramSQL:

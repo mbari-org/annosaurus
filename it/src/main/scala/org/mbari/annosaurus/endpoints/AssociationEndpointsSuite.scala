@@ -17,7 +17,16 @@
 package org.mbari.annosaurus.endpoints
 
 import org.mbari.annosaurus.controllers.{AssociationController, TestUtils}
-import org.mbari.annosaurus.domain.{Association, AssociationSC, AssociationUpdateSC, ConceptAssociationRequest, ConceptAssociationResponseSC, ConceptCount, RenameConcept, RenameCountSC}
+import org.mbari.annosaurus.domain.{
+    Association,
+    AssociationSC,
+    AssociationUpdateSC,
+    ConceptAssociationRequest,
+    ConceptAssociationResponseSC,
+    ConceptCount,
+    RenameConcept,
+    RenameCountSC
+}
 import org.mbari.annosaurus.etc.circe.CirceCodecs.{*, given}
 import org.mbari.annosaurus.etc.jwt.JwtService
 import org.mbari.annosaurus.etc.sdk.Futures.*

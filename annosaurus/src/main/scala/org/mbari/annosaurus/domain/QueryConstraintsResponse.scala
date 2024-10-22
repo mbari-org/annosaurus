@@ -16,8 +16,6 @@
 
 package org.mbari.annosaurus.domain
 
-
-
 final case class QueryConstraintsResponse[A](queryConstraints: QueryConstraints, content: A):
     def toSnakeCase: QueryConstraintsResponseSC[A] =
         QueryConstraintsResponseSC(queryConstraints.toSnakeCase, content)

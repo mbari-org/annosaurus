@@ -37,7 +37,11 @@ case class Query(
 
 object Query:
 
-    def validate(queryRequest: QueryRequest, checkWhere: Boolean = true, checkSelect: Boolean = true): Either[Throwable, Query] =
+    def validate(
+        queryRequest: QueryRequest,
+        checkWhere: Boolean = true,
+        checkSelect: Boolean = true
+    ): Either[Throwable, Query] =
         val query = from(queryRequest)
         if checkWhere && query.where.isEmpty then Left(new IllegalArgumentException("where clause is required"))
         else if checkSelect && query.select.isEmpty then Left(new IllegalArgumentException("select clause is required"))

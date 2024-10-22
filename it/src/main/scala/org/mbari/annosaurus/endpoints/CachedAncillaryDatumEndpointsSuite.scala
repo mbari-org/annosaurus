@@ -16,7 +16,6 @@
 
 package org.mbari.annosaurus.endpoints
 
-import org.junit.Assert.*
 import org.mbari.annosaurus.controllers.{CachedAncillaryDatumController, TestUtils}
 import org.mbari.annosaurus.domain.{CachedAncillaryDatum, CachedAncillaryDatumSC, CountForVideoReferenceSC}
 import org.mbari.annosaurus.etc.circe.CirceCodecs.{*, given}

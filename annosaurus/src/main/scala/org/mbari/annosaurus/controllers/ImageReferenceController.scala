@@ -123,8 +123,7 @@ class ImageReferenceController(val daoFactory: JPADAOFactory)
                     then
                         val imDao = daoFactory.newImagedMomentDAO(dao)
                         imDao.delete(imagedMoment)
-                    else
-                        imagedMoment.removeImageReference(imageReference)
+                    else imagedMoment.removeImageReference(imageReference)
 //                        dao.delete(imageReference)
                     true
         exec(fn)
