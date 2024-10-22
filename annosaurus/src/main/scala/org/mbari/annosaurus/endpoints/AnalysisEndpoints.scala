@@ -24,27 +24,24 @@ import org.mbari.annosaurus.domain.{
     QueryConstraintsSC,
     TimeHistogramSC
 }
+import org.mbari.annosaurus.endpoints.CustomTapirJsonCirce.*
 import org.mbari.annosaurus.etc.circe.CirceCodecs.given
 import org.mbari.annosaurus.repository.jdbc.AnalysisRepository
 import sttp.tapir.*
 import sttp.tapir.generic.auto.*
 import sttp.tapir.server.ServerEndpoint
-import CustomTapirJsonCirce.*
 
-import scala.concurrent.ExecutionContext
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 // Endpoint[SECURITY_INPUT, INPUT, ERROR_OUTPUT, OUTPUT, -R]
-class AnalysisEndpoints(repository: AnalysisRepository)(implicit val executor: ExecutionContext)
-    extends Endpoints {
+class AnalysisEndpoints(repository: AnalysisRepository)(implicit val executor: ExecutionContext) extends Endpoints:
 
     private val base = "histogram"
     private val tag  = "Analysis"
 
-    val depthHistogram
-        : Endpoint[Unit, (Option[Int], QueryConstraints), ErrorMsg, QueryConstraintsResponseSC[
-            DepthHistogramSC
-        ], Any] = openEndpoint
+    val depthHistogram: Endpoint[Unit, (Option[Int], QueryConstraints), ErrorMsg, QueryConstraintsResponseSC[
+        DepthHistogramSC
+    ], Any] = openEndpoint
         .post
         .in(base / "depth")
         .in(query[Option[Int]]("size").description("Bin size in meters"))
@@ -65,10 +62,9 @@ class AnalysisEndpoints(repository: AnalysisRepository)(implicit val executor: E
             handleErrors(f)
         }
 
-    val timeHistogram
-        : Endpoint[Unit, (Option[Int], QueryConstraints), ErrorMsg, QueryConstraintsResponseSC[
-            TimeHistogramSC
-        ], Any] = openEndpoint
+    val timeHistogram: Endpoint[Unit, (Option[Int], QueryConstraints), ErrorMsg, QueryConstraintsResponseSC[
+        TimeHistogramSC
+    ], Any] = openEndpoint
         .post
         .in(base / "time")
         .in(query[Option[Int]]("size").description("Bin size in days").default(Some(50)))
@@ -91,5 +87,3 @@ class AnalysisEndpoints(repository: AnalysisRepository)(implicit val executor: E
 
     override def allImpl: List[ServerEndpoint[Any, Future]] =
         List(depthHistogramImpl, timeHistogramImpl)
-
-}

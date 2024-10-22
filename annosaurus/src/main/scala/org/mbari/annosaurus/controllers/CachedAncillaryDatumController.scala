@@ -16,29 +16,26 @@
 
 package org.mbari.annosaurus.controllers
 
+import org.mbari.annosaurus.domain.CachedAncillaryDatum
+import org.mbari.annosaurus.etc.jdk.Loggers.given
+import org.mbari.annosaurus.repository.jpa.entity.{CachedAncillaryDatumEntity, ImagedMomentEntity}
+import org.mbari.annosaurus.repository.jpa.{BaseDAO, JPADAOFactory}
+import org.mbari.annosaurus.repository.{CachedAncillaryDatumDAO, NotFoundInDatastoreException}
 import org.mbari.annosaurus.util.FastCollator
+
 import java.time.Duration
 import java.util.UUID
-
-import org.mbari.annosaurus.repository.jpa.BaseDAO
-import org.mbari.annosaurus.repository.{CachedAncillaryDatumDAO, NotFoundInDatastoreException}
-import org.slf4j.LoggerFactory
-
 import scala.concurrent.{ExecutionContext, Future}
-import org.mbari.annosaurus.repository.jpa.JPADAOFactory
-import org.mbari.annosaurus.repository.jpa.entity.CachedAncillaryDatumEntity
-import org.mbari.annosaurus.domain.CachedAncillaryDatum
-import org.mbari.annosaurus.repository.jpa.entity.ImagedMomentEntity
-import org.mbari.annosaurus.etc.jdk.Logging.given
 
-/** @author
-  *   Brian Schlining
-  * @since 2017-05-01T10:53:00
-  */
+/**
+ * @author
+ *   Brian Schlining
+ * @since 2017-05-01T10:53:00
+ */
 class CachedAncillaryDatumController(val daoFactory: JPADAOFactory)
     extends BaseController[CachedAncillaryDatumEntity, CachedAncillaryDatumDAO[
         CachedAncillaryDatumEntity
-    ], CachedAncillaryDatum] {
+    ], CachedAncillaryDatum]:
 
     protected type ADDAO = CachedAncillaryDatumDAO[CachedAncillaryDatumEntity]
     private val log = System.getLogger(getClass.getName)
@@ -68,24 +65,23 @@ class CachedAncillaryDatumController(val daoFactory: JPADAOFactory)
         phi: Option[Double] = None,
         theta: Option[Double] = None,
         psi: Option[Double] = None
-    )(implicit ec: ExecutionContext): Future[Option[CachedAncillaryDatum]] = {
+    )(implicit ec: ExecutionContext): Future[Option[CachedAncillaryDatum]] =
 
-        def fn(dao: ADDAO): Option[CachedAncillaryDatumEntity] = {
+        def fn(dao: ADDAO): Option[CachedAncillaryDatumEntity] =
             val imDao = daoFactory.newImagedMomentDAO(dao)
-            imDao.findByUUID(imagedMomentUuid) match {
+            imDao.findByUUID(imagedMomentUuid) match
                 case None               =>
                     log.atDebug.log(s"ImagedMoment with UUID of $imagedMomentUuid was no found")
                     None
                 case Some(imagedMoment) =>
-                    if (imagedMoment.getAncillaryDatum != null) {
+                    if imagedMoment.getAncillaryDatum != null then
                         log.atDebug
                             .log(
                                 s"ImagedMoment with UUID of $imagedMomentUuid already has ancillary data"
                             )
                         // TODO should this return the existing data?
                         None
-                    }
-                    else {
+                    else
                         val cad = dao.newPersistentObject(
                             latitude,
                             longitude,
@@ -108,50 +104,41 @@ class CachedAncillaryDatumController(val daoFactory: JPADAOFactory)
 //                        println("---- " + cad)
                         imagedMoment.setAncillaryDatum(cad)
                         Some(cad)
-                    }
-            }
-        }
 
         for
             entity <- exec(fn)
             dto    <- findByImagedMomentUUID(imagedMomentUuid) if entity.isDefined
         yield dto
-    }
 
     def create(imagedMomentUuid: UUID, datum: CachedAncillaryDatum)(implicit
         ec: ExecutionContext
-    ): Future[Option[CachedAncillaryDatum]] = {
-        def fn(dao: ADDAO): CachedAncillaryDatumEntity = {
+    ): Future[Option[CachedAncillaryDatum]] =
+        def fn(dao: ADDAO): CachedAncillaryDatumEntity =
             val imDao = daoFactory.newImagedMomentDAO(dao)
-            imDao.findByUUID(imagedMomentUuid) match {
+            imDao.findByUUID(imagedMomentUuid) match
                 case None               =>
                     throw new NotFoundInDatastoreException(
                         s"ImagedMoment with UUID of $imagedMomentUuid was no found"
                     )
                 case Some(imagedMoment) =>
-                    if (imagedMoment.getAncillaryDatum != null) {
+                    if imagedMoment.getAncillaryDatum != null then
                         throw new RuntimeException(
                             s"ImagedMoment with UUID of $imagedMomentUuid already has ancillary data"
                         )
-                    }
-                    else {
+                    else
                         val entity = datum.toEntity
                         imagedMoment.setAncillaryDatum(entity)
                         entity
-                    }
-            }
-        }
 
         for
             entity <- exec(fn)
             dto    <- findByImagedMomentUUID(imagedMomentUuid)
         yield dto
-    }
 
     def create(
         datum: CachedAncillaryDatum
     )(implicit ec: ExecutionContext): Future[Option[CachedAncillaryDatum]] =
-        datum.imagedMomentUuid match {
+        datum.imagedMomentUuid match
             case None       =>
                 Future.failed(
                     new RuntimeException(
@@ -159,12 +146,11 @@ class CachedAncillaryDatumController(val daoFactory: JPADAOFactory)
                     )
                 )
             case Some(uuid) => create(uuid, datum)
-        }
 
     def update(
         datum: CachedAncillaryDatum
     )(implicit ec: ExecutionContext): Future[Option[CachedAncillaryDatum]] =
-        datum.uuid match {
+        datum.uuid match
             case None       =>
                 Future.failed(
                     new RuntimeException(
@@ -172,23 +158,20 @@ class CachedAncillaryDatumController(val daoFactory: JPADAOFactory)
                     )
                 )
             case Some(uuid) => update(uuid, datum)
-        }
 
     def update(uuid: UUID, datum: CachedAncillaryDatum)(implicit
         ec: ExecutionContext
-    ): Future[Option[CachedAncillaryDatum]] = {
-        def fn(dao: ADDAO): Option[CachedAncillaryDatum] = {
+    ): Future[Option[CachedAncillaryDatum]] =
+        def fn(dao: ADDAO): Option[CachedAncillaryDatum] =
             dao
                 .findByUUID(uuid)
-                .map(cad => {
+                .map(cad =>
                     updateValues(cad, datum.toEntity)
                     cad
-                })
+                )
                 .map(transform)
-        }
 
         exec(fn)
-    }
 
     def update(
         uuid: UUID,
@@ -209,12 +192,12 @@ class CachedAncillaryDatumController(val daoFactory: JPADAOFactory)
         phi: Option[Double] = None,
         theta: Option[Double] = None,
         psi: Option[Double] = None
-    )(implicit ec: ExecutionContext): Future[Option[CachedAncillaryDatum]] = {
+    )(implicit ec: ExecutionContext): Future[Option[CachedAncillaryDatum]] =
 
-        def fn(dao: ADDAO): Option[CachedAncillaryDatum] = {
+        def fn(dao: ADDAO): Option[CachedAncillaryDatum] =
             dao
                 .findByUUID(uuid)
-                .map(cad => {
+                .map(cad =>
                     latitude.foreach(cad.setLatitude(_))
                     longitude.foreach(cad.setLongitude(_))
                     depthMeters.foreach(cad.setDepthMeters(_))
@@ -233,74 +216,67 @@ class CachedAncillaryDatumController(val daoFactory: JPADAOFactory)
                     theta.foreach(cad.setTheta(_))
                     psi.foreach(cad.setPsi(_))
                     cad
-                })
+                )
                 .map(transform)
-        }
 
         exec(fn)
-    }
 
     def findByVideoReferenceUUID(
         uuid: UUID
-    )(implicit ec: ExecutionContext): Future[Seq[CachedAncillaryDatum]] = {
-        def fn(dao: ADDAO): Seq[CachedAncillaryDatum] = {
+    )(implicit ec: ExecutionContext): Future[Seq[CachedAncillaryDatum]] =
+        def fn(dao: ADDAO): Seq[CachedAncillaryDatum] =
             val imDao   = daoFactory.newImagedMomentDAO(dao)
             val moments = imDao.findByVideoReferenceUUID(uuid)
             moments
                 .filter(_.getAncillaryDatum != null)
                 .map(im => CachedAncillaryDatum.from(im.getAncillaryDatum, true))
                 .toSeq
-        }
 
         exec(fn)
-    }
 
     def findByObservationUUID(
         uuid: UUID
-    )(implicit ec: ExecutionContext): Future[Option[CachedAncillaryDatum]] = {
+    )(implicit ec: ExecutionContext): Future[Option[CachedAncillaryDatum]] =
         def fn(dao: ADDAO): Option[CachedAncillaryDatum] =
             dao.findDTOByObservationUuid(uuid)
                 .map(CachedAncillaryDatum.from)
 
         exec(fn)
-    }
 
     def findByImagedMomentUUID(
         uuid: UUID
-    )(implicit ec: ExecutionContext): Future[Option[CachedAncillaryDatum]] = {
+    )(implicit ec: ExecutionContext): Future[Option[CachedAncillaryDatum]] =
         def fn(dao: ADDAO): Option[CachedAncillaryDatum] =
             dao.findByImagedMomentUUID(uuid).map(transform)
 
         exec(fn)
-    }
 
     def bulkCreateOrUpdate(
         data: Seq[CachedAncillaryDatum]
-    )(implicit ec: ExecutionContext): Future[Seq[CachedAncillaryDatum]] = {
-        def fn(dao: ADDAO): Seq[CachedAncillaryDatum] = {
+    )(implicit ec: ExecutionContext): Future[Seq[CachedAncillaryDatum]] =
+        def fn(dao: ADDAO): Seq[CachedAncillaryDatum] =
             val fastDao = new FastAncillaryDataController(
                 dao.asInstanceOf[BaseDAO[?]].entityManager
             )
             fastDao.createOrUpdate(data)
             data
-        }
 
         exec(fn)
-    }
 
-    /** This method should be called within a transaction!
-      *
-      * @param d
-      *   This MUST be a persistable object! (Not a CahcedAncillaryDatumBean)
-      * @param im
-      *   The moment whose ancillary data is being updated
-      * @return
-      *   The CachedAncillaryDatum.
-      */
+    /**
+     * This method should be called within a transaction!
+     *
+     * @param d
+     *   This MUST be a persistable object! (Not a CahcedAncillaryDatumBean)
+     * @param im
+     *   The moment whose ancillary data is being updated
+     * @return
+     *   The CachedAncillaryDatum.
+     */
     private def createOrUpdate(
         d: CachedAncillaryDatumEntity,
         im: ImagedMomentEntity
-    ): CachedAncillaryDatumEntity = {
+    ): CachedAncillaryDatumEntity =
         require(d != null, "A null CachedAncillaryDatum argument is not allowed")
         require(im != null, "A null ImagedMoment argument is not allowed")
         require(
@@ -308,23 +284,20 @@ class CachedAncillaryDatumController(val daoFactory: JPADAOFactory)
             "The ImagedMoment should already be present in the database. (Null UUID was found"
         )
 
-        if (im.getAncillaryDatum != null) {
+        if im.getAncillaryDatum != null then
             updateValues(im.getAncillaryDatum, d)
             im.getAncillaryDatum
-        }
-        else {
+        else
             im.setAncillaryDatum(d)
             im.getAncillaryDatum
-        }
-    }
 
     def merge(
         data: Iterable[CachedAncillaryDatum],
         videoReferenceUuid: UUID,
         tolerance: Duration = Duration.ofMillis(7500)
-    )(implicit ec: ExecutionContext): Future[Seq[CachedAncillaryDatum]] = {
+    )(implicit ec: ExecutionContext): Future[Seq[CachedAncillaryDatum]] =
 
-        def fn(dao: ADDAO): Seq[CachedAncillaryDatum] = {
+        def fn(dao: ADDAO): Seq[CachedAncillaryDatum] =
             val imDao         = daoFactory.newImagedMomentDAO(dao)
             val imagedMoments = imDao
                 .findByVideoReferenceUUID(videoReferenceUuid)
@@ -338,10 +311,8 @@ class CachedAncillaryDatumController(val daoFactory: JPADAOFactory)
             def datumToMillis(cd: CachedAncillaryDatum) =
                 cd.recordedTimestamp.map(_.toEpochMilli).getOrElse(-1L).toDouble
 
-            if (imagedMoments.isEmpty || usefulData.isEmpty) {
-                Seq.empty
-            }
-            else {
+            if imagedMoments.isEmpty || usefulData.isEmpty then Seq.empty
+            else
                 val mergedData = FastCollator(
                     imagedMoments,
                     imagedMomentToMillis,
@@ -350,31 +321,26 @@ class CachedAncillaryDatumController(val daoFactory: JPADAOFactory)
                     tolerance.toMillis.toDouble
                 )
 
-                for {
+                for
                     (im, opt) <- mergedData
                     cad       <- opt
-                } yield {
+                yield
                     val d = dao.newPersistentObject(cad.toEntity)
                     transform(createOrUpdate(d, im))
-                }
-            }
-        }
 
         exec(fn)
-    }
 
     def deleteByVideoReferenceUuid(
         videoReferenceUuid: UUID
-    )(implicit ec: ExecutionContext): Future[Int] = {
+    )(implicit ec: ExecutionContext): Future[Int] =
         def fn(dao: ADDAO): Int = dao.deleteByVideoReferenceUuid(videoReferenceUuid)
 
         exec(fn)
-    }
 
     private def updateValues(
         a: CachedAncillaryDatumEntity,
         b: CachedAncillaryDatumEntity
-    ): Unit = {
+    ): Unit =
         require(a != null && b != null, "Null arguments are not allowed")
         a.setLatitude(b.getLatitude)
         a.setLongitude(b.getLongitude)
@@ -393,5 +359,3 @@ class CachedAncillaryDatumController(val daoFactory: JPADAOFactory)
         a.setPhi(b.getPhi)
         a.setTheta(b.getTheta)
         a.setPsi(b.getPsi)
-    }
-}

@@ -16,24 +16,24 @@
 
 package org.mbari.annosaurus.controllers
 
+import org.mbari.annosaurus.domain.ImageReference
+import org.mbari.annosaurus.repository.jpa.JPADAOFactory
+import org.mbari.annosaurus.repository.jpa.entity.ImageReferenceEntity
 import org.mbari.annosaurus.repository.{ImageReferenceDAO, NotFoundInDatastoreException}
 
 import java.net.URL
 import java.util.UUID
-
 import scala.concurrent.{ExecutionContext, Future}
-import org.mbari.annosaurus.repository.jpa.entity.ImageReferenceEntity
-import org.mbari.annosaurus.repository.jpa.JPADAOFactory
-import org.mbari.annosaurus.domain.ImageReference
 
-/** @author
-  *   Brian Schlining
-  * @since 2016-07-04T22:15:00
-  */
+/**
+ * @author
+ *   Brian Schlining
+ * @since 2016-07-04T22:15:00
+ */
 class ImageReferenceController(val daoFactory: JPADAOFactory)
     extends BaseController[ImageReferenceEntity, ImageReferenceDAO[
         ImageReferenceEntity
-    ], ImageReference] {
+    ], ImageReference]:
 
     type IRDAO = ImageReferenceDAO[ImageReferenceEntity]
 
@@ -48,11 +48,11 @@ class ImageReferenceController(val daoFactory: JPADAOFactory)
         heightPixels: Option[Int] = None,
         widthPixels: Option[Int] = None,
         format: Option[String] = None
-    )(implicit ec: ExecutionContext): Future[ImageReference] = {
+    )(implicit ec: ExecutionContext): Future[ImageReference] =
 
-        def fn(dao: IRDAO): ImageReference = {
+        def fn(dao: IRDAO): ImageReference =
             val imDao = daoFactory.newImagedMomentDAO()
-            imDao.findByUUID(imagedMomentUUID) match {
+            imDao.findByUUID(imagedMomentUUID) match
                 case None               =>
                     throw new NotFoundInDatastoreException(
                         s"No ImagedMoment with UUID of $imagedMomentUUID was found"
@@ -62,11 +62,8 @@ class ImageReferenceController(val daoFactory: JPADAOFactory)
                         dao.newPersistentObject(url, description, heightPixels, widthPixels, format)
                     imagedMoment.addImageReference(imageReference)
                     transform(imageReference)
-            }
-        }
 
         exec(fn)
-    }
 
     def update(
         uuid: UUID,
@@ -76,21 +73,21 @@ class ImageReferenceController(val daoFactory: JPADAOFactory)
         widthPixels: Option[Int] = None,
         format: Option[String] = None,
         imagedMomentUUID: Option[UUID] = None
-    )(implicit ec: ExecutionContext): Future[Option[ImageReference]] = {
+    )(implicit ec: ExecutionContext): Future[Option[ImageReference]] =
 
-        def fn(dao: IRDAO): Option[ImageReference] = {
+        def fn(dao: IRDAO): Option[ImageReference] =
             dao
                 .findByUUID(uuid)
-                .map(imageReference => {
+                .map(imageReference =>
                     url.foreach(imageReference.setUrl)
                     description.foreach(imageReference.setDescription)
                     heightPixels.foreach(imageReference.setHeight(_))
                     widthPixels.foreach(imageReference.setWidth(_))
                     format.foreach(imageReference.setFormat)
-                    imagedMomentUUID.foreach(imUUID => {
+                    imagedMomentUUID.foreach(imUUID =>
                         val imDao = daoFactory.newImagedMomentDAO(dao)
                         val newIm = imDao.findByUUID(imUUID)
-                        newIm match {
+                        newIm match
                             case None               =>
                                 throw new NotFoundInDatastoreException(
                                     s"ImagedMoment with UUID of $imUUID no found"
@@ -98,46 +95,35 @@ class ImageReferenceController(val daoFactory: JPADAOFactory)
                             case Some(imagedMoment) =>
                                 imageReference.getImagedMoment.removeImageReference(imageReference)
                                 imagedMoment.addImageReference(imageReference)
-                        }
-                    })
+                    )
                     dao.flush()
                     transform(imageReference)
-                })
-        }
+                )
 
         exec(fn)
-    }
 
-    /** This controller will also delete the [[MutableImagedMoment]] if it is empty (i.e. no
-      * observations or other imageReferences)
-      *
-      * @param uuid
-      * @param ec
-      * @return
-      */
-    override def delete(uuid: UUID)(implicit ec: ExecutionContext): Future[Boolean] = {
-        def fn(dao: IRDAO): Boolean = {
-            dao.findByUUID(uuid) match {
+    /**
+     * This controller will also delete the [[MutableImagedMoment]] if it is empty (i.e. no observations or other
+     * imageReferences)
+     *
+     * @param uuid
+     * @param ec
+     * @return
+     */
+    override def delete(uuid: UUID)(implicit ec: ExecutionContext): Future[Boolean] =
+        def fn(dao: IRDAO): Boolean =
+            dao.findByUUID(uuid) match
                 case None                 => false
                 case Some(imageReference) =>
                     val imagedMoment = imageReference.getImagedMoment
                     // If this is the only imageref and there are no observations, delete the imagemoment
-                    if (
-                        imagedMoment.getImageReferences.size == 1 && imagedMoment
+                    if imagedMoment.getImageReferences.size == 1 && imagedMoment
                             .getObservations
                             .isEmpty
-                    ) {
+                    then
                         val imDao = daoFactory.newImagedMomentDAO(dao)
                         imDao.delete(imagedMoment)
-                    }
-                    else {
-                        imagedMoment.removeImageReference(imageReference)
+                    else imagedMoment.removeImageReference(imageReference)
 //                        dao.delete(imageReference)
-                    }
                     true
-            }
-        }
         exec(fn)
-    }
-
-}

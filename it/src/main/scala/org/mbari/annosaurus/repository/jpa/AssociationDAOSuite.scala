@@ -16,12 +16,13 @@
 
 package org.mbari.annosaurus.repository.jpa
 
-import org.mbari.annosaurus.controllers.TestUtils
-import scala.jdk.CollectionConverters.*
 import org.mbari.annosaurus.AssertUtils
+import org.mbari.annosaurus.controllers.TestUtils
 import org.mbari.annosaurus.domain.ConceptAssociationRequest
 
-trait AssociationDAOSuite extends BaseDAOSuite {
+import scala.jdk.CollectionConverters.*
+
+trait AssociationDAOSuite extends BaseDAOSuite:
 
     given JPADAOFactory = daoFactory
 
@@ -42,9 +43,7 @@ trait AssociationDAOSuite extends BaseDAOSuite {
         val o                         = i.getObservations.asScala.head
         val a                         = o.getAssociations.asScala.head
         given dao: AssociationDAOImpl = daoFactory.newAssociationDAO()
-        val ys                        = run(() =>
-            dao.findByLinkNameAndVideoReferenceUUID(a.getLinkName, i.getVideoReferenceUuid)
-        )
+        val ys                        = run(() => dao.findByLinkNameAndVideoReferenceUUID(a.getLinkName, i.getVideoReferenceUuid))
         assert(ys.size == 1)
         AssertUtils.assertSameAssociation(a, ys.head)
     }
@@ -142,13 +141,11 @@ trait AssociationDAOSuite extends BaseDAOSuite {
         // correct way to create an association
         given dao: AssociationDAOImpl = daoFactory.newAssociationDAO()
         val obsDao                    = daoFactory.newObservationDAO(dao)
-        run(() => {
+        run(() =>
             obsDao
                 .findByUUID(o.getUuid())
-                .foreach(obs => {
-                    obs.addAssociation(a)
-                })
-        })
+                .foreach(obs => obs.addAssociation(a))
+        )
         val ys                        = run(() => dao.findByUUID(a.getUuid()))
         assert(ys.isDefined)
         AssertUtils.assertSameAssociation(ys.get, a)
@@ -173,10 +170,9 @@ trait AssociationDAOSuite extends BaseDAOSuite {
         val a                         = o.getAssociations().asScala.head
         given dao: AssociationDAOImpl = daoFactory.newAssociationDAO()
         run(() =>
-            dao.findByUUID(a.getUuid()) match {
+            dao.findByUUID(a.getUuid()) match
                 case Some(x) => dao.delete(x)
                 case None    => fail("Could not find association")
-            }
         )
         val ys                        = run(() => dao.findByUUID(a.getUuid()))
         assert(ys.isEmpty)
@@ -202,5 +198,3 @@ trait AssociationDAOSuite extends BaseDAOSuite {
         assert(ys.isDefined)
         AssertUtils.assertSameAssociation(ys.get, a)
     }
-
-}

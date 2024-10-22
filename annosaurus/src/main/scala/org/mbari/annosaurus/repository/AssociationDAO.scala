@@ -17,16 +17,16 @@
 package org.mbari.annosaurus.repository
 
 import org.mbari.annosaurus.domain.{ConceptAssociation, ConceptAssociationRequest}
+import org.mbari.annosaurus.repository.jpa.entity.{AssociationEntity, IPersistentObject}
 
 import java.util.UUID
-import org.mbari.annosaurus.repository.jpa.entity.AssociationEntity
-import org.mbari.annosaurus.repository.jpa.entity.IPersistentObject
 
-/** @author
-  *   Brian Schlining
-  * @since 2016-06-17T16:08:00
-  */
-trait AssociationDAO[T <: IPersistentObject] extends DAO[T] {
+/**
+ * @author
+ *   Brian Schlining
+ * @since 2016-06-17T16:08:00
+ */
+trait AssociationDAO[T <: IPersistentObject] extends DAO[T]:
 
     def newPersistentObject(
         linkName: String,
@@ -54,5 +54,3 @@ trait AssociationDAO[T <: IPersistentObject] extends DAO[T] {
     def countByToConcept(toConcept: String): Long
 
     def updateToConcept(oldToConcept: String, newToConcept: String): Int
-
-}

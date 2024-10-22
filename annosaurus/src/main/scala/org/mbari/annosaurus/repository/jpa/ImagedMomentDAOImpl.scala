@@ -16,26 +16,27 @@
 
 package org.mbari.annosaurus.repository.jpa
 
-import java.sql.Timestamp
-import java.time.{Duration, Instant}
-import java.util.function.Function
-import java.util.{stream, UUID}
 import jakarta.persistence.EntityManager
-
+import org.hibernate.jpa.QueryHints
 import org.mbari.annosaurus.domain.{ImagedMoment, WindowRequest}
 import org.mbari.annosaurus.repository.ImagedMomentDAO
 import org.mbari.annosaurus.repository.jpa.entity.ImagedMomentEntity
 import org.mbari.vcr4j.time.Timecode
 
-import scala.jdk.CollectionConverters._
+import java.sql.Timestamp
+import java.time.{Duration, Instant}
+import java.util.function.Function
+import java.util.{stream, UUID}
+import scala.jdk.CollectionConverters.*
 
-/** @author
-  *   Brian Schlining
-  * @since 2016-06-17T16:34:00
-  */
+/**
+ * @author
+ *   Brian Schlining
+ * @since 2016-06-17T16:34:00
+ */
 class ImagedMomentDAOImpl(entityManager: EntityManager)
     extends BaseDAO[ImagedMomentEntity](entityManager)
-    with ImagedMomentDAO[ImagedMomentEntity] {
+    with ImagedMomentDAO[ImagedMomentEntity]:
 
     override def newPersistentObject(): ImagedMomentEntity = new ImagedMomentEntity
 
@@ -44,35 +45,31 @@ class ImagedMomentDAOImpl(entityManager: EntityManager)
         timecode: Option[Timecode] = None,
         elapsedTime: Option[Duration] = None,
         recordedDate: Option[Instant] = None
-    ): ImagedMomentEntity = {
+    ): ImagedMomentEntity =
         val imagedMoment = new ImagedMomentEntity
         imagedMoment.setVideoReferenceUuid(videoReferenceUUID)
         timecode.foreach(imagedMoment.setTimecode)
         elapsedTime.foreach(imagedMoment.setElapsedTime)
         recordedDate.foreach(imagedMoment.setRecordedTimestamp)
         imagedMoment
-    }
 
     override def newPersistentObject(imagedMoment: ImagedMomentEntity): ImagedMomentEntity =
         ImagedMoment.from(imagedMoment, true).toEntity
 
-    def deleteIfEmptyByUUID(uuid: UUID): Boolean = {
-        findByUUID(uuid).exists(imagedMoment => {
-
-            if (imagedMoment.getImageReferences.isEmpty && imagedMoment.getObservations.isEmpty) {
+    def deleteIfEmptyByUUID(uuid: UUID): Boolean =
+        findByUUID(uuid).exists(imagedMoment =>
+            if imagedMoment.getImageReferences.isEmpty && imagedMoment.getObservations.isEmpty then
                 delete(imagedMoment)
                 true
-            }
             else false
-        })
-    }
+        )
 
     override def findBetweenUpdatedDates(
         start: Instant,
         end: Instant,
         limit: Option[Int] = None,
         offset: Option[Int] = None
-    ): Iterable[ImagedMomentEntity] = {
+    ): Iterable[ImagedMomentEntity] =
 
         val startTimestamp = Timestamp.from(start)
         val endTimestamp   = Timestamp.from(end)
@@ -83,14 +80,13 @@ class ImagedMomentDAOImpl(entityManager: EntityManager)
             limit,
             offset
         )
-    }
 
     override def streamBetweenUpdatedDates(
         start: Instant,
         end: Instant,
         limit: Option[Int] = None,
         offset: Option[Int] = None
-    ): java.util.stream.Stream[ImagedMomentEntity] = {
+    ): java.util.stream.Stream[ImagedMomentEntity] =
 
         val startTimestamp = Timestamp.from(start)
         val endTimestamp   = Timestamp.from(end)
@@ -101,7 +97,6 @@ class ImagedMomentDAOImpl(entityManager: EntityManager)
             limit,
             offset
         )
-    }
 
     override def streamByVideoReferenceUUIDAndTimestamps(
         uuid: UUID,
@@ -109,22 +104,20 @@ class ImagedMomentDAOImpl(entityManager: EntityManager)
         endTimestamp: Instant,
         limit: Option[Int],
         offset: Option[Int]
-    ): java.util.stream.Stream[ImagedMomentEntity] = {
-
+    ): java.util.stream.Stream[ImagedMomentEntity] =
         streamByNamedQuery(
             "ImagedMoment.findByVideoReferenceUUIDAndTimestamps",
             Map("uuid" -> uuid, "start" -> startTimestamp, "end" -> endTimestamp),
             limit,
             offset
         )
-    }
 
     override def streamVideoReferenceUuidsBetweenUpdatedDates(
         start: Instant,
         end: Instant,
         limit: Option[Int],
         offset: Option[Int]
-    ): java.util.stream.Stream[UUID] = {
+    ): java.util.stream.Stream[UUID] =
         val query          =
             entityManager.createNamedQuery(
                 "ImagedMoment.findVideoReferenceUUIDsModifiedBetweenDates"
@@ -135,15 +128,16 @@ class ImagedMomentDAOImpl(entityManager: EntityManager)
         query.setParameter(2, endTimestamp)
         query
             .getResultStream
-            .map(new Function[Any, UUID] {
-                override def apply(t: Any): UUID = UUID.fromString(t.toString)
-            })
-    }
+            .map(
+                new Function[Any, UUID]:
+                    override def apply(t: Any): UUID = UUID.fromString(t.toString)
+            )
 
-    override def countBetweenUpdatedDates(start: Instant, end: Instant): Int = {
+    override def countBetweenUpdatedDates(start: Instant, end: Instant): Int =
         val query          = entityManager.createNamedQuery("ImagedMoment.countBetweenUpdatedDates")
         val startTimestamp = Timestamp.from(start)
         val endTimestamp   = Timestamp.from(end)
+        query.setHint(QueryHints.HINT_READONLY, true)
         query.setParameter(1, startTimestamp)
         query.setParameter(2, endTimestamp)
         query
@@ -151,12 +145,11 @@ class ImagedMomentDAOImpl(entityManager: EntityManager)
             .asScala
             .map(_.toString().toInt)
             .head
-    }
 
     override def findAllVideoReferenceUUIDs(
         limit: Option[Int] = None,
         offset: Option[Int] = None
-    ): Iterable[UUID] = {
+    ): Iterable[UUID] =
         val query = entityManager.createNamedQuery("ImagedMoment.findAllVideoReferenceUUIDs")
         limit.foreach(query.setMaxResults)
         offset.foreach(query.setFirstResult)
@@ -164,23 +157,21 @@ class ImagedMomentDAOImpl(entityManager: EntityManager)
             .getResultList
             .asScala
             .map(s => UUID.fromString(s.toString))
-    }
 
-    override def countAllByVideoReferenceUuids(): Map[UUID, Int] = {
+    override def countAllByVideoReferenceUuids(): Map[UUID, Int] =
         val query = entityManager.createNamedQuery("ImagedMoment.countAllByVideoReferenceUUIDs")
         query
             .getResultList
             .asScala
             .map(_.asInstanceOf[Array[Object]])
-            .map(xs => {
+            .map(xs =>
                 val uuid  = UUID.fromString(xs(0).toString())
                 val count = xs(1).toString().toInt
                 uuid -> count
-            })
+            )
             .toMap
-    }
 
-    override def countByConcept(concept: String): Int = {
+    override def countByConcept(concept: String): Int =
         val query = entityManager.createNamedQuery("ImagedMoment.countByConcept")
         query.setParameter(1, concept)
         query
@@ -188,7 +179,6 @@ class ImagedMomentDAOImpl(entityManager: EntityManager)
             .asScala
             .map(_.toString().toInt)
             .head
-    }
 
     override def findByConcept(
         concept: String,
@@ -204,7 +194,7 @@ class ImagedMomentDAOImpl(entityManager: EntityManager)
     ): stream.Stream[ImagedMomentEntity] =
         streamByNamedQuery("ImagedMoment.findByConcept", Map("concept" -> concept), limit, offset)
 
-    override def countByConceptWithImages(concept: String): Int = {
+    override def countByConceptWithImages(concept: String): Int =
         val query = entityManager.createNamedQuery("ImagedMoment.countByConceptWithImages")
         query.setParameter(1, concept)
         query
@@ -212,9 +202,8 @@ class ImagedMomentDAOImpl(entityManager: EntityManager)
             .asScala
             .map(_.toString().toInt)
             .head
-    }
 
-    override def countModifiedBeforeDate(videoReferenceUuid: UUID, date: Instant): Int = {
+    override def countModifiedBeforeDate(videoReferenceUuid: UUID, date: Instant): Int =
         val query = entityManager.createNamedQuery("ImagedMoment.countModifiedBeforeDate")
         query.setParameter(1, videoReferenceUuid)
         query.setParameter(2, Timestamp.from(date))
@@ -223,7 +212,6 @@ class ImagedMomentDAOImpl(entityManager: EntityManager)
             .asScala
             .map(_.toString().toInt)
             .head
-    }
 
     override def findByConceptWithImages(
         concept: String,
@@ -237,7 +225,7 @@ class ImagedMomentDAOImpl(entityManager: EntityManager)
             offset
         )
 
-    override def countByVideoReferenceUUID(uuid: UUID): Int = {
+    override def countByVideoReferenceUUID(uuid: UUID): Int =
         val query = entityManager.createNamedQuery("ImagedMoment.countByVideoReferenceUUID")
 //    if (DatabaseProductName.isPostgreSQL()) {
 //      query.setParameter(1, uuid)
@@ -251,9 +239,8 @@ class ImagedMomentDAOImpl(entityManager: EntityManager)
             .asScala
             .map(_.toString().toInt)
             .head
-    }
 
-    override def countByVideoReferenceUUIDWithImages(uuid: UUID): Int = {
+    override def countByVideoReferenceUUIDWithImages(uuid: UUID): Int =
         val query =
             entityManager.createNamedQuery("ImagedMoment.countByVideoReferenceUUIDWithImages")
         setUuidParameter(query, 1, uuid)
@@ -262,7 +249,6 @@ class ImagedMomentDAOImpl(entityManager: EntityManager)
             .asScala
             .map(_.toString().toInt)
             .head
-    }
 
     override def findByVideoReferenceUUID(
         uuid: UUID,
@@ -304,12 +290,11 @@ class ImagedMomentDAOImpl(entityManager: EntityManager)
         windowRequest: WindowRequest,
         limit: Option[Int] = None,
         offset: Option[Int] = None
-    ): Iterable[ImagedMomentEntity] = {
-
-        findByUUID(windowRequest.imagedMomentUuid) match {
+    ): Iterable[ImagedMomentEntity] =
+        findByUUID(windowRequest.imagedMomentUuid) match
             case None     => Nil
             case Some(im) =>
-                Option(im.getRecordedTimestamp) match {
+                Option(im.getRecordedTimestamp) match
                     case None               => Nil
                     case Some(recordedDate) =>
                         val start = recordedDate.minus(windowRequest.window)
@@ -324,10 +309,6 @@ class ImagedMomentDAOImpl(entityManager: EntityManager)
                             limit,
                             offset
                         )
-                }
-        }
-
-    }
 
     override def findAll(
         limit: Option[Int] = None,
@@ -371,7 +352,7 @@ class ImagedMomentDAOImpl(entityManager: EntityManager)
 
     override def countByLinkName(
         linkName: String
-    ): Int = {
+    ): Int =
         val query = entityManager.createNamedQuery("ImagedMoment.countByLinkName")
 
         query.setParameter(1, linkName)
@@ -381,7 +362,6 @@ class ImagedMomentDAOImpl(entityManager: EntityManager)
             .asScala
             .map(_.toString().toInt)
             .head
-    }
 
     override def findByVideoReferenceUUIDAndElapsedTime(
         uuid: UUID,
@@ -416,21 +396,21 @@ class ImagedMomentDAOImpl(entityManager: EntityManager)
     override def updateRecordedTimestampByObservationUuid(
         observationUuid: UUID,
         recordedTimestamp: Instant
-    ): Boolean = {
+    ): Boolean =
         val query =
             entityManager.createNamedQuery("ImagedMoment.updateRecordedTimestampByObservationUuid")
         query.setParameter(1, recordedTimestamp)
         query.setParameter(2, observationUuid)
         query.executeUpdate() > 0
-    }
 
-    /** A bulk delete operation. This will delete all annotation related data for a single video.
-      * (which is identified via its uuid (e.g. videoReferenceUUID)
-      *
-      * @param uuid
-      *   The UUID of the VideoReference. WARNING!! All annotation data associated to this
-      *   videoReference will be deleted.
-      */
+    /**
+     * A bulk delete operation. This will delete all annotation related data for a single video. (which is identified
+     * via its uuid (e.g. videoReferenceUUID)
+     *
+     * @param uuid
+     *   The UUID of the VideoReference. WARNING!! All annotation data associated to this videoReference will be
+     *   deleted.
+     */
     override def deleteByVideoReferenceUUUID(uuid: UUID): Int =
         val xs = findByVideoReferenceUUID(uuid)
         xs.foreach(delete)
@@ -439,14 +419,13 @@ class ImagedMomentDAOImpl(entityManager: EntityManager)
     override def moveToVideoReference(
         newVideoReferenceUuid: UUID,
         imageMomentUuids: Seq[UUID]
-    ): Int = {
-        if (imageMomentUuids.isEmpty) return 0
+    ): Int =
+        if imageMomentUuids.isEmpty then return 0
 
         val query = entityManager.createNamedQuery("ImagedMoment.moveToVideoReference")
         query.setParameter(1, newVideoReferenceUuid)
         query.setParameter(2, imageMomentUuids.asJava)
         query.executeUpdate()
-    }
 
 //  override def delete(entity: ImagedMomentImpl): Unit = {
 //    Option(entity.ancillaryDatum).foreach(entityManager.remove)
@@ -455,4 +434,3 @@ class ImagedMomentDAOImpl(entityManager: EntityManager)
 //    entity.imageReferences.foreach(entityManager.remove)
 //    entityManager.remove(entity)
 //  }
-}

@@ -17,7 +17,7 @@
 package org.mbari.annosaurus.repository.jpa
 
 import jakarta.persistence.EntityManagerFactory
-
+import org.mbari.annosaurus.DatabaseConfig
 import org.testcontainers.containers.PostgreSQLContainer
 
 object PostgresTestDAOFactory extends TestDAOFactory:
@@ -52,3 +52,11 @@ object PostgresTestDAOFactory extends TestDAOFactory:
             container.getDriverClassName(),
             testProps()
         )
+
+    lazy val databaseConfig: DatabaseConfig = DatabaseConfig(
+        container.getJdbcUrl(),
+        container.getUsername(),
+        container.getPassword(),
+        container.getDriverClassName(),
+        annotationView
+    )

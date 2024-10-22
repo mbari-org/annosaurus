@@ -16,8 +16,8 @@
 
 package org.mbari.annosaurus.etc.jdk
 
-import java.time.{Instant, ZoneId}
 import java.time.format.DateTimeFormatter
+import java.time.{Instant, ZoneId}
 import scala.util.Try
 
 object Instants:

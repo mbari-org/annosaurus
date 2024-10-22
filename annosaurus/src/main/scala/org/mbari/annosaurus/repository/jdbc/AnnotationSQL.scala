@@ -16,21 +16,19 @@
 
 package org.mbari.annosaurus.repository.jdbc
 
-import java.time.Duration
-import java.util.UUID
-import java.sql.Timestamp
-import org.mbari.vcr4j.time.Timecode
 import org.mbari.annosaurus.domain.Annotation
+
 import java.time.Instant
+import java.util.UUID
 
-/** Object that contains the SQL and methods to build annotations
-  */
-object AnnotationSQL {
+/**
+ * Object that contains the SQL and methods to build annotations
+ */
+object AnnotationSQL:
 
-    def resultListToAnnotations(rows: List[?]): Seq[Annotation] = {
-        for {
-            row <- rows
-        } yield {
+    def resultListToAnnotations(rows: List[?]): Seq[Annotation] =
+        for row <- rows
+        yield
             val xs = row.asInstanceOf[Array[Object]]
             Annotation(
                 imagedMomentUuid = xs(0).asUUID,
@@ -46,8 +44,6 @@ object AnnotationSQL {
                 observationTimestamp = xs(10).asInstant,
                 observer = xs(11).asString
             )
-        }
-    }
 
     val SELECT: String =
         """ SELECT DISTINCT
@@ -122,5 +118,3 @@ object AnnotationSQL {
 
     val byToConceptWithImages: String =
         SELECT + FROM_WITH_IMAGES_AND_ASSOCIATIONS + " WHERE ass.to_concept = ?" + ORDER
-
-}

@@ -23,14 +23,13 @@ import org.mbari.annosaurus.domain.{
     CachedVideoReferenceInfoUpdateSC,
     ErrorMsg
 }
+import org.mbari.annosaurus.endpoints.CustomTapirJsonCirce.*
+import org.mbari.annosaurus.etc.circe.CirceCodecs.given
 import org.mbari.annosaurus.etc.jwt.JwtService
-import org.mbari.annosaurus.etc.tapir.TapirCodecs.given
+import sttp.model.StatusCode
 import sttp.tapir.*
 import sttp.tapir.generic.auto.*
 import sttp.tapir.server.ServerEndpoint
-import org.mbari.annosaurus.etc.circe.CirceCodecs.{*, given}
-import sttp.model.StatusCode
-import CustomTapirJsonCirce.*
 
 import java.util.UUID
 import scala.concurrent.{ExecutionContext, Future}
@@ -38,7 +37,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class CachedVideoReferenceInfoEndpoints(controller: CachedVideoReferenceInfoController)(using
     ec: ExecutionContext,
     jwtService: JwtService
-) extends Endpoints {
+) extends Endpoints:
 
     private val tag  = "Video Information"
     private val base = "videoreferences"
@@ -158,8 +157,7 @@ class CachedVideoReferenceInfoEndpoints(controller: CachedVideoReferenceInfoCont
             }
 
     // GET /missioncontact/:missioncontact
-    val findByMissionContact
-        : Endpoint[Unit, String, ErrorMsg, Seq[CachedVideoReferenceInfoSC], Any] =
+    val findByMissionContact: Endpoint[Unit, String, ErrorMsg, Seq[CachedVideoReferenceInfoSC], Any] =
         openEndpoint
             .get
             .in(base / "missioncontact" / path[String]("missioncontact"))
@@ -262,7 +260,7 @@ class CachedVideoReferenceInfoEndpoints(controller: CachedVideoReferenceInfoCont
                 handleErrors(
                     controller
                         .delete(uuid)
-                        .map(b => if (b) StatusCode.NoContent else StatusCode.NotFound)
+                        .map(b => if b then StatusCode.NoContent else StatusCode.NotFound)
                 )
             }
 
@@ -293,4 +291,3 @@ class CachedVideoReferenceInfoEndpoints(controller: CachedVideoReferenceInfoCont
         createOneVideoReferenceInfoImpl,
         findAllImpl
     )
-}

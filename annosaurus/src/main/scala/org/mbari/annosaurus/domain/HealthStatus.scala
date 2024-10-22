@@ -29,9 +29,9 @@ final case class HealthStatus(
     description: String = AppConfig.Description
 )
 
-object HealthStatus {
+object HealthStatus:
 
-    def default: HealthStatus = {
+    def default: HealthStatus =
         val runtime = Runtime.getRuntime
         HealthStatus(
             jdkVersion = Runtime.version.toString,
@@ -40,5 +40,3 @@ object HealthStatus {
             maxMemory = runtime.maxMemory,
             totalMemory = runtime.totalMemory
         )
-    }
-}

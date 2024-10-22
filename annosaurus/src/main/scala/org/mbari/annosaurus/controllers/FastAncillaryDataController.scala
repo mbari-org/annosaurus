@@ -16,23 +16,22 @@
 
 package org.mbari.annosaurus.controllers
 
+import jakarta.persistence.EntityManager
+import org.mbari.annosaurus.domain.CachedAncillaryDatum
+import org.mbari.annosaurus.etc.jdk.Loggers.given
+
 import java.sql.Timestamp
 import java.time.Instant
 import java.util.UUID
+import scala.concurrent.ExecutionContext
+import scala.jdk.CollectionConverters.*
 
-import jakarta.persistence.EntityManager
-
-import scala.concurrent.{ExecutionContext, Future}
-import scala.jdk.CollectionConverters._
-import org.mbari.annosaurus.domain.CachedAncillaryDatum
-import org.mbari.annosaurus.repository.jpa.extensions.*
-import org.mbari.annosaurus.etc.jdk.Logging.{*, given}
-
-/** @author
-  *   Brian Schlining
-  * @since 2019-02-13T14:35:00
-  */
-class FastAncillaryDataController(val entityManager: EntityManager) {
+/**
+ * @author
+ *   Brian Schlining
+ * @since 2019-02-13T14:35:00
+ */
+class FastAncillaryDataController(val entityManager: EntityManager):
 
     private val tableName = "ancillary_data"
 
@@ -40,20 +39,18 @@ class FastAncillaryDataController(val entityManager: EntityManager) {
 
     // Needs to be called in a transaction
     def createOrUpdate(data: Seq[CachedAncillaryDatum])(using ec: ExecutionContext): Unit =
-        for (d <- data) {
+        for d <- data do
             val ok = createOrUpdate(d)
-            if (!ok) {
+            if !ok then
                 val msg =
                     "Failed to create or update ancillary data with imagedMomentUuid = " + d.imagedMomentUuid
                 log.atError.log(msg)
                 throw new RuntimeException(msg)
-            }
-        }
 
     protected def createOrUpdate(data: CachedAncillaryDatum): Boolean =
-        if (exists(data)) update(data) else create(data)
+        if exists(data) then update(data) else create(data)
 
-    def exists(data: CachedAncillaryDatum): Boolean = {
+    def exists(data: CachedAncillaryDatum): Boolean =
         data.imagedMomentUuid match
             case None                   => false
             case Some(imagedMomentUuid) =>
@@ -67,15 +64,15 @@ class FastAncillaryDataController(val entityManager: EntityManager) {
                     .asScala
                     .size
                 n > 0
-    }
 
-    /** Creates a new AncillaryData record. Must be called in a transaction!! In general you should
-      * use createOrUpdate instead.
-      * @param data
-      * @return
-      */
-    def create(data: CachedAncillaryDatum): Boolean = {
-        if (data.imagedMomentUuid.isEmpty) false
+    /**
+     * Creates a new AncillaryData record. Must be called in a transaction!! In general you should use createOrUpdate
+     * instead.
+     * @param data
+     * @return
+     */
+    def create(data: CachedAncillaryDatum): Boolean =
+        if data.imagedMomentUuid.isEmpty then false
         else
             val uuid    = data.uuid.getOrElse(UUID.randomUUID())
             val sqlData = dataAsSql(data) +
@@ -90,9 +87,8 @@ class FastAncillaryDataController(val entityManager: EntityManager) {
                 .createNativeQuery(sql)
                 .executeUpdate()
             n == 1
-    }
 
-    def update(data: CachedAncillaryDatum): Boolean = {
+    def update(data: CachedAncillaryDatum): Boolean =
         val values = dataAsSql(data)
             .map { case (a, b) => s"$a = $b" }
             .mkString(", ")
@@ -102,9 +98,8 @@ class FastAncillaryDataController(val entityManager: EntityManager) {
             .createNativeQuery(sql)
             .executeUpdate()
         n == 1
-    }
 
-    private def dataAsSql(datum: CachedAncillaryDatum): Map[String, String] = {
+    private def dataAsSql(datum: CachedAncillaryDatum): Map[String, String] =
         require(datum.imagedMomentUuid != null)
         val lastUpdated = Timestamp.from(Instant.now())
 
@@ -127,6 +122,3 @@ class FastAncillaryDataController(val entityManager: EntityManager) {
             datum.pressureDbar.map(v => "pressure_dbar" -> s"$v") ::
             Some("last_updated_timestamp" -> s"'$lastUpdated'") ::
             Nil).flatten.toMap
-    }
-
-}

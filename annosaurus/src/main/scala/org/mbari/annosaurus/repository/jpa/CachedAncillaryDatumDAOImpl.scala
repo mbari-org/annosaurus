@@ -16,19 +16,20 @@
 
 package org.mbari.annosaurus.repository.jpa
 
-import java.util.UUID
 import jakarta.persistence.EntityManager
-import org.mbari.annosaurus.etc.jdk.Numbers.*
 import org.mbari.annosaurus.repository.CachedAncillaryDatumDAO
 import org.mbari.annosaurus.repository.jpa.entity.{AncillaryDatumDTO, CachedAncillaryDatumEntity}
 
-/** @author
-  *   Brian Schlining
-  * @since 2016-06-17T17:12:00
-  */
+import java.util.UUID
+
+/**
+ * @author
+ *   Brian Schlining
+ * @since 2016-06-17T17:12:00
+ */
 class CachedAncillaryDatumDAOImpl(entityManager: EntityManager)
     extends BaseDAO[CachedAncillaryDatumEntity](entityManager)
-    with CachedAncillaryDatumDAO[CachedAncillaryDatumEntity] {
+    with CachedAncillaryDatumDAO[CachedAncillaryDatumEntity]:
 
     override def newPersistentObject(): CachedAncillaryDatumEntity = new CachedAncillaryDatumEntity
 
@@ -50,7 +51,7 @@ class CachedAncillaryDatumDAOImpl(entityManager: EntityManager)
         phi: Option[Double] = None,
         theta: Option[Double] = None,
         psi: Option[Double] = None
-    ): CachedAncillaryDatumEntity = {
+    ): CachedAncillaryDatumEntity =
 
         val cad = new CachedAncillaryDatumEntity()
 
@@ -73,8 +74,6 @@ class CachedAncillaryDatumDAOImpl(entityManager: EntityManager)
         psi.foreach(cad.setPsi(_))
 
         cad
-
-    }
 
     override def newPersistentObject(
         datum: CachedAncillaryDatumEntity
@@ -107,9 +106,7 @@ class CachedAncillaryDatumDAOImpl(entityManager: EntityManager)
             Map("uuid" -> imagedMomentUuid)
         ).headOption
 
-    override def deleteByVideoReferenceUuid(videoReferenceUuid: UUID): Int = {
+    override def deleteByVideoReferenceUuid(videoReferenceUuid: UUID): Int =
         val query = entityManager.createNamedQuery("AncillaryDatum.deleteByVideoReferenceUuid")
         query.setParameter(1, videoReferenceUuid)
         query.executeUpdate()
-    }
-}

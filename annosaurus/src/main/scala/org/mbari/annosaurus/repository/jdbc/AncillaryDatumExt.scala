@@ -17,8 +17,8 @@
 package org.mbari.annosaurus.repository.jdbc
 
 import org.mbari.annosaurus.repository.jpa.entity.CachedAncillaryDatumEntity
+
 import java.util.UUID
 
-class AncillaryDatumExt extends CachedAncillaryDatumEntity {
+class AncillaryDatumExt extends CachedAncillaryDatumEntity:
     var imagedMomentUuid: UUID = scala.compiletime.uninitialized
-}

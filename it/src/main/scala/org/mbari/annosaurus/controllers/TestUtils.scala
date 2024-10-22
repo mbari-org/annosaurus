@@ -16,19 +16,13 @@
 
 package org.mbari.annosaurus.controllers
 
+import org.mbari.annosaurus.domain.Annotation
+import org.mbari.annosaurus.etc.jdk.Loggers.given
 import org.mbari.annosaurus.etc.jdk.Strings
-import org.mbari.annosaurus.repository.jpa.entity.{
-    AssociationEntity,
-    CachedAncillaryDatumEntity,
-    ImageReferenceEntity,
-    ImagedMomentEntity,
-    ObservationEntity
-}
-import org.mbari.scilube3.ocean.Ocean
 import org.mbari.annosaurus.repository.jpa.JPADAOFactory
-import org.mbari.annosaurus.repository.jpa.entity._
+import org.mbari.annosaurus.repository.jpa.entity.*
+import org.mbari.scilube3.ocean.Ocean
 import org.mbari.vcr4j.time.{FrameRates, Timecode}
-import org.mbari.annosaurus.etc.jdk.Logging.given
 
 import java.net.URI
 import java.security.MessageDigest
@@ -36,14 +30,10 @@ import java.sql.Connection
 import java.time.{Duration, Instant}
 import java.util.UUID
 import java.util.concurrent.TimeUnit
-import scala.concurrent.duration
+import scala.concurrent.{duration, Await, ExecutionContext}
 import scala.util.Random
-import scala.concurrent.ExecutionContext
-import java.sql.Timestamp
-import scala.concurrent.Await
-import org.mbari.annosaurus.domain.Annotation
 
-object TestUtils {
+object TestUtils:
 
     val Timeout            = duration.Duration(3, TimeUnit.SECONDS)
     val Digest             = MessageDigest.getInstance("SHA-512")
@@ -52,16 +42,15 @@ object TestUtils {
 
     private val log = System.getLogger(getClass.getName)
 
-    def runDdl(ddl: String, connection: Connection): Unit = {
+    def runDdl(ddl: String, connection: Connection): Unit =
         val statement = connection.createStatement();
         ddl
             .split(";")
-            .foreach(sql => {
+            .foreach(sql =>
                 log.atWarn.log(s"Running:\n$sql")
                 statement.execute(sql)
-            })
+            )
         statement.close()
-    }
 
     def build(
         nImagedMoments: Int = 1,
@@ -69,7 +58,7 @@ object TestUtils {
         nAssociations: Int = 0,
         nImageReferences: Int = 0,
         includeData: Boolean = false
-    ): Seq[ImagedMomentEntity] = {
+    ): Seq[ImagedMomentEntity] =
         val startDate          = Instant.now()
         val videoReferenceUuid = UUID.randomUUID()
         for (_ <- 0 until nImagedMoments)
@@ -81,17 +70,15 @@ object TestUtils {
                 videoReferenceUuid,
                 startDate
             )
-    }
 
     def create(
         entities: Seq[ImagedMomentEntity]
-    )(using daoFactory: JPADAOFactory, ec: ExecutionContext): Seq[ImagedMomentEntity] = {
+    )(using daoFactory: JPADAOFactory, ec: ExecutionContext): Seq[ImagedMomentEntity] =
         log.atDebug.log(s"Creating ${entities.size} ImagedMoments: $entities")
         val dao = daoFactory.newImagedMomentDAO()
         Await.ready(dao.runTransaction(d => entities.foreach(x => d.create(x))), Timeout)
         dao.close()
         entities
-    }
 
     def create(
         nImagedMoments: Int = 1,
@@ -99,14 +86,13 @@ object TestUtils {
         nAssociations: Int = 0,
         nImageReferences: Int = 0,
         includeData: Boolean = false
-    )(using daoFactory: JPADAOFactory, ec: ExecutionContext): Seq[ImagedMomentEntity] = {
+    )(using daoFactory: JPADAOFactory, ec: ExecutionContext): Seq[ImagedMomentEntity] =
         val xs  = build(nImagedMoments, nObservations, nAssociations, nImageReferences, includeData)
         log.atDebug.log(s"Creating ${xs.size} ImagedMoments: $xs")
         val dao = daoFactory.newImagedMomentDAO()
         Await.ready(dao.runTransaction(d => xs.foreach(x => d.create(x))), Timeout)
         dao.close()
         xs
-    }
 
     def randomImagedMoment(
         nObservations: Int = 0,
@@ -115,32 +101,29 @@ object TestUtils {
         includeData: Boolean = false,
         videoReferenceUuid: UUID = UUID.randomUUID(),
         startDate: Instant = Instant.now().minus(Duration.ofDays(30))
-    ): ImagedMomentEntity = {
+    ): ImagedMomentEntity =
         val et           = random.nextLong(2592000000L) // 30 days
         val elapsedTime  = Duration.ofMillis(et)
         val recordedDate = startDate.plusMillis(et)
         val timecode     =
-            if (random.nextBoolean())
-                Some(new Timecode(random.nextInt(10000).toDouble, FrameRates.NTSC))
+            if random.nextBoolean() then Some(new Timecode(random.nextInt(10000).toDouble, FrameRates.NTSC))
             else None
         val imagedMoment =
             ImagedMomentEntity(videoReferenceUuid, recordedDate, timecode.orNull, elapsedTime)
-        for (_ <- 0 until nObservations)
-            imagedMoment.addObservation(randomObservation(nAssociations))
-        for (_ <- 0 until nImageReferences) imagedMoment.addImageReference(randomImageReference())
-        if (includeData) imagedMoment.setAncillaryDatum(randomData())
+        for _ <- 0 until nObservations do imagedMoment.addObservation(randomObservation(nAssociations))
+        for _ <- 0 until nImageReferences do imagedMoment.addImageReference(randomImageReference())
+        if includeData then imagedMoment.setAncillaryDatum(randomData())
         imagedMoment
-    }
 
-    def randomObservation(nAssociations: Int = 0): ObservationEntity = {
+    def randomObservation(nAssociations: Int = 0): ObservationEntity =
         //        val obs = obsDao.newPersistentObject(Strings.random(conceptLength), Strings.random(10), Instant.now(), Some(Strings.random(6)))
         val concept         = Strings.random(random.nextInt(128))
         val duration        =
-            if (random.nextBoolean()) Some(Duration.ofMillis(random.nextInt(5000))) else None
+            if random.nextBoolean() then Some(Duration.ofMillis(random.nextInt(5000))) else None
         val observationDate = Instant.now()
         val observer        = Some(Strings.random(32))
-        val group           = if (random.nextBoolean()) Some(Strings.random(32)) else None
-        val activity        = if (random.nextBoolean()) Some(Strings.random(32)) else None
+        val group           = if random.nextBoolean() then Some(Strings.random(32)) else None
+        val activity        = if random.nextBoolean() then Some(Strings.random(32)) else None
         val obs             = ObservationEntity(
             concept,
             duration.orNull,
@@ -149,21 +132,17 @@ object TestUtils {
             group.orNull,
             activity.orNull
         )
-        for (_ <- 0 until nAssociations) {
-            obs.addAssociation(randomAssociation())
-        }
+        for _ <- 0 until nAssociations do obs.addAssociation(randomAssociation())
         obs
-    }
 
-    def randomAssociation(): AssociationEntity = {
+    def randomAssociation(): AssociationEntity =
         val linkName  = Strings.random(random.nextInt(30) + 2)
         val linkValue = Strings.random(random.nextInt(254) + 2)
         val toConcept = Strings.random(random.nextInt(30) + 2)
         val mimeType  = Strings.random(random.nextInt(12))
         AssociationEntity(linkName, toConcept, linkValue, mimeType)
-    }
 
-    def randomImageReference(): ImageReferenceEntity = {
+    def randomImageReference(): ImageReferenceEntity =
         val url         = URI
             .create(s"http://www.foo.bar/${Strings.random(10)}/image_${random.nextInt()}.png")
             .toURL
@@ -171,9 +150,8 @@ object TestUtils {
         val width       = random.nextInt(1440) + 480
         val height      = math.round(width * 0.5625).toInt
         new ImageReferenceEntity(url, width, height, "image/png", description)
-    }
 
-    def randomData(): CachedAncillaryDatumEntity = {
+    def randomData(): CachedAncillaryDatumEntity =
         val lat      = (random.nextInt(18000) / 100d) - 90.0
         val lon      = (random.nextInt(36000) / 100d) - 180.0
         val pressure = random.nextInt(20000) / 10d
@@ -210,49 +188,37 @@ object TestUtils {
         datum.setPsi(psi)
         datum.setLightTransmission(trans)
         datum
-    }
 
     def randomVideoReferenceInfo(
         videoReferenceUuid: UUID = UUID.randomUUID()
-    ): CachedVideoReferenceInfoEntity = {
-
+    ): CachedVideoReferenceInfoEntity =
         CachedVideoReferenceInfoEntity(
             videoReferenceUuid,
             "p-" + Strings.random(10),
             "missionId" + Strings.random(10),
             "missionContact" + Strings.random(10)
         )
-    }
 
-    def stripLastUpdated(a: Annotation): Annotation = {
+    def stripLastUpdated(a: Annotation): Annotation =
         a.copy(
             lastUpdated = None,
             associations = a.associations.map(_.copy(lastUpdated = None)),
             imageReferences = a.imageReferences.map(_.copy(lastUpdated = None)),
             ancillaryData = a.ancillaryData.map(_.copy(lastUpdated = None))
         )
-    }
 
-    def addRandomUuids(imagedMomentEntity: ImagedMomentEntity): ImagedMomentEntity = {
+    def addRandomUuids(imagedMomentEntity: ImagedMomentEntity): ImagedMomentEntity =
         imagedMomentEntity.setUuid(UUID.randomUUID())
-        if (imagedMomentEntity.getImageReferences() != null) {
+        if imagedMomentEntity.getImageReferences() != null then
             imagedMomentEntity.getImageReferences().forEach(img => img.setUuid(UUID.randomUUID()))
-        }
-        if (imagedMomentEntity.getAncillaryDatum() != null) {
+        if imagedMomentEntity.getAncillaryDatum() != null then
             imagedMomentEntity.getAncillaryDatum().setUuid(UUID.randomUUID())
-        }
-        if (imagedMomentEntity.getObservations() != null) {
+        if imagedMomentEntity.getObservations() != null then
             imagedMomentEntity
                 .getObservations()
-                .forEach(obs => {
+                .forEach(obs =>
                     obs.setUuid(UUID.randomUUID())
-                    if (obs.getAssociations() != null) {
+                    if obs.getAssociations() != null then
                         obs.getAssociations().forEach(assoc => assoc.setUuid(UUID.randomUUID()))
-                    }
-                })
-        }
+                )
         imagedMomentEntity
-
-    }
-
-}

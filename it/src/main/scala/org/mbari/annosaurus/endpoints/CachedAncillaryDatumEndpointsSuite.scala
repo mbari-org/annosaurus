@@ -16,23 +16,17 @@
 
 package org.mbari.annosaurus.endpoints
 
-import org.mbari.annosaurus.etc.circe.CirceCodecs.{*, given}
-import sttp.client3.*
-import org.mbari.annosaurus.etc.sdk.Futures.*
-import org.junit.Assert.*
 import org.mbari.annosaurus.controllers.{CachedAncillaryDatumController, TestUtils}
-import org.mbari.annosaurus.domain.{
-    CachedAncillaryDatum,
-    CachedAncillaryDatumSC,
-    CountForVideoReferenceSC,
-    DeleteCountSC
-}
+import org.mbari.annosaurus.domain.{CachedAncillaryDatum, CachedAncillaryDatumSC, CountForVideoReferenceSC}
+import org.mbari.annosaurus.etc.circe.CirceCodecs.{*, given}
 import org.mbari.annosaurus.etc.jwt.JwtService
+import org.mbari.annosaurus.etc.sdk.Futures.*
 import org.mbari.annosaurus.etc.sdk.Reflect
 import org.mbari.annosaurus.repository.jpa.JPADAOFactory
+import sttp.client3.*
 import sttp.model.StatusCode
 
-trait CachedAncillaryDatumEndpointsSuite extends EndpointsSuite {
+trait CachedAncillaryDatumEndpointsSuite extends EndpointsSuite:
 
     private val log = System.getLogger(getClass.getName)
 
@@ -49,12 +43,11 @@ trait CachedAncillaryDatumEndpointsSuite extends EndpointsSuite {
         runGet(
             endpoints.findDataByUuidImpl,
             s"http://test.com/v1/ancillarydata/${d.getUuid}",
-            response => {
+            response =>
                 assertEquals(response.code, StatusCode.Ok)
                 val obtained = checkResponse[CachedAncillaryDatumSC](response.body).toCamelCase
                 val expected = CachedAncillaryDatum.from(d, true)
                 assertEquals(obtained, expected)
-            }
         )
     }
 
@@ -64,13 +57,12 @@ trait CachedAncillaryDatumEndpointsSuite extends EndpointsSuite {
         runGet(
             endpoints.findDataByVideoReferenceUuidImpl,
             s"http://test.com/v1/ancillarydata/videoreference/${im.getVideoReferenceUuid}",
-            response => {
+            response =>
                 assertEquals(response.code, StatusCode.Ok)
                 val obtained =
                     checkResponse[List[CachedAncillaryDatumSC]](response.body).map(_.toCamelCase)
                 val expected = List(CachedAncillaryDatum.from(d, true))
                 assertEquals(obtained, expected)
-            }
         )
     }
 
@@ -80,12 +72,11 @@ trait CachedAncillaryDatumEndpointsSuite extends EndpointsSuite {
         runGet(
             endpoints.findDataByImagedMomentUuidImpl,
             s"http://test.com/v1/ancillarydata/imagedmoment/${im.getUuid}",
-            response => {
+            response =>
                 assertEquals(response.code, StatusCode.Ok)
                 val obtained = checkResponse[CachedAncillaryDatumSC](response.body).toCamelCase
                 val expected = CachedAncillaryDatum.from(d, true)
                 assertEquals(obtained, expected)
-            }
         )
     }
 
@@ -96,12 +87,11 @@ trait CachedAncillaryDatumEndpointsSuite extends EndpointsSuite {
         runGet(
             endpoints.findDataByObservationUuidImpl,
             s"http://test.com/v1/ancillarydata/observation/${obs.getUuid}",
-            response => {
+            response =>
                 assertEquals(response.code, StatusCode.Ok)
                 val obtained = checkResponse[CachedAncillaryDatumSC](response.body).toCamelCase
                 val expected = CachedAncillaryDatum.from(d, true)
                 assertEquals(obtained, expected)
-            }
         )
     }
 
@@ -265,5 +255,3 @@ trait CachedAncillaryDatumEndpointsSuite extends EndpointsSuite {
         val deleteCount        = checkResponse[CountForVideoReferenceSC](response.body)
         assertEquals(deleteCount.count, 2)
     }
-
-}

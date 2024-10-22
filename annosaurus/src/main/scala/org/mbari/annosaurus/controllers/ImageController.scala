@@ -16,39 +16,36 @@
 
 package org.mbari.annosaurus.controllers
 
+import org.mbari.annosaurus.domain.{Image, ImageCreateSC}
+import org.mbari.annosaurus.repository.ImagedMomentDAO
+import org.mbari.annosaurus.repository.jpa.JPADAOFactory
+import org.mbari.annosaurus.repository.jpa.entity.{ImageReferenceEntity, ImagedMomentEntity}
+import org.mbari.vcr4j.time.Timecode
+
 import java.net.URL
 import java.time.{Duration, Instant}
 import java.util.UUID
-import org.mbari.annosaurus.repository.ImagedMomentDAO
-import org.mbari.annosaurus.domain.{Image, ImageCreateSC}
-import org.mbari.vcr4j.time.Timecode
-import org.mbari.annosaurus.etc.jdk.Logging.{*, given}
-
 import scala.concurrent.{ExecutionContext, Future}
-import org.mbari.annosaurus.repository.jpa.JPADAOFactory
-import org.mbari.annosaurus.repository.jpa.entity.ImagedMomentEntity
-import org.mbari.annosaurus.repository.jpa.entity.ImageReferenceEntity
-
 import scala.jdk.CollectionConverters.*
 
-/** Created by brian on 7/14/16.
-  */
-class ImageController(daoFactory: JPADAOFactory) {
+/**
+ * Created by brian on 7/14/16.
+ */
+class ImageController(daoFactory: JPADAOFactory):
 
     private val log = System.getLogger(getClass.getName)
 
-    def findByUUID(uuid: UUID)(implicit ec: ExecutionContext): Future[Option[Image]] = {
+    def findByUUID(uuid: UUID)(implicit ec: ExecutionContext): Future[Option[Image]] =
         val irDao = daoFactory.newImageReferenceDAO()
         val f     = irDao.runTransaction(d => irDao.findByUUID(uuid))
         f.onComplete(t => irDao.close())
         f.map(_.map(Image.from(_, true)))
-    }
 
     def findByVideoReferenceUUID(
         videoReferenceUUID: UUID,
         limit: Option[Int] = None,
         offset: Option[Int] = None
-    )(implicit ec: ExecutionContext): Future[Seq[Image]] = {
+    )(implicit ec: ExecutionContext): Future[Seq[Image]] =
         val dao = daoFactory.newImagedMomentDAO()
         val f   =
             dao.runTransaction(d =>
@@ -58,9 +55,8 @@ class ImageController(daoFactory: JPADAOFactory) {
             ).map(_.toSeq)
         f.onComplete(t => dao.close())
         f
-    }
 
-    def findByURL(url: URL)(implicit ec: ExecutionContext): Future[Option[Image]] = {
+    def findByURL(url: URL)(implicit ec: ExecutionContext): Future[Option[Image]] =
         val dao = daoFactory.newImageReferenceDAO()
         val f   = dao.runTransaction(d =>
             d.findByURL(url)
@@ -68,9 +64,8 @@ class ImageController(daoFactory: JPADAOFactory) {
         )
         f.onComplete(_ => dao.close())
         f
-    }
 
-    def findByImageName(name: String)(implicit ec: ExecutionContext): Future[Seq[Image]] = {
+    def findByImageName(name: String)(implicit ec: ExecutionContext): Future[Seq[Image]] =
         val dao = daoFactory.newImageReferenceDAO()
         val f   = dao.runTransaction(d =>
             d.findByImageName(name)
@@ -78,14 +73,14 @@ class ImageController(daoFactory: JPADAOFactory) {
         )
         f.onComplete(t => dao.close())
         f
-    }
 
-    /** @param imageCreates
-      *   The image data to create
-      * @param ec
-      * @return
-      *   Only the newly created images. If an image already exists, it is not returned.
-      */
+    /**
+     * @param imageCreates
+     *   The image data to create
+     * @param ec
+     * @return
+     *   Only the newly created images. If an image already exists, it is not returned.
+     */
     def bulkCreate(imageCreates: Seq[ImageCreateSC])(using
         ec: ExecutionContext
     ): Future[Seq[Image]] =
@@ -93,12 +88,10 @@ class ImageController(daoFactory: JPADAOFactory) {
         val irDao      = daoFactory.newImageReferenceDAO(imDao)
         val candidates = imageCreates.distinctBy(_.url)
         // prefilter
-        if (candidates.isEmpty) {
-            return Future.successful(Seq.empty)
-        }
+        if candidates.isEmpty then return Future.successful(Seq.empty)
         val f          = for
             newOnes      <- irDao.runTransaction(d => candidates.filter(c => d.findByURL(c.url).isEmpty))
-            newlyCreated <- irDao.runTransaction(d => {
+            newlyCreated <- irDao.runTransaction(d =>
                                 for ic <- newOnes
                                 yield
                                     val imagedMoment   = ImagedMomentController
@@ -119,11 +112,9 @@ class ImageController(daoFactory: JPADAOFactory) {
                                     imagedMoment.addImageReference(imageReference)
                                     irDao.flush()
                                     imageReference
-                            })
+                            )
             persisted    <-
-                irDao.runTransaction(d =>
-                    newlyCreated.flatMap(i => d.findByUUID(i.getUuid).map(Image.from(_, true)))
-                )
+                irDao.runTransaction(d => newlyCreated.flatMap(i => d.findByUUID(i.getUuid).map(Image.from(_, true))))
         yield persisted
 
         f.onComplete(t => irDao.close())
@@ -139,11 +130,11 @@ class ImageController(daoFactory: JPADAOFactory) {
         width: Option[Int] = None,
         height: Option[Int] = None,
         description: Option[String] = None
-    )(implicit ec: ExecutionContext): Future[Image] = {
+    )(implicit ec: ExecutionContext): Future[Image] =
 
         val imDao = daoFactory.newImagedMomentDAO()
         val irDao = daoFactory.newImageReferenceDAO(imDao)
-        val f     = irDao.runTransaction(d => {
+        val f     = irDao.runTransaction(d =>
             val imagedMoment   = ImagedMomentController
                 .findOrCreateImagedMoment(
                     imDao,
@@ -158,27 +149,26 @@ class ImageController(daoFactory: JPADAOFactory) {
             imagedMoment.addImageReference(imageReference)
             d.flush()
             Image.from(imageReference, true)
-        })
+        )
         f.onComplete(t => irDao.close())
         f
-    }
 
-    /** Update params. Note that if you provide video indices then the image is moved, the indices
-      * are not updated in place as this would effect any observations or images associated with the
-      * same image moment. If you want to change the indices in place, use the the
-      * ImageMomentController instead.
-      * @param imageReferenceUuid
-      * @param videoReferenceUUID
-      * @param timecode
-      * @param elapsedTime
-      * @param recordedDate
-      * @param format
-      * @param width
-      * @param height
-      * @param description
-      * @param ec
-      * @return
-      */
+    /**
+     * Update params. Note that if you provide video indices then the image is moved, the indices are not updated in
+     * place as this would effect any observations or images associated with the same image moment. If you want to
+     * change the indices in place, use the the ImageMomentController instead.
+     * @param imageReferenceUuid
+     * @param videoReferenceUUID
+     * @param timecode
+     * @param elapsedTime
+     * @param recordedDate
+     * @param format
+     * @param width
+     * @param height
+     * @param description
+     * @param ec
+     * @return
+     */
     def update(
         imageReferenceUuid: UUID,
         videoReferenceUUID: Option[UUID] = None,
@@ -190,15 +180,15 @@ class ImageController(daoFactory: JPADAOFactory) {
         width: Option[Int] = None,
         height: Option[Int] = None,
         description: Option[String] = None
-    )(implicit ec: ExecutionContext): Future[Option[Image]] = {
+    )(implicit ec: ExecutionContext): Future[Option[Image]] =
 
         val imDao = daoFactory.newImagedMomentDAO()
         val irDao = daoFactory.newImageReferenceDAO(imDao)
 
-        val f = irDao.runTransaction(d => {
+        val f = irDao.runTransaction(d =>
             val opt = d.findByUUID(imageReferenceUuid)
 
-            opt.map(ir => {
+            opt.map(ir =>
 
                 url.foreach(ir.setUrl)
                 format.foreach(ir.setFormat)
@@ -208,7 +198,7 @@ class ImageController(daoFactory: JPADAOFactory) {
                 d.flush()
 
                 val vrUUID = videoReferenceUUID.getOrElse(ir.getImagedMoment.getVideoReferenceUuid)
-                if (timecode.isDefined || elapsedTime.isDefined || recordedDate.isDefined) {
+                if timecode.isDefined || elapsedTime.isDefined || recordedDate.isDefined then
                     // change indices
                     val newIm = ImagedMomentController
                         .findOrCreateImagedMoment(
@@ -219,8 +209,7 @@ class ImageController(daoFactory: JPADAOFactory) {
                             elapsedTime
                         )
                     move(imDao, newIm, ir)
-                }
-                else if (videoReferenceUUID.isDefined) {
+                else if videoReferenceUUID.isDefined then
                     val imagedMoment = ir.getImagedMoment
                     // move to new video-reference/imaged-moment using the existing images
                     val tc           = Option(imagedMoment.getTimecode)
@@ -229,62 +218,46 @@ class ImageController(daoFactory: JPADAOFactory) {
                     val newIm        =
                         ImagedMomentController.findOrCreateImagedMoment(imDao, vrUUID, tc, rd, et)
                     move(imDao, newIm, ir)
-                }
-
-            })
-        })
+            )
+        )
 
         val g = f.flatMap(opt =>
-            opt.map(i =>
-                irDao.runTransaction(d => d.findByUUID(imageReferenceUuid).map(Image.from(_, true)))
-            ).getOrElse(Future(None))
+            opt.map(i => irDao.runTransaction(d => d.findByUUID(imageReferenceUuid).map(Image.from(_, true))))
+                .getOrElse(Future(None))
         )
 
         g.onComplete(_ => irDao.close())
         g
-    }
 
-    def delete(uuid: UUID)(implicit ec: ExecutionContext): Future[Boolean] = {
+    def delete(uuid: UUID)(implicit ec: ExecutionContext): Future[Boolean] =
         val imDao = daoFactory.newImagedMomentDAO()
         val irDao = daoFactory.newImageReferenceDAO(imDao)
-        val f     = irDao.runTransaction(d => {
-            d.findByUUID(uuid) match {
+        val f     = irDao.runTransaction(d =>
+            d.findByUUID(uuid) match
                 case None                 => false
                 case Some(imageReference) =>
                     val imagedMoment = imageReference.getImagedMoment
-                    if (
-                        imagedMoment.getImageReferences.size == 1 && imagedMoment
+                    if imagedMoment.getImageReferences.size == 1 && imagedMoment
                             .getObservations
                             .isEmpty
-                    ) {
+                    then
                         val imDao = daoFactory.newImagedMomentDAO(d)
                         imDao.delete(imagedMoment)
-                    }
-                    else {
-                        imagedMoment.removeImageReference(imageReference)
+                    else imagedMoment.removeImageReference(imageReference)
 //                        d.delete(imageReference)
-                    }
                     true
-            }
-        })
+        )
         f.onComplete(t => irDao.close())
         f
-    }
 
     private def move(
         dao: ImagedMomentDAO[ImagedMomentEntity],
         newIm: ImagedMomentEntity,
         imageReference: ImageReferenceEntity
-    ): Unit = {
+    ): Unit =
         val oldIm = imageReference.getImagedMoment
-        if (!oldIm.getUuid.equals(newIm.getUuid)) {
+        if !oldIm.getUuid.equals(newIm.getUuid) then
             val shouldDelete = oldIm.getImageReferences.size == 1 && oldIm.getObservations.isEmpty
             oldIm.removeImageReference(imageReference)
             newIm.addImageReference(imageReference)
-            if (shouldDelete) {
-                dao.delete(oldIm)
-            }
-        }
-    }
-
-}
+            if shouldDelete then dao.delete(oldIm)

@@ -16,20 +16,22 @@
 
 package org.mbari.annosaurus.repository.jpa
 
-import java.util.UUID
 import jakarta.persistence.EntityManager
+import org.hibernate.jpa.QueryHints
 import org.mbari.annosaurus.repository.CachedVideoReferenceInfoDAO
 import org.mbari.annosaurus.repository.jpa.entity.CachedVideoReferenceInfoEntity
 
-import scala.jdk.CollectionConverters._
+import java.util.UUID
+import scala.jdk.CollectionConverters.*
 
-/** @author
-  *   Brian Schlining
-  * @since 2016-06-17T17:15:00
-  */
+/**
+ * @author
+ *   Brian Schlining
+ * @since 2016-06-17T17:15:00
+ */
 class CachedVideoReferenceInfoDAOImpl(entityManager: EntityManager)
     extends BaseDAO[CachedVideoReferenceInfoEntity](entityManager)
-    with CachedVideoReferenceInfoDAO[CachedVideoReferenceInfoEntity] {
+    with CachedVideoReferenceInfoDAO[CachedVideoReferenceInfoEntity]:
 
     override def newPersistentObject(): CachedVideoReferenceInfoEntity =
         new CachedVideoReferenceInfoEntity
@@ -76,11 +78,10 @@ class CachedVideoReferenceInfoDAOImpl(entityManager: EntityManager)
         fetchUsing("VideoReferenceInfo.findAllMissionIDs")
 
     private def fetchUsing(namedQuery: String): Iterable[String] =
-        entityManager
-            .createNamedQuery(namedQuery)
+        val query = entityManager.createNamedQuery(namedQuery)
+        query.setHint(QueryHints.HINT_READONLY, true)
+        query
             .getResultList
             .asScala
             .filter(_ != null)
             .map(_.toString)
-
-}

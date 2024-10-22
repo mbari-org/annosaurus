@@ -16,28 +16,20 @@
 
 package org.mbari.annosaurus.controllers
 
-import org.mbari.annosaurus.repository.jpa.{BaseDAOSuite, ImagedMomentDAOImpl, JPADAOFactory}
-
-import scala.concurrent.ExecutionContext
 import org.mbari.annosaurus.AssertUtils
-import org.mbari.annosaurus.domain.Annotation
-
-import scala.jdk.CollectionConverters.*
-import org.mbari.annosaurus.etc.jdk.Logging.given
-import org.mbari.annosaurus.domain.ConcurrentRequest
+import org.mbari.annosaurus.domain.{Annotation, ConcurrentRequest, MultiRequest}
 import org.mbari.annosaurus.etc.sdk.Futures.*
-
-import java.time.{Duration, Instant}
-import org.mbari.annosaurus.domain.MultiRequest
-import org.mbari.annosaurus.etc.circe.CirceCodecs.{*, given}
+import org.mbari.annosaurus.repository.jpa.{BaseDAOSuite, ImagedMomentDAOImpl, JPADAOFactory}
 import org.mbari.vcr4j.time.Timecode
 
-import java.nio.file.Files
+import java.time.{Duration, Instant}
 import java.util.UUID
+import scala.concurrent.ExecutionContext
 import scala.io.Source
-import scala.util.{Failure, Success, Using}
+import scala.jdk.CollectionConverters.*
+import scala.util.Using
 
-trait AnnotationControllerSuite extends BaseDAOSuite {
+trait AnnotationControllerSuite extends BaseDAOSuite:
     given JPADAOFactory    = daoFactory
     given ExecutionContext = ExecutionContext.global
     lazy val controller    = AnnotationController(daoFactory)
@@ -190,8 +182,8 @@ trait AnnotationControllerSuite extends BaseDAOSuite {
     }
 
     test("create(Annotation)") {
-        val im = TestUtils.build(1, 1).head
-        val expected = Annotation.from(im.getObservations.asScala.head, true)
+        val im        = TestUtils.build(1, 1).head
+        val expected  = Annotation.from(im.getObservations.asScala.head, true)
         val obtained  = exec(controller.create(expected)).head
         assert(obtained.observationUuid.isDefined)
         assert(obtained.imagedMomentUuid.isDefined)
@@ -401,5 +393,3 @@ trait AnnotationControllerSuite extends BaseDAOSuite {
         assert(imOpt.isEmpty)
         imDao.close()
     }
-
-}

@@ -19,25 +19,19 @@ package org.mbari.annosaurus.domain
 import java.util.UUID
 
 case class MoveImagedMoments(videoReferenceUuid: UUID, imagedMomentUuids: Seq[UUID])
-    extends ToSnakeCase[MoveImagedMomentsSC] {
+    extends ToSnakeCase[MoveImagedMomentsSC]:
 
-    def toSnakeCase: MoveImagedMomentsSC = {
+    def toSnakeCase: MoveImagedMomentsSC =
         MoveImagedMomentsSC(
             video_reference_uuid = videoReferenceUuid,
             imaged_moment_uuids = imagedMomentUuids
         )
-    }
-
-}
 
 case class MoveImagedMomentsSC(video_reference_uuid: UUID, imaged_moment_uuids: Seq[UUID])
-    extends ToCamelCase[MoveImagedMoments] {
+    extends ToCamelCase[MoveImagedMoments]:
 
-    def toCamelCase: MoveImagedMoments = {
+    def toCamelCase: MoveImagedMoments =
         MoveImagedMoments(
             videoReferenceUuid = video_reference_uuid,
             imagedMomentUuids = imaged_moment_uuids
         )
-    }
-
-}

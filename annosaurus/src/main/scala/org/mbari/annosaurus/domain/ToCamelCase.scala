@@ -16,6 +16,5 @@
 
 package org.mbari.annosaurus.domain
 
-trait ToCamelCase[A] {
+trait ToCamelCase[A]:
     def toCamelCase: A
-}

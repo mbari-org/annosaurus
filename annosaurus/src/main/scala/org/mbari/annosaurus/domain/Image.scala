@@ -16,11 +16,12 @@
 
 package org.mbari.annosaurus.domain
 
-import java.util.UUID
+import org.mbari.annosaurus.domain.extensions.*
+import org.mbari.annosaurus.repository.jpa.entity.ImageReferenceEntity
+
 import java.net.URL
 import java.time.{Duration, Instant}
-import org.mbari.annosaurus.repository.jpa.entity.ImageReferenceEntity
-import extensions.*
+import java.util.UUID
 
 final case class Image(
     imageReferenceUuid: UUID,
@@ -34,7 +35,7 @@ final case class Image(
     timecode: Option[String] = None,
     elapsedTimeMillis: Option[Long] = None,
     recordedTimestamp: Option[Instant] = None
-) extends ToSnakeCase[ImageSC] {
+) extends ToSnakeCase[ImageSC]:
     override def toSnakeCase: ImageSC = ImageSC(
         imageReferenceUuid,
         videoReferenceUuid,
@@ -50,9 +51,8 @@ final case class Image(
     )
 
     lazy val elapsedTime: Option[Duration] = elapsedTimeMillis.map(Duration.ofMillis)
-}
 
-object Image extends FromEntity[ImageReferenceEntity, Image] {
+object Image extends FromEntity[ImageReferenceEntity, Image]:
     override def from(entity: ImageReferenceEntity, extend: Boolean = false): Image =
         val im            = entity.getImagedMoment // TODO: This may be null!!
         val (tc, etm, rt) =
@@ -77,7 +77,6 @@ object Image extends FromEntity[ImageReferenceEntity, Image] {
             etm,
             rt
         )
-}
 
 final case class ImageSC(
     image_reference_uuid: UUID,
@@ -91,7 +90,7 @@ final case class ImageSC(
     timecode: Option[String] = None,
     elapsed_time_millis: Option[Long] = None,
     recorded_timestamp: Option[Instant] = None
-) extends ToCamelCase[Image] {
+) extends ToCamelCase[Image]:
     override def toCamelCase: Image = Image(
         image_reference_uuid,
         video_reference_uuid,
@@ -105,4 +104,3 @@ final case class ImageSC(
         elapsed_time_millis,
         recorded_timestamp
     )
-}

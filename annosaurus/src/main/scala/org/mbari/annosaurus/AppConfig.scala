@@ -17,23 +17,22 @@
 package org.mbari.annosaurus
 
 import com.typesafe.config.ConfigFactory
-import org.mbari.annosaurus.etc.jdk.Logging
-import org.mbari.annosaurus.etc.jdk.Logging.{*, given}
+import org.mbari.annosaurus.etc.jdk.Loggers
+import org.mbari.annosaurus.etc.jdk.Loggers.{*, given}
 import org.mbari.annosaurus.etc.jwt.JwtService
 
 import scala.util.Try
 import scala.util.control.NonFatal
 
-object AppConfig {
+object AppConfig:
 
-    private val log = Logging(getClass)
+    private val log = Loggers(getClass)
 
     val Name: String = "annosaurus"
 
-    val Version: String = {
+    val Version: String =
         val v = Try(getClass.getPackage.getImplementationVersion).getOrElse("0.0.0")
-        if (v == null) "0.0.0" else v
-    }
+        if v == null then "0.0.0" else v
 
     val Description: String = "Annotation Service"
 
@@ -56,18 +55,23 @@ object AppConfig {
     )
 
     lazy val DefaultZeroMQConfig: Option[ZeroMQConfig] =
-        try {
+        try
             val port   = Config.getInt("messaging.zeromq.port")
             val enable = Config.getBoolean("messaging.zeromq.enable")
             val topic  = Config.getString("messaging.zeromq.topic")
             Some(ZeroMQConfig(port, enable, topic))
-        }
-        catch {
+        catch
             case NonFatal(e) =>
                 log.atWarn.withCause(e).log("Failed to load ZeroMQ configuration")
                 None
-        }
-}
+
+    lazy val DefaultDatabaseConfig: DatabaseConfig = DatabaseConfig(
+        url = Config.getString("database.url"),
+        user = Config.getString("database.user"),
+        password = Config.getString("database.password"),
+        driver = Config.getString("database.driver"),
+        queryView = Config.getString("database.query.view")
+    )
 
 case class HttpConfig(
     port: Int,
@@ -75,3 +79,23 @@ case class HttpConfig(
     connectorIdleTimeout: Int,
     contextPath: String
 )
+
+case class DatabaseConfig(
+    url: String,
+    user: String,
+    password: String,
+    driver: String,
+    queryView: String
+):
+    lazy val dataSource                      =
+        val ds = new com.zaxxer.hikari.HikariDataSource()
+        ds.setJdbcUrl(url)
+        ds.setUsername(user)
+        ds.setPassword(password)
+        ds.setDriverClassName(driver)
+        ds.setMaximumPoolSize(AppConfig.NumberOfVertxWorkers)
+        ds
+    def newConnection(): java.sql.Connection =
+        dataSource.getConnection()
+        // Class.forName(driver)
+        // java.sql.DriverManager.getConnection(url, user, password)

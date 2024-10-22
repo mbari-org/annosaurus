@@ -16,34 +16,33 @@
 
 package org.mbari.annosaurus.repository.jdbc
 
-import java.util.UUID
-import java.time.Instant
+import jakarta.persistence.{EntityManager, Query}
 import org.mbari.annosaurus.domain.QueryConstraints
-import jakarta.persistence.EntityManager
-import jakarta.persistence.Query
-import java.sql.Timestamp
-import org.mbari.annosaurus.etc.jdk.Logging.given
+import org.mbari.annosaurus.etc.jdk.Loggers.given
 
-object QueryConstraintsSqlBuilder {
+import java.time.Instant
+
+object QueryConstraintsSqlBuilder:
 
     private val log = System.getLogger(getClass.getName)
 
-    /** Generates a SQL template for use to build a query. It's not executable SQL though!
-      * @param qc
-      * @return
-      */
-    def toFromWhereSql(qc: QueryConstraints): String = {
-        import org.mbari.annosaurus.repository.jdbc.AnnotationSQL._
+    /**
+     * Generates a SQL template for use to build a query. It's not executable SQL though!
+     * @param qc
+     * @return
+     */
+    def toFromWhereSql(qc: QueryConstraints): String =
+        import org.mbari.annosaurus.repository.jdbc.AnnotationSQL.*
 
         val sqlConstraints = List(
-            if (qc.concepts.nonEmpty) Some("(obs.concept IN (A?) OR ass.to_concept IN (A?))")
+            if qc.concepts.nonEmpty then Some("(obs.concept IN (A?) OR ass.to_concept IN (A?))")
             else None,
-            if (qc.videoReferenceUuids.nonEmpty) Some("im.video_reference_uuid IN (B?)")
+            if qc.videoReferenceUuids.nonEmpty then Some("im.video_reference_uuid IN (B?)")
             else None,
-            if (qc.observers.nonEmpty) Some("obs.observer IN (C?)") else None,
-            if (qc.groups.nonEmpty) Some("obs.observation_group IN (D?)") else None,
-            if (qc.activities.nonEmpty) Some("obs.activity IN (E?)") else None,
-            if (qc.missionContacts.nonEmpty) Some("vri.mission_contact IN (F?)") else None,
+            if qc.observers.nonEmpty then Some("obs.observer IN (C?)") else None,
+            if qc.groups.nonEmpty then Some("obs.observation_group IN (D?)") else None,
+            if qc.activities.nonEmpty then Some("obs.activity IN (E?)") else None,
+            if qc.missionContacts.nonEmpty then Some("vri.mission_contact IN (F?)") else None,
             qc.minDepth.map(_ => "ad.depth_meters >= ?"),
             qc.maxDepth.map(_ => "ad.depth_meters < ?"),
             qc.minLon.map(_ => "ad.longitude >= ?"),
@@ -60,69 +59,61 @@ object QueryConstraintsSqlBuilder {
 
         FROM_WITH_ANCILLARY_DATA + " WHERE " + sqlConstraints.mkString(" AND ")
 
-    }
-
     private def toSql(
         qc: QueryConstraints,
         selectStatement: String,
         orderStatement: String = AnnotationSQL.ORDER
-    ): String = {
+    ): String =
         // import org.mbari.vars.annotation.dao.jdbc.AnnotationSQL._
         val fromWhere = toFromWhereSql(qc)
         selectStatement + fromWhere + orderStatement
-    }
 
-    private def toCountSql(qc: QueryConstraints): String = {
+    private def toCountSql(qc: QueryConstraints): String =
         val fromWhere = toFromWhereSql(qc)
         val select    = "SELECT COUNT(DISTINCT obs.uuid)"
         select + " " + fromWhere
-    }
 
-    def toCountQuery(qc: QueryConstraints, entityManager: EntityManager): Query = {
+    def toCountQuery(qc: QueryConstraints, entityManager: EntityManager): Query =
         val sql = toCountSql(qc)
         buildQuery(qc, entityManager, sql)
-    }
 
-    /** @param qc
-      * @param entityManager
-      * @return
-      */
+    /**
+     * @param qc
+     * @param entityManager
+     * @return
+     */
     def toQuery(
         qc: QueryConstraints,
         entityManager: EntityManager,
         selectStatement: String = AnnotationSQL.SELECT,
         orderStatment: String = AnnotationSQL.ORDER
-    ): Query = {
+    ): Query =
         val sql = toSql(qc, selectStatement, orderStatment)
         log.atDebug.log(() => "SQL: " + sql)
         buildQuery(qc, entityManager, sql)
-    }
 
-    private def toGeographicRangeSql(qc: QueryConstraints): String = {
+    private def toGeographicRangeSql(qc: QueryConstraints): String =
         val fromWhere = toFromWhereSql(qc) +
             " AND ad.longitude IS NOT NULL AND ad.latitude IS NOT NULL AND ad.depth_meters IS NOT NULL"
         val select    =
             "SELECT min(ad.latitude), max(ad.latitude), min(ad.longitude), max(ad.longitude), min(ad.depth_meters), max(ad.depth_meters) "
         select + " " + fromWhere
-    }
 
-    def toGeographicRangeQuery(qc: QueryConstraints, entityManager: EntityManager): Query = {
+    def toGeographicRangeQuery(qc: QueryConstraints, entityManager: EntityManager): Query =
         val sql = toGeographicRangeSql(qc)
         buildQuery(qc, entityManager, sql)
-    }
 
     private def buildQuery(
         qc: QueryConstraints,
         entityManager: EntityManager,
         base: String
-    ): Query = {
+    ): Query =
 
         // JPA doesn't handle in clauses well. So this is a cludge
         def replaceInClause[A](xs: Iterable[A], sql: String, target: String): String =
-            if (xs.nonEmpty) {
+            if xs.nonEmpty then
                 val s = xs.mkString("('", "','", "')")
                 sql.replace(target, s)
-            }
             else sql
 
         val a   = replaceInClause(qc.concepts, base, "(A?)")
@@ -149,15 +140,8 @@ object QueryConstraintsSqlBuilder {
             qc.missionId
         ).flatten
         val query  = entityManager.createNativeQuery(sql)
-        for {
-            i <- params.indices
-        } {
-            query.setParameter(i + 1, params(i))
-        }
+        for i <- params.indices
+        do query.setParameter(i + 1, params(i))
         query.setMaxResults(qc.limit.getOrElse(5000))
         query.setFirstResult(qc.offset.getOrElse(0))
         query
-
-    }
-
-}

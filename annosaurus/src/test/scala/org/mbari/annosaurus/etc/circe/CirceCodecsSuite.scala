@@ -18,8 +18,9 @@ package org.mbari.annosaurus.etc.circe
 
 import scala.io.Source
 import scala.util.Using
-import org.mbari.annosaurus.domain.{ImagedMoment, ImagedMomentSC, ObservationsUpdate, QueryConstraints}
+import org.mbari.annosaurus.domain.{ImagedMoment, ImagedMomentSC, ObservationsUpdate, QueryConstraints, QueryRequest}
 import CirceCodecs.{*, given}
+import org.mbari.annosaurus.repository.query.Query
 
 import scala.util.Failure
 import scala.util.Success
@@ -300,6 +301,31 @@ class CirceCodecsSuite extends munit.FunSuite {
         assertEquals(ou.concept, Some("Grimpoteuthis"))
         assertEquals(ou.observer, Some("svonthun"))
         assertEquals(ou.group, Some("ROV"))
+    }
+
+    test("decode constraints") {
+        val url = getClass.getResource("/json/constraints.json")
+        assert(url != null)
+        val source = Source.fromURL(url)
+        val json = source.getLines().mkString
+        source.close()
+        assert(json != null)
+
+        val attempt = for
+            queryRequest <- json.reify[QueryRequest]
+            query <- Query.validate(queryRequest)
+        yield
+            val constraints = query.where
+            assertEquals(constraints.size, 10)
+//            println(query.where)
+
+        attempt match
+            case Left(e) =>
+                e.printStackTrace()
+                fail("Failed to read constraints.json. " + e.getMessage())
+            case Right(_) => ()
+
+
     }
 
 }

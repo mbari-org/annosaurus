@@ -18,26 +18,22 @@ package org.mbari.annosaurus.endpoints
 
 import org.mbari.annosaurus.controllers.AnnotationController
 import org.mbari.annosaurus.domain.{
-    Annotation,
-    AnnotationCreate,
     AnnotationCreateSC,
     AnnotationSC,
     AnnotationUpdateSC,
     BulkAnnotationSC,
     ConcurrentRequest,
     ConcurrentRequestCountSC,
-    ConcurrentRequestSC,
     ErrorMsg,
     MultiRequest,
     MultiRequestCountSC
 }
+import org.mbari.annosaurus.endpoints.CustomTapirJsonCirce.*
+import org.mbari.annosaurus.etc.circe.CirceCodecs.given
 import org.mbari.annosaurus.etc.jwt.JwtService
-import org.mbari.annosaurus.etc.circe.CirceCodecs.{*, given}
 import org.mbari.annosaurus.etc.tapir.TapirCodecs.given
 import sttp.tapir.*
-//import sttp.tapir.json.circe.*
 import sttp.tapir.server.ServerEndpoint
-import CustomTapirJsonCirce.*
 
 import java.util.UUID
 import scala.concurrent.{ExecutionContext, Future}
@@ -45,7 +41,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class AnnotationEndpoints(controller: AnnotationController)(using
     ec: ExecutionContext,
     jwtService: JwtService
-) extends Endpoints {
+) extends Endpoints:
 
     private val base = "annotations"
     private val tag  = "Annotations"
@@ -83,8 +79,7 @@ class AnnotationEndpoints(controller: AnnotationController)(using
                 )
             }
 
-    val findAnnotationsByVideoReferenceUuid
-        : Endpoint[Unit, (UUID, Paging), ErrorMsg, Seq[AnnotationSC], Any] =
+    val findAnnotationsByVideoReferenceUuid: Endpoint[Unit, (UUID, Paging), ErrorMsg, Seq[AnnotationSC], Any] =
         openEndpoint
             .get
             .in(base / "videoreference" / path[UUID]("videoReferenceUuid"))
@@ -108,8 +103,7 @@ class AnnotationEndpoints(controller: AnnotationController)(using
     // TOOD do we need this endpoint anymore?
 
     //    POST /
-    val createAnnotation
-        : Endpoint[Option[String], AnnotationCreateSC, ErrorMsg, AnnotationSC, Any] =
+    val createAnnotation: Endpoint[Option[String], AnnotationCreateSC, ErrorMsg, AnnotationSC, Any] =
         secureEndpoint
             .post
             .in(base)
@@ -133,8 +127,7 @@ class AnnotationEndpoints(controller: AnnotationController)(using
             }
 
 //        POST / bulk
-    val bulkCreateAnnotations
-        : Endpoint[Option[String], Seq[BulkAnnotationSC], ErrorMsg, Seq[AnnotationSC], Any] =
+    val bulkCreateAnnotations: Endpoint[Option[String], Seq[BulkAnnotationSC], ErrorMsg, Seq[AnnotationSC], Any] =
         secureEndpoint
             .post
             .in(base / "bulk")
@@ -231,8 +224,7 @@ class AnnotationEndpoints(controller: AnnotationController)(using
             }
 
 //    PUT /: uuid
-    val updateAnnotation
-        : Endpoint[Option[String], (UUID, AnnotationUpdateSC), ErrorMsg, AnnotationSC, Any] =
+    val updateAnnotation: Endpoint[Option[String], (UUID, AnnotationUpdateSC), ErrorMsg, AnnotationSC, Any] =
         secureEndpoint
             .put
             .in(base / path[UUID]("observationUuid"))
@@ -242,7 +234,7 @@ class AnnotationEndpoints(controller: AnnotationController)(using
             .description("Update an annotation. The request body can be camelCase or snake_case")
             .tag(tag)
 
-    val updateAnnotationImpl: ServerEndpoint[Any, Future] =
+    val updateAnnotationImpl: ServerEndpoint[Any, Future]                                                          =
         updateAnnotation
             .serverSecurityLogic(jwtOpt => verify(jwtOpt))
             .serverLogic { _ => (uuid, annotationCreate) =>
@@ -250,8 +242,7 @@ class AnnotationEndpoints(controller: AnnotationController)(using
                 handleOption(controller.update(uuid, annotation).map(x => x.map(_.toSnakeCase)))
             }
 //    PUT / bulk
-    val bulkUpdateAnnotations
-        : Endpoint[Option[String], Seq[AnnotationUpdateSC], ErrorMsg, Seq[AnnotationSC], Any] =
+    val bulkUpdateAnnotations: Endpoint[Option[String], Seq[AnnotationUpdateSC], ErrorMsg, Seq[AnnotationSC], Any] =
         secureEndpoint
             .put
             .in(base / "bulk")
@@ -298,4 +289,3 @@ class AnnotationEndpoints(controller: AnnotationController)(using
         updateAnnotationImpl,
         createAnnotationImpl
     )
-}

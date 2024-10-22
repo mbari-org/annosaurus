@@ -16,11 +16,11 @@
 
 package org.mbari.annosaurus.repository.jpa
 
-import org.mbari.annosaurus.controllers.TestUtils
 import org.mbari.annosaurus.AssertUtils
+import org.mbari.annosaurus.controllers.TestUtils
 import org.mbari.annosaurus.domain.CachedAncillaryDatum
 
-trait CachedAncillaryDatumDAOSuite extends BaseDAOSuite {
+trait CachedAncillaryDatumDAOSuite extends BaseDAOSuite:
     given JPADAOFactory = daoFactory
 
     test("findByUUID") {
@@ -48,14 +48,13 @@ trait CachedAncillaryDatumDAOSuite extends BaseDAOSuite {
         given dao: CachedAncillaryDatumDAOImpl = daoFactory.newCachedAncillaryDatumDAO()
         val imDao                              = daoFactory.newImagedMomentDAO(dao)
         val d                                  = TestUtils.randomData()
-        run(() => {
+        run(() =>
             imDao.findByUUID(im.getUuid()) match
                 case Some(im0) =>
                     im0.setAncillaryDatum(d)
                 // dao.create(d) // Not needed as adding to imagedmoment in transaction will persist the datum
                 case None      => fail("Failed to find imaged moment")
-
-        })
+        )
         run(() => dao.findByUUID(d.getUuid())) match
             case Some(d1) => AssertUtils.assertSameAncillaryDatum(d1, d)
             case None     => fail("Failed to find ancillary datum")
@@ -79,11 +78,11 @@ trait CachedAncillaryDatumDAOSuite extends BaseDAOSuite {
         val im                                 = TestUtils.create(1, 1, 1, 1, true).head
         val d                                  = im.getAncillaryDatum()
         given dao: CachedAncillaryDatumDAOImpl = daoFactory.newCachedAncillaryDatumDAO()
-        run(() => {
+        run(() =>
             dao.findByUUID(d.getUuid()) match
                 case Some(a) => dao.delete(a)
                 case None    => fail("Failed to find ancillary datum")
-        })
+        )
         val ys                                 = run(() => dao.findByUUID(d.getUuid()))
         dao.close()
         assert(ys.isEmpty)
@@ -146,5 +145,3 @@ trait CachedAncillaryDatumDAOSuite extends BaseDAOSuite {
         dao.close()
         assert(ys.size == 0)
     }
-
-}

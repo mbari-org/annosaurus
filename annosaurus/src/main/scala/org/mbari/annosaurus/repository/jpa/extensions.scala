@@ -17,17 +17,18 @@
 package org.mbari.annosaurus.repository.jpa
 
 import jakarta.persistence.EntityManager
+import org.mbari.annosaurus.etc.jdk.Loggers.given
 
 import scala.concurrent.{ExecutionContext, Future}
-import org.mbari.annosaurus.etc.jdk.Logging.given
 import scala.util.control.NonFatal
 
-/** Implicits used in this package
-  *
-  * @author
-  *   Brian Schlining
-  * @since 2016-05-06T13:34:00
-  */
+/**
+ * Implicits used in this package
+ *
+ * @author
+ *   Brian Schlining
+ * @since 2016-05-06T13:34:00
+ */
 object extensions:
 
     private val log = System.getLogger(getClass.getName)

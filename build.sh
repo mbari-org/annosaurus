@@ -34,4 +34,4 @@ fi
 
 
 # sbt pack && \
-#     docker build -t mbari/annosaurus:latest
+#     docker build -t mbari/annosaurus:latest .

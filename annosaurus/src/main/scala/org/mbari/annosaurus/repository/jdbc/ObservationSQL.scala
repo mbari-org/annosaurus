@@ -19,11 +19,12 @@ package org.mbari.annosaurus.repository.jdbc
 import jakarta.persistence.{EntityManager, Query}
 import org.mbari.annosaurus.domain.ObservationsUpdate
 
-/** @author
-  *   Brian Schlining
-  * @since 2019-10-28T16:39:00
-  */
-object ObservationSQL {
+/**
+ * @author
+ *   Brian Schlining
+ * @since 2019-10-28T16:39:00
+ */
+object ObservationSQL:
 
     val countAll: String = "SELECT COUNT(*) FROM observations"
 
@@ -78,7 +79,7 @@ object ObservationSQL {
         // and then sets the parameter for the value
         def build(sql: String, value: Option[String]): Option[Query] =
             value.map { v =>
-                val sql2 = sql.replace("(?)", uuidsString)
+                val sql2  = sql.replace("(?)", uuidsString)
                 val query = entityManager.createNativeQuery(sql2)
                 query.setParameter(1, v)
                 query
@@ -87,17 +88,8 @@ object ObservationSQL {
         // Map of the sql and the value to set. We'll build a query for each value that
         // is not an Option
         val params = (updateObserver -> update.observer)
-            :: (updateGroup -> update.group)
-            :: (updateConcept -> update.concept)
+            :: (updateGroup    -> update.group)
+            :: (updateConcept  -> update.concept)
             :: (updateActivity -> update.activity)
             :: Nil
         params.flatMap(p => build(p._1, p._2))
-
-
-
-
-
-
-
-
-}

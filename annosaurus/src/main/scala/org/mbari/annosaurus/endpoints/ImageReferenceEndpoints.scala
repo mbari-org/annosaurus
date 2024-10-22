@@ -18,14 +18,13 @@ package org.mbari.annosaurus.endpoints
 
 import org.mbari.annosaurus.controllers.ImageReferenceController
 import org.mbari.annosaurus.domain.{ErrorMsg, ImageReferenceSC}
+import org.mbari.annosaurus.endpoints.CustomTapirJsonCirce.*
+import org.mbari.annosaurus.etc.circe.CirceCodecs.given
 import org.mbari.annosaurus.etc.jwt.JwtService
-import org.mbari.annosaurus.etc.circe.CirceCodecs.{*, given}
 import org.mbari.annosaurus.etc.tapir.TapirCodecs.given
 import sttp.model.StatusCode
-import sttp.tapir.Endpoint
 import sttp.tapir.*
 import sttp.tapir.server.ServerEndpoint
-import CustomTapirJsonCirce.*
 
 import java.util.UUID
 import scala.concurrent.{ExecutionContext, Future}
@@ -33,7 +32,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class ImageReferenceEndpoints(controller: ImageReferenceController)(using
     val executor: ExecutionContext,
     jwtService: JwtService
-) extends Endpoints {
+) extends Endpoints:
 
     private val base = "imagereferences"
     private val tag  = "Image References"
@@ -107,4 +106,3 @@ class ImageReferenceEndpoints(controller: ImageReferenceController)(using
 
     override def allImpl: List[ServerEndpoint[Any, Future]] =
         List(deleteImageByUuidImpl, findImageByUuidImpl, updateImageReferenceByUuidImpl)
-}

@@ -8,7 +8,7 @@ ThisBuild / licenses         := Seq("Apache-2.0" -> url("http://www.apache.org/l
 ThisBuild / organization     := "org.mbari"
 ThisBuild / organizationName := "Monterey Bay Aquarium Research Institute"
 ThisBuild / resolvers ++= Seq(Resolver.githubPackages("mbari-org", "maven"))
-ThisBuild / scalaVersion     := "3.5.0"
+ThisBuild / scalaVersion     := "3.5.1"
 // ThisBuild / scalaVersion     := "3.3.1" // Fails. See https://github.com/lampepfl/dotty/issues/17069#issuecomment-1763053572
 ThisBuild / scalacOptions ++= Seq(
     "-deprecation",  // Emit warning and location for usages of deprecated APIs.
@@ -19,8 +19,12 @@ ThisBuild / scalacOptions ++= Seq(
     "-language:existentials",
     "-language:higherKinds",
     "-language:implicitConversions",
-    "-unchecked"
+    "-unchecked",
+    "-Wunused:imports"
 )
+ThisBuild / semanticdbEnabled := true
+ThisBuild / semanticdbVersion := scalafixSemanticdb.revision
+
 ThisBuild / startYear        := Some(2017)
 //ThisBuild / updateOptions    := updateOptions.value.withCachedResolution(true)
 ThisBuild / versionScheme    := Some("semver-spec")

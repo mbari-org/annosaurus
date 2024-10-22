@@ -20,18 +20,17 @@ import io.circe.*
 import io.circe.parser.*
 import org.mbari.annosaurus.etc.sdk.Futures.*
 import org.mbari.annosaurus.repository.jpa.BaseDAOSuite
-import sttp.client3.*
 import sttp.client3.testing.SttpBackendStub
+import sttp.client3.{SttpBackend, *}
+import sttp.model.StatusCode
 import sttp.tapir.server.ServerEndpoint
+import sttp.tapir.server.interceptor.CustomiseInterceptors
+import sttp.tapir.server.interceptor.exception.ExceptionHandler
+import sttp.tapir.server.model.ValuedEndpointOutput
 import sttp.tapir.server.stub.TapirStubInterpreter
+import sttp.tapir.server.vertx.VertxFutureServerOptions
 
 import scala.concurrent.Future
-import sttp.tapir.server.vertx.VertxFutureServerOptions
-import sttp.tapir.server.interceptor.exception.ExceptionHandler
-import sttp.tapir.server.interceptor.CustomiseInterceptors
-import sttp.model.StatusCode
-import sttp.client3.SttpBackend
-import sttp.tapir.server.model.ValuedEndpointOutput
 
 trait EndpointsSuite extends BaseDAOSuite:
 
@@ -113,10 +112,11 @@ trait EndpointsSuite extends BaseDAOSuite:
                     case Left(error)  => fail(error.getLocalizedMessage)
                     case Right(value) => value
 
-    /** Creates a stubbed backend for testing endpoints. Adds exception logging to the stub.
-      * @param serverEndpoint
-      * @return
-      */
+    /**
+     * Creates a stubbed backend for testing endpoints. Adds exception logging to the stub.
+     * @param serverEndpoint
+     * @return
+     */
     def newBackendStub(serverEndpoint: ServerEndpoint[Any, Future]): SttpBackend[Future, Any] =
         // --- START: This block adds exception logging to the stub
         val exceptionHandler = ExceptionHandler.pure[Future](ctx =>
@@ -129,7 +129,6 @@ trait EndpointsSuite extends BaseDAOSuite:
         )
 
         val customOptions: CustomiseInterceptors[Future, VertxFutureServerOptions] =
-            import scala.concurrent.ExecutionContext.Implicits.global
             VertxFutureServerOptions
                 .customiseInterceptors
                 .exceptionHandler(exceptionHandler)

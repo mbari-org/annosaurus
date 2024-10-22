@@ -20,11 +20,16 @@ import java.util.UUID
 
 /**
  * Update multiple observations at once
- * @param observationUuids The UUIDs of the observations to update
- * @param concept The new concept
- * @param observer The new observer
- * @param activity The new activity
- * @param group The new group
+ * @param observationUuids
+ *   The UUIDs of the observations to update
+ * @param concept
+ *   The new concept
+ * @param observer
+ *   The new observer
+ * @param activity
+ *   The new activity
+ * @param group
+ *   The new group
  */
 case class ObservationsUpdate(
     observationUuids: Seq[UUID],
@@ -32,7 +37,7 @@ case class ObservationsUpdate(
     observer: Option[String] = None,
     activity: Option[String] = None,
     group: Option[String] = None
-) extends ToSnakeCase[ObservationsUpdateSC] {
+) extends ToSnakeCase[ObservationsUpdateSC]:
     def toSnakeCase: ObservationsUpdateSC = ObservationsUpdateSC(
         observation_uuids = observationUuids,
         concept = concept,
@@ -40,7 +45,6 @@ case class ObservationsUpdate(
         activity = activity,
         group = group
     )
-}
 
 case class ObservationsUpdateSC(
     observation_uuids: Seq[UUID],
@@ -48,7 +52,7 @@ case class ObservationsUpdateSC(
     observer: Option[String] = None,
     activity: Option[String] = None,
     group: Option[String] = None
-) extends ToCamelCase[ObservationsUpdate] {
+) extends ToCamelCase[ObservationsUpdate]:
     def toCamelCase: ObservationsUpdate = ObservationsUpdate(
         observationUuids = observation_uuids,
         concept = concept,
@@ -56,4 +60,3 @@ case class ObservationsUpdateSC(
         activity = activity,
         group = group
     )
-}

@@ -23,22 +23,20 @@ final case class ConcurrentRequest(
     startTimestamp: Instant,
     endTimestamp: Instant,
     videoReferenceUuids: Seq[UUID]
-) extends ToSnakeCase[ConcurrentRequestSC] {
+) extends ToSnakeCase[ConcurrentRequestSC]:
     def toSnakeCase: ConcurrentRequestSC = ConcurrentRequestSC(
         startTimestamp,
         endTimestamp,
         videoReferenceUuids
     )
-}
 
 final case class ConcurrentRequestSC(
     start_timestamp: Instant,
     end_timestamp: Instant,
     video_reference_uuids: Seq[UUID]
-) extends ToCamelCase[ConcurrentRequest] {
+) extends ToCamelCase[ConcurrentRequest]:
     def toCamelCase: ConcurrentRequest = ConcurrentRequest(
         start_timestamp,
         end_timestamp,
         video_reference_uuids
     )
-}

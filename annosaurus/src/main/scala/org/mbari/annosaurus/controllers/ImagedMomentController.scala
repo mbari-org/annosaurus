@@ -16,29 +16,27 @@
 
 package org.mbari.annosaurus.controllers
 
-import java.io.Closeable
-import java.time.{Duration, Instant}
-import java.util.UUID
-import org.mbari.annosaurus.domain.{Annotation, ImageCreateSC, ImagedMoment, WindowRequest}
-import org.mbari.annosaurus.repository.{DAO, ImagedMomentDAO, NotFoundInDatastoreException}
-import org.mbari.vcr4j.time.Timecode
-import org.slf4j.LoggerFactory
-
-import scala.concurrent.{ExecutionContext, Future}
+import org.mbari.annosaurus.domain.{ImagedMoment, WindowRequest}
+import org.mbari.annosaurus.etc.jdk.Loggers.given
 import org.mbari.annosaurus.repository.jpa.JPADAOFactory
 import org.mbari.annosaurus.repository.jpa.entity.{AssociationEntity, ImagedMomentEntity}
+import org.mbari.annosaurus.repository.{DAO, ImagedMomentDAO, NotFoundInDatastoreException}
+import org.mbari.vcr4j.time.Timecode
 
-import scala.jdk.CollectionConverters.*
-import org.mbari.annosaurus.etc.jdk.Logging.given
-
+import java.io.Closeable
+import java.time.{Duration, Instant}
 import java.util
+import java.util.UUID
+import scala.concurrent.{ExecutionContext, Future}
+import scala.jdk.CollectionConverters.*
 
-/** @author
-  *   Brian Schlining
-  * @since 2016-06-17T16:06:00
-  */
+/**
+ * @author
+ *   Brian Schlining
+ * @since 2016-06-17T16:06:00
+ */
 class ImagedMomentController(val daoFactory: JPADAOFactory)
-    extends BaseController[ImagedMomentEntity, ImagedMomentDAO[ImagedMomentEntity], ImagedMoment] {
+    extends BaseController[ImagedMomentEntity, ImagedMomentDAO[ImagedMomentEntity], ImagedMoment]:
 
     protected type IMDAO = ImagedMomentDAO[ImagedMomentEntity]
 
@@ -73,8 +71,8 @@ class ImagedMomentController(val daoFactory: JPADAOFactory)
     ): Future[Int] =
         exec(d => d.countWithImages())
 
-    def findByLinkName(linkName: String, limit: Option[Int] = None, offset: Option[Int] = None)(
-        implicit ec: ExecutionContext
+    def findByLinkName(linkName: String, limit: Option[Int] = None, offset: Option[Int] = None)(implicit
+        ec: ExecutionContext
     ): Future[Iterable[ImagedMoment]] =
         exec(d => d.findByLinkName(linkName, limit, offset).map(transform))
 
@@ -88,46 +86,41 @@ class ImagedMomentController(val daoFactory: JPADAOFactory)
     ): Future[Iterable[UUID]] =
         exec(d => d.findAllVideoReferenceUUIDs(limit, offset))
 
-    def findByVideoReferenceUUID(uuid: UUID, limit: Option[Int] = None, offset: Option[Int] = None)(
-        implicit ec: ExecutionContext
+    def findByVideoReferenceUUID(uuid: UUID, limit: Option[Int] = None, offset: Option[Int] = None)(implicit
+        ec: ExecutionContext
     ): Future[Iterable[ImagedMoment]] =
         exec(d => d.findByVideoReferenceUUID(uuid, limit, offset).map(transform))
 
-    /** @param uuid
-      * @param limit
-      * @param offset
-      * @return
-      *   A butple of a closeable, and a stream. When the stream is done being processed invoke the
-      *   closeable
-      */
+    /**
+     * @param uuid
+     * @param limit
+     * @param offset
+     * @return
+     *   A butple of a closeable, and a stream. When the stream is done being processed invoke the closeable
+     */
     def streamByVideoReferenceUUID(
         uuid: UUID,
         limit: Option[Int] = None,
         offset: Option[Int] = None
-    ): (Closeable, java.util.stream.Stream[ImagedMomentEntity]) = {
+    ): (Closeable, java.util.stream.Stream[ImagedMomentEntity]) =
         val dao = daoFactory.newImagedMomentDAO()
         (() => dao.close(), dao.streamByVideoReferenceUUID(uuid, limit, offset))
-    }
 
     def findByImageReferenceUUID(
         uuid: UUID
-    )(implicit ec: ExecutionContext): Future[Option[ImagedMoment]] = {
-        def fn(dao: IMDAO): Option[ImagedMoment] = {
+    )(implicit ec: ExecutionContext): Future[Option[ImagedMoment]] =
+        def fn(dao: IMDAO): Option[ImagedMoment] =
             val irDao = daoFactory.newImageReferenceDAO(dao)
             irDao.findByUUID(uuid).map(_.getImagedMoment).map(transform)
-        }
         exec(fn)
-    }
 
     def findByObservationUUID(
         uuid: UUID
-    )(implicit ec: ExecutionContext): Future[Option[ImagedMoment]] = {
-        def fn(dao: IMDAO): Option[ImagedMoment] = {
+    )(implicit ec: ExecutionContext): Future[Option[ImagedMoment]] =
+        def fn(dao: IMDAO): Option[ImagedMoment] =
             val obsDao = daoFactory.newObservationDAO(dao)
             obsDao.findByUUID(uuid).map(_.getImagedMoment).map(transform)
-        }
         exec(fn)
-    }
 
     def findWithImageReferences(
         videoReferenceUUID: UUID
@@ -139,46 +132,40 @@ class ImagedMomentController(val daoFactory: JPADAOFactory)
         end: Instant,
         limit: Option[Int] = None,
         offset: Option[Int] = None
-    )(implicit ec: ExecutionContext): Future[Seq[ImagedMoment]] = {
+    )(implicit ec: ExecutionContext): Future[Seq[ImagedMoment]] =
         val imDao = daoFactory.newImagedMomentDAO()
-        val f     = imDao.runTransaction(d =>
-            d.findBetweenUpdatedDates(start, end, limit, offset).map(transform)
-        )
+        val f     = imDao.runTransaction(d => d.findBetweenUpdatedDates(start, end, limit, offset).map(transform))
         f.onComplete(_ => imDao.close())
         f.map(_.toSeq)
-    }
 
     def streamBetweenUpdatedDates(
         start: Instant,
         end: Instant,
         limit: Option[Int] = None,
         offset: Option[Int] = None
-    ): (Closeable, java.util.stream.Stream[ImagedMomentEntity]) = {
+    ): (Closeable, java.util.stream.Stream[ImagedMomentEntity]) =
         val dao = daoFactory.newImagedMomentDAO()
         (() => dao.close(), dao.streamBetweenUpdatedDates(start, end, limit, offset))
-    }
 
     def streamVideoReferenceUuidsBetweenUpdatedDates(
         start: Instant,
         end: Instant,
         limit: Option[Int] = None,
         offset: Option[Int] = None
-    ): (Closeable, java.util.stream.Stream[UUID]) = {
+    ): (Closeable, java.util.stream.Stream[UUID]) =
         val dao = daoFactory.newImagedMomentDAO()
         (
             () => dao.close(),
             dao.streamVideoReferenceUuidsBetweenUpdatedDates(start, end, limit, offset)
         )
-    }
 
     def countBetweenUpdatedDates(start: Instant, end: Instant)(implicit
         ec: ExecutionContext
-    ): Future[Int] = {
+    ): Future[Int] =
         val imDao = daoFactory.newImagedMomentDAO()
         val f     = imDao.runTransaction(d => d.countBetweenUpdatedDates(start, end))
         f.onComplete(_ => imDao.close())
         f
-    }
 
     def countAllGroupByVideoReferenceUUID()(implicit ec: ExecutionContext): Future[Map[UUID, Int]] =
         exec(dao => dao.countAllByVideoReferenceUuids())
@@ -186,70 +173,60 @@ class ImagedMomentController(val daoFactory: JPADAOFactory)
     def countByVideoReferenceUuid(uuid: UUID)(implicit ec: ExecutionContext): Future[Int] =
         exec(dao => dao.countByVideoReferenceUUID(uuid))
 
-    def findByConcept(concept: String, limit: Option[Int] = None, offset: Option[Int] = None)(
-        implicit ec: ExecutionContext
-    ): Future[Iterable[ImagedMoment]] = {
+    def findByConcept(concept: String, limit: Option[Int] = None, offset: Option[Int] = None)(implicit
+        ec: ExecutionContext
+    ): Future[Iterable[ImagedMoment]] =
         val imDao = daoFactory.newImagedMomentDAO()
         val f     = imDao.runTransaction(d => d.findByConcept(concept, limit, offset).map(transform))
         f.onComplete(_ => imDao.close())
         f
-    }
 
     def streamByConcept(
         concept: String,
         limit: Option[Int] = None,
         offset: Option[Int] = None
-    ): (Closeable, java.util.stream.Stream[ImagedMomentEntity]) = {
+    ): (Closeable, java.util.stream.Stream[ImagedMomentEntity]) =
         val dao = daoFactory.newImagedMomentDAO()
         (() => dao.close(), dao.streamByConcept(concept, limit, offset))
-    }
 
-    def countByConcept(concept: String)(implicit ec: ExecutionContext): Future[Int] = {
+    def countByConcept(concept: String)(implicit ec: ExecutionContext): Future[Int] =
         val imDao = daoFactory.newImagedMomentDAO()
         val f     = imDao.runTransaction(d => d.countByConcept(concept))
         f.onComplete(_ => imDao.close())
         f
-    }
 
     def findByConceptWithImages(
         concept: String,
         limit: Option[Int] = None,
         offset: Option[Int] = None
-    )(implicit ec: ExecutionContext): Future[Iterable[ImagedMoment]] = {
+    )(implicit ec: ExecutionContext): Future[Iterable[ImagedMoment]] =
         val imDao = daoFactory.newImagedMomentDAO()
-        val f     = imDao.runTransaction(d =>
-            d.findByConceptWithImages(concept, limit, offset).map(transform)
-        )
+        val f     = imDao.runTransaction(d => d.findByConceptWithImages(concept, limit, offset).map(transform))
         f.onComplete(_ => imDao.close())
         f
-    }
 
-    def countByConceptWithImages(concept: String)(implicit ec: ExecutionContext): Future[Int] = {
+    def countByConceptWithImages(concept: String)(implicit ec: ExecutionContext): Future[Int] =
         val imDao = daoFactory.newImagedMomentDAO()
         val f     = imDao.runTransaction(d => d.countByConceptWithImages(concept))
         f.onComplete(_ => imDao.close())
         f
-    }
 
     def countModifiedBeforeDate(videoReferenceUuid: UUID, date: Instant)(implicit
         ec: ExecutionContext
-    ): Future[Int] = {
+    ): Future[Int] =
         val dao = daoFactory.newImagedMomentDAO()
         val f   = dao.runTransaction(d => d.countModifiedBeforeDate(videoReferenceUuid, date))
         f.onComplete(_ => dao.close())
         f
-    }
 
     def deleteByVideoReferenceUUID(
         videoReferenceUUID: UUID
-    )(implicit ec: ExecutionContext): Future[Int] = {
-        def fn(dao: IMDAO): Int = {
+    )(implicit ec: ExecutionContext): Future[Int] =
+        def fn(dao: IMDAO): Int =
             val moments = dao.findByVideoReferenceUUID(videoReferenceUUID)
             moments.foreach(dao.delete)
             moments.size
-        }
         exec(fn)
-    }
 
     def findByWindowRequest(
         windowRequest: WindowRequest,
@@ -263,7 +240,7 @@ class ImagedMomentController(val daoFactory: JPADAOFactory)
         timecode: Option[Timecode] = None,
         recordedDate: Option[Instant] = None,
         elapsedTime: Option[Duration] = None
-    )(implicit ec: ExecutionContext): Future[ImagedMoment] = {
+    )(implicit ec: ExecutionContext): Future[ImagedMoment] =
 
         def fn(d: IMDAO) =
             val im = ImagedMomentController.findOrCreateImagedMoment(
@@ -275,34 +252,31 @@ class ImagedMomentController(val daoFactory: JPADAOFactory)
             )
             transform(im)
         exec(fn)
-    }
 
-    /** @param imagedMoments
-      *   For your sanity, make sure that they have unique indices BEFORE creating them
-      * @param ex
-      * @return
-      */
+    /**
+     * @param imagedMoments
+     *   For your sanity, make sure that they have unique indices BEFORE creating them
+     * @param ex
+     * @return
+     */
     def create(
         imagedMoments: Seq[ImagedMomentEntity]
-    )(implicit ex: ExecutionContext): Future[Seq[ImagedMoment]] = {
+    )(implicit ex: ExecutionContext): Future[Seq[ImagedMoment]] =
         val dao     = daoFactory.newImagedMomentDAO()
         val future  = dao.runTransaction(d => imagedMoments.map(im => create(d, im)))
         val future1 = future.flatMap(xs =>
-            dao.runTransaction(d => {
-                xs.flatMap(x => Option(x.getUuid).flatMap(d.findByUUID).map(transform))
-            })
+            dao.runTransaction(d => xs.flatMap(x => Option(x.getUuid).flatMap(d.findByUUID).map(transform)))
         )
         future1.onComplete(_ => dao.close())
         future1
-    }
 
-    /** This needs to be called inside a transaction. creates a new imaged moment base on the
-      * current one
-      * @param dao
-      * @param sourceImagedMoment
-      * @return
-      */
-    def create(dao: DAO[?], sourceImagedMoment: ImagedMomentEntity): ImagedMomentEntity = {
+    /**
+     * This needs to be called inside a transaction. creates a new imaged moment base on the current one
+     * @param dao
+     * @param sourceImagedMoment
+     * @return
+     */
+    def create(dao: DAO[?], sourceImagedMoment: ImagedMomentEntity): ImagedMomentEntity =
 
         val imDao = daoFactory.newImagedMomentDAO(dao)
 
@@ -329,48 +303,43 @@ class ImagedMomentController(val daoFactory: JPADAOFactory)
         // Create new image references
         sourceImagedMoment
             .getImageReferences
-            .forEach(imageReference => {
-                if (imageReference.getUuid != null) {
+            .forEach(imageReference =>
+                if imageReference.getUuid != null then
                     log.atDebug
                         .log(
                             s"An imageReference uuid was found. Setting to null as they need to be generated in the database: ${imageReference.getUuid}"
                         )
                     imageReference.setUuid(null)
-                }
                 targetImagedMoment.addImageReference(imageReference)
 //                irDao.create(imageReference)
-            })
+            )
 
         // Create new observations
         sourceImagedMoment
             .getObservations
-            .forEach(observation => {
-                if (observation.getUuid != null) {
+            .forEach(observation =>
+                if observation.getUuid != null then
                     log.atDebug
                         .log(
                             s"An observation uuid was found. Setting to null as they need to be generated in the database: ${observation.getUuid}"
                         )
                     observation.setUuid(null)
-                }
                 // We ALWAYS set the observation timestamp to now if it's null
-                if (observation.getObservationTimestamp == null) {
-                    observation.setObservationTimestamp(Instant.now())
-                }
+                if observation.getObservationTimestamp == null then observation.setObservationTimestamp(Instant.now())
                 targetImagedMoment.addObservation(observation)
                 val associations = observation.getAssociations.asScala
                 observation.setAssociations(new util.HashSet[AssociationEntity]())
                 associations.foreach(a =>
-                    if (a.getUuid != null) {
+                    if a.getUuid != null then
                         log.atDebug
                             .log(
                                 s"An association uuid was found. Setting to null as they need to be generated in the database: ${a.getUuid}"
                             )
                         a.setUuid(null)
-                    }
                     observation.addAssociation(a)
                 )
 //                obsDao.create(observation)
-            })
+            )
 
         if sourceImagedMoment.getAncillaryDatum != null then
             val ad = sourceImagedMoment.getAncillaryDatum
@@ -383,16 +352,13 @@ class ImagedMomentController(val daoFactory: JPADAOFactory)
             .log(() => "Created " + sourceImagedMoment.getObservations.size() + " observations")
 
         targetImagedMoment
-    }
 
     def bulkMove(newVideoReferenceUuid: UUID, uuids: Seq[UUID])(implicit
         ec: ExecutionContext
-    ): Future[Int] = {
-        def fn(dao: IMDAO): Int = {
+    ): Future[Int] =
+        def fn(dao: IMDAO): Int =
             dao.moveToVideoReference(newVideoReferenceUuid, uuids)
-        }
         exec(fn)
-    }
 
     def update(
         uuid: UUID,
@@ -400,10 +366,10 @@ class ImagedMomentController(val daoFactory: JPADAOFactory)
         timecode: Option[Timecode] = None,
         recordedDate: Option[Instant] = None,
         elapsedTime: Option[Duration] = None
-    )(implicit ec: ExecutionContext) = {
+    )(implicit ec: ExecutionContext) =
 
-        def fn(dao: IMDAO): ImagedMoment = {
-            dao.findByUUID(uuid) match {
+        def fn(dao: IMDAO): ImagedMoment =
+            dao.findByUUID(uuid) match
                 case None               =>
                     throw new NotFoundInDatastoreException(
                         s"No ImageMoment with UUID of $uuid was found in the datastore"
@@ -415,65 +381,56 @@ class ImagedMomentController(val daoFactory: JPADAOFactory)
                     elapsedTime.foreach(imagedMoment.setElapsedTime)
                     // dao.update(imagedMoment)
                     transform(imagedMoment)
-            }
-        }
         exec(fn)
-    }
 
-    def updateRecordedTimestampByObservationUuid(observationUuid: UUID, recordedTimestamp: Instant)(
-        implicit ec: ExecutionContext
-    ): Future[Boolean] = {
+    def updateRecordedTimestampByObservationUuid(observationUuid: UUID, recordedTimestamp: Instant)(implicit
+        ec: ExecutionContext
+    ): Future[Boolean] =
         def fn(dao: IMDAO): Boolean =
             dao.updateRecordedTimestampByObservationUuid(observationUuid, recordedTimestamp)
         exec(fn)
-    }
 
     def updateRecordedTimestamps(videoReferenceUuid: UUID, newStartTimestamp: Instant)(implicit
         ec: ExecutionContext
-    ): Future[Iterable[ImagedMoment]] = {
-        def fn(dao: IMDAO): Iterable[ImagedMoment] = {
+    ): Future[Iterable[ImagedMoment]] =
+        def fn(dao: IMDAO): Iterable[ImagedMoment] =
             dao
                 .findByVideoReferenceUUID(videoReferenceUuid)
-                .map(im => {
-                    if (im.getElapsedTime != null) {
+                .map(im =>
+                    if im.getElapsedTime != null then
                         val newRecordedDate = newStartTimestamp.plus(im.getElapsedTime)
-                        if (newRecordedDate != im.getRecordedTimestamp) {
-                            im.setRecordedTimestamp(newRecordedDate)
-                        }
-                    }
+                        if newRecordedDate != im.getRecordedTimestamp then im.setRecordedTimestamp(newRecordedDate)
                     transform(im)
-                })
-        }
+                )
         exec(fn)
-    }
-}
 
-object ImagedMomentController {
+object ImagedMomentController:
 
     private val log = System.getLogger(getClass.getName)
 
-    /** This method will find or create (if a matching one is not found in the datastore)
-      * @param dao
-      * @param videoReferenceUUID
-      * @param timecode
-      * @param recordedDate
-      * @param elapsedTime
-      * @return
-      */
+    /**
+     * This method will find or create (if a matching one is not found in the datastore)
+     * @param dao
+     * @param videoReferenceUUID
+     * @param timecode
+     * @param recordedDate
+     * @param elapsedTime
+     * @return
+     */
     def findOrCreateImagedMoment(
         dao: ImagedMomentDAO[ImagedMomentEntity],
         videoReferenceUUID: UUID,
         timecode: Option[Timecode] = None,
         recordedDate: Option[Instant] = None,
         elapsedTime: Option[Duration] = None
-    ): ImagedMomentEntity = {
+    ): ImagedMomentEntity =
         // -- Return existing or construct a new one if no match is found
         dao.findByVideoReferenceUUIDAndIndex(
             videoReferenceUUID,
             timecode,
             elapsedTime,
             recordedDate
-        ) match {
+        ) match
             case Some(imagedMoment) => imagedMoment
             case None               =>
                 log.atDebug
@@ -490,13 +447,11 @@ object ImagedMomentController {
                 dao.create(imagedMoment)
                 dao.flush()
                 imagedMoment
-        }
-    }
 
     def findOrCreateImagedMoment(
         dao: ImagedMomentDAO[ImagedMomentEntity],
         imagedMoment: ImagedMomentEntity
-    ): ImagedMomentEntity = {
+    ): ImagedMomentEntity =
         findOrCreateImagedMoment(
             dao,
             imagedMoment.getVideoReferenceUuid,
@@ -504,5 +459,3 @@ object ImagedMomentController {
             Option(imagedMoment.getRecordedTimestamp),
             Option(imagedMoment.getElapsedTime)
         )
-    }
-}

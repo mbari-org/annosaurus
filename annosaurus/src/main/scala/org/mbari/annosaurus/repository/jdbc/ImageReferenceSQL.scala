@@ -16,12 +16,11 @@
 
 package org.mbari.annosaurus.repository.jdbc
 
-import java.util.UUID
-import java.net.URI
-import org.mbari.annosaurus.domain.ImageReference
-import org.mbari.annosaurus.domain.Annotation
+import org.mbari.annosaurus.domain.{Annotation, ImageReference}
 
-object ImageReferenceSQL {
+import java.util.UUID
+
+object ImageReferenceSQL:
     val SELECT: String =
         """ SELECT DISTINCT
       |  ir.uuid AS image_reference_uuid,
@@ -68,10 +67,9 @@ object ImageReferenceSQL {
       | )
       |""".stripMargin
 
-    def resultListToImageReferences(rows: List[?]): Seq[ImageReference] = {
-        for {
-            row <- rows
-        } yield {
+    def resultListToImageReferences(rows: List[?]): Seq[ImageReference] =
+        for row <- rows
+        yield
             val xs = row.asInstanceOf[Array[Object]]
             ImageReference(
                 url = xs(4).asUrl.orNull,
@@ -83,18 +81,12 @@ object ImageReferenceSQL {
                 imagedMomentUuid = xs(6).asUUID
             )
 
-        }
-    }
-
     def join(
         annotations: Seq[Annotation],
         images: Seq[ImageReference]
-    ): Seq[Annotation] = {
+    ): Seq[Annotation] =
         for a <- annotations
         yield
             val matches = images.filter(_.imagedMomentUuid == a.imagedMomentUuid)
-            if (matches.isEmpty) a
+            if matches.isEmpty then a
             else a.copy(imageReferences = a.imageReferences.appendedAll(matches))
-    }
-
-}

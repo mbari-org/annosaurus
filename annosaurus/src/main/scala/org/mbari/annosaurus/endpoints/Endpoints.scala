@@ -17,28 +17,22 @@
 package org.mbari.annosaurus.endpoints
 
 import io.circe.Printer
-
-import java.net.URI
 import org.mbari.annosaurus.domain.*
 import org.mbari.annosaurus.etc.circe.CirceCodecs
 import org.mbari.annosaurus.etc.circe.CirceCodecs.{*, given}
+import org.mbari.annosaurus.etc.jdk.Loggers.given
 import org.mbari.annosaurus.etc.jwt.JwtService
-import org.mbari.annosaurus.etc.jdk.Logging.given
-
-import scala.concurrent.ExecutionContext
-import scala.concurrent.Future
-import scala.util.Failure
-import scala.util.Success
 import sttp.model.StatusCode
 import sttp.model.headers.WWWAuthenticateChallenge
 import sttp.tapir.*
-import sttp.tapir.Endpoint
 import sttp.tapir.generic.auto.*
 import sttp.tapir.json.circe.*
 import sttp.tapir.server.ServerEndpoint
 
+import java.net.{URI, URL}
 import java.time.Instant
-import java.net.URL
+import scala.concurrent.{ExecutionContext, Future}
+import scala.util.{Failure, Success}
 
 case class Paging(offset: Option[Int] = Some(0), limit: Option[Int] = Some(100))
 
@@ -118,6 +112,20 @@ trait Endpoints:
     implicit lazy val sURL: Schema[URL]                                                 = Schema.string
     implicit lazy val sInstant: Schema[Instant]                                         = Schema.string
     implicit lazy val sBulkAnnotationSc: Schema[BulkAnnotationSC]                       = Schema.derived[BulkAnnotationSC]
+//    implicit lazy val sConstraintDate: Schema[Constraint.Date]                          = Schema.derived[Constraint.Date]
+//    implicit lazy val sConstraintInString: Schema[Constraint.In[String]]                =
+//        Schema.derived[Constraint.In[String]]
+//    implicit lazy val sConstraintLike: Schema[Constraint.Like]                          = Schema.derived[Constraint.Like]
+//    implicit lazy val sConstraintMax: Schema[Constraint.Max]                            = Schema.derived[Constraint.Max]
+//    implicit lazy val sConstraintMin: Schema[Constraint.Min]                            = Schema.derived[Constraint.Min]
+//    implicit lazy val sConstraintMinMax: Schema[Constraint.MinMax]                      =
+//        Schema.derived[Constraint.MinMax]
+//    implicit lazy val sConstraintIsNull: Schema[Constraint.IsNull]                      =
+//        Schema.derived[Constraint.IsNull]
+//    implicit lazy val sConstraint: Schema[Constraint]                                   = Schema.string
+//    implicit lazy val sConstraints: Schema[Query]                                 = Schema.derived[Query]
+    implicit lazy val sConstraintRequest: Schema[ConstraintRequest]                     = Schema.derived[ConstraintRequest]
+    implicit lazy val sQueryRequest: Schema[QueryRequest]                               = Schema.derived[QueryRequest]
 //    given Schema[Option[URL]]                              = Schema.string
 //    implicit lazy val sOptCAD: Schema[Option[CachedAncillaryDatumSC]]                     = Schema.derived[Option[CachedAncillaryDatumSC]]
 //    implicit lazy val sOptDouble: Schema[Option[Double]]                                 = Schema.derived[Option[Double]]
@@ -138,6 +146,15 @@ trait Endpoints:
             case Failure(exception) =>
                 log.atError.withCause(exception).log("Error")
                 Success(Left(ServerError(exception.getMessage)))
+
+    def handleEitherAsync[T](
+        f: => Either[Throwable, T]
+    )(using ec: ExecutionContext): Future[Either[ErrorMsg, T]] =
+        Future {
+            f match
+                case Right(value) => Right(value)
+                case Left(e)      => Left(ServerError(e.getMessage))
+        }
 
     def handleOption[T](f: Future[Option[T]])(using
         ec: ExecutionContext

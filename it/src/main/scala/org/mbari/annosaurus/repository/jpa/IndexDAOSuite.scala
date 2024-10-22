@@ -16,14 +16,12 @@
 
 package org.mbari.annosaurus.repository.jpa
 
-import org.mbari.annosaurus.repository.jpa.entity.IndexEntity
-import java.util.UUID
-import org.mbari.vcr4j.time.Timecode
-import org.mbari.annosaurus.controllers.TestUtils
 import org.mbari.annosaurus.AssertUtils
-import org.mbari.annosaurus.controllers.TestUtils.create
+import org.mbari.annosaurus.controllers.TestUtils
+import org.mbari.annosaurus.repository.jpa.entity.IndexEntity
+import org.mbari.vcr4j.time.Timecode
 
-trait IndexDAOSuite extends BaseDAOSuite {
+trait IndexDAOSuite extends BaseDAOSuite:
 
     given JPADAOFactory = daoFactory
 
@@ -140,5 +138,3 @@ trait IndexDAOSuite extends BaseDAOSuite {
         AssertUtils.assertSameIndex(opt.get, idx)
         dao.close()
     }
-
-}

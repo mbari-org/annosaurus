@@ -16,44 +16,42 @@
 
 package org.mbari.annosaurus
 
-import org.junit.Assert._
+import org.junit.Assert.*
+import org.mbari.annosaurus.repository.jpa.entity.{
+    AssociationEntity,
+    CachedAncillaryDatumEntity,
+    CachedVideoReferenceInfoEntity,
+    ImageReferenceEntity,
+    ImagedMomentEntity,
+    IndexEntity,
+    ObservationEntity
+}
 
-import org.mbari.annosaurus.repository.jpa.entity.ImagedMomentEntity
-import org.mbari.annosaurus.repository.jpa.entity.ObservationEntity
-import org.mbari.annosaurus.repository.jpa.entity.ImageReferenceEntity
-import org.mbari.annosaurus.repository.jpa.entity.AssociationEntity
-import org.mbari.annosaurus.repository.jpa.entity.CachedAncillaryDatumEntity
 import scala.jdk.CollectionConverters.*
-import org.mbari.annosaurus.domain.CachedVideoReferenceInfo
-import org.mbari.annosaurus.repository.jpa.entity.CachedVideoReferenceInfoEntity
-import org.mbari.annosaurus.repository.jpa.entity.IndexEntity
 
-object AssertUtils {
+object AssertUtils:
 
     def assertSameImagedMoment(
         a: ImagedMomentEntity,
         b: ImagedMomentEntity,
         cascade: Boolean = true
-    ): Unit = {
-        if (a == null && b == null) {
+    ): Unit =
+        if a == null && b == null then {
             // do nothing
         }
-        else if (a != null && b != null) {
+        else if a != null && b != null then
             // assertEquals(a.getTimecode(), b.getTimecode())
-            if (a.getTimecode() != null && b.getTimecode() != null) {
+            if a.getTimecode() != null && b.getTimecode() != null then
                 assertEquals(a.getTimecode().toString(), b.getTimecode().toString())
-            }
-            else if (a.getTimecode() == null && b.getTimecode() == null) {
+            else if a.getTimecode() == null && b.getTimecode() == null then {
                 // do nothing
             }
-            else {
-                fail("One of the timecodes is null")
-            }
+            else fail("One of the timecodes is null")
             assertEquals(a.getElapsedTime(), b.getElapsedTime())
             assertEquals(a.getRecordedTimestamp(), b.getRecordedTimestamp())
             assertEquals(a.getVideoReferenceUuid(), b.getVideoReferenceUuid())
             assertEquals(a.getUuid(), b.getUuid())
-            if (cascade) {
+            if cascade then
                 assertEquals(a.getObservations.size, b.getObservations.size)
                 val ax = Option(a.getObservations)
                     .map(_.asScala.toSeq.sortBy(_.getUuid()))
@@ -73,82 +71,63 @@ object AssertUtils {
                 ay.zip(by).foreach(p => assertSameImageReference(p._1, p._2))
 
                 assertSameAncillaryDatum(a.getAncillaryDatum(), b.getAncillaryDatum())
-            }
-        }
-        else {
-            fail("One of the ImagedMoments is null")
-        }
-    }
+        else fail("One of the ImagedMoments is null")
 
     def assertSameObservation(
         a: ObservationEntity,
         b: ObservationEntity,
         cascade: Boolean = true
-    ): Unit = {
-        if (a == null && b == null) {
+    ): Unit =
+        if a == null && b == null then {
             // do nothing
         }
-        else if (a != null && b != null) {
+        else if a != null && b != null then
             assertEquals(a.getConcept(), b.getConcept())
             assertEquals(a.getGroup(), b.getGroup())
             assertEquals(a.getActivity(), b.getActivity())
             assertEquals(a.getDuration(), b.getDuration())
             assertEquals(a.getObserver(), b.getObserver())
             assertEquals(a.getUuid(), b.getUuid())
-            if (cascade) {
+            if cascade then
                 assertEquals(a.getAssociations().size, b.getAssociations().size)
                 val ax = a.getAssociations().asScala.toSeq.sortBy(_.getUuid)
                 val bx = b.getAssociations().asScala.toSeq.sortBy(_.getUuid)
                 ax.zip(bx).foreach(p => assertSameAssociation(p._1, p._2))
-            }
-        }
-        else {
-            fail("One of the observations is null")
-        }
+        else fail("One of the observations is null")
 
-    }
-
-    def assertSameImageReference(a: ImageReferenceEntity, b: ImageReferenceEntity): Unit = {
-        if (a == null && b == null) {
+    def assertSameImageReference(a: ImageReferenceEntity, b: ImageReferenceEntity): Unit =
+        if a == null && b == null then {
             // do nothing
         }
-        else if (a != null && b != null) {
+        else if a != null && b != null then
             assertEquals(a.getUuid, b.getUuid())
             assertEquals(a.getUrl(), b.getUrl())
             assertEquals(a.getWidth(), b.getWidth())
             assertEquals(a.getHeight(), b.getHeight())
             assertEquals(a.getDescription(), b.getDescription())
             assertEquals(a.getFormat(), b.getFormat())
-        }
-        else {
-            fail("One of the imagereferences is null")
-        }
-    }
+        else fail("One of the imagereferences is null")
 
-    def assertSameAssociation(a: AssociationEntity, b: AssociationEntity): Unit = {
-        if (a == null && b == null) {
+    def assertSameAssociation(a: AssociationEntity, b: AssociationEntity): Unit =
+        if a == null && b == null then {
             // do nothing
         }
-        else if (a != null && b != null) {
+        else if a != null && b != null then
             assertEquals(a.getUuid(), b.getUuid())
             assertEquals(a.getLinkName(), b.getLinkName())
             assertEquals(a.getToConcept(), b.getToConcept())
             assertEquals(a.getLinkValue(), b.getLinkValue())
             assertEquals(a.getMimeType(), b.getMimeType())
-        }
-        else {
-            fail("One of the associations is null")
-        }
-    }
+        else fail("One of the associations is null")
 
     def assertSameAncillaryDatum(
         a: CachedAncillaryDatumEntity,
         b: CachedAncillaryDatumEntity
-    ): Unit = {
-        if (a == null && b == null) {
+    ): Unit =
+        if a == null && b == null then {
             // do nothing
         }
-        else if (a != null && b != null) {
+        else if a != null && b != null then
             assertEquals(a.getUuid(), b.getUuid())
             assertEquals(a.getX(), b.getX())
             assertEquals(a.getY(), b.getY())
@@ -164,50 +143,37 @@ object AssertUtils {
             assertEquals(a.getOxygenMlL(), b.getOxygenMlL())
             assertEquals(a.getSalinity(), b.getSalinity())
             assertEquals(a.getTemperatureCelsius(), b.getTemperatureCelsius())
-        }
-        else {
-            fail("One of the ancillarydata is null")
-        }
-    }
+        else fail("One of the ancillarydata is null")
 
     def assertSameVideoReferenceInfo(
         a: CachedVideoReferenceInfoEntity,
         b: CachedVideoReferenceInfoEntity
-    ): Unit = {
-        if (a == null && b == null) {
+    ): Unit =
+        if a == null && b == null then {
             // do nothing
         }
-        else if (a != null && b != null) {
+        else if a != null && b != null then
             assertEquals(a.getUuid(), b.getUuid())
             assertEquals(a.getVideoReferenceUuid(), b.getVideoReferenceUuid())
             assertEquals(a.getMissionContact(), b.getMissionContact())
             assertEquals(a.getMissionId(), b.getMissionId())
             assertEquals(a.getPlatformName(), b.getPlatformName())
-        }
-    }
 
     def assertSameIndex(
         a: IndexEntity,
         b: IndexEntity
-    ): Unit = {
-        if (a == null && b == null) {
+    ): Unit =
+        if a == null && b == null then {
             // do nothing
         }
-        else if (a != null && b != null) {
+        else if a != null && b != null then
             assertEquals(a.getUuid(), b.getUuid())
             assertEquals(a.getVideoReferenceUuid(), b.getVideoReferenceUuid())
             assertEquals(a.getElapsedTime(), b.getElapsedTime())
             assertEquals(a.getRecordedTimestamp(), b.getRecordedTimestamp())
-            if (a.getTimecode() != null && b.getTimecode() != null) {
+            if a.getTimecode() != null && b.getTimecode() != null then
                 assertEquals(a.getTimecode().toString(), b.getTimecode().toString())
-            }
-            else if (a.getTimecode() == null && b.getTimecode() == null) {
+            else if a.getTimecode() == null && b.getTimecode() == null then {
                 // do nothing
             }
-            else {
-                fail("One of the timecodes is null")
-            }
-        }
-    }
-
-}
+            else fail("One of the timecodes is null")

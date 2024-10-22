@@ -16,23 +16,19 @@
 
 package org.mbari.annosaurus.endpoints
 
-import org.mbari.annosaurus.controllers.IndexController
-import org.mbari.annosaurus.controllers.TestUtils
+import org.mbari.annosaurus.controllers.{IndexController, TestUtils}
 import org.mbari.annosaurus.domain
-import org.mbari.annosaurus.domain.{ImagedMoment, Index, IndexSC, IndexUpdate}
-import sttp.model.StatusCode
-import org.mbari.annosaurus.repository.jpa.JPADAOFactory
-import org.mbari.annosaurus.etc.jwt.JwtService
-import org.mbari.annosaurus.etc.circe.CirceCodecs.given
-import org.mbari.annosaurus.etc.jdk.Instants
-import sttp.client3.*
+import org.mbari.annosaurus.domain.{Index, IndexSC, IndexUpdate}
 import org.mbari.annosaurus.etc.circe.CirceCodecs.{*, given}
+import org.mbari.annosaurus.etc.jwt.JwtService
 import org.mbari.annosaurus.etc.sdk.Futures.*
+import org.mbari.annosaurus.repository.jpa.JPADAOFactory
+import sttp.client3.*
+import sttp.model.StatusCode
 
 import java.time.{Duration, Instant}
-import scala.util.Random
 
-trait IndexEndpointsSuite extends EndpointsSuite {
+trait IndexEndpointsSuite extends EndpointsSuite:
 
     private val log = System.getLogger(getClass.getName)
 
@@ -90,5 +86,3 @@ trait IndexEndpointsSuite extends EndpointsSuite {
             val obtained = i.recorded_timestamp.get
             assertEquals(obtained, expected)
     }
-
-}

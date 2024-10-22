@@ -16,12 +16,11 @@
 
 package org.mbari.annosaurus.repository.jpa
 
-import org.mbari.annosaurus.controllers.TestUtils
 import org.mbari.annosaurus.AssertUtils
-import org.mbari.annosaurus.domain.CachedVideoReferenceInfo
+import org.mbari.annosaurus.controllers.TestUtils
 import org.mbari.annosaurus.repository.jpa.entity.CachedVideoReferenceInfoEntity
 
-trait CachedVideoReferenceInfoDAOSuite extends BaseDAOSuite {
+trait CachedVideoReferenceInfoDAOSuite extends BaseDAOSuite:
 
     given JPADAOFactory = daoFactory
 
@@ -33,14 +32,13 @@ trait CachedVideoReferenceInfoDAOSuite extends BaseDAOSuite {
         assert(vi.getUuid() != null)
     }
 
-    def createTestData(): CachedVideoReferenceInfoEntity = {
+    def createTestData(): CachedVideoReferenceInfoEntity =
         val vi                                     = TestUtils.randomVideoReferenceInfo()
         given dao: CachedVideoReferenceInfoDAOImpl = daoFactory.newCachedVideoReferenceInfoDAO()
         run(() => dao.create(vi))
         dao.close()
         vi
 
-    }
     test("update") {
         val vi                                     = createTestData()
         given dao: CachedVideoReferenceInfoDAOImpl = daoFactory.newCachedVideoReferenceInfoDAO()
@@ -55,10 +53,10 @@ trait CachedVideoReferenceInfoDAOSuite extends BaseDAOSuite {
     test("delete") {
         val vi                                     = createTestData()
         given dao: CachedVideoReferenceInfoDAOImpl = daoFactory.newCachedVideoReferenceInfoDAO()
-        run(() => {
+        run(() =>
             // update brings entity into transactional context
             dao.delete(dao.update(vi))
-        })
+        )
         run(() => dao.findByUUID(vi.getUuid())) match
             case None        => // ok
             case Some(value) => fail("should not have found the entity")
@@ -167,5 +165,3 @@ trait CachedVideoReferenceInfoDAOSuite extends BaseDAOSuite {
         assert(xs.contains(vi.getMissionId()))
         dao.close()
     }
-
-}
