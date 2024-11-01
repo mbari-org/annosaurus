@@ -49,7 +49,7 @@ object Dependencies {
     lazy val json4sJackson = "org.json4s"         %% "json4s-jackson"  % "4.0.7"
     lazy val junit         = "junit"               % "junit"           % "4.13.2"
 
-    val logbackVersion      = "1.5.11"
+    val logbackVersion      = "1.5.12"
     lazy val logbackClassic = "ch.qos.logback" % "logback-classic" % logbackVersion
     lazy val logbackCore    = "ch.qos.logback" % "logback-core"    % logbackVersion
 
@@ -93,7 +93,7 @@ object Dependencies {
     // lazy val testcontainersSqlserver =
     //   "com.dimafeng" %% "testcontainers-scala-mssqlserver" % testcontainersScalaVersion
 
-    val testcontainersVersion        = "1.20.2"
+    val testcontainersVersion        = "1.20.3"
     lazy val testcontainersCore      = "org.testcontainers" % "testcontainers" % testcontainersVersion
     lazy val testcontainersSqlserver = "org.testcontainers" % "mssqlserver"    % testcontainersVersion
     lazy val testcontainersOracle    = "org.testcontainers" % "oracle-xe"      % testcontainersVersion

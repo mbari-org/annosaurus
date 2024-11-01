@@ -20,6 +20,7 @@ import org.mbari.annosaurus.etc.jdk.Loggers.{*, given}
 
 import java.sql.PreparedStatement
 import scala.util.Try
+import org.mbari.annosaurus.DatabaseConfig
 object PreparedStatementGenerator:
 
     val IndexTime        = "index_recorded_timestamp"
@@ -49,9 +50,9 @@ object PreparedStatementGenerator:
 
     def buildPreparedStatementTemplate(
         tableName: String,
-        query: Query
+        query: Query,
+        databaseConfig: DatabaseConfig
     ): String =
-
         val select   = buildSelectClause(query)
         val where    = buildWhereClause(tableName, query)
         val distinct = if query.distinct then "DISTINCT" else ""
@@ -60,12 +61,14 @@ object PreparedStatementGenerator:
             case None          =>
                 if query.strict then query.select.head
                 else s"$IndexTime, $ObservationUuid"
+        val limitOffset = buildLimitOffsetClause(query, databaseConfig)
 
         s"""
           |SELECT $distinct $select
           |FROM $tableName
           |$where
           |ORDER BY $orderBy ASC
+          |$limitOffset
           |""".stripMargin
 
     private def buildSelectClause(query: Query): String =
@@ -109,3 +112,19 @@ object PreparedStatementGenerator:
                    |)
                    |""".stripMargin
             else s"""WHERE $wheres"""
+
+    private def buildLimitOffsetClause(query: Query, databaseConfig: DatabaseConfig): String =
+        if (query.limit.isEmpty && query.offset.isEmpty) return ""
+        else if databaseConfig.isPostgres then
+            val limit  = query.limit.map(l => s"LIMIT $l").getOrElse("")
+            val offset = query.offset.map(o => s"OFFSET $o").getOrElse("")
+            s"$limit $offset"
+        else 
+            if (query.limit.isEmpty && query.offset.isEmpty) return ""
+            else
+                val offset = query.offset.getOrElse(0)
+                val fetch = query.limit match
+                    case Some(l) => s"FETCH NEXT $l ROWS ONLY"
+                    case None    => ""
+                s"OFFSET $offset ROWS $fetch"
+                

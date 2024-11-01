@@ -82,8 +82,9 @@ class QueryService(databaseConfig: DatabaseConfig, viewName: String):
     def query(
         query: Query
     ): Either[Throwable, QueryResults] =
-        val sql = PreparedStatementGenerator.buildPreparedStatementTemplate(viewName, query)
+        val sql = PreparedStatementGenerator.buildPreparedStatementTemplate(viewName, query, databaseConfig)
         log.atDebug.log(s"Running query: $sql")
+        println(s"Running query: $sql")
         Using
             .Manager(use =>
                 val conn = use(jdbc.newConnection())
@@ -96,7 +97,8 @@ class QueryService(databaseConfig: DatabaseConfig, viewName: String):
                     )
                 )
                 query.limit.foreach(stmt.setMaxRows)
-                query.offset.foreach(stmt.setFetchSize)
+                // TODO may have to add some database specific code here
+                // query.offset.foreach(stmt.setF)
                 PreparedStatementGenerator.bind(stmt, query.where)
                 val rs   = stmt.executeQuery()
                 QueryResults.fromResultSet(rs)
