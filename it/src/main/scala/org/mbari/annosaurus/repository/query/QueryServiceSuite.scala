@@ -43,7 +43,7 @@ trait QueryServiceSuite extends BaseDAOSuite:
 
     }
 
-    test("query distinct concept with limit") {
+    test("query distinct concept with limit and offset") {
         val im    = TestUtils.create(5, 2, 1)
         val query = Query(select = Seq("concept"), distinct = true, 
             limit = Some(2), offset = Some(1))

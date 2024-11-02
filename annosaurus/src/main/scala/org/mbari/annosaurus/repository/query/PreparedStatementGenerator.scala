@@ -120,11 +120,9 @@ object PreparedStatementGenerator:
             val offset = query.offset.map(o => s"OFFSET $o").getOrElse("")
             s"$limit $offset"
         else 
-            if (query.limit.isEmpty && query.offset.isEmpty) return ""
-            else
-                val offset = query.offset.getOrElse(0)
-                val fetch = query.limit match
-                    case Some(l) => s"FETCH NEXT $l ROWS ONLY"
-                    case None    => ""
-                s"OFFSET $offset ROWS $fetch"
+            val offset = query.offset.getOrElse(0)
+            val fetch = query.limit match
+                case Some(l) => s"FETCH NEXT $l ROWS ONLY"
+                case None    => ""
+            s"OFFSET $offset ROWS $fetch"
                 

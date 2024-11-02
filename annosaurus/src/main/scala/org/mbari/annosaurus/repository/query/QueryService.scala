@@ -96,7 +96,7 @@ class QueryService(databaseConfig: DatabaseConfig, viewName: String):
                         ResultSet.CONCUR_READ_ONLY
                     )
                 )
-                query.limit.foreach(stmt.setMaxRows)
+                // query.limit.foreach(stmt.setMaxRows)
                 // TODO may have to add some database specific code here
                 // query.offset.foreach(stmt.setF)
                 PreparedStatementGenerator.bind(stmt, query.where)
