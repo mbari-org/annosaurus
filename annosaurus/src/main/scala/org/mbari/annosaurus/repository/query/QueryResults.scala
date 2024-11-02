@@ -39,7 +39,7 @@ object QueryResults:
             for i <- 1 to numColumns do
                 if isNew then results += ListBuffer[Any]()
                 val column = results(i - 1)
-                if timestampColumnIdx.contains(i - 1) then column += rs.getTimestamp(i, UtcCalendar).toInstant
+                if timestampColumnIdx.contains(i - 1) then column += Option(rs.getTimestamp(i, UtcCalendar)).map(_.toInstant).orNull
                 else column += rs.getObject(i)
             isNew = false
         val columnData         = results.result().map(_.result()) // Turn into immutable
