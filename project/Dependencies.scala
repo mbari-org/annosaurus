@@ -25,12 +25,12 @@ object Dependencies {
     lazy val gson             = "com.google.code.gson" % "gson"              % "2.10.1"
     lazy val h2               = "com.h2database"       % "h2"                % "2.3.232"
 
-    val hibernateVersion     = "6.6.1.Final"  //"6.4.8.Final" //"6.5.1.Final" - envers is throwing: The column name REV is not valid.
+    val hibernateVersion     = "6.6.2.Final"  //"6.4.8.Final" //"6.5.1.Final" - envers is throwing: The column name REV is not valid.
     lazy val hibernateCore   = "org.hibernate.orm" % "hibernate-core"     % hibernateVersion
     lazy val hibernateEnvers = "org.hibernate.orm" % "hibernate-envers"   % hibernateVersion
     lazy val hibernateHikari = "org.hibernate.orm" % "hibernate-hikaricp" % hibernateVersion
 
-    lazy val hikariCp         = "com.zaxxer"           % "HikariCP"          % "6.0.0"
+    lazy val hikariCp         = "com.zaxxer"           % "HikariCP"          % "6.1.0"
     lazy val jansi            = "org.fusesource.jansi" % "jansi"             % "2.4.1"
     lazy val javaxServlet     = "javax.servlet"        % "javax.servlet-api" % "4.0.1"
     lazy val javaxTransaction = "javax.transaction"    % "jta"               % "1.1"
@@ -73,7 +73,7 @@ object Dependencies {
     lazy val slf4jLog4j = "org.slf4j" % "log4j-over-slf4j" % slf4jVersion
     lazy val slf4jSystem = "org.slf4j" % "slf4j-jdk-platform-logging" % slf4jVersion
 
-    private val tapirVersion = "1.11.7"
+    private val tapirVersion = "1.11.8"
     lazy val tapirCirce      = "com.softwaremill.sttp.tapir"   %% "tapir-json-circe"         % tapirVersion
     lazy val tapirHelidon    = "com.softwaremill.sttp.tapir"   %% "tapir-nima-server"        % tapirVersion
     lazy val tapirPrometheus = "com.softwaremill.sttp.tapir"   %% "tapir-prometheus-metrics" % tapirVersion
