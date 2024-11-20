@@ -21,6 +21,8 @@ import org.mbari.annosaurus.etc.circe.CirceCodecs.*
 
 import java.sql.{PreparedStatement, SQLException}
 import java.time.Instant
+import java.sql.Timestamp
+import java.sql.Time
 
 // Define the Root case class
 case class Query(
@@ -112,8 +114,8 @@ object Constraint:
     case class Date(column: String, startTimestamp: Instant, endTimestamp: Instant) extends Constraint:
         @throws[SQLException]
         def bind(statement: PreparedStatement, idx: Int): Int =
-            statement.setObject(idx, startTimestamp)
-            statement.setObject(idx + 1, endTimestamp)
+            statement.setObject(idx, Timestamp.from(startTimestamp))
+            statement.setObject(idx + 1, Timestamp.from(endTimestamp))
             idx + 2
 
         def toPreparedStatementTemplate: String = column + " BETWEEN ? AND ?"

@@ -16,7 +16,8 @@
 
 package org.mbari.annosaurus.util
 
-import org.mbari.scilube3.Matlib
+import org.mbari.scommons.math.Matlib
+
 
 import scala.math.Ordering.Double.IeeeOrdering
 

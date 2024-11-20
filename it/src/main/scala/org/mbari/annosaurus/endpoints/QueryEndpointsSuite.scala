@@ -22,8 +22,13 @@ import org.mbari.annosaurus.etc.circe.CirceCodecs.{*, given}
 import org.mbari.annosaurus.repository.jpa.JPADAOFactory
 import org.mbari.annosaurus.repository.query.JDBC
 import sttp.model.StatusCode
+import org.mbari.annosaurus.etc.jdk.Loggers.{*, given}
 
 import scala.jdk.CollectionConverters.*
+import java.time.Instant
+import java.time.temporal.ChronoUnit
+import java.time.Duration
+
 
 trait QueryEndpointsSuite extends EndpointsSuite:
 
@@ -77,6 +82,30 @@ trait QueryEndpointsSuite extends EndpointsSuite:
             queryRequest.stringify,
             response =>
 //                println(response)
+                assertEquals(response.code, StatusCode.Ok)
+                val obtained = checkResponse[Count](response.body)
+                assertEquals(obtained.count, expected)
+        )
+    }
+
+    test("count with 'between' constraint") {
+        val xs           = TestUtils.create(2, 2)
+        val expected     = 4L
+        val minTime = Instant.now().minus(Duration.ofDays(40))
+        val maxTime = Instant.now().plus(Duration.ofDays(40))
+        val constraintAttempt = s"""{"column":"index_recorded_timestamp","between":["${minTime}","$maxTime"]}""".reify[ConstraintRequest]
+        assert(constraintAttempt.isRight)
+        val constraint = constraintAttempt.getOrElse(ConstraintRequest("index_recorded_timestamp", isnull = Some(false)))
+        val queryRequest =
+            QueryRequest(
+                distinct = Some(true),
+                where    = Some(Seq(constraint))
+            )
+        runPost(
+            endpoints.countImpl,
+            s"http://test.com/v1/query/count",
+            queryRequest.stringify,
+            response =>
                 assertEquals(response.code, StatusCode.Ok)
                 val obtained = checkResponse[Count](response.body)
                 assertEquals(obtained.count, expected)

@@ -21,7 +21,7 @@ import org.mbari.annosaurus.etc.jdk.Loggers.given
 import org.mbari.annosaurus.etc.jdk.Strings
 import org.mbari.annosaurus.repository.jpa.JPADAOFactory
 import org.mbari.annosaurus.repository.jpa.entity.*
-import org.mbari.scilube3.ocean.Ocean
+import org.mbari.scommons.ocean.Ocean
 import org.mbari.vcr4j.time.{FrameRates, Timecode}
 
 import java.net.URI

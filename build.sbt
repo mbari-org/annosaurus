@@ -84,7 +84,7 @@ lazy val annosaurus = (project in file("annosaurus"))
             oracle,
             postgresql,
             rxJava3,
-            scilube,
+            scommons,
             slf4j,
             slf4jJul,
             slf4jLog4j,
@@ -96,7 +96,7 @@ lazy val annosaurus = (project in file("annosaurus"))
             tapirSwagger,
             tapirVertex,
             typesafeConfig,
-            uuidgen,
+            // uuidgen,
             vcr4jCore,
             zeromq
         ).map(
