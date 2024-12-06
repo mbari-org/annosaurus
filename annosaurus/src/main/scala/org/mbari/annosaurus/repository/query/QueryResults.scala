@@ -31,7 +31,8 @@ object QueryResults:
 
     def fromResultSet(rs: ResultSet): QueryResults =
         val metadata           = JDBC.Metadata.fromResultSet(rs)
-        val timestampColumnIdx = metadata.zipWithIndex.filter(_._1.columnClassName == "java.sql.Timestamp").map(_._2)
+        val timestampColumnIdx = metadata.zipWithIndex
+            .filter(v => v._1.columnClassName == "java.sql.Timestamp" || v._1.columnClassName == "microsoft.sql.DateTimeOffset").map(_._2)
         val results            = ListBuffer[ListBuffer[Any]]()
         val numColumns         = metadata.size
         var isNew              = true
