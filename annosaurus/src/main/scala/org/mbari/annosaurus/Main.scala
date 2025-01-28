@@ -26,6 +26,7 @@ import sttp.tapir.server.vertx.{VertxFutureServerInterpreter, VertxFutureServerO
 
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext}
+import io.vertx.core.http.HttpServerOptions
 
 object Main:
 
@@ -59,13 +60,18 @@ object Main:
             .metricsInterceptor(Endpoints.prometheusMetrics.metricsInterceptor())
             .options
 
+
         val port = sys.env.get("HTTP_PORT").flatMap(_.toIntOption).getOrElse(8080)
         log.atInfo.log(s"Starting ${AppConfig.Name} v${AppConfig.Version} on port $port")
 
         val vertx  =
             Vertx.vertx(new VertxOptions().setWorkerPoolSize(AppConfig.NumberOfVertxWorkers))
-//        val vertx  = Vertx.vertx()
-        val server = vertx.createHttpServer()
+
+        // enable deflate and gzip compression
+        val httpServerOptions = new HttpServerOptions()
+        httpServerOptions.setCompressionSupported(true)
+
+        val server = vertx.createHttpServer(httpServerOptions)
         val router = Router.router(vertx)
 
         // NOTE: Don't add a handler. It will intercept all requests (Originally: Log all requests)
