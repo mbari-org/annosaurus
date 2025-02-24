@@ -1,7 +1,7 @@
 import sbt._
 object Dependencies {
 
-    lazy val auth0 = "com.auth0" % "java-jwt" % "4.4.0"
+    lazy val auth0 = "com.auth0" % "java-jwt" % "4.5.0"
 
     val circeVersion      = "0.14.10"
     lazy val circeCore    = "io.circe" %% "circe-core"    % circeVersion
@@ -11,7 +11,7 @@ object Dependencies {
     lazy val commonsCodec = "commons-codec" % "commons-codec" % "1.18.0"
 
 
-    val hibernateVersion     = "6.6.5.Final"  //"6.4.8.Final" //"6.5.1.Final" - envers is throwing: The column name REV is not valid.
+    val hibernateVersion     = "6.6.9.Final"  //"6.4.8.Final" //"6.5.1.Final" - envers is throwing: The column name REV is not valid.
     lazy val hibernateCore   = "org.hibernate.orm" % "hibernate-core"     % hibernateVersion
     lazy val hibernateEnvers = "org.hibernate.orm" % "hibernate-envers"   % hibernateVersion
     lazy val hibernateHikari = "org.hibernate.orm" % "hibernate-hikaricp" % hibernateVersion
@@ -39,7 +39,7 @@ object Dependencies {
     lazy val slf4jLog4j = "org.slf4j" % "log4j-over-slf4j" % slf4jVersion
     lazy val slf4jSystem = "org.slf4j" % "slf4j-jdk-platform-logging" % slf4jVersion
 
-    private val tapirVersion = "1.11.13"
+    private val tapirVersion = "1.11.15"
     lazy val tapirCirce      = "com.softwaremill.sttp.tapir"   %% "tapir-json-circe"         % tapirVersion
     lazy val tapirHelidon    = "com.softwaremill.sttp.tapir"   %% "tapir-nima-server"        % tapirVersion
     lazy val tapirPrometheus = "com.softwaremill.sttp.tapir"   %% "tapir-prometheus-metrics" % tapirVersion
@@ -47,7 +47,7 @@ object Dependencies {
     lazy val tapirSwagger    = "com.softwaremill.sttp.tapir"   %% "tapir-swagger-ui-bundle"  % tapirVersion
     lazy val tapirVertex     = "com.softwaremill.sttp.tapir"   %% "tapir-vertx-server"       % tapirVersion
 
-    lazy val tapirSttpCirce  = "com.softwaremill.sttp.client3" %% "circe"                    % "3.10.2"
+    lazy val tapirSttpCirce  = "com.softwaremill.sttp.client3" %% "circe"                    % "3.10.3"
 
     // val testcontainersScalaVersion = "0.41.0"
     // lazy val testcontainersPostgresql =
@@ -59,7 +59,7 @@ object Dependencies {
     // lazy val testcontainersSqlserver =
     //   "com.dimafeng" %% "testcontainers-scala-mssqlserver" % testcontainersScalaVersion
 
-    val testcontainersVersion        = "1.20.4"
+    val testcontainersVersion        = "1.20.5"
     lazy val testcontainersCore      = "org.testcontainers" % "testcontainers" % testcontainersVersion
     lazy val testcontainersSqlserver = "org.testcontainers" % "mssqlserver"    % testcontainersVersion
     lazy val testcontainersOracle    = "org.testcontainers" % "oracle-xe"      % testcontainersVersion

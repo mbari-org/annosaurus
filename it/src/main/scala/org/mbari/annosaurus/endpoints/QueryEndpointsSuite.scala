@@ -23,11 +23,13 @@ import org.mbari.annosaurus.repository.jpa.JPADAOFactory
 import org.mbari.annosaurus.repository.query.JDBC
 import sttp.model.StatusCode
 import org.mbari.annosaurus.etc.jdk.Loggers.{*, given}
+import org.mbari.annosaurus.etc.sdk.Futures.*
 
 import scala.jdk.CollectionConverters.*
 import java.time.Instant
 import java.time.temporal.ChronoUnit
 import java.time.Duration
+import sttp.client3.{SttpBackend, *}
 
 
 trait QueryEndpointsSuite extends EndpointsSuite:
@@ -70,6 +72,34 @@ trait QueryEndpointsSuite extends EndpointsSuite:
                         assertEquals(obtained, expected)
         )
     }
+
+    test("runQueryAndCache") {
+        val xs           = TestUtils.create(2, 2)
+        val expected     =
+            ("concept" +: xs.flatMap(_.getObservations.asScala.map(_.getConcept))).distinct.sorted.mkString("\n")
+        val queryRequest = QueryRequest(select = Some(Seq("concept")), distinct = Some(true))
+        val stub = newBackendStub(endpoints.downloadTsvImpl)
+        val u    = uri"http://test.com/v1/query/download"
+        val request = basicRequest.post(u).body(queryRequest.stringify)
+        val response = request.send(stub).join
+        assertEquals(response.code, StatusCode.Ok)
+        log.atInfo.log(s"Query results: ${response.body}")
+
+        // runPost(
+        //     endpoints.runQueryAndCacheImpl,
+        //     s"http://test.com/v1/query/run2",
+        //     queryRequest.stringify,
+        //     response =>
+        //         assertEquals(response.code, StatusCode.Ok)
+        //         response.body match
+        //             case Left(e)     => fail(e)
+        //             case Right(body) =>
+        //                 // val obtained = body.split("\n").sorted.mkString("\n")
+        //                log.atDebug.log(s"Query results: $body")
+        //                 // assertEquals(obtained, expected)
+        // )
+    }
+
 
     test("count") {
         val xs           = TestUtils.create(2, 2)

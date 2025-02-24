@@ -27,11 +27,16 @@ import sttp.tapir.server.ServerEndpoint
 import sttp.tapir.server.ServerEndpoint.Full
 
 import scala.concurrent.{ExecutionContext, Future}
+import java.io.File
+import java.nio.file.Files
+import java.util.concurrent.Executors
+import sttp.model.MediaType
 
 class QueryEndpoints(queryController: QueryController)(using executionContext: ExecutionContext) extends Endpoints:
 
     private val base = "query"
     private val tag  = "Query"
+    private val scheduler = Executors.newScheduledThreadPool(1)
 
     val listColumns: Endpoint[Unit, Unit, ErrorMsg, Seq[JDBC.Metadata], Any] = openEndpoint
         .get
@@ -59,6 +64,29 @@ class QueryEndpoints(queryController: QueryController)(using executionContext: E
             handleEitherAsync(
                 queryController.query(request).map(QueryResults.toTsv)
             )
+        )
+
+    val downloadTsv: Endpoint[Unit, QueryRequest, ErrorMsg, File, Any] =
+        openEndpoint
+            .post
+            .in(base / "download")
+            .in(jsonBody[QueryRequest])
+            .out(fileBody)
+            .out(header("Content-Disposition", "attachment; filename=results.tsv"))
+            .out(header("Content-Type", "text/tab-separated-values"))
+            .name("downloadTsv")
+            .description("Run a query and download the results as a tab-separate value file")
+            .tag(tag)
+
+    val downloadTsvImpl: Full[Unit, Unit, QueryRequest, ErrorMsg, File, Any, Future] =
+        downloadTsv.serverLogic(request =>
+            val path = Files.createTempFile("query", ".tsv")
+            val task: Runnable = () => Files.delete(path)
+            scheduler.schedule(task, 2, java.util.concurrent.TimeUnit.MINUTES)
+            val future = handleEitherAsync(
+                queryController.queryAndSaveToTsvFile(request, path).map(_ => path.toFile())
+            )
+            future
         )
 
     // val runQueryStreaming =
@@ -93,11 +121,13 @@ class QueryEndpoints(queryController: QueryController)(using executionContext: E
     override def all: List[Endpoint[?, ?, ?, ?, ?]] = List(
         listColumns,
         runQuery,
+        downloadTsv,
         count
     )
 
     override def allImpl: List[ServerEndpoint[Any, Future]] = List(
         listColumnsImpl,
         runQueryImpl,
+        downloadTsvImpl,
         countImpl
     )

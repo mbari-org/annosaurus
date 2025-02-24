@@ -20,6 +20,9 @@ import java.sql.ResultSet
 import java.util.{Calendar, TimeZone}
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
+import scala.util.Using
+import java.nio.file.Files
+import java.nio.file.Path
 
 type QueryResults = List[(JDBC.Metadata, Seq[Any])]
 
@@ -59,3 +62,28 @@ object QueryResults:
                 if j < numCols - 1 then sb.append("\t")
             sb.append("\n")
         sb.result()
+
+
+    object IO:
+        def writeTsv(rs: ResultSet, path: Path): Unit =
+            Using.resource(Files.newBufferedWriter(path)) { writer =>
+                val metadata = JDBC.Metadata.fromResultSet(rs)
+                val numColumns         = metadata.size
+                val timestampColumnIdx = metadata.zipWithIndex
+                        .filter(v => v._1.columnClassName == "java.sql.Timestamp" || v._1.columnClassName == "microsoft.sql.DateTimeOffset").map(_._2)
+
+                val header = metadata.map(_.columnName).mkString("\t")
+                writer.write(header)
+                writer.newLine()
+
+                while rs.next() do
+                    val row = for i <- 1 to numColumns yield
+                        if (timestampColumnIdx.contains(i - 1)) 
+                            Option(rs.getTimestamp(i, UtcCalendar)).map(_.toInstant).orNull
+                        else rs.getObject(i)
+                        
+                    writer.write(row.map(obj => if obj == null then "" else obj.toString)
+                        .mkString("\t"))
+                    writer.newLine()
+                path
+            }
