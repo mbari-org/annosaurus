@@ -65,8 +65,8 @@ object QueryResults:
 
 
     object IO:
-        def writeTsv(rs: ResultSet, path: Path): Unit =
-            Using.resource(Files.newBufferedWriter(path)) { writer =>
+        def writeTsv(rs: ResultSet, path: Path): Either[Throwable, Path] =
+            Using(Files.newBufferedWriter(path)) { writer =>
                 val metadata = JDBC.Metadata.fromResultSet(rs)
                 val numColumns         = metadata.size
                 val timestampColumnIdx = metadata.zipWithIndex
@@ -86,4 +86,4 @@ object QueryResults:
                         .mkString("\t"))
                     writer.newLine()
                 path
-            }
+            }.toEither

@@ -125,8 +125,10 @@ class QueryService(databaseConfig: DatabaseConfig, viewName: String):
                 )
                 PreparedStatementGenerator.bind(stmt, query.where)
                 val rs   = stmt.executeQuery()
-                QueryResults.IO.writeTsv(rs, file)
-                file
+                QueryResults.IO.writeTsv(rs, file) match
+                    case Left(e) => throw e
+                    case Right(_) => file
+                
             )
             .toEither
 
