@@ -155,7 +155,7 @@ AS
         ass.link_value,
         ass.to_concept,
         ass.mime_type AS association_mime_type,
-        ass.link_name || ' | ' || ass.to_concept || ' | ' || ass.link_value AS associations,
+		NULLIF(CONCAT_WS(' | ', ass.link_name, ass.to_concept, ass.link_value), '') AS associations,
         ad.altitude,
         ad.coordinate_reference_system,
         ad.depth_meters,

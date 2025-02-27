@@ -167,7 +167,7 @@ SELECT
     ass.to_concept,
     ass.mime_type AS association_mime_type,
     ass.uuid AS association_uuid,
-    CONCAT(ass.link_name, ' | ', ass.to_concept, ' | ', ass.link_value) AS associations,
+    NULLIF(CONCAT_WS(' | ', ass.link_name, ass.to_concept, ass.link_value), ''),
     ad.altitude,
     ad.coordinate_reference_system,
     ad.depth_meters,
