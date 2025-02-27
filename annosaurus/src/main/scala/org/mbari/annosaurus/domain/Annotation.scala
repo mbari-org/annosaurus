@@ -203,7 +203,7 @@ final case class AnnotationSC(
     recorded_timestamp: Option[Instant] = None,
     timecode: Option[String] = None,
     video_reference_uuid: Option[UUID] = None,
-    last_udpated: Option[java.time.Instant] = None
+    last_updated: Option[java.time.Instant] = None
 ) extends ToCamelCase[Annotation]:
 
     override def toCamelCase: Annotation =
@@ -223,7 +223,7 @@ final case class AnnotationSC(
             recorded_timestamp,
             timecode,
             video_reference_uuid,
-            last_udpated
+            last_updated
         )
 
 final case class BulkAnnotationSC(

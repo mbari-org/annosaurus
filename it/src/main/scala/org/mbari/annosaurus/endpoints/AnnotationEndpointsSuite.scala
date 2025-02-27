@@ -247,7 +247,7 @@ trait AnnotationEndpointsSuite extends EndpointsSuite:
                 observation_uuid = None,
                 imaged_moment_uuid = None,
                 associations = Nil,
-                last_udpated = None
+                last_updated = None
             )
             assertEquals(o0, e0)
 
@@ -298,7 +298,7 @@ trait AnnotationEndpointsSuite extends EndpointsSuite:
                     imaged_moment_uuid = None,
                     associations = Nil,
                     image_references = Nil,
-                    last_udpated = None
+                    last_updated = None
                 )
                 .toCamelCase
 //            println("EXPECTED: " + e0.stringify)
@@ -481,7 +481,7 @@ trait AnnotationEndpointsSuite extends EndpointsSuite:
         val expected    = xs
             .flatMap(Annotation.fromImagedMoment(_))
             .map(_.toSnakeCase)
-            .map(_.copy(activity = Some("foofoo"), concept = Some("barbar"), last_udpated = None))
+            .map(_.copy(activity = Some("foofoo"), concept = Some("barbar"), last_updated = None))
             .sortBy(_.concept)
         val jwt         = jwtService.authorize("foo").orNull
         assert(jwt != null)
@@ -496,7 +496,7 @@ trait AnnotationEndpointsSuite extends EndpointsSuite:
             .join
         assertEquals(response.code, StatusCode.Ok)
         val obtained    = checkResponse[Seq[AnnotationSC]](response.body)
-        val corrected   = obtained.map(_.copy(last_udpated = None)).sortBy(_.concept)
+        val corrected   = obtained.map(_.copy(last_updated = None)).sortBy(_.concept)
         assertEquals(corrected, expected)
     }
 

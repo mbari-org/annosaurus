@@ -21,6 +21,7 @@ import org.mbari.annosaurus.etc.jdk.Loggers.{*, given}
 
 import java.sql.ResultSet
 import scala.util.Using
+import java.nio.file.Path
 
 class QueryService(databaseConfig: DatabaseConfig, viewName: String):
 
@@ -104,3 +105,31 @@ class QueryService(databaseConfig: DatabaseConfig, viewName: String):
                 QueryResults.fromResultSet(rs)
             )
             .toEither
+
+    def queryAndSaveToTsvFile(
+        query: Query,
+        file: Path): Either[Throwable, Path] = 
+        val sql = PreparedStatementGenerator.buildPreparedStatementTemplate(viewName, query, databaseConfig)
+        log.atDebug.log(s"Running query: $sql")
+
+        Using
+            .Manager(use =>
+                val conn = use(jdbc.newConnection())
+                conn.setReadOnly(true)
+                val stmt = use(
+                    conn.prepareStatement(
+                        sql,
+                        ResultSet.TYPE_FORWARD_ONLY,
+                        ResultSet.CONCUR_READ_ONLY
+                    )
+                )
+                PreparedStatementGenerator.bind(stmt, query.where)
+                val rs   = stmt.executeQuery()
+                QueryResults.IO.writeTsv(rs, file) match
+                    case Left(e) => throw e
+                    case Right(_) => file
+                
+            )
+            .toEither
+
+        
