@@ -11,18 +11,19 @@ object Dependencies {
     lazy val commonsCodec = "commons-codec" % "commons-codec" % "1.18.0"
 
 
-    val hibernateVersion     = "6.6.15.Final"  //"6.4.8.Final" //"6.5.1.Final" - envers is throwing: The column name REV is not valid.
+    // val hibernateVersion     = "7.0.0.Final"  // See https://github.com/mbari-org/annosaurus/issues/47
+    val hibernateVersion     = "6.6.15.Final" 
     lazy val hibernateCore   = "org.hibernate.orm" % "hibernate-core"     % hibernateVersion
     lazy val hibernateEnvers = "org.hibernate.orm" % "hibernate-envers"   % hibernateVersion
     lazy val hibernateHikari = "org.hibernate.orm" % "hibernate-hikaricp" % hibernateVersion
 
     lazy val hikariCp         = "com.zaxxer"           % "HikariCP"          % "6.3.0"
-    lazy val jansi            = "org.fusesource.jansi" % "jansi"             % "2.4.1"
+    lazy val jansi            = "org.fusesource.jansi" % "jansi"             % "2.4.2"
     lazy val javaxServlet     = "javax.servlet"        % "javax.servlet-api" % "4.0.1"
     lazy val javaxTransaction = "javax.transaction"    % "jta"               % "1.1"
 
     lazy val junit         = "junit"               % "junit"           % "4.13.2"
-    lazy val logbackClassic = "ch.qos.logback" % "logback-classic" % "1.5.16"
+    lazy val logbackClassic = "ch.qos.logback" % "logback-classic" % "1.5.18"
 
     lazy val mssqlserver = "com.microsoft.sqlserver" % "mssql-jdbc" % "12.10.0.jre11"
     lazy val munit       = "org.scalameta"          %% "munit"      % "1.1.1"
