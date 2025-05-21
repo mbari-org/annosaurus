@@ -19,14 +19,16 @@ package org.mbari.annosaurus.repository.jpa
 import jakarta.persistence.EntityManagerFactory
 import org.mbari.annosaurus.DatabaseConfig
 import org.mbari.annosaurus.etc.tc.AzureSqlEdgeContainerProvider
+import org.testcontainers.containers.MSSQLServerContainer
+import org.testcontainers.utility.DockerImageName
 
 object SqlServerTestDAOFactory extends TestDAOFactory:
 
-    val container = new AzureSqlEdgeContainerProvider().newInstance()
+    // val container = new AzureSqlEdgeContainerProvider().newInstance()
 
     // The image name must match the one in src/test/resources/container-license-acceptance.txt
-    // val container = new MSSQLServerContainer(DockerImageName.parse("mcr.microsoft.com/mssql/server:2019-latest"))
-    // container.acceptLicense()
+    val container = new MSSQLServerContainer(DockerImageName.parse("mcr.microsoft.com/mssql/server:2022-latest"))
+    container.acceptLicense()
     container.withInitScript("sql/mssqlserver/02_m3_annotations.sql")
     container.withReuse(true)
     container.start()
