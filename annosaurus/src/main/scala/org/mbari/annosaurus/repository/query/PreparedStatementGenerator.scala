@@ -59,7 +59,7 @@ object PreparedStatementGenerator:
         val orderBy  = query.orderBy match
             case Some(columns) => columns.mkString(", ")
             case None          =>
-                if query.strict then query.select.head
+                if query.strict then query.select.head   // strict = true is the default. So this is the default ordering
                 else s"$IndexTime, $ObservationUuid"
         val limitOffset = buildLimitOffsetClause(query, databaseConfig)
 
