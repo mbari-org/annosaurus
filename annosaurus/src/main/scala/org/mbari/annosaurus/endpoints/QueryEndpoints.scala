@@ -33,8 +33,8 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class QueryEndpoints(queryController: QueryController)(using executionContext: ExecutionContext) extends Endpoints:
 
-    private val base = "query"
-    private val tag  = "Query"
+    private val base      = "query"
+    private val tag       = "Query"
     private val scheduler = Executors.newScheduledThreadPool(1)
 
     val listColumns: Endpoint[Unit, Unit, ErrorMsg, Seq[JDBC.Metadata], Any] = openEndpoint
@@ -79,10 +79,10 @@ class QueryEndpoints(queryController: QueryController)(using executionContext: E
 
     val downloadTsvImpl: Full[Unit, Unit, QueryRequest, ErrorMsg, File, Any, Future] =
         downloadTsv.serverLogic(request =>
-            val path = Files.createTempFile("query", ".tsv")
+            val path           = Files.createTempFile("query", ".tsv")
             val task: Runnable = () => Files.delete(path)
             scheduler.schedule(task, 2, java.util.concurrent.TimeUnit.MINUTES)
-            val future = handleEitherAsync(
+            val future         = handleEitherAsync(
                 queryController.queryAndSaveToTsvFile(request, path).map(_ => path.toFile())
             )
             future

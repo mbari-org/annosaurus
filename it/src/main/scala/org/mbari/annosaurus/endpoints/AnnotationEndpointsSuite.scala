@@ -61,7 +61,8 @@ trait AnnotationEndpointsSuite extends EndpointsSuite:
             response =>
                 assertEquals(response.code, StatusCode.Ok)
                 val obtained = checkResponse[AnnotationSC](response.body).toCamelCase
-                val expected = Annotation.from(obs)
+                val expected = Annotation
+                    .from(obs)
                     .copy(lastUpdated = obtained.lastUpdated)
                     .roundObservationTimestampToMillis()
                 assertEquals(obtained, expected)

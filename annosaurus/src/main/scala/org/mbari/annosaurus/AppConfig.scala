@@ -100,5 +100,5 @@ case class DatabaseConfig(
         // Class.forName(driver)
         // java.sql.DriverManager.getConnection(url, user, password)
 
-    def isPostgres: Boolean = driver.toLowerCase.contains("postgresql")
+    def isPostgres: Boolean  = driver.toLowerCase.contains("postgresql")
     def itSqlserver: Boolean = driver.toLowerCase.contains("sqlserver")

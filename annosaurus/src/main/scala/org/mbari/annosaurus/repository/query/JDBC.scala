@@ -43,7 +43,6 @@ object JDBC:
                 columnClassName = metadata.getColumnClassName(i)
             yield JDBC.Metadata(columnName, columnType, columnSize, columnLabel, columnClassName)
 
-
 class JDBC(config: DatabaseConfig):
 
     def newConnection(): Connection = config.newConnection()

@@ -40,10 +40,9 @@ class QueryController(databaseConfig: DatabaseConfig, viewName: String):
 
     def queryAndSaveToTsvFile(queryRequest: QueryRequest, path: Path): Either[Throwable, Path] =
         for
-            query <- Query.validate(queryRequest, checkWhere = queryRequest.strict.getOrElse(false))
+            query   <- Query.validate(queryRequest, checkWhere = queryRequest.strict.getOrElse(false))
             tsvFile <- queryService.queryAndSaveToTsvFile(query, path)
         yield path
-
 
     def listColumns(): Either[Throwable, Seq[JDBC.Metadata]] =
         queryService.jdbc.listColumnsMetadata(viewName)

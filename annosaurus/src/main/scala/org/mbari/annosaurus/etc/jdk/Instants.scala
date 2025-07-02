@@ -41,6 +41,6 @@ object Instants:
     def formatCompactIso8601(instant: Instant): String =
         CompactTimeFormatter.format(instant)
 
-
     def roundToMillis(instant: Instant): Instant =
+        if instant == null then null else
         Instant.ofEpochMilli(instant.toEpochMilli)

@@ -45,8 +45,7 @@ trait QueryServiceSuite extends BaseDAOSuite:
 
     test("query distinct concept with limit and offset") {
         val im    = TestUtils.create(5, 2, 1)
-        val query = Query(select = Seq("concept"), distinct = true, 
-            limit = Some(2), offset = Some(1))
+        val query = Query(select = Seq("concept"), distinct = true, limit = Some(2), offset = Some(1))
         queryService.query(query) match
             case Left(e)        => fail(e.getMessage)
             case Right(results) =>
@@ -60,7 +59,6 @@ trait QueryServiceSuite extends BaseDAOSuite:
             select = Seq("concept"),
             distinct = true,
             where = Seq(In("concept", Seq(im.head.getObservations.iterator().next().getConcept)))
-
         )
         queryService.query(query) match
             case Left(e)        => fail(e.getMessage)
@@ -75,12 +73,11 @@ trait QueryServiceSuite extends BaseDAOSuite:
             select = Seq("concept", "link_name", "link_value"),
             distinct = true,
             where = Seq(In("concept", Seq(im.head.getObservations.iterator().next().getConcept)))
-
         )
-        val path = java.nio.file.Paths.get("target", "test.tsv")
+        val path  = java.nio.file.Paths.get("target", "test.tsv")
         queryService.queryAndSaveToTsvFile(query, path) match
             case Left(e)  => fail(e.getMessage)
-            case Right(p) => 
+            case Right(p) =>
                 assertEquals(p, path)
                 assert(path.toFile().exists())
     }

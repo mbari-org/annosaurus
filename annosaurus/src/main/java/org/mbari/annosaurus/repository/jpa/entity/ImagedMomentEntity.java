@@ -202,7 +202,7 @@ import org.mbari.vcr4j.time.Timecode;
         ),
         @NamedQuery(
             name = "ImagedMoment.findByWindowRequest",
-            query = "SELECT i from ImagedMoment i WHERE i.videoReferenceUuid IN :uuids AND i.recordedTimestamp BETWEEN :start AND :end"
+            query = "SELECT i from ImagedMoment i WHERE i.videoReferenceUuid IN :uuids AND i.recordedTimestamp BETWEEN :start AND :end ORDER BY i.uuid"
         ),
         @NamedQuery(
             name = "ImagedMoment.findByImageReferenceUUID",

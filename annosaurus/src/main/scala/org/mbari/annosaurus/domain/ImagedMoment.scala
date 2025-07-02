@@ -70,15 +70,15 @@ final case class ImagedMoment(
     lazy val elapsedTime: Option[Duration] = elapsedTimeMillis.map(Duration.ofMillis)
 
     /**
-    * This method is used during integration testing. We store timestamps
-    * to millis, but (depending on the JVM) it may have nanosecond resolution
-    * in memory
-    *
-    * @return a copy of this ImagedMoment with observation timestamps rounded to millis
-    */
+     * This method is used during integration testing. We store timestamps to millis, but (depending on the JVM) it may
+     * have nanosecond resolution in memory
+     *
+     * @return
+     *   a copy of this ImagedMoment with observation timestamps rounded to millis
+     */
     def roundObservationTimestampsToMillis(): ImagedMoment =
-      var newObservations = observations.map(_.roundObservationTimestampToMillis)
-      this.copy(observations = newObservations)
+        var newObservations = observations.map(_.roundObservationTimestampToMillis)
+        this.copy(observations = newObservations)
 
 object ImagedMoment extends FromEntity[ImagedMomentEntity, ImagedMoment]:
     def from(entity: ImagedMomentEntity, extend: Boolean = false): ImagedMoment =

@@ -91,6 +91,7 @@ trait FastAnnotationEndpointsSuite extends EndpointsSuite:
         assertEquals(response.code, StatusCode.Ok)
         val qcr                 = checkResponse[QueryConstraintsResponseSC[Seq[AnnotationSC]]](response.body)
         assertEquals(qcr.content.size, obs.size)
+        println(qcr.stringify)
         for a <- qcr.content
         do
             assertEquals(a.image_references.size, 1)
@@ -354,9 +355,9 @@ trait FastAnnotationEndpointsSuite extends EndpointsSuite:
     }
 
     test("findImagedMomentUuidsByConcept") {
-        val xs      = TestUtils.create(2, 2, 1, 1, true)
+        val xs         = TestUtils.create(2, 2, 1, 1, true)
         val annotation = xs.head.getObservations.iterator().next()
-        val concept = annotation.getConcept
+        val concept    = annotation.getConcept
         runGet(
             endpoints.findImagedMomentUuidsByConceptImpl,
             s"http://test.com/v1/fast/imagedmoments/concept/images/$concept",
@@ -388,6 +389,7 @@ trait FastAnnotationEndpointsSuite extends EndpointsSuite:
         assert(im.getUuid != null)
         val obs = im.getObservations.iterator().next()
         assert(obs.getUuid != null)
+        assert(obs.getObservationTimestamp() != null)
         val ass = obs.getAssociations.iterator().next()
         runGet(
             endpoints.findAnnotationsByLinkNameAndLinkValueImpl,
@@ -395,9 +397,12 @@ trait FastAnnotationEndpointsSuite extends EndpointsSuite:
             response =>
                 assertEquals(response.code, StatusCode.Ok)
                 val annos    = checkResponse[Seq[AnnotationSC]](response.body)
+                println(annos.stringify)
                 assertEquals(annos.size, 1)
                 val obtained = annos.head.toCamelCase
-                val expected = TestUtils.stripLastUpdated(Annotation.from(obs).removeForeignKeys().roundObservationTimestampToMillis())
+                val expected = TestUtils.stripLastUpdated(
+                    Annotation.from(obs).removeForeignKeys().roundObservationTimestampToMillis()
+                )
 //                println("EXPECTED: " + expected.stringify)
 //                println("OBTAINED: " + obtained.stringify)
                 assertEquals(obtained, expected)

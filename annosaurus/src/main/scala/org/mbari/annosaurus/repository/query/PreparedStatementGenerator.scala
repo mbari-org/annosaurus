@@ -53,13 +53,13 @@ object PreparedStatementGenerator:
         query: Query,
         databaseConfig: DatabaseConfig
     ): String =
-        val select   = buildSelectClause(query)
-        val where    = buildWhereClause(tableName, query)
-        val distinct = if query.distinct then "DISTINCT" else ""
-        val orderBy  = query.orderBy match
+        val select      = buildSelectClause(query)
+        val where       = buildWhereClause(tableName, query)
+        val distinct    = if query.distinct then "DISTINCT" else ""
+        val orderBy     = query.orderBy match
             case Some(columns) => columns.mkString(", ")
             case None          =>
-                if query.strict then query.select.head   // strict = true is the default. So this is the default ordering
+                if query.strict then query.select.head // strict = true is the default. So this is the default ordering
                 else s"$IndexTime, $ObservationUuid"
         val limitOffset = buildLimitOffsetClause(query, databaseConfig)
 
@@ -114,15 +114,14 @@ object PreparedStatementGenerator:
             else s"""WHERE $wheres"""
 
     private def buildLimitOffsetClause(query: Query, databaseConfig: DatabaseConfig): String =
-        if (query.limit.isEmpty && query.offset.isEmpty) return ""
+        if query.limit.isEmpty && query.offset.isEmpty then return ""
         else if databaseConfig.isPostgres then
             val limit  = query.limit.map(l => s"LIMIT $l").getOrElse("")
             val offset = query.offset.map(o => s"OFFSET $o").getOrElse("")
             s"$limit $offset"
-        else 
+        else
             val offset = query.offset.getOrElse(0)
-            val fetch = query.limit match
+            val fetch  = query.limit match
                 case Some(l) => s"FETCH NEXT $l ROWS ONLY"
                 case None    => ""
             s"OFFSET $offset ROWS $fetch"
-                

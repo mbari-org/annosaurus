@@ -140,7 +140,9 @@ object Annotation extends FromEntity[ObservationEntity, Annotation]:
             Option(entity.getGroup),
             imagedMomentOpt.flatMap(im => Option(im.getUuid)),
             imageReferences,
-            Option(entity.getObservationTimestamp), //Option(entity.getObservationTimestamp).map(Instants.roundToMillis),
+            Option(
+                entity.getObservationTimestamp
+            ), // Option(entity.getObservationTimestamp).map(Instants.roundToMillis),
             Option(entity.getUuid),
             Option(entity.getObserver),
             imagedMomentOpt.flatMap(im => Option(im.getRecordedTimestamp)),

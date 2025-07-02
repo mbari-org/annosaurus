@@ -28,6 +28,7 @@ import org.mbari.annosaurus.repository.jpa.entity.{
 }
 
 import scala.jdk.CollectionConverters.*
+import org.mbari.annosaurus.etc.jdk.Instants
 
 object AssertUtils:
 
@@ -88,6 +89,9 @@ object AssertUtils:
             assertEquals(a.getDuration(), b.getDuration())
             assertEquals(a.getObserver(), b.getObserver())
             assertEquals(a.getUuid(), b.getUuid())
+            // We're only storing millis precision in the database. Don't compare past that.
+            // On some JDKs, Instants has nanos precision
+            assertEquals(Instants.roundToMillis(a.getObservationTimestamp()), Instants.roundToMillis(b.getObservationTimestamp()))
             if cascade then
                 assertEquals(a.getAssociations().size, b.getAssociations().size)
                 val ax = a.getAssociations().asScala.toSeq.sortBy(_.getUuid)

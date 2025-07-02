@@ -117,7 +117,8 @@ trait ObservationEndpointsSuite extends EndpointsSuite:
             s"http://test.com/v1/observations/association/$associationUuid",
             response =>
                 assertEquals(response.code, StatusCode.Ok)
-                val expected = Observation.from(im.getObservations.iterator().next(), true).roundObservationTimestampToMillis
+                val expected =
+                    Observation.from(im.getObservations.iterator().next(), true).roundObservationTimestampToMillis
                 val obtained = checkResponse[ObservationSC](response.body).toCamelCase
                 assertEquals(obtained, expected)
         )

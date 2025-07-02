@@ -106,9 +106,7 @@ class QueryService(databaseConfig: DatabaseConfig, viewName: String):
             )
             .toEither
 
-    def queryAndSaveToTsvFile(
-        query: Query,
-        file: Path): Either[Throwable, Path] =
+    def queryAndSaveToTsvFile(query: Query, file: Path): Either[Throwable, Path] =
         val sql = PreparedStatementGenerator.buildPreparedStatementTemplate(viewName, query, databaseConfig)
         log.atDebug.log(s"Running query: $sql")
 
@@ -126,8 +124,7 @@ class QueryService(databaseConfig: DatabaseConfig, viewName: String):
                 PreparedStatementGenerator.bind(stmt, query.where)
                 val rs   = stmt.executeQuery()
                 QueryResults.IO.writeTsv(rs, file) match
-                    case Left(e) => throw e
+                    case Left(e)  => throw e
                     case Right(_) => file
-
             )
             .toEither

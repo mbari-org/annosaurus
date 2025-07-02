@@ -30,7 +30,7 @@ import java.sql.Connection
 import java.time.{Duration, Instant}
 import java.util.UUID
 import java.util.concurrent.TimeUnit
-import scala.concurrent.{Await, ExecutionContext, duration}
+import scala.concurrent.{duration, Await, ExecutionContext}
 import scala.util.Random
 
 object TestUtils:
