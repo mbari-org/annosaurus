@@ -18,6 +18,7 @@ package org.mbari.annosaurus.repository.jpa
 
 import jakarta.persistence.EntityManagerFactory
 import org.mbari.annosaurus.DatabaseConfig
+import org.mbari.annosaurus.etc.flyway.FlywayMigrator
 import org.mbari.annosaurus.etc.tc.AzureSqlEdgeContainerProvider
 import org.testcontainers.containers.MSSQLServerContainer
 import org.testcontainers.utility.DockerImageName
@@ -29,7 +30,7 @@ object SqlServerTestDAOFactory extends TestDAOFactory:
     // The image name must match the one in src/test/resources/container-license-acceptance.txt
     val container = new MSSQLServerContainer(DockerImageName.parse("mcr.microsoft.com/mssql/server:2022-latest"))
     container.acceptLicense()
-    container.withInitScript("sql/mssqlserver/02_m3_annotations.sql")
+//    container.withInitScript("sql/mssqlserver/02_m3_annotations.sql")
     container.withReuse(true)
     container.start()
 
@@ -50,15 +51,20 @@ object SqlServerTestDAOFactory extends TestDAOFactory:
             )
 
     lazy val entityManagerFactory: EntityManagerFactory =
-        val driver = "com.microsoft.sqlserver.jdbc.SQLServerDriver"
-        Class.forName(driver)
-        EntityManagerFactories(
-            container.getJdbcUrl(),
-            container.getUsername(),
-            container.getPassword(),
-            container.getDriverClassName(),
-            testProps()
-        )
+        val db = databaseConfig
+        Class.forName(db.driver)
+        FlywayMigrator.migrate(db) match
+            case Left(ex) =>
+                throw new RuntimeException(s"Failed to migrate database: ${ex.getMessage}", ex)
+            case Right(_) =>
+                // Create the EntityManagerFactory with the provided database configuration
+            EntityManagerFactories(
+                db.url,
+                db.user,
+                db.password,
+                db.driver,
+                testProps()
+            )
 
     lazy val databaseConfig: DatabaseConfig = DatabaseConfig(
         container.getJdbcUrl(),

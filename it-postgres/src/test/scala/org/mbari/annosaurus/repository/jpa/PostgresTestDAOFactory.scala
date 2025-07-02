@@ -18,13 +18,14 @@ package org.mbari.annosaurus.repository.jpa
 
 import jakarta.persistence.EntityManagerFactory
 import org.mbari.annosaurus.DatabaseConfig
+import org.mbari.annosaurus.etc.flyway.FlywayMigrator
 import org.testcontainers.containers.PostgreSQLContainer
 
 object PostgresTestDAOFactory extends TestDAOFactory:
 
     // TODO - intialize the container with SQL so UUID type gets correctly created
     val container = new PostgreSQLContainer("postgres:17")
-    container.withInitScript("sql/postgresql/02_m3_annotations.sql")
+//    container.withInitScript("sql/postgresql/02_m3_annotations.sql")
     container.withReuse(true)
     container.start()
 
@@ -43,15 +44,20 @@ object PostgresTestDAOFactory extends TestDAOFactory:
             )
 
     lazy val entityManagerFactory: EntityManagerFactory =
-        val driver = "org.postgresql.Driver"
-        Class.forName(container.getDriverClassName)
-        EntityManagerFactories(
-            container.getJdbcUrl(),
-            container.getUsername(),
-            container.getPassword(),
-            container.getDriverClassName(),
-            testProps()
-        )
+        val db = databaseConfig
+        Class.forName(db.driver)
+        FlywayMigrator.migrate(db) match
+            case Left(ex) =>
+                throw new RuntimeException(s"Failed to migrate database: ${ex.getMessage}", ex)
+            case Right(_) =>
+                // Create the EntityManagerFactory with the provided database configuration
+                EntityManagerFactories(
+                    db.url,
+                    db.user,
+                    db.password,
+                    db.driver,
+                    testProps()
+                )
 
     lazy val databaseConfig: DatabaseConfig = DatabaseConfig(
         container.getJdbcUrl(),

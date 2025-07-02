@@ -10,6 +10,10 @@ object Dependencies {
 
     lazy val commonsCodec = "commons-codec" % "commons-codec" % "1.18.0"
 
+    val flywayVersion = "11.10.0"
+    lazy val flywayCore = "org.flywaydb" % "flyway-core" % flywayVersion
+    lazy val flywaySqlserver = "org.flywaydb" % "flyway-sqlserver" % flywayVersion
+    lazy val flywayPostgres = "org.flywaydb" % "flyway-database-postgresql" % flywayVersion
 
     val hibernateVersion     = "7.0.4.Final"  // See https://github.com/mbari-org/annosaurus/issues/47
 //    val hibernateVersion     = "6.6.17.Final"
