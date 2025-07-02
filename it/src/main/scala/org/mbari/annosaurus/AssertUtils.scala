@@ -77,7 +77,8 @@ object AssertUtils:
     def assertSameObservation(
         a: ObservationEntity,
         b: ObservationEntity,
-        cascade: Boolean = true
+        cascade: Boolean = true,
+        compareObservationTimestamp: Boolean = true
     ): Unit =
         if a == null && b == null then {
             // do nothing
@@ -91,7 +92,16 @@ object AssertUtils:
             assertEquals(a.getUuid(), b.getUuid())
             // We're only storing millis precision in the database. Don't compare past that.
             // On some JDKs, Instants has nanos precision
-            assertEquals(Instants.roundToMillis(a.getObservationTimestamp()), Instants.roundToMillis(b.getObservationTimestamp()))
+            // assertEquals(
+            //     Option(a.getObservationTimestamp()).map(_.toEpochMilli()).orNull,
+            //     Option(b.getObservationTimestamp()).map(_.toEpochMilli()).orNull
+            // )
+            if (compareObservationTimestamp) {
+                assertEquals(
+                    Option(a.getObservationTimestamp()).map(Instants.roundToMillis).orNull,
+                    Option(b.getObservationTimestamp()).map(Instants.roundToMillis).orNull
+                )
+            }
             if cascade then
                 assertEquals(a.getAssociations().size, b.getAssociations().size)
                 val ax = a.getAssociations().asScala.toSeq.sortBy(_.getUuid)

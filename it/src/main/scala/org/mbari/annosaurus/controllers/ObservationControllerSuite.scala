@@ -71,11 +71,13 @@ trait ObservationControllerSuite extends BaseDAOSuite:
 
         val newConcept  = "foobar"
         val newActivity = "baz"
+        // explicitly keep old observationTimestamp for testing
         val opt         = exec(
             controller.update(
                 o0.getUuid(),
                 concept = Option(newConcept),
-                activity = Option(newActivity)
+                activity = Option(newActivity),
+                observationDate = o0.getObservationTimestamp()
             )
         )
         assert(opt.isDefined)
@@ -158,7 +160,8 @@ trait ObservationControllerSuite extends BaseDAOSuite:
         val im      = TestUtils.create(1, 1).head
         val o0      = im.getObservations().iterator().next()
         o0.setDuration(Duration.ofSeconds(5))
-        exec(controller.update(o0.getUuid(), duration = Option(o0.getDuration())))
+        // We explcitly keep the observationTimestamp or it will be changed by the update method
+        exec(controller.update(o0.getUuid(), observationDate = o0.getObservationTimestamp(), duration = Option(o0.getDuration())))
         val sanity  = exec(controller.findByUUID(o0.getUuid()))
         assertEquals(sanity.get.duration.orNull, o0.getDuration())
         val deleted = exec(controller.deleteDuration(o0.getUuid()))

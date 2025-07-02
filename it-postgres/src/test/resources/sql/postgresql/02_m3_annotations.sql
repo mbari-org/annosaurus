@@ -7,15 +7,15 @@ Objects: TABLE, VIEW, INDEX
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 
-CREATE TABLE "imaged_moments"  ( 
+CREATE TABLE "imaged_moments"  (
 	"uuid"             	      uuid PRIMARY KEY NOT NULL DEFAULT uuid_generate_v4(),
 	"video_reference_uuid"  	uuid NOT NULL,
 	"elapsed_time_millis"   	numeric(19,0) NULL,
-	"recorded_timestamp"    	timestamp with time zone NULL,
+	"recorded_timestamp"    	timestamptz NULL,
 	"timecode"              	varchar(255) NULL,
 	"last_updated_timestamp"	timestamp NOT NULL DEFAULT now());
 
-CREATE TABLE "ancillary_data"  ( 
+CREATE TABLE "ancillary_data"  (
 	"uuid"             	          uuid PRIMARY KEY NOT NULL DEFAULT uuid_generate_v4(),
 	"imaged_moment_uuid"         	uuid NOT NULL,
 	"altitude"                   	real NULL,
@@ -36,25 +36,25 @@ CREATE TABLE "ancillary_data"  (
 	"z"                          	double precision NULL,
 	"light_transmission"         	real NULL,
 	"last_updated_timestamp"     	timestamp NOT NULL DEFAULT now(),
-	CONSTRAINT fk_ancillary_data__imaged_moments 
-	  FOREIGN KEY(imaged_moment_uuid) 
+	CONSTRAINT fk_ancillary_data__imaged_moments
+	  FOREIGN KEY(imaged_moment_uuid)
 		REFERENCES imaged_moments("uuid"));
 
-CREATE TABLE "observations"  ( 
+CREATE TABLE "observations"  (
 	"uuid"                  	uuid PRIMARY KEY NOT NULL DEFAULT uuid_generate_v4(),
 	"imaged_moment_uuid"    	uuid NOT NULL,
 	"activity"              	varchar(128) NULL,
 	"concept"               	varchar(256) NULL,
 	"duration_millis"       	numeric(19,0) NULL,
 	"observation_group"     	varchar(128) NULL,
-	"observation_timestamp" 	timestamp NULL,
+	"observation_timestamp" 	timestamptz NULL,
 	"observer"              	varchar(128) NULL,
 	"last_updated_timestamp"	timestamp NOT NULL DEFAULT now(),
-	CONSTRAINT fk_observations__imaged_moments 
-	  FOREIGN KEY(imaged_moment_uuid) 
+	CONSTRAINT fk_observations__imaged_moments
+	  FOREIGN KEY(imaged_moment_uuid)
 		REFERENCES imaged_moments("uuid"));
 
-CREATE TABLE "associations"  ( 
+CREATE TABLE "associations"  (
 	"uuid"             	      uuid PRIMARY KEY NOT NULL DEFAULT uuid_generate_v4(),
 	"observation_uuid"      	uuid NOT NULL,
 	"link_name"             	varchar(128) NOT NULL,
@@ -62,11 +62,11 @@ CREATE TABLE "associations"  (
 	"to_concept"            	varchar(128) NULL,
 	"mime_type"             	varchar(64) NOT NULL,
 	"last_updated_timestamp"	timestamp NOT NULL DEFAULT now(),
-	CONSTRAINT fk_associations__observations 
-	  FOREIGN KEY(observation_uuid) 
+	CONSTRAINT fk_associations__observations
+	  FOREIGN KEY(observation_uuid)
 		REFERENCES observations("uuid"));
 
-CREATE TABLE "image_references"  ( 
+CREATE TABLE "image_references"  (
 	"uuid"             	      uuid PRIMARY KEY NOT NULL DEFAULT uuid_generate_v4(),
 	"imaged_moment_uuid"    	uuid NOT NULL,
 	"description"           	varchar(256) NULL,
@@ -76,11 +76,11 @@ CREATE TABLE "image_references"  (
 	"width_pixels"          	integer NULL,
 	"last_updated_timestamp"	timestamp NOT NULL DEFAULT now(),
 	UNIQUE("url"),
-	CONSTRAINT fk_image_references__imaged_moments 
-	  FOREIGN KEY(imaged_moment_uuid) 
+	CONSTRAINT fk_image_references__imaged_moments
+	  FOREIGN KEY(imaged_moment_uuid)
 		REFERENCES imaged_moments("uuid"));
 
-CREATE TABLE "video_reference_information"  ( 
+CREATE TABLE "video_reference_information"  (
 	"uuid"                  	uuid PRIMARY KEY NOT NULL DEFAULT uuid_generate_v4(),
 	"video_reference_uuid"  	uuid NOT NULL,
 	"mission_contact"       	varchar(64) NULL,
