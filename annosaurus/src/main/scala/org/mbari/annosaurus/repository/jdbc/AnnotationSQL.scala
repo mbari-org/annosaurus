@@ -18,9 +18,6 @@ package org.mbari.annosaurus.repository.jdbc
 
 import org.mbari.annosaurus.domain.Annotation
 
-import java.time.Instant
-import java.util.UUID
-
 /**
  * Object that contains the SQL and methods to build annotations
  */

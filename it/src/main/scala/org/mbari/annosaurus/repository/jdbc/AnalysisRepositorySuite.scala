@@ -20,7 +20,6 @@ import org.mbari.annosaurus.controllers.TestUtils
 import org.mbari.annosaurus.domain.QueryConstraints
 import org.mbari.annosaurus.repository.jpa.{BaseDAOSuite, JPADAOFactory}
 
-import java.time.Instant
 import scala.jdk.CollectionConverters.*
 
 trait AnalysisRepositorySuite extends BaseDAOSuite:

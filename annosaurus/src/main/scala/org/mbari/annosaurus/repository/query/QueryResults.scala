@@ -16,13 +16,11 @@
 
 package org.mbari.annosaurus.repository.query
 
+import java.nio.file.{Files, Path}
 import java.sql.ResultSet
 import java.util.{Calendar, TimeZone}
-import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 import scala.util.Using
-import java.nio.file.Files
-import java.nio.file.Path
 
 type QueryResults = List[(JDBC.Metadata, Seq[Any])]
 

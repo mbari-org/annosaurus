@@ -17,11 +17,11 @@
 package org.mbari.annosaurus.repository.query
 
 import org.mbari.annosaurus.DatabaseConfig
-import org.mbari.annosaurus.etc.jdk.Loggers.{*, given}
+import org.mbari.annosaurus.etc.jdk.Loggers.given
 
+import java.nio.file.Path
 import java.sql.ResultSet
 import scala.util.Using
-import java.nio.file.Path
 
 class QueryService(databaseConfig: DatabaseConfig, viewName: String):
 

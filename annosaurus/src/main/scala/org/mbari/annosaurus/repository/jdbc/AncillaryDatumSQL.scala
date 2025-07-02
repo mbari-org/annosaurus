@@ -18,8 +18,6 @@ package org.mbari.annosaurus.repository.jdbc
 
 import org.mbari.annosaurus.domain.{Annotation, CachedAncillaryDatum}
 
-import java.util.UUID
-
 object AncillaryDatumSQL:
 
     def resultListToAnncillaryData(rows: List[?]): Seq[CachedAncillaryDatum] =

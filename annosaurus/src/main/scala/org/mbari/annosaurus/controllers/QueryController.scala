@@ -19,6 +19,7 @@ package org.mbari.annosaurus.controllers
 import org.mbari.annosaurus.DatabaseConfig
 import org.mbari.annosaurus.domain.{Count, QueryRequest}
 import org.mbari.annosaurus.repository.query.{JDBC, Query, QueryResults, QueryService}
+
 import java.nio.file.Path
 
 class QueryController(databaseConfig: DatabaseConfig, viewName: String):

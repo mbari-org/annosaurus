@@ -20,8 +20,6 @@ import jakarta.persistence.{EntityManager, Query}
 import org.mbari.annosaurus.domain.QueryConstraints
 import org.mbari.annosaurus.etc.jdk.Loggers.given
 
-import java.time.Instant
-
 object QueryConstraintsSqlBuilder:
 
     private val log = System.getLogger(getClass.getName)

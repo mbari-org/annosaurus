@@ -16,11 +16,11 @@
 
 package org.mbari.annosaurus.repository.query
 
-import org.mbari.annosaurus.etc.jdk.Loggers.{*, given}
+import org.mbari.annosaurus.DatabaseConfig
+import org.mbari.annosaurus.etc.jdk.Loggers.given
 
 import java.sql.PreparedStatement
 import scala.util.Try
-import org.mbari.annosaurus.DatabaseConfig
 object PreparedStatementGenerator:
 
     val IndexTime        = "index_recorded_timestamp"

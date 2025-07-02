@@ -19,7 +19,7 @@ package org.mbari.annosaurus.endpoints
 import org.mbari.annosaurus.controllers.IndexController
 import org.mbari.annosaurus.domain.{ErrorMsg, Index, IndexSC, IndexUpdateSC}
 import org.mbari.annosaurus.endpoints.CustomTapirJsonCirce.*
-import org.mbari.annosaurus.etc.circe.CirceCodecs.{*, given}
+import org.mbari.annosaurus.etc.circe.CirceCodecs.given
 import org.mbari.annosaurus.etc.jwt.JwtService
 import org.mbari.annosaurus.repository.jpa.entity.IndexEntity
 import sttp.tapir.*

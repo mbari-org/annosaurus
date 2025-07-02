@@ -18,7 +18,7 @@ package org.mbari.annosaurus
 
 import com.typesafe.config.ConfigFactory
 import org.mbari.annosaurus.etc.jdk.Loggers
-import org.mbari.annosaurus.etc.jdk.Loggers.{*, given}
+import org.mbari.annosaurus.etc.jdk.Loggers.given
 import org.mbari.annosaurus.etc.jwt.JwtService
 
 import scala.util.Try

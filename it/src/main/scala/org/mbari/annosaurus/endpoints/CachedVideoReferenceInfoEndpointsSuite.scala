@@ -32,7 +32,6 @@ import sttp.client3.*
 import sttp.model.StatusCode
 
 import java.util.UUID
-import scala.jdk.CollectionConverters.*
 
 trait CachedVideoReferenceInfoEndpointsSuite extends EndpointsSuite:
 

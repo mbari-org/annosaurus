@@ -19,17 +19,15 @@ package org.mbari.annosaurus.endpoints
 import org.mbari.annosaurus.controllers.{QueryController, TestUtils}
 import org.mbari.annosaurus.domain.{ConstraintRequest, Count, QueryRequest}
 import org.mbari.annosaurus.etc.circe.CirceCodecs.{*, given}
+import org.mbari.annosaurus.etc.jdk.Loggers.given
+import org.mbari.annosaurus.etc.sdk.Futures.*
 import org.mbari.annosaurus.repository.jpa.JPADAOFactory
 import org.mbari.annosaurus.repository.query.JDBC
+import sttp.client3.*
 import sttp.model.StatusCode
-import org.mbari.annosaurus.etc.jdk.Loggers.{*, given}
-import org.mbari.annosaurus.etc.sdk.Futures.*
 
+import java.time.{Duration, Instant}
 import scala.jdk.CollectionConverters.*
-import java.time.Instant
-import java.time.temporal.ChronoUnit
-import java.time.Duration
-import sttp.client3.{SttpBackend, *}
 
 
 trait QueryEndpointsSuite extends EndpointsSuite:

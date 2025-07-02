@@ -19,18 +19,17 @@ package org.mbari.annosaurus.endpoints
 import org.mbari.annosaurus.controllers.QueryController
 import org.mbari.annosaurus.domain.{Count, ErrorMsg, QueryRequest}
 import org.mbari.annosaurus.endpoints.CustomTapirJsonCirce.*
-import org.mbari.annosaurus.etc.circe.CirceCodecs.{*, given}
+import org.mbari.annosaurus.etc.circe.CirceCodecs.given
 import org.mbari.annosaurus.repository.query.{JDBC, QueryResults}
 import sttp.tapir.*
 import sttp.tapir.generic.auto.*
 import sttp.tapir.server.ServerEndpoint
 import sttp.tapir.server.ServerEndpoint.Full
 
-import scala.concurrent.{ExecutionContext, Future}
 import java.io.File
 import java.nio.file.Files
 import java.util.concurrent.Executors
-import sttp.model.MediaType
+import scala.concurrent.{ExecutionContext, Future}
 
 class QueryEndpoints(queryController: QueryController)(using executionContext: ExecutionContext) extends Endpoints:
 

@@ -16,6 +16,7 @@
 
 package org.mbari.annosaurus
 
+import io.vertx.core.http.HttpServerOptions
 import io.vertx.core.{Vertx, VertxOptions}
 import io.vertx.ext.web.Router
 import org.mbari.annosaurus.etc.jdk.Loggers
@@ -26,7 +27,6 @@ import sttp.tapir.server.vertx.{VertxFutureServerInterpreter, VertxFutureServerO
 
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext}
-import io.vertx.core.http.HttpServerOptions
 
 object Main:
 
