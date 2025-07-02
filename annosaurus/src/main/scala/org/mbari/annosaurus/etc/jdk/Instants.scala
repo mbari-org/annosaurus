@@ -40,3 +40,7 @@ object Instants:
 
     def formatCompactIso8601(instant: Instant): String =
         CompactTimeFormatter.format(instant)
+
+
+    def roundToMillis(instant: Instant): Instant =
+        Instant.ofEpochMilli(instant.toEpochMilli)

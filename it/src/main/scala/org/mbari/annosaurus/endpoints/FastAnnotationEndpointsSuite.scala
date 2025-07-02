@@ -355,7 +355,8 @@ trait FastAnnotationEndpointsSuite extends EndpointsSuite:
 
     test("findImagedMomentUuidsByConcept") {
         val xs      = TestUtils.create(2, 2, 1, 1, true)
-        val concept = xs.head.getObservations.iterator().next().getConcept
+        val annotation = xs.head.getObservations.iterator().next()
+        val concept = annotation.getConcept
         runGet(
             endpoints.findImagedMomentUuidsByConceptImpl,
             s"http://test.com/v1/fast/imagedmoments/concept/images/$concept",

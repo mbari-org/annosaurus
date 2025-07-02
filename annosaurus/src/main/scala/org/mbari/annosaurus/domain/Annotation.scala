@@ -16,6 +16,7 @@
 
 package org.mbari.annosaurus.domain
 
+import org.mbari.annosaurus.etc.jdk.Instants
 import org.mbari.annosaurus.repository.jpa.entity.{ImageReferenceEntity, ImagedMomentEntity, ObservationEntity}
 import org.mbari.vcr4j.time.Timecode
 
@@ -53,6 +54,11 @@ final case class Annotation(
             associations = associations.map(_.removeForeignKeys()),
             imageReferences = imageReferences.map(_.removeForeignKeys()),
             ancillaryData = ancillaryData.map(_.removeForeignKeys())
+        )
+
+    def roundObservationTimestampToMillis(): Annotation =
+        copy(
+            observationTimestamp = observationTimestamp.map(t => Instant.ofEpochMilli(t.toEpochMilli))
         )
 
     override def toSnakeCase: AnnotationSC =
@@ -135,7 +141,7 @@ object Annotation extends FromEntity[ObservationEntity, Annotation]:
             Option(entity.getGroup),
             imagedMomentOpt.flatMap(im => Option(im.getUuid)),
             imageReferences,
-            Option(entity.getObservationTimestamp),
+            Option(entity.getObservationTimestamp), //Option(entity.getObservationTimestamp).map(Instants.roundToMillis),
             Option(entity.getUuid),
             Option(entity.getObserver),
             imagedMomentOpt.flatMap(im => Option(im.getRecordedTimestamp)),
