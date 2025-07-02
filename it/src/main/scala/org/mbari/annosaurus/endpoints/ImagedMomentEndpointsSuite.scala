@@ -131,7 +131,7 @@ trait ImagedMomentEndpointsSuite extends EndpointsSuite:
                 assertEquals(response.code, StatusCode.Ok)
                 val imagedMoments = checkResponse[Seq[ImagedMomentSC]](response.body)
                 assertEquals(imagedMoments.size, 1)
-                val expected      = ImagedMoment.from(im, true)
+                val expected      = ImagedMoment.from(im, true).roundObservationTimestampsToMillis()
                 val obtained      = imagedMoments.head.toCamelCase
                 assertEquals(obtained, expected)
         )
@@ -184,7 +184,7 @@ trait ImagedMomentEndpointsSuite extends EndpointsSuite:
                 assertEquals(response.code, StatusCode.Ok)
                 val imagedMoments = checkResponse[Seq[ImagedMomentSC]](response.body)
                 assertEquals(imagedMoments.size, 1)
-                val expected      = ImagedMoment.from(im, true)
+                val expected      = ImagedMoment.from(im, true).roundObservationTimestampsToMillis()
                 val obtained      = imagedMoments.head.toCamelCase
                 assertEquals(obtained, expected)
         )
@@ -200,7 +200,7 @@ trait ImagedMomentEndpointsSuite extends EndpointsSuite:
                 assertEquals(response.code, StatusCode.Ok)
                 val imagedMoments = checkResponse[Seq[ImagedMomentSC]](response.body)
                 assertEquals(imagedMoments.size, 1)
-                val expected      = ImagedMoment.from(im, true)
+                val expected      = ImagedMoment.from(im, true).roundObservationTimestampsToMillis()
                 val obtained      = imagedMoments.head.toCamelCase
                 assertEquals(obtained, expected)
         )
@@ -276,7 +276,7 @@ trait ImagedMomentEndpointsSuite extends EndpointsSuite:
                     x  <- xs
                     im <- imagedMoments.find(_.uuid.get == x.getUuid)
                 do
-                    val expected = ImagedMoment.from(x, true)
+                    val expected = ImagedMoment.from(x, true).roundObservationTimestampsToMillis()
                     val obtained = im.toCamelCase
                     assertEquals(obtained, expected)
         )
@@ -344,7 +344,7 @@ trait ImagedMomentEndpointsSuite extends EndpointsSuite:
                     x  <- xs
                     im <- imagedMoments.find(_.uuid.get == x.getUuid)
                 do
-                    val expected = ImagedMoment.from(x, true)
+                    val expected = ImagedMoment.from(x, true).roundObservationTimestampsToMillis()
                     val obtained = im.toCamelCase
                     assertEquals(obtained, expected)
         )
@@ -384,7 +384,7 @@ trait ImagedMomentEndpointsSuite extends EndpointsSuite:
                     x  <- xs
                     im <- imagedMoments.find(_.uuid.get == x.getUuid)
                 do
-                    val expected = ImagedMoment.from(x, true).copy(lastUpdated = None)
+                    val expected = ImagedMoment.from(x, true).copy(lastUpdated = None).roundObservationTimestampsToMillis()
                     val obtained = im.toCamelCase.copy(lastUpdated = None)
                     assertEquals(obtained, expected)
         )
@@ -431,7 +431,7 @@ trait ImagedMomentEndpointsSuite extends EndpointsSuite:
             response =>
                 assertEquals(response.code, StatusCode.Ok)
                 val imagedMoment = checkResponse[ImagedMomentSC](response.body)
-                val expected     = ImagedMoment.from(im, true)
+                val expected     = ImagedMoment.from(im, true).roundObservationTimestampsToMillis()
                 val obtained     = imagedMoment.toCamelCase
                 assertEquals(obtained, expected)
         )

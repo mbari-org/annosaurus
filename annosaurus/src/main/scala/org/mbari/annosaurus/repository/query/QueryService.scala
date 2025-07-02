@@ -85,7 +85,7 @@ class QueryService(databaseConfig: DatabaseConfig, viewName: String):
     ): Either[Throwable, QueryResults] =
         val sql = PreparedStatementGenerator.buildPreparedStatementTemplate(viewName, query, databaseConfig)
         log.atDebug.log(s"Running query: $sql")
-        println(s"Running query: $sql")
+        // println(s"Running query: $sql")
         Using
             .Manager(use =>
                 val conn = use(jdbc.newConnection())
@@ -108,7 +108,7 @@ class QueryService(databaseConfig: DatabaseConfig, viewName: String):
 
     def queryAndSaveToTsvFile(
         query: Query,
-        file: Path): Either[Throwable, Path] = 
+        file: Path): Either[Throwable, Path] =
         val sql = PreparedStatementGenerator.buildPreparedStatementTemplate(viewName, query, databaseConfig)
         log.atDebug.log(s"Running query: $sql")
 
@@ -128,8 +128,6 @@ class QueryService(databaseConfig: DatabaseConfig, viewName: String):
                 QueryResults.IO.writeTsv(rs, file) match
                     case Left(e) => throw e
                     case Right(_) => file
-                
+
             )
             .toEither
-
-        

@@ -397,7 +397,7 @@ trait FastAnnotationEndpointsSuite extends EndpointsSuite:
                 val annos    = checkResponse[Seq[AnnotationSC]](response.body)
                 assertEquals(annos.size, 1)
                 val obtained = annos.head.toCamelCase
-                val expected = TestUtils.stripLastUpdated(Annotation.from(obs).removeForeignKeys())
+                val expected = TestUtils.stripLastUpdated(Annotation.from(obs).removeForeignKeys().roundObservationTimestampToMillis())
 //                println("EXPECTED: " + expected.stringify)
 //                println("OBTAINED: " + obtained.stringify)
                 assertEquals(obtained, expected)

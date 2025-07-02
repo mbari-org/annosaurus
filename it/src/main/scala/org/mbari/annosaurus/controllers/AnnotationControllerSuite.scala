@@ -137,7 +137,7 @@ trait AnnotationControllerSuite extends BaseDAOSuite:
         val obs      = xs.getObservations.asScala.head
         val imr      = xs.getImageReferences().asScala.head
         val obtained = exec(controller.findByImageReferenceUUID(imr.getUuid)).head
-        val expected = Annotation.from(obs, true)
+        val expected = Annotation.from(obs, true).roundObservationTimestampToMillis()
         assertEquals(obtained, expected)
     }
 
@@ -360,6 +360,7 @@ trait AnnotationControllerSuite extends BaseDAOSuite:
             .sortBy(_.observationUuid)
         val expected = annos2
             .toList
+            .map(_.roundObservationTimestampToMillis())
             .sortBy(_.observationUuid)
         obtained.zip(expected).foreach { (a, b) =>
             assertEquals(a, b)
