@@ -59,7 +59,7 @@ trait ObservationDAOSuite extends BaseDAOSuite:
         given dao: ObservationDAOImpl = daoFactory.newObservationDAO()
         run(() =>
             // Bring it into the transaction
-            val opt = dao.findByUUID(obs.getUuid())
+            val opt  = dao.findByUUID(obs.getUuid())
             assert(opt.isDefined)
             val obs0 = opt.get
             obs0.getImagedMoment().removeObservation(obs0)

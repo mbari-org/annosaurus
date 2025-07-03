@@ -18,13 +18,12 @@ package org.mbari.annosaurus.repository.jpa
 
 import com.typesafe.config.ConfigFactory
 import jakarta.persistence.{EntityManagerFactory, Persistence}
-import org.mbari.annosaurus.AppConfig
-import org.mbari.annosaurus.etc.jdk.Loggers.given
 import org.mbari.annosaurus.etc.flyway.FlywayMigrator
+import org.mbari.annosaurus.etc.jdk.Loggers.given
+import org.mbari.annosaurus.{AppConfig, DatabaseConfig}
 
 import java.lang.System.Logger.Level
 import scala.jdk.CollectionConverters.*
-import org.mbari.annosaurus.DatabaseConfig
 
 /**
  * https://stackoverflow.com/questions/4106078/dynamic-jpa-connection
@@ -94,11 +93,9 @@ object EntityManagerFactories:
                 )
                 apply(map ++ properties)
 
-
     def apply(configNode: String): EntityManagerFactory =
         val driver   = config.getString(configNode + ".driver")
         val password = config.getString(configNode + ".password")
         val url      = config.getString(configNode + ".url")
         val user     = config.getString(configNode + ".user")
         apply(url, user, password, driver)
-

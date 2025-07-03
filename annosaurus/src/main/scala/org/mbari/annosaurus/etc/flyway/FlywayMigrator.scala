@@ -18,7 +18,7 @@ package org.mbari.annosaurus.etc.flyway
 
 import org.flywaydb.core.Flyway
 import org.mbari.annosaurus.DatabaseConfig
-import org.mbari.annosaurus.etc.jdk.Loggers.given 
+import org.mbari.annosaurus.etc.jdk.Loggers.given
 
 import scala.util.Try
 
@@ -29,12 +29,13 @@ object FlywayMigrator:
     def migrate(databaseConfig: DatabaseConfig): Either[Throwable, Unit] =
         // Implementation of Flyway migration logic
         Try {
-            val location = if (databaseConfig.isSqlserver) "classpath:/db/migrations/sqlserver"
-            else if (databaseConfig.isPostgres) "classpath:/db/migrations/postgres"
-            else throw new IllegalArgumentException(s"Unsupported database type: ${databaseConfig.driver}")
-            
+            val location =
+                if databaseConfig.isSqlserver then "classpath:/db/migrations/sqlserver"
+                else if databaseConfig.isPostgres then "classpath:/db/migrations/postgres"
+                else throw new IllegalArgumentException(s"Unsupported database type: ${databaseConfig.driver}")
+
             log.atInfo.log("Starting Flyway migration using SQL in " + location)
-            val flyway       = Flyway
+            val flyway = Flyway
                 .configure()
                 .baselineOnMigrate(true)
                 .dataSource(databaseConfig.url, databaseConfig.user, databaseConfig.password)

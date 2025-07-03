@@ -17,6 +17,7 @@
 package org.mbari.annosaurus
 
 import org.junit.Assert.*
+import org.mbari.annosaurus.etc.jdk.Instants
 import org.mbari.annosaurus.repository.jpa.entity.{
     AssociationEntity,
     CachedAncillaryDatumEntity,
@@ -28,7 +29,6 @@ import org.mbari.annosaurus.repository.jpa.entity.{
 }
 
 import scala.jdk.CollectionConverters.*
-import org.mbari.annosaurus.etc.jdk.Instants
 
 object AssertUtils:
 
@@ -96,12 +96,11 @@ object AssertUtils:
             //     Option(a.getObservationTimestamp()).map(_.toEpochMilli()).orNull,
             //     Option(b.getObservationTimestamp()).map(_.toEpochMilli()).orNull
             // )
-            if (compareObservationTimestamp) {
+            if compareObservationTimestamp then
                 assertEquals(
                     Option(a.getObservationTimestamp()).map(Instants.roundToMillis).orNull,
                     Option(b.getObservationTimestamp()).map(Instants.roundToMillis).orNull
                 )
-            }
             if cascade then
                 assertEquals(a.getAssociations().size, b.getAssociations().size)
                 val ax = a.getAssociations().asScala.toSeq.sortBy(_.getUuid)

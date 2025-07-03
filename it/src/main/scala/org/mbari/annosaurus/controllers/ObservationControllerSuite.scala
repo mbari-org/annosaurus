@@ -161,7 +161,13 @@ trait ObservationControllerSuite extends BaseDAOSuite:
         val o0      = im.getObservations().iterator().next()
         o0.setDuration(Duration.ofSeconds(5))
         // We explcitly keep the observationTimestamp or it will be changed by the update method
-        exec(controller.update(o0.getUuid(), observationDate = o0.getObservationTimestamp(), duration = Option(o0.getDuration())))
+        exec(
+            controller.update(
+                o0.getUuid(),
+                observationDate = o0.getObservationTimestamp(),
+                duration = Option(o0.getDuration())
+            )
+        )
         val sanity  = exec(controller.findByUUID(o0.getUuid()))
         assertEquals(sanity.get.duration.orNull, o0.getDuration())
         val deleted = exec(controller.deleteDuration(o0.getUuid()))
