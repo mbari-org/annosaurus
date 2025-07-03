@@ -53,18 +53,14 @@ object SqlServerTestDAOFactory extends TestDAOFactory:
     lazy val entityManagerFactory: EntityManagerFactory =
         val db = databaseConfig
         Class.forName(db.driver)
-        FlywayMigrator.migrate(db) match
-            case Left(ex) =>
-                throw new RuntimeException(s"Failed to migrate database: ${ex.getMessage}", ex)
-            case Right(_) =>
-                // Create the EntityManagerFactory with the provided database configuration
-            EntityManagerFactories(
-                db.url,
-                db.user,
-                db.password,
-                db.driver,
-                testProps()
-            )
+        // Create the EntityManagerFactory with the provided database configuration
+        EntityManagerFactories(
+            db.url,
+            db.user,
+            db.password,
+            db.driver,
+            testProps()
+        )
 
     lazy val databaseConfig: DatabaseConfig = DatabaseConfig(
         container.getJdbcUrl(),
