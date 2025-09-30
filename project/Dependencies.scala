@@ -3,7 +3,7 @@ object Dependencies {
 
     lazy val auth0 = "com.auth0" % "java-jwt" % "4.5.0"
 
-    val circeVersion      = "0.14.13"
+    val circeVersion      = "0.14.15"
     lazy val circeCore    = "io.circe" %% "circe-core"    % circeVersion
     lazy val circeGeneric = "io.circe" %% "circe-generic" % circeVersion
     lazy val circeParser  = "io.circe" %% "circe-parser"  % circeVersion
@@ -26,7 +26,7 @@ object Dependencies {
     lazy val logbackClassic = "ch.qos.logback" % "logback-classic" % "1.5.18"
 
     lazy val mssqlserver = "com.microsoft.sqlserver" % "mssql-jdbc" % "12.10.0.jre11"
-    lazy val munit       = "org.scalameta"          %% "munit"      % "1.1.1"
+    lazy val munit       = "org.scalameta"          %% "munit"      % "1.2.0"
     lazy val oracle      = "com.oracle.ojdbc"        % "ojdbc8"     % "19.3.0.0"
     lazy val postgresql  = "org.postgresql"          % "postgresql" % "42.7.6"
     lazy val rxJava3     = "io.reactivex.rxjava3"    % "rxjava"     % "3.1.10"
