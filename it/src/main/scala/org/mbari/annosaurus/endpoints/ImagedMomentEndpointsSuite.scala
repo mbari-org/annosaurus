@@ -399,13 +399,13 @@ trait ImagedMomentEndpointsSuite extends EndpointsSuite:
                 // 3. sort collection by uuid
                 // 4. Round in-memory observation timestamps to milliseconds
 
-                var obtained = imagedMoments
+                val obtained = imagedMoments
                     .map(_.toCamelCase.copy(lastUpdated = None))
                     .map(a => a.copy(observations = a.observations.sortBy(_.uuid)))
                     .sortBy(_.uuid.get)
                     .toList
 
-                var expected = xs
+                val expected = xs
                     .map(ImagedMoment.from(_, true).copy(lastUpdated = None).roundObservationTimestampsToMillis())
                     .map(a => a.copy(observations = a.observations.sortBy(_.uuid)))
                     .sortBy(_.uuid.get)

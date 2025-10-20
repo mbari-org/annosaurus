@@ -397,7 +397,7 @@ trait FastAnnotationEndpointsSuite extends EndpointsSuite:
             response =>
                 assertEquals(response.code, StatusCode.Ok)
                 val annos    = checkResponse[Seq[AnnotationSC]](response.body)
-                println(annos.stringify)
+                // println(annos.stringify)
                 assertEquals(annos.size, 1)
                 val obtained = annos.head.toCamelCase
                 val expected = TestUtils.stripLastUpdated(
