@@ -91,7 +91,6 @@ trait FastAnnotationEndpointsSuite extends EndpointsSuite:
         assertEquals(response.code, StatusCode.Ok)
         val qcr                 = checkResponse[QueryConstraintsResponseSC[Seq[AnnotationSC]]](response.body)
         assertEquals(qcr.content.size, obs.size)
-        println(qcr.stringify)
         for a <- qcr.content
         do
             assertEquals(a.image_references.size, 1)
