@@ -165,6 +165,7 @@ public class ObservationEntity implements IPersistentObject {
     ImagedMomentEntity imagedMoment;
 
     @Column(name = "observation_timestamp", nullable = false)
+    @Temporal(value = TemporalType.TIMESTAMP)
     Instant observationTimestamp = Instant.now();
 
     @Column(name = "observer", length = 128, nullable = true)

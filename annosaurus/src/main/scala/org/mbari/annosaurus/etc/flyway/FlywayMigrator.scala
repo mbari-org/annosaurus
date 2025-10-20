@@ -51,7 +51,8 @@ object FlywayMigrator:
                 case n if n > 0 => log.atInfo.log(s"Successfully applied $n database migrations")
                 case _          => log.atWarn.log("Database migration result was unexpected")
 
-            if !result.success then throw new Exception("Migration failed using SQL in " + location)
+            if !result.success then 
+                throw new Exception("Migration failed using SQL in " + location)
 
             log.atInfo
                 .log(

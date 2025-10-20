@@ -32,6 +32,7 @@ import java.util.UUID
 import java.util.concurrent.TimeUnit
 import scala.concurrent.{duration, Await, ExecutionContext}
 import scala.util.Random
+import java.time.temporal.ChronoUnit
 
 object TestUtils:
 
@@ -120,7 +121,7 @@ object TestUtils:
         val concept         = Strings.random(random.nextInt(128))
         val duration        =
             if random.nextBoolean() then Some(Duration.ofMillis(random.nextInt(5000))) else None
-        val observationDate = Instant.now()
+        val observationDate = Instant.now().truncatedTo(ChronoUnit.MILLIS)
         val observer        = Some(Strings.random(32))
         val group           = if random.nextBoolean() then Some(Strings.random(32)) else None
         val activity        = if random.nextBoolean() then Some(Strings.random(32)) else None
