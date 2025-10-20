@@ -17,17 +17,8 @@
 package org.mbari.annosaurus.repository.jdbc
 
 import jakarta.persistence.{EntityManager, EntityManagerFactory, Query}
-import org.hibernate.jpa.QueryHints
-import org.mbari.annosaurus.domain.{
-    Annotation,
-    ConcurrentRequest,
-    DeleteCount,
-    GeographicRange,
-    Image,
-    MultiRequest,
-    ObservationsUpdate,
-    QueryConstraints
-}
+import org.hibernate.jpa.{AvailableHints, HibernateHints}
+import org.mbari.annosaurus.domain.{Annotation, ConcurrentRequest, DeleteCount, GeographicRange, Image, MultiRequest, ObservationsUpdate, QueryConstraints}
 import org.mbari.annosaurus.etc.jdk.Loggers.given
 import org.mbari.annosaurus.repository.jpa.extensions.*
 
@@ -72,7 +63,7 @@ class JdbcRepository(entityManagerFactory: EntityManagerFactory):
             //     q.setParameter(1, videoReferenceUuid)
             // }
             // else {
-            q.setHint(QueryHints.HINT_READONLY, true)
+            q.setHint(HibernateHints.HINT_READ_ONLY, true)
             q.setParameter(1, videoReferenceUuid.toString)
             // }
         )
@@ -81,11 +72,11 @@ class JdbcRepository(entityManagerFactory: EntityManagerFactory):
             val counts = queries.map(_.executeUpdate())
             deleteCount = DeleteCount(
                 videoReferenceUuid,
-                counts(4),
-                counts(1),
-                counts(3),
-                counts(2),
-                counts(0)
+                counts(0), // ancillary data
+                counts(1), // image references
+                counts(2), // associations
+                counts(3), // observations
+                counts(4) // imaged moments
             )
             transaction.commit()
         catch
@@ -113,7 +104,7 @@ class JdbcRepository(entityManagerFactory: EntityManagerFactory):
         entityManagerFactory.createEntityManager().runTransactionSync { entityManager =>
             given EntityManager = entityManager
             val query           = QueryConstraintsSqlBuilder.toCountQuery(constraints, entityManager)
-            query.setHint(QueryHints.HINT_READONLY, true)
+            query.setHint(HibernateHints.HINT_READ_ONLY, true)
             // Postgresql returns a Long, Everything else returns an Int
             val count           = query.getResultList.get(0).toString().toInt
             entityManager.close()
@@ -127,7 +118,7 @@ class JdbcRepository(entityManagerFactory: EntityManagerFactory):
             given EntityManager = entityManager
             val query           =
                 QueryConstraintsSqlBuilder.toGeographicRangeQuery(constraints, entityManager)
-            query.setHint(QueryHints.HINT_READONLY, true)
+            query.setHint(HibernateHints.HINT_READ_ONLY, true)
             // Queries return java.util.List[Array[Object]]
             val count           = query.getResultList.asScala.toList
             if count.nonEmpty then
@@ -166,7 +157,7 @@ class JdbcRepository(entityManagerFactory: EntityManagerFactory):
     def countAll(): Long =
         given entityManager: EntityManager = entityManagerFactory.createEntityManager()
         val query                          = entityManager.createNativeQuery(ObservationSQL.countAll)
-        query.setHint(QueryHints.HINT_READONLY, true)
+        query.setHint(HibernateHints.HINT_READ_ONLY, true)
         // This will throw and exception if nothing is returned. That's ok.
         val count                          = query.getSingleResult.asLong.get
         entityManager.close()
@@ -175,7 +166,7 @@ class JdbcRepository(entityManagerFactory: EntityManagerFactory):
     def countImagesByVideoReferenceUuid(videoReferenceUuid: UUID): Long =
         given entityManager: EntityManager = entityManagerFactory.createEntityManager()
         val query                          = entityManager.createNativeQuery(ImageReferenceSQL.countByVideoReferenceUuid)
-        query.setHint(QueryHints.HINT_READONLY, true)
+        query.setHint(HibernateHints.HINT_READ_ONLY, true)
         query.setParameter(1, videoReferenceUuid.toString())
         // This will throw and exception if nothing is returned. That's ok.
         // SQL Server returns Int, Postgresql returns Long
@@ -223,7 +214,7 @@ class JdbcRepository(entityManagerFactory: EntityManagerFactory):
         )
 
         queries.foreach(q =>
-            q.setHint(QueryHints.HINT_READONLY, true)
+            q.setHint(HibernateHints.HINT_READ_ONLY, true)
             q.setParameter(1, videoReferenceUuid.toString)
             q.setParameter(2, startTimestamp)
             q.setParameter(3, endTimestamp)
@@ -254,7 +245,7 @@ class JdbcRepository(entityManagerFactory: EntityManagerFactory):
             .map(entityManager.createNativeQuery)
 
         queries.foreach(q =>
-            q.setHint(QueryHints.HINT_READONLY, true)
+            q.setHint(HibernateHints.HINT_READ_ONLY, true)
             q.setParameter(1, request.startTimestamp)
             q.setParameter(2, request.endTimestamp)
             // q.setParameter(1, Timestamp.from(request.startTimestamp))
@@ -281,7 +272,7 @@ class JdbcRepository(entityManagerFactory: EntityManagerFactory):
         ).map(sql => inClause(sql, uuids))
             .map(entityManager.createNativeQuery)
 
-        queries.foreach(q => q.setHint(QueryHints.HINT_READONLY, true))
+        queries.foreach(q => q.setHint(HibernateHints.HINT_READ_ONLY, true))
 
         val annos =
             executeQuery(queries(0), queries(1), queries(2), limit, offset, includeAncillaryData)
@@ -297,7 +288,7 @@ class JdbcRepository(entityManagerFactory: EntityManagerFactory):
         given entityManager: EntityManager = entityManagerFactory.createEntityManager()
         val query1                         = entityManager.createNativeQuery(AnnotationSQL.byConcept)
         query1.setParameter(1, concept)
-        query1.setHint(QueryHints.HINT_READONLY, true)
+        query1.setHint(HibernateHints.HINT_READ_ONLY, true)
         limit.foreach(query1.setMaxResults)
         offset.foreach(query1.setFirstResult)
 
@@ -315,7 +306,7 @@ class JdbcRepository(entityManagerFactory: EntityManagerFactory):
     ): Seq[Annotation] =
         given entityManager: EntityManager = entityManagerFactory.createEntityManager()
         val query1                         = entityManager.createNativeQuery(AnnotationSQL.byConceptWithImages)
-        query1.setHint(QueryHints.HINT_READONLY, true)
+        query1.setHint(HibernateHints.HINT_READ_ONLY, true)
         query1.setParameter(1, concept)
         limit.foreach(query1.setMaxResults)
         offset.foreach(query1.setFirstResult)
@@ -333,7 +324,7 @@ class JdbcRepository(entityManagerFactory: EntityManagerFactory):
     ): Seq[Annotation] =
         given entityManager: EntityManager = entityManagerFactory.createEntityManager()
         val query1                         = entityManager.createNativeQuery(AnnotationSQL.byToConceptWithImages)
-        query1.setHint(QueryHints.HINT_READONLY, true)
+        query1.setHint(HibernateHints.HINT_READ_ONLY, true)
         query1.setParameter(1, toConcept)
         limit.foreach(query1.setMaxResults)
         offset.foreach(query1.setFirstResult)
@@ -350,7 +341,7 @@ class JdbcRepository(entityManagerFactory: EntityManagerFactory):
     ): Seq[UUID] =
         given entityManager: EntityManager = entityManagerFactory.createEntityManager()
         val query                          = entityManager.createNativeQuery(ImagedMomentSQL.byConceptWithImages)
-        query.setHint(QueryHints.HINT_READONLY, true)
+        query.setHint(HibernateHints.HINT_READ_ONLY, true)
         query.setParameter(1, concept)
         limit.foreach(query.setMaxResults)
         offset.foreach(query.setFirstResult)
@@ -370,7 +361,7 @@ class JdbcRepository(entityManagerFactory: EntityManagerFactory):
     ): Seq[UUID] =
         implicit val entityManager: EntityManager = entityManagerFactory.createEntityManager()
         val query                                 = entityManager.createNativeQuery(ImagedMomentSQL.byToConceptWithImages)
-        query.setHint(QueryHints.HINT_READONLY, true)
+        query.setHint(HibernateHints.HINT_READ_ONLY, true)
         query.setParameter(1, toConcept)
         limit.foreach(query.setMaxResults)
         offset.foreach(query.setFirstResult)
@@ -390,7 +381,7 @@ class JdbcRepository(entityManagerFactory: EntityManagerFactory):
     ): Seq[Image] =
         implicit val entityManager: EntityManager = entityManagerFactory.createEntityManager()
         val query                                 = entityManager.createNativeQuery(ImagedMomentSQL.byVideoReferenceUuid)
-        query.setHint(QueryHints.HINT_READONLY, true)
+        query.setHint(HibernateHints.HINT_READ_ONLY, true)
         query.setParameter(1, videoReferenceUuid.toString)
         limit.foreach(query.setMaxResults)
         offset.foreach(query.setFirstResult)
@@ -406,7 +397,7 @@ class JdbcRepository(entityManagerFactory: EntityManagerFactory):
     ): Seq[Annotation] =
         implicit val entityManager: EntityManager = entityManagerFactory.createEntityManager()
         val query                                 = entityManager.createNativeQuery(AssociationSQL.byLinkNameAndLinkValue)
-        query.setHint(QueryHints.HINT_READONLY, true)
+        query.setHint(HibernateHints.HINT_READ_ONLY, true)
         query.setParameter(1, linkName)
         query.setParameter(2, linkValue)
         val results                               = query.getResultList.asScala.toList
@@ -432,7 +423,7 @@ class JdbcRepository(entityManagerFactory: EntityManagerFactory):
         val annotations = (for (im <- imUuids.grouped(200)) yield
             val sql     = inClause(AnnotationSQL.byImagedMomentUuids, im)
             val query   = entityManager.createNativeQuery(sql)
-            query.setHint(QueryHints.HINT_READONLY, true)
+            query.setHint(HibernateHints.HINT_READ_ONLY, true)
             val results = query.getResultList.asScala.toList
             AnnotationSQL.resultListToAnnotations(results)
         ).flatten.toSeq
@@ -448,7 +439,7 @@ class JdbcRepository(entityManagerFactory: EntityManagerFactory):
         val assocTemp        = for (obs <- observationUuids.grouped(200)) yield
             val sql2   = inClause(AssociationSQL.byObservationUuids, obs)
             val query2 = entityManager.createNativeQuery(sql2)
-            query2.setHint(QueryHints.HINT_READONLY, true)
+            query2.setHint(HibernateHints.HINT_READ_ONLY, true)
             val r2     = query2.getResultList.asScala.toList
 
             // Remove the observationUuid and imagedMomentUuid from the association
@@ -460,7 +451,7 @@ class JdbcRepository(entityManagerFactory: EntityManagerFactory):
         val irTemp            = for (im <- imagedMomentUuids.grouped(200)) yield
             val sql3   = inClause(ImageReferenceSQL.byImagedMomentUuids, im)
             val query3 = entityManager.createNativeQuery(sql3)
-            query3.setHint(QueryHints.HINT_READONLY, true)
+            query3.setHint(HibernateHints.HINT_READ_ONLY, true)
             val r3     = query3.getResultList.asScala.toList
             ImageReferenceSQL.resultListToImageReferences(r3)
         val imageReferences   = irTemp.flatten.toSeq
@@ -489,9 +480,9 @@ class JdbcRepository(entityManagerFactory: EntityManagerFactory):
         includeAncillaryData: Boolean = false
     )(implicit entityManager: EntityManager): Seq[Annotation] =
 
-        annotationQuery.setHint(QueryHints.HINT_READONLY, true)
-        associationQuery.setHint(QueryHints.HINT_READONLY, true)
-        imageReferenceQuery.setHint(QueryHints.HINT_READONLY, true)
+        annotationQuery.setHint(HibernateHints.HINT_READ_ONLY, true)
+        associationQuery.setHint(HibernateHints.HINT_READ_ONLY, true)
+        imageReferenceQuery.setHint(HibernateHints.HINT_READ_ONLY, true)
 
         limit.foreach(annotationQuery.setMaxResults)
         offset.foreach(annotationQuery.setFirstResult)
@@ -531,7 +522,7 @@ class JdbcRepository(entityManagerFactory: EntityManagerFactory):
             val ims   = annos.flatMap(_.imagedMomentUuid.map(_.toString())).distinct
             val sql   = inClause(AncillaryDatumSQL.byImagedMomentUuid, ims)
             val query = entityManager.createNativeQuery(sql)
-            query.setHint(QueryHints.HINT_READONLY, true)
+            query.setHint(HibernateHints.HINT_READ_ONLY, true)
             val rows  = query.getResultList.asScala.toList
             val data  = AncillaryDatumSQL.resultListToAnncillaryData(rows)
             AncillaryDatumSQL.join(annos, data)
