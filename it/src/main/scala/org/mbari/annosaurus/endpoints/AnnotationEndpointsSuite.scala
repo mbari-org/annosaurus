@@ -61,7 +61,10 @@ trait AnnotationEndpointsSuite extends EndpointsSuite:
             response =>
                 assertEquals(response.code, StatusCode.Ok)
                 val obtained = checkResponse[AnnotationSC](response.body).toCamelCase
-                val expected = Annotation.from(obs).copy(lastUpdated = obtained.lastUpdated)
+                val expected = Annotation
+                    .from(obs)
+                    .copy(lastUpdated = obtained.lastUpdated)
+                    .roundObservationTimestampToMillis()
                 assertEquals(obtained, expected)
         )
     }
@@ -86,7 +89,10 @@ trait AnnotationEndpointsSuite extends EndpointsSuite:
                 val ys       = checkResponse[Seq[AnnotationSC]](response.body).map(_.toCamelCase)
                 assertEquals(ys.length, 1)
                 val obtained = ys.head
-                val expected = Annotation.from(obs).copy(lastUpdated = obtained.lastUpdated)
+                val expected = Annotation
+                    .from(obs)
+                    .copy(lastUpdated = obtained.lastUpdated)
+                    .roundObservationTimestampToMillis()
                 assertEquals(obtained, expected)
         )
     }
@@ -112,7 +118,10 @@ trait AnnotationEndpointsSuite extends EndpointsSuite:
                 val ys       = checkResponse[Seq[AnnotationSC]](response.body).map(_.toCamelCase)
                 assertEquals(ys.length, 1)
                 val obtained = ys.head
-                val expected = Annotation.from(obs).copy(lastUpdated = obtained.lastUpdated)
+                val expected = Annotation
+                    .from(obs)
+                    .copy(lastUpdated = obtained.lastUpdated)
+                    .roundObservationTimestampToMillis()
                 assertEquals(obtained, expected)
         )
     }
@@ -413,6 +422,7 @@ trait AnnotationEndpointsSuite extends EndpointsSuite:
         val expected    = Annotation
             .from(im.getObservations.iterator.next())
             .copy(activity = Some("foo"), concept = Some("bar"), lastUpdated = None)
+            .roundObservationTimestampToMillis()
         val au          = AnnotationCreate.fromAnnotation(expected).toSnakeCase
         val jwt         = jwtService.authorize("foo").orNull
         assert(jwt != null)
@@ -457,6 +467,7 @@ trait AnnotationEndpointsSuite extends EndpointsSuite:
         val expected    = Annotation
             .from(im.getObservations.iterator.next())
             .copy(activity = Some("foo"), concept = Some("bar"), lastUpdated = None)
+            .roundObservationTimestampToMillis()
         val au          = AnnotationCreate.fromAnnotation(expected).toSnakeCase
         val jwt         = jwtService.authorize("foo").orNull
         assert(jwt != null)

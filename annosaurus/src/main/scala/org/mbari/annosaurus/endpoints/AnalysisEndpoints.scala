@@ -21,7 +21,6 @@ import org.mbari.annosaurus.domain.{
     ErrorMsg,
     QueryConstraints,
     QueryConstraintsResponseSC,
-    QueryConstraintsSC,
     TimeHistogramSC
 }
 import org.mbari.annosaurus.endpoints.CustomTapirJsonCirce.*

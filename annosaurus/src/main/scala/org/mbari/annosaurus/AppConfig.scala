@@ -17,8 +17,10 @@
 package org.mbari.annosaurus
 
 import com.typesafe.config.ConfigFactory
+import org.mbari.annosaurus.etc.jdbc.Databases
+import org.mbari.annosaurus.etc.jdbc.Databases.DatabaseType
 import org.mbari.annosaurus.etc.jdk.Loggers
-import org.mbari.annosaurus.etc.jdk.Loggers.{*, given}
+import org.mbari.annosaurus.etc.jdk.Loggers.given
 import org.mbari.annosaurus.etc.jwt.JwtService
 
 import scala.util.Try
@@ -100,5 +102,4 @@ case class DatabaseConfig(
         // Class.forName(driver)
         // java.sql.DriverManager.getConnection(url, user, password)
 
-    def isPostgres: Boolean = driver.toLowerCase.contains("postgresql")
-    def itSqlserver: Boolean = driver.toLowerCase.contains("sqlserver")
+    lazy val databaseType: DatabaseType = Databases.typeFromUrl(url)

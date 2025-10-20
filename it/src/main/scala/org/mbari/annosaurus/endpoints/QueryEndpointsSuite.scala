@@ -19,18 +19,15 @@ package org.mbari.annosaurus.endpoints
 import org.mbari.annosaurus.controllers.{QueryController, TestUtils}
 import org.mbari.annosaurus.domain.{ConstraintRequest, Count, QueryRequest}
 import org.mbari.annosaurus.etc.circe.CirceCodecs.{*, given}
+import org.mbari.annosaurus.etc.jdk.Loggers.given
+import org.mbari.annosaurus.etc.sdk.Futures.*
 import org.mbari.annosaurus.repository.jpa.JPADAOFactory
 import org.mbari.annosaurus.repository.query.JDBC
+import sttp.client3.*
 import sttp.model.StatusCode
-import org.mbari.annosaurus.etc.jdk.Loggers.{*, given}
-import org.mbari.annosaurus.etc.sdk.Futures.*
 
+import java.time.{Duration, Instant}
 import scala.jdk.CollectionConverters.*
-import java.time.Instant
-import java.time.temporal.ChronoUnit
-import java.time.Duration
-import sttp.client3.{SttpBackend, *}
-
 
 trait QueryEndpointsSuite extends EndpointsSuite:
 
@@ -78,10 +75,10 @@ trait QueryEndpointsSuite extends EndpointsSuite:
         val expected     =
             ("concept" +: xs.flatMap(_.getObservations.asScala.map(_.getConcept))).distinct.sorted.mkString("\n")
         val queryRequest = QueryRequest(select = Some(Seq("concept")), distinct = Some(true))
-        val stub = newBackendStub(endpoints.downloadTsvImpl)
-        val u    = uri"http://test.com/v1/query/download"
-        val request = basicRequest.post(u).body(queryRequest.stringify)
-        val response = request.send(stub).join
+        val stub         = newBackendStub(endpoints.downloadTsvImpl)
+        val u            = uri"http://test.com/v1/query/download"
+        val request      = basicRequest.post(u).body(queryRequest.stringify)
+        val response     = request.send(stub).join
         assertEquals(response.code, StatusCode.Ok)
         log.atInfo.log(s"Query results: ${response.body}")
 
@@ -99,7 +96,6 @@ trait QueryEndpointsSuite extends EndpointsSuite:
         //                 // assertEquals(obtained, expected)
         // )
     }
-
 
     test("count") {
         val xs           = TestUtils.create(2, 2)
@@ -119,17 +115,19 @@ trait QueryEndpointsSuite extends EndpointsSuite:
     }
 
     test("count with 'between' constraint") {
-        val xs           = TestUtils.create(2, 2)
-        val expected     = 4L
-        val minTime = Instant.now().minus(Duration.ofDays(40))
-        val maxTime = Instant.now().plus(Duration.ofDays(40))
-        val constraintAttempt = s"""{"column":"index_recorded_timestamp","between":["${minTime}","$maxTime"]}""".reify[ConstraintRequest]
+        val xs                = TestUtils.create(2, 2)
+        val expected          = 4L
+        val minTime           = Instant.now().minus(Duration.ofDays(40))
+        val maxTime           = Instant.now().plus(Duration.ofDays(40))
+        val constraintAttempt =
+            s"""{"column":"index_recorded_timestamp","between":["${minTime}","$maxTime"]}""".reify[ConstraintRequest]
         assert(constraintAttempt.isRight)
-        val constraint = constraintAttempt.getOrElse(ConstraintRequest("index_recorded_timestamp", isnull = Some(false)))
-        val queryRequest =
+        val constraint        =
+            constraintAttempt.getOrElse(ConstraintRequest("index_recorded_timestamp", isnull = Some(false)))
+        val queryRequest      =
             QueryRequest(
                 distinct = Some(true),
-                where    = Some(Seq(constraint))
+                where = Some(Seq(constraint))
             )
         runPost(
             endpoints.countImpl,

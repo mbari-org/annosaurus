@@ -62,7 +62,7 @@ trait ObservationEndpointsSuite extends EndpointsSuite:
             s"http://test.com/v1/observations/$uuid",
             response =>
                 assertEquals(response.code, StatusCode.Ok)
-                val expected = Observation.from(observation, true)
+                val expected = Observation.from(observation, true).roundObservationTimestampToMillis
                 val obtained = checkResponse[ObservationSC](response.body).toCamelCase
                 assertEquals(obtained, expected)
         )
@@ -78,7 +78,7 @@ trait ObservationEndpointsSuite extends EndpointsSuite:
                 assertEquals(response.code, StatusCode.Ok)
                 val expected = xs
                     .flatMap(_.getObservations.asScala)
-                    .map(Observation.from(_, true))
+                    .map(Observation.from(_, true).roundObservationTimestampToMillis)
                     .sortBy(_.uuid)
                     .toSet
                 val obtained = checkResponse[Seq[ObservationSC]](response.body)
@@ -117,7 +117,8 @@ trait ObservationEndpointsSuite extends EndpointsSuite:
             s"http://test.com/v1/observations/association/$associationUuid",
             response =>
                 assertEquals(response.code, StatusCode.Ok)
-                val expected = Observation.from(im.getObservations.iterator().next(), true)
+                val expected =
+                    Observation.from(im.getObservations.iterator().next(), true).roundObservationTimestampToMillis
                 val obtained = checkResponse[ObservationSC](response.body).toCamelCase
                 assertEquals(obtained, expected)
         )

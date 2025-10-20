@@ -19,7 +19,7 @@ package org.mbari.annosaurus.endpoints
 import io.circe.Printer
 import org.mbari.annosaurus.domain.*
 import org.mbari.annosaurus.etc.circe.CirceCodecs
-import org.mbari.annosaurus.etc.circe.CirceCodecs.{*, given}
+import org.mbari.annosaurus.etc.circe.CirceCodecs.given
 import org.mbari.annosaurus.etc.jdk.Loggers.given
 import org.mbari.annosaurus.etc.jwt.JwtService
 import sttp.model.StatusCode

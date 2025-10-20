@@ -20,7 +20,7 @@ import io.reactivex.rxjava3.subjects.Subject
 import org.mbari.annosaurus.domain.Observation
 import org.mbari.annosaurus.messaging.{AnnotationPublisher, MessageBus}
 import org.mbari.annosaurus.repository.jpa.JPADAOFactory
-import org.mbari.annosaurus.repository.jpa.entity.{ImagedMomentEntity, ObservationEntity}
+import org.mbari.annosaurus.repository.jpa.entity.ObservationEntity
 import org.mbari.annosaurus.repository.{NotFoundInDatastoreException, ObservationDAO}
 
 import java.time.{Duration, Instant}

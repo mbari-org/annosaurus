@@ -19,6 +19,7 @@ package org.mbari.annosaurus.controllers
 import org.mbari.annosaurus.DatabaseConfig
 import org.mbari.annosaurus.domain.{Count, QueryRequest}
 import org.mbari.annosaurus.repository.query.{JDBC, Query, QueryResults, QueryService}
+
 import java.nio.file.Path
 
 class QueryController(databaseConfig: DatabaseConfig, viewName: String):
@@ -39,10 +40,9 @@ class QueryController(databaseConfig: DatabaseConfig, viewName: String):
 
     def queryAndSaveToTsvFile(queryRequest: QueryRequest, path: Path): Either[Throwable, Path] =
         for
-            query <- Query.validate(queryRequest, checkWhere = queryRequest.strict.getOrElse(false))
+            query   <- Query.validate(queryRequest, checkWhere = queryRequest.strict.getOrElse(false))
             tsvFile <- queryService.queryAndSaveToTsvFile(query, path)
         yield path
-
 
     def listColumns(): Either[Throwable, Seq[JDBC.Metadata]] =
         queryService.jdbc.listColumnsMetadata(viewName)

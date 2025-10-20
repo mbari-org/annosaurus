@@ -16,13 +16,11 @@
 
 package org.mbari.annosaurus.repository.query
 
+import java.nio.file.{Files, Path}
 import java.sql.ResultSet
 import java.util.{Calendar, TimeZone}
-import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 import scala.util.Using
-import java.nio.file.Files
-import java.nio.file.Path
 
 type QueryResults = List[(JDBC.Metadata, Seq[Any])]
 
@@ -34,8 +32,12 @@ object QueryResults:
 
     def fromResultSet(rs: ResultSet): QueryResults =
         val metadata           = JDBC.Metadata.fromResultSet(rs)
-        val timestampColumnIdx = metadata.zipWithIndex
-            .filter(v => v._1.columnClassName == "java.sql.Timestamp" || v._1.columnClassName == "microsoft.sql.DateTimeOffset").map(_._2)
+        val timestampColumnIdx = metadata
+            .zipWithIndex
+            .filter(v =>
+                v._1.columnClassName == "java.sql.Timestamp" || v._1.columnClassName == "microsoft.sql.DateTimeOffset"
+            )
+            .map(_._2)
         val results            = ListBuffer[ListBuffer[Any]]()
         val numColumns         = metadata.size
         var isNew              = true
@@ -43,7 +45,8 @@ object QueryResults:
             for i <- 1 to numColumns do
                 if isNew then results += ListBuffer[Any]()
                 val column = results(i - 1)
-                if timestampColumnIdx.contains(i - 1) then column += Option(rs.getTimestamp(i, UtcCalendar)).map(_.toInstant).orNull
+                if timestampColumnIdx.contains(i - 1) then
+                    column += Option(rs.getTimestamp(i, UtcCalendar)).map(_.toInstant).orNull
                 else column += rs.getObject(i)
             isNew = false
         val columnData         = results.result().map(_.result()) // Turn into immutable
@@ -63,27 +66,36 @@ object QueryResults:
             sb.append("\n")
         sb.result()
 
-
     object IO:
         def writeTsv(rs: ResultSet, path: Path): Either[Throwable, Path] =
             Using(Files.newBufferedWriter(path)) { writer =>
-                val metadata = JDBC.Metadata.fromResultSet(rs)
+                val metadata           = JDBC.Metadata.fromResultSet(rs)
                 val numColumns         = metadata.size
-                val timestampColumnIdx = metadata.zipWithIndex
-                        .filter(v => v._1.columnClassName == "java.sql.Timestamp" || v._1.columnClassName == "microsoft.sql.DateTimeOffset").map(_._2)
+                val timestampColumnIdx = metadata
+                    .zipWithIndex
+                    .filter(v =>
+                        v._1.columnClassName == "java.sql.Timestamp" || v
+                            ._1
+                            .columnClassName == "microsoft.sql.DateTimeOffset"
+                    )
+                    .map(_._2)
 
                 val header = metadata.map(_.columnName).mkString("\t")
                 writer.write(header)
                 writer.newLine()
 
                 while rs.next() do
-                    val row = for i <- 1 to numColumns yield
-                        if (timestampColumnIdx.contains(i - 1)) 
-                            Option(rs.getTimestamp(i, UtcCalendar)).map(_.toInstant).orNull
-                        else rs.getObject(i)
-                        
-                    writer.write(row.map(obj => if obj == null then "" else obj.toString)
-                        .mkString("\t"))
+                    val row =
+                        for i <- 1 to numColumns
+                        yield
+                            if timestampColumnIdx.contains(i - 1) then
+                                Option(rs.getTimestamp(i, UtcCalendar)).map(_.toInstant).orNull
+                            else rs.getObject(i)
+
+                    writer.write(
+                        row.map(obj => if obj == null then "" else obj.toString)
+                            .mkString("\t")
+                    )
                     writer.newLine()
                 path
             }.toEither

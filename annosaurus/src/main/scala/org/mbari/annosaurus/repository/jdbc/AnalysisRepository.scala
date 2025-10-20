@@ -22,7 +22,6 @@ import org.mbari.annosaurus.domain.{DepthHistogram, QueryConstraints, TimeHistog
 import org.slf4j.LoggerFactory
 
 import java.time.Instant
-import scala.jdk.CollectionConverters.*
 
 class AnalysisRepository(entityManagerFactory: EntityManagerFactory):
 

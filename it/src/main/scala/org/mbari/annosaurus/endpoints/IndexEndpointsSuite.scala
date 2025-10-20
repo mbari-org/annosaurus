@@ -17,7 +17,6 @@
 package org.mbari.annosaurus.endpoints
 
 import org.mbari.annosaurus.controllers.{IndexController, TestUtils}
-import org.mbari.annosaurus.domain
 import org.mbari.annosaurus.domain.{Index, IndexSC, IndexUpdate}
 import org.mbari.annosaurus.etc.circe.CirceCodecs.{*, given}
 import org.mbari.annosaurus.etc.jwt.JwtService

@@ -80,6 +80,7 @@ trait JdbcRepositorySuite extends BaseDAOSuite:
             Annotation
                 .from(obs, true)
                 .removeForeignKeys()
+                .roundObservationTimestampToMillis()
         )
         val obtained = xs2.head.removeForeignKeys()
 //        println("OBTAINED: " + obtained.stringify)
@@ -242,7 +243,7 @@ trait JdbcRepositorySuite extends BaseDAOSuite:
                 i.copy(
                     imageReferences = i.imageReferences.sortBy(_.uuid),
                     associations = i.associations.sortBy(_.uuid)
-                )
+                ).roundObservationTimestampToMillis()
             )
             .sortBy(_.observationUuid)
             .map(TestUtils.stripLastUpdated(_))

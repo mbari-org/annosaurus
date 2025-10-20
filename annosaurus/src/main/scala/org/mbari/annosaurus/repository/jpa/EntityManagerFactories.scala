@@ -18,8 +18,9 @@ package org.mbari.annosaurus.repository.jpa
 
 import com.typesafe.config.ConfigFactory
 import jakarta.persistence.{EntityManagerFactory, Persistence}
-import org.mbari.annosaurus.AppConfig
+import org.mbari.annosaurus.etc.flyway.FlywayMigrator
 import org.mbari.annosaurus.etc.jdk.Loggers.given
+import org.mbari.annosaurus.{AppConfig, DatabaseConfig}
 
 import java.lang.System.Logger.Level
 import scala.jdk.CollectionConverters.*
@@ -76,26 +77,25 @@ object EntityManagerFactories:
         properties: Map[String, String] = Map.empty
     ): EntityManagerFactory =
 
-        val map = Map(
-            "jakarta.persistence.jdbc.url"      -> url,
-            "jakarta.persistence.jdbc.user"     -> username,
-            "jakarta.persistence.jdbc.password" -> password,
-            "jakarta.persistence.jdbc.driver"   -> driverName
-        )
-        apply(map ++ properties)
+        // Flyway migration here. Need to initialize the database before we
+        // can create an EntityManagerFactory
+        val dbConfig = DatabaseConfig(url, username, password, driverName, "foo")
+        FlywayMigrator.migrate(dbConfig) match
+            case Left(e)      =>
+                log.atError.withCause(e).log(s"Failed to migrate database at $url")
+                throw e
+            case Right(value) =>
+                val map = Map(
+                    "jakarta.persistence.jdbc.url"      -> url,
+                    "jakarta.persistence.jdbc.user"     -> username,
+                    "jakarta.persistence.jdbc.password" -> password,
+                    "jakarta.persistence.jdbc.driver"   -> driverName
+                )
+                apply(map ++ properties)
 
     def apply(configNode: String): EntityManagerFactory =
         val driver   = config.getString(configNode + ".driver")
         val password = config.getString(configNode + ".password")
-//        val productName = config.getString(configNode + ".name")
         val url      = config.getString(configNode + ".url")
         val user     = config.getString(configNode + ".user")
-        val props    = Map(
-//            "hibernate.dialect"                 -> productName,
-            // "jakarta.persistence.database-product-name" -> productName,
-            "jakarta.persistence.jdbc.driver"   -> driver,
-            "jakarta.persistence.jdbc.password" -> password,
-            "jakarta.persistence.jdbc.url"      -> url,
-            "jakarta.persistence.jdbc.user"     -> user
-        )
-        apply(props)
+        apply(url, user, password, driver)

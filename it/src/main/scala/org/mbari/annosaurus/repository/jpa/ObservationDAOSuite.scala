@@ -58,9 +58,12 @@ trait ObservationDAOSuite extends BaseDAOSuite:
         val obs                       = im.getObservations().iterator().next()
         given dao: ObservationDAOImpl = daoFactory.newObservationDAO()
         run(() =>
-            val obs0 = dao.update(obs)
+            // Bring it into the transaction
+            val opt  = dao.findByUUID(obs.getUuid())
+            assert(opt.isDefined)
+            val obs0 = opt.get
             obs0.getImagedMoment().removeObservation(obs0)
-            // dao.delete(obs0) // DOn't call delete, just remove from parent
+            // dao.delete(obs0) // Don't call delete, just remove from parent
         )
         run(() => dao.findByUUID(obs.getUuid())) match
             case None        => // OK

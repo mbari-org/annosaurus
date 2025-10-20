@@ -21,7 +21,7 @@ import org.mbari.annosaurus.domain.{Annotation, ConcurrentRequest, ImageCreateSC
 import org.mbari.annosaurus.etc.jdk.Loggers.given
 import org.mbari.annosaurus.messaging.{AnnotationPublisher, MessageBus}
 import org.mbari.annosaurus.repository.jpa.JPADAOFactory
-import org.mbari.annosaurus.repository.jpa.entity.{ImagedMomentEntity, ObservationEntity}
+import org.mbari.annosaurus.repository.jpa.entity.ObservationEntity
 import org.mbari.annosaurus.repository.{DAO, ObservationDAO}
 import org.mbari.vcr4j.time.Timecode
 
@@ -31,7 +31,6 @@ import java.util.UUID
 import scala.collection.mutable
 import scala.concurrent.{ExecutionContext, Future}
 import scala.jdk.CollectionConverters.*
-import scala.util.chaining.*
 
 /**
  * @author

@@ -19,23 +19,22 @@ package org.mbari.annosaurus.endpoints
 import org.mbari.annosaurus.controllers.QueryController
 import org.mbari.annosaurus.domain.{Count, ErrorMsg, QueryRequest}
 import org.mbari.annosaurus.endpoints.CustomTapirJsonCirce.*
-import org.mbari.annosaurus.etc.circe.CirceCodecs.{*, given}
+import org.mbari.annosaurus.etc.circe.CirceCodecs.given
 import org.mbari.annosaurus.repository.query.{JDBC, QueryResults}
 import sttp.tapir.*
 import sttp.tapir.generic.auto.*
 import sttp.tapir.server.ServerEndpoint
 import sttp.tapir.server.ServerEndpoint.Full
 
-import scala.concurrent.{ExecutionContext, Future}
 import java.io.File
 import java.nio.file.Files
 import java.util.concurrent.Executors
-import sttp.model.MediaType
+import scala.concurrent.{ExecutionContext, Future}
 
 class QueryEndpoints(queryController: QueryController)(using executionContext: ExecutionContext) extends Endpoints:
 
-    private val base = "query"
-    private val tag  = "Query"
+    private val base      = "query"
+    private val tag       = "Query"
     private val scheduler = Executors.newScheduledThreadPool(1)
 
     val listColumns: Endpoint[Unit, Unit, ErrorMsg, Seq[JDBC.Metadata], Any] = openEndpoint
@@ -80,10 +79,10 @@ class QueryEndpoints(queryController: QueryController)(using executionContext: E
 
     val downloadTsvImpl: Full[Unit, Unit, QueryRequest, ErrorMsg, File, Any, Future] =
         downloadTsv.serverLogic(request =>
-            val path = Files.createTempFile("query", ".tsv")
+            val path           = Files.createTempFile("query", ".tsv")
             val task: Runnable = () => Files.delete(path)
             scheduler.schedule(task, 2, java.util.concurrent.TimeUnit.MINUTES)
-            val future = handleEitherAsync(
+            val future         = handleEitherAsync(
                 queryController.queryAndSaveToTsvFile(request, path).map(_ => path.toFile())
             )
             future

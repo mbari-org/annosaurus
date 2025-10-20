@@ -25,8 +25,8 @@
     <logger name="org.eclipse.jetty" level="WARN"/>
     <logger name="org.eclipse.jetty.server" level="WARN"/>
     <logger name="org.eclipse.jetty.util.log" level="WARN"/>
-    <logger name="org.mbari.vars.annotation.controllers" level="WARN"/>
-    <logger name="org.mbari.vars.annotation.repository.jpa" level="INFO"/>
+    <logger name="org.mbari.annosaurus" level="INFO"/>
+    <logger name="org.mbari.annosaurus.repository.jpa" level="INFO"/>
     <logger name="org.testcontainers" level="INFO"/>
 
     <!-- Hibernate after 6 DEBUG -->

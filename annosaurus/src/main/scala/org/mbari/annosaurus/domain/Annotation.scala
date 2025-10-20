@@ -55,6 +55,11 @@ final case class Annotation(
             ancillaryData = ancillaryData.map(_.removeForeignKeys())
         )
 
+    def roundObservationTimestampToMillis(): Annotation =
+        copy(
+            observationTimestamp = observationTimestamp.map(t => Instant.ofEpochMilli(t.toEpochMilli))
+        )
+
     override def toSnakeCase: AnnotationSC =
         AnnotationSC(
             activity,
@@ -135,7 +140,9 @@ object Annotation extends FromEntity[ObservationEntity, Annotation]:
             Option(entity.getGroup),
             imagedMomentOpt.flatMap(im => Option(im.getUuid)),
             imageReferences,
-            Option(entity.getObservationTimestamp),
+            Option(
+                entity.getObservationTimestamp
+            ), // Option(entity.getObservationTimestamp).map(Instants.roundToMillis),
             Option(entity.getUuid),
             Option(entity.getObserver),
             imagedMomentOpt.flatMap(im => Option(im.getRecordedTimestamp)),

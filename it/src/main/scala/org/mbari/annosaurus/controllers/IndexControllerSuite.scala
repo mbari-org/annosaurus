@@ -16,7 +16,7 @@
 
 package org.mbari.annosaurus.controllers
 
-import org.mbari.annosaurus.domain.{Index, IndexUpdate}
+import org.mbari.annosaurus.domain.IndexUpdate
 import org.mbari.annosaurus.repository.jpa.{BaseDAOSuite, JPADAOFactory}
 
 import java.time.{Duration, Instant}

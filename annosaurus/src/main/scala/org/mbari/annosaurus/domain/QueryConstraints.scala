@@ -18,7 +18,6 @@ package org.mbari.annosaurus.domain
 
 import java.time.Instant
 import java.util.UUID
-import scala.jdk.CollectionConverters.*
 
 final case class QueryConstraints(
     videoReferenceUuids: Seq[UUID] = Nil,

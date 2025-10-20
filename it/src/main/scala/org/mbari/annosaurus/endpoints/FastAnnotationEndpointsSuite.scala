@@ -354,8 +354,9 @@ trait FastAnnotationEndpointsSuite extends EndpointsSuite:
     }
 
     test("findImagedMomentUuidsByConcept") {
-        val xs      = TestUtils.create(2, 2, 1, 1, true)
-        val concept = xs.head.getObservations.iterator().next().getConcept
+        val xs         = TestUtils.create(2, 2, 1, 1, true)
+        val annotation = xs.head.getObservations.iterator().next()
+        val concept    = annotation.getConcept
         runGet(
             endpoints.findImagedMomentUuidsByConceptImpl,
             s"http://test.com/v1/fast/imagedmoments/concept/images/$concept",
@@ -387,6 +388,7 @@ trait FastAnnotationEndpointsSuite extends EndpointsSuite:
         assert(im.getUuid != null)
         val obs = im.getObservations.iterator().next()
         assert(obs.getUuid != null)
+        assert(obs.getObservationTimestamp() != null)
         val ass = obs.getAssociations.iterator().next()
         runGet(
             endpoints.findAnnotationsByLinkNameAndLinkValueImpl,
@@ -394,9 +396,12 @@ trait FastAnnotationEndpointsSuite extends EndpointsSuite:
             response =>
                 assertEquals(response.code, StatusCode.Ok)
                 val annos    = checkResponse[Seq[AnnotationSC]](response.body)
+                // println(annos.stringify)
                 assertEquals(annos.size, 1)
                 val obtained = annos.head.toCamelCase
-                val expected = TestUtils.stripLastUpdated(Annotation.from(obs).removeForeignKeys())
+                val expected = TestUtils.stripLastUpdated(
+                    Annotation.from(obs).removeForeignKeys().roundObservationTimestampToMillis()
+                )
 //                println("EXPECTED: " + expected.stringify)
 //                println("OBTAINED: " + obtained.stringify)
                 assertEquals(obtained, expected)
@@ -405,19 +410,55 @@ trait FastAnnotationEndpointsSuite extends EndpointsSuite:
     }
 
     test("deleteAnnotationsByVideoReferenceUuid") {
-        val xs          = TestUtils.create(2, 1, 1)
-        val jwt         = jwtService.authorize("foo").orNull
+        val xs                          = TestUtils.create(2, 1, 1)
+        val jwt                         = jwtService.authorize("foo").orNull
         assert(jwt != null)
-        val backendStub = newBackendStub(endpoints.deleteAnnotationsByVideoReferenceUuidImpl)
-        val response    = basicRequest
+        val backendStub                 = newBackendStub(endpoints.deleteAnnotationsByVideoReferenceUuidImpl)
+        val response                    = basicRequest
             .delete(uri"http://test.com/v1/fast/videoreference/${xs.head.getVideoReferenceUuid}")
             .header("Authorization", s"Bearer $jwt")
             .send(backendStub)
             .join
         assertEquals(response.code, StatusCode.Ok)
 //        println(response.body)
-        val count       = checkResponse[DeleteCountSC](response.body).toCamelCase
-        assertEquals(count.observationCount, xs.size)
+        val count                       = checkResponse[DeleteCountSC](response.body).toCamelCase
+        val expectedImageMomentCount    = xs.size
+        val expectedObservationCount    = xs.flatMap(_.getObservations.asScala).size
+        val expectedAncillaryDataCount  = xs.flatMap(im => Option(im.getAncillaryDatum)).size
+        val expectedImageReferenceCount = xs.flatMap(_.getImageReferences.asScala).size
+        val expectedAssociationCount    = xs.flatMap(_.getObservations.asScala).flatMap(_.getAssociations.asScala).size
+        assertEquals(count.observationCount, expectedObservationCount)
+        assertEquals(count.imageReferenceCount, expectedImageReferenceCount)
+        assertEquals(count.ancillaryDataCount, expectedAncillaryDataCount)
+        assertEquals(count.imagedMomentCount, expectedImageMomentCount)
+        assertEquals(count.associationCount, expectedAssociationCount)
+        assertEquals(count.videoReferenceUuid, xs.head.getVideoReferenceUuid)
+
+    }
+
+    test("deleteAnnotationsByVideoReferenceUuid (large)") {
+        val xs                          = TestUtils.create(100, 5, 3, 2, true)
+        val jwt                         = jwtService.authorize("foo").orNull
+        assert(jwt != null)
+        val backendStub                 = newBackendStub(endpoints.deleteAnnotationsByVideoReferenceUuidImpl)
+        val response                    = basicRequest
+            .delete(uri"http://test.com/v1/fast/videoreference/${xs.head.getVideoReferenceUuid}")
+            .header("Authorization", s"Bearer $jwt")
+            .send(backendStub)
+            .join
+        assertEquals(response.code, StatusCode.Ok)
+        val count                       = checkResponse[DeleteCountSC](response.body).toCamelCase
+        val expectedImageMomentCount    = xs.size
+        val expectedObservationCount    = xs.flatMap(_.getObservations.asScala).size
+        val expectedAncillaryDataCount  = xs.flatMap(im => Option(im.getAncillaryDatum)).size
+        val expectedImageReferenceCount = xs.flatMap(_.getImageReferences.asScala).size
+        val expectedAssociationCount    = xs.flatMap(_.getObservations.asScala).flatMap(_.getAssociations.asScala).size
+        assertEquals(count.observationCount, expectedObservationCount)
+        assertEquals(count.imageReferenceCount, expectedImageReferenceCount)
+        assertEquals(count.ancillaryDataCount, expectedAncillaryDataCount)
+        assertEquals(count.imagedMomentCount, expectedImageMomentCount)
+        assertEquals(count.associationCount, expectedAssociationCount)
+        assertEquals(count.videoReferenceUuid, xs.head.getVideoReferenceUuid)
 
     }
 

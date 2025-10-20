@@ -23,7 +23,6 @@ import org.mbari.annosaurus.repository.jdbc.AnalysisRepository
 import org.mbari.annosaurus.repository.jpa.JPADAOFactory
 import sttp.model.StatusCode
 
-import java.time.Instant
 import scala.jdk.CollectionConverters.*
 
 trait AnalysisEndpointsSuite extends EndpointsSuite:

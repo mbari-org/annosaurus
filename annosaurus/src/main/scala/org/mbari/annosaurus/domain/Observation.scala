@@ -16,6 +16,7 @@
 
 package org.mbari.annosaurus.domain
 
+import org.mbari.annosaurus.etc.jdk.Instants
 import org.mbari.annosaurus.repository.jpa.entity.ObservationEntity
 import org.mbari.annosaurus.repository.jpa.entity.extensions.*
 
@@ -62,6 +63,18 @@ final case class Observation(
 
     lazy val duration: Option[Duration] = durationMillis.map(Duration.ofMillis)
 
+    /**
+     * This method is used during integration testing. We store timestamps to millis, but (depending on the JVM) it may
+     * have nanosecond resolution in memory
+     *
+     * @return
+     *   a copy of this observation with observationTimestamps rounded to millis
+     */
+    def roundObservationTimestampToMillis: Observation =
+        observationTimestamp match
+            case Some(ts) => copy(observationTimestamp = Some(Instants.roundToMillis(ts)))
+            case None     => this
+
 object Observation extends FromEntity[ObservationEntity, Observation]:
     override def from(entity: ObservationEntity, extend: Boolean = false): Observation =
 
@@ -75,7 +88,9 @@ object Observation extends FromEntity[ObservationEntity, Observation]:
             Option(entity.getGroup),
             Option(entity.getActivity),
             Option(entity.getObserver),
-            Option(entity.getObservationTimestamp),
+            Option(
+                entity.getObservationTimestamp
+            ), // Option(entity.getObservationTimestamp).map(Instants.roundToMillis),
             associations,
             entity.primaryKey,
             entity.lastUpdated
