@@ -21,6 +21,7 @@ import org.mbari.annosaurus.etc.jdk.Loggers.given
 
 import java.sql.PreparedStatement
 import scala.util.Try
+import org.mbari.annosaurus.etc.jdbc.Databases
 object PreparedStatementGenerator:
 
     val IndexTime        = "index_recorded_timestamp"
@@ -115,7 +116,7 @@ object PreparedStatementGenerator:
 
     private def buildLimitOffsetClause(query: Query, databaseConfig: DatabaseConfig): String =
         if query.limit.isEmpty && query.offset.isEmpty then return ""
-        else if databaseConfig.isPostgres then
+        else if databaseConfig.databaseType == Databases.DatabaseType.PostgreSQL then
             val limit  = query.limit.map(l => s"LIMIT $l").getOrElse("")
             val offset = query.offset.map(o => s"OFFSET $o").getOrElse("")
             s"$limit $offset"

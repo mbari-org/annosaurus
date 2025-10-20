@@ -30,7 +30,6 @@ object SqlServerTestDAOFactory extends TestDAOFactory:
     // The image name must match the one in src/test/resources/container-license-acceptance.txt
     val container = new MSSQLServerContainer(DockerImageName.parse("mcr.microsoft.com/mssql/server:2022-latest"))
     container.acceptLicense()
-//    container.withInitScript("sql/mssqlserver/02_m3_annotations.sql")
     container.withReuse(true)
     container.start()
 

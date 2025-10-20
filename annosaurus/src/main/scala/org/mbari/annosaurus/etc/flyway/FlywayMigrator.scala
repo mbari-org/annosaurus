@@ -21,6 +21,7 @@ import org.mbari.annosaurus.DatabaseConfig
 import org.mbari.annosaurus.etc.jdk.Loggers.given
 
 import scala.util.Try
+import org.mbari.annosaurus.etc.jdbc.Databases
 
 object FlywayMigrator:
 
@@ -29,19 +30,31 @@ object FlywayMigrator:
     def migrate(databaseConfig: DatabaseConfig): Either[Throwable, Unit] =
         // Implementation of Flyway migration logic
         Try {
-            val location =
-                if databaseConfig.isSqlserver then "classpath:/db/migrations/sqlserver"
-                else if databaseConfig.isPostgres then "classpath:/db/migrations/postgres"
-                else throw new IllegalArgumentException(s"Unsupported database type: ${databaseConfig.driver}")
+            val databaseType = Databases.typeFromUrl(databaseConfig.url)
+            val location     = databaseType match
+                case Databases.DatabaseType.SQLServer  => "classpath:/db/migrations/sqlserver"
+                case Databases.DatabaseType.PostgreSQL => "classpath:/db/migrations/postgres"
+                case _                                 => throw new IllegalArgumentException(s"Unsupported database type: $databaseType")
 
-            log.atInfo.log("Starting Flyway migration using SQL in " + location)
+            log.atDebug.log(s"Starting database migrations on ${databaseConfig.url}")
             val flyway = Flyway
                 .configure()
-                .baselineOnMigrate(true)
+                .table("schema_history_annosaurus") // name of the metadata table
+                .locations(location)         // migration scripts location
                 .dataSource(databaseConfig.url, databaseConfig.user, databaseConfig.password)
-                .locations(location)
+                .baselineOnMigrate(true)     // this makes Flyway baseline if no metadata table exists
                 .load()
 
             val result = flyway.migrate()
+            result.migrationsExecuted match
+                case 0          => log.atInfo.log("No database migrations were necessary")
+                case n if n > 0 => log.atInfo.log(s"Successfully applied $n database migrations")
+                case _          => log.atWarn.log("Database migration result was unexpected")
+
             if !result.success then throw new Exception("Migration failed using SQL in " + location)
+
+            log.atInfo
+                .log(
+                    "Flyway Database migrations applied. Current schema version: " + flyway.info().current().getVersion
+                )
         }.toEither

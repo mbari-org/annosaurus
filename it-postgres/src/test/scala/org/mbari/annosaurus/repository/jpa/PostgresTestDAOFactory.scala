@@ -25,7 +25,6 @@ object PostgresTestDAOFactory extends TestDAOFactory:
 
     // TODO - intialize the container with SQL so UUID type gets correctly created
     val container = new PostgreSQLContainer("postgres:17")
-//    container.withInitScript("sql/postgresql/02_m3_annotations.sql")
     container.withReuse(true)
     container.start()
 
