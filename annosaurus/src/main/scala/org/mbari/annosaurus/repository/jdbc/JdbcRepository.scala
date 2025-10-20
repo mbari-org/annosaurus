@@ -17,8 +17,17 @@
 package org.mbari.annosaurus.repository.jdbc
 
 import jakarta.persistence.{EntityManager, EntityManagerFactory, Query}
-import org.hibernate.jpa.{AvailableHints, HibernateHints}
-import org.mbari.annosaurus.domain.{Annotation, ConcurrentRequest, DeleteCount, GeographicRange, Image, MultiRequest, ObservationsUpdate, QueryConstraints}
+import org.hibernate.jpa.HibernateHints
+import org.mbari.annosaurus.domain.{
+    Annotation,
+    ConcurrentRequest,
+    DeleteCount,
+    GeographicRange,
+    Image,
+    MultiRequest,
+    ObservationsUpdate,
+    QueryConstraints
+}
 import org.mbari.annosaurus.etc.jdk.Loggers.given
 import org.mbari.annosaurus.repository.jpa.extensions.*
 
@@ -76,7 +85,7 @@ class JdbcRepository(entityManagerFactory: EntityManagerFactory):
                 counts(1), // image references
                 counts(2), // associations
                 counts(3), // observations
-                counts(4) // imaged moments
+                counts(4)  // imaged moments
             )
             transaction.commit()
         catch

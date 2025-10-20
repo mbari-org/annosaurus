@@ -18,10 +18,10 @@ package org.mbari.annosaurus.etc.flyway
 
 import org.flywaydb.core.Flyway
 import org.mbari.annosaurus.DatabaseConfig
+import org.mbari.annosaurus.etc.jdbc.Databases
 import org.mbari.annosaurus.etc.jdk.Loggers.given
 
 import scala.util.Try
-import org.mbari.annosaurus.etc.jdbc.Databases
 
 object FlywayMigrator:
 
@@ -40,9 +40,9 @@ object FlywayMigrator:
             val flyway = Flyway
                 .configure()
                 .table("schema_history_annosaurus") // name of the metadata table
-                .locations(location)         // migration scripts location
+                .locations(location)                // migration scripts location
                 .dataSource(databaseConfig.url, databaseConfig.user, databaseConfig.password)
-                .baselineOnMigrate(true)     // this makes Flyway baseline if no metadata table exists
+                .baselineOnMigrate(true)            // this makes Flyway baseline if no metadata table exists
                 .load()
 
             val result = flyway.migrate()

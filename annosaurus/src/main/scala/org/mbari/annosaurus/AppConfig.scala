@@ -17,11 +17,11 @@
 package org.mbari.annosaurus
 
 import com.typesafe.config.ConfigFactory
+import org.mbari.annosaurus.etc.jdbc.Databases
+import org.mbari.annosaurus.etc.jdbc.Databases.DatabaseType
 import org.mbari.annosaurus.etc.jdk.Loggers
 import org.mbari.annosaurus.etc.jdk.Loggers.given
 import org.mbari.annosaurus.etc.jwt.JwtService
-import org.mbari.annosaurus.etc.jdbc.Databases
-import org.mbari.annosaurus.etc.jdbc.Databases.DatabaseType 
 
 import scala.util.Try
 import scala.util.control.NonFatal

@@ -411,23 +411,23 @@ trait FastAnnotationEndpointsSuite extends EndpointsSuite:
     }
 
     test("deleteAnnotationsByVideoReferenceUuid") {
-        val xs          = TestUtils.create(2, 1, 1)
-        val jwt         = jwtService.authorize("foo").orNull
+        val xs                          = TestUtils.create(2, 1, 1)
+        val jwt                         = jwtService.authorize("foo").orNull
         assert(jwt != null)
-        val backendStub = newBackendStub(endpoints.deleteAnnotationsByVideoReferenceUuidImpl)
-        val response    = basicRequest
+        val backendStub                 = newBackendStub(endpoints.deleteAnnotationsByVideoReferenceUuidImpl)
+        val response                    = basicRequest
             .delete(uri"http://test.com/v1/fast/videoreference/${xs.head.getVideoReferenceUuid}")
             .header("Authorization", s"Bearer $jwt")
             .send(backendStub)
             .join
         assertEquals(response.code, StatusCode.Ok)
 //        println(response.body)
-        val count       = checkResponse[DeleteCountSC](response.body).toCamelCase
-        val expectedImageMomentCount = xs.size
-        val expectedObservationCount = xs.flatMap(_.getObservations.asScala).size
-        val expectedAncillaryDataCount = xs.flatMap(im => Option(im.getAncillaryDatum)).size
+        val count                       = checkResponse[DeleteCountSC](response.body).toCamelCase
+        val expectedImageMomentCount    = xs.size
+        val expectedObservationCount    = xs.flatMap(_.getObservations.asScala).size
+        val expectedAncillaryDataCount  = xs.flatMap(im => Option(im.getAncillaryDatum)).size
         val expectedImageReferenceCount = xs.flatMap(_.getImageReferences.asScala).size
-        val expectedAssociationCount = xs.flatMap(_.getObservations.asScala).flatMap(_.getAssociations.asScala).size
+        val expectedAssociationCount    = xs.flatMap(_.getObservations.asScala).flatMap(_.getAssociations.asScala).size
         assertEquals(count.observationCount, expectedObservationCount)
         assertEquals(count.imageReferenceCount, expectedImageReferenceCount)
         assertEquals(count.ancillaryDataCount, expectedAncillaryDataCount)
@@ -438,22 +438,22 @@ trait FastAnnotationEndpointsSuite extends EndpointsSuite:
     }
 
     test("deleteAnnotationsByVideoReferenceUuid (large)") {
-        val xs = TestUtils.create(100, 5, 3, 2, true)
-        val jwt = jwtService.authorize("foo").orNull
+        val xs                          = TestUtils.create(100, 5, 3, 2, true)
+        val jwt                         = jwtService.authorize("foo").orNull
         assert(jwt != null)
-        val backendStub = newBackendStub(endpoints.deleteAnnotationsByVideoReferenceUuidImpl)
-        val response = basicRequest
+        val backendStub                 = newBackendStub(endpoints.deleteAnnotationsByVideoReferenceUuidImpl)
+        val response                    = basicRequest
             .delete(uri"http://test.com/v1/fast/videoreference/${xs.head.getVideoReferenceUuid}")
             .header("Authorization", s"Bearer $jwt")
             .send(backendStub)
             .join
         assertEquals(response.code, StatusCode.Ok)
-        val count = checkResponse[DeleteCountSC](response.body).toCamelCase
-        val expectedImageMomentCount = xs.size
-        val expectedObservationCount = xs.flatMap(_.getObservations.asScala).size
-        val expectedAncillaryDataCount = xs.flatMap(im => Option(im.getAncillaryDatum)).size
+        val count                       = checkResponse[DeleteCountSC](response.body).toCamelCase
+        val expectedImageMomentCount    = xs.size
+        val expectedObservationCount    = xs.flatMap(_.getObservations.asScala).size
+        val expectedAncillaryDataCount  = xs.flatMap(im => Option(im.getAncillaryDatum)).size
         val expectedImageReferenceCount = xs.flatMap(_.getImageReferences.asScala).size
-        val expectedAssociationCount = xs.flatMap(_.getObservations.asScala).flatMap(_.getAssociations.asScala).size
+        val expectedAssociationCount    = xs.flatMap(_.getObservations.asScala).flatMap(_.getAssociations.asScala).size
         assertEquals(count.observationCount, expectedObservationCount)
         assertEquals(count.imageReferenceCount, expectedImageReferenceCount)
         assertEquals(count.ancillaryDataCount, expectedAncillaryDataCount)
