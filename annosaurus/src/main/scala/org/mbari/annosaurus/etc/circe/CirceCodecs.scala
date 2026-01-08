@@ -26,6 +26,7 @@ import org.mbari.annosaurus.util.HexUtil
 import java.net.{URI, URL}
 import java.time.Instant
 import scala.util.Try
+import org.checkerframework.checker.units.qual.g
 
 object CirceCodecs:
     given Encoder[Array[Byte]] = (xs: Array[Byte]) => Json.fromString(HexUtil.toHex(xs))
@@ -377,20 +378,25 @@ object CirceCodecs:
     given Encoder[Constraint.In[String]]     = deriveEncoder
     given Encoder[Constraint.IsNull]         = deriveEncoder
     given Encoder[Constraint.Like]           = deriveEncoder
+    given Encoder[Constraint.NotLike]        = deriveEncoder
     given Encoder[Constraint.Max]            = deriveEncoder
     given Encoder[Constraint.MinMax]         = deriveEncoder
     given Encoder[Constraint.Min]            = deriveEncoder
     given Encoder[List[Constraint]]          = deriveEncoder
 
-    // THis is needed to handle the trait Constraint used in Constraints
+    // This is needed to handle the trait Constraint used in Constraints
     given constraintEncoder: Encoder[Constraint] = Encoder.instance[Constraint] {
         case c: Constraint.Date       => c.asJson
+        case c: Constraint.Contains   => c.asJson
+        case c: Constraint.Equals[String] => c.asJson
         case c: Constraint.In[String] => c.asJson
         case c: Constraint.IsNull     => c.asJson
         case c: Constraint.Like       => c.asJson
+        case c: Constraint.NotLike    => c.asJson
         case c: Constraint.Max        => c.asJson
         case c: Constraint.Min        => c.asJson
         case c: Constraint.MinMax     => c.asJson
+        case Constraint.Noop          => Json.obj()
     }
 
     given constraintsDecoder: Decoder[Query] = deriveDecoder
