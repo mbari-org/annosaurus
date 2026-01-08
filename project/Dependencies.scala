@@ -11,7 +11,7 @@ object Dependencies {
     lazy val flywayCore              = "org.flywaydb"                   % "flyway-core"                % flywayVersion
     lazy val flywaySqlserver         = "org.flywaydb"                   % "flyway-sqlserver"           % flywayVersion
     lazy val flywayPostgres          = "org.flywaydb"                   % "flyway-database-postgresql" % flywayVersion
-    val hibernateVersion             = "7.1.4.Final" // See https://github.com/mbari-org/annosaurus/issues/47
+    val hibernateVersion             = "7.2.0.Final" // See https://github.com/mbari-org/annosaurus/issues/47
     lazy val hibernateCore           = "org.hibernate.orm"              % "hibernate-core"             % hibernateVersion
     lazy val hibernateEnvers         = "org.hibernate.orm"              % "hibernate-envers"           % hibernateVersion
     lazy val hibernateHikari         = "org.hibernate.orm"              % "hibernate-hikaricp"         % hibernateVersion
@@ -20,7 +20,7 @@ object Dependencies {
     lazy val javaxServlet            = "javax.servlet"                  % "javax.servlet-api"          % "4.0.1"
     lazy val javaxTransaction        = "javax.transaction"              % "jta"                        % "1.1"
     lazy val junit                   = "junit"                          % "junit"                      % "4.13.2"
-    lazy val logbackClassic          = "ch.qos.logback"                 % "logback-classic"            % "1.5.20"
+    lazy val logbackClassic          = "ch.qos.logback"                 % "logback-classic"            % "1.5.24"
     lazy val mssqlserver             = "com.microsoft.sqlserver"        % "mssql-jdbc"                 % "13.2.1.jre11"
     lazy val munit                   = "org.scalameta"                 %% "munit"                      % "1.2.1"
     lazy val oracle                  = "com.oracle.ojdbc"               % "ojdbc8"                     % "19.3.0.0"
@@ -32,7 +32,7 @@ object Dependencies {
     lazy val slf4jJul                = "org.slf4j"                      % "jul-to-slf4j"               % slf4jVersion
     lazy val slf4jLog4j              = "org.slf4j"                      % "log4j-over-slf4j"           % slf4jVersion
     lazy val slf4jSystem             = "org.slf4j"                      % "slf4j-jdk-platform-logging" % slf4jVersion
-    private val tapirVersion         = "1.11.50"
+    private val tapirVersion         = "1.13.4"
     lazy val tapirCirce              = "com.softwaremill.sttp.tapir"   %% "tapir-json-circe"           % tapirVersion
     lazy val tapirHelidon            = "com.softwaremill.sttp.tapir"   %% "tapir-nima-server"          % tapirVersion
     lazy val tapirPrometheus         = "com.softwaremill.sttp.tapir"   %% "tapir-prometheus-metrics"   % tapirVersion
@@ -40,11 +40,11 @@ object Dependencies {
     lazy val tapirSwagger            = "com.softwaremill.sttp.tapir"   %% "tapir-swagger-ui-bundle"    % tapirVersion
     lazy val tapirVertex             = "com.softwaremill.sttp.tapir"   %% "tapir-vertx-server"         % tapirVersion
     lazy val tapirSttpCirce          = "com.softwaremill.sttp.client3" %% "circe"                      % "3.11.0"
-    val testcontainersVersion        = "1.21.3"
+    val testcontainersVersion        = "2.0.3"
     lazy val testcontainersCore      = "org.testcontainers"             % "testcontainers"             % testcontainersVersion
-    lazy val testcontainersSqlserver = "org.testcontainers"             % "mssqlserver"                % testcontainersVersion
-    lazy val testcontainersOracle    = "org.testcontainers"             % "oracle-xe"                  % testcontainersVersion
-    lazy val testcontainersPostgres  = "org.testcontainers"             % "postgresql"                 % testcontainersVersion
+    lazy val testcontainersSqlserver = "org.testcontainers"             % "testcontainers-mssqlserver" % testcontainersVersion
+    lazy val testcontainersOracle    = "org.testcontainers"             % "testcontainers-oracle-xe"   % testcontainersVersion
+    lazy val testcontainersPostgres  = "org.testcontainers"             % "testcontainers-postgresql"  % testcontainersVersion
     lazy val typesafeConfig          = "com.typesafe"                   % "config"                     % "1.4.5"
     lazy val vcr4jCore               = "org.mbari.vcr4j"                % "vcr4j-core"                 % "5.3.1"
     lazy val zeromq                  = "org.zeromq"                     % "jeromq"                     % "0.6.0"

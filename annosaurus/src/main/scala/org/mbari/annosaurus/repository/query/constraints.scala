@@ -81,16 +81,17 @@ object Constraint:
 
     def from(constraintRequest: ConstraintRequest): Constraint =
         constraintRequest match
-            case ConstraintRequest(column, Some(between: Seq[Instant]), _, _, _, _, _, _, _, _) =>
+            case ConstraintRequest(column, Some(between: Seq[Instant]), _, _, _, _, _, _, _, _, _) =>
                 Date(column, between.head, between(1))
-            case ConstraintRequest(column, _, Some(contains), _, _, _, _, _, _, _)              => Contains(column, contains)
-            case ConstraintRequest(column, _, _, Some(equals), _, _, _, _, _, _)                => Equals(column, equals)
-            case ConstraintRequest(column, _, _, _, Some(in), _, _, _, _, _)                    => In(column, in)
-            case ConstraintRequest(column, _, _, _, _, Some(isnull), _, _, _, _)                => IsNull(column, isnull)
-            case ConstraintRequest(column, _, _, _, _, _, Some(like), _, _, _)                  => Like(column, like)
-            case ConstraintRequest(column, _, _, _, _, _, _, Some(max), _, _)                   => Max(column, max)
-            case ConstraintRequest(column, _, _, _, _, _, _, _, Some(min), _)                   => Min(column, min)
-            case ConstraintRequest(column, _, _, _, _, _, _, _, _, Some(minmax))                =>
+            case ConstraintRequest(column, _, Some(contains), _, _, _, _, _, _, _, _)           => Contains(column, contains)
+            case ConstraintRequest(column, _, _, Some(equals), _, _, _, _, _, _, _)             => Equals(column, equals)
+            case ConstraintRequest(column, _, _, _, Some(in), _, _, _, _, _, _)                 => In(column, in)
+            case ConstraintRequest(column, _, _, _, _, Some(isnull), _, _, _, _, _)             => IsNull(column, isnull)
+            case ConstraintRequest(column, _, _, _, _, _, Some(like), _, _, _, _)               => Like(column, like)
+            case ConstraintRequest(column, _, _, _, _, _, _, Some(notlike), _, _, _)            => NotLike(column, notlike)
+            case ConstraintRequest(column, _, _, _, _, _, _, _, Some(max), _, _)                => Max(column, max)
+            case ConstraintRequest(column, _, _, _, _, _, _, _, _, Some(min), _)                => Min(column, min)
+            case ConstraintRequest(column, _, _, _, _, _, _, _, _, _, Some(minmax))             =>
                 MinMax(column, minmax.head, minmax(1))
             case _                                                                              => Noop
 
@@ -153,6 +154,14 @@ object Constraint:
             idx + 1
 
         def toPreparedStatementTemplate: String = s"$column LIKE ?"
+
+    case class NotLike(column: String, notlike: String) extends Constraint:
+        @throws[SQLException]
+        def bind(statement: PreparedStatement, idx: Int): Int =
+            statement.setString(idx, notlike)
+            idx + 1
+
+        def toPreparedStatementTemplate: String = s"$column NOT LIKE ?"
 
     case class Max(column: String, max: Double) extends Constraint:
         @throws[SQLException]

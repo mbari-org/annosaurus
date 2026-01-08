@@ -70,6 +70,33 @@ trait QueryEndpointsSuite extends EndpointsSuite:
         )
     }
 
+    test("runQuery - notlike constraint") {
+        val xs           = TestUtils.create(2, 2)
+        val conceptToExclude = xs.head.getObservations.asScala.head.getConcept
+        val xsFiltered   = xs.filterNot(_.getObservations.asScala.exists(_.getConcept == conceptToExclude))
+        val expected     =
+            ("concept" +: xsFiltered.flatMap(_.getObservations.asScala.map(_.getConcept))).distinct.sorted.mkString("\n")
+        val queryRequest = QueryRequest(select = Some(Seq("concept")), distinct = Some(true), where = Some(Seq(
+            ConstraintRequest(
+                column = "concept",
+                notlike = Some(conceptToExclude)
+            )
+        )))
+        runPost(
+            endpoints.runQueryImpl,
+            s"http://test.com/v1/query/run",
+            queryRequest.stringify,
+            response =>
+                assertEquals(response.code, StatusCode.Ok)
+                response.body match
+                    case Left(e)     => fail(e)
+                    case Right(body) =>
+                        val obtained = body.split("\n").sorted.mkString("\n")
+//                        log.atDebug.log(s"Query results: $obtained")
+                        assertEquals(obtained, expected)
+        )
+    }
+
     test("runQueryAndCache") {
         val xs           = TestUtils.create(2, 2)
         val expected     =

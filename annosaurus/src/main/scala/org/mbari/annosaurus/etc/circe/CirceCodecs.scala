@@ -358,6 +358,8 @@ object CirceCodecs:
                     c.downField("isnull").as[Boolean].map(Constraint.IsNull(columnName, _))
                 else if c.downField("like").succeeded then
                     c.downField("like").as[String].map(Constraint.Like(columnName, _))
+                else if c.downField("notlike").succeeded then
+                    c.downField("notlike").as[String].map(Constraint.NotLike(columnName, _))
                 else if c.downField("max").succeeded then
                     c.downField("max").as[Double].map(Constraint.Max(columnName, _))
                 else if c.downField("min").succeeded then

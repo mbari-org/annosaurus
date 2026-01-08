@@ -73,6 +73,8 @@ case class QueryRequest(
  *   'IS NOT NULL'
  * @param like
  *   A value to apply a 'LIKE' constraint. You must apply the '%' characters to the value before passing it
+ * @param notlike
+ *  A value to apply a 'NOT LIKE' constraint. You must apply the '%' characters to the value before passing it
  * @param max
  *   The maximum value to apply a '<=' constraint
  * @param min
@@ -88,6 +90,7 @@ case class ConstraintRequest(
     in: Option[Seq[String]] = None,
     isnull: Option[Boolean] = None,
     like: Option[String] = None,
+    notlike: Option[String] = None,
     max: Option[Double] = None,
     min: Option[Double] = None,
     minmax: Option[Seq[Double]] = None
