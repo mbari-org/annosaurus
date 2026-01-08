@@ -19,6 +19,7 @@ package org.mbari.annosaurus.etc.circe
 import io.circe.*
 import io.circe.generic.semiauto.*
 import io.circe.syntax.*
+import org.checkerframework.checker.units.qual.g
 import org.mbari.annosaurus.domain.*
 import org.mbari.annosaurus.repository.query.{Constraint, JDBC, Query}
 import org.mbari.annosaurus.util.HexUtil
@@ -26,7 +27,6 @@ import org.mbari.annosaurus.util.HexUtil
 import java.net.{URI, URL}
 import java.time.Instant
 import scala.util.Try
-import org.checkerframework.checker.units.qual.g
 
 object CirceCodecs:
     given Encoder[Array[Byte]] = (xs: Array[Byte]) => Json.fromString(HexUtil.toHex(xs))
@@ -386,17 +386,17 @@ object CirceCodecs:
 
     // This is needed to handle the trait Constraint used in Constraints
     given constraintEncoder: Encoder[Constraint] = Encoder.instance[Constraint] {
-        case c: Constraint.Date       => c.asJson
-        case c: Constraint.Contains   => c.asJson
+        case c: Constraint.Date           => c.asJson
+        case c: Constraint.Contains       => c.asJson
         case c: Constraint.Equals[String] => c.asJson
-        case c: Constraint.In[String] => c.asJson
-        case c: Constraint.IsNull     => c.asJson
-        case c: Constraint.Like       => c.asJson
-        case c: Constraint.NotLike    => c.asJson
-        case c: Constraint.Max        => c.asJson
-        case c: Constraint.Min        => c.asJson
-        case c: Constraint.MinMax     => c.asJson
-        case Constraint.Noop          => Json.obj()
+        case c: Constraint.In[String]     => c.asJson
+        case c: Constraint.IsNull         => c.asJson
+        case c: Constraint.Like           => c.asJson
+        case c: Constraint.NotLike        => c.asJson
+        case c: Constraint.Max            => c.asJson
+        case c: Constraint.Min            => c.asJson
+        case c: Constraint.MinMax         => c.asJson
+        case Constraint.Noop              => Json.obj()
     }
 
     given constraintsDecoder: Decoder[Query] = deriveDecoder

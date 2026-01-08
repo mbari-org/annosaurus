@@ -1,4 +1,4 @@
-FROM eclipse-temurin:21-ubi9-minimal
+FROM eclipse-temurin:25-ubi10-minimal
 
 # Build-time metadata as defined at http://label-schema.org
 ARG BUILD_DATE

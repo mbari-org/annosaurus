@@ -27,12 +27,12 @@ import org.mbari.vcr4j.time.{FrameRates, Timecode}
 import java.net.URI
 import java.security.MessageDigest
 import java.sql.Connection
+import java.time.temporal.ChronoUnit
 import java.time.{Duration, Instant}
 import java.util.UUID
 import java.util.concurrent.TimeUnit
 import scala.concurrent.{duration, Await, ExecutionContext}
 import scala.util.Random
-import java.time.temporal.ChronoUnit
 
 object TestUtils:
 

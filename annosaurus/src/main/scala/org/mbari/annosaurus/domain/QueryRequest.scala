@@ -74,7 +74,7 @@ case class QueryRequest(
  * @param like
  *   A value to apply a 'LIKE' constraint. You must apply the '%' characters to the value before passing it
  * @param notlike
- *  A value to apply a 'NOT LIKE' constraint. You must apply the '%' characters to the value before passing it
+ *   A value to apply a 'NOT LIKE' constraint. You must apply the '%' characters to the value before passing it
  * @param max
  *   The maximum value to apply a '<=' constraint
  * @param min
