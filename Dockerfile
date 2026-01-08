@@ -14,7 +14,7 @@ LABEL org.label-schema.build-date=$BUILD_DATE \
   org.label-schema.schema-version="1.0" \
   maintainer="Brian Schlining <brian@mbari.org>"
 
-ENV APP_HOME /opt/annosaurus
+ENV APP_HOME=/opt/annosaurus
 
 RUN mkdir -p ${APP_HOME}
 
@@ -22,4 +22,4 @@ COPY annosaurus/target/universal/stage/ ${APP_HOME}/
 
 EXPOSE 8080
 
-ENTRYPOINT $APP_HOME/bin/annosaurus
+ENTRYPOINT ["/opt/annosaurus/bin/annosaurus"]
