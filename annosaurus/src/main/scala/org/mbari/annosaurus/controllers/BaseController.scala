@@ -42,6 +42,19 @@ trait BaseController[A <: IPersistentObject, B <: DAO[A], C]:
         f.onComplete(_ => dao.close())
         f
 
+    /**
+     * Execute a read-only operation. This uses a read-only transaction that
+     * does not flush changes to the database, preventing Hibernate from
+     * attempting to UPDATE entities that were loaded but not modified.
+     * Use this for all read-only operations (findByUUID, findAll, etc.)
+     * to support read-only database connections.
+     */
+    protected def execReadOnly[T](fn: B => T)(implicit ec: ExecutionContext): Future[T] =
+        val dao = newDAO()
+        val f   = dao.runReadOnlyTransaction(fn)
+        f.onComplete(_ => dao.close())
+        f
+
     def delete(uuid: UUID)(implicit ec: ExecutionContext): Future[Boolean] =
         def fn(dao: B): Boolean =
             dao.findByUUID(uuid) match
@@ -55,7 +68,7 @@ trait BaseController[A <: IPersistentObject, B <: DAO[A], C]:
     def findAll(limit: Option[Int] = None, offset: Option[Int] = None)(implicit
         ec: ExecutionContext
     ): Future[Iterable[C]] =
-        exec(d => d.findAll(limit, offset).map(transform))
+        execReadOnly(d => d.findAll(limit, offset).map(transform))
 
     def findByUUID(uuid: UUID)(implicit ec: ExecutionContext): Future[Option[C]] =
-        exec(d => d.findByUUID(uuid).map(transform))
+        execReadOnly(d => d.findByUUID(uuid).map(transform))

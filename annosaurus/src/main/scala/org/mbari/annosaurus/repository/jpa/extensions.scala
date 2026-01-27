@@ -16,7 +16,7 @@
 
 package org.mbari.annosaurus.repository.jpa
 
-import jakarta.persistence.EntityManager
+import jakarta.persistence.{EntityManager, FlushModeType}
 import org.mbari.annosaurus.etc.jdk.Loggers.given
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -50,3 +50,36 @@ object extensions:
                     log.atError.withCause(e).log("Error running transaction")
                     throw e
             finally if transaction.isActive then transaction.rollback()
+
+        /**
+         * Runs a read-only transaction that does not flush changes to the database.
+         * This prevents Hibernate from attempting to UPDATE entities that were loaded
+         * but not explicitly modified, which is important when running with a read-only
+         * database connection.
+         */
+        def runReadOnlyTransaction[R](fn: EntityManager => R)(implicit ec: ExecutionContext): Future[R] =
+            Future:
+                runReadOnlyTransactionSync(fn)
+
+        /**
+         * Synchronous version of runReadOnlyTransaction.
+         * Sets flush mode to COMMIT (no auto-flush) and rolls back the transaction
+         * instead of committing to ensure no changes are persisted.
+         */
+        def runReadOnlyTransactionSync[R](fn: EntityManager => R): R =
+            val originalFlushMode = entityManager.getFlushMode
+            val transaction = entityManager.getTransaction
+            transaction.begin()
+            try
+                entityManager.setFlushMode(FlushModeType.COMMIT)
+                val n = fn.apply(entityManager)
+                // Rollback instead of commit to ensure no changes are persisted
+                transaction.rollback()
+                n
+            catch
+                case NonFatal(e) =>
+                    log.atError.withCause(e).log("Error running read-only transaction")
+                    throw e
+            finally
+                entityManager.setFlushMode(originalFlushMode)
+                if transaction.isActive then transaction.rollback()
