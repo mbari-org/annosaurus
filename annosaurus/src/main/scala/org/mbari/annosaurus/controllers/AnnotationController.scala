@@ -63,7 +63,7 @@ class AnnotationController(
 
     def countByVideoReferenceUuid(uuid: UUID)(implicit ec: ExecutionContext): Future[Int] =
         val dao = daoFactory.newObservationDAO()
-        val f   = dao.runTransaction(d => d.countByVideoReferenceUUID(uuid))
+        val f   = dao.runReadOnlyTransaction(d => d.countByVideoReferenceUUID(uuid))
         f.onComplete(_ => dao.close())
         f
 
@@ -83,7 +83,7 @@ class AnnotationController(
 
         val dao = daoFactory.newObservationDAO()
         val f   =
-            dao.runTransaction(d =>
+            dao.runReadOnlyTransaction(d =>
                 d.findByVideoReferenceUuid(videoReferenceUUID, limit, offset)
                     .map(obs => Annotation.from(obs, includedAncillaryData))
                     .toSeq

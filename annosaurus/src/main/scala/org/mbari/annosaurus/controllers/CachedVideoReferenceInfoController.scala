@@ -50,44 +50,44 @@ class CachedVideoReferenceInfoController(val daoFactory: JPADAOFactory)
     )(implicit ec: ExecutionContext): Future[Option[CachedVideoReferenceInfo]] =
         def fn(dao: VRDAO): Option[CachedVideoReferenceInfo] =
             dao.findByVideoReferenceUUID(uuid).map(transform)
-        exec(fn)
+        execReadOnly(fn)
 
     def findByPlatformName(
         name: String
     )(implicit ec: ExecutionContext): Future[Iterable[CachedVideoReferenceInfo]] =
         def fn(dao: VRDAO): Iterable[CachedVideoReferenceInfo] =
             dao.findByPlatformName(name).map(transform)
-        exec(fn)
+        execReadOnly(fn)
 
     def findByMissionId(
         id: String
     )(implicit ec: ExecutionContext): Future[Iterable[CachedVideoReferenceInfo]] =
         def fn(dao: VRDAO): Iterable[CachedVideoReferenceInfo] =
             dao.findByMissionID(id).map(transform)
-        exec(fn)
+        execReadOnly(fn)
 
     def findByMissionContact(
         contact: String
     )(implicit ec: ExecutionContext): Future[Iterable[CachedVideoReferenceInfo]] =
         def fn(dao: VRDAO): Iterable[CachedVideoReferenceInfo] =
             dao.findByMissionContact(contact).map(transform)
-        exec(fn)
+        execReadOnly(fn)
 
     def findAllMissionContacts()(implicit ec: ExecutionContext): Future[Iterable[String]] =
         def fn(dao: VRDAO): Iterable[String] = dao.findAllMissionContacts()
-        exec(fn)
+        execReadOnly(fn)
 
     def findAllPlatformNames()(implicit ec: ExecutionContext): Future[Iterable[String]] =
         def fn(dao: VRDAO): Iterable[String] = dao.findAllPlatformNames()
-        exec(fn)
+        execReadOnly(fn)
 
     def findAllMissionIds()(implicit ec: ExecutionContext): Future[Iterable[String]] =
         def fn(dao: VRDAO): Iterable[String] = dao.findAllMissionIDs()
-        exec(fn)
+        execReadOnly(fn)
 
     def findAllVideoReferenceUUIDs()(implicit ec: ExecutionContext): Future[Iterable[UUID]] =
         def fn(dao: VRDAO): Iterable[UUID] = dao.findAllVideoReferenceUUIDs()
-        exec(fn)
+        execReadOnly(fn)
 
     def create(
         videoReferenceUUID: UUID,

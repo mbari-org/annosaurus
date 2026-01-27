@@ -138,14 +138,14 @@ class AssociationController(
         linkName: String
     )(implicit ec: ExecutionContext): Future[Iterable[Association]] =
         def fn(dao: ADAO): Iterable[Association] = dao.findByLinkName(linkName).map(transform)
-        exec(fn)
+        execReadOnly(fn)
 
     def findByLinkNameAndVideoReferenceUuid(linkName: String, videoReferenceUUID: UUID)(implicit
         ec: ExecutionContext
     ): Future[Iterable[Association]] =
         def fn(dao: ADAO): Iterable[Association] =
             dao.findByLinkNameAndVideoReferenceUUID(linkName, videoReferenceUUID).map(transform)
-        exec(fn)
+        execReadOnly(fn)
 
     def findByLinkNameAndVideoReferenceUuidAndConcept(
         linkName: String,
@@ -155,19 +155,19 @@ class AssociationController(
         def fn(dao: ADAO): Iterable[Association] =
             dao.findByLinkNameAndVideoReferenceUUIDAndConcept(linkName, videoReferenceUUID, concept)
                 .map(transform)
-        exec(fn)
+        execReadOnly(fn)
 
     def findByConceptAssociationRequest(
         request: ConceptAssociationRequest
     )(implicit ec: ExecutionContext): Future[ConceptAssociationResponse] =
         def fn(dao: ADAO): Iterable[ConceptAssociation] =
             dao.findByConceptAssociationRequest(request)
-        exec(fn).map(ca => ConceptAssociationResponse(request, ca.toSeq))
+        execReadOnly(fn).map(ca => ConceptAssociationResponse(request, ca.toSeq))
 
     def countByToConcept(concept: String)(implicit ec: ExecutionContext): Future[Long] =
         def fn(dao: ADAO): Long = dao.countByToConcept(concept)
-        exec(fn)
-
+        execReadOnly(fn)
+        
     def updateToConcept(oldToConcept: String, newToConcept: String)(implicit
         ec: ExecutionContext
     ): Future[Int] =

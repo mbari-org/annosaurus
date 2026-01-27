@@ -41,7 +41,7 @@ class IndexController(val daoFactory: JPADAOFactory) extends BaseController[Inde
     def findByVideoReferenceUUID(uuid: UUID, limit: Option[Int] = None, offset: Option[Int] = None)(implicit
         ec: ExecutionContext
     ): Future[Iterable[Index]] =
-        exec(d => d.findByVideoReferenceUuid(uuid, limit, offset).map(transform))
+        execReadOnly(d => d.findByVideoReferenceUuid(uuid, limit, offset).map(transform))
 
     /**
      * Updates all recordedTimestamps thave have an elapsed time using the updated video starttimestamp

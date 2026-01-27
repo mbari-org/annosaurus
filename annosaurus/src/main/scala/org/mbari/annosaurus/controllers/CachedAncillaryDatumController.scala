@@ -232,7 +232,7 @@ class CachedAncillaryDatumController(val daoFactory: JPADAOFactory)
                 .map(im => CachedAncillaryDatum.from(im.getAncillaryDatum, true))
                 .toSeq
 
-        exec(fn)
+        execReadOnly(fn)
 
     def findByObservationUUID(
         uuid: UUID
@@ -241,7 +241,7 @@ class CachedAncillaryDatumController(val daoFactory: JPADAOFactory)
             dao.findDTOByObservationUuid(uuid)
                 .map(CachedAncillaryDatum.from)
 
-        exec(fn)
+        execReadOnly(fn)
 
     def findByImagedMomentUUID(
         uuid: UUID
@@ -249,7 +249,7 @@ class CachedAncillaryDatumController(val daoFactory: JPADAOFactory)
         def fn(dao: ADDAO): Option[CachedAncillaryDatum] =
             dao.findByImagedMomentUUID(uuid).map(transform)
 
-        exec(fn)
+        execReadOnly(fn)
 
     def bulkCreateOrUpdate(
         data: Seq[CachedAncillaryDatum]

@@ -43,11 +43,9 @@ trait BaseController[A <: IPersistentObject, B <: DAO[A], C]:
         f
 
     /**
-     * Execute a read-only operation. This uses a read-only transaction that
-     * does not flush changes to the database, preventing Hibernate from
-     * attempting to UPDATE entities that were loaded but not modified.
-     * Use this for all read-only operations (findByUUID, findAll, etc.)
-     * to support read-only database connections.
+     * Execute a read-only operation. This uses a read-only transaction that does not flush changes to the database,
+     * preventing Hibernate from attempting to UPDATE entities that were loaded but not modified. Use this for all
+     * read-only operations (findByUUID, findAll, etc.) to support read-only database connections.
      */
     protected def execReadOnly[T](fn: B => T)(implicit ec: ExecutionContext): Future[T] =
         val dao = newDAO()

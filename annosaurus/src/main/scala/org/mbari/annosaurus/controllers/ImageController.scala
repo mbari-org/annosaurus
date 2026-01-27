@@ -37,7 +37,7 @@ class ImageController(daoFactory: JPADAOFactory):
 
     def findByUUID(uuid: UUID)(implicit ec: ExecutionContext): Future[Option[Image]] =
         val irDao = daoFactory.newImageReferenceDAO()
-        val f     = irDao.runTransaction(d => irDao.findByUUID(uuid))
+        val f     = irDao.runReadOnlyTransaction(d => irDao.findByUUID(uuid))
         f.onComplete(t => irDao.close())
         f.map(_.map(Image.from(_, true)))
 
@@ -48,7 +48,7 @@ class ImageController(daoFactory: JPADAOFactory):
     )(implicit ec: ExecutionContext): Future[Seq[Image]] =
         val dao = daoFactory.newImagedMomentDAO()
         val f   =
-            dao.runTransaction(d =>
+            dao.runReadOnlyTransaction(d =>
                 d.findByVideoReferenceUUID(videoReferenceUUID, limit, offset)
                     .flatMap(_.getImageReferences.asScala)
                     .map(Image.from(_, true))
@@ -58,7 +58,7 @@ class ImageController(daoFactory: JPADAOFactory):
 
     def findByURL(url: URL)(implicit ec: ExecutionContext): Future[Option[Image]] =
         val dao = daoFactory.newImageReferenceDAO()
-        val f   = dao.runTransaction(d =>
+        val f   = dao.runReadOnlyTransaction(d =>
             d.findByURL(url)
                 .map(Image.from(_, true))
         )
@@ -67,7 +67,7 @@ class ImageController(daoFactory: JPADAOFactory):
 
     def findByImageName(name: String)(implicit ec: ExecutionContext): Future[Seq[Image]] =
         val dao = daoFactory.newImageReferenceDAO()
-        val f   = dao.runTransaction(d =>
+        val f   = dao.runReadOnlyTransaction(d =>
             d.findByImageName(name)
                 .map(Image.from(_, true))
         )

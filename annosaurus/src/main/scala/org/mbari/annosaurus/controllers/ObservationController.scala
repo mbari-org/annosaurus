@@ -117,28 +117,28 @@ class ObservationController(
 
     def findAllConcepts(implicit ec: ExecutionContext): Future[Iterable[String]] =
         def fn(dao: ODAO): Iterable[String] = dao.findAllConcepts()
-        exec(fn)
+        execReadOnly(fn)
 
     def findAllGroups(implicit ec: ExecutionContext): Future[Iterable[String]] =
         def fn(dao: ODAO): Iterable[String] = dao.findAllGroups()
-        exec(fn)
+        execReadOnly(fn)
 
     def findAllActivities(implicit ec: ExecutionContext): Future[Iterable[String]] =
         def fn(dao: ODAO): Iterable[String] = dao.findAllActivities()
-        exec(fn)
+        execReadOnly(fn)
 
     def findAllConceptsByVideoReferenceUuid(
         uuid: UUID
     )(implicit ec: ExecutionContext): Future[Iterable[String]] =
         def fn(dao: ODAO): Iterable[String] = dao.findAllConceptsByVideoReferenceUUID(uuid)
-        exec(fn)
+        execReadOnly(fn)
 
     def findByVideoReferenceUuid(uuid: UUID, limit: Option[Int] = None, offset: Option[Int] = None)(implicit
         ec: ExecutionContext
     ): Future[Iterable[Observation]] =
         def fn(dao: ODAO): Iterable[Observation] =
             dao.findByVideoReferenceUuid(uuid, limit, offset).map(transform)
-        exec(fn)
+        execReadOnly(fn)
 
     def findByAssociationUuid(
         uuid: UUID
@@ -146,7 +146,7 @@ class ObservationController(
         def fn(dao: ODAO): Option[Observation] =
             val adao = daoFactory.newAssociationDAO(dao)
             adao.findByUUID(uuid).map(_.getObservation).map(transform)
-        exec(fn)
+        execReadOnly(fn)
 
     /**
      * This controller will also delete the [[MutableImagedMoment]] if it is empty (i.e. no observations or other
@@ -179,24 +179,24 @@ class ObservationController(
 
     def countByConcept(concept: String)(implicit ec: ExecutionContext): Future[Int] =
         def fn(dao: ODAO): Int = dao.countByConcept(concept)
-        exec(fn)
+        execReadOnly(fn)
 
     def countByConceptWithImages(concept: String)(implicit ec: ExecutionContext): Future[Int] =
         def fn(dao: ODAO): Int = dao.countByConceptWithImages(concept)
-        exec(fn)
+        execReadOnly(fn)
 
     def countByVideoReferenceUuid(uuid: UUID)(implicit ec: ExecutionContext): Future[Int] =
         def fn(dao: ODAO): Int = dao.countByVideoReferenceUUID(uuid)
-        exec(fn)
+        execReadOnly(fn)
 
     def countByVideoReferenceUuidAndTimestamps(uuid: UUID, start: Instant, end: Instant)(implicit
         ec: ExecutionContext
     ): Future[Int] =
         def fn(dao: ODAO): Int = dao.countByVideoReferenceUUIDAndTimestamps(uuid, start, end)
-        exec(fn)
+        execReadOnly(fn)
 
     def countAllGroupByVideoReferenceUuid()(implicit ec: ExecutionContext): Future[Map[UUID, Int]] =
-        exec(dao => dao.countAllByVideoReferenceUuids())
+        execReadOnly(dao => dao.countAllByVideoReferenceUuids())
 
     def updateConcept(oldConcept: String, newConcept: String)(implicit
         ec: ExecutionContext

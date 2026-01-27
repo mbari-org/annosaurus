@@ -54,42 +54,42 @@ class ImagedMomentController(val daoFactory: JPADAOFactory)
     def countAll()(implicit
         ec: ExecutionContext
     ): Future[Int] =
-        exec(d => d.countAll())
+        execReadOnly(d => d.countAll())
 
     def countByVideoReferenceUUIDWithImages(videoReferenceUUID: UUID)(implicit
         ec: ExecutionContext
     ): Future[Int] =
-        exec(d => d.countByVideoReferenceUUIDWithImages(videoReferenceUUID))
+        execReadOnly(d => d.countByVideoReferenceUUIDWithImages(videoReferenceUUID))
 
     def findWithImages(limit: Option[Int] = None, offset: Option[Int] = None)(implicit
         ec: ExecutionContext
     ): Future[Iterable[ImagedMoment]] =
-        exec(d => d.findWithImages(limit, offset).map(transform))
+        execReadOnly(d => d.findWithImages(limit, offset).map(transform))
 
     def countWithImages()(implicit
         ec: ExecutionContext
     ): Future[Int] =
-        exec(d => d.countWithImages())
+        execReadOnly(d => d.countWithImages())
 
     def findByLinkName(linkName: String, limit: Option[Int] = None, offset: Option[Int] = None)(implicit
         ec: ExecutionContext
     ): Future[Iterable[ImagedMoment]] =
-        exec(d => d.findByLinkName(linkName, limit, offset).map(transform))
+        execReadOnly(d => d.findByLinkName(linkName, limit, offset).map(transform))
 
     def countByLinkName(linkName: String)(implicit
         ec: ExecutionContext
     ): Future[Int] =
-        exec(d => d.countByLinkName(linkName))
+        execReadOnly(d => d.countByLinkName(linkName))
 
     def findAllVideoReferenceUUIDs(limit: Option[Int] = None, offset: Option[Int] = None)(implicit
         ec: ExecutionContext
     ): Future[Iterable[UUID]] =
-        exec(d => d.findAllVideoReferenceUUIDs(limit, offset))
+        execReadOnly(d => d.findAllVideoReferenceUUIDs(limit, offset))
 
     def findByVideoReferenceUUID(uuid: UUID, limit: Option[Int] = None, offset: Option[Int] = None)(implicit
         ec: ExecutionContext
     ): Future[Iterable[ImagedMoment]] =
-        exec(d => d.findByVideoReferenceUUID(uuid, limit, offset).map(transform))
+        execReadOnly(d => d.findByVideoReferenceUUID(uuid, limit, offset).map(transform))
 
     /**
      * @param uuid
@@ -112,7 +112,7 @@ class ImagedMomentController(val daoFactory: JPADAOFactory)
         def fn(dao: IMDAO): Option[ImagedMoment] =
             val irDao = daoFactory.newImageReferenceDAO(dao)
             irDao.findByUUID(uuid).map(_.getImagedMoment).map(transform)
-        exec(fn)
+        execReadOnly(fn)
 
     def findByObservationUUID(
         uuid: UUID
@@ -120,12 +120,12 @@ class ImagedMomentController(val daoFactory: JPADAOFactory)
         def fn(dao: IMDAO): Option[ImagedMoment] =
             val obsDao = daoFactory.newObservationDAO(dao)
             obsDao.findByUUID(uuid).map(_.getImagedMoment).map(transform)
-        exec(fn)
+        execReadOnly(fn)
 
     def findWithImageReferences(
         videoReferenceUUID: UUID
     )(implicit ec: ExecutionContext): Future[Iterable[ImagedMoment]] =
-        exec(d => d.findWithImageReferences(videoReferenceUUID).map(transform))
+        execReadOnly(d => d.findWithImageReferences(videoReferenceUUID).map(transform))
 
     def findBetweenUpdatedDates(
         start: Instant,
@@ -134,7 +134,7 @@ class ImagedMomentController(val daoFactory: JPADAOFactory)
         offset: Option[Int] = None
     )(implicit ec: ExecutionContext): Future[Seq[ImagedMoment]] =
         val imDao = daoFactory.newImagedMomentDAO()
-        val f     = imDao.runTransaction(d => d.findBetweenUpdatedDates(start, end, limit, offset).map(transform))
+        val f     = imDao.runReadOnlyTransaction(d => d.findBetweenUpdatedDates(start, end, limit, offset).map(transform))
         f.onComplete(_ => imDao.close())
         f.map(_.toSeq)
 
@@ -163,21 +163,21 @@ class ImagedMomentController(val daoFactory: JPADAOFactory)
         ec: ExecutionContext
     ): Future[Int] =
         val imDao = daoFactory.newImagedMomentDAO()
-        val f     = imDao.runTransaction(d => d.countBetweenUpdatedDates(start, end))
+        val f     = imDao.runReadOnlyTransaction(d => d.countBetweenUpdatedDates(start, end))
         f.onComplete(_ => imDao.close())
         f
 
     def countAllGroupByVideoReferenceUUID()(implicit ec: ExecutionContext): Future[Map[UUID, Int]] =
-        exec(dao => dao.countAllByVideoReferenceUuids())
+        execReadOnly(dao => dao.countAllByVideoReferenceUuids())
 
     def countByVideoReferenceUuid(uuid: UUID)(implicit ec: ExecutionContext): Future[Int] =
-        exec(dao => dao.countByVideoReferenceUUID(uuid))
+        execReadOnly(dao => dao.countByVideoReferenceUUID(uuid))
 
     def findByConcept(concept: String, limit: Option[Int] = None, offset: Option[Int] = None)(implicit
         ec: ExecutionContext
     ): Future[Iterable[ImagedMoment]] =
         val imDao = daoFactory.newImagedMomentDAO()
-        val f     = imDao.runTransaction(d => d.findByConcept(concept, limit, offset).map(transform))
+        val f     = imDao.runReadOnlyTransaction(d => d.findByConcept(concept, limit, offset).map(transform))
         f.onComplete(_ => imDao.close())
         f
 
@@ -191,7 +191,7 @@ class ImagedMomentController(val daoFactory: JPADAOFactory)
 
     def countByConcept(concept: String)(implicit ec: ExecutionContext): Future[Int] =
         val imDao = daoFactory.newImagedMomentDAO()
-        val f     = imDao.runTransaction(d => d.countByConcept(concept))
+        val f     = imDao.runReadOnlyTransaction(d => d.countByConcept(concept))
         f.onComplete(_ => imDao.close())
         f
 
@@ -201,13 +201,13 @@ class ImagedMomentController(val daoFactory: JPADAOFactory)
         offset: Option[Int] = None
     )(implicit ec: ExecutionContext): Future[Iterable[ImagedMoment]] =
         val imDao = daoFactory.newImagedMomentDAO()
-        val f     = imDao.runTransaction(d => d.findByConceptWithImages(concept, limit, offset).map(transform))
+        val f     = imDao.runReadOnlyTransaction(d => d.findByConceptWithImages(concept, limit, offset).map(transform))
         f.onComplete(_ => imDao.close())
         f
 
     def countByConceptWithImages(concept: String)(implicit ec: ExecutionContext): Future[Int] =
         val imDao = daoFactory.newImagedMomentDAO()
-        val f     = imDao.runTransaction(d => d.countByConceptWithImages(concept))
+        val f     = imDao.runReadOnlyTransaction(d => d.countByConceptWithImages(concept))
         f.onComplete(_ => imDao.close())
         f
 
@@ -215,7 +215,7 @@ class ImagedMomentController(val daoFactory: JPADAOFactory)
         ec: ExecutionContext
     ): Future[Int] =
         val dao = daoFactory.newImagedMomentDAO()
-        val f   = dao.runTransaction(d => d.countModifiedBeforeDate(videoReferenceUuid, date))
+        val f   = dao.runReadOnlyTransaction(d => d.countModifiedBeforeDate(videoReferenceUuid, date))
         f.onComplete(_ => dao.close())
         f
 
@@ -233,7 +233,7 @@ class ImagedMomentController(val daoFactory: JPADAOFactory)
         limit: Option[Int] = None,
         offset: Option[Int] = None
     )(implicit ec: ExecutionContext): Future[Iterable[ImagedMoment]] =
-        exec(d => d.findByWindowRequest(windowRequest, limit, offset).map(transform))
+        execReadOnly(d => d.findByWindowRequest(windowRequest, limit, offset).map(transform))
 
     def create(
         videoReferenceUUID: UUID,
