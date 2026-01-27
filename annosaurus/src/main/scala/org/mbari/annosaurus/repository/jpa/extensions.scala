@@ -71,9 +71,9 @@ object extensions:
 
             // Get underlying Hibernate session and set read-only hints
             val session = entityManager.unwrap(classOf[org.hibernate.Session])
-            session.doWork { connection =>
-                connection.setReadOnly(true)
-            }
+            // session.doWork { connection =>
+            //     connection.setReadOnly(true)
+            // }
             session.setDefaultReadOnly(true)
 
             transaction.begin()
@@ -90,7 +90,7 @@ object extensions:
             finally
                 entityManager.setFlushMode(originalFlushMode)
                 session.setDefaultReadOnly(false)
-                session.doWork { connection =>
-                    connection.setReadOnly(false)
-                }
+                // session.doWork { connection =>
+                //     connection.setReadOnly(false)
+                // }
                 if transaction.isActive then transaction.rollback()
