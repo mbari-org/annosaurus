@@ -65,7 +65,7 @@ class QueryService(databaseConfig: DatabaseConfig, viewName: String):
         Using
             .Manager(use =>
                 val conn = use(jdbc.newConnection())
-                conn.setReadOnly(true)
+                try conn.setReadOnly(true) catch case _: Exception => log.atDebug.log("Could not set connection to read-only")
                 val stmt = use(
                     conn.prepareStatement(
                         sql,
@@ -89,7 +89,7 @@ class QueryService(databaseConfig: DatabaseConfig, viewName: String):
         Using
             .Manager(use =>
                 val conn = use(jdbc.newConnection())
-                conn.setReadOnly(true)
+                try conn.setReadOnly(true) catch case _: Exception => log.atDebug.log("Could not set connection to read-only")
                 val stmt = use(
                     conn.prepareStatement(
                         sql,
@@ -113,7 +113,7 @@ class QueryService(databaseConfig: DatabaseConfig, viewName: String):
         Using
             .Manager(use =>
                 val conn = use(jdbc.newConnection())
-                conn.setReadOnly(true)
+                try conn.setReadOnly(true) catch case _: Exception => log.atDebug.log("Could not set connection to read-only")
                 val stmt = use(
                     conn.prepareStatement(
                         sql,
