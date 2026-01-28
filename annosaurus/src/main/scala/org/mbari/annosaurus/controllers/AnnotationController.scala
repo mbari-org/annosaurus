@@ -153,7 +153,7 @@ class AnnotationController(
         request: ConcurrentRequest
     )(implicit ec: ExecutionContext): Future[Long] =
         def dao = daoFactory.newObservationDAO()
-        val f   = dao.runTransaction(d => d.countByConcurrentRequest(request))
+        val f   = dao.runReadOnlyTransaction(d => d.countByConcurrentRequest(request))
         f.onComplete(t => dao.close())
         f
 
@@ -170,7 +170,7 @@ class AnnotationController(
 
     def countByMultiRequest(request: MultiRequest)(implicit ec: ExecutionContext): Future[Long] =
         def dao = daoFactory.newObservationDAO()
-        val f   = dao.runTransaction(d => d.countByMultiRequest(request))
+        val f   = dao.runReadOnlyTransaction(d => d.countByMultiRequest(request))
         f.onComplete(t => dao.close())
         f
 
@@ -179,7 +179,7 @@ class AnnotationController(
     )(implicit ec: ExecutionContext): Future[Iterable[Annotation]] =
 
         val imDao = daoFactory.newImagedMomentDAO()
-        val f     = imDao.runTransaction(d =>
+        val f     = imDao.runReadOnlyTransaction(d =>
             d.findByImageReferenceUUID(imageReferenceUUID) match
                 case None     => Nil
                 case Some(im) => im.getObservations.asScala.map(Annotation.from(_))
