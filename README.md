@@ -2,7 +2,7 @@
 
 # annosaurus
 
-[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/mbari-org/annosaurus)![Build](https://github.com/mbari-org/annosaurus/actions/workflows/scala.yml/badge.svg)
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/mbari-org/annosaurus) ![Build](https://github.com/mbari-org/annosaurus/actions/workflows/scala.yml/badge.svg)
  [![DOI](https://zenodo.org/badge/90171432.svg)](https://zenodo.org/badge/latestdoi/90171432)
 
 A RESTful microservice for creating and managing video and image annotations. Built with Scala, Tapir, and Hibernate, annosaurus provides a type-safe, language-agnostic API for annotation management with support for PostgreSQL and SQL Server.
