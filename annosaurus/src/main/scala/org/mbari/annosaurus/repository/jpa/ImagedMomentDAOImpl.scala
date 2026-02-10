@@ -416,16 +416,53 @@ class ImagedMomentDAOImpl(entityManager: EntityManager)
         xs.foreach(delete)
         xs.size
 
+
+    // override def moveToVideoReference(
+    //     newVideoReferenceUuid: UUID,
+    //     imageMomentUuids: Seq[UUID],
+    //     newVideoReferenceStartTimestamp: Option[Instant]
+    // ): Int =
+    //     if imageMomentUuids.isEmpty then return 0
+
+    //     val query = entityManager.createNamedQuery("ImagedMoment.moveToVideoReference")
+    //     query.setParameter(1, newVideoReferenceUuid)
+    //     query.setParameter(2, imageMomentUuids.asJava)
+    //     query.executeUpdate()
+
     override def moveToVideoReference(
         newVideoReferenceUuid: UUID,
-        imageMomentUuids: Seq[UUID]
+        imageMomentUuids: Seq[UUID],
+        newVideoReferenceStartTimestamp: Option[Instant],
     ): Int =
         if imageMomentUuids.isEmpty then return 0
 
-        val query = entityManager.createNamedQuery("ImagedMoment.moveToVideoReference")
-        query.setParameter(1, newVideoReferenceUuid)
-        query.setParameter(2, imageMomentUuids.asJava)
-        query.executeUpdate()
+        // Let's do this in batches of 1000 to avoid hitting parameter limits for databases like Postgres
+        val n = imageMomentUuids.grouped(1000).map { batch =>
+             val query = entityManager.createNamedQuery("ImagedMoment.moveToVideoReference")
+             query.setParameter(1, newVideoReferenceUuid)
+             query.setParameter(2, batch.asJava)
+             query.executeUpdate()
+        }.sum
+
+        if (newVideoReferenceStartTimestamp.isDefined) then
+
+            val startTimestamp = newVideoReferenceStartTimestamp.get
+
+            // Update the recorded timestamp for all the imaged moments that were moved
+            // Loop though each imaged moment and update the recorded timestamp by the difference between the new video reference start timestamp and the old video reference start timestamp
+            for
+                imagedMomentUuid <- imageMomentUuids
+            do
+                findByUUID(imagedMomentUuid).foreach { imagedMoment =>
+                    Option(imagedMoment.getElapsedTime()) match
+                        case None               => // do nothing
+                        case Some(oldElapsedTime) =>
+                            val recordedTimestamp = imagedMoment.getRecordedTimestamp()
+                            val newElapsedTime = Duration.between(startTimestamp, recordedTimestamp)
+                            imagedMoment.setElapsedTime(newElapsedTime)
+                }
+        n
+
 
 //  override def delete(entity: ImagedMomentImpl): Unit = {
 //    Option(entity.ancillaryDatum).foreach(entityManager.remove)

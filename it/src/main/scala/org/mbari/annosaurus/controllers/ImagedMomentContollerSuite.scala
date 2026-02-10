@@ -28,6 +28,7 @@ import java.time.{Duration, Instant}
 import java.util.UUID
 import scala.concurrent.ExecutionContext
 import scala.util.Random
+import org.mbari.annosaurus.etc.jdk.Instants
 
 trait ImagedMomentContollerSuite extends BaseDAOSuite:
 
@@ -325,6 +326,17 @@ trait ImagedMomentContollerSuite extends BaseDAOSuite:
         val newVideoReferenceUuid = UUID.randomUUID()
         val n                     = exec(controller.bulkMove(newVideoReferenceUuid, xs.map(_.getUuid())))
         assertEquals(n, 40)
+    }
+
+    test("bulkMove with videoReferenceStartTimestamp") {
+        val xs                    = TestUtils.create(40, 1)
+        val newVideoReferenceUuid = UUID.randomUUID()
+        val t0                    = Instant.parse("2024-01-01T00:00:00Z")
+        val n                     = exec(controller.bulkMove(newVideoReferenceUuid, xs.map(_.getUuid()), Option(t0)))
+        assertEquals(n, 40)
+        val im2s = exec(controller.findByVideoReferenceUUID(newVideoReferenceUuid))
+        assertEquals(im2s.size, 40)
+        im2s.foreach(im => assertEquals(im.recordedTimestamp.map(Instants.roundToMillis), Some(t0.plus(im.elapsedTime.orNull))))
     }
 
     test("update") {

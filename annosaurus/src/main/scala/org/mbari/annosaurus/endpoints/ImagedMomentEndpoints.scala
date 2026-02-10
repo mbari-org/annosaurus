@@ -73,7 +73,8 @@ class ImagedMomentEndpoints(controller: ImagedMomentController)(using
                         controller
                             .bulkMove(
                                 moveImagedMoments.videoReferenceUuid,
-                                moveImagedMoments.imagedMomentUuids
+                                moveImagedMoments.imagedMomentUuids,
+                                moveImagedMoments.videoReferenceStartTimestamp
                             )
                             .map(n => Count(n))
                     )

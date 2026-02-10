@@ -17,21 +17,24 @@
 package org.mbari.annosaurus.domain
 
 import java.util.UUID
+import java.time.Instant
 
-case class MoveImagedMoments(videoReferenceUuid: UUID, imagedMomentUuids: Seq[UUID])
+case class MoveImagedMoments(videoReferenceUuid: UUID, imagedMomentUuids: Seq[UUID], videoReferenceStartTimestamp: Option[Instant] = None)
     extends ToSnakeCase[MoveImagedMomentsSC]:
 
     def toSnakeCase: MoveImagedMomentsSC =
         MoveImagedMomentsSC(
             video_reference_uuid = videoReferenceUuid,
-            imaged_moment_uuids = imagedMomentUuids
+            imaged_moment_uuids = imagedMomentUuids,
+            video_reference_start_timestamp = videoReferenceStartTimestamp
         )
 
-case class MoveImagedMomentsSC(video_reference_uuid: UUID, imaged_moment_uuids: Seq[UUID])
+case class MoveImagedMomentsSC(video_reference_uuid: UUID, imaged_moment_uuids: Seq[UUID], video_reference_start_timestamp: Option[Instant] = None)
     extends ToCamelCase[MoveImagedMoments]:
 
     def toCamelCase: MoveImagedMoments =
         MoveImagedMoments(
             videoReferenceUuid = video_reference_uuid,
-            imagedMomentUuids = imaged_moment_uuids
+            imagedMomentUuids = imaged_moment_uuids,
+            videoReferenceStartTimestamp = video_reference_start_timestamp
         )

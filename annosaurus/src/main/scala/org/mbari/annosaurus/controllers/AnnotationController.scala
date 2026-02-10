@@ -237,6 +237,7 @@ class AnnotationController(
         future.onComplete(_ => dao.close())
         future
 
+
     /**
      * Bulk create annotations
      * @param annotations

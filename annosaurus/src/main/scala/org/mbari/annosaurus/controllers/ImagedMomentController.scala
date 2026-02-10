@@ -353,11 +353,12 @@ class ImagedMomentController(val daoFactory: JPADAOFactory)
 
         targetImagedMoment
 
-    def bulkMove(newVideoReferenceUuid: UUID, uuids: Seq[UUID])(implicit
+    def bulkMove(newVideoReferenceUuid: UUID, uuids: Seq[UUID], newVideoStartTimestamp: Option[Instant] = None)(implicit
         ec: ExecutionContext
     ): Future[Int] =
+                
         def fn(dao: IMDAO): Int =
-            dao.moveToVideoReference(newVideoReferenceUuid, uuids)
+            dao.moveToVideoReference(newVideoReferenceUuid, uuids, newVideoStartTimestamp)
         exec(fn)
 
     def update(
