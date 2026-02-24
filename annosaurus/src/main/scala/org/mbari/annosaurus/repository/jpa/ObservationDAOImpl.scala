@@ -25,7 +25,7 @@ import org.mbari.annosaurus.repository.jpa.entity.ObservationEntity
 
 import java.time.{Duration, Instant}
 import java.util as ju
-import java.util.{stream, UUID}
+import java.util.{UUID, stream}
 import scala.jdk.CollectionConverters.*
 
 /**

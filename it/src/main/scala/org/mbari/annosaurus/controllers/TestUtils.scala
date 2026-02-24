@@ -223,3 +223,45 @@ object TestUtils:
                         obs.getAssociations().forEach(assoc => assoc.setUuid(UUID.randomUUID()))
                 )
         imagedMomentEntity
+
+    /**
+     * Assigns recorded timestamps, timecodes, and elapsed times to a sequence of ImagedMomentEntities in order,
+     * starting with the given startDate. The timestamps are randomly spaced within a 30 day period. The timecodes are
+     * generated based on the recorded timestamps using the NTSC frame rate. The elapsed times are calculated as the
+     * difference between each recorded timestamp and the startDate. This is useful for testing scenarios where you want
+     * to ensure that a sequence of ImagedMomentEntities have unique and ordered timestamps, timecodes, and elapsed
+     * times, without having to manually set them for each entity. The random spacing simulates real-world data where
+     * imaged moments may not occur at regular intervals. Note that this function modifies the input
+     * ImagedMomentEntities in place and returns the same sequence for convenience. The recorded timestamps are assigned
+     * starting from the given startDate, and each subsequent timestamp is incremented by a random number of
+     * milliseconds (up to 10,000 ms or 10 seconds). The timecodes are calculated based on the total number of frames
+     * that would have elapsed at the NTSC frame rate for the given recorded timestamp. The elapsed times are simply the
+     * duration between the recorded timestamp and the startDate. Example usage:
+     * {{{
+     *   val imagedMoments = Seq(new ImagedMomentEntity(), new ImagedMomentEntity(), new ImagedMomentEntity())
+     *   val updatedMoments = assignOrderedTimestamps(imagedMoments)
+     *   // Each ImagedMomentEntity in updatedMoments now has a unique recorded timestamp, timecode, and elapsed time, with the recorded timestamps ordered from earliest to latest.
+     * }}}
+     *
+     * @param xs
+     * @return
+     */
+    def assignOrderedTimestamps(xs: Seq[ImagedMomentEntity]): Seq[ImagedMomentEntity] =
+        val random = new Random()
+
+        var t  = Instant.now()
+        var tc = new Timecode(0, FrameRates.NTSC)
+        var et = Duration.ZERO
+        for x <- xs
+        do
+            x.setRecordedTimestamp(t)
+            x.setTimecode(tc)
+            x.setElapsedTime(et)
+
+            val dtMillis = random.nextInt(10000)
+            t = t.plusMillis(dtMillis)
+
+            val frames = tc.getFrames() + tc.getFrameRate() * dtMillis / 1000
+            tc = new Timecode(frames, FrameRates.NTSC)
+            et = et.plusMillis(dtMillis)
+        xs

@@ -18,8 +18,6 @@ package org.mbari.annosaurus.repository.jdbc
 
 import org.mbari.annosaurus.domain.Image
 
-import java.util.UUID
-
 object ImagedMomentSQL:
 
     /** recorded_timestamp is used for sorting, but not returned in the result set */

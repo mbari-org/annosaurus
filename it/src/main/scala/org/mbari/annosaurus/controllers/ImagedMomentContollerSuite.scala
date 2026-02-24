@@ -19,6 +19,7 @@ package org.mbari.annosaurus.controllers
 import org.mbari.annosaurus.AssertUtils
 import org.mbari.annosaurus.domain.WindowRequest
 import org.mbari.annosaurus.etc.circe.CirceCodecs.{*, given}
+import org.mbari.annosaurus.etc.jdk.Instants
 import org.mbari.annosaurus.etc.jdk.Loggers.given
 import org.mbari.annosaurus.repository.jpa.entity.ImagedMomentEntity
 import org.mbari.annosaurus.repository.jpa.{BaseDAOSuite, ImagedMomentDAOImpl, JPADAOFactory}
@@ -28,7 +29,6 @@ import java.time.{Duration, Instant}
 import java.util.UUID
 import scala.concurrent.ExecutionContext
 import scala.util.Random
-import org.mbari.annosaurus.etc.jdk.Instants
 
 trait ImagedMomentContollerSuite extends BaseDAOSuite:
 
@@ -321,6 +321,18 @@ trait ImagedMomentContollerSuite extends BaseDAOSuite:
         AssertUtils.assertSameImagedMoment(x, y.toEntity)
     }
 
+    test("bulkCreate") {
+        val xs = TestUtils.assignOrderedTimestamps(TestUtils.build(400, 1))
+        val dao = controller.daoFactory.newImagedMomentDAO()
+        val ys = exec(dao.runTransaction(d => controller.bulkCreate(d, xs))) // warm up the database
+
+        assertEquals(ys.size, xs.size)
+        xs.zip(ys).foreach { case (x, y) =>
+            x.setUuid(y.getUuid())
+            AssertUtils.assertSameImagedMoment(x, y)
+        }
+    }
+
     test("bulkMove") {
         val xs                    = TestUtils.create(40, 1)
         val newVideoReferenceUuid = UUID.randomUUID()
@@ -334,9 +346,11 @@ trait ImagedMomentContollerSuite extends BaseDAOSuite:
         val t0                    = Instant.parse("2024-01-01T00:00:00Z")
         val n                     = exec(controller.bulkMove(newVideoReferenceUuid, xs.map(_.getUuid()), Option(t0)))
         assertEquals(n, 40)
-        val im2s = exec(controller.findByVideoReferenceUUID(newVideoReferenceUuid))
+        val im2s                  = exec(controller.findByVideoReferenceUUID(newVideoReferenceUuid))
         assertEquals(im2s.size, 40)
-        im2s.foreach(im => assertEquals(im.recordedTimestamp.map(Instants.roundToMillis), Some(t0.plus(im.elapsedTime.orNull))))
+        im2s.foreach(im =>
+            assertEquals(im.recordedTimestamp.map(Instants.roundToMillis), Some(t0.plus(im.elapsedTime.orNull)))
+        )
     }
 
     test("update") {

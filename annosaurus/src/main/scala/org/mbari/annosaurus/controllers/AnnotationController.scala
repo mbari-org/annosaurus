@@ -28,7 +28,6 @@ import org.mbari.vcr4j.time.Timecode
 import java.io.Closeable
 import java.time.{Duration, Instant}
 import java.util.UUID
-import scala.collection.mutable
 import scala.concurrent.{ExecutionContext, Future}
 import scala.jdk.CollectionConverters.*
 
@@ -237,7 +236,6 @@ class AnnotationController(
         future.onComplete(_ => dao.close())
         future
 
-
     /**
      * Bulk create annotations
      * @param annotations
@@ -254,30 +252,25 @@ class AnnotationController(
         else if annotations.size == 1 then return create(annotations.head)
 
         val obsDao          = daoFactory.newObservationDAO()
-        val imDao           = daoFactory.newImagedMomentDAO(obsDao)
         val imageController = new ImageController(daoFactory)
 
         // Add prefilter to remove duplicate image references
         val imageCreates       = annotations.flatMap(ImageCreateSC.fromAnnotation).toSeq
         val noImageAnnotations = annotations.map(_.copy(imageReferences = Nil))
 
-        // TODO need to stress test this to find the maximum number oa annotations that can be inserted at once
         val imagedMoments = Annotation.toEntities(noImageAnnotations.toSeq, true)
-
-        val newObservationUuids = mutable.ListBuffer[UUID]();
 
         // We commit the images first, then the annotations
         val future = for
-            images               <- imageController.bulkCreate(imageCreates)
+            _                    <- imageController.bulkCreate(imageCreates)
             persistedAnnotations <-
                 obsDao
                     .runTransaction(d =>
-                        for im <- imagedMoments
-                        yield
-                            val newIm = imagedMomentController.create(d, im)
-                            Annotation.fromImagedMoment(newIm, true)
+                        imagedMomentController
+                            .bulkCreate(d, imagedMoments)
+                            .flatMap(newIm => Annotation.fromImagedMoment(newIm, true))
                     )
-        yield persistedAnnotations.flatten
+        yield persistedAnnotations
 
         future.onComplete(_ => obsDao.close())
         future.foreach(annotationPublisher.publish) // publish new annotations

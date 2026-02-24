@@ -27,6 +27,7 @@ import java.io.Closeable
 import java.time.{Duration, Instant}
 import java.util
 import java.util.UUID
+import scala.collection.mutable
 import scala.concurrent.{ExecutionContext, Future}
 import scala.jdk.CollectionConverters.*
 
@@ -353,10 +354,118 @@ class ImagedMomentController(val daoFactory: JPADAOFactory)
 
         targetImagedMoment
 
+    /**
+     * Bulk-optimized version of [[create(dao, sourceImagedMoment)]]. Instead of issuing one
+     * `findByVideoReferenceUUIDAndIndex` query per imagedMoment, this method pre-fetches all existing imagedMoments for
+     * the involved videoReferenceUUIDs in K queries (K = unique video references, typically 1) and uses in-memory
+     * lookup maps for matching. A single flush is issued at the end of the batch rather than once per item.
+     *
+     * @param dao
+     *   An open DAO/transaction context
+     * @param sourceIMs
+     *   The imagedMoment entities (already deduplicated by [[Annotation.toEntities]]) to persist
+     * @return
+     *   The persisted imagedMoment entities, reusing existing ones where they already exist
+     */
+    def bulkCreate(dao: DAO[?], sourceIMs: Seq[ImagedMomentEntity]): Seq[ImagedMomentEntity] =
+        if sourceIMs.isEmpty then return Nil
+
+        val imDao = daoFactory.newImagedMomentDAO(dao)
+
+        // Pre-fetch all existing imagedMoments for all videoReferenceUUIDs in the batch.
+        // K queries instead of N (K = unique video references, N = annotations).
+        val videoRefUuids = sourceIMs.map(_.getVideoReferenceUuid).distinct
+        val existingIMs   = videoRefUuids.flatMap(uuid => imDao.findByVideoReferenceUUID(uuid))
+
+        // Three in-memory lookup maps mirroring the priority order of findByVideoReferenceUUIDAndIndex:
+        // timecode > elapsedTime > recordedDate
+        val byTimecode     = mutable.Map.empty[(UUID, String), ImagedMomentEntity]
+        val byElapsedTime  = mutable.Map.empty[(UUID, Duration), ImagedMomentEntity]
+        val byRecordedDate = mutable.Map.empty[(UUID, Instant), ImagedMomentEntity]
+
+        def indexIM(im: ImagedMomentEntity): Unit =
+            val uuid = im.getVideoReferenceUuid
+            Option(im.getTimecode).foreach(tc => byTimecode.put((uuid, tc.toString), im))
+            Option(im.getElapsedTime).foreach(et => byElapsedTime.put((uuid, et), im))
+            Option(im.getRecordedTimestamp).foreach(rd => byRecordedDate.put((uuid, rd), im))
+
+        existingIMs.foreach(indexIM)
+
+        def findInCache(source: ImagedMomentEntity): Option[ImagedMomentEntity] =
+            val uuid = source.getVideoReferenceUuid
+            Option(source.getTimecode) match
+                case Some(tc) => byTimecode.get((uuid, tc.toString))
+                case None     =>
+                    Option(source.getElapsedTime) match
+                        case Some(et) => byElapsedTime.get((uuid, et))
+                        case None     =>
+                            Option(source.getRecordedTimestamp).flatMap(rd => byRecordedDate.get((uuid, rd)))
+
+        val result = sourceIMs.map { sourceIM =>
+            val targetIM = findInCache(sourceIM) match
+                case Some(existing) => existing
+                case None           =>
+                    val newIM = new ImagedMomentEntity(
+                        sourceIM.getVideoReferenceUuid,
+                        sourceIM.getRecordedTimestamp,
+                        sourceIM.getTimecode,
+                        sourceIM.getElapsedTime
+                    )
+                    imDao.create(newIM)
+                    indexIM(newIM) // cache so subsequent items in the same batch share it
+                    newIM
+
+            // Merge imageReferences — skip any that already exist on the target
+            val existingUrls = targetIM.getImageReferences.asScala.map(_.getUrl).toSet
+            sourceIM
+                .getImageReferences
+                .asScala
+                .filterNot(ir => existingUrls.contains(ir.getUrl))
+                .foreach { ir =>
+                    if ir.getUuid != null then ir.setUuid(null)
+                    targetIM.addImageReference(ir)
+                }
+
+            // Merge observations
+            sourceIM.getObservations.forEach { observation =>
+                if observation.getUuid != null then
+                    log.atDebug
+                        .log(
+                            s"An observation uuid was found. Setting to null as they need to be generated in the database: ${observation.getUuid}"
+                        )
+                    observation.setUuid(null)
+                if observation.getObservationTimestamp == null then observation.setObservationTimestamp(Instant.now())
+                targetIM.addObservation(observation)
+                val associations = observation.getAssociations.asScala.toList
+                observation.setAssociations(new util.HashSet[AssociationEntity]())
+                associations.foreach { a =>
+                    if a.getUuid != null then
+                        log.atDebug
+                            .log(
+                                s"An association uuid was found. Setting to null as they need to be generated in the database: ${a.getUuid}"
+                            )
+                        a.setUuid(null)
+                    observation.addAssociation(a)
+                }
+            }
+
+            if sourceIM.getAncillaryDatum != null then
+                val ad = sourceIM.getAncillaryDatum
+                ad.setUuid(null)
+                targetIM.setAncillaryDatum(ad)
+
+            targetIM
+        }
+
+        // Single flush for the entire batch instead of one flush per imagedMoment
+        dao.flush()
+        log.atTrace.log(() => s"Bulk created/merged ${sourceIMs.size} imaged moments")
+        result
+
     def bulkMove(newVideoReferenceUuid: UUID, uuids: Seq[UUID], newVideoStartTimestamp: Option[Instant] = None)(implicit
         ec: ExecutionContext
     ): Future[Int] =
-                
+
         def fn(dao: IMDAO): Int =
             dao.moveToVideoReference(newVideoReferenceUuid, uuids, newVideoStartTimestamp)
         exec(fn)

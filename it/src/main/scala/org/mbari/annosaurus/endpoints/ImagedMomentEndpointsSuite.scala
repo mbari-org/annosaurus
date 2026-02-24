@@ -599,7 +599,7 @@ trait ImagedMomentEndpointsSuite extends EndpointsSuite:
     test("bulkMove (camelCase) with videoReferenceTimestamp update") {
         val xs          = TestUtils.create(4)
         val newVideoRef = java.util.UUID.randomUUID()
-        val t0 = Instant.parse("2024-01-01T00:00:00Z")
+        val t0          = Instant.parse("2024-01-01T00:00:00Z")
         val moveRequest = MoveImagedMoments(newVideoRef, xs.map(_.getUuid), Some(t0))
         val jwt         = jwtService.authorize("foo").orNull
         assert(jwt != null)
@@ -642,7 +642,7 @@ trait ImagedMomentEndpointsSuite extends EndpointsSuite:
     test("bulkMove (snake_case) with videoReferenceTimestamp update") {
         val xs          = TestUtils.create(4)
         val newVideoRef = java.util.UUID.randomUUID()
-        val t0 = Instant.parse("2024-01-01T00:00:00Z")
+        val t0          = Instant.parse("2024-01-01T00:00:00Z")
         val moveRequest = MoveImagedMoments(newVideoRef, xs.map(_.getUuid), Some(t0))
         val jwt         = jwtService.authorize("foo").orNull
         assert(jwt != null)

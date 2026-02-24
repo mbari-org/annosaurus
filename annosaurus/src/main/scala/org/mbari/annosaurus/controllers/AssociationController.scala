@@ -167,7 +167,7 @@ class AssociationController(
     def countByToConcept(concept: String)(implicit ec: ExecutionContext): Future[Long] =
         def fn(dao: ADAO): Long = dao.countByToConcept(concept)
         execReadOnly(fn)
-        
+
     def updateToConcept(oldToConcept: String, newToConcept: String)(implicit
         ec: ExecutionContext
     ): Future[Int] =
