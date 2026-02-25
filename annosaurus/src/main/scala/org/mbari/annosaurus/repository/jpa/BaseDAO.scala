@@ -39,6 +39,11 @@ abstract class BaseDAO[B <: IPersistentObject: ClassTag](val entityManager: Enti
 
     private val log = System.getLogger(getClass.getName)
 
+    /**
+      * This should match the batch size in persistence.xml. 
+      */
+    val BatchSize: Int = entityManager.getProperties.getOrDefault("hibernate.jdbc.batch_size", "200").toString.toInt
+
     if log.isLoggable(Level.DEBUG) then
         val props = entityManager.getProperties
         if props.containsKey(BaseDAO.JDBC_URL_KEY) then

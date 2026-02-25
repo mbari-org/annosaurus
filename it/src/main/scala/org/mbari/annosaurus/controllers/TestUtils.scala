@@ -246,7 +246,7 @@ object TestUtils:
      * @param xs
      * @return
      */
-    def assignOrderedTimestamps(xs: Seq[ImagedMomentEntity]): Seq[ImagedMomentEntity] =
+    def assignOrderedTimestamps(xs: Seq[ImagedMomentEntity], deltaMillis: Option[Int] = None): Seq[ImagedMomentEntity] =
         val random = new Random()
 
         var t  = Instant.now()
@@ -258,10 +258,9 @@ object TestUtils:
             x.setTimecode(tc)
             x.setElapsedTime(et)
 
-            val dtMillis = random.nextInt(10000)
+            val dtMillis = deltaMillis.getOrElse(random.nextInt(10000))
+            val frames = tc.getFrames() + tc.getFrameRate() * dtMillis / 1000D
             t = t.plusMillis(dtMillis)
-
-            val frames = tc.getFrames() + tc.getFrameRate() * dtMillis / 1000
             tc = new Timecode(frames, FrameRates.NTSC)
             et = et.plusMillis(dtMillis)
         xs

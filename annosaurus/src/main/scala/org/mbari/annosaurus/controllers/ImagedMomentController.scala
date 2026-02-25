@@ -18,7 +18,7 @@ package org.mbari.annosaurus.controllers
 
 import org.mbari.annosaurus.domain.{ImagedMoment, WindowRequest}
 import org.mbari.annosaurus.etc.jdk.Loggers.given
-import org.mbari.annosaurus.repository.jpa.JPADAOFactory
+import org.mbari.annosaurus.repository.jpa.{BaseDAO, JPADAOFactory}
 import org.mbari.annosaurus.repository.jpa.entity.{AssociationEntity, ImagedMomentEntity}
 import org.mbari.annosaurus.repository.{DAO, ImagedMomentDAO, NotFoundInDatastoreException}
 import org.mbari.vcr4j.time.Timecode
@@ -371,6 +371,32 @@ class ImagedMomentController(val daoFactory: JPADAOFactory)
         if sourceIMs.isEmpty then return Nil
 
         val imDao = daoFactory.newImagedMomentDAO(dao)
+        val entityManager = dao match
+            case jpaDao: BaseDAO[?] => Some(jpaDao.entityManager)
+            case _ =>
+                log.atWarn.log(
+                    "DAO is not a JPA DAO. Bulk create may be inefficient as it relies on batch flushing and pre-fetching existing imaged moments by video reference UUID."
+                )
+                None
+
+        val flushMode = entityManager match
+            case Some(em) =>
+                val flushMode = em.getFlushMode
+                if flushMode != jakarta.persistence.FlushModeType.COMMIT then
+                    log.atDebug.log(
+                        s"Setting flush mode to COMMIT for bulk create. Current flush mode is $flushMode. This allows batch flushing at the end of the transaction which can significantly improve performance when creating large numbers of imaged moments. Remember to set it back to the original flush mode if the DAO is reused after this operation."
+                    )
+                    em.setFlushMode(jakarta.persistence.FlushModeType.COMMIT) // batch flush at the end of the transaction
+                    Some(flushMode)
+                else    
+                    None
+            case None =>
+                log.atWarn.log(
+                    "DAO is not a JPA DAO. Bulk create may be inefficient as it relies on batch flushing and pre-fetching existing imaged moments by video reference UUID."
+                )
+                None
+
+        
 
         // Pre-fetch all existing imagedMoments for all videoReferenceUUIDs in the batch.
         // K queries instead of N (K = unique video references, N = annotations).
@@ -401,6 +427,7 @@ class ImagedMomentController(val daoFactory: JPADAOFactory)
                         case None     =>
                             Option(source.getRecordedTimestamp).flatMap(rd => byRecordedDate.get((uuid, rd)))
 
+        var n = 0 // current iteration count for montiroing when to flush batch
         val result = sourceIMs.map { sourceIM =>
             val targetIM = findInCache(sourceIM) match
                 case Some(existing) => existing
@@ -454,11 +481,23 @@ class ImagedMomentController(val daoFactory: JPADAOFactory)
                 ad.setUuid(null)
                 targetIM.setAncillaryDatum(ad)
 
+            n += 1
+            if (n % imDao.BatchSize == 0) then
+                log.atTrace.log(() => s"Flushing batch of $n imaged moments")
+                dao.flush()
+                entityManager.foreach(_.clear()) // clear persistence context to avoid memory issues and ensure we return detached entities 
+                n = 0
+
             targetIM
         }
 
         // Single flush for the entire batch instead of one flush per imagedMoment
         dao.flush()
+        entityManager.foreach(em => {
+            em.clear() // clear persistence context to avoid memory issues and ensure we return detached entities
+            flushMode.foreach(originalFlushMode => em.setFlushMode(originalFlushMode)) // reset to original flush mode
+        })
+
         log.atTrace.log(() => s"Bulk created/merged ${sourceIMs.size} imaged moments")
         result
 
