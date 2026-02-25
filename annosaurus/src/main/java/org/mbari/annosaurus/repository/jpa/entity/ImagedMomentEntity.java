@@ -315,6 +315,16 @@ public class ImagedMomentEntity implements IPersistentObject {
         this.uuid = that.uuid;
     }
 
+    /**
+     * Force-initialize lazy collections so they remain accessible after entity detachment (em.clear())
+     */
+    public ImagedMomentEntity initializeLazyRelations() {
+        getObservations().forEach(obs -> obs.getAssociations().size());
+        getImageReferences().size();
+        Optional.ofNullable(getAncillaryDatum()).ifPresent(ad -> ad.getLatitude());
+        return this;
+    }
+
     @Override
     public UUID getUuid() {
         return uuid;

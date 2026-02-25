@@ -396,12 +396,12 @@ class ImagedMomentController(val daoFactory: JPADAOFactory)
                 )
                 None
 
-        
+
 
         // Pre-fetch all existing imagedMoments for all videoReferenceUUIDs in the batch.
         // K queries instead of N (K = unique video references, N = annotations).
         val videoRefUuids = sourceIMs.map(_.getVideoReferenceUuid).distinct
-        val existingIMs   = videoRefUuids.flatMap(uuid => imDao.findByVideoReferenceUUID(uuid))
+        val existingIMs   = videoRefUuids.flatMap(uuid => imDao.findByVideoReferenceUUID(uuid)).map(_.initializeLazyRelations())
 
         // Three in-memory lookup maps mirroring the priority order of findByVideoReferenceUUIDAndIndex:
         // timecode > elapsedTime > recordedDate
@@ -427,10 +427,7 @@ class ImagedMomentController(val daoFactory: JPADAOFactory)
                         case None     =>
                             Option(source.getRecordedTimestamp).flatMap(rd => byRecordedDate.get((uuid, rd)))
 
-        // Force-initialize lazy collections so they remain accessible after entity detachment (em.clear())
-        def initializeLazyCollections(im: ImagedMomentEntity): Unit =
-            im.getObservations.forEach(obs => obs.getAssociations.size())
-            im.getImageReferences.size()
+        
 
         var n = 0 // current iteration count for monitoring when to flush batch
         val resultBuffer = mutable.ListBuffer[ImagedMomentEntity]()
@@ -492,7 +489,7 @@ class ImagedMomentController(val daoFactory: JPADAOFactory)
             if (n == imDao.BatchSize) then
                 log.atTrace.log(() => s"Flushing batch of $n imaged moments")
                 dao.flush()
-                resultBuffer.foreach(initializeLazyCollections) // initialize before clearing to allow post-detachment access
+                resultBuffer.foreach(_.initializeLazyRelations()) // initialize before clearing to allow post-detachment access
                 entityManager.foreach(_.clear()) // clear persistence context to avoid memory issues
                 n = 0
 
@@ -500,7 +497,7 @@ class ImagedMomentController(val daoFactory: JPADAOFactory)
 
         // Single flush for the entire batch instead of one flush per imagedMoment
         dao.flush()
-        result.foreach(initializeLazyCollections) // initialize before clearing to allow post-detachment access
+        result.foreach(_.initializeLazyRelations()) // initialize before clearing to allow post-detachment access
         entityManager.foreach(em => {
             em.clear() // clear persistence context to avoid memory issues
             flushMode.foreach(originalFlushMode => em.setFlushMode(originalFlushMode)) // reset to original flush mode
