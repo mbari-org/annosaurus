@@ -427,8 +427,14 @@ class ImagedMomentController(val daoFactory: JPADAOFactory)
                         case None     =>
                             Option(source.getRecordedTimestamp).flatMap(rd => byRecordedDate.get((uuid, rd)))
 
-        var n = 0 // current iteration count for montiroing when to flush batch
-        val result = sourceIMs.map { sourceIM =>
+        // Force-initialize lazy collections so they remain accessible after entity detachment (em.clear())
+        def initializeLazyCollections(im: ImagedMomentEntity): Unit =
+            im.getObservations.forEach(obs => obs.getAssociations.size())
+            im.getImageReferences.size()
+
+        var n = 0 // current iteration count for monitoring when to flush batch
+        val resultBuffer = mutable.ListBuffer[ImagedMomentEntity]()
+        for sourceIM <- sourceIMs do
             val targetIM = findInCache(sourceIM) match
                 case Some(existing) => existing
                 case None           =>
@@ -481,20 +487,22 @@ class ImagedMomentController(val daoFactory: JPADAOFactory)
                 ad.setUuid(null)
                 targetIM.setAncillaryDatum(ad)
 
+            resultBuffer += targetIM
             n += 1
-            if (n % imDao.BatchSize == 0) then
+            if (n == imDao.BatchSize) then
                 log.atTrace.log(() => s"Flushing batch of $n imaged moments")
                 dao.flush()
-                entityManager.foreach(_.clear()) // clear persistence context to avoid memory issues and ensure we return detached entities 
+                resultBuffer.foreach(initializeLazyCollections) // initialize before clearing to allow post-detachment access
+                entityManager.foreach(_.clear()) // clear persistence context to avoid memory issues
                 n = 0
 
-            targetIM
-        }
+        val result = resultBuffer.toList
 
         // Single flush for the entire batch instead of one flush per imagedMoment
         dao.flush()
+        result.foreach(initializeLazyCollections) // initialize before clearing to allow post-detachment access
         entityManager.foreach(em => {
-            em.clear() // clear persistence context to avoid memory issues and ensure we return detached entities
+            em.clear() // clear persistence context to avoid memory issues
             flushMode.foreach(originalFlushMode => em.setFlushMode(originalFlushMode)) // reset to original flush mode
         })
 
