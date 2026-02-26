@@ -23,6 +23,7 @@ import java.time.Instant;
 import java.util.*;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.Type;
+import org.hibernate.annotations.UuidGenerator;
 import org.hibernate.type.SqlTypes;
 import org.mbari.annosaurus.repository.jpa.*;
 import org.mbari.vcr4j.time.Timecode;
@@ -238,8 +239,9 @@ import org.mbari.vcr4j.time.Timecode;
 public class ImagedMomentEntity implements IPersistentObject {
 
     @Id
+    @GeneratedValue
+    @UuidGenerator(style = UuidGenerator.Style.VERSION_7)
     @Column(name = "uuid", nullable = false, updatable = false)
-    @GeneratedValue(strategy = GenerationType.UUID)
     UUID uuid;
 
     /** Optimistic lock to prevent concurrent overwrites */

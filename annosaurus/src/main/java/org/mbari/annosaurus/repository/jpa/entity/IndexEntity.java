@@ -17,6 +17,7 @@
 package org.mbari.annosaurus.repository.jpa.entity;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.UuidGenerator;
 import org.mbari.annosaurus.repository.jpa.DurationConverter;
 import org.mbari.annosaurus.repository.jpa.TimecodeConverter;
 import org.mbari.vcr4j.time.Timecode;
@@ -43,8 +44,9 @@ import java.util.UUID;
 public class IndexEntity implements IPersistentObject {
 
     @Id
+    @GeneratedValue
+    @UuidGenerator(style = UuidGenerator.Style.VERSION_7)
     @Column(name = "uuid", nullable = false, updatable = false)
-    @GeneratedValue(strategy = GenerationType.UUID)
     UUID uuid;
 
     /** Optimistic lock to prevent concurrent overwrites */

@@ -22,6 +22,7 @@ import java.net.URL;
 import java.sql.Timestamp;
 import java.util.UUID;
 import java.util.Objects;
+import org.hibernate.annotations.UuidGenerator;
 import org.mbari.annosaurus.repository.jpa.TransactionLogger;
 import org.mbari.annosaurus.repository.jpa.URLConverter;
 
@@ -88,8 +89,9 @@ import org.mbari.annosaurus.repository.jpa.URLConverter;
 public class ImageReferenceEntity implements IPersistentObject {
 
     @Id
+    @GeneratedValue
+    @UuidGenerator(style = UuidGenerator.Style.VERSION_7)
     @Column(name = "uuid", nullable = false, updatable = false)
-    @GeneratedValue(strategy = GenerationType.UUID)
     UUID uuid;
 
     /** Optimistic lock to prevent concurrent overwrites */

@@ -20,6 +20,7 @@ import jakarta.persistence.*;
 
 import java.sql.Timestamp;
 import java.util.UUID;
+import org.hibernate.annotations.UuidGenerator;
 import org.mbari.annosaurus.repository.jpa.TransactionLogger;
 
 @Entity(name = "AncillaryDatum")
@@ -103,8 +104,9 @@ import org.mbari.annosaurus.repository.jpa.TransactionLogger;
 public class CachedAncillaryDatumEntity implements IPersistentObject {
 
     @Id
+    @GeneratedValue
+    @UuidGenerator(style = UuidGenerator.Style.VERSION_7)
     @Column(name = "uuid", nullable = false, updatable = false)
-    @GeneratedValue(strategy = GenerationType.UUID)
     UUID uuid;
 
     /** Optimistic lock to prevent concurrent overwrites */

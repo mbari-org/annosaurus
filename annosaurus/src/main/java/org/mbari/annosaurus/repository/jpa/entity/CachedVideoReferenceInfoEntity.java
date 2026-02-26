@@ -18,6 +18,7 @@ package org.mbari.annosaurus.repository.jpa.entity;
 
 import jakarta.persistence.*;
 import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.annotations.UuidGenerator;
 import org.hibernate.type.SqlTypes;
 import org.mbari.annosaurus.repository.jpa.TransactionLogger;
 import org.mbari.annosaurus.repository.jpa.UUIDConverter;
@@ -97,8 +98,9 @@ import java.util.UUID;
 public class CachedVideoReferenceInfoEntity implements IPersistentObject {
 
     @Id
+    @GeneratedValue
+    @UuidGenerator(style = UuidGenerator.Style.VERSION_7)
     @Column(name = "uuid", nullable = false, updatable = false)
-    @GeneratedValue(strategy = GenerationType.UUID)
     UUID uuid;
 
     /** Optimistic lock to prevent concurrent overwrites */
