@@ -223,11 +223,11 @@ trait AnnotationEndpointsSuite extends EndpointsSuite:
     }
 
     test("bulkCreateAnnotations (with associations)") {
-        val xs          = TestUtils.build(2, 5, 2)
+        val xs          = TestUtils.assignOrderedTimestamps(TestUtils.build(200, 1, 2), Some(100))
         val expected    = xs
             .flatMap(Annotation.fromImagedMoment(_))
             .map(_.toSnakeCase)
-            .sortBy(_.concept)
+            .sortBy(_.timecode.getOrElse(""))
         val jwt         = jwtService.authorize("foo").orNull
         assert(jwt != null)
         val backendStop = newBackendStub(endpoints.bulkCreateAnnotationsImpl)
@@ -242,7 +242,7 @@ trait AnnotationEndpointsSuite extends EndpointsSuite:
         assertEquals(response.code, StatusCode.Ok)
 
         // Everything below is snake_case
-        val obtained = checkResponse[Seq[AnnotationSC]](response.body).sortBy(_.concept)
+        val obtained = checkResponse[Seq[AnnotationSC]](response.body).sortBy(_.timecode.getOrElse(""))
         for o <- obtained
         do
             assert(o.observation_uuid.isDefined)

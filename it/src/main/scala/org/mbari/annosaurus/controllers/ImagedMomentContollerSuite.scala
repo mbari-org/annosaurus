@@ -312,7 +312,7 @@ trait ImagedMomentContollerSuite extends BaseDAOSuite:
     }
 
     test("create multiple") {
-        val xs = TestUtils.build(2, 1)
+        val xs = TestUtils.assignOrderedTimestamps(TestUtils.build(2, 1))
         val ys = exec(controller.create(xs))
         assertEquals(ys.size, 2)
         val x  = xs.head
@@ -322,7 +322,7 @@ trait ImagedMomentContollerSuite extends BaseDAOSuite:
     }
 
     test("bulkCreate") {
-        val xs = TestUtils.assignOrderedTimestamps(TestUtils.build(400, 1))
+        val xs = TestUtils.assignOrderedTimestamps(TestUtils.build(1501, 1), Some(100))
         val dao = controller.daoFactory.newImagedMomentDAO()
         val ys = exec(dao.runTransaction(d => controller.bulkCreate(d, xs))) // warm up the database
 

@@ -18,9 +18,10 @@ package org.mbari.annosaurus.controllers
 
 import org.mbari.annosaurus.domain.{Image, ImageCreateSC}
 import org.mbari.annosaurus.repository.ImagedMomentDAO
-import org.mbari.annosaurus.repository.jpa.JPADAOFactory
+import org.mbari.annosaurus.repository.jpa.{BaseDAO, JPADAOFactory}
 import org.mbari.annosaurus.repository.jpa.entity.{ImageReferenceEntity, ImagedMomentEntity}
 import org.mbari.vcr4j.time.Timecode
+import org.mbari.annosaurus.etc.jdk.Loggers.given
 
 import java.net.URL
 import java.time.{Duration, Instant}
@@ -85,13 +86,26 @@ class ImageController(daoFactory: JPADAOFactory):
         ec: ExecutionContext
     ): Future[Seq[Image]] =
         val imDao      = daoFactory.newImagedMomentDAO()
-        val irDao      = daoFactory.newImageReferenceDAO(imDao)
+        val irDao      = daoFactory.newImageReferenceDAO()
+
+        val entityManager = imDao match
+            case jpaDao: BaseDAO[?] => 
+                jpaDao.entityManager.setFlushMode(jakarta.persistence.FlushModeType.COMMIT) // batch flush at the end of the transaction
+                Some(jpaDao.entityManager)
+            case _ =>
+                log.atWarn.log(
+                    "DAO is not a JPA DAO. Bulk create may be inefficient as it relies on batch flushing and pre-fetching existing imaged moments by video reference UUID."
+                )
+                None
+
         val candidates = imageCreates.distinctBy(_.url)
         // prefilter
         if candidates.isEmpty then return Future.successful(Seq.empty)
+
+        var n = 0 // counter for batch flushing
         val f          = for
             newOnes      <- irDao.runTransaction(d => candidates.filter(c => d.findByURL(c.url).isEmpty))
-            newlyCreated <- irDao.runTransaction(d =>
+            newlyCreated <- imDao.runTransaction(d =>
                                 for ic <- newOnes
                                 yield
                                     val imagedMoment   = ImagedMomentController
@@ -110,14 +124,23 @@ class ImageController(daoFactory: JPADAOFactory):
                                         ic.format
                                     )
                                     imagedMoment.addImageReference(imageReference)
-                                    irDao.flush()
+                                    n += 1
+                                    if (n == imDao.BatchSize) then
+                                        log.atTrace.log(() => s"Flushing batch of $n imaged moments")
+                                        imDao.flush()
+                                        entityManager.foreach(_.clear()) // clear persistence context to avoid memory issues and ensure we return detached entities
+                                        n = 0
                                     imageReference
                             )
             persisted    <-
                 irDao.runTransaction(d => newlyCreated.flatMap(i => d.findByUUID(i.getUuid).map(Image.from(_, true))))
-        yield persisted
+        yield 
+            persisted
 
-        f.onComplete(t => irDao.close())
+        f.onComplete(t => {
+            imDao.close()
+            irDao.close()
+        })
         f
 
     def create(
