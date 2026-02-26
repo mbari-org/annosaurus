@@ -17,6 +17,7 @@
 package org.mbari.annosaurus.repository.jpa.entity;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.UuidGenerator;
 import org.mbari.annosaurus.repository.jpa.TransactionLogger;
 
 import java.sql.Timestamp;
@@ -109,8 +110,9 @@ public class AssociationEntity implements IPersistentObject {
     public static String LINK_VALUE_SELF = "self";
 
     @Id
+    @GeneratedValue
+    @UuidGenerator(style = UuidGenerator.Style.VERSION_7)
     @Column(name = "uuid", nullable = false, updatable = false)
-    @GeneratedValue(strategy = GenerationType.UUID)
     UUID uuid;
 
     /** Optimistic lock to prevent concurrent overwrites */
