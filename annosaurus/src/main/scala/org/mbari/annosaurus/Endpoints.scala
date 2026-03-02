@@ -76,11 +76,11 @@ object Endpoints:
     // --------------------------------
     // For VertX, we need to separate the non-blocking endpoints from the blocking ones
     val nonBlockingEndpoints = List(
-        authorizationEndpoints.allImpl,
         healthEndpoints.allImpl
     ).flatten
 
     val blockingEndpoints = List(
+        authorizationEndpoints.allImpl,
         analysisEndpoints.allImpl,
         annotationEndpoints.allImpl,
         associationEndpoints.allImpl,

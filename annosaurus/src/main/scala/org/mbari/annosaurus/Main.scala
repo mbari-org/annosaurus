@@ -73,9 +73,23 @@ object Main:
         val server = vertx.createHttpServer(httpServerOptions)
         val router = Router.router(vertx)
 
-        // NOTE: Don't add a handler. It will intercept all requests (Originally: Log all requests)
-//        router.route()
-//            .handler(ctx => log.atInfo.log(s"${ctx.request().method()} ${ctx.request().path()}"))
+        // Log all requests at DEBUG, and log the time taken for each request at INFO. This 
+        // gives us visibility into all requests and their performance without overwhelming 
+        // the logs with INFO-level messages.
+        val debugLogger = log.atDebug // Avoid object allocation
+        val infoLogger  = log.atInfo  // Avoid object allocation
+        router.route()
+           .handler(ctx => {
+                val start  = System.currentTimeMillis()
+                val method = ctx.request().method()
+                val path   = ctx.request().uri()
+                debugLogger.log(s"→ $method $path")
+                ctx.addEndHandler(_ =>
+                    val dt = System.currentTimeMillis() - start
+                    infoLogger.log(s"← $method $path ${dt}ms")
+                )
+                ctx.next()
+            })
 
         val interpreter = VertxFutureServerInterpreter(serverOptions)
 
@@ -97,20 +111,41 @@ object Main:
             )
 
         // Add our metrics endpoints
-        interpreter.route(Endpoints.metricsEndpoint).apply(router)
+        interpreter.blockingRoute(Endpoints.metricsEndpoint).apply(router)
 
         // Add our documentation endpoints
         Endpoints
             .docEndpoints
             .foreach(endpoint =>
                 interpreter
-                    .route(endpoint)
+                    .blockingRoute(endpoint)
                     .apply(router)
             )
 
         router
             .getRoutes()
             .forEach(r => log.atInfo.log(f"Adding route: ${r.methods()}%8s ${r.getPath}%s"))
+
+        router
+            .errorHandler(
+                500,
+                ctx =>
+                    Option(ctx.failure()) match
+                        case Some(_: IllegalArgumentException) =>
+                            // Client sent a malformed URL (e.g. invalid percent-encoding like %uf).
+                            // Log at WARN — this is a client error, not a server fault.
+                            // Avoid calling ctx.request().path() here as path normalization is
+                            // what threw in the first place; use uri() for the raw, unnormalized value.
+                            log.atWarn.withCause(ctx.failure()).log(s"Bad request (malformed URL): ${ctx.request().uri()}")
+                            if !ctx.response().ended() then ctx.response().setStatusCode(400).end()
+                        case Some(t) =>
+                            log.atError.withCause(t).log(s"Unhandled exception in route: ${ctx.request().uri()}")
+                            if !ctx.response().ended() then ctx.response().setStatusCode(500).end()
+                        case None    =>
+                            log.atError.log(s"Error 500 in route: ${ctx.request().uri()}")
+                            if !ctx.response().ended() then ctx.response().setStatusCode(500).end()
+            )
+
 
         val program = server.requestHandler(router).listen(port).asScala
 

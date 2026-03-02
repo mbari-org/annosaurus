@@ -19,6 +19,10 @@
   <logger name="org.eclipse.jetty" level="WARN" />
   <logger name="org.fusesource.scalate" level="WARN" />
 <!--  <logger name="org.mbari.vars.annotation.repository.jpa" level="INFO" />-->
+  <!-- <logger name="org.mbari.annosaurus.Main" level="DEBUG" /> -->
+
+  <!-- Netty will emit warnings if a client disconnects abruptly. Setting to ERROR suppresses these warnings. -->
+  <logger name="io.netty.channel.DefaultChannelPipeline" level="ERROR" />
 
   <root level="${LOGBACK_LEVEL}">
     <appender-ref ref="CONSOLE" />
