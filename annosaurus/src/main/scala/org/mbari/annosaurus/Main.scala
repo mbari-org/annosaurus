@@ -83,10 +83,11 @@ object Main:
                 val start  = System.currentTimeMillis()
                 val method = ctx.request().method()
                 val path   = ctx.request().uri()
-                debugLogger.log(s"→ $method $path")
+                val remoteAddress = ctx.request().remoteAddress()
+                debugLogger.log(s"→ $method $path from $remoteAddress")
                 ctx.addEndHandler(_ =>
                     val dt = System.currentTimeMillis() - start
-                    infoLogger.log(s"← $method $path ${dt}ms")
+                    infoLogger.log(s"← $method $path ${dt}ms from $remoteAddress")
                 )
                 ctx.next()
             })
