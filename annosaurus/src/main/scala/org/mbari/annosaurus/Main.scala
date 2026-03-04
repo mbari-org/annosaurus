@@ -83,7 +83,7 @@ object Main:
                 val start  = System.currentTimeMillis()
                 val method = ctx.request().method()
                 val path   = ctx.request().uri()
-                val remoteAddress = ctx.request().remoteAddress()
+                val remoteAddress = Option(ctx.request().getHeader("X-Real-IP")).getOrElse(ctx.request().remoteAddress().host())
                 debugLogger.log(s"→ $method $path from $remoteAddress")
                 ctx.addEndHandler(_ =>
                     val dt = System.currentTimeMillis() - start
