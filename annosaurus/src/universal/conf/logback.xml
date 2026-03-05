@@ -10,16 +10,18 @@
 
   <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
     <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
-      <pattern>%gray(%d{HH:mm:ss.SSS}) %highlight(%-5level) [%green(%-25thread)] %blue(%-40logger{40}) %gray(|) %msg%n</pattern>
+      <pattern>%yellow(%d{yyyy-MM-dd HH:mm:ss.SSS}) %highlight(%-5level) [%green(%-25thread)] %blue(%-40logger{40}) %yellow(|) %msg%n</pattern>
     </encoder>
   </appender>
 
   <logger name="httpclient.wire.header" level="WARN" />
-  <logger name="java.util.Date" level="WARN" />
+  <logger name="java" level="WARN" />
+  <logger name="jdk" level="WARN" />
   <logger name="org.eclipse.jetty" level="WARN" />
   <logger name="org.fusesource.scalate" level="WARN" />
-<!--  <logger name="org.mbari.vars.annotation.repository.jpa" level="INFO" />-->
+  <!-- <logger name="org.mbari.vars.annotation.repository.jpa" level="INFO" />-->
   <!-- <logger name="org.mbari.annosaurus.Main" level="DEBUG" /> -->
+  <logger name="sun" level="WARN" />
 
   <!-- Netty will emit warnings if a client disconnects abruptly. Setting to ERROR suppresses these warnings. -->
   <logger name="io.netty.channel.DefaultChannelPipeline" level="ERROR" />
