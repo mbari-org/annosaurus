@@ -80,6 +80,7 @@ lazy val annosaurus = (project in file("annosaurus"))
             jansi             % Runtime,
             javaxServlet,
             javaxTransaction,
+            jnats,
             junit             % Test,
             logbackClassic,
             mssqlserver,

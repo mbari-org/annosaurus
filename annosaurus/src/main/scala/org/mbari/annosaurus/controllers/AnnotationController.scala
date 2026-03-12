@@ -173,6 +173,16 @@ class AnnotationController(
         f.onComplete(t => dao.close())
         f
 
+    def findByAssociationUuid(associationUuid: UUID)(implicit ec: ExecutionContext): Future[Option[Annotation]] =
+        def dao = daoFactory.newAssociationDAO()
+        val f   = dao.runReadOnlyTransaction(d => {
+            d.findByUUID(associationUuid) match
+                case None          => None
+                case Some(assoc) => Option(Annotation.from(assoc.getObservation, true))
+        })
+        f.onComplete(t => dao.close())
+        f
+
     def findByImageReferenceUUID(
         imageReferenceUUID: UUID
     )(implicit ec: ExecutionContext): Future[Iterable[Annotation]] =

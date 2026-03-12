@@ -7,7 +7,7 @@ object Dependencies {
     lazy val circeGeneric            = "io.circe"                      %% "circe-generic"              % circeVersion
     lazy val circeParser             = "io.circe"                      %% "circe-parser"               % circeVersion
     lazy val commonsCodec            = "commons-codec"                  % "commons-codec"              % "1.21.0"
-    val flywayVersion                = "12.0.3"
+    val flywayVersion                = "12.1.0"
     lazy val flywayCore              = "org.flywaydb"                   % "flyway-core"                % flywayVersion
     lazy val flywaySqlserver         = "org.flywaydb"                   % "flyway-sqlserver"           % flywayVersion
     lazy val flywayPostgres          = "org.flywaydb"                   % "flyway-database-postgresql" % flywayVersion
@@ -20,6 +20,7 @@ object Dependencies {
     lazy val javaxServlet            = "javax.servlet"                  % "javax.servlet-api"          % "4.0.1"
     lazy val javaxTransaction        = "javax.transaction"              % "jta"                        % "1.1"
     lazy val junit                   = "junit"                          % "junit"                      % "4.13.2"
+    lazy val jnats                   = "io.nats"                        % "jnats"                      % "2.25.2"
     lazy val logbackClassic          = "ch.qos.logback"                 % "logback-classic"            % "1.5.32"
     lazy val mssqlserver             = "com.microsoft.sqlserver"        % "mssql-jdbc"                 % "13.2.1.jre11"
     lazy val munit                   = "org.scalameta"                 %% "munit"                      % "1.2.4"
@@ -32,7 +33,7 @@ object Dependencies {
     lazy val slf4jJul                = "org.slf4j"                      % "jul-to-slf4j"               % slf4jVersion
     lazy val slf4jLog4j              = "org.slf4j"                      % "log4j-over-slf4j"           % slf4jVersion
     lazy val slf4jSystem             = "org.slf4j"                      % "slf4j-jdk-platform-logging" % slf4jVersion
-    private val tapirVersion         = "1.13.10"
+    private val tapirVersion         = "1.13.11"
     lazy val tapirCirce              = "com.softwaremill.sttp.tapir"   %% "tapir-json-circe"           % tapirVersion
     lazy val tapirHelidon            = "com.softwaremill.sttp.tapir"   %% "tapir-nima-server"          % tapirVersion
     lazy val tapirPrometheus         = "com.softwaremill.sttp.tapir"   %% "tapir-prometheus-metrics"   % tapirVersion

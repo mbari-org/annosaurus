@@ -132,6 +132,18 @@ trait AnnotationControllerSuite extends BaseDAOSuite:
         assertEquals(m, obs.size / 2)
     }
 
+    test("findByAssociationUuid") {
+        val xs       = TestUtils.create(1, 1, 1, 1).head
+        val obs      = xs.getObservations.asScala.head
+        val assoc    = obs.getAssociations.asScala.head
+        val obtained = exec(controller.findByAssociationUuid(assoc.getUuid))
+        obtained match
+            case None       => fail("findByAssociationUuid returned None")
+            case Some(anno) =>
+                val im2 = Annotation.toEntities(Seq(anno)).head
+                AssertUtils.assertSameImagedMoment(xs, im2, false)
+    }
+
     test("findByImageReferenceUUID") {
         val xs       = TestUtils.create(1, 1, 0, 1).head
         val obs      = xs.getObservations.asScala.head

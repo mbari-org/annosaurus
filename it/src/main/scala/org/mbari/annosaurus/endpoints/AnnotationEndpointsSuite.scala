@@ -77,6 +77,24 @@ trait AnnotationEndpointsSuite extends EndpointsSuite:
         )
     }
 
+    test("findAnnotationsByAssociationUuid") {
+        val im  = TestUtils.create(1, 1, 1, 1).head
+        val obs = im.getObservations.iterator.next()
+        val assoc = obs.getAssociations.iterator().next()
+        runGet(
+            endpoints.findAnnotationByAssociationUuidImpl,
+            s"http://test.com/v1/annotations/association/${assoc.getUuid}",
+            response =>
+                assertEquals(response.code, StatusCode.Ok)
+                val obtained = checkResponse[AnnotationSC](response.body).toCamelCase
+                val expected = Annotation
+                    .from(obs)
+                    .copy(lastUpdated = obtained.lastUpdated)
+                    .roundObservationTimestampToMillis()
+                assertEquals(obtained, expected)
+        )
+    }
+
     test("findAnnotationsByImageReferenceUuid") {
         val im  = TestUtils.create(1, 1, 0, 1).head
         val obs = im.getObservations.iterator.next()

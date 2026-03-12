@@ -62,6 +62,21 @@ class AnnotationEndpoints(controller: AnnotationController)(using
                 handleOption(controller.findByUUID(uuid).map(x => x.map(_.toSnakeCase)))
             }
 
+    val findAnnotationByAssociationUuid: Endpoint[Unit, UUID, ErrorMsg, AnnotationSC, Any] =
+        openEndpoint
+            .get
+            .in(base / "association" / path[UUID]("associationUuid"))
+            .out(jsonBody[AnnotationSC])
+            .name("findAnnotationByAssociationUuid")
+            .description("Find an annotation by one of its association UUIDs")
+            .tag(tag)
+
+    val findAnnotationByAssociationUuidImpl: ServerEndpoint[Any, Future] =
+        findAnnotationByAssociationUuid
+            .serverLogic { uuid =>
+                handleOption(controller.findByAssociationUuid(uuid).map(x => x.map(_.toSnakeCase)))
+            }
+
     val findAnnotationByImageReferenceUuid: Endpoint[Unit, UUID, ErrorMsg, Seq[AnnotationSC], Any] =
         openEndpoint
             .get
@@ -270,6 +285,7 @@ class AnnotationEndpoints(controller: AnnotationController)(using
         bulkCreateAnnotations,
         bulkUpdateAnnotations,
         countByConcurrentRequest,
+        findAnnotationByAssociationUuid,
         findAnnotationByImageReferenceUuid,
         countByMultiRequest,
         findAnnotationsByVideoReferenceUuid,
@@ -282,6 +298,7 @@ class AnnotationEndpoints(controller: AnnotationController)(using
         bulkCreateAnnotationsImpl,
         bulkUpdateAnnotationsImpl,
         countByConcurrentRequestImpl,
+        findAnnotationByAssociationUuidImpl,
         findAnnotationByImageReferenceUuidImpl,
         countByMultiRequestImpl,
         findAnnotationsByVideoReferenceUuidImpl,
