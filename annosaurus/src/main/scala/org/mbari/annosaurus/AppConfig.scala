@@ -67,6 +67,17 @@ object AppConfig:
                 log.atWarn.withCause(e).log("Failed to load ZeroMQ configuration")
                 None
 
+    lazy val DefaultNatsConfig: Option[NatsConfig] =
+        try
+            val enable = Config.getBoolean("messaging.nats.enable")
+            val url    = Config.getString("messaging.nats.url")
+            val subject = Config.getString("messaging.nats.subject")
+            Some(NatsConfig(enable, url, subject))
+        catch
+            case NonFatal(e) =>
+                log.atWarn.withCause(e).log("Failed to load NATS configuration")
+                None
+
     lazy val DefaultDatabaseConfig: DatabaseConfig = DatabaseConfig(
         url = Config.getString("database.url"),
         user = Config.getString("database.user"),

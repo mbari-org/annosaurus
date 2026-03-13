@@ -243,7 +243,10 @@ class AnnotationController(
             val newIm = imagedMomentController.create(d, entity)
             Annotation.fromImagedMoment(newIm, true)
         )
-        future.onComplete(_ => dao.close())
+        future.onComplete(_ => {
+            dao.close()
+            // TODO publish to message publisher
+        })
         future
 
     /**
