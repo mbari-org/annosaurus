@@ -18,7 +18,8 @@ package org.mbari.annosaurus.controllers
 
 import io.reactivex.rxjava3.subjects.Subject
 import org.mbari.annosaurus.domain.Observation
-import org.mbari.annosaurus.messaging.{AnnotationPublisher, MessageBus}
+import org.mbari.annosaurus.etc.rxjava.EventBus
+import org.mbari.annosaurus.messaging.AnnotationPublisher
 import org.mbari.annosaurus.repository.jpa.JPADAOFactory
 import org.mbari.annosaurus.repository.jpa.entity.ObservationEntity
 import org.mbari.annosaurus.repository.{NotFoundInDatastoreException, ObservationDAO}
@@ -34,7 +35,7 @@ import scala.concurrent.{ExecutionContext, Future}
  */
 class ObservationController(
     val daoFactory: JPADAOFactory,
-    bus: Subject[Any] = MessageBus.RxSubject
+    bus: Subject[Any] = EventBus.RxSubject
 ) extends BaseController[ObservationEntity, ObservationDAO[ObservationEntity], Observation]:
 
     type ODAO = ObservationDAO[ObservationEntity]
@@ -74,7 +75,7 @@ class ObservationController(
                     imagedMoment.addObservation(observation)
                     dao.flush()
                     // observation.setImagedMoment(imagedMoment)
-                    annotationPublisher.publish(Observation.from(observation))
+                    annotationPublisher.created(Observation.from(observation))
                     transform(observation)
 
         exec(fn)
@@ -109,7 +110,7 @@ class ObservationController(
                     obs.getImagedMoment.removeObservation(obs)
                     newIm.addObservation(obs)
 
-                annotationPublisher.publish(Observation.from(obs))
+                annotationPublisher.created(Observation.from(obs))
                 transform(obs)
             )
 

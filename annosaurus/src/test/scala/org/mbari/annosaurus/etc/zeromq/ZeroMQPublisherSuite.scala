@@ -16,9 +16,7 @@
 
 package org.mbari.annosaurus.etc.zeromq
 
-import org.mbari.annosaurus.messaging.{AnnotationMessage, AssociationMessage, MessageBus}
 import org.mbari.annosaurus.repository.jpa.entity.{AssociationEntity, ObservationEntity}
-
 import org.zeromq.{SocketType, ZContext}
 import zmq.ZMQ
 
@@ -26,6 +24,7 @@ import java.time.Instant
 import java.util.UUID
 import org.mbari.annosaurus.domain.Annotation
 import org.mbari.annosaurus.domain.Association
+import org.mbari.annosaurus.etc.rxjava.EventBus
 
 class ZeroMQPublisherSuite extends munit.FunSuite {
 
@@ -33,7 +32,7 @@ class ZeroMQPublisherSuite extends munit.FunSuite {
 
     test("publish annotations") {
         val port = 9997
-        val mq   = new ZeroMQPublisher("test", port, MessageBus.RxSubject)
+        val mq   = new ZeroMQPublisher("test", port, EventBus.RxSubject)
 
         // Counts messages recieved
         @volatile
@@ -70,9 +69,9 @@ class ZeroMQPublisherSuite extends munit.FunSuite {
         )
 
         val thread = new Thread(() =>
-            MessageBus
+            EventBus
                 .RxSubject
-                .onNext(AnnotationMessage(annotation))
+                .onNext(AnnotationCreatedMessage(annotation))
         )
         thread.run()
         Thread.sleep(1000)
@@ -82,7 +81,7 @@ class ZeroMQPublisherSuite extends munit.FunSuite {
 
     test("publish many annotations from multiple threads") {
         val port = 9997
-        val mq   = new ZeroMQPublisher("test", port, MessageBus.RxSubject)
+        val mq   = new ZeroMQPublisher("test", port, EventBus.RxSubject)
 
         // Counts messages recieved
         @volatile
@@ -118,7 +117,7 @@ class ZeroMQPublisherSuite extends munit.FunSuite {
                 recordedTimestamp = Some(Instant.now())
             )
             val thread     =
-                new Thread(() => MessageBus.RxSubject.onNext(AnnotationMessage(annotation)))
+                new Thread(() => EventBus.RxSubject.onNext(AnnotationCreatedMessage(annotation)))
             thread.setDaemon(true)
             thread.start()
         }
@@ -131,7 +130,7 @@ class ZeroMQPublisherSuite extends munit.FunSuite {
 
     test("publish associations") {
         val port = 9997
-        val mq   = new ZeroMQPublisher("test", port, MessageBus.RxSubject)
+        val mq   = new ZeroMQPublisher("test", port, EventBus.RxSubject)
 
         // Counts messages recieved
         @volatile
@@ -167,9 +166,9 @@ class ZeroMQPublisherSuite extends munit.FunSuite {
         observation.addAssociation(association)
         val assoc       = Association.from(association, true)
         val thread      = new Thread(() =>
-            MessageBus
+            EventBus
                 .RxSubject
-                .onNext(AssociationMessage(assoc))
+                .onNext(AssociationCreatedMessage(assoc))
         )
         thread.run()
         Thread.sleep(1000)

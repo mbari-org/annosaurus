@@ -22,6 +22,8 @@ import org.mbari.annosaurus.etc.jdbc.Databases.DatabaseType
 import org.mbari.annosaurus.etc.jdk.Loggers
 import org.mbari.annosaurus.etc.jdk.Loggers.given
 import org.mbari.annosaurus.etc.jwt.JwtService
+import org.mbari.annosaurus.etc.nats.NatsConfig
+import org.mbari.annosaurus.etc.zeromq.ZeroMQConfig
 
 import scala.util.Try
 import scala.util.control.NonFatal
@@ -71,8 +73,8 @@ object AppConfig:
         try
             val enable = Config.getBoolean("messaging.nats.enable")
             val url    = Config.getString("messaging.nats.url")
-            val subject = Config.getString("messaging.nats.subject")
-            Some(NatsConfig(enable, url, subject))
+            val topic  = Config.getString("messaging.nats.topic")
+            Some(NatsConfig(url, enable, topic))
         catch
             case NonFatal(e) =>
                 log.atWarn.withCause(e).log("Failed to load NATS configuration")

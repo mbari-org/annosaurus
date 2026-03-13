@@ -1,7 +1,7 @@
-package org.mbari.annosaurus
+package org.mbari.annosaurus.etc.nats
 
 final case class NatsConfig(
     url: String,
     enable: Boolean,
-    subject: String
+    topic: String
 )

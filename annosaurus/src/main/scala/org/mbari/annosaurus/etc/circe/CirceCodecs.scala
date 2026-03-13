@@ -20,6 +20,7 @@ import io.circe.*
 import io.circe.generic.semiauto.*
 import io.circe.syntax.*
 import org.mbari.annosaurus.domain.*
+import org.mbari.annosaurus.etc.nats.NatsMessage
 import org.mbari.annosaurus.repository.query.{Constraint, JDBC, Query}
 import org.mbari.annosaurus.util.HexUtil
 
@@ -330,6 +331,9 @@ object CirceCodecs:
     private val observationsUpdateCcDecoder: Decoder[ObservationsUpdate] = deriveDecoder
     given observationsUpdateDecoder: Decoder[ObservationsUpdate]         =
         observationsUpdateCcDecoder or observationsUpdateScDecoder.map(_.toCamelCase)
+        
+    given natsMessageAnnotationEncoder: Encoder[NatsMessage] = deriveEncoder
+    given natsMessageAnnotationDecoder: Decoder[NatsMessage] = deriveDecoder
 
     // Custom Decoder for Constraint
     given constraintDecoder: Decoder[Constraint] = (c: HCursor) =>

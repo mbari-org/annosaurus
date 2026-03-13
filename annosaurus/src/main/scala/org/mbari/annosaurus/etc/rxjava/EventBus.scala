@@ -14,11 +14,21 @@
  * limitations under the License.
  */
 
-package org.mbari.annosaurus.messaging
+package org.mbari.annosaurus.etc.rxjava
 
 import io.reactivex.rxjava3.subjects.{PublishSubject, Subject}
 
 import java.lang.System.Logger.Level
+
+class EventBus[T]:
+
+    private val log = System.getLogger(getClass.getName)
+    
+    lazy val rxSubject: Subject[T] = { 
+        val rx = PublishSubject.create[T]().toSerialized
+        if log.isLoggable(Level.TRACE) then rx.subscribe(m => log.log(Level.TRACE, m.toString))
+        rx
+    }
 
 /**
  * This is the shared message bus. All publishers whould listen to this bus and publish the appropriate events to their
@@ -26,11 +36,8 @@ import java.lang.System.Logger.Level
  *
  * MessageBus.RxSubject: Subject[Any] ^ \| AnnotationPublisher.publish(msg)
  */
-object MessageBus:
+object EventBus:
 
-    private lazy val log = System.getLogger(getClass.getName)
 
-    val RxSubject: Subject[Any] =
-        PublishSubject.create[Any]().toSerialized
+    val RxSubject: Subject[Any] = new EventBus[Any]().rxSubject
 
-    if log.isLoggable(Level.TRACE) then RxSubject.subscribe(m => log.log(Level.TRACE, m.toString))

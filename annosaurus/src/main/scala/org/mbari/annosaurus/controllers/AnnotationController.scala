@@ -19,7 +19,8 @@ package org.mbari.annosaurus.controllers
 import io.reactivex.rxjava3.subjects.Subject
 import org.mbari.annosaurus.domain.{Annotation, ConcurrentRequest, ImageCreateSC, MultiRequest}
 import org.mbari.annosaurus.etc.jdk.Loggers.given
-import org.mbari.annosaurus.messaging.{AnnotationPublisher, MessageBus}
+import org.mbari.annosaurus.etc.rxjava.EventBus
+import org.mbari.annosaurus.messaging.AnnotationPublisher
 import org.mbari.annosaurus.repository.jpa.JPADAOFactory
 import org.mbari.annosaurus.repository.jpa.entity.ObservationEntity
 import org.mbari.annosaurus.repository.{DAO, ObservationDAO}
@@ -38,12 +39,12 @@ import scala.jdk.CollectionConverters.*
  */
 class AnnotationController(
     val daoFactory: JPADAOFactory,
-    bus: Subject[Any] = MessageBus.RxSubject
+    bus: Subject[Any] = EventBus.RxSubject
 ):
 
     private val imagedMomentController = new ImagedMomentController(daoFactory)
     private val annotationPublisher    = new AnnotationPublisher(bus)
-    private val log                    = System.getLogger(getClass.getName())
+    private val log                    = System.getLogger(getClass.getName)
 
     protected def exec[T](
         fn: ObservationDAO[ObservationEntity] => T
@@ -286,7 +287,7 @@ class AnnotationController(
         yield persistedAnnotations
 
         future.onComplete(_ => obsDao.close())
-        future.foreach(annotationPublisher.publish) // publish new annotations
+        future.foreach(annotationPublisher.created) // publish new annotations
         future
 
     def update(observationUuid: UUID, annotation: Annotation)(implicit
@@ -350,7 +351,7 @@ class AnnotationController(
             ff
         )
 
-        g.foreach(annotationPublisher.publish)
+        g.foreach(annotationPublisher.created)
 
         g
 

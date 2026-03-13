@@ -19,10 +19,9 @@ package org.mbari.annosaurus.etc.zeromq
 import io.reactivex.rxjava3.disposables.Disposable
 import io.reactivex.rxjava3.schedulers.Schedulers
 import io.reactivex.rxjava3.subjects.Subject
-import org.mbari.annosaurus.ZeroMQConfig
 import org.mbari.annosaurus.etc.jdk.Loggers
 import org.mbari.annosaurus.etc.jdk.Loggers.given
-import org.mbari.annosaurus.messaging.{GenericMessage, MessageBus}
+import org.mbari.annosaurus.etc.rxjava.EventBus
 import org.zeromq.{SocketType, ZContext}
 
 import java.util.concurrent.{LinkedBlockingQueue, TimeUnit}
@@ -37,8 +36,7 @@ class ZeroMQPublisher(val topic: String, val port: Int, val subject: Subject[?])
 
     private val context                = new ZContext()
     private val queue                  = new LinkedBlockingQueue[GenericMessage[?]]()
-    private val disposable: Disposable = MessageBus
-        .RxSubject
+    private val disposable: Disposable = subject
         .ofType(classOf[GenericMessage[?]])
         .observeOn(Schedulers.io())
         .distinct()
@@ -89,7 +87,7 @@ object ZeroMQPublisher:
      */
     def autowire(
         opt: Option[ZeroMQConfig],
-        subject: Subject[Any] = MessageBus.RxSubject
+        subject: Subject[Any] = EventBus.RxSubject
     ): Option[ZeroMQPublisher] =
         for
             conf <- opt

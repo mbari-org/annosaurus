@@ -21,6 +21,7 @@ import io.vertx.core.{Vertx, VertxOptions}
 import io.vertx.ext.web.Router
 import org.mbari.annosaurus.etc.jdk.Loggers
 import org.mbari.annosaurus.etc.jdk.Loggers.given
+import org.mbari.annosaurus.etc.nats.NatsPublisher
 import org.mbari.annosaurus.etc.zeromq.ZeroMQPublisher
 import sttp.tapir.server.vertx.VertxFutureServerInterpreter.VertxFutureToScalaFuture
 import sttp.tapir.server.vertx.{VertxFutureServerInterpreter, VertxFutureServerOptions}
@@ -32,6 +33,7 @@ object Main:
 
     // hold on to messaging objects so they don't get GC'd
     private val zmq = ZeroMQPublisher.autowire(AppConfig.DefaultZeroMQConfig)
+    private val nats = NatsPublisher.autowire(AppConfig.DefaultNatsConfig)
     private val log = Loggers(this.getClass)
 
     def main(args: Array[String]): Unit =
