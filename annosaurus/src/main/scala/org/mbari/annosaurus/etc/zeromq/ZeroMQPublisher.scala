@@ -22,6 +22,7 @@ import io.reactivex.rxjava3.subjects.Subject
 import org.mbari.annosaurus.etc.jdk.Loggers
 import org.mbari.annosaurus.etc.jdk.Loggers.given
 import org.mbari.annosaurus.etc.rxjava.EventBus
+import org.mbari.annosaurus.messaging.Message
 import org.zeromq.{SocketType, ZContext}
 
 import java.util.concurrent.{LinkedBlockingQueue, TimeUnit}
@@ -35,9 +36,9 @@ import scala.util.control.NonFatal
 class ZeroMQPublisher(val topic: String, val port: Int, val subject: Subject[?]):
 
     private val context                = new ZContext()
-    private val queue                  = new LinkedBlockingQueue[GenericMessage[?]]()
+    private val queue                  = new LinkedBlockingQueue[Message[?]]()
     private val disposable: Disposable = subject
-        .ofType(classOf[GenericMessage[?]])
+        .ofType(classOf[Message[?]])
         .observeOn(Schedulers.io())
         .distinct()
         .subscribe(m => queue.offer(m))

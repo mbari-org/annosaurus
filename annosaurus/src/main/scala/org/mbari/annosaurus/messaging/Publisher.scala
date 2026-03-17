@@ -18,9 +18,11 @@ package org.mbari.annosaurus.messaging
 
 import io.reactivex.rxjava3.subjects.Subject
 import org.mbari.annosaurus.domain.{Annotation, Association, Observation}
-import org.mbari.annosaurus.etc.zeromq.{AnnotationCreatedMessage, AssociationCreatedMessage, GenericPublisher}
+import org.mbari.annosaurus.etc.zeromq.{AnnotationCreatedMessage, AssociationCreatedMessage}
 import org.mbari.annosaurus.etc.jdk.Loggers.given
 import org.mbari.annosaurus.etc.nats.NatsMessage
+import org.mbari.annosaurus.repository.jpa.entity.AssociationEntity
+import org.mbari.scommons.util.mail.liftToOption
 
 import scala.util.Try
 
@@ -31,6 +33,11 @@ import scala.util.Try
  */
 trait Publisher[A]:
 
+
+    protected def tryWithLogging(f: => Unit): Unit = Try(f).recover {
+        case e => log.atWarn.withCause(e).log("Failed to publish message")
+    }
+
     val log: System.Logger = System.getLogger(getClass.getName)
 
     def created(x: A): Unit
@@ -39,9 +46,7 @@ trait Publisher[A]:
         do created(x)
     def created(opt: Option[A]): Unit  = opt match
         case None    => // do nothing
-        case Some(a) => Try(created(a)).recover {
-            case e => log.atWarn.withCause(e).log(s"Failed to publish created message for $a")
-        }
+        case Some(a) => created(a)
 
     def updated(x: A): Unit
     def updated(xs: Iterable[A]): Unit =
@@ -49,9 +54,7 @@ trait Publisher[A]:
         do updated(x)
     def updated(opt: Option[A]): Unit = opt match {
         case None    => // do nothing
-        case Some(a) => Try(updated(a)).recover {
-            case e => log.atWarn.withCause(e).log(s"Failed to publish updated message for $a")
-        }
+        case Some(a) =>  updated(a)
     }
 
     def deleted(x: A): Unit
@@ -60,43 +63,69 @@ trait Publisher[A]:
         do deleted(x)
     def deleted(opt: Option[A]): Unit = opt match {
         case None => // do nothing
-        case Some(a) => Try(deleted(a)).recover {
-            case e => log.atWarn.withCause(e).log(s"Failed to publish deleted message for $a")
-        }
+        case Some(a) => deleted(a)
     }
+
+object Publisher:
+
+    private def lookup[T](obj: T)(using subject: Subject[Any]): Publisher[T] =
+        (obj match
+            case _: Annotation      => AnnotationPublisher(subject)
+            case _: Observation     => ObservationPublisher(subject)
+            case _: AssociationEntity => AssociationPublisher(subject)
+            case _                  => NoopPublisher(subject)
+        ).asInstanceOf[Publisher[T]]
+
+    def created[A](a: A)(using subject: Subject[Any]): Unit = lookup(a).created(a)
+    def updated[A](a: A)(using subject: Subject[Any]): Unit = lookup(a).updated(a)
+    def deleted[A](a: A)(using subject: Subject[Any]): Unit = lookup(a).deleted(a)
 
 /**
  * Decorator for an reactive Subject that publishes AnnotationMessages for common use cases.
  * @param subject
  */
 class AnnotationPublisher(subject: Subject[Any]) extends Publisher[Annotation]:
-    def created(annotation: Annotation): Unit   = Try:
+    def created(annotation: Annotation): Unit   = tryWithLogging({
         subject.onNext(AnnotationCreatedMessage(annotation))
         subject.onNext(NatsMessage.created(annotation))
-
-    def created(observation: Observation): Unit = created(Annotation.from(observation.toEntity))
-
-    def updated(annotation: Annotation): Unit = Try:
-        subject.onNext(NatsMessage.updated(annotation))
-
-    def updated(observation: Observation): Unit = Try:
-        subject.onNext(NatsMessage.updated(observation))
-
-    def deleted(annotation: Annotation): Unit = Try:
-        subject.onNext(NatsMessage.deleted(annotation))
-
-    def deleted(observation: Observation): Unit = Try:
-        subject.onNext(NatsMessage.deleted(observation))
-
-class Ob
+    })
 
 
+    def updated(annotation: Annotation): Unit =
+        tryWithLogging(subject.onNext(NatsMessage.updated(annotation)))
+
+    def deleted(annotation: Annotation): Unit =
+        tryWithLogging(subject.onNext(NatsMessage.deleted(annotation)))
+
+
+class ObservationPublisher(subject: Subject[Any]) extends Publisher[Observation]:
+    def created(observation: Observation): Unit =
+        tryWithLogging(subject.onNext(NatsMessage.created(observation)))
+
+    def updated(observation: Observation): Unit = {
+        Annotation.from(observation.toEntity).foreach(a => tryWithLogging(subject.onNext(AnnotationCreatedMessage(a))))
+        tryWithLogging(subject.onNext(NatsMessage.updated(observation)))
+    }
+
+    def deleted(observation: Observation): Unit =
+        tryWithLogging(subject.onNext(NatsMessage.deleted(observation)))
 
 class AssociationPublisher(subject: Subject[Any]) extends Publisher[Association]:
-    def created(association: Association): Unit = Try(
-        subject.onNext(AssociationCreatedMessage(association))
-    )
+    def created(association: Association): Unit =
+        tryWithLogging({
+            subject.onNext(AssociationCreatedMessage(association))
+            subject.onNext(NatsMessage.created(association))
+        })
 
-    def updated(association: Association): Unit = ???
+    def updated(association: Association): Unit =
+        tryWithLogging(subject.onNext(NatsMessage.updated(association)))
 
-    def deleted(association: Association): Unit = ???
+
+    def deleted(association: Association): Unit =
+        tryWithLogging(subject.onNext(NatsMessage.deleted(association)))
+
+class NoopPublisher(subject: Subject[Any]) extends Publisher[Any]:
+
+    def created(x: Any): Unit = ()
+    def updated(x: Any): Unit = ()
+    def deleted(x: Any): Unit = ()
