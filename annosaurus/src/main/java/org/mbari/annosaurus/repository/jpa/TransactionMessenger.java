@@ -25,7 +25,7 @@ public class TransactionMessenger {
     @PostPersist
     public void postPersist(Object object) {
         var subject = subjectRef.get();
-        if (subject == null) {
+        if (subject != null) {
             Publisher$.MODULE$.created(object, subject);
         }
 
