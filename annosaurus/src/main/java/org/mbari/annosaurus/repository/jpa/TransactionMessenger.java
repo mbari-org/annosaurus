@@ -1,41 +1,33 @@
 package org.mbari.annosaurus.repository.jpa;
 
-import io.reactivex.rxjava3.annotations.NonNull;
-import io.reactivex.rxjava3.subjects.PublishSubject;
 import io.reactivex.rxjava3.subjects.Subject;
-import org.mbari.annosaurus.repository.jpa.entity.AssociationEntity;
-import org.mbari.annosaurus.repository.jpa.entity.ObservationEntity;
+import jakarta.persistence.PostPersist;
+import org.mbari.annosaurus.messaging.Publisher$;
 
-import java.util.Optional;
-import java.util.UUID;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class TransactionMessenger {
 
-    public enum Action {
-        CREATE,
-        UPDATE,
-        REMOVE
+    private static final AtomicReference<Subject<Object>> subjectRef = new AtomicReference<>();
+
+    public TransactionMessenger() {
+
     }
 
-    public record Message(Action action, Class<?> clazz, UUID uuid) {}
-
-    private static final @NonNull Subject<Object> rxSubject = PublishSubject.create().toSerialized();
-
-
-    public static Subject<?> getRxSubject() {
-        return rxSubject;
+    public static void setSubject(Subject<Object> subject) {
+        subjectRef.set(subject);
     }
 
-    public void notifyPersist(Object o) {
-        extractUuid(o).ifPresent(uuid -> getRxSubject().onNext(new Message(Action.CREATE, o.getClass(), uuid)));
+    public static Subject<Object> getSubject() {
+        return subjectRef.get();
     }
 
-
-    private Optional<UUID> extractUuid(Object o) {
-        return switch(o) {
-            case ObservationEntity observation -> Optional.of(observation.getUuid());
-            case AssociationEntity association -> Optional.of(association.getUuid());
-            default -> Optional.empty();
+    @PostPersist
+    public void postPersist(Object object) {
+        var subject = subjectRef.get();
+        if (subject == null) {
+            Publisher$.MODULE$.created(object, subject);
         }
+
     }
 }

@@ -17,14 +17,9 @@
 package org.mbari.annosaurus.controllers
 
 import io.reactivex.rxjava3.subjects.Subject
-import org.mbari.annosaurus.domain.{
-    Association,
-    ConceptAssociation,
-    ConceptAssociationRequest,
-    ConceptAssociationResponse
-}
+import org.mbari.annosaurus.domain.{Association, ConceptAssociation, ConceptAssociationRequest, ConceptAssociationResponse}
 import org.mbari.annosaurus.etc.rxjava.EventBus
-import org.mbari.annosaurus.messaging.AssociationPublisher
+import org.mbari.annosaurus.messaging.{AssociationPublisher, Publisher}
 import org.mbari.annosaurus.repository.jpa.JPADAOFactory
 import org.mbari.annosaurus.repository.jpa.entity.AssociationEntity
 import org.mbari.annosaurus.repository.{AssociationDAO, NotFoundInDatastoreException}
@@ -44,7 +39,7 @@ class AssociationController(
 
     type ADAO = AssociationDAO[AssociationEntity]
 
-    private val associationPublisher = new AssociationPublisher(bus)
+    given Subject[Any] = bus
 
     override def newDAO(): AssociationDAO[AssociationEntity] = daoFactory.newAssociationDAO()
 
@@ -78,7 +73,7 @@ class AssociationController(
                     association
         exec(fn).map(entity =>
             val a = transform(entity) // transform after transaction is committed or UUID isn't set
-            associationPublisher.created(a)
+            Publisher.created(a)
             a
         )
 
@@ -107,7 +102,7 @@ class AssociationController(
                     do
                         association.getObservation.removeAssociation(association)
                         obs.addAssociation(association)
-                    associationPublisher.created(Association.from(association))
+                    Publisher.created(Association.from(association))
                     transform(association)
                 )
 
