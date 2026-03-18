@@ -20,8 +20,6 @@ import jakarta.persistence.PostLoad;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreRemove;
 import jakarta.persistence.PreUpdate;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -29,15 +27,15 @@ import org.slf4j.LoggerFactory;
  */
 public class TransactionLogger {
 
-    private final Logger log = LoggerFactory.getLogger(TransactionLogger.class);
+    private final System.Logger log = System.getLogger(getClass().getName());
 
     public TransactionLogger() {
     }
 
     @PostLoad
     public void logLoad(Object object) {
-        if (log.isDebugEnabled()) {
-            log.debug("Loaded '{}' into persistent context", object);
+        if (log.isLoggable(System.Logger.Level.DEBUG)) {
+            log.log(System.Logger.Level.DEBUG, "Loaded '" + object +"' into persistent context");
         }
     }
 
@@ -57,8 +55,8 @@ public class TransactionLogger {
     }
 
     private void logTransaction(Object object, TransactionType transactionType) {
-        if (log.isDebugEnabled()) {
-            log.debug("Performing '{}' on {}", transactionType, object);
+        if (log.isLoggable(System.Logger.Level.DEBUG)) {
+            log.log(System.Logger.Level.DEBUG, "Performing '" + transactionType + "' on " + object);
         }
     }
 }

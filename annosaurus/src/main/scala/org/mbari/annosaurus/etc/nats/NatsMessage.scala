@@ -43,7 +43,7 @@ object NatsMessage:
     def updated[A](obj: A): Option[NatsMessage] = from(updated, obj)
 
     def deleted[A](obj: A): Option[NatsMessage] = from(deleted, obj)
-
+    
     private def from[A](action: String, obj: A): Option[NatsMessage] =
         obj match {
             case a: Annotation => a.observationUuid.map(NatsMessage(action, "observation", _))
