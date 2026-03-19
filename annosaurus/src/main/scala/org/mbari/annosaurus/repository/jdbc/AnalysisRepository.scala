@@ -17,21 +17,19 @@
 package org.mbari.annosaurus.repository.jdbc
 
 import jakarta.persistence.{EntityManager, EntityManagerFactory}
-import org.hibernate.jpa.QueryHints
+import org.hibernate.jpa.HibernateHints
 import org.mbari.annosaurus.domain.{DepthHistogram, QueryConstraints, TimeHistogram}
-import org.slf4j.LoggerFactory
 
 import java.time.Instant
 
 class AnalysisRepository(entityManagerFactory: EntityManagerFactory):
 
-    private val log = LoggerFactory.getLogger(getClass)
 
     def depthHistogram(constraints: QueryConstraints, binSizeMeters: Int = 50): DepthHistogram =
         val select                       = DepthHistogramSQL.selectFromBinSize(binSizeMeters)
         val entityManager: EntityManager = entityManagerFactory.createEntityManager()
         val query                        = QueryConstraintsSqlBuilder.toQuery(constraints, entityManager, select, "")
-        query.setHint(QueryHints.HINT_READONLY, true)
+        query.setHint(HibernateHints.HINT_READ_ONLY, true)
         val results                      = query.getResultList.iterator().next()
         entityManager.close()
         val values                       = results
@@ -49,7 +47,7 @@ class AnalysisRepository(entityManagerFactory: EntityManagerFactory):
         val select                       = TimeHistogramSQL.selectFromBinSize(start, now, binSizeDays)
         val entityManager: EntityManager = entityManagerFactory.createEntityManager()
         val query                        = QueryConstraintsSqlBuilder.toQuery(constraints, entityManager, select, "")
-        query.setHint(QueryHints.HINT_READONLY, true)
+        query.setHint(HibernateHints.HINT_READ_ONLY, true)
         val results                      = query.getResultList.iterator().next()
         entityManager.close()
         val values                       = results

@@ -20,10 +20,13 @@ import org.mbari.annosaurus.AssertUtils
 import org.mbari.annosaurus.domain.{Annotation, ConcurrentRequest, MultiRequest}
 import org.mbari.annosaurus.etc.sdk.Futures.*
 import org.mbari.annosaurus.repository.jpa.{BaseDAOSuite, ImagedMomentDAOImpl, JPADAOFactory}
+import org.mbari.annosaurus.repository.jpa.TransactionNotifier
+import org.mbari.annosaurus.repository.jpa.entity.ObservationEntity
 import org.mbari.vcr4j.time.Timecode
 
 import java.time.{Duration, Instant}
 import java.util.UUID
+import java.util.concurrent.{LinkedBlockingQueue, TimeUnit}
 import scala.concurrent.ExecutionContext
 import scala.io.Source
 import scala.jdk.CollectionConverters.*
@@ -405,4 +408,96 @@ trait AnnotationControllerSuite extends BaseDAOSuite:
         val imOpt                        = run(() => imDao.findByUUID(im.getUuid))
         assert(imOpt.isEmpty)
         imDao.close()
+    }
+
+    test("rxCreate") {
+        val queue      = new LinkedBlockingQueue[TransactionNotifier.Message[?]]()
+        val disposable = TransactionNotifier
+            .getRxSubject()
+            .ofType(classOf[TransactionNotifier.Message[?]])
+            .subscribe(queue.offer(_))
+
+        try
+            val im      = TestUtils.build(1, 1).head
+            val anno    = Annotation.from(im.getObservations.asScala.head, true)
+            val created = exec(
+                controller.create(
+                    anno.videoReferenceUuid.get,
+                    anno.concept.get,
+                    anno.observer.get,
+                    anno.observationTimestamp.get
+                )
+            )
+            val uuid = created.observationUuid.get
+
+            // Drain the queue looking for a CREATE event for our specific observation UUID
+            val deadline = System.currentTimeMillis() + 3000L
+            var found    = Option.empty[TransactionNotifier.Message[?]]
+            while found.isEmpty && System.currentTimeMillis() < deadline do
+                Option(queue.poll(200, TimeUnit.MILLISECONDS))
+                    .filter(m => m.action() == TransactionNotifier.Action.CREATE
+                        && m.clazz() == classOf[ObservationEntity]
+                        && m.uuid() == uuid)
+                    .foreach(m => found = Some(m))
+
+            assert(found.isDefined, s"No CREATE event received for observation $uuid")
+        finally
+            disposable.dispose()
+    }
+
+    test("rxUpdate") {
+        val im         = TestUtils.create(1, 1).head
+        val obs        = im.getObservations.asScala.head
+        val newConcept = "rxUpdateConcept"
+
+        val queue      = new LinkedBlockingQueue[TransactionNotifier.Message[?]]()
+        val disposable = TransactionNotifier
+            .getRxSubject()
+            .ofType(classOf[TransactionNotifier.Message[?]])
+            .subscribe(queue.offer(_))
+
+        try
+            exec(controller.update(obs.getUuid, concept = Some(newConcept)))
+            val uuid = obs.getUuid
+
+            val deadline = System.currentTimeMillis() + 3000L
+            var found    = Option.empty[TransactionNotifier.Message[?]]
+            while found.isEmpty && System.currentTimeMillis() < deadline do
+                Option(queue.poll(200, TimeUnit.MILLISECONDS))
+                    .filter(m => m.action() == TransactionNotifier.Action.UPDATE
+                        && m.clazz() == classOf[ObservationEntity]
+                        && m.uuid() == uuid)
+                    .foreach(m => found = Some(m))
+
+            assert(found.isDefined, s"No UPDATE event received for observation $uuid")
+        finally
+            disposable.dispose()
+    }
+
+    test("rxDelete") {
+        val im         = TestUtils.create(1, 1).head
+        val obs        = im.getObservations.asScala.head
+        val uuid       = obs.getUuid
+
+        val queue      = new LinkedBlockingQueue[TransactionNotifier.Message[?]]()
+        val disposable = TransactionNotifier
+            .getRxSubject()
+            .ofType(classOf[TransactionNotifier.Message[?]])
+            .subscribe(queue.offer(_))
+
+        try
+            exec(controller.delete(uuid))
+
+            val deadline = System.currentTimeMillis() + 3000L
+            var found    = Option.empty[TransactionNotifier.Message[?]]
+            while found.isEmpty && System.currentTimeMillis() < deadline do
+                Option(queue.poll(200, TimeUnit.MILLISECONDS))
+                    .filter(m => m.action() == TransactionNotifier.Action.REMOVE
+                        && m.clazz() == classOf[ObservationEntity]
+                        && m.uuid() == uuid)
+                    .foreach(m => found = Some(m))
+
+            assert(found.isDefined, s"No REMOVE event received for observation $uuid")
+        finally
+            disposable.dispose()
     }

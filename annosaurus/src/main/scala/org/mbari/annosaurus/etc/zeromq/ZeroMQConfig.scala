@@ -14,6 +14,6 @@
  * limitations under the License.
  */
 
-package org.mbari.annosaurus
+package org.mbari.annosaurus.etc.zeromq
 
 case class ZeroMQConfig(port: Int, enable: Boolean, topic: String)

@@ -16,8 +16,11 @@
 
 package org.mbari.annosaurus.controllers
 
+import io.reactivex.rxjava3.subjects.Subject
 import org.mbari.annosaurus.domain.{ImagedMoment, WindowRequest}
 import org.mbari.annosaurus.etc.jdk.Loggers.given
+import org.mbari.annosaurus.etc.rxjava.EventBus
+import org.mbari.annosaurus.messaging.Publisher
 import org.mbari.annosaurus.repository.jpa.{BaseDAO, JPADAOFactory}
 import org.mbari.annosaurus.repository.jpa.entity.{AssociationEntity, ImagedMomentEntity}
 import org.mbari.annosaurus.repository.{DAO, ImagedMomentDAO, NotFoundInDatastoreException}
@@ -36,7 +39,7 @@ import scala.jdk.CollectionConverters.*
  *   Brian Schlining
  * @since 2016-06-17T16:06:00
  */
-class ImagedMomentController(val daoFactory: JPADAOFactory)
+class ImagedMomentController(val daoFactory: JPADAOFactory, bus: Subject[Any] = EventBus.RxSubject)
     extends BaseController[ImagedMomentEntity, ImagedMomentDAO[ImagedMomentEntity], ImagedMoment]:
 
     protected type IMDAO = ImagedMomentDAO[ImagedMomentEntity]
@@ -316,6 +319,7 @@ class ImagedMomentController(val daoFactory: JPADAOFactory)
             )
 
         // Create new observations
+        // TODO this loop creates both observations and associations. We need to send creates on an event bus
         sourceImagedMoment
             .getObservations
             .forEach(observation =>
@@ -339,14 +343,12 @@ class ImagedMomentController(val daoFactory: JPADAOFactory)
                         a.setUuid(null)
                     observation.addAssociation(a)
                 )
-//                obsDao.create(observation)
             )
 
         if sourceImagedMoment.getAncillaryDatum != null then
             val ad = sourceImagedMoment.getAncillaryDatum
             ad.setUuid(null)
             targetImagedMoment.setAncillaryDatum(ad)
-//            adDao.create(ad)
 
         dao.flush()
         log.atTrace

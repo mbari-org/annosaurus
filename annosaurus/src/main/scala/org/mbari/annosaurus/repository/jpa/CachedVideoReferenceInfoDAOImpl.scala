@@ -17,7 +17,7 @@
 package org.mbari.annosaurus.repository.jpa
 
 import jakarta.persistence.EntityManager
-import org.hibernate.jpa.QueryHints
+import org.hibernate.jpa.HibernateHints
 import org.mbari.annosaurus.repository.CachedVideoReferenceInfoDAO
 import org.mbari.annosaurus.repository.jpa.entity.CachedVideoReferenceInfoEntity
 
@@ -79,7 +79,7 @@ class CachedVideoReferenceInfoDAOImpl(entityManager: EntityManager)
 
     private def fetchUsing(namedQuery: String): Iterable[String] =
         val query = entityManager.createNamedQuery(namedQuery)
-        query.setHint(QueryHints.HINT_READONLY, true)
+        query.setHint(HibernateHints.HINT_READ_ONLY, true)
         query
             .getResultList
             .asScala

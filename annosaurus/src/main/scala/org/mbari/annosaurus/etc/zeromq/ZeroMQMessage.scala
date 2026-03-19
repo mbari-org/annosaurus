@@ -14,25 +14,20 @@
  * limitations under the License.
  */
 
-package org.mbari.annosaurus.messaging
+package org.mbari.annosaurus.etc.zeromq
 
 import org.mbari.annosaurus.domain.{Annotation, Association}
+import org.mbari.annosaurus.messaging.Message
 import org.mbari.annosaurus.etc.circe.CirceCodecs.{*, given}
 
-/**
- * @author
- *   Brian Schlining
- * @since 2020-03-04T13:31:00
- */
-sealed trait GenericMessage[+A]:
-    def content: A
-    def toJson: String
 
+trait ZeroMQMessage[+T] extends Message[T]
 /**
  * Send when a new annotation is created or an existing one is updated
+ *
  * @param content
  */
-case class AnnotationMessage(content: Annotation) extends GenericMessage[Annotation]:
+case class AnnotationCreatedMessage(content: Annotation) extends ZeroMQMessage[Annotation]:
 
     override def hashCode(): Int =
         this.content.observationUuid.hashCode() +
@@ -40,20 +35,15 @@ case class AnnotationMessage(content: Annotation) extends GenericMessage[Annotat
 
     override def equals(obj: Any): Boolean =
         obj match
-            case that: AnnotationMessage =>
+            case that: AnnotationCreatedMessage =>
                 this.content.observationUuid == that.content.observationUuid &&
-                this.content.observationTimestamp == that.content.observationTimestamp
+                    this.content.observationTimestamp == that.content.observationTimestamp
             case _                       => false
 
     override def toJson: String = content.stringify
 
-case class AssociationMessage(content: Association) extends GenericMessage[Association]:
-//  override def hashCode(): Int = this.content.uuid.hashCode()
-//
-//  override def equals(obj: Any): Boolean = obj match {
-//    case that: AssociationMessage => this.content.uuid == that.content.uuid
-//    case _ => false
-//  }
+case class AssociationCreatedMessage(content: Association) extends ZeroMQMessage[Association]:
 
     override def toJson: String =
         content.stringify
+

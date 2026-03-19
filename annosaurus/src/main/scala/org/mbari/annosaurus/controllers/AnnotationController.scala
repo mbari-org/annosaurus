@@ -19,7 +19,8 @@ package org.mbari.annosaurus.controllers
 import io.reactivex.rxjava3.subjects.Subject
 import org.mbari.annosaurus.domain.{Annotation, ConcurrentRequest, ImageCreateSC, MultiRequest}
 import org.mbari.annosaurus.etc.jdk.Loggers.given
-import org.mbari.annosaurus.messaging.{AnnotationPublisher, MessageBus}
+import org.mbari.annosaurus.etc.rxjava.EventBus
+import org.mbari.annosaurus.messaging.Publisher
 import org.mbari.annosaurus.repository.jpa.JPADAOFactory
 import org.mbari.annosaurus.repository.jpa.entity.ObservationEntity
 import org.mbari.annosaurus.repository.{DAO, ObservationDAO}
@@ -28,6 +29,7 @@ import org.mbari.vcr4j.time.Timecode
 import java.io.Closeable
 import java.time.{Duration, Instant}
 import java.util.UUID
+import java.util.concurrent.atomic.AtomicReference
 import scala.concurrent.{ExecutionContext, Future}
 import scala.jdk.CollectionConverters.*
 
@@ -38,12 +40,14 @@ import scala.jdk.CollectionConverters.*
  */
 class AnnotationController(
     val daoFactory: JPADAOFactory,
-    bus: Subject[Any] = MessageBus.RxSubject
+    bus: Subject[Any] = EventBus.RxSubject
 ):
 
     private val imagedMomentController = new ImagedMomentController(daoFactory)
-    private val annotationPublisher    = new AnnotationPublisher(bus)
-    private val log                    = System.getLogger(getClass.getName())
+
+    private val publisher              = Publisher(bus)
+
+    private val log                    = System.getLogger(getClass.getName)
 
     protected def exec[T](
         fn: ObservationDAO[ObservationEntity] => T
@@ -237,13 +241,14 @@ class AnnotationController(
     def create(annotation: Annotation)(using ec: ExecutionContext): Future[Seq[Annotation]] =
         val entity = annotation.toEntity
         val dao    = daoFactory.newImagedMomentDAO()
+        val ref    = AtomicReference[UUID]()
         val future = dao.runTransaction(d =>
-//            d.create(entity)
-//            Annotation.fromImagedMoment(entity, true)
             val newIm = imagedMomentController.create(d, entity)
             Annotation.fromImagedMoment(newIm, true)
         )
-        future.onComplete(_ => dao.close())
+        future.onComplete(_  => {
+            dao.close()
+        })
         future
 
     /**
@@ -283,7 +288,7 @@ class AnnotationController(
         yield persistedAnnotations
 
         future.onComplete(_ => obsDao.close())
-        future.foreach(annotationPublisher.publish) // publish new annotations
+        future.foreach(publisher.created) // publish new annotations
         future
 
     def update(observationUuid: UUID, annotation: Annotation)(implicit
@@ -347,7 +352,7 @@ class AnnotationController(
             ff
         )
 
-        g.foreach(annotationPublisher.publish)
+        g.foreach(publisher.created)
 
         g
 

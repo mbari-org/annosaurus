@@ -17,13 +17,9 @@
 package org.mbari.annosaurus.controllers
 
 import io.reactivex.rxjava3.subjects.Subject
-import org.mbari.annosaurus.domain.{
-    Association,
-    ConceptAssociation,
-    ConceptAssociationRequest,
-    ConceptAssociationResponse
-}
-import org.mbari.annosaurus.messaging.{AssociationPublisher, MessageBus}
+import org.mbari.annosaurus.domain.{Association, ConceptAssociation, ConceptAssociationRequest, ConceptAssociationResponse}
+import org.mbari.annosaurus.etc.rxjava.EventBus
+import org.mbari.annosaurus.messaging.Publisher
 import org.mbari.annosaurus.repository.jpa.JPADAOFactory
 import org.mbari.annosaurus.repository.jpa.entity.AssociationEntity
 import org.mbari.annosaurus.repository.{AssociationDAO, NotFoundInDatastoreException}
@@ -38,12 +34,12 @@ import scala.concurrent.{ExecutionContext, Future}
  */
 class AssociationController(
     val daoFactory: JPADAOFactory,
-    bus: Subject[Any] = MessageBus.RxSubject
+    bus: Subject[Any] = EventBus.RxSubject
 ) extends BaseController[AssociationEntity, AssociationDAO[AssociationEntity], Association]:
 
     type ADAO = AssociationDAO[AssociationEntity]
 
-    private val associationPublisher = new AssociationPublisher(bus)
+    private val publisher = Publisher(bus)
 
     override def newDAO(): AssociationDAO[AssociationEntity] = daoFactory.newAssociationDAO()
 
@@ -77,7 +73,7 @@ class AssociationController(
                     association
         exec(fn).map(entity =>
             val a = transform(entity) // transform after transaction is committed or UUID isn't set
-            associationPublisher.publish(a)
+            publisher.created(a)
             a
         )
 
@@ -106,7 +102,7 @@ class AssociationController(
                     do
                         association.getObservation.removeAssociation(association)
                         obs.addAssociation(association)
-                    associationPublisher.publish(Association.from(association))
+                    publisher.created(Association.from(association))
                     transform(association)
                 )
 

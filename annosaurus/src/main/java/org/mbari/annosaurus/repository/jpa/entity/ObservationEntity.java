@@ -22,6 +22,7 @@ import org.mbari.annosaurus.repository.jpa.DurationConverter;
 import org.mbari.annosaurus.repository.jpa.TransactionLogger;
 import org.hibernate.envers.Audited;
 import org.hibernate.envers.RelationTargetAuditMode;
+import org.mbari.annosaurus.repository.jpa.TransactionNotifier;
 
 import java.sql.Timestamp;
 import java.time.Duration;
@@ -41,7 +42,7 @@ import java.util.Objects;
                 @Index(name = "idx_observations__imaged_moment_uuid", columnList = "imaged_moment_uuid")
         }
 )
-@EntityListeners({TransactionLogger.class})
+@EntityListeners({TransactionLogger.class, TransactionNotifier.class})
 @NamedNativeQueries(
         {
                 @NamedNativeQuery(

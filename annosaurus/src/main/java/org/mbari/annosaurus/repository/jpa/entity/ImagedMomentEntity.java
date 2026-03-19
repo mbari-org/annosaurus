@@ -22,7 +22,6 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.*;
 import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.annotations.Type;
 import org.hibernate.annotations.UuidGenerator;
 import org.hibernate.type.SqlTypes;
 import org.mbari.annosaurus.repository.jpa.*;

@@ -19,6 +19,7 @@ package org.mbari.annosaurus.repository.jpa.entity;
 import jakarta.persistence.*;
 import org.hibernate.annotations.UuidGenerator;
 import org.mbari.annosaurus.repository.jpa.TransactionLogger;
+import org.mbari.annosaurus.repository.jpa.TransactionNotifier;
 
 import java.sql.Timestamp;
 import java.util.Objects;
@@ -34,7 +35,7 @@ import java.util.UUID;
                 @Index(name = "idx_associations__observation_uuid", columnList = "observation_uuid")
         }
 )
-@EntityListeners({TransactionLogger.class})
+@EntityListeners({TransactionLogger.class, TransactionNotifier.class})
 @NamedNativeQueries(
         {
                 @NamedNativeQuery(

@@ -17,7 +17,7 @@
 package org.mbari.annosaurus.repository.jpa
 
 import jakarta.persistence.EntityManager
-import org.hibernate.jpa.QueryHints
+import org.hibernate.jpa.HibernateHints
 import org.mbari.annosaurus.domain.{ImagedMoment, WindowRequest}
 import org.mbari.annosaurus.repository.ImagedMomentDAO
 import org.mbari.annosaurus.repository.jpa.entity.ImagedMomentEntity
@@ -137,7 +137,7 @@ class ImagedMomentDAOImpl(entityManager: EntityManager)
         val query          = entityManager.createNamedQuery("ImagedMoment.countBetweenUpdatedDates")
         val startTimestamp = Timestamp.from(start)
         val endTimestamp   = Timestamp.from(end)
-        query.setHint(QueryHints.HINT_READONLY, true)
+        query.setHint(HibernateHints.HINT_READ_ONLY, true)
         query.setParameter(1, startTimestamp)
         query.setParameter(2, endTimestamp)
         query

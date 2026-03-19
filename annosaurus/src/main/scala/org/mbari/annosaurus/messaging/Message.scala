@@ -16,21 +16,7 @@
 
 package org.mbari.annosaurus.messaging
 
-import io.reactivex.rxjava3.subjects.{PublishSubject, Subject}
+trait Message[+A]:
+    def content: A
+    def toJson: String
 
-import java.lang.System.Logger.Level
-
-/**
- * This is the shared message bus. All publishers whould listen to this bus and publish the appropriate events to their
- * subscribers.
- *
- * MessageBus.RxSubject: Subject[Any] ^ \| AnnotationPublisher.publish(msg)
- */
-object MessageBus:
-
-    private lazy val log = System.getLogger(getClass.getName)
-
-    val RxSubject: Subject[Any] =
-        PublishSubject.create[Any]().toSerialized
-
-    if log.isLoggable(Level.TRACE) then RxSubject.subscribe(m => log.log(Level.TRACE, m.toString))
