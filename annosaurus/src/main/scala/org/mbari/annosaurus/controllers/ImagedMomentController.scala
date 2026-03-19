@@ -43,7 +43,7 @@ class ImagedMomentController(val daoFactory: JPADAOFactory, bus: Subject[Any] = 
     extends BaseController[ImagedMomentEntity, ImagedMomentDAO[ImagedMomentEntity], ImagedMoment]:
 
     protected type IMDAO = ImagedMomentDAO[ImagedMomentEntity]
-    
+
     private val log = System.getLogger(getClass.getName)
 
 //  // HACK. Assumes daoFactory is JPA
@@ -228,10 +228,7 @@ class ImagedMomentController(val daoFactory: JPADAOFactory, bus: Subject[Any] = 
     )(implicit ec: ExecutionContext): Future[Int] =
         def fn(dao: IMDAO): Int =
             val moments = dao.findByVideoReferenceUUID(videoReferenceUUID)
-            val observationUuids = moments.flatMap(i => i.getObservations.asScala.map(_.getUuid))
-            val associationUuids = moments.flatMap(i => i.getObservations.asScala.flatMap(_.getAssociations.asScala.map(_.getUuid)))
             moments.foreach(dao.delete)
-
             moments.size
         exec(fn)
 
