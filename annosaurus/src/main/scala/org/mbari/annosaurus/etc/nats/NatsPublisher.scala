@@ -81,18 +81,24 @@ object NatsPublisher:
     def autowire(
         opt: Option[NatsConfig],
         subject: Subject[Any] = EventBus.RxSubject
-    ): Option[NatsPublisher] =
-        for
-            config <- opt
-            if config.enable
-        yield
-            val source = TransactionNotifier.getRxSubject
+    ): Option[NatsPublisher] = {
+        try
+            for
+                config <- opt
+                if config.enable
+            yield
+                val source = TransactionNotifier.getRxSubject
 
-            // Translates TransactionNotifier messages to NatsMessages and forwards to subject
-            val bridge = new NatsBridge(source, subject)
+                // Translates TransactionNotifier messages to NatsMessages and forwards to subject
+                val bridge = new NatsBridge(source, subject)
 
-            val closeOp = () => bridge.close()
-            new NatsPublisher(config.url, config.topic, subject, closeOp)
+                val closeOp = () => bridge.close()
+                new NatsPublisher(config.url, config.topic, subject, closeOp)
+        catch
+            case NonFatal(e) =>
+                log.atError.withCause(e).log("Failed to initialize NATS publisher")
+                None
+    }
 
     def log(opt: Option[NatsPublisher]): Unit = opt match
         case None    => log.atInfo.log("NATS is not enabled/configured")
