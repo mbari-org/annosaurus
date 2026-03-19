@@ -241,7 +241,6 @@ class AnnotationController(
     def create(annotation: Annotation)(using ec: ExecutionContext): Future[Seq[Annotation]] =
         val entity = annotation.toEntity
         val dao    = daoFactory.newImagedMomentDAO()
-        val ref    = AtomicReference[UUID]()
         val future = dao.runTransaction(d =>
             val newIm = imagedMomentController.create(d, entity)
             Annotation.fromImagedMoment(newIm, true)

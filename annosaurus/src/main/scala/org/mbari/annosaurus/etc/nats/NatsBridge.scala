@@ -48,10 +48,14 @@ class NatsBridge(source: Subject[?], val sink: Subject[? >: NatsMessage]) extend
             case TransactionNotifier.Action.REMOVE  => Some(NatsMessage.Actions.DELETED)
             case _ => None
 
-        val dataType = msg.clazz() match
-            case `observationClass` => Some(NatsMessage.DataTypes.OBSERVATION)
-            case `associationClass` => Some(NatsMessage.DataTypes.ASSOCIATION)
-            case _ => None
+        val clazz = msg.clazz()
+        val dataType =
+            if observationClass.isAssignableFrom(clazz) then
+                Some(NatsMessage.DataTypes.OBSERVATION)
+            else if associationClass.isAssignableFrom(clazz) then
+                Some(NatsMessage.DataTypes.ASSOCIATION)
+            else
+                None
 
         for
             a <- action

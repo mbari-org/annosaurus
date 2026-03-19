@@ -90,10 +90,17 @@ object ZeroMQPublisher:
         opt: Option[ZeroMQConfig],
         subject: Subject[Any] = EventBus.RxSubject
     ): Option[ZeroMQPublisher] =
-        for
-            conf <- opt
-            if conf.enable
-        yield new ZeroMQPublisher(conf.topic, conf.port, subject)
+        val x = try
+            for
+                conf <- opt
+                if conf.enable
+            yield new ZeroMQPublisher(conf.topic, conf.port, subject)
+        catch
+            case NonFatal(e) =>
+                log.atError.withCause(e).log("Failed to initialize ZeroMQ publisher")
+                None
+        log(x)
+        x
 
     /**
      * Logs info about the ZMQ configuration

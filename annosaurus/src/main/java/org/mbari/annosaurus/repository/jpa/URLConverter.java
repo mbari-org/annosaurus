@@ -48,7 +48,7 @@ public class URLConverter implements AttributeConverter<URL, String> {
                 // url = URI.create(t).toURL();
                 url = URI.create(s).toURL();
             }
-            catch (MalformedURLException e) {
+            catch (IllegalArgumentException | MalformedURLException e) {
                 log.log(System.Logger.Level.WARNING, "Bad URL found. Could not convert " + s + " to a URL");
             }
         }

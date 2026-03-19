@@ -27,12 +27,13 @@ import org.mbari.annosaurus.repository.jpa.TransactionNotifier
 
 import java.nio.charset.StandardCharsets
 import java.util.concurrent.{LinkedBlockingQueue, TimeUnit}
+import scala.util.Try
 import scala.util.control.NonFatal
 
 class NatsPublisher(val url: String, val topic: String, val source: Subject[?], closeOp: () => Unit = () => {}):
 
     private val log                    = Loggers(getClass)
-    private val nc                     = Nats.connect(url)
+    @volatile private var nc           = Nats.connect(url)
     private val queue                  = new LinkedBlockingQueue[NatsMessage]()
     private val disposable: Disposable = source
         .ofType(classOf[NatsMessage])
@@ -40,29 +41,53 @@ class NatsPublisher(val url: String, val topic: String, val source: Subject[?], 
         .distinct()
         .subscribe(m => queue.offer(m))
 
-    @volatile
-    var ok = true
+    @volatile var ok = true
 
     val thread = new Thread(
         () =>
             while ok do
                 try
                     val msg = queue.poll(3600L, TimeUnit.SECONDS)
-                    if msg != null then nc.publish(topic, msg.toJson.getBytes(StandardCharsets.UTF_8))
+                    if msg != null then publish(msg)
                 catch
                     case NonFatal(e) =>
                         log.atWarn
                             .withCause(e)
-                            .log("An exception was thrown in NatsPublisher's publish thread")
+                            .log("Unexpected error in NatsPublisher thread")
         ,
         "NatsPublisher"
     )
     thread.setDaemon(true)
     thread.start()
 
+    private def publish(msg: NatsMessage): Unit =
+        try
+            nc.publish(topic, msg.toJson.getBytes(StandardCharsets.UTF_8))
+        catch
+            case NonFatal(e) =>
+                log.atWarn.withCause(e).log("Failed to publish to NATS, requeueing message and reconnecting")
+                queue.offer(msg)
+                reconnect()
+
+    private def reconnect(): Unit =
+        var delay    = 1000L
+        var connected = false
+        while !connected && ok do
+            Try(nc.close())
+            try
+                log.atInfo.log(s"Attempting to reconnect to NATS at $url ...")
+                nc = Nats.connect(url)
+                connected = true
+                log.atInfo.log("Reconnected to NATS successfully")
+            catch
+                case NonFatal(e) =>
+                    log.atWarn.withCause(e).log(s"Reconnect failed, retrying in ${delay}ms")
+                    Thread.sleep(delay)
+                    delay = Math.min(delay * 2, 30000L)
+
     def close(): Unit =
         ok = false
-        nc.close()
+        Try(nc.close())
         disposable.dispose()
         closeOp()
 
@@ -82,7 +107,7 @@ object NatsPublisher:
         opt: Option[NatsConfig],
         subject: Subject[Any] = EventBus.RxSubject
     ): Option[NatsPublisher] = {
-        try
+        val x = try
             for
                 config <- opt
                 if config.enable
@@ -98,9 +123,11 @@ object NatsPublisher:
             case NonFatal(e) =>
                 log.atError.withCause(e).log("Failed to initialize NATS publisher")
                 None
+        log(x)
+        x
     }
 
     def log(opt: Option[NatsPublisher]): Unit = opt match
         case None    => log.atInfo.log("NATS is not enabled/configured")
         case Some(p) =>
-            log.atInfo.log(s"NATS is publishing annotations to '${p.topic}' at '${p.url}'")
+            log.atInfo.log(s"NATS is publishing annotations to '${p.url}' using topic '${p.topic}'")

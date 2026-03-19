@@ -50,8 +50,6 @@ object Main:
 
         given ExecutionContext = ExecutionContext.global
 
-        ZeroMQPublisher.log(zmq)
-
         // Disable server log: https://github.com/softwaremill/tapir/issues/3272
         // https://softwaremill.com/benchmarking-tapir-part-1/
         // https://softwaremill.com/benchmarking-tapir-part-2/
