@@ -16,8 +16,6 @@
 
 package org.mbari.annosaurus.repository.jpa;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
@@ -30,7 +28,7 @@ import java.net.URISyntaxException;
 @Converter(autoApply = true)
 public class URIConverter implements AttributeConverter<URI, String> {
 
-    private final Logger log = LoggerFactory.getLogger(getClass());
+    private final System.Logger log = System.getLogger(getClass().getName());
 
     @Override
     public String convertToDatabaseColumn(URI uri) {
@@ -45,7 +43,7 @@ public class URIConverter implements AttributeConverter<URI, String> {
                 uri = new URI(s);
             }
             catch (URISyntaxException e) {
-                log.warn("Bad URI found. Could not convert " + s + " to a URI");
+                log.log(System.Logger.Level.WARNING, "Bad URI found. Could not convert " + s + " to a URI");
             }
         }
 

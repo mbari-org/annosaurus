@@ -16,13 +16,12 @@
 
 package org.mbari.annosaurus.repository.jpa;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
 
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 
 /**
@@ -32,7 +31,7 @@ import java.net.URL;
 @Converter(autoApply = true)
 public class URLConverter implements AttributeConverter<URL, String> {
 
-    private final Logger log = LoggerFactory.getLogger(getClass());
+    private final System.Logger log = System.getLogger(getClass().getName());
 
     @Override
     public String convertToDatabaseColumn(URL url) {
@@ -47,10 +46,10 @@ public class URLConverter implements AttributeConverter<URL, String> {
                 // url = URI.create(s).toURL(); // This causes tests to fail
                 // var t = java.net.URLEncoder.encode(s, "UTF-8");
                 // url = URI.create(t).toURL();
-                url = new URL(s);
+                url = URI.create(s).toURL();
             }
             catch (MalformedURLException e) {
-                log.warn("Bad URL found. Could not convert " + s + " to a URL");
+                log.log(System.Logger.Level.WARNING, "Bad URL found. Could not convert " + s + " to a URL");
             }
         }
         return url;

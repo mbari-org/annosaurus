@@ -17,7 +17,7 @@
 package org.mbari.annosaurus.repository.jpa
 
 import jakarta.persistence.{EntityManager, Query}
-import org.hibernate.jpa.QueryHints
+import org.hibernate.jpa.HibernateHints
 import org.mbari.annosaurus.etc.jdk.Loggers.given
 import org.mbari.annosaurus.repository.DAO
 import org.mbari.annosaurus.repository.jpa.entity.IPersistentObject
@@ -73,7 +73,7 @@ abstract class BaseDAO[B <: IPersistentObject: ClassTag](val entityManager: Enti
     ): List[C] =
         if log.isLoggable(Level.DEBUG) then log.atDebug.log(s"JPA Query => $name using $namedParameters")
         val query = entityManager.createNamedQuery(name)
-        if readOnly then query.setHint(QueryHints.HINT_READONLY, true)
+        if readOnly then query.setHint(HibernateHints.HINT_READ_ONLY, true)
         limit.foreach(query.setMaxResults)
         offset.foreach(query.setFirstResult)
         namedParameters.foreach { case (a, b) => query.setParameter(a, b) }
@@ -101,7 +101,7 @@ abstract class BaseDAO[B <: IPersistentObject: ClassTag](val entityManager: Enti
     ): java.util.stream.Stream[B] =
 
         val query = entityManager.createNamedQuery(name)
-        if readOnly then query.setHint(QueryHints.HINT_READONLY, true)
+        if readOnly then query.setHint(HibernateHints.HINT_READ_ONLY, true)
         limit.foreach(query.setMaxResults)
         offset.foreach(query.setFirstResult)
         namedParameters.foreach { case (a, b) => query.setParameter(a, b) }

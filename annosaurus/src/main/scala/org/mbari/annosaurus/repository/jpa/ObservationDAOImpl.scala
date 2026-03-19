@@ -17,7 +17,7 @@
 package org.mbari.annosaurus.repository.jpa
 
 import jakarta.persistence.EntityManager
-import org.hibernate.jpa.QueryHints
+import org.hibernate.jpa.HibernateHints
 import org.mbari.annosaurus.domain.{ConcurrentRequest, MultiRequest}
 import org.mbari.annosaurus.repository.ObservationDAO
 import org.mbari.annosaurus.repository.jdbc.*
@@ -146,7 +146,7 @@ class ObservationDAOImpl(entityManager: EntityManager)
 
     override def countByMultiRequest(request: MultiRequest): Long =
         val query = entityManager.createNamedQuery("Observation.countByMultiRequest")
-        query.setHint(QueryHints.HINT_READONLY, true)
+        query.setHint(HibernateHints.HINT_READ_ONLY, true)
         query.setParameter("uuids", request.videoReferenceUuids.asJava)
         query.getSingleResult.asInstanceOf[Number].longValue()
 
@@ -156,7 +156,7 @@ class ObservationDAOImpl(entityManager: EntityManager)
      */
     override def findAllConcepts(): Seq[String] =
         val query = entityManager.createNamedQuery("Observation.findAllNames")
-        query.setHint(QueryHints.HINT_READONLY, true)
+        query.setHint(HibernateHints.HINT_READ_ONLY, true)
         query
             .getResultList
             .asScala
@@ -166,7 +166,7 @@ class ObservationDAOImpl(entityManager: EntityManager)
 
     override def findAllGroups(): Seq[String] =
         val query = entityManager.createNamedQuery("Observation.findAllGroups")
-        query.setHint(QueryHints.HINT_READONLY, true)
+        query.setHint(HibernateHints.HINT_READ_ONLY, true)
         query
             .getResultList
             .asScala
@@ -176,7 +176,7 @@ class ObservationDAOImpl(entityManager: EntityManager)
 
     override def findAllActivities(): Seq[String] =
         val query = entityManager.createNamedQuery("Observation.findAllActivities")
-        query.setHint(QueryHints.HINT_READONLY, true)
+        query.setHint(HibernateHints.HINT_READ_ONLY, true)
         query
             .getResultList
             .asScala
@@ -201,7 +201,7 @@ class ObservationDAOImpl(entityManager: EntityManager)
 
     override def countByConcept(name: String): Int =
         val query = entityManager.createNamedQuery("Observation.countByConcept")
-        query.setHint(QueryHints.HINT_READONLY, true)
+        query.setHint(HibernateHints.HINT_READ_ONLY, true)
         query.setParameter(1, name)
         query
             .getResultList
@@ -211,7 +211,7 @@ class ObservationDAOImpl(entityManager: EntityManager)
 
     override def countByConceptWithImages(name: String): Int =
         val query = entityManager.createNamedQuery("Observation.countByConceptWithImages")
-        query.setHint(QueryHints.HINT_READONLY, true)
+        query.setHint(HibernateHints.HINT_READ_ONLY, true)
         query.setParameter(1, name)
         query
             .getResultList
@@ -221,7 +221,7 @@ class ObservationDAOImpl(entityManager: EntityManager)
 
     override def countByVideoReferenceUUID(uuid: UUID): Int =
         val query = entityManager.createNamedQuery("Observation.countByVideoReferenceUUID")
-        query.setHint(QueryHints.HINT_READONLY, true)
+        query.setHint(HibernateHints.HINT_READ_ONLY, true)
         query.setParameter(1, uuid)
         query
             .getResultList
@@ -231,7 +231,7 @@ class ObservationDAOImpl(entityManager: EntityManager)
 
     override def countAllByVideoReferenceUuids(): Map[UUID, Int] =
         val query = entityManager.createNamedQuery("Observation.countAllByVideoReferenceUUIDs")
-        query.setHint(QueryHints.HINT_READONLY, true)
+        query.setHint(HibernateHints.HINT_READ_ONLY, true)
         query
             .getResultList
             .asScala
