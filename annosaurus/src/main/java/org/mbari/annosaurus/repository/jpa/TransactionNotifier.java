@@ -28,7 +28,7 @@ import org.mbari.annosaurus.repository.jpa.entity.ObservationEntity;
 import java.util.Optional;
 import java.util.UUID;
 
-public class TransactionMessenger {
+public class TransactionNotifier {
 
     public enum Action {
         CREATE,

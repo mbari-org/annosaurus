@@ -23,19 +23,20 @@ import io.reactivex.rxjava3.subjects.Subject
 import org.mbari.annosaurus.etc.jdk.Loggers
 import org.mbari.annosaurus.etc.jdk.Loggers.given
 import org.mbari.annosaurus.etc.rxjava.EventBus
+import org.mbari.annosaurus.repository.jpa.TransactionNotifier
 
 import java.nio.charset.StandardCharsets
 import java.util.concurrent.{LinkedBlockingQueue, TimeUnit}
 import scala.util.control.NonFatal
 
-class NatsPublisher(val url: String, val topic: String, val subject: Subject[?]):
+class NatsPublisher(val url: String, val topic: String, val source: Subject[?], closeOp: () => Unit = () => {}):
 
     private val log                    = Loggers(getClass)
     private val nc                     = Nats.connect(url)
     private val queue                  = new LinkedBlockingQueue[NatsMessage]()
-    private val disposable: Disposable = subject
+    private val disposable: Disposable = source
         .ofType(classOf[NatsMessage])
-        .observeOn(Schedulers.io())
+        .subscribeOn(Schedulers.io())
         .distinct()
         .subscribe(m => queue.offer(m))
 
@@ -43,16 +44,16 @@ class NatsPublisher(val url: String, val topic: String, val subject: Subject[?])
     var ok = true
 
     val thread = new Thread(
-        () => while ok do
-            try
-                val msg = queue.poll(3600L, TimeUnit.SECONDS)
-                if msg != null then
-                    nc.publish(topic, msg.toJson.getBytes(StandardCharsets.UTF_8))
-            catch
-                case NonFatal(e) =>
-                    log.atWarn
-                        .withCause(e)
-                        .log("An exception was thrown in NatsPublisher's publish thread")
+        () =>
+            while ok do
+                try
+                    val msg = queue.poll(3600L, TimeUnit.SECONDS)
+                    if msg != null then nc.publish(topic, msg.toJson.getBytes(StandardCharsets.UTF_8))
+                catch
+                    case NonFatal(e) =>
+                        log.atWarn
+                            .withCause(e)
+                            .log("An exception was thrown in NatsPublisher's publish thread")
         ,
         "NatsPublisher"
     )
@@ -60,14 +61,23 @@ class NatsPublisher(val url: String, val topic: String, val subject: Subject[?])
     thread.start()
 
     def close(): Unit =
+        ok = false
         nc.close()
         disposable.dispose()
-        ok = false
+        closeOp()
 
 object NatsPublisher:
 
     private val log = Loggers(getClass)
 
+    /**
+     * Creates a NatsPublisher if the config contains NATS info. Otherwise returns None.
+     *
+     * @param opt The NATS config infor. The Config parser may not contain info for NATS. If it doesn't it returns None.
+     * @param subject The RX subjectd to listen for NatsMessages. This is typically the EventBus.RxSubject but can be overridden for testing.
+     *                NatsMessage are converted to JSON and published to NATS.
+     * @return
+     */
     def autowire(
         opt: Option[NatsConfig],
         subject: Subject[Any] = EventBus.RxSubject
@@ -75,7 +85,14 @@ object NatsPublisher:
         for
             config <- opt
             if config.enable
-        yield new NatsPublisher(config.url, config.topic, subject)
+        yield
+            val source = TransactionNotifier.getRxSubject
+
+            // Translates TransactionNotifier messages to NatsMessages and forwards to subject
+            val bridge = new NatsBridge(source, subject)
+
+            val closeOp = () => bridge.close()
+            new NatsPublisher(config.url, config.topic, subject, closeOp)
 
     def log(opt: Option[NatsPublisher]): Unit = opt match
         case None    => log.atInfo.log("NATS is not enabled/configured")

@@ -20,7 +20,7 @@ import io.reactivex.rxjava3.subjects.Subject
 import org.mbari.annosaurus.domain.{ImagedMoment, WindowRequest}
 import org.mbari.annosaurus.etc.jdk.Loggers.given
 import org.mbari.annosaurus.etc.rxjava.EventBus
-import org.mbari.annosaurus.messaging.AssociationPublisher
+import org.mbari.annosaurus.messaging.Publisher
 import org.mbari.annosaurus.repository.jpa.{BaseDAO, JPADAOFactory}
 import org.mbari.annosaurus.repository.jpa.entity.{AssociationEntity, ImagedMomentEntity}
 import org.mbari.annosaurus.repository.{DAO, ImagedMomentDAO, NotFoundInDatastoreException}
@@ -43,9 +43,7 @@ class ImagedMomentController(val daoFactory: JPADAOFactory, bus: Subject[Any] = 
     extends BaseController[ImagedMomentEntity, ImagedMomentDAO[ImagedMomentEntity], ImagedMoment]:
 
     protected type IMDAO = ImagedMomentDAO[ImagedMomentEntity]
-
-    private val associationPublisher = new AssociationPublisher(bus)
-
+    
     private val log = System.getLogger(getClass.getName)
 
 //  // HACK. Assumes daoFactory is JPA

@@ -42,13 +42,7 @@ case class AnnotationCreatedMessage(content: Annotation) extends ZeroMQMessage[A
 
     override def toJson: String = content.stringify
 
-case class AssociationCreatedMessage(content: Association) extends Message[Association]:
-    //  override def hashCode(): Int = this.content.uuid.hashCode()
-    //
-    //  override def equals(obj: Any): Boolean = obj match {
-    //    case that: AssociationMessage => this.content.uuid == that.content.uuid
-    //    case _ => false
-    //  }
+case class AssociationCreatedMessage(content: Association) extends ZeroMQMessage[Association]:
 
     override def toJson: String =
         content.stringify

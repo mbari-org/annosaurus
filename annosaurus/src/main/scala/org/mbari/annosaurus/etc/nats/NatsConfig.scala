@@ -16,6 +16,12 @@
 
 package org.mbari.annosaurus.etc.nats
 
+/**
+ * Configuration for NATS from application.conf/reference.conf
+ * @param url e.g. nats://localhost:4222
+ * @param enable true if NATS should be used
+ * @param topic the NATS topic to publish to
+ */
 final case class NatsConfig(
     url: String,
     enable: Boolean,

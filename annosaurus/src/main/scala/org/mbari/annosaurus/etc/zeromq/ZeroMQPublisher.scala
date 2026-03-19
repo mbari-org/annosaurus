@@ -39,7 +39,7 @@ class ZeroMQPublisher(val topic: String, val port: Int, val subject: Subject[?])
     private val queue                  = new LinkedBlockingQueue[Message[?]]()
     private val disposable: Disposable = subject
         .ofType(classOf[Message[?]])
-        .observeOn(Schedulers.io())
+        .subscribeOn(Schedulers.io())
         .distinct()
         .subscribe(m => queue.offer(m))
     private val log                    = Loggers(getClass)

@@ -40,8 +40,8 @@ class ObservationController(
 
     type ODAO = ObservationDAO[ObservationEntity]
 
-    given Subject[Any] = bus
-
+    private val publisher = Publisher(bus)
+    
     override def newDAO(): ODAO = daoFactory.newObservationDAO()
 
     override def transform(a: ObservationEntity): Observation = Observation.from(a, true)
@@ -75,7 +75,7 @@ class ObservationController(
                     imagedMoment.addObservation(observation)
                     dao.flush()
                     // observation.setImagedMoment(imagedMoment)
-                    Publisher.created(Observation.from(observation))
+                    publisher.created(Observation.from(observation))
                     transform(observation)
 
         exec(fn)
@@ -110,7 +110,7 @@ class ObservationController(
                     obs.getImagedMoment.removeObservation(obs)
                     newIm.addObservation(obs)
 
-                Publisher.created(Observation.from(obs))
+                publisher.created(Observation.from(obs))
                 transform(obs)
             )
 

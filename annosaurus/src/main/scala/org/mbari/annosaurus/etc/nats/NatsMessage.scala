@@ -22,35 +22,35 @@ import org.mbari.annosaurus.etc.circe.CirceCodecs.{*, given}
 
 import java.util.UUID
 
-case class NatsMessage(
-                          action: String,
-                          dataType: String,
-                          uuid: UUID) extends Message[UUID]{
+/**
+ * A minimal message that contains the action, data type, and uuid of the affected record. This is used to trigger
+ * updates in other services without sending the entire record. The receiving service can then query for the
+ * record using the uuid.
+ *
+ * @param action 1 of CREATED, UPDATED, or DELETED
+ * @param dataType 1 of OBSERVATION or ASSOCIATION
+ * @param uuid The uuid of the record that was affected
+ */
+case class NatsMessage(action: String, dataType: String, uuid: UUID) extends Message[UUID]:
 
     override def content: UUID = uuid
 
     override def toJson: String = this.stringify
-}
 
 object NatsMessage:
 
-    private val deleted: String = "deleted"
-    private val created: String = "created"
-    private val updated: String = "updated"
+    enum Actions:
+        case DELETED, CREATED, UPDATED
 
-    def created[A](obj: A): Option[NatsMessage] = from(created, obj)
+    enum DataTypes:
+        case OBSERVATION, ASSOCIATION
 
-    def updated[A](obj: A): Option[NatsMessage] = from(updated, obj)
-
-    def deleted[A](obj: A): Option[NatsMessage] = from(deleted, obj)
-    
-    private def from[A](action: String, obj: A): Option[NatsMessage] =
-        obj match {
-            case a: Annotation => a.observationUuid.map(NatsMessage(action, "observation", _))
-            case o: Observation => o.uuid.map(NatsMessage(action, "observation", _))
-            case b: Association => b.uuid.map(NatsMessage(action, "association", _))
-            case _ => None
-        }
-
-
-
+    /**
+     * Factory method for creating a NatsMessage.
+     * @param action 1 of CREATED, UPDATED, or DELETED
+     * @param dataType 1 of OBSERVATION or ASSOCIATION
+     * @param uuid The uuid of the record that was affected
+     * @return A NatsMessage
+     */
+    def apply(action: Actions, dataType: DataTypes, uuid: UUID): NatsMessage =
+        NatsMessage(action.toString, dataType.toString, uuid)
