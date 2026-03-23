@@ -9,6 +9,7 @@ import java.time.Instant
 
 if (args.length != 2) {
     println("Usage: nats-monitor <url> <topic>")
+    println("Example: nats-monitor nats://localhost:4222 'vars'")
     System.exit(1)
 }
 val (url, topic) = (args(0), args(1))
