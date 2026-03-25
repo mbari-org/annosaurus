@@ -22,7 +22,9 @@ import io.reactivex.rxjava3.subjects.Subject;
 import jakarta.persistence.PostPersist;
 import jakarta.persistence.PostRemove;
 import jakarta.persistence.PostUpdate;
+import org.hibernate.Hibernate;
 import org.mbari.annosaurus.repository.jpa.entity.AssociationEntity;
+import org.mbari.annosaurus.repository.jpa.entity.IPersistentObject;
 import org.mbari.annosaurus.repository.jpa.entity.ObservationEntity;
 
 import java.util.Optional;
@@ -61,33 +63,13 @@ public class TransactionNotifier {
     }
 
     private void notify(Action action, Object obj) {
-        Class<?> entityClass = extractEntityClass(obj);
-        extractUuid(obj).ifPresent(uuid -> getRxSubject().onNext(new Message<>(action, entityClass, uuid)));
-    }
 
-    private Optional<UUID> extractUuid(Object o) {
-        return switch(o) {
-            case ObservationEntity observation -> Optional.of(observation.getUuid());
-            case AssociationEntity association -> Optional.of(association.getUuid());
-            default -> Optional.empty();
-        };
-    }
-
-    /**
-     * obj.getClass() may be a Hibernate proxy/enhanced subclass rather than the entity base type, which can break
-     * downstream matching (e.g., comparisons to ObservationEntity.class). Consider publishing the base entity class
-     * (e.g., ObservationEntity.class / AssociationEntity.class based on instanceof) or change consumers to use
-     * isAssignableFrom.
-     * @param o
-     * @return
-     */
-    private Class<?> extractEntityClass(Object o) {
-        if (o instanceof ObservationEntity) {
-            return ObservationEntity.class;
-        } else if (o instanceof AssociationEntity) {
-            return AssociationEntity.class;
-        } else {
-            return o.getClass();
+        if (obj instanceof IPersistentObject persistentObject) {
+            Class<?> entityClass = Hibernate.getClass(obj);
+            var uuid = persistentObject.getUuid();
+            getRxSubject().onNext(new Message<>(action, entityClass, uuid));
         }
+
     }
+
 }
