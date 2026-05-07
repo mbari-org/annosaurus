@@ -1,3 +1,4 @@
 {
-  "docdir": "annosaurus/src/site"
+  "docdir": "annosaurus/src/site",
+  "generator": "zensical"
 }
