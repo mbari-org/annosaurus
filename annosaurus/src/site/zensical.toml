@@ -10,6 +10,7 @@ nav = [
     { "Security Handshake" = "howto/security_handshake.md" },
     { "Fetch Annotations" = "howto/fetch_annotations.md" },
   ]},
+  { "DeepWiki" = "https://deepwiki.com/mbari-org/annosaurus" },
   { "About" = [
     { "GitHub" = "https://github.com/mbari-media-management/annosaurus" },
   ]},
