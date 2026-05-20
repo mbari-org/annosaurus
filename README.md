@@ -2,8 +2,7 @@
 
 # annosaurus
 
-[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/mbari-org/annosaurus) ![Build](https://github.com/mbari-org/annosaurus/actions/workflows/scala.yml/badge.svg)
- [![DOI](https://zenodo.org/badge/90171432.svg)](https://zenodo.org/badge/latestdoi/90171432)
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/mbari-org/annosaurus) ![Build](https://github.com/mbari-org/annosaurus/actions/workflows/scala.yml/badge.svg) [![DOI](https://zenodo.org/badge/90171432.svg)](https://zenodo.org/badge/latestdoi/90171432)
 
 A RESTful microservice for creating and managing video and image annotations. Built with Scala, Tapir, and Hibernate, annosaurus provides a type-safe, language-agnostic API for annotation management with support for PostgreSQL and SQL Server.
 
@@ -54,13 +53,13 @@ docker run -d \
     mbari/annosaurus
 ```
 
-Once running, access the Swagger API documentation at `http://localhost:8080/docs`
+Once running, access the Swagger API documentation at `http://localhost:8080/docs`.
 
 ## Overview
 
-The service in this repository is one component of our [Video Annotation and Reference System](https://github.com/mbari-org/m3-quickstart). _annosaurus_ is a REST-based web service that stores and retrieves annotations for videos and images. It is designed to work as a programming-language agnostic API that can be accessed from any programming language. The goal of this project is to provide a data service that allows developers and scientists to easily build their own tools for annotating video and images collections.
+Annosaurus is one component of MBARI's [Video Annotation and Reference System](https://github.com/mbari-org/m3-quickstart). It is a REST-based web service that stores and retrieves annotations for videos and images, providing a language-agnostic API so developers and scientists can build their own annotation tools against any tech stack.
 
-This service stands on its own and does not require any other video annotations services. It does require a database, either PostgreSQL or SQL Server.
+The service is self-contained and requires only a database — either PostgreSQL or SQL Server.
 
 ## Documentation
 
@@ -72,23 +71,84 @@ This service stands on its own and does not require any other video annotations 
 
 ### Class Diagram
 
-![Data Model](annosaurus/src/site/images/annosaurus_classes.png)
+```mermaid
+classDiagram
+    class ImagedMoment {
+        +UUID uuid
+        +UUID videoReferenceUuid
+        +Instant recordedTimestamp
+        +Timecode timecode
+        +Duration elapsedTime
+    }
+    class Observation {
+        +UUID uuid
+        +String concept
+        +String observer
+        +Instant observationTimestamp
+        +Duration duration
+        +String group
+        +String activity
+    }
+    class Association {
+        +UUID uuid
+        +String linkName
+        +String toConcept
+        +String linkValue
+        +String mimeType
+    }
+    class ImageReference {
+        +UUID uuid
+        +URL url
+        +String description
+        +Integer width
+        +Integer height
+        +String format
+    }
+    class CachedAncillaryDatum {
+        +UUID uuid
+        +Double latitude
+        +Double longitude
+        +Float depthMeters
+        +Float altitude
+        +Float salinity
+        +Float temperatureCelsius
+        +Float oxygenMlL
+        +Float pressureDbar
+        +Float lightTransmission
+        +Double x
+        +Double y
+        +Double z
+        +Double phi
+        +Double theta
+        +Double psi
+        +String crs
+        +String posePositionUnits
+    }
+    class CachedVideoReferenceInfo {
+        +UUID uuid
+        +UUID videoReferenceUuid
+        +String missionId
+        +String platformName
+        +String missionContact
+    }
 
-- `ImagedMoment`: Reference to some index in a particular video. It can contain zero or more _Observations_ and zero or more _ImageReferences_. It can use any or all of the following as indices, but at least one _must_ be present:
+    ImagedMoment "1" --> "0..*" Observation : contains
+    ImagedMoment "1" --> "0..*" ImageReference : has
+    ImagedMoment "1" --> "0..1" CachedAncillaryDatum : has
+    Observation "1" --> "0..*" Association : has
+```
 
-  - _recordedDate_: The moment in time when the frame or image was recorded
-  - _timecode_: Typically this is a tape timecode, but it could be pulled from a timecode track in a video too.
-  - _elapsedTime_: This is the time since the start of the video clip. This is the most commonly used index for video files.
+- `ImagedMoment`: A reference to a specific point in a video or image collection. It can hold zero or more _Observations_ and zero or more _ImageReferences_. At least one of the following time indices must be present:
 
-- `Observation`: Represents an `annotation`. Includes the annotation term (i.e. concept), an optional duration, and tracks who made the observation. The group and activity fields can be used to further categorize annotations for example at MBARI we might use groups like: _images_, _ROV_, and _AUV_ and activities like: _descent_, _ascent_, _transect_, and _cruising_.
-- `Association`: Information that augments an observation. Very flexible, the format is `linkName | toConcept | linkValue`. Some examples; `eating | Aegina | nil`, `surface-color | self | red`, `audio-comment | nil | first sighting on this mission`.
-- `ImageReference`: Images, such as framegrabs, linked to the moment. It will also be possible to load image references for image annotation projects.
-- `CachedAnxillaryData`: For performance reason, we may want to cache some time indexed information, such as position, CTD, etc, in side the same database as the annotations.
-- `CachedMissionInfo`: This may contain information describing a camera deployment.
+  - _recordedTimestamp_: The wall-clock time when the frame was captured.
+  - _timecode_: A tape or video-track timecode (e.g. `HH:MM:SS:FF`).
+  - _elapsedTime_: Time elapsed since the start of the video clip — the most commonly used index for video files.
 
-### ER Diagram
-
-![ER Model](annosaurus/src/site/images/sqlserver-er-diagram.png)
+- `Observation`: A single annotation at an `ImagedMoment`. Records the concept (taxon or object label), observer, timestamp, optional duration, and optional `group` and `activity` tags. At MBARI, groups include _ROV_, _AUV_, and _images_; activities include _descent_, _ascent_, _transect_, and _cruising_.
+- `Association`: Structured metadata that augments an observation. The format is `linkName | toConcept | linkValue`, for example: `eating | Aegina | nil`, `surface-color | self | red`, or `audio-comment | nil | first sighting on this mission`.
+- `ImageReference`: An image or framegrab linked to an `ImagedMoment`, identified by URL. Used for both video framegrabs and standalone image annotation projects.
+- `CachedAncillaryDatum`: Time-indexed environmental and positional data (latitude, longitude, depth, CTD readings, vehicle pose, etc.) cached alongside annotations for query performance.
+- `CachedVideoReferenceInfo`: Deployment metadata for a video reference — platform name, mission ID, and mission contact — cached to avoid round-trips to the video asset service.
 
 ## Prerequisites
 
@@ -141,6 +201,40 @@ The service is configured through `application.conf` or environment variables. K
 | `LOGBACK_LEVEL` | Logging level | `INFO`, `DEBUG`, `WARN` |
 
 For complete configuration options, see `annosaurus/src/universal/conf/application.conf`.
+
+### NATS Messaging
+
+Annosaurus can optionally publish change notifications to a [NATS](https://nats.io) messaging server whenever observations or associations are created, updated, or deleted. This is disabled by default.
+
+| Environment Variable | Description | Default |
+|---------------------|-------------|---------|
+| `MESSAGING_NATS_ENABLE` | Enable NATS publishing (`true`/`false`) | `false` |
+| `MESSAGING_NATS_URL` | NATS server URL | `nats://localhost:4222` |
+| `MESSAGING_NATS_TOPIC` | NATS subject/topic to publish to | `vars` |
+
+Equivalent `application.conf` keys:
+
+```hocon
+messaging.nats {
+  enable = true
+  url    = "nats://nats-server:4222"
+  topic  = "vars"
+}
+```
+
+Each published message is a compact JSON notification — not the full record. Receivers should query the REST API for the full object using the provided UUID.
+
+```json
+{
+  "action":   "CREATED",
+  "dataType": "OBSERVATION",
+  "uuid":     "018f1a2b-3c4d-7e5f-8a9b-0c1d2e3f4a5b"
+}
+```
+
+- **action** — one of `CREATED`, `UPDATED`, or `DELETED`
+- **dataType** — one of `OBSERVATION` or `ASSOCIATION`
+- **uuid** — the UUID of the affected record
 
 ## API Documentation
 
@@ -219,7 +313,6 @@ Refer to [DEPLOYMENT.md](annosaurus/src/site/docs/DEPLOYMENT.md) for production 
 - Performance tuning
 - Monitoring and logging
 
-
 ## Related Projects
 
 This service is part of MBARI's [Video Annotation and Reference System](https://github.com/mbari-org/m3-quickstart):
@@ -234,7 +327,7 @@ Contributions are welcome! Please:
 1. Fork the repository
 2. Create a feature branch (`git checkout -b feature/your-feature`)
 3. Make your changes and add tests
-4. Ensure all tests pass (`sbt test itPostgres/test itSqlserver/test`)
+4. Ensure all tests pass (`sbt annosaurus/test itPostgres/test itSqlserver/test`)
 5. Commit your changes (`git commit -am 'Add new feature'`)
 6. Push to the branch (`git push origin feature/your-feature`)
 7. Create a Pull Request

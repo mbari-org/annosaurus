@@ -1,6 +1,6 @@
 # Security Handshake
 
-All endpoints that can mutate the database require a header of `Authorization: Bearer <jwt_token>`. You can obtain a JWT token by submitting a `POST /auth` request such as the following:
+All endpoints that can mutate the database require an `Authorization: Bearer <jwt_token>` header. Obtain a JWT token by sending a `POST /auth` request with your API key:
 
 ```text
 POST /anno/v1/auth
@@ -11,24 +11,26 @@ Example using curl:
 
 ```bash
 curl -X 'POST' \
-  'http:/myserver.org/anno/v1/auth' \
+  'http://myserver.org/anno/v1/auth' \
   -H 'Authorization: APIKEY <your_api_key>'
 ```
 
-## Security flow diagram
+The response includes an `access_token` field containing the JWT. Pass that token in all subsequent mutating requests.
+
+## Security Flow
 
 ```mermaid
 sequenceDiagram
     actor U as User
     participant A as Annosaurus
-    U->>+A: GET /auth
+    U->>+A: POST /auth
     activate A
     Note right of A: Authorization: APIKEY <your api key>
     A-->>U: {..., "access_token": <jwt> }
     deactivate A
-    U->>+A: POST/DELETE/PUT
+    U->>+A: POST / PUT / DELETE
     activate A
     Note right of A: Authorization: Bearer <jwt>
-    A-->>U: Success reponse 20x
+    A-->>U: Success response 20x
     deactivate A
 ```

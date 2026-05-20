@@ -43,5 +43,5 @@ public record AncillaryDatumDTO(
     UUID imagedMomentUuid,
     Instant recordedTimestamp
 ) {
-
+    
 }

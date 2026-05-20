@@ -1,40 +1,93 @@
-# How to deploy
+# Deployment
 
-## Customize for your Database
+## Using Docker (Recommended)
 
-These are the deployment instructions for MBARI. To deploy on your own network and database you will need to do the following:
+Pre-built multi-platform images (amd64/arm64) are published to Docker Hub as `mbari/annosaurus`.
 
-1. Run `sbt pack`
-2. Find the JDBC driver for your database. For example, you can get the PostgreSQL driver at [https://jdbc.postgresql.org/download.html](https://jdbc.postgresql.org/download.html). Download the _.jar_ file for your database and copy it into `target\pack\lib`.
-3. Customize configuration file at `target\pack\conf\application.conf`. You will need to change the `production` section to use your databases parameters. 
-    - Refer to your databases JDBC documentation for the format of the URL and the drivers _class_ name. 
-    - Your database administrator can provide you with a username (with write access) and password for your database
-    - Annosaurus will generate the database schema automatically when it's first run. Make sure that the user account has permissions to create schemas.
-4. Run the commands below. Substitute your docker username for _hohonuuli_.    
-
-
-## Deployment Instructions
-
-Build and deploy an new docker image. __Substitute your docker username for _hohonuuli_.__
-
+**PostgreSQL:**
+```bash
+docker run -d \
+    -p 8080:8080 \
+    -e BASICJWT_CLIENT_SECRET="your-client-secret" \
+    -e BASICJWT_SIGNING_SECRET="your-signing-secret" \
+    -e DATABASE_DRIVER="org.postgresql.Driver" \
+    -e DATABASE_URL="jdbc:postgresql://localhost:5432/annotations" \
+    -e DATABASE_USER="dbuser" \
+    -e DATABASE_PASSWORD="dbpass" \
+    -e LOGBACK_LEVEL=INFO \
+    --name=annosaurus \
+    --restart unless-stopped \
+    mbari/annosaurus
 ```
-sbt pack
+
+**SQL Server:**
+```bash
+docker run -d \
+    -p 8080:8080 \
+    -e BASICJWT_CLIENT_SECRET="your-client-secret" \
+    -e BASICJWT_SIGNING_SECRET="your-signing-secret" \
+    -e DATABASE_DRIVER="com.microsoft.sqlserver.jdbc.SQLServerDriver" \
+    -e DATABASE_URL="jdbc:sqlserver://localhost:1433;databaseName=annotations" \
+    -e DATABASE_USER="dbuser" \
+    -e DATABASE_PASSWORD="dbpass" \
+    -e LOGBACK_LEVEL=INFO \
+    --name=annosaurus \
+    --restart unless-stopped \
+    mbari/annosaurus
+```
+
+Database schema migrations are applied automatically by Flyway on startup. The database user must have permission to create and alter tables on the first run.
+
+## Building from Source
+
+```bash
+sbt stage
+```
+
+The staged application is written to `annosaurus/target/universal/stage/`. Run it with:
+
+```bash
+annosaurus/target/universal/stage/bin/annosaurus
+```
+
+## Building and Publishing a Docker Image
+
+```bash
+sbt stage
 docker build -t mbari/annosaurus .
-docker login --username=hohonuuli
+docker login
 docker push mbari/annosaurus
 ```
 
-## On Deployment Machine
+## Running as a systemd Service
 
-```
+If your deployment machine uses systemd, you can manage the container as a service.
+
+1. Copy `docker.annosaurus.service` to `/etc/systemd/system/`.
+2. Test the service: `sudo systemctl start docker.annosaurus`
+3. Check the status: `sudo systemctl status docker.annosaurus`
+4. Enable it to start on boot: `sudo systemctl enable docker.annosaurus`
+
+To restart after pulling a new image:
+
+```bash
 docker pull mbari/annosaurus
-sudo /usr/bin/systemctl restart docker.annosaurus
+sudo systemctl restart docker.annosaurus
 ```
 
-## Setup for deployment
+## Configuration
 
-This has already been done, but these notes are for reference. If you are using a machine that supports systemctl you can follow the instructions below to setup annosaurus as a service.
+All settings can be overridden with environment variables. Key options:
 
-1. Copy `docker.annosaurus.service` onto portal at `/etc/systemd/system`. I did it as myself (brian) and did not have to monkey with file permissions at all.
-2. Run a test using `/usr/bin/systemctl start docker.annosaurus` and verify that it works.
-3. Enable it with `/usr/bin/systemctl enable docker.annosaurus`. You can verify the status using `/usr/bin/systemctl status docker.annosaurus`
+| Environment Variable | Description | Example |
+|---------------------|-------------|---------|
+| `DATABASE_URL` | JDBC connection URL | `jdbc:postgresql://localhost:5432/annotations` |
+| `DATABASE_DRIVER` | JDBC driver class | `org.postgresql.Driver` |
+| `DATABASE_USER` | Database username | `dbuser` |
+| `DATABASE_PASSWORD` | Database password | `dbpass` |
+| `BASICJWT_CLIENT_SECRET` | JWT client secret | `your-secret` |
+| `BASICJWT_SIGNING_SECRET` | JWT signing secret | `your-secret` |
+| `HTTP_PORT` | HTTP server port | `8080` |
+| `LOGBACK_LEVEL` | Logging level | `INFO`, `DEBUG`, `WARN` |
+
+For the full list of options, see `annosaurus/src/universal/conf/application.conf`.

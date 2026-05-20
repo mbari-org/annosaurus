@@ -1,22 +1,23 @@
-# Fetching annotations
+# Fetching Annotations
 
-There are a number of endpoints for fetching annotations. The recommended way to fetch annotations is to use the `GET /v1/fast` endpoints.
+There are a number of endpoints for fetching annotations. The recommended approach is to use the `GET /v1/fast` endpoints.
 
-By default, he endpoints below do no include the ancillary data for each annotation. To include the ancillary data, add the `?data=true` query parameter to the URL.
+By default, the endpoints below do not include ancillary data for each annotation. To include it, add the `?data=true` query parameter.
 
 ## Fetch by video
 
 Get all annotations for a single video. You will need the `video_reference_uuid` from your video asset manager.
 
-`GET http://myserver.org/anno/v1/fast/videoreference/<video_reference_uuid>`
+```text
+GET http://myserver.org/anno/v1/fast/videoreference/<video_reference_uuid>
+```
 
 ## Fetch by multiple videos
 
-Get all annotations for multiple videos. You will need the list of `video_reference_uuid` from your video asset manager.
+Get all annotations for a set of videos.
 
 ```text
 POST http://myserver.org/anno/v1/fast/multi
-
 Content-Type: application/json
 
 {
@@ -28,13 +29,12 @@ Content-Type: application/json
 }
 ```
 
-## Fetch by multiple videos but only within specific time bounds
+## Fetch by multiple videos within a time window
 
-Gets all annotations from multiple videos, but only returns the ones in the given time range.
+Returns only annotations whose `recordedTimestamp` falls within the given range.
 
 ```text
 POST http://myserver.org/anno/v1/fast/concurrent
-
 Content-Type: application/json
 
 {
@@ -43,16 +43,16 @@ Content-Type: application/json
     "<video_reference_uuid>",
     "<video_reference_uuid>"
   ],
-  "start_timestamp": <start_time_iso8601>,
-  "end_timestamp": <end_time_iso8601>
+  "start_timestamp": "<ISO 8601>",
+  "end_timestamp": "<ISO 8601>"
 }
 ```
 
-iso8601 timestamps are formated like: `yyyy-mm-ddThh:mm:ss.sssZ`
+Timestamps must be ISO 8601 formatted: `YYYY-MM-DDTHH:MM:SS.sssZ`
 
 ## Fetch by concept name
 
-Gets all annotations for a concept name.
+Get all annotations for a given concept name.
 
 ```text
 GET http://myserver.org/anno/v1/fast/concept/<concept_name>

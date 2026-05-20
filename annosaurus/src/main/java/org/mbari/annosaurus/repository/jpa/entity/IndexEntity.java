@@ -85,6 +85,7 @@ public class IndexEntity implements IPersistentObject {
         this.elapsedTime = elapsedTime;
         this.recordedTimestamp = recordedTimestamp;
         this.timecode = timecode;
+
     }
 
     public IndexEntity(ImagedMomentEntity imagedMomentEntity) {
