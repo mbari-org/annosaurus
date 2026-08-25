@@ -44,9 +44,10 @@ a hard-coded list that each tool maintains privately.
 (`"x": 982`). Every other type uses parallel arrays (`"x": [2128]`). A point is an array of
 length one. Any consumer must branch on `link_name` before it can even begin parsing.
 
-**2.3 — Parallel arrays can desynchronize.** Nothing enforces `len(x) == len(y)`. A truncated or
-partially-written value produces a polygon that cannot be interpreted, and no constraint anywhere
-detects it. The failure surfaces at read time, in whichever tool happens to read it next.
+**2.3 — Parallel arrays can desynchronize.** (i.e. separate x and y columns) Nothing enforces
+`len(x) == len(y)`. A truncated or partially-written value produces a polygon that cannot be
+interpreted, and no constraint anywhere detects it. The failure surfaces at read time, in
+whichever tool happens to read it next.
 
 **2.4 — Optional provenance keys appear and disappear.** `verifier` is present in one bounding box
 and absent in the other. `generator` and `confidence` are present on boxes and absent on points,
@@ -395,6 +396,8 @@ GET    /v1/localizations/videoreference/{video_reference_uuid}   (paged; ML expo
 PUT    /v1/localizations/{observation_uuid}/{localization_type}  (upsert)
 DELETE /v1/localizations/{observation_uuid}/{localization_type}
 POST   /v1/localizations/bulk                                    (ML pipelines)
+GET    /v1/localizations/list/types                              (list the 5 localization_types)
+GET    /v1/localizations/list/maskencodings                      (list accepted values for mask_encoding)
 ```
 
 `PUT` against the natural key is idempotent. It optionally accepts the caller's
