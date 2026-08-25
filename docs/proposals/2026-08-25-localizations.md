@@ -398,6 +398,7 @@ DELETE /v1/localizations/{observation_uuid}/{localization_type}
 POST   /v1/localizations/bulk                                    (ML pipelines)
 GET    /v1/localizations/list/types                              (list the 5 localization_types)
 GET    /v1/localizations/list/maskencodings                      (list accepted values for mask_encoding)
+GET    /v1/localizations/list/constraints                        (return localization_types, mask_encodings)
 ```
 
 `PUT` against the natural key is idempotent. It optionally accepts the caller's
