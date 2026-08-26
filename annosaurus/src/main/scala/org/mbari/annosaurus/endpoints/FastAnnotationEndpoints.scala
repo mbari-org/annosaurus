@@ -402,8 +402,8 @@ class FastAnnotationEndpoints(jdbcRepository: JdbcRepository)(using
             }
 
     // DELETE /videoreference/:uuid
-    val deleteAnnotationsByVideoReferenceUuid: Endpoint[Unit, UUID, ErrorMsg, DeleteCountSC, Any] =
-        openEndpoint
+    val deleteAnnotationsByVideoReferenceUuid: Endpoint[Option[String], UUID, ErrorMsg, DeleteCountSC, Any] =
+        secureEndpoint
             .delete
             .in(base / "videoreference" / path[UUID]("videoReferenceUuid"))
             .out(jsonBody[DeleteCountSC])
@@ -413,7 +413,8 @@ class FastAnnotationEndpoints(jdbcRepository: JdbcRepository)(using
 
     val deleteAnnotationsByVideoReferenceUuidImpl: ServerEndpoint[Any, Future] =
         deleteAnnotationsByVideoReferenceUuid
-            .serverLogic { uuid =>
+            .serverSecurityLogic(jwtOpt => verify(jwtOpt))
+            .serverLogic { _ => uuid =>
                 handleErrors(
                     Future {
                         val count = jdbcRepository.deleteByVideoReferenceUuid(uuid)

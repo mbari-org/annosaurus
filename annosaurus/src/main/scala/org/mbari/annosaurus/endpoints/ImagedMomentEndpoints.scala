@@ -455,8 +455,8 @@ class ImagedMomentEndpoints(controller: ImagedMomentController)(using
             }
 
     // DELETE /videoreference/:uuid
-    val deleteByVideoReferenceUUID: Endpoint[Unit, UUID, ErrorMsg, CountForVideoReferenceSC, Any] =
-        openEndpoint
+    val deleteByVideoReferenceUUID: Endpoint[Option[String], UUID, ErrorMsg, CountForVideoReferenceSC, Any] =
+        secureEndpoint
             .delete
             .in(base / "videoreference" / path[UUID]("videoReferenceUuid"))
             .out(jsonBody[CountForVideoReferenceSC])
@@ -466,7 +466,8 @@ class ImagedMomentEndpoints(controller: ImagedMomentController)(using
 
     val deleteByVideoReferenceUUIDImpl: ServerEndpoint[Any, Future] =
         deleteByVideoReferenceUUID
-            .serverLogic { uuid =>
+            .serverSecurityLogic(jwtOpt => verify(jwtOpt))
+            .serverLogic { _ => uuid =>
                 handleErrors(
                     controller
                         .deleteByVideoReferenceUUID(uuid)

@@ -33,14 +33,6 @@ PUT  /v1/observations/{uuid}               # Authorization: Bearer <jwt>
 
 Note that several read-only operations use `POST` because they take a JSON request body — searching by a list of video references, or submitting a query. Those still need no token. The rule follows what the endpoint *does*, not which verb it uses.
 
-There are two exceptions to be aware of, both bulk deletes that are **not** protected by a token in the current release:
-
-```text
-DELETE /v1/fast/videoreference/{uuid}          # deletes annotations for a video reference
-DELETE /v1/imagedmoments/videoreference/{uuid} # deletes all imaged moments for a video reference
-```
-
-Anyone who can reach the service can call these and remove every annotation for a video. If your deployment is reachable beyond a trusted network, block these two paths at your reverse proxy.
 
 ## For staff deploying annosaurus
 
