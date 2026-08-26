@@ -37,7 +37,7 @@ class HealthEndpoints(using ec: ExecutionContext) extends Endpoints:
             .tag("Health")
 
     val healthEndpointImpl: ServerEndpoint[Any, Future] =
-        healthEndpoint.serverLogic(_ => handleErrors(Future(HealthStatus.default)))
+        healthEndpoint.serverLogic(_ => handleErrors(Future.successful(HealthStatus.default)))
 
     override def all: List[Endpoint[?, ?, ?, ?, ?]] =
         List(healthEndpoint)
