@@ -22,6 +22,7 @@ A RESTful microservice for creating and managing video and image annotations. Bu
 ### Using Docker (Recommended)
 
 **PostgreSQL:**
+
 ```bash
 docker run -d \
     -p 8080:8080 \
@@ -38,6 +39,7 @@ docker run -d \
 ```
 
 **SQL Server:**
+
 ```bash
 docker run -d \
     -p 8080:8080 \
