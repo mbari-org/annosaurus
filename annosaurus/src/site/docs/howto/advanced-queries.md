@@ -215,7 +215,7 @@ Notes on the output:
 ```json
 {
   "select": ["concept", "observer", "index_recorded_timestamp", "associations", "image_url"],
-  "where": [{ "column": "dive_number", "equals": "Doc Ricketts 1373" }],
+  "where": [{ "column": "video_sequence_name", "equals": "Doc Ricketts 1373" }],
   "strict": false
 }
 ```
@@ -243,22 +243,22 @@ Notes on the output:
 }
 ```
 
-**Everything observed at the same moment as a squid** — the flag turns a filter for squid into a filter for moments containing squid
+**Everything observed at the same moment as all types of _Opisthoteuthidae_** — You can use [Oni](https://dsg.mbari.org/kb/v1/phylogeny/down/Opisthoteuthidae) or [FathomNet](https://database.fathomnet.org/worms/descendants/Opisthoteuthidae) to fetch all the relevant names. A shell command for fetching from MBARI's public knowledgebase might be `curl -s https://dsg.mbari.org/kb/v1/phylogeny/down/Opisthoteuthidae | jq -r '[.. | objects | .name // empty] | map("\"\(.)\"") | join(", ")'`
 
 ```json
 {
   "select": ["concept", "index_recorded_timestamp", "depth_meters"],
-  "where": [{ "column": "concept", "contains": "squid" }],
+  "where": [{ "column": "concept", "in": ["squid"] }],
   "concurrentObservations": true
 }
 ```
 
-**Measurement associations only, paged**
+**"Eating" associations only, paged**
 
 ```json
 {
   "select": ["concept", "link_name", "to_concept", "link_value"],
-  "where": [{ "column": "link_name", "like": "%length%" }],
+  "where": [{ "column": "link_name", "like": "eating%" }],
   "orderBy": ["concept"],
   "limit": 1000,
   "offset": 0
