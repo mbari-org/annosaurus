@@ -248,7 +248,18 @@ Notes on the output:
 ```json
 {
   "select": ["concept", "index_recorded_timestamp", "depth_meters"],
-  "where": [{ "column": "concept", "in": ["squid"] }],
+  "where": [{ "column": "concept", "in": [
+      "Opisthoteuthidae", 
+      "Opisthoteuthis", 
+      "Opisthoteuthis cf. californiana", 
+      "Opisthoteuthis sp. A", 
+      "Grimpoteuthis", 
+      "Grimpoteuthis sp. 5", 
+      "Grimpoteuthis sp. 1", 
+      "Grimpoteuthis bathynectes", 
+      "Grimpoteuthis sp. 4", 
+      "Grimpoteuthis tuftsi"
+    ] }],
   "concurrentObservations": true
 }
 ```
