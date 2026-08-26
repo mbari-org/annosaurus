@@ -57,7 +57,7 @@ Once running, access the Swagger API documentation at `http://localhost:8080/doc
 
 ## Overview
 
-Annosaurus is one component of MBARI's [Video Annotation and Reference System](https://github.com/mbari-org/m3-quickstart). It is a REST-based web service that stores and retrieves annotations for videos and images, providing a language-agnostic API so developers and scientists can build their own annotation tools against any tech stack.
+Annosaurus is one component of MBARI's Video Annotation and Reference System (VARS). It is a REST-based web service that stores and retrieves annotations for videos and images, providing a language-agnostic API so developers and scientists can build their own annotation tools against any tech stack.
 
 The service is self-contained and requires only a database — either PostgreSQL or SQL Server.
 
@@ -315,10 +315,11 @@ Refer to [DEPLOYMENT.md](annosaurus/src/site/docs/DEPLOYMENT.md) for production 
 
 ## Related Projects
 
-This service is part of MBARI's [Video Annotation and Reference System](https://github.com/mbari-org/m3-quickstart):
+This service is part of MBARI's Video Annotation and Reference System (VARS):
 
 - [vampire-squid](https://github.com/mbari-org/vampire-squid) - Video asset management service
-- [m3-quickstart](https://github.com/mbari-org/m3-quickstart) - Complete system deployment guide
+- [vars-quickstart-public](https://github.com/mbari-org/vars-quickstart-public) - Complete system deployment guide for use outside MBARI
+- [vars-quickstart-mbari](https://github.com/mbari-org/vars-quickstart-mbari) - Complete system deployment guide for MBARI deployments
 
 ## Contributing
 

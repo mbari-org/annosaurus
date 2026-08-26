@@ -6,9 +6,11 @@ repo_name = "mbari-org/annosaurus"
 repo_url = "https://github.com/mbari-org/annosaurus"
 nav = [
   { "Home" = "index.md" },
+  { "Overview" = "overview.md" },
   { "How-to" = [
     { "Security Handshake" = "howto/security_handshake.md" },
     { "Fetch Annotations" = "howto/fetch_annotations.md" },
+    { "Advanced Queries" = "howto/advanced-queries.md" },
   ]},
   { "DeepWiki" = "https://deepwiki.com/mbari-org/annosaurus" },
   { "About" = [
