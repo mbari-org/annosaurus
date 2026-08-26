@@ -5,6 +5,7 @@
 Pre-built multi-platform images (amd64/arm64) are published to Docker Hub as `mbari/annosaurus`.
 
 **PostgreSQL:**
+
 ```bash
 docker run -d \
     -p 8080:8080 \
@@ -21,6 +22,7 @@ docker run -d \
 ```
 
 **SQL Server:**
+
 ```bash
 docker run -d \
     -p 8080:8080 \
