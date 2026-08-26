@@ -197,6 +197,7 @@ The service is configured through `application.conf` or environment variables. K
 | `DATABASE_DRIVER` | JDBC driver class | `org.postgresql.Driver` |
 | `DATABASE_USER` | Database username | `dbuser` |
 | `DATABASE_PASSWORD` | Database password | `dbpass` |
+| `DATABASE_QUERY_VIEW` | Database view backing the `/v1/query` endpoints | `annotations` |
 | `BASICJWT_CLIENT_SECRET` | JWT client secret | `your-secret` |
 | `BASICJWT_SIGNING_SECRET` | JWT signing secret | `your-secret` |
 | `HTTP_PORT` | HTTP server port | `8080` |

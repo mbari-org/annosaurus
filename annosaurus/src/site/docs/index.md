@@ -33,12 +33,11 @@ PUT  /v1/observations/{uuid}               # Authorization: Bearer <jwt>
 
 Note that several read-only operations use `POST` because they take a JSON request body — searching by a list of video references, or submitting a query. Those still need no token. The rule follows what the endpoint *does*, not which verb it uses.
 
-
 ## For staff deploying annosaurus
 
 The [Deployment guide](DEPLOYMENT.md) has the full procedure. The points that most often bite:
 
-**Always set both JWT secrets.** `BASICJWT_CLIENT_SECRET` and `BASICJWT_SIGNING_SECRET` ship with the placeholder defaults `secret` and `supersecret`. A server started without them will happily accept those well-known values and hand out valid tokens, so every write endpoint is effectively unprotected. Set them to real secrets, keep them out of source control, and rotate them if they have ever been committed.
+**Both JWT secrets are required.** `BASICJWT_CLIENT_SECRET` and `BASICJWT_SIGNING_SECRET` have no defaults — the service refuses to start without them, the same way it refuses to start without a database URL. Set them to real secrets and keep them out of source control. Earlier releases fell back to the placeholders `secret` and `supersecret`, so if you are upgrading a deployment that never set them, treat any token issued so far as compromised and rotate.
 
 **The database is the only dependency.** Point `DATABASE_DRIVER`, `DATABASE_URL`, `DATABASE_USER`, and `DATABASE_PASSWORD` at a PostgreSQL or SQL Server instance. Flyway migrations run on startup, so the account needs DDL rights on first launch. Both databases are supported and tested.
 
@@ -50,7 +49,7 @@ The [Deployment guide](DEPLOYMENT.md) has the full procedure. The points that mo
 | `/metrics` | Prometheus metrics for scraping. |
 | `/docs` | Swagger UI. Auto-generated from the running build, so it always matches the deployed version. |
 
-**Restrict the service, not just the tokens.** Because reads are unauthenticated and the two deletes above are as well, network placement is part of your security posture. Put annosaurus behind a reverse proxy or on a private network unless your annotations are meant to be public.
+**Restrict the service, not just the tokens.** Writes require a token, but reads do not, so network placement is part of your security posture. Put annosaurus behind a reverse proxy or on a private network unless your annotations are meant to be readable by anyone who can reach the host.
 
 **Optional change notifications.** Annosaurus can publish `CREATED`/`UPDATED`/`DELETED` messages to a [NATS](https://nats.io) topic as observations and associations change, so downstream systems can stay in sync. Off by default; enable with `MESSAGING_NATS_ENABLE`.
 

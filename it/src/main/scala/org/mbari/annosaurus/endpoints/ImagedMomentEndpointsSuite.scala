@@ -365,8 +365,10 @@ trait ImagedMomentEndpointsSuite extends EndpointsSuite:
     test("countModifiedBeforeDate") {
         val xs          = TestUtils.create(2, 2, 2, 2)
         val im          = xs.head
-        val modified    = im.getLastUpdatedTime.toInstant
-        val start       = modified.plus(java.time.Duration.ofSeconds(1))
+        val modified    = xs.map(_.getLastUpdatedTime.toInstant).max
+        // formatCompactIso8601 truncates to whole seconds, so a 1 second margin can round
+        // back to before a record's last-updated time. Use more than a second of slack.
+        val start       = modified.plus(java.time.Duration.ofSeconds(2))
         val startString = Instants.formatCompactIso8601(start)
         runGet(
             endpoints.countModifiedBeforeDateImpl,
@@ -420,6 +422,8 @@ trait ImagedMomentEndpointsSuite extends EndpointsSuite:
     test("deleteByVideoReferenceUUID") {
         val xs                 = TestUtils.create(2, 2)
         val videoReferenceUuid = xs.head.getVideoReferenceUuid
+        val jwt                = jwtService.authorize("foo")
+        assert(jwt.isDefined)
         runDelete(
             endpoints.deleteByVideoReferenceUUIDImpl,
             s"http://test.com/v1/imagedmoments/videoreference/${videoReferenceUuid}",
@@ -428,6 +432,8 @@ trait ImagedMomentEndpointsSuite extends EndpointsSuite:
                 val count = checkResponse[CountForVideoReferenceSC](response.body)
                 assertEquals(count.video_reference_uuid, videoReferenceUuid)
                 assertEquals(count.count, xs.size)
+            ,
+            jwt = jwt
         )
         val c                  = ImagedMomentController(daoFactory)
         val imagedMoments      = c.findByVideoReferenceUUID(videoReferenceUuid).join

@@ -15,7 +15,7 @@ None of these endpoints require authentication — they are read-only.
 
 ## Everything queries a single view
 
-These endpoints do not query the annotation tables directly. They query one flat database view — named `annotations`, set by `database.query.view` — that joins imaged moments, observations, associations, image references, ancillary data, and video reference info into a single wide, denormalized row set.
+These endpoints do not query the annotation tables directly. They query one flat database view — named `annotations` by default, overridable with `DATABASE_QUERY_VIEW` — that joins imaged moments, observations, associations, image references, ancillary data, and video reference info into a single wide, denormalized row set.
 
 Two consequences matter:
 

@@ -60,7 +60,10 @@ object TestUtils:
         nImageReferences: Int = 0,
         includeData: Boolean = false
     ): Seq[ImagedMomentEntity] =
-        val startDate          = Instant.now()
+        // Recorded timestamps must be in the past: randomImagedMoment adds up to 30 days
+        // of elapsed time to startDate, and queries that bin by time (e.g. timeHistogram)
+        // only cover instants up to now.
+        val startDate          = Instant.now().minus(Duration.ofDays(30))
         val videoReferenceUuid = UUID.randomUUID()
         for (_ <- 0 until nImagedMoments)
             yield randomImagedMoment(
@@ -118,7 +121,9 @@ object TestUtils:
 
     def randomObservation(nAssociations: Int = 0): ObservationEntity =
         //        val obs = obsDao.newPersistentObject(Strings.random(conceptLength), Strings.random(10), Instant.now(), Some(Strings.random(6)))
-        val concept         = Strings.random(random.nextInt(128))
+        // Never empty: concepts are interpolated into URL path segments by many tests
+        // (e.g. /v1/fast/concept/$concept), and an empty segment fails to route.
+        val concept         = Strings.random(random.nextInt(128) + 2)
         val duration        =
             if random.nextBoolean() then Some(Duration.ofMillis(random.nextInt(5000))) else None
         val observationDate = Instant.now().truncatedTo(ChronoUnit.MILLIS)
