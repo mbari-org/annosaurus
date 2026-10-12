@@ -10,6 +10,24 @@ The `round` vs `floor`/`ceil` disagreement is the wrong axis, though. **Both pro
 2. **pixel -> whole-pixel region** — needed only to actually *crop* an image. Quantize the **edges** (`floor` the min, `ceil` the max) and derive width.
 3. **point -> pixel index** — `floor` plus a clamp to `[0, W-1]`.
 
+> **Status vs. the localizations proposal** ([2026-08-25-localizations.md](2026-08-25-localizations.md), §6.4):
+> the Java below was compiled and differential-tested against the proposal's rules and the SQL `CHECK`
+> constraints. It matches on box/point validation, `EPS`/`MIN_EXTENT`, confidence 0–1, normalization,
+> edge quantization, and the YOLO/VOC round trips. Known gaps, **not yet fixed in this document**:
+>
+> 1. **No edge snapping.** The `NormalizedBoundingBox` constructor tolerates values down to `-EPS`, but the DB
+>    requires `x >= 0` / `y >= 0` exactly. Snap *edges* (not origin and extent separately), then derive
+>    `width`/`height`; nothing here does that yet.
+> 2. **No clamp + `truncated` path.** `clampToImage()` can only change a box within `EPS`, because the
+>    constructor rejects out-of-bounds boxes first; `normalized()` throws on a box crossing the frame edge;
+>    `toNormalizedVisible()` clamps but returns no `truncated` flag. Needs a `clamped(x, y, w, h)` factory
+>    returning the box plus the flag.
+> 3. **Boxes and points only.** No Java for lines, polygons or masks, and a line's derived extent can be
+>    zero-width, which `NormalizedBoundingBox` cannot hold.
+> 4. **Stale prose in §9:** the "store source image dimensions" item contradicts the proposal (dimensions are
+>    not stored; D-1); `difficult` has no column yet (proposal open question 6); the serialized-precision item
+>    is resolved by the proposal (§6.2).
+
 ---
 
 ## 1. The agreed coordinate model
@@ -1290,10 +1308,13 @@ String xml = VocXml.write(VocAnnotation.of("image.png", w, h, objects));
 
 ## 9. Open items
 
-- [x] ~~**Store the source image dimensions on the annotation record.**~~ Settled: adopt VOC's `<size>` semantics (section 8). Without them we cannot validate a normalized box, cannot emit COCO, and cannot detect that the image was later re-encoded at a different size. Normalized coordinates survive resizes but *hide* the fact that a resize happened, which matters when a human placed a box at a specific resolution.
+- [x] ~~**Store the source image dimensions on the annotation record.**~~ **Superseded by the localizations proposal: dimensions are not stored (all media for an observation share aspect ratio, uncropped).** Previously settled: adopt VOC's `<size>` semantics (section 8). Without them we cannot validate a normalized box, cannot emit COCO, and cannot detect that the image was later re-encoded at a different size. Normalized coordinates survive resizes but *hide* the fact that a resize happened, which matters when a human placed a box at a specific resolution.
 - [x] ~~**Decide whether stored boxes may be clipped**, and add a `truncated` flag.~~ Settled: adopt VOC's `truncated` semantics (section 8).
-- [ ] **Confirm the serialized precision.** `%.6f` in the YOLO writer is ~0.002 px on a 1920-wide image, which is fine; but if the wire/DB format is also 6 decimal places, that is a deliberate quantization we should state rather than inherit.
+- [x] **Confirm the serialized precision.** *Resolved by the localizations proposal §6.2 (stored doubles, 9-decimal JSON vertices, `EPS` = 1e-6).* Original note: `%.6f` in the YOLO writer is ~0.002 px on a 1920-wide image, which is fine; but if the wire/DB format is also 6 decimal places, that is a deliberate quantization we should state rather than inherit.
 - [ ] **Persist the `YoloClassMap` with every export** and never re-derive it. Appending is safe; reordering silently relabels the corpus.
 - [ ] **Record the `VocConvention` with every VOC import**, and refuse to guess when the sniffer is ambiguous.
-- [ ] **Preserve `difficult` on ingest** so evaluation stays comparable with published VOC numbers.
+- [ ] **Preserve `difficult` on ingest** *(blocked: no `difficult` column in the proposal; open question 6)* so evaluation stays comparable with published VOC numbers.
 - [ ] **Round-trip property tests**: `normalize(toPixels(b)) == b` within `EPS` for random boxes, and `toCropRegion` contains the float box for random boxes and image sizes. For the YOLO round trip, assert within `EPS` rather than with `equals` — it is not bit-exact.
+- [ ] **Add edge snapping** so constructor tolerance (`-EPS`) and DB `CHECK` (`>= 0`) agree.
+- [ ] **Add a clamp + `truncated` factory** (`clamped(x, y, w, h)`), replacing the ineffective `clampToImage()`.
+- [ ] **Add line/polygon/mask types**, including zero-extent lines.
