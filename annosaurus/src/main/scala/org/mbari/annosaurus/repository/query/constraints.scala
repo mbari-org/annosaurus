@@ -144,7 +144,7 @@ object Constraint:
             i
 
         def toPreparedStatementTemplate: String =
-            if in.size eq 1 then column + " = ?"
+            if in.size == 1 then column + " = ?"
             else column + " IN " + in.map(s => "?").mkString("(", ",", ")")
 
     case class Like(column: String, like: String) extends Constraint:

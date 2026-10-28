@@ -247,15 +247,15 @@ trait AnnotationControllerSuite extends BaseDAOSuite:
 
     test("bulkCreate a 200 annotations") {
         import org.mbari.annosaurus.etc.circe.CirceCodecs.{*, given}
-        val url         = this.getClass.getResource("/json/annotation_full_dive.json").toURI
-        val readAttempt = Using(Source.fromFile(url)) { source =>
+        val in          = this.getClass.getResourceAsStream("/json/annotation_full_dive.json")
+        val readAttempt = Using(Source.fromInputStream(in, "UTF-8")) { source =>
             val json = source.getLines().mkString("\n")
             json
                 .reify[Seq[Annotation]]
                 .getOrElse(throw new RuntimeException("Failed to parse json"))
                 .take(200)
         }
-        val annos       = readAttempt.getOrElse(throw new RuntimeException("Failed to read json"))
+        val annos       = readAttempt.fold(e => throw new RuntimeException("Failed to read json", e), identity)
         assert(annos.nonEmpty)
 
         val n = controller.bulkCreate(annos).join(Duration.ofSeconds(10))
@@ -266,15 +266,15 @@ trait AnnotationControllerSuite extends BaseDAOSuite:
 
     test("bulkCreate a 200 annotations with imageReferences") {
         import org.mbari.annosaurus.etc.circe.CirceCodecs.{*, given}
-        val url         = this.getClass.getResource("/json/annotation_full_dive.json").toURI
-        val readAttempt = Using(Source.fromFile(url)) { source =>
+        val in          = this.getClass.getResourceAsStream("/json/annotation_full_dive.json")
+        val readAttempt = Using(Source.fromInputStream(in, "UTF-8")) { source =>
             val json = source.getLines().mkString("\n")
             json
                 .reify[Seq[Annotation]]
                 .getOrElse(throw new RuntimeException("Failed to parse json"))
                 .take(200)
         }
-        val annos       = readAttempt.getOrElse(throw new RuntimeException("Failed to read json"))
+        val annos       = readAttempt.fold(e => throw new RuntimeException("Failed to read json", e), identity)
         assert(annos.nonEmpty)
         val n           = controller.bulkCreate(annos).join(Duration.ofSeconds(10))
         assertEquals(n.size, annos.size)
