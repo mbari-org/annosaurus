@@ -58,6 +58,7 @@ The model is a small hierarchy anchored to a moment in a video:
 - **ImagedMoment** — a point in a specific video reference, indexed by `recordedTimestamp`, `timecode`, and/or `elapsedTime`. It holds the observations and images at that moment.
 - **Observation** — a single annotation: a concept, the observer who made it, a timestamp, and optional duration, `group`, and `activity`.
 - **Association** — structured detail attached to an observation, in `linkName | toConcept | linkValue` form (for example `eating | Aegina | nil` or `surface-color | self | red`). Associations are how new kinds of detail — behavior, measurements, bounding boxes, free-text comments — get added without schema changes.
+- **Localization** — a shape that says where in the frame the annotated thing is: a `bounding_box`, `point`, `line`, `polygon` or `mask`, with coordinates normalized to [0, 1]. An observation has at most one of each type. Observation responses (for example `GET /v1/observations/{uuid}`) include them in a `localizations` array, in the same way they include `associations`. See [Localizations](howto/localizations/index.md).
 - **ImageReference** — a framegrab or still image at the moment, identified by URL.
 - **CachedAncillaryDatum** — position, depth, CTD, and vehicle-pose values recorded alongside the annotation so that spatial and environmental queries do not require a join to an external sensor archive.
 - **CachedVideoReferenceInfo** — deployment metadata (platform, mission ID, contact) cached from the video asset service.
