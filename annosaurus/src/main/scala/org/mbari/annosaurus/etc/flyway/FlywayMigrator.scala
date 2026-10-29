@@ -21,11 +21,25 @@ import org.mbari.annosaurus.DatabaseConfig
 import org.mbari.annosaurus.etc.jdbc.Databases
 import org.mbari.annosaurus.etc.jdk.Loggers.given
 
+import scala.jdk.CollectionConverters.*
 import scala.util.Try
 
 object FlywayMigrator:
 
     private val log = System.getLogger(getClass.getName)
+
+    /**
+     * vampire-squid's video_references table, referenced by the localizations migration routine. A blank value is
+     * treated as unset and falls back to the dialect default.
+     */
+    def resolveVideoReferencesTable(
+        databaseType: Databases.DatabaseType,
+        configured: Option[String]
+    ): String =
+        val default = databaseType match
+            case Databases.DatabaseType.SQLServer => "dbo.video_references"
+            case _                                => "video_references"
+        DatabaseConfig.cleanVideoReferencesTable(configured).getOrElse(default)
 
     def migrate(databaseConfig: DatabaseConfig): Either[Throwable, Unit] =
         // Implementation of Flyway migration logic
@@ -36,6 +50,8 @@ object FlywayMigrator:
                 case Databases.DatabaseType.PostgreSQL => "classpath:/db/migrations/postgres"
                 case _                                 => throw new IllegalArgumentException(s"Unsupported database type: $databaseType")
 
+            val videoReferencesTable = resolveVideoReferencesTable(databaseType, databaseConfig.videoReferencesTable)
+
             log.atDebug.log(s"Starting database migrations on ${databaseConfig.url}")
             val flyway = Flyway
                 .configure()
@@ -43,6 +59,7 @@ object FlywayMigrator:
                 .locations(location)                // migration scripts location
                 .dataSource(databaseConfig.url, databaseConfig.user, databaseConfig.password)
                 .baselineOnMigrate(true)            // this makes Flyway baseline if no metadata table exists
+                .placeholders(Map("videoReferencesTable" -> videoReferencesTable).asJava)
                 .load()
 
             val result = flyway.migrate()

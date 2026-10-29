@@ -35,3 +35,5 @@ final case class NotFound(message: String, responseCode: Int = 404)     extends 
 final case class ServerError(message: String, responseCode: Int = 500)  extends ErrorMsg
 final case class Unauthorized(message: String, responseCode: Int = 401) extends ErrorMsg
 final case class BadRequest(message: String, responseCode: Int = 400)   extends ErrorMsg
+final case class Conflict(message: String, current: Option[LocalizationSC] = None, responseCode: Int = 409)
+    extends ErrorMsg

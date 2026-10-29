@@ -80,12 +80,15 @@ object AppConfig:
                 log.atWarn.withCause(e).log("Failed to load NATS configuration")
                 None
 
+    lazy val LocalizationQueryView: String = Config.getString("database.query.localization.view")
+
     lazy val DefaultDatabaseConfig: DatabaseConfig = DatabaseConfig(
         url = Config.getString("database.url"),
         user = Config.getString("database.user"),
         password = Config.getString("database.password"),
         driver = Config.getString("database.driver"),
-        queryView = Config.getString("database.query.view")
+        queryView = Config.getString("database.query.view"),
+        videoReferencesTable = DatabaseConfig.videoReferencesTable(Config)
     )
 
 case class HttpConfig(
@@ -100,7 +103,8 @@ case class DatabaseConfig(
     user: String,
     password: String,
     driver: String,
-    queryView: String
+    queryView: String,
+    videoReferencesTable: Option[String] = None
 ):
     lazy val dataSource                      =
         val ds = new com.zaxxer.hikari.HikariDataSource()
@@ -116,3 +120,18 @@ case class DatabaseConfig(
         // java.sql.DriverManager.getConnection(url, user, password)
 
     lazy val databaseType: DatabaseType = Databases.typeFromUrl(url)
+
+object DatabaseConfig:
+
+    val VideoReferencesTablePath = "database.video.references.table"
+
+    /**
+     * The configured vampire-squid video_references table. Unset, empty and whitespace-only values (e.g.
+     * `DATABASE_VIDEO_REFERENCES_TABLE=""`) all mean "use the dialect default", never an empty table name.
+     */
+    def videoReferencesTable(config: com.typesafe.config.Config): Option[String] =
+        if config.hasPath(VideoReferencesTablePath) then cleanVideoReferencesTable(Some(config.getString(VideoReferencesTablePath)))
+        else None
+
+    def cleanVideoReferencesTable(value: Option[String]): Option[String] =
+        value.map(_.trim).filter(_.nonEmpty)

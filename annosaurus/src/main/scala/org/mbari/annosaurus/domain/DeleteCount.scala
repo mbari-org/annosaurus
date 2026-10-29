@@ -23,6 +23,7 @@ final case class DeleteCount(
     ancillaryDataCount: Int = 0,
     imageReferenceCount: Int = 0,
     associationCount: Int = 0,
+    localizationCount: Int = 0,
     observationCount: Int = 0,
     imagedMomentCount: Int = 0,
     errorMessage: Option[String] = None
@@ -32,6 +33,7 @@ final case class DeleteCount(
         ancillaryDataCount,
         imageReferenceCount,
         associationCount,
+        localizationCount,
         observationCount,
         imagedMomentCount,
         errorMessage
@@ -42,6 +44,7 @@ final case class DeleteCountSC(
     ancillary_data_count: Int = 0,
     image_reference_count: Int = 0,
     association_count: Int = 0,
+    localization_count: Int = 0,
     observation_count: Int = 0,
     imaged_moment_count: Int = 0,
     error_message: Option[String] = None
@@ -51,6 +54,7 @@ final case class DeleteCountSC(
         ancillary_data_count,
         image_reference_count,
         association_count,
+        localization_count,
         observation_count,
         imaged_moment_count,
         error_message

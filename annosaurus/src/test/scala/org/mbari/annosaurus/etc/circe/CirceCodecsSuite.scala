@@ -18,7 +18,17 @@ package org.mbari.annosaurus.etc.circe
 
 import scala.io.Source
 import scala.util.Using
-import org.mbari.annosaurus.domain.{ImagedMoment, ImagedMomentSC, ObservationsUpdate, QueryConstraints, QueryRequest}
+import org.mbari.annosaurus.domain.{
+    Annotation,
+    AnnotationCreateSC,
+    AnnotationSC,
+    BulkAnnotationSC,
+    ImagedMoment,
+    ImagedMomentSC,
+    ObservationsUpdate,
+    QueryConstraints,
+    QueryRequest
+}
 import CirceCodecs.{*, given}
 import org.mbari.annosaurus.repository.query.Query
 
@@ -326,6 +336,60 @@ class CirceCodecsSuite extends munit.FunSuite {
             case Right(_) => ()
 
 
+    }
+
+
+    private val vrUuid = "e3005de7-2c0a-4a3f-80ad-79e5e79ee4b8"
+
+    test("decode AnnotationCreateSC without localizations") {
+        val json = s"""{"video_reference_uuid":"$vrUuid","concept":"Nanomia"}"""
+        val a    = json.reify[AnnotationCreateSC].fold(e => fail(e.getMessage), identity)
+        assertEquals(a.localizations, None)
+        assertEquals(a.toCamelCase.toAnnotation.localizations, Nil)
+    }
+
+    test("decode AnnotationCreateSC with localizations") {
+        val json = s"""{"video_reference_uuid":"$vrUuid","concept":"Nanomia",
+            "localizations":[{"localization_type":"bounding_box","x":0.1,"y":0.2,"width":0.3,"height":0.4},
+                             {"localization_type":"point","x":0.5,"y":0.6}]}"""
+        val a    = json.reify[AnnotationCreateSC].fold(e => fail(e.getMessage), identity)
+        val ls   = a.toCamelCase.toAnnotation.localizations
+        assertEquals(ls.map(_.localizationType), Seq("bounding_box", "point"))
+        assertEquals(ls.head.width, Some(0.3))
+        assert(!ls.head.training)
+    }
+
+    test("decode BulkAnnotationSC without localizations") {
+        val json = s"""[{"video_reference_uuid":"$vrUuid","concept":"Nanomia"}]"""
+        val xs   = json.reify[Seq[BulkAnnotationSC]].fold(e => fail(e.getMessage), identity)
+        assertEquals(xs.head.localizations, None)
+        assertEquals(xs.head.toCamelCase.localizations, Nil)
+    }
+
+    test("decode BulkAnnotationSC with localizations") {
+        val json = s"""[{"video_reference_uuid":"$vrUuid","concept":"Nanomia",
+            "localizations":[{"localization_type":"polygon","vertices":[0.1,0.1,0.5,0.1,0.5,0.5]}]}]"""
+        val xs   = json.reify[Seq[BulkAnnotationSC]].fold(e => fail(e.getMessage), identity)
+        val ls   = xs.head.toCamelCase.localizations
+        assertEquals(ls.map(_.localizationType), Seq("polygon"))
+        assertEquals(ls.head.vertices, Some(Seq(0.1, 0.1, 0.5, 0.1, 0.5, 0.5)))
+    }
+
+    test("decode Annotation and AnnotationSC without localizations defaults to empty") {
+        val json = s"""{"video_reference_uuid":"$vrUuid","concept":"Nanomia","associations":[],"image_references":[]}"""
+        val sc   = json.reify[AnnotationSC].fold(e => fail(e.getMessage), identity)
+        assertEquals(sc.localizations, Nil)
+        val cc   = json.reify[Annotation].fold(e => fail(e.getMessage), identity)
+        assertEquals(cc.localizations, Nil)
+    }
+
+    test("encode AnnotationSC includes localizations") {
+        val json = s"""{"video_reference_uuid":"$vrUuid","concept":"Nanomia","associations":[],"image_references":[],
+            "localizations":[{"localization_type":"point","x":0.5,"y":0.6}]}"""
+        val sc   = json.reify[AnnotationSC].fold(e => fail(e.getMessage), identity)
+        assertEquals(sc.localizations.map(_.localization_type), Seq("point"))
+        val back = sc.stringify.reify[AnnotationSC].fold(e => fail(e.getMessage), identity)
+        assertEquals(back, sc)
     }
 
 }

@@ -69,6 +69,9 @@ object CirceCodecs:
     given Decoder[Unauthorized] = deriveDecoder
     given Encoder[Unauthorized] = deriveEncoder
 
+    given conflictDecoder: Decoder[Conflict] = deriveDecoder
+    given conflictEncoder: Encoder[Conflict] = deriveEncoder
+
     given Decoder[Count] = deriveDecoder
     given Encoder[Count] = deriveEncoder
 
@@ -133,6 +136,45 @@ object CirceCodecs:
     given associationDecoder: Decoder[Association]         =
         associationCcDecoder or associationScDecoder.map(_.toCamelCase)
 
+    // Derived decoders ignore default values, so the Boolean flags are defaulted to false when absent
+    private def withLocalizationFlagDefaults(c: ACursor): ACursor =
+        c.withFocus(
+            _.mapObject(o =>
+                List("training", "truncated", "difficult").foldLeft(o)((acc, k) =>
+                    if acc.contains(k) then acc else acc.add(k, Json.False)
+                )
+            )
+        )
+
+    /**
+     * The stale-write token arrives as `last_updated_timestamp` (the spec's name, section 7.2) or `last_updated_time`
+     * (the name responses use, as AssociationSC does), and for camelCase also as `lastUpdated`. All are folded onto
+     * `target`, the field the derived decoder reads. When several are present the spec name wins. A null value counts
+     * as absent.
+     */
+    private def withLocalizationToken(target: String)(c: ACursor): ACursor =
+        val spellings = List("last_updated_timestamp", target) ++ List("last_updated_time", "lastUpdated").filterNot(_ == target)
+        c.withFocus(
+            _.mapObject(o =>
+                spellings.flatMap(k => o(k).filterNot(_.isNull)).headOption match
+                    case Some(token) => o.add(target, token)
+                    case None        => o
+            )
+        )
+
+    given localizationScDecoder: Decoder[LocalizationSC]     =
+        deriveDecoder[LocalizationSC]
+            .prepare(withLocalizationFlagDefaults)
+            .prepare(withLocalizationToken("last_updated_time"))
+    given localizationScEncoder: Encoder[LocalizationSC]     = deriveEncoder
+    private val localizationCcDecoder: Decoder[Localization] =
+        deriveDecoder[Localization]
+            .prepare(withLocalizationFlagDefaults)
+            .prepare(withLocalizationToken("lastUpdated"))
+    given localizationEncoder: Encoder[Localization]         = deriveEncoder
+    given localizationDecoder: Decoder[Localization]         =
+        localizationCcDecoder or localizationScDecoder.map(_.toCamelCase)
+
     given imageReferenceScDecoder: Decoder[ImageReferenceSC]     = deriveDecoder
     given imageReferenceScEncoder: Encoder[ImageReferenceSC]     = deriveEncoder
     private val imageReferenceCcDecoder: Decoder[ImageReference] = deriveDecoder
@@ -167,9 +209,13 @@ object CirceCodecs:
     given imagedMomentDecoder: Decoder[ImagedMoment]         =
         imagedMomentCcDecoder or imagedMomentScDecoder.map(_.toCamelCase)
 
-    given annotationScDecoder: Decoder[AnnotationSC]     = deriveDecoder
+    // Annotations written before localizations existed have no "localizations" field; default it to []
+    private def withLocalizationsDefault(c: ACursor): ACursor =
+        c.withFocus(_.mapObject(o => if o.contains("localizations") then o else o.add("localizations", Json.arr())))
+
+    given annotationScDecoder: Decoder[AnnotationSC]     = deriveDecoder[AnnotationSC].prepare(withLocalizationsDefault)
     given annotationScEncoder: Encoder[AnnotationSC]     = deriveEncoder
-    private val annotationCcDecoder: Decoder[Annotation] = deriveDecoder
+    private val annotationCcDecoder: Decoder[Annotation] = deriveDecoder[Annotation].prepare(withLocalizationsDefault)
     given annotationEncoder: Encoder[Annotation]         = deriveEncoder
     given annotationDecoder: Decoder[Annotation]         =
         annotationCcDecoder or annotationScDecoder.map(_.toCamelCase)

@@ -58,6 +58,9 @@ trait Endpoints:
     implicit lazy val sAssociationSc: Schema[AssociationSC]                             = Schema.derived[AssociationSC]
     implicit lazy val sAssociationUpdateSc: Schema[AssociationUpdateSC]                 =
         Schema.derived[AssociationUpdateSC]
+    implicit lazy val sLocalization: Schema[Localization]                               = Schema.derived[Localization]
+    implicit lazy val sLocalizationSc: Schema[LocalizationSC]                           = Schema.derived[LocalizationSC]
+    implicit lazy val sConflict: Schema[Conflict]                                       = Schema.derived[Conflict]
     implicit lazy val sCachedAncillaryDatum: Schema[CachedAncillaryDatum]               =
         Schema.derived[CachedAncillaryDatum]
     implicit lazy val sCachedAncillaryDatumSC: Schema[CachedAncillaryDatumSC]           =
@@ -175,6 +178,7 @@ trait Endpoints:
             oneOf[ErrorMsg](
                 oneOfVariant(statusCode(StatusCode.BadRequest).and(jsonBody[BadRequest])),
                 oneOfVariant(statusCode(StatusCode.NotFound).and(jsonBody[NotFound])),
+                oneOfVariant(statusCode(StatusCode.Conflict).and(jsonBody[Conflict])),
                 oneOfVariant(statusCode(StatusCode.InternalServerError).and(jsonBody[ServerError])),
                 oneOfVariant(statusCode(StatusCode.Unauthorized).and(jsonBody[Unauthorized]))
             )
@@ -189,6 +193,7 @@ trait Endpoints:
         oneOf[ErrorMsg](
             oneOfVariant(statusCode(StatusCode.BadRequest).and(jsonBody[BadRequest])),
             oneOfVariant(statusCode(StatusCode.NotFound).and(jsonBody[NotFound])),
+            oneOfVariant(statusCode(StatusCode.Conflict).and(jsonBody[Conflict])),
             oneOfVariant(statusCode(StatusCode.InternalServerError).and(jsonBody[ServerError]))
         )
     )

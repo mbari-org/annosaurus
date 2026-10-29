@@ -20,7 +20,7 @@ import java.util.UUID
 
 class DeleteCountSuite extends munit.FunSuite {
   
-    val cc1 = DeleteCount(UUID.randomUUID, 1, 2, 3, 4, 5, Some("foog"))
+    val cc1 = DeleteCount(UUID.randomUUID, 1, 2, 3, 4, 5, 6, Some("foog"))
 
     test("camelCase/snake_case round trip") {
         val sc1 = cc1.toSnakeCase

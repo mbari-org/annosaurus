@@ -25,6 +25,7 @@ import org.mbari.annosaurus.repository.jpa.entity.{
     ImageReferenceEntity,
     ImagedMomentEntity,
     IndexEntity,
+    LocalizationEntity,
     ObservationEntity
 }
 
@@ -132,6 +133,41 @@ object AssertUtils:
             assertEquals(a.getLinkValue(), b.getLinkValue())
             assertEquals(a.getMimeType(), b.getMimeType())
         else fail("One of the associations is null")
+
+    def assertSameLocalization(a: LocalizationEntity, b: LocalizationEntity): Unit =
+        if a == null && b == null then {
+            // do nothing
+        }
+        else if a != null && b != null then
+            assertEquals(a.getUuid(), b.getUuid())
+            assertEquals(a.getLocalizationType(), b.getLocalizationType())
+            assertEquals(a.getX(), b.getX())
+            assertEquals(a.getY(), b.getY())
+            assertEquals(a.getWidth(), b.getWidth())
+            assertEquals(a.getHeight(), b.getHeight())
+            assertEquals(a.getVertices(), b.getVertices())
+            assertEquals(a.getMaskEncoding(), b.getMaskEncoding())
+            assertEquals(a.getMaskData(), b.getMaskData())
+            assertEquals(a.getMaskWidthPixels(), b.getMaskWidthPixels())
+            assertEquals(a.getMaskHeightPixels(), b.getMaskHeightPixels())
+            assertEquals(a.getGenerator(), b.getGenerator())
+            assertEquals(a.getConfidence(), b.getConfidence())
+            assertEquals(a.getObserver(), b.getObserver())
+            assertEquals(
+                Option(a.getObservationTimestamp()).map(Instants.roundToMillis).orNull,
+                Option(b.getObservationTimestamp()).map(Instants.roundToMillis).orNull
+            )
+            assertEquals(a.getVerifier(), b.getVerifier())
+            assertEquals(
+                Option(a.getVerificationTimestamp()).map(Instants.roundToMillis).orNull,
+                Option(b.getVerificationTimestamp()).map(Instants.roundToMillis).orNull
+            )
+            assertEquals(a.getComment(), b.getComment())
+            assertEquals(a.getPart(), b.getPart())
+            assertEquals(a.isTraining(), b.isTraining())
+            assertEquals(a.isTruncated(), b.isTruncated())
+            assertEquals(a.isDifficult(), b.isDifficult())
+        else fail("One of the localizations is null")
 
     def assertSameAncillaryDatum(
         a: CachedAncillaryDatumEntity,

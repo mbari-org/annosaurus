@@ -320,7 +320,10 @@ public class ImagedMomentEntity implements IPersistentObject {
      * Force-initialize lazy collections so they remain accessible after entity detachment (em.clear())
      */
     public ImagedMomentEntity initializeLazyRelations() {
-        getObservations().forEach(obs -> obs.getAssociations().size());
+        getObservations().forEach(obs -> {
+            obs.getAssociations().size();
+            obs.getLocalizations().size();
+        });
         getImageReferences().size();
         Optional.ofNullable(getAncillaryDatum()).ifPresent(ad -> ad.getLatitude());
         return this;

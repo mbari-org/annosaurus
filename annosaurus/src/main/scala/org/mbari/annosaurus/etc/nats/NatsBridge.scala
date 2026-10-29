@@ -18,7 +18,7 @@ package org.mbari.annosaurus.etc.nats
 
 import io.reactivex.rxjava3.subjects.Subject
 import org.mbari.annosaurus.repository.jpa.TransactionNotifier
-import org.mbari.annosaurus.repository.jpa.entity.{AssociationEntity, ObservationEntity}
+import org.mbari.annosaurus.repository.jpa.entity.{AssociationEntity, LocalizationEntity, ObservationEntity}
 
 /**
  * Translates JPA TransactionNotifier messages received from source into NATS messages. Then forwards the NATS messages
@@ -34,6 +34,7 @@ class NatsBridge(source: Subject[?], val sink: Subject[? >: NatsMessage]) extend
     private val log = System.getLogger(getClass.getName)
     private val observationClass = classOf[ObservationEntity]
     private val associationClass = classOf[AssociationEntity]
+    private val localizationClass = classOf[LocalizationEntity]
 
     private val disposable = source
         .ofType(classOf[TransactionNotifier.Message[?]])
@@ -54,6 +55,8 @@ class NatsBridge(source: Subject[?], val sink: Subject[? >: NatsMessage]) extend
                 Some(NatsMessage.DataTypes.OBSERVATION)
             else if associationClass.isAssignableFrom(clazz) then
                 Some(NatsMessage.DataTypes.ASSOCIATION)
+            else if localizationClass.isAssignableFrom(clazz) then
+                Some(NatsMessage.DataTypes.LOCALIZATION)
             else
                 None
 
