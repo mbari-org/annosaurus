@@ -280,7 +280,9 @@ For a `mask`, the extent is the bounding box of the set pixels divided by
 length. Interleaving rather than the current parallel-array form is deliberate: a single array cannot
 desynchronize against itself, which removes defect §2.3 by construction.
 
-- `line` — at least 2 pairs.
+- `line` — at least 2 pairs. A `line` is an open chain of segments and is never closed, so one with three or
+  more pairs is a polyline. There is deliberately no separate `polyline` type: it would be
+  indistinguishable from `line`.
 - `polygon` — at least 3 pairs, **implicitly closed**. The first vertex is *not* repeated at the end.
   This matches the observed data: in the real polygon example the first pair `(2208,1525)` and the
   last `(4252,1449)` differ.
@@ -289,6 +291,12 @@ desynchronize against itself, which removes defect §2.3 by construction.
 `(4252,1449)` twice. A naive "no duplicate vertices" rule would reject existing production data
 during migration. The server instead collapses consecutive duplicates on write, and the migration
 applies the same normalization. Normalization is idempotent, so a round-trip is stable.
+
+**A point may be submitted as a single vertex pair.** A `point` with no `x`/`y` and `vertices` of
+exactly one pair (`[x, y]`) is accepted and converted to the canonical form: `x` and `y` are set from
+the pair, `width` and `height` are `0`, and `vertices` is cleared. Responses never return a point
+with `vertices`. Ambiguous input is still rejected: more than one pair, or `x`/`y` together with
+`vertices`.
 
 ### 6.2 Coordinate space
 

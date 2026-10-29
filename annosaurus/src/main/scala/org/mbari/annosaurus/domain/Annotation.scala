@@ -40,8 +40,8 @@ final case class Annotation(
     recordedTimestamp: Option[Instant] = None,
     timecode: Option[String] = None,
     videoReferenceUuid: Option[UUID] = None,
-    lastUpdated: Option[java.time.Instant] = None,
-    localizations: Seq[Localization] = Nil
+    localizations: Seq[Localization] = Nil,
+    lastUpdated: Option[java.time.Instant] = None
 ) extends ToSnakeCase[AnnotationSC]
     with ToEntity[ImagedMomentEntity]:
 
@@ -80,8 +80,8 @@ final case class Annotation(
             recordedTimestamp,
             timecode,
             videoReferenceUuid,
-            lastUpdated,
-            localizations.map(_.toSnakeCase)
+            localizations.map(_.toSnakeCase),
+            lastUpdated
         )
 
     override def toEntity: ImagedMomentEntity =
@@ -156,8 +156,8 @@ object Annotation extends FromEntity[ObservationEntity, Annotation]:
             imagedMomentOpt.flatMap(im => Option(im.getRecordedTimestamp)),
             imagedMomentOpt.flatMap(im => Option(im.getTimecode).map(_.toString)),
             imagedMomentOpt.flatMap(im => Option(im.getVideoReferenceUuid)),
-            Option(entity.getLastUpdatedTime).map(_.toInstant),
-            localizations
+            localizations,
+            Option(entity.getLastUpdatedTime).map(_.toInstant)
         )
 
     def fromImagedMoment(entity: ImagedMomentEntity, extend: Boolean = false): Seq[Annotation] =
@@ -219,8 +219,8 @@ final case class AnnotationSC(
     recorded_timestamp: Option[Instant] = None,
     timecode: Option[String] = None,
     video_reference_uuid: Option[UUID] = None,
-    last_updated: Option[java.time.Instant] = None,
-    localizations: Seq[LocalizationSC] = Nil
+    localizations: Seq[LocalizationSC] = Nil,
+    last_updated: Option[java.time.Instant] = None
 ) extends ToCamelCase[Annotation]:
 
     override def toCamelCase: Annotation =
@@ -240,8 +240,8 @@ final case class AnnotationSC(
             recorded_timestamp,
             timecode,
             video_reference_uuid,
-            last_updated,
-            localizations.map(_.toCamelCase)
+            localizations.map(_.toCamelCase),
+            last_updated
         )
 
 final case class BulkAnnotationSC(

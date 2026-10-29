@@ -72,6 +72,20 @@ class LocalizationRulesSuite extends munit.FunSuite:
         assertEquals(r.toOption.get.height, Some(0.0))
     }
 
+    test("point submitted as a single vertex pair is converted to x, y") {
+        val r = normalize(Localization("point", vertices = Some(Seq(0.25, 0.75)))).toOption.get
+        assertEquals(r.x, Some(0.25))
+        assertEquals(r.y, Some(0.75))
+        assertEquals(r.width, Some(0.0))
+        assertEquals(r.height, Some(0.0))
+        assertEquals(r.vertices, None)
+    }
+
+    test("point with more than one vertex pair, or both x/y and vertices, is rejected") {
+        assert(normalize(Localization("point", vertices = Some(Seq(0.1, 0.1, 0.2, 0.2)))).isLeft)
+        assert(normalize(Localization("point", x = Some(0.5), y = Some(0.5), vertices = Some(Seq(0.5, 0.5)))).isLeft)
+    }
+
     test("polygon collapses consecutive duplicate vertices") {
         val in  = polygon(0.46, 0.51, 0.24, 0.42, 0.63, 0.67, 0.89, 0.48, 0.89, 0.48)
         val r   = normalize(in)

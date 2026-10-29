@@ -50,7 +50,18 @@ object LocalizationRules:
         for (name, value, max) <- limited; v <- value if v.length > max do
             errors += s"$name must be at most $max characters, got ${v.length}"
 
-    def normalize(l: Localization): Either[Seq[String], Localization] =
+    /**
+     * A point submitted as a single vertex pair (`vertices = [x, y]` with no x/y) is accepted and converted to the
+     * canonical form: x and y set, vertices absent. Anything else is left for validation to judge.
+     */
+    private def canonicalPoint(l: Localization): Localization =
+        (l.localizationType, l.x, l.y, l.vertices) match
+            case (t, None, None, Some(Seq(x, y))) if t == LocalizationType.Point.value =>
+                l.copy(x = Some(x), y = Some(y), vertices = None)
+            case _                                                                      => l
+
+    def normalize(localization: Localization): Either[Seq[String], Localization] =
+        val l      = canonicalPoint(localization)
         val errors = Seq.newBuilder[String]
 
         l.confidence.foreach { c =>
