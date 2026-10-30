@@ -182,9 +182,13 @@ object CirceCodecs:
     given imageReferenceDecoder: Decoder[ImageReference]         =
         imageReferenceCcDecoder or imageReferenceScDecoder.map(_.toCamelCase)
 
-    given observationScDecoder: Decoder[ObservationSC]     = deriveDecoder
+    // JSON written before localizations existed has no "localizations" field; default it to []
+    private def withLocalizationsDefault(c: ACursor): ACursor =
+        c.withFocus(_.mapObject(o => if o.contains("localizations") then o else o.add("localizations", Json.arr())))
+
+    given observationScDecoder: Decoder[ObservationSC]     = deriveDecoder[ObservationSC].prepare(withLocalizationsDefault)
     given observationScEncoder: Encoder[ObservationSC]     = deriveEncoder
-    private val observationCcDecoder: Decoder[Observation] = deriveDecoder
+    private val observationCcDecoder: Decoder[Observation] = deriveDecoder[Observation].prepare(withLocalizationsDefault)
     given observationEncoder: Encoder[Observation]         = deriveEncoder
     given observationDecoder: Decoder[Observation]         =
         observationCcDecoder or observationScDecoder.map(_.toCamelCase)
@@ -208,10 +212,6 @@ object CirceCodecs:
     given imagedMomentEncoder: Encoder[ImagedMoment]         = deriveEncoder
     given imagedMomentDecoder: Decoder[ImagedMoment]         =
         imagedMomentCcDecoder or imagedMomentScDecoder.map(_.toCamelCase)
-
-    // Annotations written before localizations existed have no "localizations" field; default it to []
-    private def withLocalizationsDefault(c: ACursor): ACursor =
-        c.withFocus(_.mapObject(o => if o.contains("localizations") then o else o.add("localizations", Json.arr())))
 
     given annotationScDecoder: Decoder[AnnotationSC]     = deriveDecoder[AnnotationSC].prepare(withLocalizationsDefault)
     given annotationScEncoder: Encoder[AnnotationSC]     = deriveEncoder
