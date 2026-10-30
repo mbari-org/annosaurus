@@ -31,17 +31,29 @@ import java.nio.file.Files
 import java.util.concurrent.Executors
 import scala.concurrent.{ExecutionContext, Future}
 
-class QueryEndpoints(queryController: QueryController)(using executionContext: ExecutionContext) extends Endpoints:
+/**
+ * @param base
+ *   The path prefix for the routes, e.g. "query" gives /v1/query/run
+ * @param namePrefix
+ *   Prepended to each operation name so that several instances have unique OpenAPI operation ids
+ * @param tag
+ *   The OpenAPI tag
+ */
+class QueryEndpoints(
+    queryController: QueryController,
+    base: EndpointInput[Unit] = stringToPath("query"),
+    namePrefix: String = "",
+    tag: String = "Query"
+)(using executionContext: ExecutionContext)
+    extends Endpoints:
 
-    private val base      = "query"
-    private val tag       = "Query"
     private val scheduler = Executors.newScheduledThreadPool(1)
 
     val listColumns: Endpoint[Unit, Unit, ErrorMsg, Seq[JDBC.Metadata], Any] = openEndpoint
         .get
         .in(base / "columns")
         .out(jsonBody[Seq[JDBC.Metadata]])
-        .name("listQueryColumns")
+        .name(namePrefix + "listQueryColumns")
         .description("List columns in the query view")
         .tag(tag)
 
@@ -54,7 +66,7 @@ class QueryEndpoints(queryController: QueryController)(using executionContext: E
             .in(base / "run")
             .in(jsonBody[QueryRequest])
             .out(stringBody)
-            .name("runQuery")
+            .name(namePrefix + "runQuery")
             .description("Run a query")
             .tag(tag)
 
@@ -73,7 +85,7 @@ class QueryEndpoints(queryController: QueryController)(using executionContext: E
             .out(fileBody)
             .out(header("Content-Disposition", "attachment; filename=results.tsv"))
             .out(header("Content-Type", "text/tab-separated-values"))
-            .name("downloadTsv")
+            .name(namePrefix + "downloadTsv")
             .description("Run a query and download the results as a tab-separate value file")
             .tag(tag)
 
@@ -110,7 +122,7 @@ class QueryEndpoints(queryController: QueryController)(using executionContext: E
         .in(base / "count")
         .in(jsonBody[QueryRequest])
         .out(jsonBody[Count])
-        .name("countQuery")
+        .name(namePrefix + "countQuery")
         .description("Count the number of rows in a query")
         .tag(tag)
 

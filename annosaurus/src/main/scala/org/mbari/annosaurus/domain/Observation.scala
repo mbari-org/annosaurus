@@ -32,6 +32,7 @@ final case class Observation(
     observer: Option[String] = None,
     observationTimestamp: Option[Instant] = None,
     associations: Seq[Association] = Nil,
+    localizations: Seq[Localization] = Nil,
     uuid: Option[UUID] = None,
     lastUpdated: Option[Instant] = None
 ) extends ToSnakeCase[ObservationSC]
@@ -45,6 +46,7 @@ final case class Observation(
             observer,
             observationTimestamp,
             associations.map(_.toSnakeCase),
+            localizations.map(_.toSnakeCase),
             uuid,
             lastUpdated
         )
@@ -58,6 +60,7 @@ final case class Observation(
         observer.foreach(entity.setObserver)
         observationTimestamp.foreach(entity.setObservationTimestamp)
         associations.foreach(a => entity.addAssociation(a.toEntity))
+        localizations.foreach(l => entity.addLocalization(l.toEntity))
         uuid.foreach(entity.setUuid)
         entity
 
@@ -82,6 +85,9 @@ object Observation extends FromEntity[ObservationEntity, Observation]:
         val associations =
             if extend then entity.getAssociations.asScala.map(Association.from(_)).toSeq else Nil
 
+        val localizations =
+            if extend then entity.getLocalizations.asScala.map(Localization.from).toSeq else Nil
+
         Observation(
             entity.getConcept,
             Option(entity.getDuration).map(_.toMillis),
@@ -92,6 +98,7 @@ object Observation extends FromEntity[ObservationEntity, Observation]:
                 entity.getObservationTimestamp
             ), // Option(entity.getObservationTimestamp).map(Instants.roundToMillis),
             associations,
+            localizations,
             entity.primaryKey,
             entity.lastUpdated
         )
@@ -104,6 +111,7 @@ final case class ObservationSC(
     observer: Option[String] = None,
     observation_timestamp: Option[Instant] = None,
     associations: Seq[AssociationSC] = Nil,
+    localizations: Seq[LocalizationSC] = Nil,
     uuid: Option[UUID] = None,
     last_updated_time: Option[Instant] = None
 ) extends ToCamelCase[Observation]:
@@ -116,6 +124,7 @@ final case class ObservationSC(
             observer,
             observation_timestamp,
             associations.map(_.toCamelCase),
+            localizations.map(_.toCamelCase),
             uuid,
             last_updated_time
         )

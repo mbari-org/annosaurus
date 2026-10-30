@@ -40,6 +40,8 @@ def instantConverter(obj: Object): Option[Instant] =
         case null                            => None
         case i: Instant                      => Some(i)
         case ts: java.sql.Timestamp          => Some(ts.toInstant)
+        case o: java.time.OffsetDateTime     => Some(o.toInstant)
+        case z: java.time.ZonedDateTime      => Some(z.toInstant)
         case m: microsoft.sql.DateTimeOffset => Some(m.getOffsetDateTime().toInstant())
         case _                               => None // TODO handle postgres
 

@@ -40,6 +40,7 @@ final case class Annotation(
     recordedTimestamp: Option[Instant] = None,
     timecode: Option[String] = None,
     videoReferenceUuid: Option[UUID] = None,
+    localizations: Seq[Localization] = Nil,
     lastUpdated: Option[java.time.Instant] = None
 ) extends ToSnakeCase[AnnotationSC]
     with ToEntity[ImagedMomentEntity]:
@@ -52,7 +53,9 @@ final case class Annotation(
         copy(
             associations = associations.map(_.removeForeignKeys()),
             imageReferences = imageReferences.map(_.removeForeignKeys()),
-            ancillaryData = ancillaryData.map(_.removeForeignKeys())
+            ancillaryData = ancillaryData.map(_.removeForeignKeys()),
+            // keep lastUpdated: it is the localization's stale-write token (PUT /v1/localizations)
+            localizations = localizations.map(_.copy(observationUuid = None))
         )
 
     def roundObservationTimestampToMillis(): Annotation =
@@ -77,6 +80,7 @@ final case class Annotation(
             recordedTimestamp,
             timecode,
             videoReferenceUuid,
+            localizations.map(_.toSnakeCase),
             lastUpdated
         )
 
@@ -98,6 +102,7 @@ final case class Annotation(
         )
         obs.setUuid(observationUuid.orNull)
         associations.foreach(x => obs.addAssociation(x.toEntity))
+        localizations.foreach(x => obs.addLocalization(x.toEntity))
         im.addObservation(obs)
         imageReferences.foreach(x => im.addImageReference(x.toEntity))
         ancillaryData.foreach(x => im.setAncillaryDatum(x.toEntity))
@@ -130,6 +135,9 @@ object Annotation extends FromEntity[ObservationEntity, Annotation]:
         // Do not extend associations here. As that would include redundant information
         val associations = entity.getAssociations.asScala.map(Association.from(_, false)).toSeq
 
+        // We always include localizations
+        val localizations = entity.getLocalizations.asScala.map(Localization.from).toSeq
+
         Annotation(
             Option(entity.getActivity),
             data,
@@ -148,6 +156,7 @@ object Annotation extends FromEntity[ObservationEntity, Annotation]:
             imagedMomentOpt.flatMap(im => Option(im.getRecordedTimestamp)),
             imagedMomentOpt.flatMap(im => Option(im.getTimecode).map(_.toString)),
             imagedMomentOpt.flatMap(im => Option(im.getVideoReferenceUuid)),
+            localizations,
             Option(entity.getLastUpdatedTime).map(_.toInstant)
         )
 
@@ -210,6 +219,7 @@ final case class AnnotationSC(
     recorded_timestamp: Option[Instant] = None,
     timecode: Option[String] = None,
     video_reference_uuid: Option[UUID] = None,
+    localizations: Seq[LocalizationSC] = Nil,
     last_updated: Option[java.time.Instant] = None
 ) extends ToCamelCase[Annotation]:
 
@@ -230,6 +240,7 @@ final case class AnnotationSC(
             recorded_timestamp,
             timecode,
             video_reference_uuid,
+            localizations.map(_.toCamelCase),
             last_updated
         )
 
@@ -248,7 +259,8 @@ final case class BulkAnnotationSC(
     observer: Option[String] = None,
     recorded_timestamp: Option[Instant] = None,
     timecode: Option[String] = None,
-    video_reference_uuid: Option[UUID] = None
+    video_reference_uuid: Option[UUID] = None,
+    localizations: Option[Seq[LocalizationSC]] = None
 ) extends ToCamelCase[Annotation]:
 
     override def toCamelCase: Annotation =
@@ -267,5 +279,6 @@ final case class BulkAnnotationSC(
             observer,
             recorded_timestamp,
             timecode,
-            video_reference_uuid
+            video_reference_uuid,
+            localizations = localizations.getOrElse(Nil).map(_.toCamelCase)
         )

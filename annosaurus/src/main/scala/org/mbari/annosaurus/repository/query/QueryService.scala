@@ -17,7 +17,9 @@
 package org.mbari.annosaurus.repository.query
 
 import org.mbari.annosaurus.DatabaseConfig
+import org.mbari.annosaurus.etc.jdbc.Databases.DatabaseType
 import org.mbari.annosaurus.etc.jdk.Loggers.given
+import org.mbari.annosaurus.repository.query.PreparedStatementGenerator.ColumnKind
 
 import java.nio.file.Path
 import java.sql.ResultSet
@@ -28,6 +30,34 @@ class QueryService(databaseConfig: DatabaseConfig, viewName: String):
     val jdbc        = new JDBC(databaseConfig)
 //    val AnnotationViewName = "annotations"
     private val log = System.getLogger(getClass.getName)
+
+    @volatile private var cachedColumnKinds: Option[Map[String, ColumnKind]] = None
+
+    /**
+     * Boolean and uuid columns of the view (lower-case name -> kind), read once from the view's metadata and cached.
+     * SQL Server converts the strings 'true'/'false' and a uuid string implicitly, but `bit` is still bound as a
+     * boolean for symmetry; uniqueidentifier keeps the string bind it has always had. If the metadata cannot be read
+     * the map is empty (not cached), so every constraint binds exactly as before.
+     */
+    private[query] def columnKinds: Map[String, ColumnKind] =
+        cachedColumnKinds.getOrElse {
+            val sql = s"SELECT * FROM $viewName WHERE 1 = 0"
+            jdbc.runQuery(sql, rs => JDBC.Metadata.fromResultSet(rs)) match
+                case Right(metadata) =>
+                    val kinds = metadata.flatMap { m =>
+                        val kind = (databaseConfig.databaseType, m.columnType.toLowerCase) match
+                            case (DatabaseType.PostgreSQL, "bool" | "boolean") => Some(ColumnKind.Boolean)
+                            case (DatabaseType.PostgreSQL, "uuid")             => Some(ColumnKind.Uuid)
+                            case (DatabaseType.SQLServer, "bit")               => Some(ColumnKind.Boolean)
+                            case _                                             => None
+                        kind.map(k => m.columnLabel.toLowerCase -> k)
+                    }.toMap
+                    cachedColumnKinds = Some(kinds)
+                    kinds
+                case Left(e)         =>
+                    log.atWarn.withCause(e).log(s"Could not read the column types of $viewName; binding as strings")
+                    Map.empty
+        }
 
 //    def findAllConceptNames(): Either[Throwable, Seq[String]] =
 //        jdbc.findDistinct(viewName, "concept", stringConverter)
@@ -62,6 +92,8 @@ class QueryService(databaseConfig: DatabaseConfig, viewName: String):
             query
         )
         log.atDebug.log(s"Running query: $sql")
+        // read before borrowing a connection, so the metadata lookup never waits on this query's connection
+        val kinds = columnKinds
         Using
             .Manager(use =>
                 val conn = use(jdbc.newConnection())
@@ -74,7 +106,7 @@ class QueryService(databaseConfig: DatabaseConfig, viewName: String):
                         ResultSet.CONCUR_READ_ONLY
                     )
                 )
-                PreparedStatementGenerator.bind(stmt, query.where)
+                PreparedStatementGenerator.bind(stmt, query.where, kinds)
                 val rs   = stmt.executeQuery()
                 //                val rs   = use(stmt.executeQuery(sql))
                 if rs.next() then rs.getInt(1) else 0
@@ -87,6 +119,8 @@ class QueryService(databaseConfig: DatabaseConfig, viewName: String):
         val sql = PreparedStatementGenerator.buildPreparedStatementTemplate(viewName, query, databaseConfig)
         log.atDebug.log(s"Running query: $sql")
         // println(s"Running query: $sql")
+        // read before borrowing a connection, so the metadata lookup never waits on this query's connection
+        val kinds = columnKinds
         Using
             .Manager(use =>
                 val conn = use(jdbc.newConnection())
@@ -102,7 +136,7 @@ class QueryService(databaseConfig: DatabaseConfig, viewName: String):
                 // query.limit.foreach(stmt.setMaxRows)
                 // TODO may have to add some database specific code here
                 // query.offset.foreach(stmt.setF)
-                PreparedStatementGenerator.bind(stmt, query.where)
+                PreparedStatementGenerator.bind(stmt, query.where, kinds)
                 val rs   = stmt.executeQuery()
                 QueryResults.fromResultSet(rs)
             )
@@ -112,6 +146,8 @@ class QueryService(databaseConfig: DatabaseConfig, viewName: String):
         val sql = PreparedStatementGenerator.buildPreparedStatementTemplate(viewName, query, databaseConfig)
         log.atDebug.log(s"Running query: $sql")
 
+        // read before borrowing a connection, so the metadata lookup never waits on this query's connection
+        val kinds = columnKinds
         Using
             .Manager(use =>
                 val conn = use(jdbc.newConnection())
@@ -124,7 +160,7 @@ class QueryService(databaseConfig: DatabaseConfig, viewName: String):
                         ResultSet.CONCUR_READ_ONLY
                     )
                 )
-                PreparedStatementGenerator.bind(stmt, query.where)
+                PreparedStatementGenerator.bind(stmt, query.where, kinds)
                 val rs   = stmt.executeQuery()
                 QueryResults.IO.writeTsv(rs, file) match
                     case Left(e)  => throw e

@@ -1,4 +1,12 @@
--- V1.1.0__localizations.sql (SQL Server) -- DRAFT, see docs/proposals/2026-08-25-localizations.md
+-- V1.1.0__localizations.sql (SQL Server) -- localizations, see docs/proposals/2026-08-25-localizations.md
+--
+-- Deployment requirements (the code cannot enforce these):
+--   1. Set DATABASE_VIDEO_REFERENCES_TABLE (the ${videoReferencesTable} placeholder below) BEFORE
+--      the first start that applies this migration. Flyway applies it once; changing the
+--      variable afterwards does not re-create the synonym. Unset or blank means the default.
+--   2. Database compatibility level >= 140 (see below; check the DATABASE, not the server).
+--   3. The migrating user needs CREATE SYNONYM, CREATE PROCEDURE and CREATE VIEW permissions
+--      (plus CREATE TABLE) in the dbo schema.
 --
 -- Creates the localizations table, the quarantine table, and dbo.migrate_localizations, the
 -- procedure that converts legacy localization associations. Flyway applies the DDL on startup;
@@ -42,8 +50,11 @@ CREATE TABLE "dbo"."localizations" (
     "verification_timestamp"  datetimeoffset(6) NULL,
     "comment"                 varchar(1024) NULL,
 
+    "part"                    varchar(128) NULL,
+
     "training"                bit NOT NULL DEFAULT 0,
     "truncated"               bit NOT NULL DEFAULT 0,
+    "difficult"               bit NOT NULL DEFAULT 0,
 
     "last_updated_timestamp"  datetime2(6) NOT NULL DEFAULT SYSUTCDATETIME(),
 
@@ -106,6 +117,83 @@ CREATE INDEX "idx_localization_migration_rejects__association_uuid"
 GO
 
 -- ---------------------------------------------------------------------------------------
+-- localized_annotations: one row per localization (proposal section 7.3, D-14).
+--
+-- Same observation / imaged-moment / ancillary / video-reference-info columns as the
+-- "annotations" view, but NO association columns and NO image_references join (that join would
+-- multiply rows, and a localization no longer belongs to an image). Where a name would collide:
+--   ancillary x, y, z               -> ancillary_x, ancillary_y, ancillary_z   (x, y are the box)
+--   the localization's observer     -> localization_observer                    (observer is the observation's)
+--   the localization's timestamp    -> localization_observation_timestamp
+-- ---------------------------------------------------------------------------------------
+
+CREATE VIEW "dbo"."localized_annotations"
+AS
+SELECT
+    l.uuid                   AS localization_uuid,
+    l.localization_type,
+    l.x,
+    l.y,
+    l.width,
+    l.height,
+    l.vertices,
+    l.mask_encoding,
+    l.mask_data,
+    l.mask_width_pixels,
+    l.mask_height_pixels,
+    l.generator,
+    l.confidence,
+    l.observer               AS localization_observer,
+    l.observation_timestamp  AS localization_observation_timestamp,
+    l.verifier,
+    l.verification_timestamp,
+    l.comment,
+    l.part,
+    l.training,
+    l.truncated,
+    l.difficult,
+    l.last_updated_timestamp,
+    im.uuid                  AS imaged_moment_uuid,
+    im.video_reference_uuid,
+    im.elapsed_time_millis   AS index_elapsed_time_millis,
+    im.recorded_timestamp    AS index_recorded_timestamp,
+    im.timecode              AS index_timecode,
+    obs.uuid                 AS observation_uuid,
+    obs.activity,
+    obs.concept,
+    obs.duration_millis,
+    obs.observation_group,
+    obs.observation_timestamp,
+    obs.observer,
+    ad.altitude,
+    ad.coordinate_reference_system,
+    ad.depth_meters,
+    ad.latitude,
+    ad.longitude,
+    ad.oxygen_ml_per_l,
+    ad.phi,
+    ad.xyz_position_units,
+    ad.pressure_dbar,
+    ad.psi,
+    ad.salinity,
+    ad.temperature_celsius,
+    ad.theta,
+    ad.x                     AS ancillary_x,
+    ad.y                     AS ancillary_y,
+    ad.z                     AS ancillary_z,
+    ad.light_transmission,
+    info.mission_contact     AS chief_scientist,
+    info.mission_id          AS dive_number,
+    info.platform_name       AS camera_platform
+FROM
+    dbo.localizations l
+        JOIN dbo.observations obs ON obs.uuid = l.observation_uuid
+        JOIN dbo.imaged_moments im ON im.uuid = obs.imaged_moment_uuid
+        LEFT JOIN dbo.ancillary_data ad ON ad.imaged_moment_uuid = im.uuid
+        LEFT JOIN dbo.video_reference_information info ON info.video_reference_uuid = im.video_reference_uuid
+GO
+
+-- ---------------------------------------------------------------------------------------
 -- vampire-squid's video_references, wherever it lives.
 -- ---------------------------------------------------------------------------------------
 
@@ -132,10 +220,16 @@ AS
 BEGIN
     SET NOCOUNT ON;
     DECLARE @eps float = 1e-6;
+    -- to_concept values that mean "no part" (a placeholder, not a real part) become NULL. Every
+    -- legacy writer uses 'self'. Add any other placeholder that survey (k) of the proposal
+    -- (section 8.1) finds. Matching is exact and case-sensitive (COLLATE below).
+    DECLARE @no_part TABLE (v varchar(128) NOT NULL);
+    INSERT INTO @no_part (v) VALUES ('self');
 
     DROP TABLE IF EXISTS #loc_work;
     DROP TABLE IF EXISTS #loc_arr;
     DROP TABLE IF EXISTS #loc_verts;
+    DROP TABLE IF EXISTS #loc_video_scale;
     DELETE FROM dbo.localization_migration_rejects;
 
     -- 1. Candidates. JSON functions are only applied to rows already known to be JSON objects.
@@ -143,6 +237,7 @@ BEGIN
            a.observation_uuid,
            a.link_name,
            a.link_value,
+           a.to_concept,
            a.last_updated_timestamp,
            CASE a.link_name
                WHEN 'bounding box'          THEN 'bounding_box'
@@ -160,6 +255,9 @@ BEGIN
            CAST(NULL AS int)              AS image_h,
            CAST(NULL AS int)              AS video_w,
            CAST(NULL AS int)              AS video_h,
+           CAST(NULL AS uniqueidentifier) AS video_reference_uuid,
+           CAST(0 AS bit)                 AS orphaned,
+           CAST(NULL AS bit)              AS scale100,
            CAST(NULL AS int)              AS w,
            CAST(NULL AS int)              AS h,
            CAST(NULL AS float) AS px, CAST(NULL AS float) AS py,
@@ -185,20 +283,23 @@ BEGIN
 
     UPDATE s SET s.image_uuid = ir.uuid, s.image_w = ir.width_pixels, s.image_h = ir.height_pixels
       FROM #loc_work s JOIN dbo.image_references ir ON ir.uuid = s.ref_uuid;
+    UPDATE s SET s.video_reference_uuid = im.video_reference_uuid
+      FROM #loc_work s
+      JOIN dbo.imaged_moments im ON im.uuid = s.imaged_moment_uuid;
     UPDATE s SET s.video_w = vr.width, s.video_h = vr.height
       FROM #loc_work s
-      JOIN dbo.imaged_moments im ON im.uuid = s.imaged_moment_uuid
-      JOIN dbo.vampire_squid_video_references vr ON vr.uuid = im.video_reference_uuid;
+      JOIN dbo.vampire_squid_video_references vr ON vr.uuid = s.video_reference_uuid;
 
     -- 2. Pre-checks, in order of precedence.
     UPDATE #loc_work SET reason = 'unknown_link_name' WHERE localization_type IS NULL;
     UPDATE #loc_work SET reason = 'malformed_json'
      WHERE reason IS NULL AND (is_obj = 0 OR (ref_text IS NOT NULL AND ref_uuid IS NULL));
 
-    -- Frame size. The image the pixels were drawn on wins; a missing image row is never
-    -- silently turned into a video frame. An image that exists but has no size falls back to
-    -- the video's, on the same-size assumption of section 6.2.
-    UPDATE #loc_work SET reason = 'orphaned_image_reference'
+    -- Frame size. The image the pixels were drawn on wins. An image row that is gone (an
+    -- orphaned reference) and an image that exists but has no size both fall back to the video's,
+    -- on the same-size assumption of section 6.2 (proposal section 13, question 3). Orphans are
+    -- flagged so the report can count them apart.
+    UPDATE #loc_work SET orphaned = 1
      WHERE reason IS NULL AND ref_uuid IS NOT NULL AND image_uuid IS NULL;
     UPDATE #loc_work SET
         w = CASE WHEN image_w > 0 AND image_h > 0 THEN image_w
@@ -208,14 +309,40 @@ BEGIN
      WHERE reason IS NULL;
     UPDATE #loc_work SET reason = 'unresolved_dimensions' WHERE reason IS NULL AND (w IS NULL OR h IS NULL);
 
-    -- 3. Provenance (confidence 0-100 -> 0-1; tags -> training).
+    -- 3. Provenance (confidence -> 0-1; tags -> training).
+    --
+    -- Legacy confidence is on 0-100 or on 0-1, and a value <= 1 cannot say which, so the scale is
+    -- decided per VIDEO by a hard rule (proposal section 8.2, D-15): if ANY legacy confidence in the
+    -- video exceeds 1, the whole video is 0-100 and is divided by 100; otherwise it is 0-1 and used
+    -- as is. It is computed over EVERY legacy localization in the video, not only the ones still to
+    -- migrate, so a delta pass classifies a video the same way the first pass did.
+    SELECT im.video_reference_uuid,
+           CAST(MAX(CASE WHEN c.conf > 1 THEN 1 ELSE 0 END) AS bit) AS scale100
+      INTO #loc_video_scale
+      FROM dbo.associations a
+      JOIN dbo.observations o    ON o.uuid  = a.observation_uuid
+      JOIN dbo.imaged_moments im ON im.uuid = o.imaged_moment_uuid
+     CROSS APPLY (
+         SELECT TRY_CAST(CASE WHEN ISJSON(a.link_value) = 1 AND LEFT(LTRIM(a.link_value), 1) = '{'
+                              THEN JSON_VALUE(a.link_value, '$.confidence') END AS float) AS conf
+     ) c
+     WHERE a.link_name IN ('bounding box','localization-point','localization-line','localization-polygon')
+       AND c.conf IS NOT NULL
+     GROUP BY im.video_reference_uuid;
+
     UPDATE #loc_work SET confidence = TRY_CAST(JSON_VALUE(link_value, '$.confidence') AS float)
      WHERE reason IS NULL AND JSON_VALUE(link_value, '$.confidence') IS NOT NULL;
     UPDATE #loc_work SET reason = 'malformed_json'
      WHERE reason IS NULL AND JSON_VALUE(link_value, '$.confidence') IS NOT NULL AND confidence IS NULL;
+    UPDATE s SET s.scale100   = vs.scale100,
+                 s.confidence = s.confidence / CASE WHEN vs.scale100 = 1 THEN 100.0 ELSE 1.0 END
+      FROM #loc_work s
+      JOIN #loc_video_scale vs
+        ON vs.video_reference_uuid = s.video_reference_uuid
+        OR (vs.video_reference_uuid IS NULL AND s.video_reference_uuid IS NULL)
+     WHERE s.reason IS NULL AND s.confidence IS NOT NULL;
     UPDATE #loc_work SET reason = 'confidence_out_of_range'
-     WHERE reason IS NULL AND (confidence < 0 OR confidence > 100);
-    UPDATE #loc_work SET confidence = confidence / 100.0 WHERE reason IS NULL AND confidence IS NOT NULL;
+     WHERE reason IS NULL AND (confidence < 0 OR confidence > 1);
     UPDATE #loc_work SET training = 1
      WHERE reason IS NULL
        AND LEFT(LTRIM(JSON_QUERY(link_value, '$.tags')), 1) = '['
@@ -289,6 +416,18 @@ BEGIN
               FROM #loc_verts) d ON d.association_uuid = v.association_uuid AND d.idx = v.idx
      WHERE d.dup = 1;
 
+    -- A polygon sent explicitly closed (last vertex = first) is stored open: drop the closing
+    -- vertex once (section 6.1), before the minimum-vertex check, so [A,B,A] has 2 vertices.
+    DELETE v
+      FROM #loc_verts v
+      JOIN (SELECT association_uuid, MIN(idx) AS first_idx, MAX(idx) AS last_idx
+              FROM #loc_verts GROUP BY association_uuid HAVING COUNT(*) > 1) e
+        ON e.association_uuid = v.association_uuid AND v.idx = e.last_idx
+      JOIN #loc_verts f ON f.association_uuid = v.association_uuid AND f.idx = e.first_idx
+      JOIN #loc_work s  ON s.association_uuid = v.association_uuid
+     WHERE s.reason IS NULL AND s.localization_type = 'polygon'
+       AND f.px = v.px AND f.py = v.py;
+
     UPDATE s SET s.reason = 'insufficient_vertices'
       FROM #loc_work s
      WHERE s.reason IS NULL AND s.localization_type IN ('point','line','polygon')
@@ -351,10 +490,12 @@ BEGIN
 
     INSERT INTO dbo.localizations
         (uuid, observation_uuid, localization_type, x, y, width, height, vertices,
-         generator, confidence, verifier, training, truncated, last_updated_timestamp)
+         generator, confidence, verifier, part, training, truncated, last_updated_timestamp)
     SELECT s.association_uuid, s.observation_uuid, s.localization_type, s.nx, s.ny, s.nw, s.nh, s.vertices,
            LEFT(JSON_VALUE(s.link_value, '$.generator'), 128), s.confidence,
            LEFT(JSON_VALUE(s.link_value, '$.verifier'), 128),
+           CASE WHEN EXISTS (SELECT 1 FROM @no_part n WHERE n.v = s.to_concept COLLATE Latin1_General_100_CS_AS) THEN NULL
+                ELSE LEFT(s.to_concept, 128) END,
            s.training, s.truncated, ISNULL(s.last_updated_timestamp, SYSUTCDATETIME())
       FROM #loc_work s
      WHERE s.reason IS NULL;
@@ -368,6 +509,18 @@ BEGIN
     UNION ALL
     SELECT 'rejected: ' + reason, COUNT_BIG(*)
       FROM #loc_work WHERE reason IS NOT NULL GROUP BY reason
+    UNION ALL
+    SELECT 'info: orphaned image reference, used the video''s dimensions (media assumption)', COUNT_BIG(*)
+      FROM #loc_work WHERE reason IS NULL AND orphaned = 1
+    UNION ALL
+    SELECT 'info: videos on the 0-100 confidence scale (divided by 100)', COUNT_BIG(*)
+      FROM #loc_video_scale WHERE scale100 = 1
+    UNION ALL
+    SELECT 'info: rows divided by 100 (video is 0-100)', COUNT_BIG(*)
+      FROM #loc_work WHERE reason IS NULL AND scale100 = 1
+    UNION ALL
+    SELECT 'info: rows used as is (video is 0-1)', COUNT_BIG(*)
+      FROM #loc_work WHERE reason IS NULL AND scale100 = 0
     UNION ALL
     SELECT 'info: image/video aspect ratio differs by >1% (media assumption)', COUNT_BIG(*)
       FROM #loc_work

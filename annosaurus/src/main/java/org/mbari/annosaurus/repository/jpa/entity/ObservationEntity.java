@@ -189,6 +189,15 @@ public class ObservationEntity implements IPersistentObject {
     )
     Set<AssociationEntity> associations = new HashSet<>();
 
+    @OneToMany(
+            targetEntity = LocalizationEntity.class,
+            cascade = {CascadeType.ALL},
+            fetch = FetchType.LAZY,
+            mappedBy = "observation",
+            orphanRemoval = true
+    )
+    Set<LocalizationEntity> localizations = new HashSet<>();
+
     public ObservationEntity() {
     }
 
@@ -296,6 +305,24 @@ public class ObservationEntity implements IPersistentObject {
     public void removeAssociation(AssociationEntity ass) {
         associations.remove(ass);
         ass.setObservation(null);
+    }
+
+    public Set<LocalizationEntity> getLocalizations() {
+        return localizations;
+    }
+
+    public void setLocalizations(Set<LocalizationEntity> localizations) {
+        this.localizations = localizations;
+    }
+
+    public void addLocalization(LocalizationEntity localization) {
+        localizations.add(localization);
+        localization.setObservation(this);
+    }
+
+    public void removeLocalization(LocalizationEntity localization) {
+        localizations.remove(localization);
+        localization.setObservation(null);
     }
 
     @Override

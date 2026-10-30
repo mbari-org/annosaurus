@@ -58,7 +58,8 @@ object TestUtils:
         nObservations: Int = 0,
         nAssociations: Int = 0,
         nImageReferences: Int = 0,
-        includeData: Boolean = false
+        includeData: Boolean = false,
+        nLocalizations: Int = 0
     ): Seq[ImagedMomentEntity] =
         // Recorded timestamps must be in the past: randomImagedMoment adds up to 30 days
         // of elapsed time to startDate, and queries that bin by time (e.g. timeHistogram)
@@ -72,7 +73,8 @@ object TestUtils:
                 nImageReferences,
                 includeData,
                 videoReferenceUuid,
-                startDate
+                startDate,
+                nLocalizations
             )
 
     def create(
@@ -89,9 +91,10 @@ object TestUtils:
         nObservations: Int = 0,
         nAssociations: Int = 0,
         nImageReferences: Int = 0,
-        includeData: Boolean = false
+        includeData: Boolean = false,
+        nLocalizations: Int = 0
     )(using daoFactory: JPADAOFactory, ec: ExecutionContext): Seq[ImagedMomentEntity] =
-        val xs  = build(nImagedMoments, nObservations, nAssociations, nImageReferences, includeData)
+        val xs  = build(nImagedMoments, nObservations, nAssociations, nImageReferences, includeData, nLocalizations)
         log.atDebug.log(s"Creating ${xs.size} ImagedMoments: $xs")
         val dao = daoFactory.newImagedMomentDAO()
         Await.ready(dao.runTransaction(d => xs.foreach(x => d.create(x))), Timeout)
@@ -104,7 +107,8 @@ object TestUtils:
         nImageReferences: Int = 0,
         includeData: Boolean = false,
         videoReferenceUuid: UUID = UUID.randomUUID(),
-        startDate: Instant = Instant.now().minus(Duration.ofDays(30))
+        startDate: Instant = Instant.now().minus(Duration.ofDays(30)),
+        nLocalizations: Int = 0
     ): ImagedMomentEntity =
         val et           = random.nextLong(2592000000L) // 30 days
         val elapsedTime  = Duration.ofMillis(et)
@@ -114,12 +118,13 @@ object TestUtils:
             else None
         val imagedMoment =
             ImagedMomentEntity(videoReferenceUuid, recordedDate, timecode.orNull, elapsedTime)
-        for _ <- 0 until nObservations do imagedMoment.addObservation(randomObservation(nAssociations))
+        for _ <- 0 until nObservations do
+            imagedMoment.addObservation(randomObservation(nAssociations, nLocalizations))
         for _ <- 0 until nImageReferences do imagedMoment.addImageReference(randomImageReference())
         if includeData then imagedMoment.setAncillaryDatum(randomData())
         imagedMoment
 
-    def randomObservation(nAssociations: Int = 0): ObservationEntity =
+    def randomObservation(nAssociations: Int = 0, nLocalizations: Int = 0): ObservationEntity =
         //        val obs = obsDao.newPersistentObject(Strings.random(conceptLength), Strings.random(10), Instant.now(), Some(Strings.random(6)))
         // Never empty: concepts are interpolated into URL path segments by many tests
         // (e.g. /v1/fast/concept/$concept), and an empty segment fails to route.
@@ -139,7 +144,65 @@ object TestUtils:
             activity.orNull
         )
         for _ <- 0 until nAssociations do obs.addAssociation(randomAssociation())
+        // At most one localization per type per observation (uk_localizations__observation_uuid_type)
+        require(nLocalizations <= LocalizationTypes.size, s"nLocalizations must be <= ${LocalizationTypes.size}")
+        LocalizationTypes.take(nLocalizations).foreach(t => obs.addLocalization(randomLocalization(t)))
         obs
+
+    /** Localization types in the order TestUtils assigns them: create(1, 1, 0, 2) yields a box and a point. */
+    val LocalizationTypes: Seq[String] = Seq("bounding_box", "point", "line", "polygon", "mask")
+
+    /**
+     * A localization whose values satisfy the database CHECK constraints for its type. Coordinates are normalized;
+     * x/y/width/height are the bounding box of the shape.
+     */
+    def randomLocalization(localizationType: String = "bounding_box"): LocalizationEntity =
+        def coord(): Double = math.round(random.nextDouble() * 0.4 * 1000) / 1000d // [0, 0.4]
+        def size(): Double  = math.round((random.nextDouble() * 0.4 + 0.01) * 1000) / 1000d // [0.01, 0.41]
+        val l               = new LocalizationEntity
+        l.setLocalizationType(localizationType)
+        localizationType match
+            case "point"           =>
+                l.setX(coord())
+                l.setY(coord())
+                l.setWidth(0d)
+                l.setHeight(0d)
+            case "line" | "polygon" =>
+                val x0       = coord()
+                val y0       = coord()
+                val w        = size()
+                val h        = size()
+                val vertices =
+                    if localizationType == "line" then Seq(x0, y0, x0 + w, y0 + h)
+                    else Seq(x0, y0, x0 + w, y0, x0 + w, y0 + h, x0, y0 + h)
+                l.setX(x0)
+                l.setY(y0)
+                l.setWidth(w)
+                l.setHeight(h)
+                l.setVertices(vertices.mkString("[", ",", "]"))
+            case "mask"            =>
+                l.setX(0d)
+                l.setY(0d)
+                l.setWidth(1d)
+                l.setHeight(1d)
+                l.setMaskEncoding("coco_rle")
+                l.setMaskData(Strings.random(64))
+                l.setMaskWidthPixels(random.nextInt(1440) + 480)
+                l.setMaskHeightPixels(random.nextInt(1080) + 270)
+            case _                 => // bounding_box
+                l.setX(coord())
+                l.setY(coord())
+                l.setWidth(size())
+                l.setHeight(size())
+        l.setGenerator(Strings.random(16))
+        l.setConfidence(math.round(random.nextFloat() * 100) / 100f)
+        l.setObserver(Strings.random(16))
+        l.setObservationTimestamp(Instant.now().truncatedTo(ChronoUnit.MILLIS))
+        l.setComment(Strings.random(32))
+        l.setTraining(random.nextBoolean())
+        l.setTruncated(random.nextBoolean())
+        l.setDifficult(random.nextBoolean())
+        l
 
     def randomAssociation(): AssociationEntity =
         val linkName  = Strings.random(random.nextInt(30) + 2)

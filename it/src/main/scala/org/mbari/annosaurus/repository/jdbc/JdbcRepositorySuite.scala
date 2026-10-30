@@ -18,7 +18,7 @@ package org.mbari.annosaurus.repository.jdbc
 
 import org.mbari.annosaurus.controllers.TestUtils
 import org.mbari.annosaurus.domain.{Annotation, ConcurrentRequest, MultiRequest, ObservationsUpdate, QueryConstraints}
-import org.mbari.annosaurus.repository.jpa.{BaseDAOSuite, JPADAOFactory}
+import org.mbari.annosaurus.repository.jpa.{BaseDAOSuite, JPADAOFactory, LocalizationDAOImpl}
 
 import java.time.Duration
 import scala.jdk.CollectionConverters.*
@@ -62,6 +62,32 @@ trait JdbcRepositorySuite extends BaseDAOSuite:
         assertEquals(n.imageReferenceCount, 8)
         assertEquals(n.associationCount, 8)
 
+    }
+
+    test("deleteByVideoReferenceUUID removes localizations") {
+        val keep = TestUtils.create(1, 1, nLocalizations = 2)
+        val xs   = TestUtils.create(1, 1, 1, 1, true, nLocalizations = 2)
+        val x    = xs.head
+        val vru  = x.getVideoReferenceUuid()
+        val n    = repository.deleteByVideoReferenceUuid(vru)
+        assertEquals(n.errorMessage, None)
+        assertEquals(n.localizationCount, 2)
+        assertEquals(n.observationCount, 1)
+        assertEquals(n.imagedMomentCount, 1)
+        assertEquals(n.ancillaryDataCount, 1)
+        assertEquals(n.imageReferenceCount, 1)
+        assertEquals(n.associationCount, 1)
+
+        given dao: LocalizationDAOImpl = daoFactory.newLocalizationDAO()
+        val deleted                    = run(() => dao.findByVideoReferenceUuid(vru, None, None))
+        assert(deleted.isEmpty)
+        val kept                       = run(() => dao.findByVideoReferenceUuid(keep.head.getVideoReferenceUuid(), None, None))
+        assertEquals(kept.size, 2)
+        dao.close()
+        val imDao                      = daoFactory.newImagedMomentDAO()
+        val ims                        = run(() => imDao.findByVideoReferenceUUID(vru))(using imDao)
+        assert(ims.isEmpty)
+        imDao.close()
     }
 
     test("findAll") {

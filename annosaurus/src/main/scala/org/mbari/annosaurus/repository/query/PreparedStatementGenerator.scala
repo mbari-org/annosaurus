@@ -30,13 +30,66 @@ object PreparedStatementGenerator:
 
     private val log = System.getLogger(getClass.getName)
 
-    def bind(statement: PreparedStatement, constraints: Seq[Constraint]): Either[Throwable, Unit] =
+    /** Column kinds that need a typed bind instead of the default string bind of `equals` / `in`. */
+    enum ColumnKind:
+        case Boolean, Uuid
+
+    /**
+     * Binds the constraints. `columnKinds` (lower-case column name -> kind, from the view's metadata) switches `equals`
+     * and `in` values of boolean and uuid columns to a typed bind: PostgreSQL rejects `boolean = varchar`, so the string
+     * "true" cannot be bound as is. A value that does not parse as the column's type falls back to the original string
+     * bind, so the database reports the same error it always did. Every other constraint, and every column not in
+     * `columnKinds`, binds exactly as before.
+     */
+    def bind(
+        statement: PreparedStatement,
+        constraints: Seq[Constraint],
+        columnKinds: Map[String, ColumnKind] = Map.empty
+    ): Either[Throwable, Unit] =
         Try {
             var idx = 1
             for c <- constraints
-            do idx = c.bind(statement, idx)
+            do idx = bindOne(statement, c, idx, columnKinds)
             log.atDebug.log(s"Bound ${idx - 1} constraints to prepared statement")
         }.toEither
+
+    /** The typed value for a string bound against a column of the given kind; None means "bind the string as is". */
+    private[query] def typedValue(kind: Option[ColumnKind], value: Any): Option[Any] =
+        (kind, value) match
+            case (Some(ColumnKind.Boolean), s: String) =>
+                s.trim.toLowerCase match
+                    case "true" | "1"  => Some(java.lang.Boolean.TRUE)
+                    case "false" | "0" => Some(java.lang.Boolean.FALSE)
+                    case _             => None
+            case (Some(ColumnKind.Uuid), s: String)    => Try(java.util.UUID.fromString(s.trim)).toOption
+            case _                                     => None
+
+    private def setTyped(statement: PreparedStatement, idx: Int, value: Any): Unit =
+        value match
+            case b: java.lang.Boolean => statement.setBoolean(idx, b)
+            case other                => statement.setObject(idx, other)
+
+    private def bindOne(
+        statement: PreparedStatement,
+        c: Constraint,
+        idx: Int,
+        columnKinds: Map[String, ColumnKind]
+    ): Int =
+        def kindOf(column: String) = columnKinds.get(column.trim.toLowerCase)
+        c match
+            case Constraint.Equals(column, value) =>
+                typedValue(kindOf(column), value) match
+                    case Some(v) =>
+                        setTyped(statement, idx, v)
+                        idx + 1
+                    case None    => c.bind(statement, idx)
+            case Constraint.In(column, values)    =>
+                val typed = values.map(v => typedValue(kindOf(column), v))
+                if typed.forall(_.isDefined) then
+                    for (v, i) <- typed.flatten.zipWithIndex do setTyped(statement, idx + i, v)
+                    idx + typed.size
+                else c.bind(statement, idx)
+            case _                                => c.bind(statement, idx)
 
     def buildPreparedStatementTemplateForCounts(
         tableName: String,

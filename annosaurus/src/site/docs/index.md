@@ -16,6 +16,7 @@ Source code and issue tracker: <https://github.com/mbari-org/annosaurus>
 | Reading annotations out of an existing deployment | [Fetching Annotations](howto/fetch_annotations.md) |
 | Assembling a dataset with filters on depth, time, platform, or concept | [Advanced Queries](howto/advanced-queries.md) |
 | Writing annotations, or anything that changes data | [Security Handshake](howto/security_handshake.md), then the Swagger UI at `/docs` |
+| Drawing shapes on an observation (box, point, line, polygon, mask) | [Localizations](howto/localizations/index.md) |
 | Standing up a server | [Deployment](DEPLOYMENT.md), plus [For staff deploying annosaurus](#for-staff-deploying-annosaurus) below |
 
 ## Authentication in one paragraph
@@ -58,5 +59,7 @@ The [Deployment guide](DEPLOYMENT.md) has the full procedure. The points that mo
 ## The data model in brief
 
 An **imaged moment** is a point in a video or an image, indexed by recorded timestamp, timecode, and/or elapsed time. It holds **observations** — the actual annotations, each with a concept and an observer — and **image references** for framegrabs. Each observation can carry **associations**, structured detail in `linkName | toConcept | linkValue` form. **Ancillary data** (position, depth, CTD) is cached against the moment so that spatial and environmental queries stay fast.
+
+An observation can also carry **localizations**: shapes that say *where in the frame* the annotated thing is. There are five types: `bounding_box`, `point`, `line`, `polygon` and `mask`. An observation has at most one of each type, and coordinates are normalized to [0, 1] with the origin at the top-left of the frame, so they do not depend on image resolution. See [Localizations](howto/localizations/index.md) for an overview, with a page per type ([bounding box](howto/localizations/bounding-box.md), [point](howto/localizations/point.md), [line](howto/localizations/line.md), [polygon](howto/localizations/polygon.md), [mask](howto/localizations/mask.md)) covering how to create, edit and delete each.
 
 Annotations are keyed to video by `videoReferenceUuid`, a UUID that comes from the video asset service rather than from annosaurus. See the [Overview](overview.md) for how that boundary is drawn.

@@ -16,27 +16,31 @@
 
 package org.mbari.annosaurus.endpoints
 
-import org.mbari.annosaurus.controllers.AnnotationController
+import org.mbari.annosaurus.controllers.{AnnotationController, LocalizationValidationException}
 import org.mbari.annosaurus.domain.{
     AnnotationCreateSC,
     AnnotationSC,
     AnnotationUpdateSC,
+    BadRequest,
     BulkAnnotationSC,
     ConcurrentRequest,
     ConcurrentRequestCountSC,
     ErrorMsg,
+    LocalizationSC,
     MultiRequest,
     MultiRequestCountSC
 }
 import org.mbari.annosaurus.endpoints.CustomTapirJsonCirce.*
-import org.mbari.annosaurus.etc.circe.CirceCodecs.given
+import org.mbari.annosaurus.etc.circe.CirceCodecs.{*, given}
 import org.mbari.annosaurus.etc.jwt.JwtService
 import org.mbari.annosaurus.etc.tapir.TapirCodecs.given
 import sttp.tapir.*
+import sttp.tapir.CodecFormat.TextPlain
 import sttp.tapir.server.ServerEndpoint
 
 import java.util.UUID
 import scala.concurrent.{ExecutionContext, Future}
+import scala.util.{Failure, Success}
 
 class AnnotationEndpoints(controller: AnnotationController)(using
     ec: ExecutionContext,
@@ -45,6 +49,30 @@ class AnnotationEndpoints(controller: AnnotationController)(using
 
     private val base = "annotations"
     private val tag  = "Annotations"
+
+    /** A form-encoded annotation create carries its localizations as a JSON array in the `localizations` field. */
+    private given localizationsFormFieldCodec: Codec[String, Seq[LocalizationSC], TextPlain] =
+        Codec
+            .string
+            .mapDecode(s =>
+                s.reify[Seq[LocalizationSC]] match
+                    case Right(xs) => DecodeResult.Value(xs)
+                    case Left(e)   => DecodeResult.Error(s, e)
+            )(_.stringify)
+
+    /**
+     * An invalid localization on create is the caller's fault, so it maps to 400 instead of the 500 that
+     * handleErrors/handleOption give. Every other outcome is passed on to `handle`.
+     */
+    private def invalidLocalizationsAsBadRequest[T, U](f: Future[T])(
+        handle: Future[T] => Future[Either[ErrorMsg, U]]
+    ): Future[Either[ErrorMsg, U]] =
+        f.transform:
+            case Failure(e: LocalizationValidationException) => Success(Left(BadRequest(e.getMessage)))
+            case other                                       => Success(Right(other))
+        .flatMap:
+            case Left(error)  => Future.successful(Left(error))
+            case Right(tried) => handle(Future.fromTry(tried))
 
 //    GET /: uuid
     val findAnnotationByUuid: Endpoint[Unit, UUID, ErrorMsg, AnnotationSC, Any] =
@@ -133,12 +161,12 @@ class AnnotationEndpoints(controller: AnnotationController)(using
             .serverSecurityLogic(jwtOpt => verify(jwtOpt))
             .serverLogic { _ => annotationCreate =>
                 val annotation = annotationCreate.toCamelCase.toAnnotation
-                handleOption(
+                invalidLocalizationsAsBadRequest(
                     controller
                         .create(annotation)
                         .map(xs => xs.maxByOption(_.lastUpdated).map(_.toSnakeCase))
 //                        .map(xs => xs.headOption.map(_.toSnakeCase))
-                )
+                )(handleOption)
             }
 
 //        POST / bulk
@@ -157,7 +185,9 @@ class AnnotationEndpoints(controller: AnnotationController)(using
             .serverSecurityLogic(jwtOpt => verify(jwtOpt))
             .serverLogic { _ => annotations =>
                 val annosCc = annotations.map(_.toCamelCase)
-                handleErrors(controller.bulkCreate(annosCc).map(xs => xs.map(_.toSnakeCase)))
+                invalidLocalizationsAsBadRequest(controller.bulkCreate(annosCc).map(xs => xs.map(_.toSnakeCase)))(
+                    handleErrors
+                )
             }
 //    POST / concurrent
 

@@ -46,6 +46,24 @@ trait ObservationControllerSuite extends BaseDAOSuite:
         AssertUtils.assertSameObservation(expected.head, obtained.head.toEntity)
     }
 
+    test("findByUUID includes the observation's localizations") {
+        val im       = TestUtils.create(1, 1, 0, 0, nLocalizations = 2).head
+        val expected = im.getObservations().iterator().next().getLocalizations().asScala.toSeq
+        assertEquals(expected.size, 2)
+        val obtained = exec(controller.findByUUID(im.getObservations().iterator().next().getUuid())).get
+        assertEquals(obtained.localizations.size, 2)
+        assertEquals(
+            obtained.localizations.flatMap(_.uuid).toSet,
+            expected.map(_.getUuid()).toSet
+        )
+    }
+
+    test("findByUUID returns no localizations for an observation without any") {
+        val im       = TestUtils.create(1, 1).head
+        val obtained = exec(controller.findByUUID(im.getObservations().iterator().next().getUuid())).get
+        assertEquals(obtained.localizations, Nil)
+    }
+
     test("create using params") {
         val im   = TestUtils.create(1).head
         val obs0 = TestUtils.randomObservation()

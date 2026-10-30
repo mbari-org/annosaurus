@@ -18,7 +18,7 @@ package org.mbari.annosaurus.etc.nats
 
 import io.reactivex.rxjava3.subjects.PublishSubject
 import org.mbari.annosaurus.repository.jpa.TransactionNotifier
-import org.mbari.annosaurus.repository.jpa.entity.{AssociationEntity, ObservationEntity}
+import org.mbari.annosaurus.repository.jpa.entity.{AssociationEntity, LocalizationEntity, ObservationEntity}
 
 import java.util.UUID
 import scala.collection.mutable
@@ -68,6 +68,12 @@ class NatsBridgeSuite extends munit.FunSuite:
         val uuid   = UUID.randomUUID()
         val result = bridge.handle(makeMsg(TransactionNotifier.Action.REMOVE, classOf[AssociationEntity], uuid))
         assertEquals(result, Some(NatsMessage(NatsMessage.Actions.DELETED, NatsMessage.DataTypes.ASSOCIATION, uuid)))
+
+    test("handle returns CREATED/LOCALIZATION for LocalizationEntity CREATE"):
+        val bridge = NatsBridge(makeSource, makeSource)
+        val uuid   = UUID.randomUUID()
+        val result = bridge.handle(makeMsg(TransactionNotifier.Action.CREATE, classOf[LocalizationEntity], uuid))
+        assertEquals(result, Some(NatsMessage(NatsMessage.Actions.CREATED, NatsMessage.DataTypes.LOCALIZATION, uuid)))
 
     test("handle returns None for unknown entity class"):
         val bridge = NatsBridge(makeSource, makeSource)

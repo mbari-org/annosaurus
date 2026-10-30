@@ -28,7 +28,7 @@ import java.util.UUID
  * record using the uuid.
  *
  * @param action 1 of CREATED, UPDATED, or DELETED
- * @param dataType 1 of OBSERVATION or ASSOCIATION
+ * @param dataType 1 of OBSERVATION, ASSOCIATION or LOCALIZATION
  * @param uuid The uuid of the record that was affected
  */
 case class NatsMessage(action: String, dataType: String, uuid: UUID) extends Message[UUID]:
@@ -43,12 +43,12 @@ object NatsMessage:
         case DELETED, CREATED, UPDATED
 
     enum DataTypes:
-        case OBSERVATION, ASSOCIATION
+        case OBSERVATION, ASSOCIATION, LOCALIZATION
 
     /**
      * Factory method for creating a NatsMessage.
      * @param action 1 of CREATED, UPDATED, or DELETED
-     * @param dataType 1 of OBSERVATION or ASSOCIATION
+     * @param dataType 1 of OBSERVATION, ASSOCIATION or LOCALIZATION
      * @param uuid The uuid of the record that was affected
      * @return A NatsMessage
      */

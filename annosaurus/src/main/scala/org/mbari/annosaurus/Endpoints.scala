@@ -22,6 +22,7 @@ import org.mbari.annosaurus.etc.jwt.JwtService
 import org.mbari.annosaurus.repository.jdbc.{AnalysisRepository, JdbcRepository}
 import org.mbari.annosaurus.repository.jpa.JPADAOFactory
 import sttp.tapir.server.ServerEndpoint
+import sttp.tapir.stringToPath
 import sttp.tapir.server.metrics.prometheus.PrometheusMetrics
 import sttp.tapir.swagger.bundle.SwaggerInterpreter
 
@@ -43,10 +44,16 @@ object Endpoints:
     val imagedMomentController             = new ImagedMomentController(daoFactory)
     val imageReferenceController           = new ImageReferenceController(daoFactory)
     val indexController                    = new IndexController(daoFactory)
+    val localizationController             = new LocalizationController(daoFactory)
     val observationController              = new ObservationController(daoFactory)
     val queryController                    = new QueryController(
         AppConfig.DefaultDatabaseConfig,
         AppConfig.DefaultDatabaseConfig.queryView
+    )
+
+    val localizationQueryController        = new QueryController(
+        AppConfig.DefaultDatabaseConfig,
+        AppConfig.LocalizationQueryView
     )
 
     // --------------------------------
@@ -70,8 +77,15 @@ object Endpoints:
     val imageEndpoints                    = new ImageEndpoints(imageController)
     val imageReferenceEndpoints           = new ImageReferenceEndpoints(imageReferenceController)
     val indexEndpoints                    = new IndexEndpoints(indexController)
+    val localizationEndpoints             = new LocalizationEndpoints(localizationController)
     val observationEndpoints              = new ObservationEndpoints(observationController, jdbcRepository)
     val queryEndpoints                    = new QueryEndpoints(queryController)
+    val localizationQueryEndpoints        = new QueryEndpoints(
+        localizationQueryController,
+        "localizations" / "query",
+        "localization",
+        "Localization Query"
+    )
 
     // --------------------------------
     // For VertX, we need to separate the non-blocking endpoints from the blocking ones
@@ -91,8 +105,10 @@ object Endpoints:
         imageEndpoints.allImpl,
         imageReferenceEndpoints.allImpl,
         indexEndpoints.allImpl,
+        localizationEndpoints.allImpl,
         observationEndpoints.allImpl,
-        queryEndpoints.allImpl
+        queryEndpoints.allImpl,
+        localizationQueryEndpoints.allImpl
     ).flatten
 
     val apiEndpoints = nonBlockingEndpoints ++ blockingEndpoints
