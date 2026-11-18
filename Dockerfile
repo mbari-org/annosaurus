@@ -20,6 +20,9 @@ RUN mkdir -p ${APP_HOME}
 
 COPY annosaurus/target/universal/stage/ ${APP_HOME}/
 
+# Mitigation for CVE-2026-114938 (Java4Shell): disable the vulnerable Base64 intrinsic
+ENV JAVA_TOOL_OPTIONS="-XX:-UseBASE64Intrinsics"
+
 EXPOSE 8080
 
 ENTRYPOINT ["/opt/annosaurus/bin/annosaurus"]
