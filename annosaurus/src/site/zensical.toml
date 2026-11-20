@@ -11,6 +11,15 @@ nav = [
     { "Security Handshake" = "howto/security_handshake.md" },
     { "Fetch Annotations" = "howto/fetch_annotations.md" },
     { "Advanced Queries" = "howto/advanced-queries.md" },
+    { "Localizations" = [
+      { "Overview" = "howto/localizations/index.md" },
+      { "Bounding Box" = "howto/localizations/bounding-box.md" },
+      { "Point" = "howto/localizations/point.md" },
+      { "Line" = "howto/localizations/line.md" },
+      { "Polygon" = "howto/localizations/polygon.md" },
+      { "Mask" = "howto/localizations/mask.md" },
+      { "Mask Example" = "howto/localizations/mask-example.md" },
+    ]},
   ]},
   { "DeepWiki" = "https://deepwiki.com/mbari-org/annosaurus" },
   { "About" = [

@@ -46,7 +46,8 @@ trait TestDAOFactory extends JPADAOFactory:
 
     def databaseConfig: DatabaseConfig
 
-    val annotationView: String = "annotations"
+    val annotationView: String   = "annotations"
+    val localizationView: String = "localized_annotations"
 
 object TestDAOFactory:
     val TestProperties = EntityManagerFactories.PRODUCTION_PROPS ++ Map(

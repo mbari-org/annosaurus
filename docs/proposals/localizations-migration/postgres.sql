@@ -1,4 +1,13 @@
--- V1.1.0__localizations.sql (PostgreSQL) -- DRAFT, see docs/proposals/2026-08-25-localizations.md
+-- V1.1.0__localizations.sql (PostgreSQL) -- localizations, see docs/proposals/2026-08-25-localizations.md
+--
+-- Deployment requirements (the code cannot enforce these):
+--   1. Set DATABASE_VIDEO_REFERENCES_TABLE (the ${videoReferencesTable} placeholder below) BEFORE
+--      the first start that applies this migration. Flyway applies it once; changing the
+--      variable afterwards does not re-apply it. Unset or blank means the default.
+--   2. Database version: SQL Server needs compatibility level >= 140 for its copy of this
+--      migration; PostgreSQL has no equivalent requirement.
+--   3. The migrating user needs permission to create tables, views and functions in the schema
+--      (on SQL Server: CREATE SYNONYM, CREATE PROCEDURE and CREATE VIEW).
 --
 -- Creates the localizations table, the quarantine table, and migrate_localizations(), the
 -- routine that converts legacy localization associations. Flyway applies the DDL on startup;
@@ -36,8 +45,11 @@ CREATE TABLE "localizations" (
     "verification_timestamp"  timestamptz NULL,
     "comment"                 varchar(1024) NULL,
 
+    "part"                    varchar(128) NULL,
+
     "training"                boolean NOT NULL DEFAULT false,
     "truncated"               boolean NOT NULL DEFAULT false,
+    "difficult"               boolean NOT NULL DEFAULT false,
 
     "last_updated_timestamp"  timestamp NOT NULL DEFAULT now(),
 
@@ -91,6 +103,82 @@ CREATE INDEX "idx_localization_migration_rejects__association_uuid"
     ON "localization_migration_rejects"("association_uuid");
 
 -- ---------------------------------------------------------------------------------------
+-- localized_annotations: one row per localization (proposal section 7.3, D-14).
+--
+-- Same observation / imaged-moment / ancillary / video-reference-info columns as the
+-- "annotations" view, but NO association columns and NO image_references join (that join would
+-- multiply rows, and a localization no longer belongs to an image). Where a name would collide:
+--   ancillary x, y, z               -> ancillary_x, ancillary_y, ancillary_z   (x, y are the box)
+--   the localization's observer     -> localization_observer                    (observer is the observation's)
+--   the localization's timestamp    -> localization_observation_timestamp
+-- ---------------------------------------------------------------------------------------
+
+CREATE VIEW "localized_annotations"
+AS
+SELECT
+    l.uuid                   AS localization_uuid,
+    l.localization_type,
+    l.x,
+    l.y,
+    l.width,
+    l.height,
+    l.vertices,
+    l.mask_encoding,
+    l.mask_data,
+    l.mask_width_pixels,
+    l.mask_height_pixels,
+    l.generator,
+    l.confidence,
+    l.observer               AS localization_observer,
+    l.observation_timestamp  AS localization_observation_timestamp,
+    l.verifier,
+    l.verification_timestamp,
+    l.comment,
+    l.part,
+    l.training,
+    l.truncated,
+    l.difficult,
+    l.last_updated_timestamp,
+    im.uuid                  AS imaged_moment_uuid,
+    im.video_reference_uuid,
+    im.elapsed_time_millis   AS index_elapsed_time_millis,
+    im.recorded_timestamp    AS index_recorded_timestamp,
+    im.timecode              AS index_timecode,
+    obs.uuid                 AS observation_uuid,
+    obs.activity,
+    obs.concept,
+    obs.duration_millis,
+    obs.observation_group,
+    obs.observation_timestamp,
+    obs.observer,
+    ad.altitude,
+    ad.coordinate_reference_system,
+    ad.depth_meters,
+    ad.latitude,
+    ad.longitude,
+    ad.oxygen_ml_per_l,
+    ad.phi,
+    ad.xyz_position_units,
+    ad.pressure_dbar,
+    ad.psi,
+    ad.salinity,
+    ad.temperature_celsius,
+    ad.theta,
+    ad.x                     AS ancillary_x,
+    ad.y                     AS ancillary_y,
+    ad.z                     AS ancillary_z,
+    ad.light_transmission,
+    info.mission_contact     AS chief_scientist,
+    info.mission_id          AS dive_number,
+    info.platform_name       AS camera_platform
+FROM
+    localizations l
+        JOIN observations obs ON obs.uuid = l.observation_uuid
+        JOIN imaged_moments im ON im.uuid = obs.imaged_moment_uuid
+        LEFT JOIN ancillary_data ad ON ad.imaged_moment_uuid = im.uuid
+        LEFT JOIN video_reference_information info ON info.video_reference_uuid = im.video_reference_uuid;
+
+-- ---------------------------------------------------------------------------------------
 -- Helpers: a malformed legacy value must become a reject row, never an aborted migration.
 -- ---------------------------------------------------------------------------------------
 
@@ -126,9 +214,14 @@ LANGUAGE plpgsql AS $fn$
 DECLARE
     eps constant double precision := 1e-6;
     uuid_re constant text := '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$';
+    -- to_concept values that mean "no part" (a placeholder, not a real part) become NULL. Every
+    -- legacy writer uses 'self'. Add any other placeholder that survey (k) of the proposal
+    -- (section 8.1) finds. Matching is exact and case-sensitive.
+    no_part constant text[] := ARRAY['self'];
 BEGIN
     DROP TABLE IF EXISTS loc_work;
     DROP TABLE IF EXISTS loc_verts;
+    DROP TABLE IF EXISTS loc_video_scale;
     DELETE FROM localization_migration_rejects;
 
     -- 1. Candidates, with the frame size each one's pixels must be divided by.
@@ -137,6 +230,7 @@ BEGIN
            a.observation_uuid,
            a.link_name,
            a.link_value,
+           a.to_concept,
            a.last_updated_timestamp,
            CASE a.link_name
                WHEN 'bounding box'          THEN 'bounding_box'
@@ -152,6 +246,9 @@ BEGIN
            ir.height_pixels            AS image_h,
            vr.width                    AS video_w,
            vr.height                   AS video_h,
+           im.video_reference_uuid,
+           false                       AS orphaned,
+           CAST(NULL AS boolean)       AS scale100,
            CAST(NULL AS integer)       AS w,
            CAST(NULL AS integer)       AS h,
            CAST(NULL AS double precision) AS px, CAST(NULL AS double precision) AS py,
@@ -182,10 +279,11 @@ BEGIN
     UPDATE loc_work SET reason = 'malformed_json'
      WHERE reason IS NULL AND (j IS NULL OR (ref_text IS NOT NULL AND ref_uuid IS NULL));
 
-    -- Frame size. The image the pixels were drawn on wins; a missing image row is never
-    -- silently turned into a video frame. An image that exists but has no size falls back to
-    -- the video's, on the same-size assumption of section 6.2.
-    UPDATE loc_work SET reason = 'orphaned_image_reference'
+    -- Frame size. The image the pixels were drawn on wins. An image row that is gone (an
+    -- orphaned reference) and an image that exists but has no size both fall back to the video's,
+    -- on the same-size assumption of section 6.2 (proposal section 13, question 3). Orphans are
+    -- flagged so the report can count them apart.
+    UPDATE loc_work SET orphaned = true
      WHERE reason IS NULL AND ref_uuid IS NOT NULL AND image_uuid IS NULL;
     UPDATE loc_work SET
         w = CASE WHEN image_w > 0 AND image_h > 0 THEN image_w
@@ -195,14 +293,36 @@ BEGIN
      WHERE reason IS NULL;
     UPDATE loc_work SET reason = 'unresolved_dimensions' WHERE reason IS NULL AND (w IS NULL OR h IS NULL);
 
-    -- 3. Provenance (confidence 0-100 -> 0-1; tags -> training).
+    -- 3. Provenance (confidence -> 0-1; tags -> training).
+    --
+    -- Legacy confidence is on 0-100 or on 0-1, and a value <= 1 cannot say which, so the scale is
+    -- decided per VIDEO by a hard rule (proposal section 8.2, D-15): if ANY legacy confidence in the
+    -- video exceeds 1, the whole video is 0-100 and is divided by 100; otherwise it is 0-1 and used
+    -- as is. It is computed over EVERY legacy localization in the video, not only the ones still to
+    -- migrate, so a delta pass classifies a video the same way the first pass did.
+    CREATE TEMP TABLE loc_video_scale ON COMMIT DROP AS
+    SELECT im.video_reference_uuid, bool_or(c.conf > 1) AS scale100
+    FROM associations a
+    JOIN observations o    ON o.uuid  = a.observation_uuid
+    JOIN imaged_moments im ON im.uuid = o.imaged_moment_uuid
+    CROSS JOIN LATERAL (
+        SELECT localization_try_float(localization_try_jsonb(a.link_value) ->> 'confidence') AS conf
+    ) c
+    WHERE a.link_name IN ('bounding box','localization-point','localization-line','localization-polygon')
+      AND c.conf IS NOT NULL
+    GROUP BY im.video_reference_uuid;
+
     UPDATE loc_work SET confidence = localization_try_float(j ->> 'confidence')
      WHERE reason IS NULL AND j ->> 'confidence' IS NOT NULL;
     UPDATE loc_work SET reason = 'malformed_json'
      WHERE reason IS NULL AND j ->> 'confidence' IS NOT NULL AND confidence IS NULL;
+    UPDATE loc_work s SET scale100   = vs.scale100,
+                          confidence = s.confidence / CASE WHEN vs.scale100 THEN 100.0 ELSE 1.0 END
+      FROM loc_video_scale vs
+     WHERE s.reason IS NULL AND s.confidence IS NOT NULL
+       AND vs.video_reference_uuid IS NOT DISTINCT FROM s.video_reference_uuid;
     UPDATE loc_work SET reason = 'confidence_out_of_range'
-     WHERE reason IS NULL AND (confidence < 0 OR confidence > 100);
-    UPDATE loc_work SET confidence = confidence / 100.0 WHERE reason IS NULL AND confidence IS NOT NULL;
+     WHERE reason IS NULL AND (confidence < 0 OR confidence > 1);
     UPDATE loc_work SET training = true
      WHERE reason IS NULL AND jsonb_typeof(j -> 'tags') = 'array' AND (j -> 'tags') ? 'training';
 
@@ -254,6 +374,17 @@ BEGIN
         FROM loc_verts
     ) d
     WHERE d.association_uuid = v.association_uuid AND d.idx = v.idx AND d.dup;
+
+    -- A polygon sent explicitly closed (last vertex = first) is stored open: drop the closing
+    -- vertex once (section 6.1), before the minimum-vertex check, so [A,B,A] has 2 vertices.
+    DELETE FROM loc_verts v USING (
+        SELECT association_uuid, min(idx) AS first_idx, max(idx) AS last_idx
+        FROM loc_verts GROUP BY association_uuid HAVING count(*) > 1
+    ) e, loc_verts f, loc_work s
+    WHERE e.association_uuid = v.association_uuid AND v.idx = e.last_idx
+      AND f.association_uuid = v.association_uuid AND f.idx = e.first_idx
+      AND s.association_uuid = v.association_uuid AND s.reason IS NULL AND s.localization_type = 'polygon'
+      AND f.px IS NOT DISTINCT FROM v.px AND f.py IS NOT DISTINCT FROM v.py;
 
     UPDATE loc_work s SET reason = 'insufficient_vertices'
      WHERE s.reason IS NULL AND s.localization_type IN ('point','line','polygon')
@@ -310,9 +441,10 @@ BEGIN
 
     INSERT INTO localizations
         (uuid, observation_uuid, localization_type, x, y, width, height, vertices,
-         generator, confidence, verifier, training, truncated, last_updated_timestamp)
+         generator, confidence, verifier, part, training, truncated, last_updated_timestamp)
     SELECT s.association_uuid, s.observation_uuid, s.localization_type, s.nx, s.ny, s.nw, s.nh, s.vertices,
            left(s.j ->> 'generator', 128), s.confidence, left(s.j ->> 'verifier', 128),
+           CASE WHEN s.to_concept = ANY (no_part) THEN NULL ELSE left(s.to_concept, 128) END,
            s.training, s.truncated, coalesce(s.last_updated_timestamp, now())
     FROM loc_work s
     WHERE s.reason IS NULL;
@@ -326,6 +458,18 @@ BEGIN
      WHERE s.reason IS NULL AND s.truncated AND EXISTS (SELECT 1 FROM localizations l WHERE l.uuid = s.association_uuid)
     UNION ALL
     SELECT 'rejected: ' || s.reason, count(*) FROM loc_work s WHERE s.reason IS NOT NULL GROUP BY s.reason
+    UNION ALL
+    SELECT 'info: orphaned image reference, used the video''s dimensions (media assumption)', count(*) FROM loc_work s
+     WHERE s.reason IS NULL AND s.orphaned
+    UNION ALL
+    SELECT 'info: videos on the 0-100 confidence scale (divided by 100)', count(*) FROM loc_video_scale vs
+     WHERE vs.scale100
+    UNION ALL
+    SELECT 'info: rows divided by 100 (video is 0-100)', count(*) FROM loc_work s
+     WHERE s.reason IS NULL AND s.scale100
+    UNION ALL
+    SELECT 'info: rows used as is (video is 0-1)', count(*) FROM loc_work s
+     WHERE s.reason IS NULL AND s.scale100 IS NOT NULL AND NOT s.scale100
     UNION ALL
     SELECT 'info: image/video aspect ratio differs by >1% (media assumption)', count(*) FROM loc_work s
      WHERE s.reason IS NULL AND s.image_w > 0 AND s.image_h > 0 AND s.video_w > 0 AND s.video_h > 0

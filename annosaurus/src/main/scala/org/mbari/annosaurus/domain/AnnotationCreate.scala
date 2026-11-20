@@ -31,7 +31,8 @@ case class AnnotationCreate(
     observationUuid: Option[UUID] = None,
     observer: Option[String] = None,
     recordedTimestamp: Option[Instant] = None,
-    timecode: Option[String] = None
+    timecode: Option[String] = None,
+    localizations: Option[Seq[Localization]] = None
 ) extends ToSnakeCase[AnnotationCreateSC]:
 
     def toAnnotation: Annotation =
@@ -47,7 +48,8 @@ case class AnnotationCreate(
             observer = observer,
             recordedTimestamp = recordedTimestamp,
             timecode = timecode,
-            videoReferenceUuid = Some(videoReferenceUuid)
+            videoReferenceUuid = Some(videoReferenceUuid),
+            localizations = localizations.getOrElse(Nil)
         )
 
     def toSnakeCase: AnnotationCreateSC =
@@ -63,7 +65,8 @@ case class AnnotationCreate(
             observer = observer,
             recorded_timestamp = recordedTimestamp,
             timecode = timecode,
-            video_reference_uuid = videoReferenceUuid
+            video_reference_uuid = videoReferenceUuid,
+            localizations = localizations.map(_.map(_.toSnakeCase))
         )
 
 object AnnotationCreate:
@@ -96,7 +99,8 @@ case class AnnotationCreateSC(
     observation_uuid: Option[UUID] = None,
     observer: Option[String] = None,
     recorded_timestamp: Option[Instant] = None,
-    timecode: Option[String] = None
+    timecode: Option[String] = None,
+    localizations: Option[Seq[LocalizationSC]] = None
 ) extends ToCamelCase[AnnotationCreate]:
 
     def toCamelCase: AnnotationCreate =
@@ -112,5 +116,6 @@ case class AnnotationCreateSC(
             observer = observer,
             recordedTimestamp = recorded_timestamp,
             timecode = timecode,
-            videoReferenceUuid = video_reference_uuid
+            videoReferenceUuid = video_reference_uuid,
+            localizations = localizations.map(_.map(_.toCamelCase))
         )

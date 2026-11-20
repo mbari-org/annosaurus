@@ -17,7 +17,7 @@
 package org.mbari.annosaurus.controllers
 
 import io.reactivex.rxjava3.subjects.Subject
-import org.mbari.annosaurus.domain.{Annotation, ConcurrentRequest, ImageCreateSC, MultiRequest}
+import org.mbari.annosaurus.domain.{Annotation, ConcurrentRequest, ImageCreateSC, LocalizationRules, MultiRequest}
 import org.mbari.annosaurus.etc.jdk.Loggers.given
 import org.mbari.annosaurus.etc.rxjava.EventBus
 import org.mbari.annosaurus.messaging.Publisher
@@ -238,7 +238,34 @@ class AnnotationController(
                 ).orNull
             )
 
+    /**
+     * Runs every localization of every annotation through [[LocalizationRules.normalize]] before anything is persisted.
+     * An annotation may carry at most one localization of each type. Errors are prefixed with the zero-based annotation
+     * and localization index.
+     * @return
+     *   The annotations with their localizations normalized, or every validation error
+     */
+    private def normalizeLocalizations(annotations: Seq[Annotation]): Either[Seq[String], Seq[Annotation]] =
+        val results = annotations.zipWithIndex.map { (a, i) =>
+            val normalized = a.localizations.zipWithIndex.map { (l, j) =>
+                LocalizationRules.normalize(l).left.map(_.map(e => s"annotation $i, localization $j: $e"))
+            }
+            val duplicates = a.localizations.groupBy(_.localizationType).collect {
+                case (t, ls) if ls.size > 1 => s"annotation $i: more than one $t localization"
+            }
+            val errors     = normalized.flatMap(_.left.getOrElse(Nil)) ++ duplicates
+            if errors.isEmpty then Right(a.copy(localizations = normalized.flatMap(_.toOption)))
+            else Left(errors)
+        }
+        val errors  = results.flatMap(_.left.getOrElse(Nil))
+        if errors.isEmpty then Right(results.flatMap(_.toOption)) else Left(errors)
+
     def create(annotation: Annotation)(using ec: ExecutionContext): Future[Seq[Annotation]] =
+        normalizeLocalizations(Seq(annotation)) match
+            case Left(errors) => Future.failed(new LocalizationValidationException(errors))
+            case Right(xs)    => createNormalized(xs.head)
+
+    private def createNormalized(annotation: Annotation)(using ec: ExecutionContext): Future[Seq[Annotation]] =
         val entity = annotation.toEntity
         val dao    = daoFactory.newImagedMomentDAO()
         val future = dao.runTransaction(d =>
@@ -264,6 +291,15 @@ class AnnotationController(
         // short circuit if there ore 0 or 1 annotations
         if annotations.isEmpty then return Future.successful(Nil)
         else if annotations.size == 1 then return create(annotations.head)
+
+        // Validate every localization before anything (images included) is written
+        normalizeLocalizations(annotations.toSeq) match
+            case Left(errors) => Future.failed(new LocalizationValidationException(errors))
+            case Right(xs)    => bulkCreateNormalized(xs)
+
+    private def bulkCreateNormalized(
+        annotations: Seq[Annotation]
+    )(using ec: ExecutionContext): Future[Seq[Annotation]] =
 
         val obsDao          = daoFactory.newObservationDAO()
         val imageController = new ImageController(daoFactory)

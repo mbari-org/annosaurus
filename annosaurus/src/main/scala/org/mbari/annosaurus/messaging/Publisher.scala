@@ -17,8 +17,8 @@
 package org.mbari.annosaurus.messaging
 
 import io.reactivex.rxjava3.subjects.Subject
-import org.mbari.annosaurus.domain.{Annotation, Association, Observation}
-import org.mbari.annosaurus.etc.zeromq.{AnnotationCreatedMessage, AssociationCreatedMessage}
+import org.mbari.annosaurus.domain.{Annotation, Association, Localization, Observation}
+import org.mbari.annosaurus.etc.zeromq.{AnnotationCreatedMessage, AssociationCreatedMessage, LocalizationCreatedMessage}
 import org.mbari.annosaurus.etc.jdk.Loggers.given
 import org.mbari.annosaurus.repository.jpa.entity.AssociationEntity
 import org.mbari.scommons.util.mail.liftToOption
@@ -44,6 +44,7 @@ class Publisher(subject: Subject[? >: Message[?]]):
             case annotation: Annotation => tryWithLogging(subject.onNext(AnnotationCreatedMessage(annotation)))
             case observation: Observation => tryWithLogging(subject.onNext(AnnotationCreatedMessage(Annotation.from(observation.toEntity))))
             case association: Association => tryWithLogging(subject.onNext(AssociationCreatedMessage(association)))
+            case localization: Localization => tryWithLogging(subject.onNext(LocalizationCreatedMessage(localization)))
             case _ => ()
 
     def created(xs: Iterable[Any]): Unit =

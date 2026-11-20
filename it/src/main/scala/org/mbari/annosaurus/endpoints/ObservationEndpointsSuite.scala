@@ -68,6 +68,36 @@ trait ObservationEndpointsSuite extends EndpointsSuite:
         )
     }
 
+    test("findObservationByUuid includes the observation's localizations") {
+        val im          = TestUtils.create(1, 1, 0, 0, nLocalizations = 2).head
+        val observation = im.getObservations.iterator().next()
+        runGet(
+            endpoints.findObservationByUuidImpl,
+            s"http://test.com/v1/observations/${observation.getUuid}",
+            response =>
+                assertEquals(response.code, StatusCode.Ok)
+                val obtained = checkResponse[ObservationSC](response.body)
+                assertEquals(obtained.localizations.size, 2)
+                assertEquals(
+                    obtained.localizations.flatMap(_.uuid).toSet,
+                    observation.getLocalizations.asScala.map(_.getUuid).toSet
+                )
+                assert(obtained.localizations.forall(_.observation_uuid.contains(observation.getUuid)))
+        )
+    }
+
+    test("findObservationByUuid returns an empty localizations array when there are none") {
+        val im          = TestUtils.create(1, 1).head
+        val observation = im.getObservations.iterator().next()
+        runGet(
+            endpoints.findObservationByUuidImpl,
+            s"http://test.com/v1/observations/${observation.getUuid}",
+            response =>
+                assertEquals(response.code, StatusCode.Ok)
+                assertEquals(checkResponse[ObservationSC](response.body).localizations, Nil)
+        )
+    }
+
     test("findObservationsByVideoReferenceUuid") {
         val xs                 = TestUtils.create(2, 2)
         val videoReferenceUuid = xs.head.getVideoReferenceUuid

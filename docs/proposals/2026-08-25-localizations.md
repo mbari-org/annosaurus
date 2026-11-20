@@ -1,7 +1,7 @@
 # Proposal: First-class localizations
 
-- **Status:** Draft, revised after review (vars-feedback#338)
-- **Date:** 2026-08-25 (revised 2026-10-12)
+- **Status:** Draft, revised after review (vars-feedback#338) and after the client survey ([localizations-clients/](localizations-clients/))
+- **Date:** 2026-08-25 (revised 2026-10-28)
 - **Affects:** schema, `Annotation` payload, a new endpoint group, Flyway migrations, a SQL migration routine, ZeroMQ subscribers, **every client that reads or writes localizations**
 - **Does not affect:** the association model for non-localization link names
 - **Companion:** [bounding-box-coordinates.md](bounding-box-coordinates.md) — coordinate convention and format conversions (YOLO, VOC, COCO)
@@ -66,6 +66,12 @@ percentage, but nothing states it. That scale is an artifact of the visual-event
 format; softmax/sigmoid output is canonically 0–1, and a tool emitting a native score would write
 `0.43`, which is indistinguishable from a legitimate 0.43%.
 
+The client survey shows this is not hypothetical. `vars-cli`'s `ml upload` writes visual-event
+confidences on 0–100, while its `ml upload-images` path writes COCO `score` / Ultralytics `conf`
+(0–1) raw, into the same `bounding box` link name. The existing data therefore mixes both scales. A
+blanket ÷100 at migration would turn a real `0.87` into `0.0087`, and no `CHECK` can detect that
+(§8.2 resolves the scale per video instead).
+
 **2.6 — Pixels with no declared frame.** `x: 982` is meaningless without knowing which raster it
 indexes into, and the examples above carry no image reference at all. Pixel coordinates also bind a
 localization to one resolution: a box drawn on a 4K framegrab cannot be shown on a lower-resolution
@@ -112,7 +118,7 @@ is authoritative is undefined.
 | D-2 | **One table**, `localization_type` discriminator, hybrid columns | Uniform cross-type queries; bbox/point fully columnar; one entity, one DAO, one endpoint group |
 | D-3 | **Normalized `[0,1]` coordinates**; no link to `image_references` | Resolution-independent; validated without dimensions. Rests on the media assumption in §6.2 |
 | D-4 | Provenance as real nullable columns | A column cannot be dropped by a tool that does not know about it |
-| D-5 | `confidence` on a **0–1** scale | Matches ML convention; migration divides legacy values by 100 |
+| D-5 | `confidence` on a **0–1** scale | Matches ML convention. Legacy data mixes 0–1 and 0–100, so the migration resolves the scale **per video** rather than dividing everything by 100 (D-15, §8.2) |
 | D-6 | Masks stored **inline** as COCO RLE | Atomic with the annotation; no object store, no orphaned blobs |
 | D-7 | Vertices stored as **interleaved pairs** `[x0,y0,x1,y1,…]` | One array cannot desynchronize against itself (fixes §2.3) |
 | D-8 | **Legacy association pathway removed** (reads and writes); existing rows converted by a SQL migration routine | Chosen explicitly. A read projection is not feasible: reproducing legacy pixel JSON would need image dimensions the service does not have (§7) |
@@ -120,6 +126,10 @@ is authoritative is undefined.
 | D-10 | `training` is a boolean column, not a `tags` array | The only tag in use is `training`. Revisit if a second tag appears |
 | D-11 | `truncated` boolean for boxes clipped at the frame edge | Lets the box stay valid (`x + width <= 1`) without hiding that the object was cut off. Same meaning as VOC's `truncated` |
 | D-12 | Migration is a **SQL routine**, run by an operator, not by Flyway at startup | vampire-squid's `video_references` is reachable from SQL (same database, or `M3_VIDEO_ASSETS.dbo` on the same server). A routine can be dry-run, reviewed, and re-run as a delta pass at cutover |
+| D-13 | `part` is a nullable `varchar(128)` column, carried over from the legacy association's `to_concept`; the placeholder `self` becomes `NULL` | vars-localize and vars-gridview store the organism part there and have a "part" feature built on it. A separate association cannot work: it would have no stable link to the localization, and the "one per type" rule has nothing to attach it to. Free text, as `to_concept` is today |
+| D-14 | Localization **query surface** is a new one-row-per-localization view and a `localizations/query/*` endpoint group, not new columns on the `annotations` view | `/query` runs over the flat `annotations` view, which has one row per observation × association. Adding localization columns there would multiply rows (up to five per observation) and pad the rest with nulls. vars-gridview reads *only* through `/query` (§7.3) |
+| D-15 | Legacy `confidence` scale is resolved **per video** (`video_reference_uuid`) by a hard rule: any legacy value `> 1` in the video means the whole video is 0–100 and is divided by 100; otherwise it is 0–1 and used as is. Never per row, never a blanket ÷100 | The data mixes 0–1 and 0–100 under one link name (§2.5). A value `≤ 1` cannot be classified on its own, but low confidences are rejected upstream, so a 0–100 video always contains a value above `1` and there is no ambiguous case (§8.2) |
+| D-16 | `difficult` is a boolean column, added now | The companion doc is already in review and VOC evaluation depends on it. The column is trivial to add before the table exists and awkward to add after clients write to it |
 
 ### 4.1 Why the natural key does most of the work
 
@@ -166,9 +176,13 @@ CREATE TABLE "localizations" (
     "verification_timestamp"  timestamptz NULL,
     "comment"                 varchar(1024) NULL,
 
+    -- label: the part of the organism this localization marks (legacy association to_concept)
+    "part"                    varchar(128) NULL,
+
     -- flags
     "training"                boolean NOT NULL DEFAULT false,
     "truncated"               boolean NOT NULL DEFAULT false,
+    "difficult"               boolean NOT NULL DEFAULT false,
 
     "last_updated_timestamp"  timestamp NOT NULL DEFAULT now(),
 
@@ -266,7 +280,9 @@ For a `mask`, the extent is the bounding box of the set pixels divided by
 length. Interleaving rather than the current parallel-array form is deliberate: a single array cannot
 desynchronize against itself, which removes defect §2.3 by construction.
 
-- `line` — at least 2 pairs.
+- `line` — at least 2 pairs. A `line` is an open chain of segments and is never closed, so one with three or
+  more pairs is a polyline. There is deliberately no separate `polyline` type: it would be
+  indistinguishable from `line`.
 - `polygon` — at least 3 pairs, **implicitly closed**. The first vertex is *not* repeated at the end.
   This matches the observed data: in the real polygon example the first pair `(2208,1525)` and the
   last `(4252,1449)` differ.
@@ -275,6 +291,12 @@ desynchronize against itself, which removes defect §2.3 by construction.
 `(4252,1449)` twice. A naive "no duplicate vertices" rule would reject existing production data
 during migration. The server instead collapses consecutive duplicates on write, and the migration
 applies the same normalization. Normalization is idempotent, so a round-trip is stable.
+
+**A point may be submitted as a single vertex pair.** A `point` with no `x`/`y` and `vertices` of
+exactly one pair (`[x, y]`) is accepted and converted to the canonical form: `x` and `y` are set from
+the pair, `width` and `height` are `0`, and `vertices` is cleared. Responses never return a point
+with `vertices`. Ambiguous input is still rejected: more than one pair, or `x`/`y` together with
+`vertices`.
 
 ### 6.2 Coordinate space
 
@@ -344,8 +366,10 @@ reference implementations, not in this service.
 | `verifier` | Who confirmed it, e.g. `kwalz` |
 | `verification_timestamp` | When it was confirmed |
 | `comment` | Free text about the localization itself |
+| `part` | The part of the organism the localization marks (e.g. a body part), free text, nullable. Replaces the legacy association's `to_concept`. Distinct from the observation's `concept`, which names the organism |
 | `training` | Include this localization in training sets. Replaces the legacy `tags: ["training"]` |
 | `truncated` | The object extends past the frame edge and the geometry was clipped to it |
+| `difficult` | The object is hard to detect or classify. Same meaning as VOC's `difficult`, which evaluation metrics use to exclude objects, so it must survive ingest or those metrics silently change. Has no legacy source, so every migrated row is `false` |
 
 `verification_timestamp` earns its place by making staleness detectable: if
 `verification_timestamp < last_updated_timestamp`, the geometry has been edited since it was approved,
@@ -354,7 +378,8 @@ and the verification should no longer be trusted. That question is unanswerable 
 > **Note on `confidence`.** The scale is 0–1 to match what classifiers actually emit, so a native
 > softmax/sigmoid score is stored unchanged. A legacy writer still emitting 0–100 is now caught loudly
 > for any value above 1 (the `CHECK` rejects `43.0`). The remaining silent case is a legacy value
-> `≤ 1` that really meant a percentage. Separately, `confidence` is a classification-plus-objectness
+> `≤ 1` that really meant a percentage; the migration resolves that per video instead of
+> guessing per row (§8.2). Separately, `confidence` is a classification-plus-objectness
 > score (per YOLO), not a property of the geometry alone; it stays on this table for now because it
 > remains useful, but it is a candidate to move if classification confidence ever gets its own home.
 
@@ -378,7 +403,7 @@ routine produced.
 | A client clamps a box that crosses the frame edge and sets `truncated` (§6.2) | `clampToImage()`; `PixelBoundingBox.normalized` | **Gap 2.** The constructor rejects out-of-bounds boxes, so `clampToImage()` can only ever change something within `EPS`, and `normalized()` throws on a box that crosses the edge. `YoloBoundingBox.toNormalizedVisible()` clamps but returns no `truncated` flag, and VOC has no equivalent. The migration routine does exactly this clamp-and-flag in SQL; the client code has nothing to match |
 | `line`, `polygon`, `mask` are normalized (§5.4, §6.1) | none | **Gap 3.** Only `bounding_box` and `point` have reference code. A line's derived extent can be zero-width or zero-height, which `NormalizedBoundingBox` cannot represent, so a row of those types must not be mapped onto it |
 | Source dimensions are **not** stored (§11.2) | §8 and §9: "store the source image dimensions", marked settled | **Conflict in prose.** The code is fine, since `VocAnnotation` takes `width` and `height` from the file or the caller, but the open item says the opposite of this spec |
-| `difficult` has no column (open question 6) | `VocObject.difficult`; §9 "preserve `difficult` on ingest" | **Open.** A VOC import has nowhere to put it |
+| `difficult` flag (§6.3, D-16) | `VocObject.difficult`; §9 "preserve `difficult` on ingest" | **Resolved by this spec.** `difficult` is now a column, so a VOC import has somewhere to put it |
 | Precision: columns are `double`, no quantization (§6.2) | §9 "confirm the serialized precision" | **Resolved by this spec.** The only `%.6f` is in the YOLO text writer |
 
 ## 7. Removal of the legacy association pathway
@@ -429,8 +454,8 @@ WARN LegacyLocalizationWriteRejected path=POST /v1/associations link_name="local
 **The `annotations` view.** It exposes `ass.link_name` / `ass.link_value` directly from the
 `associations` table, and it is a public read surface. From cutover it must exclude the localization
 link names, matching the association reads above. Localizations are not added to the view: it is
-flat, and an observation can have up to five. Whether the view should expose them some other way is an
-open question (§13).
+flat, and an observation can have up to five. Nothing downstream needs localizations through it:
+vars-gridview was the only consumer and moves to the localization view (§7.3, §13 question 5).
 
 ### 7.2 New endpoints
 
@@ -444,6 +469,10 @@ POST   /v1/localizations/bulk                                    (ML pipelines)
 GET    /v1/localizations/list/types                              (list the 5 localization_types)
 GET    /v1/localizations/list/maskencodings                      (list accepted values for mask_encoding)
 GET    /v1/localizations/list/constraints                        (return localization_types, mask_encodings)
+GET    /v1/localizations/query/columns                           (columns of the localization query view, §7.3)
+POST   /v1/localizations/query/run                               (QueryRequest -> JSON, §7.3)
+POST   /v1/localizations/query/download                          (QueryRequest -> TSV, §7.3)
+POST   /v1/localizations/query/count                             (QueryRequest -> row count, §7.3)
 ```
 
 There is no `imagereference` lookup: localizations no longer reference image references. To find the
@@ -458,11 +487,78 @@ without the timestamp is last-write-wins, which matches de facto behavior today.
 `/list/constraints` is the preferred way for a tool to discover what it may write; the two narrower
 list endpoints are conveniences over the same data.
 
+`POST /v1/localizations/bulk` is **transactional per batch** (§13, question 4): every item is validated and
+upserted against its natural key in one transaction, and if any item is invalid or conflicts, nothing
+is written and the response identifies the failing item(s). ML pipelines that want partial success
+must split their own batches. (The response shape for the failing items is left to the implementation.)
+
 Reads follow the non-blocking classification; writes go on the blocking worker pool, per
 `Endpoints.scala`.
 
 `Annotation` gains `localizations: Seq[Localization] = Nil`, with the matching `AnnotationSC`
 snake-case variant and Circe codecs. `associations` never contains localizations.
+
+**Annotation create accepts localizations.** `POST /v1/annotations` and `POST /v1/annotations/bulk` accept
+`localizations` in each annotation's body, so a client that creates an observation can create its
+localizations in the same call. They are validated by the same rules as `PUT /v1/localizations/…` (§6),
+written in the same transaction as the annotation, and an invalid localization fails that request, so an
+annotation is never created with some of its localizations missing. This keeps the single-call atomicity
+that the ML uploaders have today, which a separate localization call would lose. `localizations` in a
+create body takes the same shape the endpoints return, minus the server-derived fields (`uuid`,
+`last_updated_timestamp`, and the derived extent of lines, polygons and masks). `PUT /v1/annotations/{uuid}`
+does **not** carry localizations (proposed): an existing localization is edited through the localization
+endpoints, where `last_updated_timestamp` gives it a concurrency check.
+
+**Annotation reads.** `GET /v1/annotations/imagereference/{uuid}` stays and returns annotations with their
+`localizations` populated. Dropping `image_reference_uuid` from localization data has no effect on it. Reading an
+image reference itself (`GET /v1/imagereferences/{uuid}`) is likewise unaffected.
+
+### 7.3 Query surface
+
+The client survey found a gap this proposal did not cover. `query/run` and `query/download` take a
+`QueryRequest` (`select`, `where`, `orderBy`, `limit`, `offset`, …) and run it over the flat
+`annotations` view. vars-gridview reads *all* of its boxes through that path, selecting `link_name`,
+`link_value` and `to_concept`, and filtering on JSON text. After cutover the legacy rows are excluded
+from that view (§7.1), so those queries return nothing, and there is no replacement.
+
+**Decision D-14: a separate view and endpoint group.** The `annotations` view is one row per
+observation × association. Adding localization columns would multiply rows (an observation can have
+up to five) and null-pad the rest, which is the reason §7.1 declined to put localizations in it. A
+localization consumer wants one row per localization. So:
+
+- A read-only view, `localized_annotations` (name settled in §13, question 13), with **one row per
+  localization**: every `localizations` column (`uuid` exposed as `localization_uuid`) plus the
+  observation, imaged-moment and video-reference-info columns the `annotations` view already exposes,
+  and **none** of the association columns. Created in the same migration as the table, one per dialect.
+  Three names would collide with the `annotations` view, so they are aliased: the ancillary position
+  columns `x`, `y`, `z` become `ancillary_x`, `ancillary_y`, `ancillary_z` (the localization owns `x` and
+  `y`), and the localization's own `observer` and `observation_timestamp` become `localization_observer`
+  and `localization_observation_timestamp` (`observer` stays the observation's).
+- `GET /v1/localizations/query/columns`, `POST /v1/localizations/query/run` and
+  `POST /v1/localizations/query/download` accept the same `QueryRequest` / `ConstraintRequest` shape
+  and return JSON / TSV like their `query/*` counterparts, so the existing builder and TSV code are
+  reused with a different `FROM`. `POST /v1/localizations/query/count` returns the number of rows that match
+  the same constraints, for paging (vars-gridview pages with it). It returns the same `Count` body as the
+  existing `query/count`, `{"count": <n>}`.
+- The things clients filtered by parsing JSON are now real columns, so they filter by type, with no
+  `LIKE` on `link_value`: `localization_type`, `generator`, `verifier`, `confidence` (range),
+  `training`, `truncated`, `part`.
+- The view has **no image columns**, neither `image_reference_uuid` nor `image_url` / `image_format`.
+  Coordinates are normalized and belong to no particular image or video size, so a localization is not
+  tied to an image, and joining image references would multiply rows. A client that needs an image to show
+  chooses one itself from `imaged_moment_uuid`, through the existing image-reference endpoints. The
+  selection criteria are the client's to define (vars-gridview's are still to be decided).
+
+**Behavior changes to document in the release notes:**
+
+- `query/run` and `query/download` return no localization rows, and `QueryConstraints.linkName` /
+  `linkValue` can no longer match a localization.
+- The existing `concepts` constraint matches `obs.concept OR ass.to_concept`, so a concept search used to
+  find boxes by their **part** as well. In the localization view the `concepts` constraint matches the
+  observation's concept only, and the part is filtered through the separate `part` column.
+- The view has no image columns (above, §5.3). A client that must show a framegrab resolves image
+  references from `imaged_moment_uuid` (§13, question 11). `GET` of an image reference by uuid is
+  unaffected by this proposal.
 
 ## 8. Migration
 
@@ -518,9 +614,10 @@ SELECT link_name, COUNT(*) AS n_conflicts FROM (
 ) d GROUP BY link_name;
 
 -- (e) Where will the dimensions come from? Every legacy pixel value needs a width and
---     height to normalize against. 'orphaned_image_reference' is the dangerous bucket:
---     the referenced image row is already gone, and it must not silently become a
---     video-frame localization. 'no dimensions anywhere' will be rejected by the migration.
+--     height to normalize against. 'orphaned_image_reference' is the bucket to watch: the
+--     referenced image row is already gone, so the migration falls back to the video's
+--     dimensions (decision in §13, question 3), which leans on the media assumption (§6.2).
+--     'no dimensions anywhere' will be rejected by the migration.
 --     (On MBARI's SQL Server: M3_VIDEO_ASSETS.dbo.video_references. Elsewhere: video_references.)
 WITH loc AS (
     SELECT a.uuid, o.imaged_moment_uuid,
@@ -588,6 +685,35 @@ JOIN video_references vr ON vr.uuid = im.video_reference_uuid
 WHERE ir.width_pixels > 0 AND ir.height_pixels > 0 AND vr.width > 0 AND vr.height > 0
   AND ABS(ir.width_pixels::float / ir.height_pixels - vr.width::float / vr.height)
       / (vr.width::float / vr.height) > 0.01;
+
+-- (j) THE CONFIDENCE SCALE (D-15). Per video: how many values, how many are <= 1, and the range.
+--     The migration rule (§8.2): max_confidence > 1 means the video is 0-100 and every value in it
+--     is divided by 100; max_confidence <= 1 means it is already 0-1. `generators` shows which
+--     tools wrote it, so the 0-100 videos can be reviewed before the real run.
+--     Assumes numeric confidences; screen with (a)/(b) first.
+SELECT im.video_reference_uuid,
+       COUNT(*)                                          AS n,
+       COUNT(*) FILTER (WHERE x.c <= 1)                  AS n_le_1,
+       MIN(x.c)                                          AS min_confidence,
+       MAX(x.c)                                          AS max_confidence,
+       ARRAY_AGG(DISTINCT x.generator)                   AS generators
+FROM (SELECT a.observation_uuid,
+             (a.link_value::jsonb ->> 'confidence')::float AS c,
+             a.link_value::jsonb ->> 'generator'           AS generator
+      FROM associations a
+      WHERE a.link_name IN ('bounding box','localization-point','localization-line','localization-polygon')
+        AND a.link_value::jsonb ? 'confidence') x
+JOIN observations o    ON o.uuid  = x.observation_uuid
+JOIN imaged_moments im ON im.uuid = o.imaged_moment_uuid
+GROUP BY 1 ORDER BY 2 DESC;
+
+-- (k) THE PART (D-13). Distinct to_concept values on localization associations. Any value that
+--     means "no part" (a placeholder rather than a real part) maps to NULL, not to `part`. `self`
+--     already does; add any other placeholder this finds to the no_part list in the migration.
+SELECT link_name, to_concept, COUNT(*)
+FROM associations
+WHERE link_name IN ('bounding box','localization-point','localization-line','localization-polygon')
+GROUP BY 1, 2 ORDER BY 3 DESC;
 ```
 
 The dry run of the migration routine (§8.2) reports the same aspect-ratio check restricted to the
@@ -648,12 +774,14 @@ database fails with a plain "object does not exist" error.
 1. **Resolve dimensions**, in this order:
    1. `image_reference_uuid` in the JSON, and that row exists with a positive width and height →
       the image's `width_pixels` / `height_pixels`.
-   2. `image_reference_uuid` in the JSON but the row **does not exist** → quarantine as
-      `orphaned_image_reference`. It is never silently treated as a video frame.
-   3. No `image_reference_uuid`, or the image row exists but has no size → the source video's
-      `width` / `height`, via `observations → imaged_moments.video_reference_uuid →
-      video_references`. Falling back for a sizeless image relies on the media assumption (§6.2).
-   4. Nothing resolves → quarantine as `unresolved_dimensions`.
+   2. No `image_reference_uuid`, **or the row it names does not exist (an orphaned reference)**, or the
+      image row exists but has no size → the source video's `width` / `height`, via
+      `observations → imaged_moments.video_reference_uuid → video_references`. Every one of these
+      fallbacks relies on the media assumption (§6.2). The orphaned case is a deliberate choice (§13,
+      question 3): it is the one place a localization drawn on an image that no longer exists is
+      reinterpreted against the video, so the dry run **counts orphaned fallbacks separately** to
+      keep that visible.
+   3. Nothing resolves → quarantine as `unresolved_dimensions`.
 2. **Convert** pixels to normalized coordinates (`x / W`, `y / H`, and so on). For a bounding box the
    *edges* are normalized and then clamped, with the width derived from them. Line and polygon
    vertices are interleaved and normalized the same way, then written at 9 decimal places (far finer
@@ -664,7 +792,8 @@ database fails with a plain "object does not exist" error.
    |---|---|
    | `x`, `y`, `width`, `height`, `x[]`, `y[]` | `x`, `y`, `width`, `height`, `vertices` (normalized) |
    | `generator`, `verifier` | `generator`, `verifier` (truncated to 128 characters) |
-   | `confidence` (0–100) | `confidence` ÷ 100 |
+   | `confidence` (0–100 **or** 0–1, per video) | `confidence` ÷ the video's divisor (see "Resolving the confidence scale" below) |
+   | association `to_concept` | `part` (truncated to 128 characters). The value `self`, which every writer uses to mean "no part", becomes `NULL` |
    | `tags` containing `"training"` | `training = true` |
    | any other `tags` value, any other key | **not migrated**; surfaced by survey (b) and (c) |
    | association `uuid` | localization `uuid` (reused, so a migrated row traces to its source) |
@@ -680,20 +809,57 @@ database fails with a plain "object does not exist" error.
    endpoints since. The routine never overwrites.
 7. **Copy** the winners into `localizations`.
 
+**Resolving the confidence scale.** A legacy `confidence` of `0.43` could mean 43% or 0.43%, and the
+two scales coexist in production data (§2.5), so the routine never divides blindly. The scale is a
+hard rule applied **per video** (`video_reference_uuid`, reached through
+`observations → imaged_moments`), as decided in §13, question 12:
+
+1. If **any** legacy confidence in the video is greater than `1`, the video is on the 0–100 scale and
+   **every** confidence in it is divided by `100`.
+2. Otherwise every legacy confidence in the video is within `[0,1]`, the video is on the 0–1 scale, and
+   the values are used as is.
+3. A video with no confidences needs no scale.
+
+There is no ambiguous case, because low confidences are rejected upstream: legacy writers drop boxes
+below a minimum confidence (the visual-events default is 20 on the 0–100 scale), so a 0–100 video
+always contains a value above `1`. The scale is therefore the same for every row of a video, and the
+routine needs no override table and no reject reason of its own. It also holds because every upload
+writes a whole video from one pipeline: vars-cli's `ml upload` (0–100) and `ml upload-images` (0–1) each
+work per video, so a video does not mix the two. After scaling, a value outside `[0,1]`
+is still rejected as `confidence_out_of_range`.
+
+The dry run reports how many videos and rows resolved to each scale. Survey (j) shows the same
+breakdown beforehand, so the 0–100 videos can be reviewed before the real run.
+
 The routine is **idempotent**: it skips associations that are already migrated and rebuilds the
 rejects table from scratch each run. That is what makes the final delta pass at cutover (§12) safe.
 
-**Status.** Both scripts have been run against the real annosaurus schema (PostgreSQL 17 and
-SQL Server 2022) with the same 20 seeded legacy cases, including the real examples from §2. Both
-produce identical results, including a dry run that leaves no rows behind and a second run that
-changes nothing. They have not been run against production data or a real vampire-squid database.
+**Status.** Both scripts match this revision (`part` and `difficult`, the `localized_annotations` view,
+the orphaned-reference fallback, `self` stored as `NULL`, the per-video confidence rule). They were run
+against the real annosaurus schema with 25 seeded legacy localization associations plus one
+non-localization association, on PostgreSQL 17 and SQL Server 2022. The seed covers a 0–100 video, a 0–1
+video, a video with no confidences, a video whose only value is `150`, a video with values on both sides of
+`1`, an orphaned and a sizeless image reference, a missing video row, every reject reason, the duplicate
+vertex collapse, an edge-clamped box, and `to_concept` values `eye`, `self` and `Self`. Both databases
+produce identical results: 15 migrated (1 truncated), 10 rejected (one per reason, `malformed_json` twice),
+a dry run that leaves no rows behind, a second run that migrates nothing, `self` stored as `NULL` while
+`eye` and `Self` are kept, and a **delta pass** that scales a new `0.3` in an already-migrated 0–100 video
+to `0.003` rather than leaving it at `0.3`. SQL Server 2025 ran the earlier 24-case set, before `self` was
+mapped to `NULL`, with the same results, and has not been re-run since. None of it has been run against
+production data or a real vampire-squid database. The earlier 20-case harness is not in the repository, so
+these cases replace it; they do not include the real examples from §2.
+
 SQL Server needs **2017 or later** for `STRING_AGG`, **and the database's compatibility level must be
 140 or higher**. MBARI's production server is SQL Server 2025, but a database restored from an older
 server keeps its old compatibility level, so check it: `SELECT compatibility_level FROM sys.databases
-WHERE name = DB_NAME()`. The script was run on SQL Server 2022, not 2025; the T-SQL it uses is all
-available in both, but the run is worth repeating on a 2025 instance. (`LEAST`/`GREATEST`, available
-since 2022, would shorten the clamping `CASE` expressions; they are not used so the script also runs on
-older instances.)
+WHERE name = DB_NAME()`. (`LEAST`/`GREATEST`, available since 2022, would shorten the clamping `CASE`
+expressions; they are not used so the script also runs on older instances.)
+
+**`self` becomes `NULL`.** Every legacy writer surveyed (vars-localize, vars-annotation, vars-cli) puts the
+literal `self` in `to_concept` to mean "no part", and keeping it would store a value that says nothing, so
+each script maps it to `NULL` (the `no_part` list in `postgres.sql`, `@no_part` in `sqlserver.sql`, which
+holds `self`). Survey (k) lists the distinct `to_concept` values, so any other placeholder it finds is added
+to that list before the real run. Matching is exact and case-sensitive.
 
 ### 8.3 Quarantine, never drop
 
@@ -703,7 +869,7 @@ Rejected rows go to `localization_migration_rejects` (`association_uuid`, `obser
 Rejection reasons: `duplicate_type` (lost the tie-break), `malformed_json` (not a JSON object, or a
 required key is missing or non-numeric), `array_length_mismatch`, `confidence_out_of_range`,
 `insufficient_vertices`, `invalid_geometry` (a box with zero or negative size), `unknown_link_name`
-(including `localization-mask`, which has no legacy form), `orphaned_image_reference`,
+(including `localization-mask`, which has no legacy form),
 `unresolved_dimensions`, `entirely_out_of_bounds`.
 
 Conflict resolution for duplicates: **keep the valid row with the newest `last_updated_timestamp`,
@@ -749,7 +915,7 @@ be in the release notes, and subscribers need updating in step with cutover.
 | Bounds | Enforced on every write with no dimensions needed; boundary cases at exactly `0` and `1`; a point at `x = 1.0` is accepted |
 | Round trip | Property tests: pixel → normalized → pixel within `EPS`, including the integer-snap cases (`15/22`, `13/23`, `31/39`) |
 | Companion code | A differential test of the reference `NormalizedBoundingBox` against the §5.1 `CHECK` constraints on boundary-heavy random boxes, so the Java and the database cannot drift apart (§6.4). It already found the snapping gap in §6.2 |
-| Migration | Seed legacy associations including duplicates, malformed JSON, mismatched array lengths, an orphaned `image_reference_uuid`, unresolved dimensions, a box crossing the frame edge, `tags` with and without `training`, 0–100 confidences, and the real degenerate polygon; run the routine; assert correct rows migrated, `truncated` set, confidence divided, dimensions taken from the right source, and every reject quarantined with the right reason. A dry run leaves no rows; a second run changes nothing. Run on both dialects, including with vampire-squid in a separate database |
+| Migration | Seed legacy associations including duplicates, malformed JSON, mismatched array lengths, an orphaned `image_reference_uuid` (expected to migrate using the video's dimensions and be counted as an orphaned fallback), unresolved dimensions, a box crossing the frame edge, `tags` with and without `training`, 0–100 confidences, and the real degenerate polygon; run the routine; assert correct rows migrated, `truncated` set, confidence divided, dimensions taken from the right source, and every reject quarantined with the right reason. A dry run leaves no rows; a second run changes nothing. Run on both dialects, including with vampire-squid in a separate database |
 | Flyway | The `${videoReferencesTable}` placeholder resolves; the `it-*` suites still migrate with no vampire-squid tables present |
 | Derived extent | Line/polygon/mask extents computed correctly; point extent is exactly `0`; a horizontal line has `height = 0` |
 
@@ -778,8 +944,10 @@ enforced and no mitigation is needed.
 - **Source dimensions are not stored.** A localization cannot tell you what resolution it was drawn
   at, and a later re-encode at a different size is invisible. Exporters that need pixels (COCO, VOC
   `<size>`) must look up the media's dimensions at export time.
-- **No fallback for orphaned image references** in the migration (§8.2); they are quarantined for a
-  human decision. An image that exists but has no recorded size does fall back to the video's.
+- **Orphaned image references fall back to the video's dimensions** in the migration (§8.2), as does an
+  image that exists but has no recorded size. A localization drawn on an image that is gone is therefore
+  reinterpreted against the video, which is correct only if the media assumption holds. The dry run
+  counts these separately so the number is known before anyone commits to it.
 - **Legacy callers fail hard.** There is no compatibility window; a tool that is not updated gets a
   `400` on every localization write and silently sees no localizations in associations.
 - **Legacy callers cannot be reliably attributed** (§7.1).
@@ -790,7 +958,7 @@ enforced and no mitigation is needed.
 
 | Phase | Action | Reversible |
 |---|---|---|
-| 0 | Run the §8.1 survey and a dry run of the migration routine. Resolve duplicates (query d). Inventory localization-dependent apps (readers vs writers) | n/a |
+| 0 | Run the §8.1 survey and a dry run of the migration routine. Resolve duplicates (query d). Inventory localization-dependent apps (readers vs writers). Review the 0–100 videos from survey (j). Add any `to_concept` placeholder other than `self` that survey (k) finds to the `no_part` list | n/a |
 | 1 | Ship the table, entity, controller, endpoints, and migration routine (created, not run). Nothing reads or writes the table yet; the association endpoints are unchanged | yes |
 | 2 | Run the migration routine (copy only). Review `localization_migration_rejects`. Update client apps to the new endpoints in parallel, so they are ready to flip | yes — drop the rows |
 | 3 | **Cutover**, in an announced window: stop legacy writers, run the routine again as a delta pass, deploy the application version that excludes legacy rows from reads and rejects legacy writes, switch clients, notify ZeroMQ subscribers | until new-path writes begin |
@@ -808,20 +976,27 @@ rejection logs having gone quiet.
 
 1. **Is there an existing mask link name?** Survey query (a) will confirm. Given the 1024-character
    ceiling, masks almost certainly do not exist in production today.
+    A: No. 
 2. **When is the cutover window?** It is gated on the Phase 0 app inventory and on client releases,
    not on a `Sunset` date, since there is no deprecation period.
+    A: TBD. The window will be announced once all apps are aligned to this change.
 3. **Orphaned image references:** quarantine for manual repair (proposed), or fall back to video
    dimensions? The fallback is justified by the media assumption but is exactly the silent
    reinterpretation we want to avoid. Survey query (e) sizes the problem; if it is small, quarantine
    is cheap.
+    A: Fall back to video dimensions.
 4. **Should `POST /v1/localizations/bulk` be transactional per-batch or per-row?** Per-row partial
    success suits ML ingest; per-batch suits correctness. Not yet decided.
+    A: per-batch.
 5. **Should the `annotations` view expose localizations?** Currently proposed: no, it only drops the
    legacy rows (§7.1). Does anything downstream rely on seeing bounding boxes through it?
+    A: No, vars-gridview is the only consumer, and it will switch to the new view.
 6. **`difficult` flag.** VOC's `difficult` must survive ingest or evaluation metrics silently change
    (see the companion doc). It is not a column today. Add it now, or when a VOC import exists?
+    A. Add it now, since the companion doc is already in review and the column is trivial to add.
 7. **A second tag.** `training` is a boolean because it is the only tag in use. Is there a planned
    second one that would argue for a tags table or array instead?
+    A. No, there is no second tag in use today. The survey query (c) will confirm.
 8. **SQL Server compatibility level.** Production runs SQL Server 2025, which is fine, but the
    migration routine needs the *database* at compatibility level 140+ (`STRING_AGG`); the survey queries
    alone need 130. Confirm both the annosaurus and `M3_VIDEO_ASSETS` databases. Any external SQL Server
@@ -829,3 +1004,24 @@ rejection logs having gone quiet.
 9. **Where does `${videoReferencesTable}` come from** — a new `database.*` config key with an
    environment override (proposed), and does the annosaurus database user have `SELECT` on
    `M3_VIDEO_ASSETS.dbo.video_references` in production?
+    A: the table is from `M3_VIDEO_ASSETS.dbo.video_references`, managed by vampire-squid (/Users/brian/workspace/github/mbari-org/vampire-squid), and the annosaurus user has `SELECT` on it.
+10. **Part (D-13).** Confirm a `part` column is the right home, and what survey (k) shows for
+    placeholder values. Should `part` be validated against anything, or stay free text as `to_concept` is?
+    (Proposed: free text.)
+    A: free text. No validation is needed.
+    A: `self` means "no part" for every writer, so it is stored as `NULL`, not as a value (§8.2).
+11. **Image vs. video source for clients.** vars-gridview chooses between an image and a video frame from
+    the JSON `image_reference_uuid`, which no longer exists. Clients can resolve image references from
+    `imaged_moment_uuid`; should the localization view also expose one preferred image URL, or is that
+    left to each client? (Proposed: leave it, since an imaged moment can have several images and the view
+    is one row per localization.)
+    A: leave it to the client. The view exposes `imaged_moment_uuid`, and clients can resolve image references from that.
+    A: the view has no `image_url` / `image_format` either. vars-gridview chooses its image by criteria still to be decided, using the existing image-reference endpoints.
+12. **Mixed-scale generators (D-15).** Which generators does survey (j) flag as mixed, and for each: map to
+    one scale and accept some wrong rows, or repair the legacy rows first?
+    A: A quick check is to aggregate the existing localizations by video_reference_uuid. If the range between 0-1 use as is, if the range is 0-100 then divide by 100. 
+    A: rule kept. Uploads are per video, so the per-video grouping holds.
+13. **Query view name and shape (D-14).** Is `localization_annotations` the right name, and is it
+    acceptable to add a second view and three endpoints for this, given vars-gridview is the only
+    reader that needs them so far?
+    A: No, `localized_annotations` is the right name, and it is acceptable to add a second view and three endpoints for this, since vars-gridview is the only reader that needs them so far.

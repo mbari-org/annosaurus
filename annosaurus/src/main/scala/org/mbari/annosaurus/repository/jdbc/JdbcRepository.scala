@@ -64,6 +64,7 @@ class JdbcRepository(entityManagerFactory: EntityManagerFactory):
             AncillaryDatumSQL.deleteByVideoReferenceUuid,
             ImageReferenceSQL.deleteByVideoReferenceUuid,
             AssociationSQL.deleteByVideoReferenceUuid,
+            LocalizationSQL.deleteByVideoReferenceUuid,
             ObservationSQL.deleteByVideoReferenceUuid,
             ImagedMomentSQL.deleteByVideoReferenceUuid
         ).map(entityManager.createNativeQuery)
@@ -84,8 +85,9 @@ class JdbcRepository(entityManagerFactory: EntityManagerFactory):
                 counts(0), // ancillary data
                 counts(1), // image references
                 counts(2), // associations
-                counts(3), // observations
-                counts(4)  // imaged moments
+                counts(3), // localizations
+                counts(4), // observations
+                counts(5)  // imaged moments
             )
             transaction.commit()
         catch
@@ -196,13 +198,14 @@ class JdbcRepository(entityManagerFactory: EntityManagerFactory):
         val queries = List(
             entityManager.createNativeQuery(AnnotationSQL.byVideoReferenceUuid),
             entityManager.createNativeQuery(AssociationSQL.byVideoReferenceUuid),
-            entityManager.createNativeQuery(ImageReferenceSQL.byVideoReferenceUuid)
+            entityManager.createNativeQuery(ImageReferenceSQL.byVideoReferenceUuid),
+            entityManager.createNativeQuery(LocalizationSQL.byVideoReferenceUuid)
         )
 
         queries.foreach(q => q.setParameter(1, videoReferenceUuid.toString))
 
         val annos =
-            executeQuery(queries(0), queries(1), queries(2), limit, offset, includeAncillaryData)
+            executeQuery(queries(0), queries(1), queries(2), queries(3), limit, offset, includeAncillaryData)
         entityManager.close()
         annos
 
@@ -219,7 +222,8 @@ class JdbcRepository(entityManagerFactory: EntityManagerFactory):
         val queries                        = List(
             entityManager.createNativeQuery(AnnotationSQL.byVideoReferenceUuidBetweenDates),
             entityManager.createNativeQuery(AssociationSQL.byVideoReferenceUuidBetweenDates),
-            entityManager.createNativeQuery(ImageReferenceSQL.byVideoReferenceUuidBetweenDates)
+            entityManager.createNativeQuery(ImageReferenceSQL.byVideoReferenceUuidBetweenDates),
+            entityManager.createNativeQuery(LocalizationSQL.byVideoReferenceUuidBetweenDates)
         )
 
         queries.foreach(q =>
@@ -232,7 +236,7 @@ class JdbcRepository(entityManagerFactory: EntityManagerFactory):
         )
 
         val annos =
-            executeQuery(queries(0), queries(1), queries(2), limit, offset, includeAncillaryData)
+            executeQuery(queries(0), queries(1), queries(2), queries(3), limit, offset, includeAncillaryData)
         entityManager.close()
         annos
 
@@ -249,7 +253,8 @@ class JdbcRepository(entityManagerFactory: EntityManagerFactory):
         val queries                        = List(
             AnnotationSQL.byConcurrentRequest,
             AssociationSQL.byConcurrentRequest,
-            ImageReferenceSQL.byConcurrentRequest
+            ImageReferenceSQL.byConcurrentRequest,
+            LocalizationSQL.byConcurrentRequest
         ).map(sql => inClause(sql, videoReferenceUuids))
             .map(entityManager.createNativeQuery)
 
@@ -262,7 +267,7 @@ class JdbcRepository(entityManagerFactory: EntityManagerFactory):
         )
 
         val annos =
-            executeQuery(queries(0), queries(1), queries(2), limit, offset, includeAncillaryData)
+            executeQuery(queries(0), queries(1), queries(2), queries(3), limit, offset, includeAncillaryData)
         entityManager.close()
         annos
 
@@ -277,14 +282,15 @@ class JdbcRepository(entityManagerFactory: EntityManagerFactory):
         val queries                        = List(
             AnnotationSQL.byMultiRequest,
             AssociationSQL.byMultiRequest,
-            ImageReferenceSQL.byMultiRequest
+            ImageReferenceSQL.byMultiRequest,
+            LocalizationSQL.byMultiRequest
         ).map(sql => inClause(sql, uuids))
             .map(entityManager.createNativeQuery)
 
         queries.foreach(q => q.setHint(HibernateHints.HINT_READ_ONLY, true))
 
         val annos =
-            executeQuery(queries(0), queries(1), queries(2), limit, offset, includeAncillaryData)
+            executeQuery(queries(0), queries(1), queries(2), queries(3), limit, offset, includeAncillaryData)
         entityManager.close()
         annos
 
@@ -455,6 +461,13 @@ class JdbcRepository(entityManagerFactory: EntityManagerFactory):
             AssociationSQL.resultListToAssociations(r2)
         val associations     = assocTemp.flatten.toSeq
 
+        // lookup localizations
+        val locTemp          = for (obs <- observationUuids.grouped(200)) yield
+            val query = entityManager.createNativeQuery(inClause(LocalizationSQL.byObservationUuids, obs))
+            query.setHint(HibernateHints.HINT_READ_ONLY, true)
+            LocalizationSQL.resultListToLocalizations(query.getResultList.asScala.toList)
+        val localizations    = locTemp.flatten.toSeq
+
         // lookup imageMoments
         val imagedMomentUuids = annotations.flatMap(_.imagedMomentUuid.map(_.toString())).distinct
         val irTemp            = for (im <- imagedMomentUuids.grouped(200)) yield
@@ -471,7 +484,8 @@ class JdbcRepository(entityManagerFactory: EntityManagerFactory):
             yield
                 val assocs = associations.filter(_.observationUuid == a.observationUuid)
                 val irs    = imageReferences.filter(_.imagedMomentUuid == a.imagedMomentUuid)
-                a.copy(associations = assocs, imageReferences = irs)
+                val locs   = localizations.filter(_.observationUuid == a.observationUuid)
+                a.copy(associations = assocs, imageReferences = irs, localizations = locs)
 
         val xs =
             if includeAncillaryData then findAncillaryData(a2)
@@ -484,6 +498,7 @@ class JdbcRepository(entityManagerFactory: EntityManagerFactory):
         annotationQuery: Query,
         associationQuery: Query,
         imageReferenceQuery: Query,
+        localizationQuery: Query,
         limit: Option[Int] = None,
         offset: Option[Int] = None,
         includeAncillaryData: Boolean = false
@@ -492,6 +507,7 @@ class JdbcRepository(entityManagerFactory: EntityManagerFactory):
         annotationQuery.setHint(HibernateHints.HINT_READ_ONLY, true)
         associationQuery.setHint(HibernateHints.HINT_READ_ONLY, true)
         imageReferenceQuery.setHint(HibernateHints.HINT_READ_ONLY, true)
+        localizationQuery.setHint(HibernateHints.HINT_READ_ONLY, true)
 
         limit.foreach(annotationQuery.setMaxResults)
         offset.foreach(annotationQuery.setFirstResult)
@@ -513,7 +529,14 @@ class JdbcRepository(entityManagerFactory: EntityManagerFactory):
         log.atDebug.log(s"Transforming ${r2.size} imageReferences")
         val imageReferences = ImageReferenceSQL.resultListToImageReferences(r2)
         log.atDebug.log("Joining annotations to imageReferences")
-        val a3              = ImageReferenceSQL.join(a2, imageReferences)
+        val a3a             = ImageReferenceSQL.join(a2, imageReferences)
+
+        log.atDebug.log("Running localization query")
+        val r3            = localizationQuery.getResultList.asScala.toList
+        log.atDebug.log(s"Transforming ${r3.size} localizations")
+        val localizations = LocalizationSQL.resultListToLocalizations(r3)
+        log.atDebug.log("Joining annotations to localizations")
+        val a3            = LocalizationSQL.join(a3a, localizations)
 
         val xs =
             if includeAncillaryData then findAncillaryData(a3)

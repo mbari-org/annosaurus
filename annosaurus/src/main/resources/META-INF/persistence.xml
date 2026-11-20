@@ -14,6 +14,7 @@
         <class>org.mbari.annosaurus.repository.jpa.entity.ImagedMomentEntity</class>
         <class>org.mbari.annosaurus.repository.jpa.entity.ObservationEntity</class>
         <class>org.mbari.annosaurus.repository.jpa.entity.AssociationEntity</class>
+        <class>org.mbari.annosaurus.repository.jpa.entity.LocalizationEntity</class>
         <class>org.mbari.annosaurus.repository.jpa.entity.ImageReferenceEntity</class>
         <class>org.mbari.annosaurus.repository.jpa.entity.CachedAncillaryDatumEntity</class>
         <class>org.mbari.annosaurus.repository.jpa.entity.CachedVideoReferenceInfoEntity</class>

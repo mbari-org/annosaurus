@@ -44,6 +44,9 @@ object EntityManagerFactories:
     // https://juliuskrah.com/tutorial/2017/02/16/getting-started-with-hikaricp-hibernate-and-jpa/
     val PRODUCTION_PROPS = Map(
         "hibernate.connection.provider_class"      -> "org.hibernate.hikaricp.internal.HikariCPConnectionProvider",
+        // Loads lazy collections (e.g. each observation's localizations and associations) in batches instead of
+        // one SELECT per owner when a read path walks many entities
+        "hibernate.default_batch_fetch_size"       -> "64",
         "hibernate.hbm2ddl.auto"                   -> "validate",
         "hibernate.hikari.idleTimeout"             -> "30000",
         "hibernate.jdbc.batch_size"                -> "100",
@@ -79,7 +82,8 @@ object EntityManagerFactories:
 
         // Flyway migration here. Need to initialize the database before we
         // can create an EntityManagerFactory
-        val dbConfig = DatabaseConfig(url, username, password, driverName, "foo")
+        val videoReferencesTable = DatabaseConfig.videoReferencesTable(config)
+        val dbConfig             = DatabaseConfig(url, username, password, driverName, "foo", videoReferencesTable)
         FlywayMigrator.migrate(dbConfig) match
             case Left(e)      =>
                 log.atError.withCause(e).log(s"Failed to migrate database at $url")

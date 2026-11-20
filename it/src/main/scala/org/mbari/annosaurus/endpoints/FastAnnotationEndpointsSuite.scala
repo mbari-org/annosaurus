@@ -16,10 +16,12 @@
 
 package org.mbari.annosaurus.endpoints
 
-import org.mbari.annosaurus.controllers.TestUtils
+import org.mbari.annosaurus.controllers.{LocalizationController, TestUtils}
 import org.mbari.annosaurus.domain.{
     Annotation,
     AnnotationSC,
+    Localization,
+    LocalizationSC,
     CachedAncillaryDatum,
     ConcurrentRequest,
     Count,
@@ -272,6 +274,173 @@ trait FastAnnotationEndpointsSuite extends EndpointsSuite:
         )
     }
 
+    private lazy val localizationController = new LocalizationController(daoFactory)
+
+    /**
+     * What the read paths return: no observation join key, ordered by type so comparisons are deterministic. The
+     * stale-write token is compared separately (against a JPA read of the stored row) by [[assertLocalizations]].
+     */
+    private def expectedLocalizations(im: org.mbari.annosaurus.repository.jpa.entity.ImagedMomentEntity) =
+        im.getObservations.asScala.map(o =>
+            o.getUuid -> o.getLocalizations.asScala
+                .map(Localization.from(_).copy(observationUuid = None, lastUpdated = None))
+                .toSeq
+                .sortBy(_.localizationType)
+        ).toMap
+
+    /** The JDBC read path keeps the stale-write token, equal to what the JPA path returns for the same row. */
+    private def assertTokenMatchesJpa(l: LocalizationSC): Unit =
+        assert(l.last_updated_time.isDefined, s"fast path dropped last_updated_time: $l")
+        assertEquals(l.observation_uuid, None)
+        val jpa = localizationController.findByUUID(l.uuid.get).join.getOrElse(fail(s"no localization ${l.uuid}"))
+        assertEquals(l.last_updated_time, jpa.lastUpdated)
+
+    private def assertLocalizations(
+        annotations: Seq[AnnotationSC],
+        expected: Map[UUID, Seq[Localization]]
+    ): Unit =
+        assertEquals(annotations.size, expected.size)
+        for a <- annotations
+        do
+            a.localizations.foreach(assertTokenMatchesJpa)
+            val obtained = a.localizations.map(_.toCamelCase.copy(lastUpdated = None)).sortBy(_.localizationType)
+            assertEquals(obtained, expected(a.observation_uuid.get))
+
+    test("fast videoreference: the localization token can be used for a PUT; a stale one gets 409") {
+        val im              = TestUtils.create(1, 1, 0, 0, nLocalizations = 1).head
+        val obsUuid         = im.getObservations.iterator.next().getUuid
+        var token: Option[java.time.Instant] = None
+        var tpe: String     = ""
+        runGet(
+            endpoints.findAnnotationsByVideoReferenceUuidImpl,
+            s"http://test.com/v1/fast/videoreference/${im.getVideoReferenceUuid}",
+            response =>
+                val l = checkResponse[Seq[AnnotationSC]](response.body).head.localizations.head
+                token = l.last_updated_time
+                tpe = l.localization_type
+        )
+        assert(token.isDefined)
+        assertEquals(tpe, "bounding_box")
+        val locEndpoints    = new LocalizationEndpoints(localizationController)
+        val jwt             = Some(jwtService.authorize("foo").getOrElse(fail("no jwt")))
+        def body(t: java.time.Instant) =
+            s"""{"localization_type":"bounding_box","x":0.2,"y":0.2,"width":0.1,"height":0.1,"last_updated_time":"$t"}"""
+        runPut(
+            locEndpoints.upsertLocalizationImpl,
+            s"http://test.com/v1/localizations/$obsUuid/bounding_box",
+            body(token.get),
+            response => assertEquals(response.code, StatusCode.Ok, response.body.toString),
+            jwt
+        )
+        runPut(
+            locEndpoints.upsertLocalizationImpl,
+            s"http://test.com/v1/localizations/$obsUuid/bounding_box",
+            body(token.get), // now stale: the previous PUT advanced the version
+            response => assertEquals(response.code, StatusCode.Conflict, response.body.toString),
+            jwt
+        )
+    }
+
+    test("fast videoreference returns localizations (box and polygon) without disturbing associations") {
+        val im       = TestUtils.create(1, 1, 2, 1, nLocalizations = 4).head
+        val expected = expectedLocalizations(im)
+        assertEquals(expected.values.head.size, 4)
+        runGet(
+            endpoints.findAnnotationsByVideoReferenceUuidImpl,
+            s"http://test.com/v1/fast/videoreference/${im.getVideoReferenceUuid}",
+            response =>
+                assertEquals(response.code, StatusCode.Ok)
+                val annotations = checkResponse[Seq[AnnotationSC]](response.body)
+                assertLocalizations(annotations, expected)
+                assert(annotations.head.localizations.exists(_.vertices.isDefined))
+                assertEquals(annotations.head.associations.size, 2)
+                assertEquals(annotations.head.image_references.size, 1)
+        )
+    }
+
+    test("fast videoreference: associations only gives localizations == []") {
+        val im = TestUtils.create(1, 1, 2, 0).head
+        runGet(
+            endpoints.findAnnotationsByVideoReferenceUuidImpl,
+            s"http://test.com/v1/fast/videoreference/${im.getVideoReferenceUuid}",
+            response =>
+                val annotations = checkResponse[Seq[AnnotationSC]](response.body)
+                assertEquals(annotations.size, 1)
+                assertEquals(annotations.head.localizations, Nil)
+                assertEquals(annotations.head.associations.size, 2)
+        )
+    }
+
+    test("fast videoreference: localizations are not cross-contaminated between observations") {
+        val im       = TestUtils.create(1, 3, 2, 0, nLocalizations = 2).head
+        val expected = expectedLocalizations(im)
+        runGet(
+            endpoints.findAnnotationsByVideoReferenceUuidImpl,
+            s"http://test.com/v1/fast/videoreference/${im.getVideoReferenceUuid}",
+            response =>
+                val annotations = checkResponse[Seq[AnnotationSC]](response.body)
+                assertLocalizations(annotations, expected)
+                assert(annotations.forall(_.associations.size == 2))
+        )
+    }
+
+    test("fast concept returns localizations") {
+        val im       = TestUtils.create(1, 1, 1, 0, nLocalizations = 2).head
+        val obs      = im.getObservations.iterator.next()
+        val expected = expectedLocalizations(im)
+        runGet(
+            endpoints.findAnnotationsByConceptImpl,
+            s"http://test.com/v1/fast/concept/${obs.getConcept}",
+            response =>
+                val annotations = checkResponse[Seq[AnnotationSC]](response.body)
+                assertLocalizations(annotations, expected)
+        )
+    }
+
+    test("fast concurrent request returns localizations") {
+        val im       = TestUtils.create(1, 2, 1, 0, nLocalizations = 2).head
+        val expected = expectedLocalizations(im)
+        val cr       = ConcurrentRequest(
+            im.getRecordedTimestamp.minusSeconds(1),
+            im.getRecordedTimestamp.plusSeconds(1),
+            Seq(im.getVideoReferenceUuid))
+        runPost(
+            endpoints.findAnnotationsByConcurrentRequestImpl,
+            "http://test.com/v1/fast/concurrent",
+            cr.toSnakeCase.stringify,
+            response =>
+                val annotations = checkResponse[Seq[AnnotationSC]](response.body)
+                assertLocalizations(annotations, expected)
+        )
+    }
+
+    test("fast multi request returns localizations") {
+        val im       = TestUtils.create(1, 2, 1, 0, nLocalizations = 2).head
+        val expected = expectedLocalizations(im)
+        runPost(
+            endpoints.findAnnotationsByMultiRequestImpl,
+            "http://test.com/v1/fast/multi",
+            MultiRequest(Seq(im.getVideoReferenceUuid)).toSnakeCase.stringify,
+            response =>
+                val annotations = checkResponse[Seq[AnnotationSC]](response.body)
+                assertLocalizations(annotations, expected)
+        )
+    }
+
+    test("fast query constraints returns localizations") {
+        val im       = TestUtils.create(1, 2, 1, 0, nLocalizations = 2).head
+        val expected = expectedLocalizations(im)
+        val qc       = QueryConstraints(videoReferenceUuids = Seq(im.getVideoReferenceUuid))
+        runPost(
+            endpoints.findAnnotationsByQueryConstraintsImpl,
+            "http://test.com/v1/fast",
+            qc.toSnakeCase.stringify,
+            response =>
+                val qcr = checkResponse[QueryConstraintsResponseSC[Seq[AnnotationSC]]](response.body)
+                assertLocalizations(qcr.content, expected)
+        )
+    }
+
     test("findAnnotationsByVideoReferenceUuid") {
         val xs                 = TestUtils.create(2, 2, 1, 1, true)
         val videoReferenceUuid = xs.head.getVideoReferenceUuid
@@ -434,6 +603,24 @@ trait FastAnnotationEndpointsSuite extends EndpointsSuite:
         assertEquals(count.associationCount, expectedAssociationCount)
         assertEquals(count.videoReferenceUuid, xs.head.getVideoReferenceUuid)
 
+    }
+
+    test("deleteAnnotationsByVideoReferenceUuid (with localizations)") {
+        val xs          = TestUtils.create(2, 1, nLocalizations = 2)
+        val jwt         = jwtService.authorize("foo").orNull
+        assert(jwt != null)
+        val backendStub = newBackendStub(endpoints.deleteAnnotationsByVideoReferenceUuidImpl)
+        val response    = basicRequest
+            .delete(uri"http://test.com/v1/fast/videoreference/${xs.head.getVideoReferenceUuid}")
+            .header("Authorization", s"Bearer $jwt")
+            .send(backendStub)
+            .join
+        assertEquals(response.code, StatusCode.Ok)
+        assert(response.body.toString.contains("\"localization_count\":4"), response.body.toString)
+        val count       = checkResponse[DeleteCountSC](response.body).toCamelCase
+        assertEquals(count.errorMessage, None)
+        assertEquals(count.localizationCount, 4)
+        assertEquals(count.observationCount, 2)
     }
 
     test("deleteAnnotationsByVideoReferenceUuid (large)") {

@@ -34,6 +34,7 @@ object DomainObjects {
         Some("brian"),
         Some(Instant.now()),
         Seq(association),
+        Nil,
         Some(UUID.randomUUID()),
         None // Don't compare lastUpdated as it is set by the database
     )

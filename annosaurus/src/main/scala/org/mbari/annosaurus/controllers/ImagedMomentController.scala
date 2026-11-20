@@ -22,7 +22,7 @@ import org.mbari.annosaurus.etc.jdk.Loggers.given
 import org.mbari.annosaurus.etc.rxjava.EventBus
 import org.mbari.annosaurus.messaging.Publisher
 import org.mbari.annosaurus.repository.jpa.{BaseDAO, JPADAOFactory}
-import org.mbari.annosaurus.repository.jpa.entity.{AssociationEntity, ImagedMomentEntity}
+import org.mbari.annosaurus.repository.jpa.entity.{AssociationEntity, ImagedMomentEntity, LocalizationEntity}
 import org.mbari.annosaurus.repository.{DAO, ImagedMomentDAO, NotFoundInDatastoreException}
 import org.mbari.vcr4j.time.Timecode
 
@@ -343,6 +343,17 @@ class ImagedMomentController(val daoFactory: JPADAOFactory, bus: Subject[Any] = 
                         a.setUuid(null)
                     observation.addAssociation(a)
                 )
+                val localizations = observation.getLocalizations.asScala.toList
+                observation.setLocalizations(new util.HashSet[LocalizationEntity]())
+                localizations.foreach(l =>
+                    if l.getUuid != null then
+                        log.atDebug
+                            .log(
+                                s"A localization uuid was found. Setting to null as they need to be generated in the database: ${l.getUuid}"
+                            )
+                        l.setUuid(null)
+                    observation.addLocalization(l)
+                )
             )
 
         if sourceImagedMoment.getAncillaryDatum != null then
@@ -478,6 +489,17 @@ class ImagedMomentController(val daoFactory: JPADAOFactory, bus: Subject[Any] = 
                             )
                         a.setUuid(null)
                     observation.addAssociation(a)
+                }
+                val localizations = observation.getLocalizations.asScala.toList
+                observation.setLocalizations(new util.HashSet[LocalizationEntity]())
+                localizations.foreach { l =>
+                    if l.getUuid != null then
+                        log.atDebug
+                            .log(
+                                s"A localization uuid was found. Setting to null as they need to be generated in the database: ${l.getUuid}"
+                            )
+                        l.setUuid(null)
+                    observation.addLocalization(l)
                 }
             }
 

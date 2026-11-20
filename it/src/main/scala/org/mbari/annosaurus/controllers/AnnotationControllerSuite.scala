@@ -17,8 +17,10 @@
 package org.mbari.annosaurus.controllers
 
 import org.mbari.annosaurus.AssertUtils
-import org.mbari.annosaurus.domain.{Annotation, ConcurrentRequest, MultiRequest}
+import org.mbari.annosaurus.domain.{Annotation, ConcurrentRequest, Localization, MultiRequest}
+import io.reactivex.rxjava3.subjects.PublishSubject
 import org.mbari.annosaurus.etc.sdk.Futures.*
+import org.mbari.annosaurus.etc.zeromq.{AnnotationCreatedMessage, LocalizationCreatedMessage}
 import org.mbari.annosaurus.repository.jpa.{BaseDAOSuite, ImagedMomentDAOImpl, JPADAOFactory}
 import org.mbari.annosaurus.repository.jpa.TransactionNotifier
 import org.mbari.annosaurus.repository.jpa.entity.ObservationEntity
@@ -43,6 +45,23 @@ trait AnnotationControllerSuite extends BaseDAOSuite:
 
     override val munitTimeout: scala.concurrent.duration.FiniteDuration =
         scala.concurrent.duration.Duration(30, "s")
+
+    test("findByVideoReferenceUuid (JPA) batch-fetches localizations instead of one SELECT per observation") {
+        val nObs  = 40
+        val im    = TestUtils.create(1, nObs, 1, 0, nLocalizations = 2).head
+        val stats = daoFactory.entityManagerFactory.unwrap(classOf[org.hibernate.SessionFactory]).getStatistics
+        stats.setStatisticsEnabled(true)
+        stats.clear()
+        val annotations =
+            try exec(controller.findByVideoReferenceUuid(im.getVideoReferenceUuid))
+            finally stats.setStatisticsEnabled(false)
+        val statements = stats.getPrepareStatementCount
+        assertEquals(annotations.size, nObs)
+        assert(annotations.forall(_.localizations.size == 2))
+        assert(annotations.forall(_.associations.size == 1))
+        // without batch fetching this is ~1 + nObs (localizations) + nObs (associations) + ...
+        assert(statements < nObs / 2, s"$statements statements for $nObs observations")
+    }
 
     test("findByUUID") {
         val im1 = TestUtils.create(1, 2, 3, 2, true).head
@@ -500,4 +519,119 @@ trait AnnotationControllerSuite extends BaseDAOSuite:
             assert(found.isDefined, s"No REMOVE event received for observation $uuid")
         finally
             disposable.dispose()
+    }
+
+    // --- localizations carried on annotation create ---
+
+    private lazy val localizationController = LocalizationController(daoFactory)
+
+    private def newAnnotation(localizations: Seq[Localization] = Nil): Annotation =
+        Annotation(
+            concept = Some("Nanomia bijuga"),
+            observer = Some("brian"),
+            observationTimestamp = Some(Instant.now()),
+            recordedTimestamp = Some(Instant.now()),
+            videoReferenceUuid = Some(UUID.randomUUID()),
+            localizations = localizations
+        )
+
+    private val bbox    =
+        Localization("bounding_box", x = Some(0.1), y = Some(0.2), width = Some(0.3), height = Some(0.4))
+    private val point   = Localization("point", x = Some(0.5), y = Some(0.6))
+    private val polygon = Localization("polygon", vertices = Some(Seq(0.1, 0.1, 0.5, 0.1, 0.5, 0.5)))
+
+    // Today only bulkCreate (2 or more annotations) publishes AnnotationCreatedMessage; a single create(...) does not.
+    test("bulkCreate publishes AnnotationCreatedMessages whose content carries the localizations") {
+        val bus      = PublishSubject.create[Any]().toSerialized
+        val received = scala.collection.mutable.ListBuffer.empty[Any]
+        bus.subscribe(x => received.synchronized { received += x })
+        val c        = AnnotationController(daoFactory, bus)
+        val vr       = UUID.randomUUID()
+        val xs       = Seq(
+            newAnnotation(Seq(bbox, point)).copy(videoReferenceUuid = Some(vr)),
+            newAnnotation(Seq(bbox, point)).copy(videoReferenceUuid = Some(vr))
+        )
+        val obtained = exec(c.bulkCreate(xs))
+        assertEquals(obtained.size, 2)
+        // publication runs in a Future callback, so it may land just after the result is returned
+        val deadline = System.currentTimeMillis() + 5000
+        while received.synchronized(received.size) < 2 && System.currentTimeMillis() < deadline do Thread.sleep(25)
+        val msgs     = received.synchronized(received.toList).collect { case m: AnnotationCreatedMessage => m }
+        assertEquals(msgs.size, 2)
+        msgs.foreach(m =>
+            assertEquals(m.content.localizations.map(_.localizationType).toSet, Set("bounding_box", "point"))
+            assertEquals(m.content.localizations.size, 2)
+        )
+        assert(!received.exists(_.isInstanceOf[LocalizationCreatedMessage]))
+    }
+
+
+    test("create(Annotation) with localizations persists them in the same request") {
+        val obtained = exec(controller.create(newAnnotation(Seq(bbox, point))))
+        assertEquals(obtained.size, 1)
+        val a        = obtained.head
+        assertEquals(a.localizations.size, 2)
+        assert(a.localizations.forall(_.uuid.isDefined))
+        assertEquals(a.localizations.map(_.localizationType).toSet, Set("bounding_box", "point"))
+        val stored   = exec(localizationController.findByObservationUuid(a.observationUuid.get))
+        assertEquals(stored.map(_.uuid).toSet, a.localizations.map(_.uuid).toSet)
+        assertEquals(stored.map(_.observationUuid).toSet, Set(a.observationUuid))
+    }
+
+    test("create(Annotation) ignores client supplied localization uuids") {
+        val clientUuid = UUID.randomUUID()
+        val a          = exec(controller.create(newAnnotation(Seq(bbox.copy(uuid = Some(clientUuid)))))).head
+        assertEquals(a.localizations.size, 1)
+        assert(a.localizations.head.uuid.isDefined)
+        assertNotEquals(a.localizations.head.uuid, Some(clientUuid))
+    }
+
+    test("bulkCreate persists a localization carried by one of the annotations") {
+        val annos    = Seq(newAnnotation(), newAnnotation(Seq(polygon)), newAnnotation())
+        val obtained = exec(controller.bulkCreate(annos))
+        assertEquals(obtained.size, 3)
+        val withLoc  = obtained.filter(_.localizations.nonEmpty)
+        assertEquals(withLoc.size, 1)
+        val l        = withLoc.head.localizations.head
+        assertEquals(l.localizationType, "polygon")
+        assert(l.uuid.isDefined)
+        val stored   = exec(localizationController.findByObservationUuid(withLoc.head.observationUuid.get))
+        assertEquals(stored.map(_.uuid), Seq(l.uuid))
+        assertEquals(stored.head.vertices, polygon.vertices)
+    }
+
+    test("create(Annotation) with one invalid localization fails and creates nothing") {
+        val bad  = bbox.copy(x = Some(0.9), width = Some(0.5)) // x + width > 1
+        val anno = newAnnotation(Seq(point, bad))
+        val ex   = intercept[LocalizationValidationException] {
+            exec(controller.create(anno))
+        }
+        assert(ex.errors.exists(_.startsWith("annotation 0, localization 1:")), ex.errors.toString)
+        assert(exec(controller.findByVideoReferenceUuid(anno.videoReferenceUuid.get)).isEmpty)
+    }
+
+    test("bulkCreate with one invalid localization fails and creates nothing") {
+        val bad   = bbox.copy(width = Some(-1.0))
+        val vrUuid = UUID.randomUUID()
+        val annos = Seq(newAnnotation(), newAnnotation(Seq(point)), newAnnotation(Seq(bad)))
+            .map(_.copy(videoReferenceUuid = Some(vrUuid)))
+        val ex    = intercept[LocalizationValidationException] {
+            exec(controller.bulkCreate(annos))
+        }
+        assert(ex.errors.exists(_.startsWith("annotation 2, localization 0:")), ex.errors.toString)
+        assert(exec(controller.findByVideoReferenceUuid(vrUuid)).isEmpty)
+    }
+
+    test("create(Annotation) stores the normalized localization") {
+        val dupPolygon = Localization("polygon", vertices = Some(Seq(0.1, 0.1, 0.5, 0.1, 0.5, 0.1, 0.5, 0.5)))
+        val line       = Localization("line", vertices = Some(Seq(0.1, 0.2, 0.4, 0.6)))
+        val a          = exec(controller.create(newAnnotation(Seq(dupPolygon, line)))).head
+        val stored     = exec(localizationController.findByObservationUuid(a.observationUuid.get))
+        val p          = stored.find(_.localizationType == "polygon").get
+        assertEquals(p.vertices, Some(Seq(0.1, 0.1, 0.5, 0.1, 0.5, 0.5)))
+        val l          = stored.find(_.localizationType == "line").get
+        assertEqualsDouble(l.x.get, 0.1, 1e-9)
+        assertEqualsDouble(l.y.get, 0.2, 1e-9)
+        assertEqualsDouble(l.width.get, 0.3, 1e-9)
+        assertEqualsDouble(l.height.get, 0.4, 1e-9)
     }

@@ -16,7 +16,7 @@
 
 package org.mbari.annosaurus.etc.zeromq
 
-import org.mbari.annosaurus.domain.{Annotation, Association}
+import org.mbari.annosaurus.domain.{Annotation, Association, Localization}
 import org.mbari.annosaurus.messaging.Message
 import org.mbari.annosaurus.etc.circe.CirceCodecs.{*, given}
 
@@ -47,3 +47,10 @@ case class AssociationCreatedMessage(content: Association) extends ZeroMQMessage
     override def toJson: String =
         content.stringify
 
+/**
+ * Sent when a localization is created or updated. A localization never produces an AssociationCreatedMessage.
+ */
+case class LocalizationCreatedMessage(content: Localization) extends ZeroMQMessage[Localization]:
+
+    override def toJson: String =
+        content.stringify

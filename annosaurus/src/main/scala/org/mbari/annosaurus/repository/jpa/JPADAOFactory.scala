@@ -45,6 +45,12 @@ trait JPADAOFactory:
     ): CachedAncillaryDatumDAOImpl =
         new CachedAncillaryDatumDAOImpl(extractEntityManager(dao))
 
+    def newLocalizationDAO(): LocalizationDAOImpl =
+        new LocalizationDAOImpl(entityManagerFactory.createEntityManager())
+
+    def newLocalizationDAO(dao: DAO[?]): LocalizationDAOImpl =
+        new LocalizationDAOImpl(extractEntityManager(dao))
+
     def newObservationDAO(): ObservationDAOImpl =
         new ObservationDAOImpl(entityManagerFactory.createEntityManager())
 

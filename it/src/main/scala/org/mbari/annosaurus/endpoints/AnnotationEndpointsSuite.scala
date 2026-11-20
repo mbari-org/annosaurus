@@ -21,6 +21,7 @@ import org.mbari.annosaurus.domain.{
     Annotation,
     AnnotationCreate,
     AnnotationSC,
+    Localization,
     ConcurrentRequest,
     ConcurrentRequestCountSC,
     MultiRequest,
@@ -66,6 +67,64 @@ trait AnnotationEndpointsSuite extends EndpointsSuite:
                     .copy(lastUpdated = obtained.lastUpdated)
                     .roundObservationTimestampToMillis()
                 assertEquals(obtained, expected)
+        )
+    }
+
+    private def noKeys(l: Localization): Localization = l.copy(observationUuid = None, lastUpdated = None)
+
+    private def expectedLocalizations(obs: org.mbari.annosaurus.repository.jpa.entity.ObservationEntity) =
+        obs.getLocalizations.asScala.map(x => noKeys(Localization.from(x))).toSeq.sortBy(_.localizationType)
+
+    test("findAnnotationByUuid returns localizations (box and polygon)") {
+        val im  = TestUtils.create(1, 1, 2, 0, nLocalizations = 4).head
+        val obs = im.getObservations.iterator.next()
+        runGet(
+            endpoints.findAnnotationByUuidImpl,
+            s"http://test.com/v1/annotations/${obs.getUuid}",
+            response =>
+                assertEquals(response.code, StatusCode.Ok)
+                val obtained = checkResponse[AnnotationSC](response.body).toCamelCase
+                assertEquals(obtained.localizations.map(noKeys).sortBy(_.localizationType), expectedLocalizations(obs))
+                assertEquals(obtained.localizations.size, 4)
+                assertEquals(obtained.associations.size, 2)
+        )
+    }
+
+    test("findAnnotationsByImageReferenceUuid returns localizations") {
+        val im  = TestUtils.create(1, 1, 1, 1, nLocalizations = 4).head
+        val obs = im.getObservations.iterator.next()
+        val ir  = im.getImageReferences.iterator().next()
+        runGet(
+            endpoints.findAnnotationByImageReferenceUuidImpl,
+            s"http://test.com/v1/annotations/imagereference/${ir.getUuid}",
+            response =>
+                assertEquals(response.code, StatusCode.Ok)
+                val ys = checkResponse[Seq[AnnotationSC]](response.body).map(_.toCamelCase)
+                assertEquals(ys.length, 1)
+                assertEquals(ys.head.localizations.map(noKeys).sortBy(_.localizationType), expectedLocalizations(obs))
+                assertEquals(ys.head.associations.size, 1)
+        )
+    }
+
+    test("findAnnotationsByVideoReferenceUuid returns localizations; associations-only gives []") {
+        val im1 = TestUtils.create(1, 1, 0, 0, nLocalizations = 4).head
+        val obs = im1.getObservations.iterator.next()
+        runGet(
+            endpoints.findAnnotationsByVideoReferenceUuidImpl,
+            s"http://test.com/v1/annotations/videoreference/${im1.getVideoReferenceUuid}",
+            response =>
+                val ys = checkResponse[Seq[AnnotationSC]](response.body).map(_.toCamelCase)
+                assertEquals(ys.length, 1)
+                assertEquals(ys.head.localizations.map(noKeys).sortBy(_.localizationType), expectedLocalizations(obs))
+        )
+        val im2 = TestUtils.create(1, 1, 2, 0).head
+        runGet(
+            endpoints.findAnnotationsByVideoReferenceUuidImpl,
+            s"http://test.com/v1/annotations/videoreference/${im2.getVideoReferenceUuid}",
+            response =>
+                val ys = checkResponse[Seq[AnnotationSC]](response.body).map(_.toCamelCase)
+                assertEquals(ys.head.localizations, Nil)
+                assertEquals(ys.head.associations.size, 2)
         )
     }
 
@@ -339,6 +398,154 @@ trait AnnotationEndpointsSuite extends EndpointsSuite:
                 .sortBy(_.url.toExternalForm)
                 .map(_.copy(uuid = None, last_updated_time = None))
             assertEquals(oa0, ea0)
+    }
+
+    test("createAnnotation (json) with localizations returns them with uuids") {
+        val vrUuid      = UUID.randomUUID()
+        val json        =
+            s"""{"video_reference_uuid":"$vrUuid","concept":"Nanomia","observer":"brian",
+               |"recorded_timestamp":"2026-10-28T00:00:00Z",
+               |"localizations":[{"localization_type":"bounding_box","x":0.1,"y":0.2,"width":0.3,"height":0.4},
+               |{"localization_type":"point","x":0.5,"y":0.6}]}""".stripMargin
+        val jwt         = jwtService.authorize("foo").orNull
+        val backendStub = newBackendStub(endpoints.createAnnotationImpl)
+        val response    = basicRequest
+            .post(uri"http://test.com/v1/annotations")
+            .body(json)
+            .auth
+            .bearer(jwt)
+            .contentType("application/json")
+            .send(backendStub)
+            .join
+        assertEquals(response.code, StatusCode.Ok)
+        val obtained    = checkResponse[AnnotationSC](response.body)
+        assertEquals(obtained.localizations.map(_.localization_type).toSet, Set("bounding_box", "point"))
+        assert(obtained.localizations.forall(_.uuid.isDefined))
+    }
+
+    test("createAnnotation (form) with localizations as a JSON field") {
+        val vrUuid      = UUID.randomUUID()
+        val locs        = java.net.URLEncoder.encode(
+            """[{"localization_type":"point","x":0.5,"y":0.6}]""",
+            java.nio.charset.StandardCharsets.UTF_8
+        )
+        val formData    =
+            s"video_reference_uuid=$vrUuid&concept=Nanomia&observer=brian&recorded_timestamp=2026-10-28T00:00:00Z&localizations=$locs"
+        val jwt         = jwtService.authorize("foo").orNull
+        val backendStub = newBackendStub(endpoints.createAnnotationImpl)
+        val response    = basicRequest
+            .post(uri"http://test.com/v1/annotations")
+            .body(formData)
+            .auth
+            .bearer(jwt)
+            .contentType("application/x-www-form-urlencoded")
+            .send(backendStub)
+            .join
+        assertEquals(response.code, StatusCode.Ok)
+        val obtained    = checkResponse[AnnotationSC](response.body)
+        assertEquals(obtained.localizations.map(_.localization_type), Seq("point"))
+        assert(obtained.localizations.head.uuid.isDefined)
+    }
+
+    test("createAnnotation (json) with an invalid localization returns 400 and creates nothing") {
+        val vrUuid      = UUID.randomUUID()
+        val json        =
+            s"""{"video_reference_uuid":"$vrUuid","concept":"Nanomia","observer":"brian",
+               |"recorded_timestamp":"2026-10-28T00:00:00Z",
+               |"localizations":[{"localization_type":"point","x":0.5,"y":0.6},
+               |{"localization_type":"bounding_box","x":0.9,"y":0.2,"width":0.5,"height":0.4}]}""".stripMargin
+        val jwt         = jwtService.authorize("foo").orNull
+        val backendStub = newBackendStub(endpoints.createAnnotationImpl)
+        val response    = basicRequest
+            .post(uri"http://test.com/v1/annotations")
+            .body(json)
+            .auth
+            .bearer(jwt)
+            .contentType("application/json")
+            .send(backendStub)
+            .join
+        assertEquals(response.code, StatusCode.BadRequest)
+        assert(response.body.left.exists(_.contains("annotation 0, localization 1")), response.body.toString)
+        assert(controller.findByVideoReferenceUuid(vrUuid).join.isEmpty)
+    }
+
+    test("bulkCreateAnnotations with an invalid localization returns 400 and creates nothing") {
+        val vrUuid      = UUID.randomUUID()
+        val json        =
+            s"""[{"video_reference_uuid":"$vrUuid","concept":"A","observer":"brian","recorded_timestamp":"2026-10-28T00:00:00Z"},
+               |{"video_reference_uuid":"$vrUuid","concept":"B","observer":"brian","recorded_timestamp":"2026-10-28T00:00:01Z",
+               |"localizations":[{"localization_type":"polygon","vertices":[0.1,0.1,0.5,0.1,0.5,0.5]}]},
+               |{"video_reference_uuid":"$vrUuid","concept":"C","observer":"brian","recorded_timestamp":"2026-10-28T00:00:02Z",
+               |"localizations":[{"localization_type":"point","x":1.5,"y":0.6}]}]""".stripMargin
+        val jwt         = jwtService.authorize("foo").orNull
+        val backendStub = newBackendStub(endpoints.bulkCreateAnnotationsImpl)
+        val response    = basicRequest
+            .post(uri"http://test.com/v1/annotations/bulk")
+            .body(json)
+            .auth
+            .bearer(jwt)
+            .contentType("application/json")
+            .send(backendStub)
+            .join
+        assertEquals(response.code, StatusCode.BadRequest)
+        assert(response.body.left.exists(_.contains("annotation 2, localization 0")), response.body.toString)
+        assert(controller.findByVideoReferenceUuid(vrUuid).join.isEmpty)
+    }
+
+    test("bulkCreateAnnotations with an over-length localization field returns 400 and creates nothing (DAOs)") {
+        val vrUuid      = UUID.randomUUID()
+        val url         = s"http://test.com/${UUID.randomUUID()}.png"
+        val longGen     = "g" * 129
+        val json        =
+            s"""[{"video_reference_uuid":"$vrUuid","concept":"A","observer":"brian","recorded_timestamp":"2026-10-28T00:00:00Z",
+               |"image_references":[{"url":"$url","format":"image/png","width_pixels":100,"height_pixels":100}]},
+               |{"video_reference_uuid":"$vrUuid","concept":"B","observer":"brian","recorded_timestamp":"2026-10-28T00:00:01Z",
+               |"localizations":[{"localization_type":"point","x":0.5,"y":0.5,"generator":"$longGen"}]}]""".stripMargin
+        val jwt         = jwtService.authorize("foo").orNull
+        val backendStub = newBackendStub(endpoints.bulkCreateAnnotationsImpl)
+        val response    = basicRequest
+            .post(uri"http://test.com/v1/annotations/bulk")
+            .body(json)
+            .auth
+            .bearer(jwt)
+            .contentType("application/json")
+            .send(backendStub)
+            .join
+        assertEquals(response.code, StatusCode.BadRequest)
+        assert(response.body.left.exists(_.contains("annotation 1, localization 0")), response.body.toString)
+        assert(response.body.left.exists(_.contains("generator")), response.body.toString)
+        val imDao  = daoFactory.newImagedMomentDAO()
+        val obsDao = daoFactory.newObservationDAO(imDao)
+        val irDao  = daoFactory.newImageReferenceDAO(imDao)
+        try
+            assert(imDao.findByVideoReferenceUUID(vrUuid).isEmpty, "no imaged moment")
+            assert(obsDao.findByVideoReferenceUuid(vrUuid).isEmpty, "no observation")
+            assert(irDao.findByURL(java.net.URI.create(url).toURL).isEmpty, "no image reference")
+        finally imDao.close()
+    }
+
+    test("bulkCreateAnnotations with localizations persists them") {
+        val vrUuid      = UUID.randomUUID()
+        val json        =
+            s"""[{"video_reference_uuid":"$vrUuid","concept":"A","observer":"brian","recorded_timestamp":"2026-10-28T00:00:00Z"},
+               |{"video_reference_uuid":"$vrUuid","concept":"B","observer":"brian","recorded_timestamp":"2026-10-28T00:00:01Z",
+               |"localizations":[{"localization_type":"polygon","vertices":[0.1,0.1,0.5,0.1,0.5,0.5]}]}]""".stripMargin
+        val jwt         = jwtService.authorize("foo").orNull
+        val backendStub = newBackendStub(endpoints.bulkCreateAnnotationsImpl)
+        val response    = basicRequest
+            .post(uri"http://test.com/v1/annotations/bulk")
+            .body(json)
+            .auth
+            .bearer(jwt)
+            .contentType("application/json")
+            .send(backendStub)
+            .join
+        assertEquals(response.code, StatusCode.Ok)
+        val obtained    = checkResponse[Seq[AnnotationSC]](response.body)
+        val b           = obtained.find(_.concept.contains("B")).get
+        assertEquals(b.localizations.map(_.localization_type), Seq("polygon"))
+        assert(b.localizations.head.uuid.isDefined)
+        assertEquals(obtained.find(_.concept.contains("A")).get.localizations, Nil)
     }
 
     test("countByConcurrentRequest (CamelCase)") {

@@ -1,0 +1,141 @@
+# Line (open polyline) localization: create, edit, delete
+
+An open chain of straight segments. A `line` is never closed, so one with three or more vertices **is** a polyline; there is deliberately no separate `polyline` type. `vertices` is a single interleaved array `[x0,y0,x1,y1,...]` of normalized coordinates.
+
+An observation can have **at most one** localization of each type. The pair (observation, type) is the identity, so create and edit are the same call (`PUT`), and delete addresses the same pair. All coordinates are normalized to [0, 1] with the origin at the top-left of the frame. Every call needs `Authorization: Bearer <jwt>`.
+
+## Rules
+
+- Required: `vertices`, an even-length array of at least 2 pairs (4 numbers), each in [0, 1].
+- Do not send `x`/`y`/`width`/`height`: the server derives the axis-aligned bounding box of the vertices and overwrites anything you send. A perfectly horizontal or vertical line legitimately derives a `height` or `width` of 0.
+- Consecutive duplicate vertices are collapsed on write. If that leaves fewer than 2 distinct pairs the request is rejected.
+- The vertex list is stored as sent (after snapping); it is never closed or reordered.
+- Do not send `mask_*` (ignored).
+
+### Optional fields (all types)
+
+| Field | Notes |
+|---|---|
+| `generator` | Who or what produced it (model name, tool), max 128 characters. |
+| `confidence` | 0 to 1. Values outside that range are rejected. |
+| `observer`, `verifier` | Max 128 characters. |
+| `observation_timestamp`, `verification_timestamp` | ISO-8601 instants. |
+| `part` | Free text naming the part of the organism, max 128 characters. |
+| `comment` | Max 1024 characters. |
+| `training`, `truncated`, `difficult` | Booleans, default `false`. |
+| `last_updated_timestamp` | Stale-write token, see **Edit**. |
+
+## Create
+
+```
+PUT /v1/localizations/{observationUuid}/line
+Content-Type: application/json
+```
+
+`{observationUuid}` is the observation (annotation) to attach it to. The path decides the type, but the body must still contain `localization_type`.
+
+```json
+{
+  "localization_type": "line",
+  "vertices": [0.125, 0.25, 0.5, 0.375, 0.75, 0.25],
+  "generator": "yolo-v11",
+  "confidence": 0.87,
+  "observer": "brian"
+}
+```
+
+Response `200 OK`: the stored localization, with the derived fields filled in. `uuid` and `last_updated_time` are server-generated (the values here are illustrative). Unset fields are omitted.
+
+```json
+{
+  "localization_type": "line",
+  "x": 0.125,
+  "y": 0.25,
+  "width": 0.625,
+  "height": 0.125,
+  "vertices": [0.125, 0.25, 0.5, 0.375, 0.75, 0.25],
+  "generator": "yolo-v11",
+  "confidence": 0.87,
+  "observer": "brian",
+  "training": false,
+  "truncated": false,
+  "difficult": false,
+  "uuid": "6f1c2a52-8d0e-4b1f-9a77-3c5e0d7b1a10",
+  "observation_uuid": "0b8d7c9e-41a2-4f6b-8e35-2d9a6c1f4e77",
+  "last_updated_time": "2026-10-29T20:15:42.318Z"
+}
+```
+
+The same object can instead be placed in the `localizations` array of `POST /v1/annotations` or `POST /v1/annotations/bulk` when the observation is created (omit `observation_uuid` there), or sent with an `observation_uuid` to `POST /v1/localizations/bulk` (all or nothing; failing indexes are named in the 400).
+
+## Edit
+
+Edit is the same `PUT /v1/localizations/{observationUuid}/line`. It **replaces** the stored localization: every field you leave out is cleared (flags go back to `false`), including provenance such as `generator` and `confidence`. Always send the complete body, not just what changed. The localization keeps its `uuid`.
+
+To guard against overwriting someone else's change, send the `last_updated_time` you last read back as `last_updated_timestamp` (`last_updated_time` is also accepted). If it does not match the stored row, nothing is written and the server returns `409` with the current row. Omit it to overwrite unconditionally.
+
+Here a fourth vertex is appended. The whole vertex list is sent again.
+
+```json
+{
+  "localization_type": "line",
+  "vertices": [0.125, 0.25, 0.5, 0.375, 0.75, 0.25, 0.875, 0.5],
+  "generator": "yolo-v11",
+  "confidence": 0.87,
+  "observer": "brian",
+  "last_updated_timestamp": "2026-10-29T20:15:42.318Z"
+}
+```
+
+Response `200 OK`:
+
+```json
+{
+  "localization_type": "line",
+  "x": 0.125,
+  "y": 0.25,
+  "width": 0.75,
+  "height": 0.25,
+  "vertices": [0.125, 0.25, 0.5, 0.375, 0.75, 0.25, 0.875, 0.5],
+  "generator": "yolo-v11",
+  "confidence": 0.87,
+  "observer": "brian",
+  "training": false,
+  "truncated": false,
+  "difficult": false,
+  "uuid": "6f1c2a52-8d0e-4b1f-9a77-3c5e0d7b1a10",
+  "observation_uuid": "0b8d7c9e-41a2-4f6b-8e35-2d9a6c1f4e77",
+  "last_updated_time": "2026-10-29T20:31:07.915Z"
+}
+```
+
+Stale-write response `409 Conflict`:
+
+```json
+{
+  "message": "...",
+  "responseCode": 409,
+  "current": { "...": "the stored localization as it is now" }
+}
+```
+
+Re-read `current`, reapply your change, and retry with its `last_updated_time`.
+
+## Delete
+
+```
+DELETE /v1/localizations/{observationUuid}/line
+```
+
+Response `200 OK` with an empty body. If the observation has no line localization the response is `404`. Deleting an observation, or its video reference, removes its localizations too. Other types on the same observation are not affected.
+
+To list what an observation has first, `GET /v1/localizations/observation/{observationUuid}`; to fetch one by its uuid, `GET /v1/localizations/{localizationUuid}`.
+
+## Errors
+
+| Status | When |
+|---|---|
+| `400` | Validation failed. Examples: a single vertex, or an odd number of values gives 400 `line requires at least 2 distinct consecutive vertices, got 1` / `line vertices must have an even length`. The message lists every problem found. |
+| `401` | Missing or invalid bearer token. |
+| `404` | The observation does not exist (create/edit), or there is nothing to delete. |
+| `409` | Stale `last_updated_timestamp` on edit, or another writer created the same (observation, type) first. The body carries `current`. |
